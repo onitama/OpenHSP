@@ -1,0 +1,125 @@
+	;
+	;	フライングロゴ
+	;
+#include "hsp3dish.as"
+#cmpopt varname 1
+
+#module "sprmod"
+#define global ROT4096 0.00153398078125
+
+;
+;	標準命令による簡易スプライトモジュール
+;
+#deffunc init_sprite int _p1, int _p2, int max
+
+	;	スプライト初期化
+	;
+	sprsx=_p1:sprsy=_p2
+	dim sprflg,max
+	dim sprx,max
+	dim spry,max
+	dim sprpx,max
+	dim sprpy,max
+	dim sprchr,max
+	dim sprrot,max
+	sprbuf=3
+	sprgmode=2
+	sprhx=sprsx/2
+	sprhy=sprsy/2
+	sprmax=max
+	return
+
+#deffunc opt_sprite int _p1, int _p2
+
+	;	スプライト表示設定変更
+	;	opt_sprite バッファID, コピーモード
+	;
+	sprbuf=_p1
+	sprgmode=_p2
+	celdiv sprbuf, sprsx, sprsy, sprhx, sprhy
+	return
+
+#deffunc set_sprite int id, int _p1, int _p2, int _p3
+
+	;	スプライト設定
+	;
+	sprflg.id=1
+	sprx.id=_p1
+	spry.id=_p2
+	sprchr.id=_p3
+	return
+
+#deffunc draw_sprite int id, int _p1, int _p2, int _p3
+
+	;	スプライト表示
+	;
+	gmode sprgmode,sprsx,sprsy,256
+	;
+	;foreach sprflg
+	repeat sprmax
+	if sprflg.cnt=0 : continue
+		pos sprx.cnt,spry.cnt
+		celput 1,sprchr.cnt>>2
+	loop
+	return
+
+
+#deffunc move_sprite1_init
+
+	;foreach sprflg
+	repeat sprmax
+	set_sprite cnt,rnd(480),rnd(800)+800+sprhy,0
+	sprpx.cnt=rnd(4096)
+	sprpy.cnt=rnd(4)-4
+	sprchr.cnt=rnd(64)
+	loop
+	return
+
+#deffunc move_sprite1
+
+	;foreach sprflg
+	repeat sprmax
+	if sprflg(cnt)=0 : continue
+
+	sprx.cnt+=sin(ROT4096*sprpx.cnt)*4
+	spry.cnt+=sprpy.cnt
+	sprpx.cnt+=64
+	if spry.cnt<-sprhy : spry.cnt=800+sprhy
+	sprchr.cnt=(sprchr.cnt+1)&63
+
+	loop
+	return
+
+#global
+
+	x1=0:y1=0		; 画面左上の座標
+	x2=480:y2=800		; 画面右下の座標
+
+	celload "hsplogo8.png",1
+
+	screen 0,x2,y2
+	title "HSP logo demo"
+	max=64
+
+	init_sprite 80,50,max
+	opt_sprite 1,2
+	move_sprite1_init
+
+	mx=sx:my=sy:x=-sx:y=240:z=0
+
+	repeat
+	redraw 0
+	;color 0,0,0:boxf
+	gradf x1,y1,x2,y2,1,0,128
+
+	move_sprite1
+	draw_sprite
+
+	redraw 1
+	await 1000/60
+
+
+	loop
+
+*owari
+	end

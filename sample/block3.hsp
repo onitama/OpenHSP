@@ -1,0 +1,136 @@
+#include "hsp3dish.as"
+
+	;
+	;	ブロック崩し(3)
+	;	(ボール・バー・ブロック表示します)
+	;
+#cmpopt varname 1
+
+	x1=0:y1=0				; 画面左上の座標
+	x2=ginfo_winx:y2=ginfo_winy		; 画面右下の座標
+
+	screen 0,x2,y2
+	title "ブロック崩し"
+	;cls 4
+*gstart
+	clrflag=0		; クリアフラグ
+
+	blsize=16		; ボールのサイズ
+	blspd=10		; ボールのスピード
+	blx=200:bly=200		; ボールの座標
+	bpx=4:bpy=4		; XY方向のボール座標加算値
+	bk=0			; ブロックを崩すフラグ(1=崩す)
+	mblsize=-blsize
+
+	barsize=64		; バーのサイズ
+	barx=240:bary=540	; バーの座標
+
+	barhalf=barsize/2
+	blhalf=blsize/2
+
+	wx=0:wy=80		; ブロックの表示開始位置(左上)
+	wsx=10:wsy=6		; ブロックの配置数(X,Y)
+	wpx=x2/wsx:wpy=16	; ブロック1個あたりのサイズ
+
+	dim wall,wsx,wsy	; ブロックを表示するフラグ
+				; 0=表示、1=表示しない
+	score = 0
+	gameflag = 0
+*main
+	redraw 0
+	color 0,0,128:boxf
+	color 0,255,255:pos 8,8:mes "SCORE:"+score
+
+	;gradf 0,0,x2,y2,1,0,128	; 画面クリア
+
+	; バー : マウス座標から位置を決定
+	barx=mousex-barsize/2
+	color 255,255,255
+	boxf barx,bary,barx+barsize,bary+16
+
+	if gameflag {
+		gosub *gameover
+		stick key
+		if key&256 {
+			if mousey<300 : goto *gstart
+		}
+		goto *main2
+	}
+
+	; ボール : X方向の移動
+	blx=blx+bpx
+	if blx<=x1 : blx=x1 : bpx=-bpx
+	if blx>=(x2-blsize) : blx=x2-blsize : bpx=-bpx
+
+	; ボール : Y方向の移動
+	bly=bly+bpy
+	if bly<=y1 : bly=y1 : bpy=blspd : bk=1 : blspd=16
+	if bly>=(y2-blsize) : gameflag = 1
+
+	; ボールとバーがぶつかったかどうか調べます
+	coly=bly+blsize
+	if (coly>=bary)&(bly<(bary+16)) {	; ボールY座標のチェック
+		; ボールX座標のチェック
+		colx=blx+blhalf
+		x=barx+barhalf
+		if abs(colx-x)<(barhalf+blhalf) {
+			bly=bary-blsize : bpy=-blspd
+			i=(colx-x)/4
+			if i!=0 : bpx=i
+			bk=1
+			if clrflag {
+				dim wall,wsx,wsy	; ブロックを復活させる
+				clrflag=0
+			}
+		}
+	}
+
+*main2
+	; ブロックの処理
+	colx=wpx+bsize
+	coly=wpy+bsize
+	left=0
+	repeat wsy
+	cy=cnt
+	y=cnt*wpy+wy
+	hsvcolor cnt*10,255,255
+	repeat wsx
+		cx=cnt
+		x=cnt*wpx+wx
+		if wall(cx,cy)=0 {
+			; ブロックを表示
+			left++
+			boxf x,y,x+wpx-2,y+wpy-2
+			i=blx-x:j=bly-y
+			if (i>=mblsize)&(i<colx)&(j>=mblsize)&(j<coly)&(bk) {
+				wall(cx,cy)=1
+				bpy=-bpy
+				bk=0
+				score+=wsy-cy
+			}
+		}
+	loop
+	loop
+
+	; ボールを表示
+	pos blx,bly:color 255,255,255
+	circle blx,bly,blx+blsize,bly+blsize
+	;font msgothic,blsize
+	;mes "●"
+
+	redraw 1
+	await 33
+
+	if left=0 : clrflag=1
+	goto *main
+
+*gameover
+	color 255,255,255
+	pos 160,380:mes "GAME OVER"
+	return
+	;objsize 180,32
+	;pos 150,330:button "終わり",*owari
+	;stop
+
+*owari
+	end

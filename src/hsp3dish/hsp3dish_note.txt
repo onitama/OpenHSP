@@ -1,0 +1,14 @@
+
+・hsp3dish各機種用のソース注意点
+
+	・hsp3dish,hsp3フォルダを必ず設置すること
+	・コンパイル時はHSPDISH及び機種ごとのキーワードを定義すること
+	　(hsp3config.h参照)
+
+	・subversionのhsp3コアコードはsjisコードで登録します
+	・ios,ndk用ソースはUTF-8で登録します
+	　(基本的にターゲット環境の標準的な文字コードを利用)
+
+	・hsp3wnd_dish.*、hsp3gr_dish.*は機種依存なし
+
+	・obaqサポート部分のソースは除外しています

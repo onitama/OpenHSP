@@ -1,0 +1,44 @@
+#include "hsp3dish.as"
+
+	;	イージング関数の設定
+	i=0
+	repeat
+		redraw 0
+		color 0,0,0:boxf	; 画面をクリア
+		color 255,255,255
+		y=20
+
+		setease 100,400,ease_linear+ease_loop
+		x = getease(i,50)	; イージング値の取得(整数)
+		pos 100,y : mes "ease_linear"
+		pos x,y+20 : mes "●"
+		y+=50
+
+		setease 100,400,ease_quad_inout+ease_loop
+		x = getease(i,50)	; イージング値の取得(整数)
+		pos 100,y : mes "ease_quad_inout"
+		pos x,y+20 : mes "●"
+		y+=50
+
+		setease 100,400,ease_quartic_inout+ease_loop
+		x = getease(i,50)	; イージング値の取得(整数)
+		pos 100,y : mes "ease_quartic_inout"
+		pos x,y+20 : mes "●"
+		y+=50
+
+		setease 100,400,ease_shake_in+ease_loop
+		x = getease(i,50)	; イージング値の取得(整数)
+		pos 100,y : mes "ease_shake_in"
+		pos x,y+20 : mes "●"
+		y+=50
+
+		setease 100,400,ease_bounce_in+ease_loop
+		x = getease(i,50)	; イージング値の取得(整数)
+		pos 100,y : mes "ease_bounce_in"
+		pos x,y+20 : mes "●"
+		y+=50
+
+		redraw 1
+		await 30
+		i=i+1
+	loop

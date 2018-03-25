@@ -1,0 +1,46 @@
+#include "hsp3dish.as"
+#packopt xsize 480
+#packopt ysize 800
+
+	;
+	;	一定時間ごとにオブジェクトを追加
+	;	mes命令などHSPの描画命令も同時に使えます
+	;	[ESC]で終了します
+	;
+	randomize		; 乱数の初期化
+	title "OBAQ Test"
+
+	qreset			; OBAQの初期化
+	frame=0
+	boxmax=30
+	boxnum=0
+*main
+	;	メインループ
+	;
+	redraw 0		; 画面の更新を開始
+	gradf ,,,,1,0,128	; 画面クリア
+	qexec			; OBAQによるオブジェクトの更新
+
+	stick key,15		; キーの取得
+	if key&128 : end	; [ESC]キーで終了
+
+	;	一定時間ごとに出現
+	;
+	if boxnum<boxmax {
+		if frame\30=0 {
+			qaddpoly my, 4, 32,24,0		; 多角形を追加
+			qspeed my,0.1*rnd(10)-0.5,0,0.01	; ランダムな方向に飛ばす
+			boxnum++
+		}
+	}
+
+	qdraw			; オブジェクトの描画
+
+	color 255,255,255
+	pos 0,0:mes "Frame:"+frame	; フレーム数を表示
+
+	redraw 1		; 画面の更新を終了
+	await 12		; 一定時間待つ
+	frame++
+	goto *main
+

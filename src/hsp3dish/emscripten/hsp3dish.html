@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>HSP3Dish</title>
+    <style>
+      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+      div.emscripten { text-align: center; }      
+      div.emscripten_border { border: 1px solid black; }
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      canvas.emscripten { border: 0px none; }
+
+      #status {
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 30px;
+        margin-left: 20px;
+        font-weight: bold;
+        color: rgb(120, 120, 120);
+      }
+
+      #progress {
+        height: 20px;
+        width: 30px;
+      }
+
+      #output {
+        width: 100%;
+        height: 200px;
+        margin: 0 auto;
+        margin-top: 10px;
+        display: block;
+        background-color: black;
+        color: white;
+        outline: none;
+      }
+      #drop {
+        opacity: 0.50;
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        border: 10px dashed #ccc;
+        width: 200px;
+        height: 200px;
+        margin: 20px auto;
+        text-align: center;
+        z-index: 100;
+      }
+      #drop.hover {
+        border: 10px dashed #0c0;
+      }
+    </style>
+  </head>
+  <body>
+	<p>
+	<a href="javascript:window.location.reload()">reload</a>
+    <div class="emscripten" id="status">Downloading...</div>
+
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" hidden=1></progress>
+    </div>
+
+    <div class="emscripten_border">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+      <div id="drop">Drop ax file HERE.</div>
+    </div>
+    <textarea id="output" rows="8"></textarea>
+
+    <script type='text/javascript'>
+var statusElement = document.getElementById('status');
+var progressElement = document.getElementById('progress');
+
+var Module = {
+	preRun: [initDrop],
+	postRun: [],
+	print: (function() {
+		var element = document.getElementById('output');
+		if (element) element.value = ''; // clear browser cache
+		return function(text) {
+			if (1) { 
+				text = Array.prototype.slice.call(arguments).join(' ');
+				// These replacements are necessary if you render to raw HTML
+				//text = text.replace(/&/g, "&amp;");
+				//text = text.replace(/</g, "&lt;");
+				//text = text.replace(/>/g, "&gt;");
+				//text = text.replace('\n', '<br>', 'g');
+				console.log(text);
+				if (element) {
+					element.value += text + "\n";
+					element.scrollTop = element.scrollHeight; // focus on bottom
+				}
+			} else {
+				console.log(text);
+			}
+		};
+	})(),
+	printErr: function(text) {
+		text = Array.prototype.slice.call(arguments).join(' ');
+		if (0) { // XXX disabled for safety typeof dump == 'function') {
+			dump(text + '\n'); // fast, straight to the real console
+		} else {
+			console.error(text);
+		}
+	},
+	canvas: document.getElementById('canvas'),
+	setStatus: function(text) {
+		if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+		if (text === Module.setStatus.text) return;
+		var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+		var now = Date.now();
+		if (m && now - Date.now() < 30) return; // if this is a progress update, skip it if too soon
+		if (m) {
+			text = m[1];
+			progressElement.value = parseInt(m[2])*100;
+			progressElement.max = parseInt(m[4])*100;
+			progressElement.hidden = false;
+		} else {
+			progressElement.value = null;
+			progressElement.max = null;
+			progressElement.hidden = true;
+		}
+		statusElement.innerHTML = text;
+	},
+	noInitialRun: true
+};
+Module.setStatus('Downloading...');
+
+var Module;
+
+function initDrop() {
+	var drop = document.getElementById('drop');
+	function registerFile(file, callback) {
+		console.log("read", file.name);
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var data = new Uint8Array(e.target.result);
+			var stream = FS.open(file.name, 'w');
+			FS.write(stream, data, 0, data.length, 0);
+			FS.close(stream);
+			console.log(FS.stat(file.name));
+			callback();
+		};
+		reader.readAsArrayBuffer(file);
+	}
+	drop.ondragover = function(e) {
+		drop.classList.add("hover");
+		return false;
+	};
+	drop.ondragleave = function(e) {
+		drop.classList.remove("hover");
+		return false;
+	};
+	drop.ondrop = function(e) {
+		drop.classList.remove("hover");
+		e.preventDefault();
+		var files = e.dataTransfer.files;
+		var ax = null;
+		var rest = files.length;
+		function cb() {
+			rest--;
+			console.log(rest);
+			if (rest == 0) {
+				console.log("callMain", ax);
+				drop.style.display = "none";
+				Module.callMain([ax]);
+			}
+		}
+
+		for (var i = 0; i < files.length; i++) {
+			var file = files[i];
+			console.log(file.name, file.size);
+			registerFile(file, cb);
+			if (file.name.match(/\.ax$/))
+				ax = file.name;
+		}
+	};
+}
+    </script>
+    <script async type="text/javascript" src="hsp3dish.js"></script>
+  </body>
+</html>

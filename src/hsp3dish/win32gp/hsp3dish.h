@@ -1,0 +1,13 @@
+
+//
+//	hsp3dish.cpp header
+//
+#ifndef __hsp3dish_h
+#define __hsp3dish_h
+
+int hsp3dish_exec( void );
+int hsp3dish_init( HINSTANCE hInstance, char *startfile );
+void hsp3dish_dialog( char *mes );
+char *hsp3dish_getlog(void);
+
+#endif

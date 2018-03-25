@@ -1,0 +1,34 @@
+#include "hsp3dish.as"
+
+title "Dish Test"
+
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	redraw 0
+
+	gmode 0
+	color 0,0,128
+	boxf
+
+	color 255,255,255
+	pos 0,0:mes "("+mousex+","+mousey+")"
+	y=16
+	mtlist touchid
+	num=stat
+	repeat num
+		id = touchid(cnt)
+		mtinfo touch,id
+		mes "T:"+id+"("+touch(1)+","+touch(2)+") "+touch(3)
+		y+=10
+	loop
+
+
+	redraw 1
+	await 1000/60
+
+loop
+
+stop

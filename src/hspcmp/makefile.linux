@@ -1,0 +1,41 @@
+CC = gcc
+CFLAGS = -Wall -std=c++11 --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX -DHSPDEBUG
+OBJS = ahtmodel.o ahtobj.o codegen.o comutil.o errormsg.o hsc3.o \
+    hspcmd.o label.o localinfo.o main.o membuf.o strnote.o \
+    tagstack.o token.o linux/supio_linux.o
+TARGET = hspcmp
+LIBS = 
+.SUFFIXES: .cpp
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -lm -lstdc++ -o $@ $(LIBS)
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $*.o
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $*.o
+
+ahtmodel.o: supio.h ahtmodel.h membuf.h
+ahtobj.o: supio.h strnote.h ahtobj.h membuf.h ahtmodel.h
+codegen.o: supio.h token.h label.h tagstack.h membuf.h \
+  strnote.h comutil.h ../hsp3/hsp3debug.h ../hsp3/hsp3struct.h \
+  ../hsp3/hspvar_core.h errormsg.h
+comutil.o: comutil.h
+errormsg.o: ../hsp3/hsp3config.h hsc3.h errormsg.h
+hsc3.o: ../hsp3/hsp3config.h ../hsp3/hsp3debug.h \
+  ../hsp3/hsp3struct.h ../hsp3/hspvar_core.h supio.h hsc3.h membuf.h \
+  strnote.h label.h token.h localinfo.h
+label.o: label.h
+localinfo.o: localinfo.h
+main.o: supio.h hsc3.h token.h
+membuf.o: membuf.h
+strnote.o: strnote.h
+tagstack.o: tagstack.h
+token.o: supio.h token.h label.h tagstack.h membuf.h strnote.h \
+  ahtobj.h ahtmodel.h
+linux/supio_linux.o: linux/supio_linux.h
+
+clean:
+	rm -f $(OBJS) $(TARGET)
+
+release:
+	make clean
+	make "CFLAGS = -O3 -Wall -std=c++11 --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX"

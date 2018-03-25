@@ -1,0 +1,66 @@
+#include "hsp3dish.as"
+
+	;
+	;	grotate命令による画像回転サンプル
+	;
+	randomize
+
+	title "grotate"
+	celload "hsp3dish.png",3
+
+	cls 4
+	font "Arial",14
+	m="HSP3 grotate sample"
+
+	maxx=ginfo_winx-32
+	maxy=ginfo_winy-32
+
+	max=20
+	dim xx,max
+	dim yy,max
+	dim px,max
+	dim py,max
+	dim rot,max
+	dim prot,max
+	repeat max
+	xx.cnt=rnd(maxx)
+	yy.cnt=rnd(maxy)
+	rot.cnt=rnd(4096)
+	p=rnd(5)-2:if p=0 : p=-1
+	px.cnt=p*2
+	p=rnd(5)-2:if p=0 : p=-1
+	py.cnt=p*2
+	prot.cnt=rnd(16)
+	prot.cnt+=8
+	loop
+
+	repeat
+
+	redraw 0
+	color 64,64,64:boxf
+
+	pos 0,0
+	grotate 3,0,0,double(rot(0))*0.005
+
+	gmode 2,64,64
+	repeat max
+		pos xx.cnt,yy.cnt
+		;gcopy 3,0,0
+		grotate 3,0,0,double(rot.cnt)*0.005
+		xx.cnt+=px.cnt
+		if (xx.cnt<2)|(xx.cnt>maxx) : px.cnt=-px.cnt
+		yy.cnt+=py.cnt
+		if (yy.cnt<2)|(yy.cnt>maxy) : py.cnt=-py.cnt
+		rot.cnt+=prot.cnt
+	loop
+
+	pos 12,12:color 0,0,0:mes m
+	pos 10,10:color 255,255,255:mes m
+	redraw 1
+	await 1000/60
+	;await 12
+
+	loop
+
+stop
+

@@ -1,0 +1,89 @@
+#include "hsp3dish.as"
+
+title "CELPUTm Test"
+
+	randomize
+
+
+	sx=ginfo_sx	; 画面のXサイズ
+	sy=ginfo_sy	; 画面のYサイズ
+
+	celload "hsp3dish.png",2
+	celload "ball64.png",3
+	celdiv 3, 64,64, 32,32
+
+	setcls CLSMODE_SOLID, $404040
+
+	max = 100		; ボールの最大数
+	gosub *c_init
+
+	id=0
+	x = sx / 2
+	y = sy / 2
+
+*main
+	stick key
+	if key&$100 {		; マウスクリック判定
+		x=mousex
+		y=mousey
+		id++
+	}
+	gosub *c_move		; ボールを動かす
+
+	redraw 0
+
+	gmode 5,,,255
+	celputm mx,my,mf,3,max	; セルをまとめて描画
+
+	; 文字を表示
+	color 255,255,255
+	pos 8,8
+	mes "celputm test"
+
+	redraw 1
+	await 1000/60
+
+	goto *main
+
+*c_init
+	;	ボールの初期化サブルーチン
+	;
+	speed=2				; ボールのスピード
+	dim mf,max			; 配列変数mfを定義する
+	dim mx,max			; 配列変数mxを定義する
+	dim my,max			; 配列変数myを定義する
+	dim mpx,max			; 配列変数mpxを定義する
+	dim mpy,max			; 配列変数mpyを定義する
+	repeat max
+		mf(cnt)=cnt&63		; 表示IDを設定
+		mx(cnt)=rnd(sx-128)+64	; 表示X位置を乱数で設定
+		my(cnt)=rnd(sy-128)+64	; 表示Y位置を乱数で設定
+		if rnd(2)=0 {		; X方向の移動量を乱数で設定
+			mpx(cnt)=-speed
+		} else {
+			mpx(cnt)=speed
+		}
+		if rnd(2)=0 {		; Y方向の移動量を乱数で設定
+			mpy(cnt)=-speed
+		} else {
+			mpy(cnt)=speed
+		}
+	loop
+	return
+
+*c_move
+	;	ボール動作サブルーチン
+	;
+	repeat max
+		x=mx(cnt):y=my(cnt)	; 変数X,Yに座標を代入する
+		x+=mpx(cnt)		; X方向の移動
+		if (x>sx)|(x<0) {	; 画面の端ならば反転させる
+			x=mx(cnt):mpx(cnt)=-mpx(cnt)
+		}
+		y+=mpy(cnt)		; Y方向の移動
+		if (y>=sy)|(y<0) {	; 画面の端ならば反転させる
+			y=my(cnt):mpy(cnt)=-mpy(cnt)
+		}
+		mx(cnt)=x:my(cnt)=y	; 変数X,Yに結果を戻す
+	loop
+	return

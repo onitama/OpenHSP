@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="angle_hsprt|Win32">
+      <Configuration>angle_hsprt</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="angle_Release|Win32">
+      <Configuration>angle_Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="hsprt|Win32">
+      <Configuration>hsprt</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{70071784-3472-4FDA-8F73-8163A29F9D3F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>hsp3gp</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='angle_Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='angle_hsprt|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='hsprt|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='angle_Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='angle_hsprt|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='hsprt|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSdk_71A_IncludePath);</IncludePath>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='angle_Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSdk_71A_IncludePath);</IncludePath>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='angle_hsprt|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSdk_71A_IncludePath);</IncludePath>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='hsprt|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSdk_71A_IncludePath);</IncludePath>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISH;HSPDISHGP;HSPDEBUG;NDEBUG;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/glew/;../gameplay/src/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib/lib/;../gameplay/windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='angle_Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;HSPDEBUG;NDEBUG;GP_USE_ANGLE;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/angle/;../gameplay/src/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib/lib/;../gameplay/windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)dx$(TargetExt)</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='angle_hsprt|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;NDEBUG;GP_USE_ANGLE;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/angle/;../gameplay/src/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib/lib/;../gameplay/windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)dx.hrt</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='hsprt|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;NDEBUG;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/glew/;../gameplay/src/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib/lib/;../gameplay/windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName).hrt</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\hsp3\dpmread.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3code.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3debug.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3int.cpp" />
+    <ClCompile Include="..\..\hsp3\hspvar_core.cpp" />
+    <ClCompile Include="..\..\hsp3\hspvar_double.cpp" />
+    <ClCompile Include="..\..\hsp3\hspvar_int.cpp" />
+    <ClCompile Include="..\..\hsp3\hspvar_label.cpp" />
+    <ClCompile Include="..\..\hsp3\hspvar_str.cpp" />
+    <ClCompile Include="..\..\hsp3\hspvar_struct.cpp" />
+    <ClCompile Include="..\..\hsp3\stack.cpp" />
+    <ClCompile Include="..\..\hsp3\strbuf.cpp" />
+    <ClCompile Include="..\..\hsp3\strnote.cpp" />
+    <ClCompile Include="..\..\hsp3\win32gui\hsp3extlib.cpp" />
+    <ClCompile Include="..\..\hsp3\win32gui\hsp3ext_win.cpp" />
+    <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp" />
+    <ClCompile Include="..\geometry.cpp" />
+    <ClCompile Include="..\hsp3gr_dish.cpp" />
+    <ClCompile Include="..\hspwnd_dish.cpp" />
+    <ClCompile Include="..\hspwnd_obj.cpp" />
+    <ClCompile Include="..\random.cpp" />
+    <ClCompile Include="..\sysreq.cpp" />
+    <ClCompile Include="..\win32\dxsnd.cpp" />
+    <ClCompile Include="..\win32\mmman.cpp" />
+    <ClCompile Include="..\win32\webtask_win.cpp" />
+    <ClCompile Include="gamehsp.cpp" />
+    <ClCompile Include="gpcam.cpp" />
+    <ClCompile Include="gplgt.cpp" />
+    <ClCompile Include="gpmat.cpp" />
+    <ClCompile Include="gpphy.cpp" />
+    <ClCompile Include="hgiox.cpp" />
+    <ClCompile Include="hsp3dish.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\hsp3\dpmread.h" />
+    <ClInclude Include="..\..\hsp3\hsp3.h" />
+    <ClInclude Include="..\..\hsp3\hsp3code.h" />
+    <ClInclude Include="..\..\hsp3\hsp3config.h" />
+    <ClInclude Include="..\..\hsp3\hsp3debug.h" />
+    <ClInclude Include="..\..\hsp3\hsp3ext.h" />
+    <ClInclude Include="..\..\hsp3\hsp3gr.h" />
+    <ClInclude Include="..\..\hsp3\hsp3int.h" />
+    <ClInclude Include="..\..\hsp3\hsp3struct.h" />
+    <ClInclude Include="..\..\hsp3\hspvar_core.h" />
+    <ClInclude Include="..\..\hsp3\hspvar_label.h" />
+    <ClInclude Include="..\..\hsp3\hspwnd.h" />
+    <ClInclude Include="..\..\hsp3\stack.h" />
+    <ClInclude Include="..\..\hsp3\strbuf.h" />
+    <ClInclude Include="..\..\hsp3\strnote.h" />
+    <ClInclude Include="..\..\hsp3\supio.h" />
+    <ClInclude Include="..\..\hsp3\win32gui\hspvar_comobj.h" />
+    <ClInclude Include="..\..\hsp3\win32gui\hspvar_variant.h" />
+    <ClInclude Include="..\geometry.h" />
+    <ClInclude Include="..\hsp3ext.h" />
+    <ClInclude Include="..\hsp3gr.h" />
+    <ClInclude Include="..\hsp3gr_dish.h" />
+    <ClInclude Include="..\hspwnd.h" />
+    <ClInclude Include="..\hspwnd_dish.h" />
+    <ClInclude Include="..\random.h" />
+    <ClInclude Include="..\supio.h" />
+    <ClInclude Include="..\sysreq.h" />
+    <ClInclude Include="..\webtask.h" />
+    <ClInclude Include="dxsnd.h" />
+    <ClInclude Include="gamehsp.h" />
+    <ClInclude Include="gpcam.h" />
+    <ClInclude Include="gplgt.h" />
+    <ClInclude Include="gpmat.h" />
+    <ClInclude Include="gpphy.h" />
+    <ClInclude Include="hgiox.h" />
+    <ClInclude Include="hsp3dish.h" />
+    <ClInclude Include="hsp3extlib.h" />
+    <ClInclude Include="hsp3ext_win.h" />
+    <ClInclude Include="mmman.h" />
+    <ClInclude Include="supio_win.h" />
+    <ClInclude Include="webtask_win.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="hsp3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="hsp3.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="XPStyle.xml" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

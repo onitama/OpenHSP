@@ -1,0 +1,48 @@
+#include "hsp3dish.as"
+
+	;
+	;	ファイルの取得
+	;	画像ファイル(onibtn.gif)をネットから取得してファイルとして保存します
+	;
+
+	;	URLを指定
+	url="http://www.onionsoft.net/img/onibtn.gif"
+	fname ="onibtn.gif"	; 保存するファイル名
+
+	httpload url
+	if stat : goto *bad	; 正しくリクエストができなかった
+
+	; "DOWNLOAD 開始"
+
+*main
+	;	結果待ちのためのループ
+	httpinfo res,HTTPINFO_MODE
+	if res = HTTPMODE_READY : goto *comp
+	if res <= HTTPMODE_NONE : goto *bad
+	await 50
+	goto *main
+
+*bad
+	;	エラー
+	httpinfo estr,HTTPINFO_ERROR
+	dialog "ERROR "+estr
+	stop
+
+*comp
+	; "DOWNLOAD 完了"
+
+	httpinfo buf,HTTPINFO_DATA
+	httpinfo size,HTTPINFO_SIZE
+	bsave fname,buf,size
+
+	repeat
+	redraw 0
+	color 0,0,0:pos 0,0
+	mes "["+fname+"] saved."
+
+	redraw 1
+	await 33
+	loop
+
+	stop
+

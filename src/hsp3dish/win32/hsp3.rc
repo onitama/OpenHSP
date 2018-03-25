@@ -1,0 +1,13 @@
+
+#include "windows.h"
+
+#define IDR_MAIN                   128
+
+// RT_MANIFEST
+//
+1              RT_MANIFEST             "XPStyle.xml"
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAIN       ICON    DISCARDABLE     "hsp3.ico"
+

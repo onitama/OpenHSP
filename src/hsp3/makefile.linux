@@ -1,0 +1,59 @@
+CC = gcc
+CFLAGS = -Wall --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX -DHSPDEBUG
+OBJS = linux/main.o hsp3.o hsp3code.o hsp3debug.o \
+    hsp3int.o hspvar_core.o hspvar_double.o hspvar_int.o \
+    hspvar_label.o hspvar_str.o hspvar_struct.o stack.o strbuf.o strnote.o \
+    dpmread.o linux/supio_linux.o linux/hsp3cl.o linux/hsp3ext_linux.o linux/hsp3gr_linux.o
+TARGET = hsp3
+LIBS = 
+.SUFFIXES: .cpp
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -lm -lstdc++ -s -o $@ $(LIBS)
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $*.o
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $*.o
+linux/main.o: linux/hsp3cl.h hsp3config.h
+linux/hsp3cl.o: strbuf.h hsp3.h hsp3debug.h \
+  hsp3struct.h hspvar_core.h hsp3ext.h hsp3code.h \
+  hsp3config.h supio.h hsp3gr.h
+linux/hsp3ext_linux.o: hsp3ext.h hsp3code.h hsp3debug.h \
+  hsp3struct.h hspvar_core.h
+linux/hsp3gr_linux.o: hsp3code.h hsp3debug.h hsp3struct.h \
+  hspvar_core.h supio.h strbuf.h hsp3gr.h
+hsp3.o: hsp3.h hsp3debug.h hsp3struct.h \
+  hspvar_core.h hsp3ext.h hsp3code.h hsp3config.h \
+  dpmread.h supio.h
+hsp3code.o: hspwnd.h hsp3code.h hsp3debug.h \
+  hsp3struct.h hspvar_core.h supio.h dpmread.h stack.h \
+  strbuf.h hsp3config.h hsp3int.h
+hsp3debug.o: hsp3config.h hsp3.h hsp3debug.h \
+  hsp3struct.h hspvar_core.h hsp3ext.h hsp3code.h
+hsp3int.o: hspwnd.h hsp3code.h hsp3debug.h \
+  hsp3struct.h hspvar_core.h supio.h dpmread.h strbuf.h \
+  strnote.h hsp3int.h
+hspvar_core.o: hspvar_core.h hspvar_label.h \
+  hsp3debug.h strbuf.h supio.h
+hspvar_double.o: hspvar_core.h hsp3debug.h \
+  strbuf.h
+hspvar_int.o: hspvar_core.h hsp3debug.h \
+  strbuf.h supio.h
+hspvar_label.o: hsp3code.h hsp3debug.h \
+  hsp3struct.h hspvar_core.h hspvar_label.h strbuf.h \
+  supio.h
+hspvar_str.o: hspvar_core.h hsp3debug.h \
+  strbuf.h supio.h
+hspvar_struct.o: hsp3code.h hsp3debug.h \
+  hsp3struct.h hspvar_core.h strbuf.h supio.h
+stack.o: stack.h hspvar_core.h hsp3debug.h
+strbuf.o: supio.h strbuf.h hsp3debug.h
+strnote.o: strnote.h
+Dpmread.o: dpmread.h supio.h
+linux/supio_linux.o: linux/supio_linux.h supio.h dpmread.h strbuf.h
+
+clean:
+	rm -f $(OBJS) $(TARGET)
+
+release:
+	make clean
+	make "CFLAGS = -O3 -Wall --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX"

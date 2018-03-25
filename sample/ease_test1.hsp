@@ -1,0 +1,19 @@
+#include "hsp3dish.as"
+
+	;	イージング関数の設定
+	setease 100,400,ease_cubic_inout
+	i=0
+	repeat 51
+		redraw 0
+		color 0,0,0:boxf	; 画面をクリア
+
+		x = getease(i,50)	; イージング値の取得(整数)
+
+		color 255,255,255
+		pos x,100 : mes "●"
+		pos 16,16 : mes "i="+i+" x="+x
+
+		redraw 1
+		await 30
+		i=i+1
+	loop

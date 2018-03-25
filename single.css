@@ -1,0 +1,1 @@
+@charset "Shift_JIS";/*	1章のみで構成されるHTML向けのCSSです。	h2要素のデザインをh3のものと同等にします。*/h2 {	color: #323232;	font-size: 1em;	margin: 2em 0 5px;	padding: 0 0 2px;	line-height: 1.5em;	border-bottom: 2px solid #ff9933;}

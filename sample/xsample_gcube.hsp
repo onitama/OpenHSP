@@ -1,0 +1,175 @@
+
+;============================================================
+;                                                 2006/--/--
+	title "S.Programs Glass-Cube"
+;	version 1.0/sample_ver
+;                               http://sprocket.babyblue.jp/
+;============================================================
+/*
+・Glass-Cube
+
+ガラスのキューブがバウンドしながら転がっていく様子を描画します。
+単一のオブジェクトをローカル座標変換して、回転させたり、鏡像にしたり、影にしたりして描画しています。
+
+↑/↓ : キューブの回転速度の増減
+[Enter] : フルスクリーン切り替え
+[Esc] : 終了
+
+*/
+
+#include "hsp3dish.as"
+#include "d3m.hsp"
+
+;============================================================
+;	main
+;============================================================
+
+;------------------------------------------------------------
+; init
+	ve = 200.0
+	po = 0.0
+
+	t_start = d3timer()
+
+
+;------------------------------------------------------------
+*mainloop
+
+
+	;------------------------------------------------------------
+	; full-screen ctrlr (toggle : Enter)
+
+	stick ky_inp, 15
+	if ky_inp & 128 : end
+
+/*
+	if ky_inp & 32 {
+		mode_fsc ^= 1
+		chgdisp mode_fsc ; (default : 640, 480)
+		if mode_fsc {
+			bgscr 2
+			gsel 2, 2
+			mouse -1
+		} else {
+			gsel 2, -1
+			gsel
+			mouse
+		}
+	}
+*/
+
+	;------------------------------------------------------------
+	; timers
+
+	sec = 0.001 * d3timer()
+	dt  = sec - ot
+	ot  = sec
+
+	; a-v-p
+	ve += dt * 100 * ((ky_inp=2)-(ky_inp=8))
+	po += dt * ve
+
+	; uso バウンド
+	h  = absf(sin(sec))
+
+	; starting-efct divisor
+	div = (d3timer() - t_start + 1000)
+
+
+	;------------------------------------------------------------
+	; drw init
+
+	redraw 0
+	color : boxf
+;	gmode 6, , , 128 : gcopy 0, , , ginfo_winx, ginfo_winy
+	hsvcolor sec, 128, 224 - 224000 / div
+
+
+	;------------------------------------------------------------
+	; setcam
+
+	r = 3000000 / div + 700
+
+	d3setcam cos(sec/5)*r, sin(sec/5)*r, sin(sec/6)*300 + r/2,  0,0,h*140
+
+
+	;------------------------------------------------------------
+	; global
+	repeat 16
+		x = ((cnt * 64 + po) & 1023) - 512
+		repeat 16
+			y = cnt * 64 - 512
+
+			r = h * 150 + 400
+			a = (1.0 - 0.4 * h) * ( (r-sqrt(x*x + y*y)) / r) * (rnd(160) + 160)
+			if a > 0 {
+				r = 28
+				x0 = x-r, x+r, x+r, x-r
+				y0 = y-r, y-r, y+r, y+r
+				z0 =   0,   0,   0,   0
+
+				gmode 5, , , a
+				d3square  x0, y0, z0
+			}
+
+		loop
+	loop
+
+
+	;------------------------------------------------------------
+	; local object
+	repeat 3
+		randomize 0
+
+		if cnt = 0 {
+			; shadow
+			alp = sqrt(h) * 0.1
+			gm  = 6
+			rr  = h * 0.5 + 1
+			zz  = -0.05
+		}
+		if cnt = 1 {
+			; reflex
+			alp = 0.3 - h * 0.2
+			gm  = 5
+			rr  = 1
+			zz  = -0.9
+		}
+		if cnt = 2 {
+			; real
+			alp = 1
+			zz  = 1
+		}
+
+		r0 = 64 : r1 = 58 : r2 = 4
+
+		; set local
+		th = -po / 170
+		d3setlocal 0,0,(h*300 + 70)*zz,  sin(th)*rr,0,cos(th)*rr,  0,rr,0,  cos(th)*zz,0,-sin(th)*zz
+
+		; glass-cube
+		repeat 2
+			z = r0 * (cnt*2-1), z, z, z
+
+			repeat 4
+				s1 = (cnt\2*2-1)
+				s2 = (cnt/2*2-1)
+
+				x = r2*s1, r2*s1, r1*s1, r1*s1
+				y = r2*s2, r1*s2, r1*s2, r2*s2
+
+				gmode gm, , , alp * (rnd(160) + 96)
+				d3square  x, y, z
+				d3square  z, x, y
+				d3square  y, z, x
+			loop
+		loop
+	loop
+
+
+	;------------------------------------------------------------
+	redraw 1
+	await 10
+
+	goto *mainloop
+

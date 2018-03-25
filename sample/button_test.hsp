@@ -1,0 +1,93 @@
+#include "hsp3dish.as"
+
+	;
+	; gradf命令サンプル
+	;
+	sx=ginfo_sx: sy=ginfo_sy
+	;screen 0,sx,sy
+	;celload "chr.png"
+
+	info_os = sysinfo(0)
+	info_user = sysinfo(1)
+	info_name = sysinfo(2)
+
+	flag_ios=0:flag_and=0:flag_win=0
+	if instr(info_os,0,"iOS")>=0 : flag_ios=1
+	if instr(info_os,0,"android")>=0 : flag_and=1
+	if instr(info_os,0,"Windows")>=0 : flag_win=1
+
+	; それぞれの頂点座標と色を配列に代入
+	x(0)=0 : y(0)=0 : col(0)=$0000ff
+	x(1)=sx : y(1)=0 : col(1)=$00ffff
+	x(2)=sx : y(2)=sy : col(2)=$ff0000
+	x(3)=0 : y(3)=sy : col(3)=$ff00ff
+
+	;pos 16,16
+	objsize 160,40
+	;objimage 1, 0,0, 0,64, 0,32	; ボタン画像の指定
+
+	;objsize 128,32
+
+	if flag_ios=0 {
+		button goto "TEST END",*owari
+	}
+	button gosub "URL",*wowsub
+	if flag_and=0 {
+		button gosub "DIALOG",*wowsub4
+	}
+	if flag_and {
+		button gosub "DIAL",*wowsub3
+	}
+	;objenable 1,0
+
+	gmode 0
+	repeat
+
+	py=sin(0.1*cnt)*32
+
+	redraw 0
+	;color 64,64,64:boxf
+
+	; グラデーションで四角形を描画
+	gsquare gsquare_grad, x,y,col
+
+	color 255,255,255
+	pos 0,360
+	mes "OS:"+info_os
+	mes "USER:"+info_user
+	mes "NAME:"+info_name
+
+	; グラデーションで矩形を塗りつぶし
+	gradf 0,180+py,320,100, 1, $ff00ff, $ffffff
+
+	; 文字を表示
+	color 0,0,128
+	font msgothic, 30, 1
+	pos 64,210+py
+	mes "HSP3Dish Test"
+
+	; chr.pngの一部を表示
+	;pos 160,0
+	;gmode 2,128,128:gcopy 1
+
+	redraw 1
+	await 1000/60
+	;await 12
+
+	loop
+
+*wowsub
+	exec "http://hsp.tv",16
+	return
+
+*wowsub3
+	exec "tel:0123456789",16
+	return
+
+*wowsub4
+	dialog "OK"
+	return
+
+*owari
+	end
+

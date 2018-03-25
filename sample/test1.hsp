@@ -1,0 +1,81 @@
+#include "hsp3dish.as"
+
+#module
+#deffunc fprt str _p1
+	;	fprt "message"
+	;	(画像を使用したフォント表示を行ないます)
+	;	"message" : 表示するメッセージ
+	;	表示座標は、posで指定した位置から
+	;
+	i=0:st=_p1
+
+	repeat
+	a1=peek(st,i):i++:if a1=0 : break
+	if a1=13 {
+		a1=peek(st,i)
+		if a1=10 : i++
+		continue	; 改行
+	} else {
+		celput 1,a1
+	}
+	loop
+	return
+
+#global
+
+title "Dish Test"
+
+celload "chr.png",1
+celdiv 1,16,16,0,0
+
+celload "hsp3dish.png",2
+celdiv 2,640,200,320,100
+
+ang=0.0
+
+;font "Arial",32,1
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	redraw 0
+
+	gmode 0
+	color 0,0,128
+	boxf
+
+	gmode 0
+	pos 0,20+16:celput 1,$1f
+	gmode 5,,,255
+	pos 0,20:celput 1,$1f
+
+	gmode 0
+	color 255,255,0
+	line 200,200,0,0
+
+	;pos 320,240
+	;gcopy 2,0,0,320,240
+
+	gmode 5,,,192
+	color 0,0,0:pos 0,0
+	fprt "FONT TEST"
+
+	;gmode 3,,,128:color 0,0,128
+	;grect 320,240, ang, 320,240
+
+	gmode 0,,,128
+	pos 160,240:celput 2,0,1,1,ang
+	;pos 0,240:gcopy 2,0,0,640,200
+	;color 255,0,0:circle 200,200,300,300
+
+	color 255,255,255
+	pos 0,60:mes "("+mousex+","+mousey+")"
+
+	redraw 1
+	await 16
+
+	ang+=0.01
+loop
+
+stop

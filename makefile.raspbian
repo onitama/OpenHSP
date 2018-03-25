@@ -1,0 +1,126 @@
+CC = gcc
+CXX = g++
+AR = ar
+CFLAGS_DISH = -Wall -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -DUSE_OBAQ -I /opt/vc/include
+CFLAGS_GP = -Wall -g -O0 -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -I /opt/vc/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src -std=c++11
+LDFLAGS= -lm -L$(SDKSTAGE)/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lSDL -lSDL_mixer
+CFLAGS_CL = -Wall -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSPRASPBIAN
+CFLAGS_CMP = -Wall -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
+
+OBJS = \
+	src/hsp3/dpmread.do \
+	src/hsp3dish/geometry.do \
+	src/hsp3dish/hgdx.do \
+	src/hsp3dish/hgemitter.do \
+	src/hsp3dish/hgevent.do \
+	src/hsp3dish/hgmodel.do \
+	src/hsp3dish/hgobj.do \
+	src/hsp3/hsp3.do \
+	src/hsp3/hsp3code.do \
+	src/hsp3/hsp3debug.do \
+	src/hsp3dish/hsp3gr_dish.do \
+	src/hsp3/hsp3int.do \
+	src/hsp3/hspvar_core.do \
+	src/hsp3/hspvar_double.do \
+	src/hsp3/hspvar_int.do \
+	src/hsp3/hspvar_label.do \
+	src/hsp3/hspvar_str.do \
+	src/hsp3/hspvar_struct.do \
+	src/hsp3dish/hspwnd_dish.do \
+	src/hsp3dish/hspwnd_obj.do \
+	src/hsp3dish/random.do \
+	src/hsp3/stack.do \
+	src/hsp3/strbuf.do \
+	src/hsp3/strnote.do \
+	src/hsp3dish/sysreq.do \
+	src/hsp3dish/emscripten/hgtex.do \
+	src/hsp3dish/emscripten/hgiox.do \
+	src/hsp3dish/emscripten/mmman.do \
+	src/hsp3dish/emscripten/main.do \
+	src/hsp3dish/emscripten/stb_image.do \
+	src/hsp3dish/obaq/omkedraw.do \
+	src/hsp3dish/obaq/hsp3dw.do \
+	src/hsp3dish/obaq/game.do \
+	src/obaq/physics/rock.do \
+	src/obaq/physics/vessel.do \
+	src/hsp3dish/raspbian/hsp3dish.do \
+	src/hsp3dish/linux/webtask_linux.do \
+	src/hsp3dish/linux/supio_linux.do
+
+OBJS_CMP = \
+	src/hspcmp/main.o \
+	src/hspcmp/token.o \
+	src/hspcmp/linux/supio_linux.o \
+	src/hspcmp/ahtmodel.o \
+	src/hspcmp/ahtobj.o \
+	src/hspcmp/codegen.o \
+	src/hspcmp/comutil.o \
+	src/hspcmp/errormsg.o \
+	src/hspcmp/hsc3.o \
+	src/hspcmp/hspcmd.o \
+	src/hspcmp/label.o \
+	src/hspcmp/localinfo.o \
+	src/hspcmp/membuf.o \
+	src/hspcmp/strnote.o \
+	src/hspcmp/tagstack.o
+
+OBJS_CL = \
+	src/hsp3/linux/main.o \
+	src/hsp3/hsp3.o \
+	src/hsp3/hsp3code.o \
+	src/hsp3/hsp3debug.o \
+	src/hsp3/hsp3int.o \
+	src/hsp3/hspvar_core.o \
+	src/hsp3/hspvar_double.o \
+	src/hsp3/hspvar_int.o \
+	src/hsp3/hspvar_label.o \
+	src/hsp3/hspvar_str.o \
+	src/hsp3/hspvar_struct.o \
+	src/hsp3/stack.o \
+	src/hsp3/strbuf.o \
+	src/hsp3/strnote.o \
+	src/hsp3/dpmread.o \
+	src/hsp3/linux/supio_linux.o \
+	src/hsp3/linux/hsp3cl.o \
+	src/hsp3/linux/hsp3ext_linux.o \
+	src/hsp3/linux/hsp3gr_linux.o
+
+TARGETS = hsp3dish hsp3cl hspcmp hsed
+LIBS1 = -lm -lGL -lEGL -lSDL -lSDL_image -lSDL_mixer -lstdc++
+LIBS2 = -lm -lGL -lEGL -lSDL -lSDL_image -lSDL_mixer -lstdc++
+LIBS_GP = \
+	libgameplay.a \
+	libBulletDynamics.a \
+	libBulletCollision.a \
+	libLinearMath.a
+
+all: $(TARGETS)
+
+.SUFFIXES: .cpp
+hsp3dish: $(OBJS)
+	$(CXX) $(CFLAGS_DISH) $(OBJS) $(LDFLAGS) -s -o $@
+%.do: %.c
+	$(CC) $(CFLAGS_DISH) -c $< -o $*.do
+%.do: %.cpp
+	$(CXX) $(CFLAGS_DISH) -c $< -o $*.do
+
+hspcmp: $(OBJS_CMP)
+	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) -s -o $@
+%.o: %.c
+	$(CC) $(CFLAGS_CMP) -c $< -o $*.o
+%.o: %.cpp
+	$(CXX) $(CFLAGS_CMP) -c $< -o $*.o
+
+hsp3cl: $(OBJS_CL)
+	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -s -o $@
+%.o: %.c
+	$(CC) $(CFLAGS_CL) -c $< -o $*.o
+%.o: %.cpp
+	$(CXX) $(CFLAGS_CL) -c $< -o $*.o
+
+hsed: src/tools/hsed_gtk2.cpp
+	$(CXX) -O2 -Wall -DHSPRASPBIAN -o hsed src/tools/hsed_gtk2.cpp `pkg-config --cflags --libs gtk+-2.0`
+
+clean:
+	rm -f $(OBJS) $(OBJS_CMP) $(OBJS_CL) $(TARGETS)
+

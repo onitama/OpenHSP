@@ -1,0 +1,59 @@
+CC = em++
+# CFLAGS = -Wall --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX -DHSPDEBUG
+#CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -s USE_TYPED_ARRAYS=2 -O2 -s NO_EXIT_RUNTIME=1
+#CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -s USE_TYPED_ARRAYS=2 -g4 --js-opts 0 -s NO_EXIT_RUNTIME=1 -std=gnu++11
+CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive \
+	   -std=gnu++11 \
+	   -s USE_TYPED_ARRAYS=2 -s NO_EXIT_RUNTIME=1 \
+	   -s DISABLE_EXCEPTION_CATCHING=0 -O2 \
+	   --memory-init-file 0
+#CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -s USE_TYPED_ARRAYS=2 -g4 --js-opts 0 -s SAFE_HEAP=1 -s NO_EXIT_RUNTIME=1 -std=gnu++11
+
+OBJS = ahtmodel.bc ahtobj.bc codegen_utf8.bc comutil.bc errormsg_utf8.bc hsc3.bc \
+    hspcmd.bc label.bc localinfo.bc membuf.bc strnote.bc \
+    tagstack.bc token_utf8.bc \
+	win32dll/dpm.bc \
+	emscripten/supio_emscripten.bc emscripten/hspcmp3.bc
+TARGET = hspcmp.js
+LIBS = 
+.SUFFIXES: .cpp
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBS)
+%.bc: %.c
+	echo $(CC) $(CFLAGS) -c $< -o $*.bc
+	$(CC) $(CFLAGS) -c $< -o $*.bc
+%.bc: %.cpp
+	echo $(CC) $(CFLAGS) -c $< -o $*.bc
+	$(CC) $(CFLAGS) -c $< -o $*.bc
+
+codegen_utf8.cpp: codegen.cpp
+	iconv -f cp932 -t utf-8 $< > $@
+
+errormsg_utf8.cpp: errormsg.cpp
+	iconv -f cp932 -t utf-8 $< > $@
+
+token_utf8.cpp: token.cpp
+	iconv -f cp932 -t utf-8 $< > $@
+
+block3cmp.js: $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBS)
+
+hspcmp.html: $(OBJS) assets
+	$(CC) $(CFLAGS) \
+	$(OBJS) -o $@ $(LIBS) \
+	--preload-file emscripten/assets@/
+	cat ../hsp3dish/emscripten/license.js hspcmp.js > tmp.js
+	cp tmp.js hspcmp.js
+	cat tmp.js | gzip -9 > hspcmp.js.gz
+	cat hspcmp.data | gzip -9 > hspcmp.data.gz
+
+assets:
+	rm -rf emscripten/assets/comon
+	cp -r ../package/win32/common/ emscripten/assets/
+
+clean:
+	rm -f $(OBJS) $(TARGET)
+
+release:
+	make clean
+	make "CFLAGS = -O3 -Wall --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX"

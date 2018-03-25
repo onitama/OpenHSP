@@ -1,0 +1,32 @@
+#include "hsp3dish.as"
+
+	;	配列変数のソート
+	;
+	kaz=20
+	dim n,kaz
+
+
+	pos 0,0
+	repeat kaz
+	n.cnt = rnd(100)
+	mes "N["+cnt+"]="+n.cnt
+	loop
+
+	sortval n,0
+
+	repeat
+	redraw 0
+
+	color 0,0,0
+	pos 0,0
+	repeat kaz
+	sortget a,cnt
+	mes "sort N["+cnt+"]="+n.cnt+"("+a+")"
+	loop
+
+	redraw 1
+	await 33
+	loop
+
+	stop
+

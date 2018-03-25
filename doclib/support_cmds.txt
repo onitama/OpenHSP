@@ -1,0 +1,359 @@
+HSP3Dishサポート済みコマンド
+
+goto	,sys|func
+gosub	,sys|func
+return	,sys|func
+break	,sys|func
+repeat	,sys|func
+loop	,sys|func
+continue	,sys|func
+wait	,sys|func
+await	,sys|func
+dim	,sys|func
+sdim	,sys|func
+foreach	,sys|func
+dimtype	,sys|func
+dup	,sys|func
+end	,sys|func
+stop	,sys|func
+exgoto	,sys|func
+on	,sys|func
+assert	,sys|func
+logmes	,sys|func
+bload	,sys|func
+if	,sys|func
+else	,sys|func
+poke	,sys|func
+wpoke	,sys|func
+lpoke	,sys|func
+getstr	,sys|func
+memexpand	,sys|func
+memcpy	,sys|func
+memset	,sys|func
+notesel	,sys|func
+noteadd	,sys|func
+notedel	,sys|func
+noteload	,sys|func
+randomize	,sys|func
+noteunsel	,sys|func
+noteget	,sys|func
+
+pset	,sys|func
+pos	,sys|func
+circle	,sys|func
+cls	,sys|func
+color	,sys|func
+redraw	,sys|func
+gsel	,sys|func
+gcopy	,sys|func
+gzoom	,sys|func
+hsvcolor	,sys|func
+buffer	,sys|func
+line	,sys|func
+boxf	,sys|func
+stick	,sys|func
+grect	,sys|func
+grotate	,sys|func
+gsquare	,sys|func
+gradf	,sys|func
+celdiv	,sys|func
+celput	,sys|func
+
+objsize	,sys|func
+objimage	,sys|func
+objenable	,sys|func
+clrobj	,sys|func
+objprm	,sys|func
+button	,sys|func
+
+getkey	,sys|func
+bsave	,sys|func
+exist	,sys|func
+notesave	,sys|func
+
+mmload	,sys|func
+mmplay	,sys|func
+mmstop	,sys|func
+
+setease	,sys|func
+
+
+HSP3Dishサポート済みシステム変数・関数
+
+system	,sys|func
+hspstat	,sys|func
+hspver	,sys|func
+stat	,sys|func
+cnt	,sys|func
+err	,sys|func
+strsize	,sys|func
+looplev	,sys|func
+sublev	,sys|func
+refstr	,sys|func
+refdval	,sys|func
+int	,sys|func
+rnd	,sys|func
+strlen	,sys|func
+length	,sys|func
+length2	,sys|func
+length3	,sys|func
+length4	,sys|func
+vartype	,sys|func
+gettime	,sys|func
+peek	,sys|func
+wpeek	,sys|func
+lpeek	,sys|func
+varptr	,sys|func
+varuse	,sys|func
+noteinfo	,sys|func
+notesize	,sys|macro
+instr	,sys|func
+abs	,sys|func
+limit	,sys|func
+str	,sys|func
+strmid	,sys|func
+strf	,sys|func
+getpath	,sys|func
+strtrim	,sys|func
+sin	,sys|func
+cos	,sys|func
+tan	,sys|func
+atan	,sys|func
+sqrt	,sys|func
+double	,sys|func
+absf	,sys|func
+expf	,sys|func
+logf	,sys|func
+limitf	,sys|func
+powf	,sys|func
+mousex	,sys|func
+mousey	,sys|func
+mousew	,sys|func
+ginfo	,sys|func
+ginfo_winx	,sys|macro
+ginfo_winy	,sys|macro
+ginfo_vx	,sys|macro
+ginfo_vy	,sys|macro
+ginfo_accx	,sys|macro
+ginfo_accy	,sys|macro
+getease	,sys|func
+geteasef	,sys|func
+
+
+HSP3Dishサポート済みプリプロセッサ命令
+
+#addition	,pre|func
+#const	,pre|func
+#deffunc	,pre|func
+#defcfunc	,pre|func
+#define	,pre|func
+#else	,pre|func
+#endif	,pre|func
+#enum	,pre|func
+#epack	,pre|func
+#global	,pre|func
+#if	,pre|func
+#ifdef	,pre|func
+#ifndef	,pre|func
+#include	,pre|func
+#module	,pre|func
+#pack	,pre|func
+#packopt	,pre|func
+#runtime	,pre|func
+#undef	,pre|func
+#cmpopt	,pre|func
+
+
+HSP3Dishサポート済みマクロ
+
+__hspver__	,sys|macro
+__hsp30__	,sys|macro
+__date__	,sys|macro
+__time__	,sys|macro
+__line__	,sys|macro
+__file__	,sys|macro
+_debug	,sys|macro
+__hspdef__	,sys|macro
+and	,sys|macro
+or	,sys|macro
+xor	,sys|macro
+not	,sys|macro
+ginfo_mx	,sys|macro
+ginfo_my	,sys|macro
+ginfo_sizex	,sys|macro
+ginfo_sizey	,sys|macro
+ginfo_mesx	,sys|macro
+ginfo_mesy	,sys|macro
+ginfo_r	,sys|macro
+ginfo_g	,sys|macro
+ginfo_b	,sys|macro
+ginfo_dispx	,sys|macro
+ginfo_dispy	,sys|macro
+ginfo_cx	,sys|macro
+ginfo_cy	,sys|macro
+ginfo_act	,sys|macro
+ginfo_intid	,sys|macro
+ginfo_newid	,sys|macro
+ginfo_sx	,sys|macro
+ginfo_sy	,sys|macro
+notemax	,sys|macro
+do	,sys|macro
+until	,sys|macro
+while	,sys|macro
+wend	,sys|macro
+for	,sys|macro
+next	,sys|macro
+_break	,sys|macro
+_continue	,sys|macro
+switch	,sys|macro
+case	,sys|macro
+default	,sys|macro
+swbreak	,sys|macro
+swend	,sys|macro
+ddim	,sys|macro
+ldim	,sys|macro
+alloc	,sys|macro
+m_pi	,sys|macro
+rad2deg	,sys|macro
+deg2rad	,sys|macro
+
+
+HSP3Dish非互換コマンド
+(これらの命令はデバイスにより異なる仕様が含まれています)
+
+screen	,sys|func
+bgscr	,sys|func
+width	,sys|func
+font	,sys|func
+
+picload	,sys|func
+celload	,sys|func
+gmode	,sys|func
+mes	,sys|func
+print	,sys|func
+
+exec	,sys|func
+dialog	,sys|func
+
+
+HSP3Dish非互換コマンド
+(これらの命令はWindows上でのみ動作し、他のデバイスでは無視されます)
+
+chdpm	,sys|func
+memfile	,sys|func
+bcopy	,sys|func
+delete	,sys|func
+mkdir	,sys|func
+chdir	,sys|func
+dirlist	,sys|func
+
+title	,sys|func
+onexit	,sys|func
+onerror	,sys|func
+
+dupptr	,sys|func
+
+sendmsg	,sys|func|1
+#regcmd	,pre|func
+#uselib	,pre|func
+#func	,pre|func
+#cfunc	,pre|func
+
+
+HSP3Dishサポート外コマンド
+
+mouse	,sys|func
+run	,sys|func
+objinfo	,sys|func
+dirinfo	,sys|func
+sysinfo	,sys|func
+thismod	,sys|func
+onkey	,sys|func
+onclick	,sys|func
+oncmd	,sys|func
+newcom	,sys|func|1
+querycom	,sys|func|1
+delcom	,sys|func|1
+cnvstow	,sys|func|1
+comres	,sys|func|1
+axobj	,sys|func|1
+winobj	,sys|func|1
+comevent	,sys|func|1
+comevarg	,sys|func|1
+sarrayconv	,sys|func|1
+callfunc	,sys|func|1
+cnvwtos	,sys|func|1
+comevdisp	,sys|func|1
+libptr	,sys|func|1
+listbox	,sys|func
+chkbox	,sys|func
+combox	,sys|func
+input	,sys|func
+mesbox	,sys|func
+bmpsave	,sys|func
+palcolor	,sys|func
+palette	,sys|func
+sysfont	,sys|func
+chgdisp	,sys|func
+syscolor	,sys|func
+newlab	,sys|func
+resume	,sys|func
+yield	,sys|func
+pget	,sys|func
+mci	,sys|func
+objsel	,sys|func
+groll	,sys|func
+mref	,sys|func
+mcall	,sys|func
+newmod	,sys|func
+delmod	,sys|func
+split	,sys|func
+strrep	,sys|func
+
+objskip	,sys|func
+objmode	,sys|func
+
+#usecom	,pre|func
+#defint	,pre|func
+#defdouble	,pre|func
+#defnone	,pre|func
+#modfunc	,pre|func
+#modcfunc	,pre|func
+#modinit	,pre|func
+#modterm	,pre|func
+
+HSP3Dishサポート外システム変数・関数・マクロ
+
+hwnd	,sys|func
+hinstance	,sys|func
+hdc	,sys|func
+iparam	,sys|func
+wparam	,sys|func
+lparam	,sys|func
+ginfo_paluse	,sys|macro
+ginfo_sel	,sys|macro
+ginfo_wx1	,sys|macro
+ginfo_wy1	,sys|macro
+ginfo_wx2	,sys|macro
+ginfo_wy2	,sys|macro
+dir_cur	,sys|macro
+dir_exe	,sys|macro
+dir_win	,sys|macro
+dir_sys	,sys|macro
+dir_cmdline	,sys|macro
+dir_desktop	,sys|macro
+dir_mydoc	,sys|macro
+font_normal	,sys|macro
+font_bold	,sys|macro
+font_italic	,sys|macro
+font_underline	,sys|macro
+font_strikeout	,sys|macro
+font_antialias	,sys|macro
+objmode_normal	,sys|macro
+objmode_guifont	,sys|macro
+objmode_usefont	,sys|macro
+gsquare_grad	,sys|macro
+msgothic	,sys|macro
+msmincho	,sys|macro
+
+

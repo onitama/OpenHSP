@@ -1,0 +1,46 @@
+#include "hsp3dish.as"
+
+	;
+	;	ネット上のデータ取得(メモリ上に取得)
+	;	旧HSP3掲示板(onionsoft.net)の検索CGIを直接実行し、結果を取得します
+	;
+
+	;	URLを指定
+	url="http://www.onionsoft.net/hsp/beta/betabbs.cgi"
+
+	;	POST形式でCGIにパラメーターを渡す
+	prm = "mode=find&cond=and&log=0&word=script"
+
+	httpload url,prm
+	if stat : goto *bad	; 正しくリクエストができなかった
+
+*main
+	;	結果待ちのためのループ
+	httpinfo res,HTTPINFO_MODE
+	if res = HTTPMODE_READY : goto *comp
+	if res <= HTTPMODE_NONE : goto *bad
+	await 50
+	goto *main
+
+*bad
+	;	エラー
+	httpinfo estr,HTTPINFO_ERROR
+	dialog "ERROR "+estr
+	stop
+
+*comp
+	;	読み込み完了
+	httpinfo buf,HTTPINFO_DATA
+	httpinfo size,HTTPINFO_SIZE
+
+	repeat
+	redraw 0
+	color 0,0,0:pos 0,0
+	mes buf
+
+	redraw 1
+	await 33
+	loop
+
+	stop
+

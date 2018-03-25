@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\win">
+      <UniqueIdentifier>{db97b476-608f-4e04-bead-18266f6e5ec0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\core">
+      <UniqueIdentifier>{c0cc7801-2b0c-4262-865a-575d4a3d839f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\core">
+      <UniqueIdentifier>{c27e5900-8391-493a-a4ad-fbe4c45184b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\win">
+      <UniqueIdentifier>{93e9850c-d44f-4519-ba55-ce5d9ebd356f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gamehsp.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcam.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="gplgt.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="gpmat.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="gpphy.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="hgiox.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="hsp3dish.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\dpmread.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hsp3.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hsp3code.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hsp3debug.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hsp3int.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hspvar_core.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hspvar_double.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hspvar_label.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hspvar_struct.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\stack.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\strbuf.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\strnote.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hspvar_int.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\hspvar_str.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsp3gr_dish.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspwnd_dish.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspwnd_obj.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\random.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sysreq.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\geometry.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\dxsnd.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\mmman.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\webtask_win.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\win32gui\hsp3ext_win.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\win32gui\hsp3extlib.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dxsnd.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="gamehsp.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="gpcam.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="gplgt.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="gpmat.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="gpphy.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="hgiox.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="hsp3dish.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="mmman.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="supio_win.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\dpmread.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3code.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3config.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3debug.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3ext.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3gr.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3int.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hsp3struct.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hspvar_core.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hspvar_label.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\hspwnd.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\stack.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\strbuf.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\strnote.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\supio.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="webtask_win.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="hsp3extlib.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="hsp3ext_win.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\win32gui\hspvar_comobj.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hsp3\win32gui\hspvar_variant.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\webtask.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sysreq.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\supio.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hspwnd.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3ext.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3gr.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3gr_dish.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hspwnd_dish.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\random.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="hsp3.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="hsp3.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="XPStyle.xml" />
+  </ItemGroup>
+</Project>

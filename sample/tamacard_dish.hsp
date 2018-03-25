@@ -1,0 +1,34 @@
+#include "hsp3dish.as"
+
+	tamaface=ginfo_newid
+	celload dir_tv+"tamaface.png",tamaface		; 素材フォルダから読み込みます
+	tama_sx=256:tama_sy=256
+	celdiv tamaface,tama_sx,tama_sy
+
+	tcard=ginfo_newid
+	celload dir_tv+"tcard.png",tcard		; 素材フォルダから読み込みます
+	card_sx=256:card_sy=384
+	celdiv tcard,card_sx,card_sy
+
+*main
+	redraw 0
+	color 255,255,255
+	boxf
+
+	;	標準のサイズで表示
+	gmode 2
+	pos 0,0
+	celput tcard,1
+	pos 0,64
+	celput tamaface,1
+
+	;	半分のサイズで表示
+	gmode 2
+	pos 320,0
+	celput tcard,1,0.5,0.5
+	pos 320,32
+	celput tamaface,1,0.5,0.5
+
+	redraw 1
+	await 1000/30
+	goto *main
