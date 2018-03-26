@@ -1,28 +1,34 @@
 ------------------------------------------------------------------------------
-HSP : Hot Soup Processor
-ホットスーププロセッサ
-copyright 1997-2018 (c) onion software/onitama
+HSP : Hot Soup Processor  
+ホットスーププロセッサ  
+copyright 1997-2018 (c) onion software/onitama  
 ------------------------------------------------------------------------------
 
-・はじめに
+##はじめに
 
 このフォルダには、OpenHSP/Hot Soup Processorビルド用のファイルが含まれています。
 HSP3の機能やSDKを検証することが可能です。
 βなどテスト用ブランチに含まれる内容は、未実装の機能や、不具合が含まれていることをご了承の上お使い下さい。
 
 
-・動作環境
+##動作環境
 
 LinuxのGUI環境(X Window System)で動作します。
 一部の機能は、OpenGL及びSDLライブラリを使用して動作します。
 
 
-・インストール
+##インストール
 
-アーカイブの内容を任意のディレクトリに展開して、ソースをコンパイルしてください。コンパイルには、gcc及びmakeを実行できる環境が必要になります。
+githubから最新のリポジトリを取得してご使用ください。
+
+	git clone http://github.com/onitama/OpenHSP
+
+ダウンロードしたアーカイブのを展開することも可能です。
 
 	tar -vxzf hsplinux-???.tar.gz   (???はバージョン)
 
+取得したリポジトリのソースをコンパイルしてください。
+コンパイルには、gcc及びmakeを実行できる環境が必要です。
 コンパイルの際には、以下のライブラリが必要になりますので、あらかじめ確認を行なって下さい。
 
 	OpenGLES2.0以降 / EGL
@@ -39,7 +45,7 @@ LinuxのGUI環境(X Window System)で動作します。
 必要なツールのコンパイルが行なわれ、HSP3が使用できる状態になります。
 
 
-・Raspberry Piインストール
+##Raspberry Piインストール
 
 Raspberry Pi上のRaspbian上で動作します。(推奨バージョンは、September 2017 Kernel version4.9です)
 hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作します。
@@ -80,7 +86,7 @@ Raspberry Pi版では、フルスクリーンで実行を行ないます。
 GUIエディタだけでなく、コマンドラインから「./hsp3dish ****.ax」の形で実行を行なうことも可能です。
 
 
-・使用方法
+##使用方法
 
 HSP3は、オープンソースとして公開されているOpenHSP技術をベースに、
 Linux上で手軽にプログラミングを楽しむことができるよう構成されています。
@@ -119,7 +125,7 @@ HSPオブジェクトファイルを作成する必要があります。
 (「hsp3dish」「hsp3gp」の実行は、GUI環境が必要になります。)
 
 
-・exec、devprm命令について
+##exec、devprm命令について
 
 Linux版、Raspberry Pi版ともにexec命令により、シェルのコマンドを呼び出すことができます。
 また、devprm命令によりファイルシステム上のデバイスに文字列を出力することが可能です。
@@ -130,7 +136,7 @@ Linux版、Raspberry Pi版ともにexec命令により、シェルのコマン�
 シェルから「echo 2 > /sys/class/gpio/export」を実行するのと同じ動作になります。
 
 
-・Raspberry PiのGPIO入出力
+##Raspberry PiのGPIO入出力
 
 Raspberry Pi版では、devprm命令の他にdevcontrol命令によりGPIO入出力を行なう拡張が行われています。
 GPIO出力を制御する場合は、以下のように記述します。
@@ -148,7 +154,7 @@ GPIO出力を制御する場合は、以下のように記述します。
 GPIO入出力は、hsp3dishだけでなくhsp3clからも使用することが可能です。
 
 
-・オンラインマニュアル
+##オンラインマニュアル
 
 HSP3.5に関する情報はオンラインマニュアルでご覧いただけます。
 http://www.onionsoft.net/hsp/v35/
@@ -157,7 +163,7 @@ HSPについての最新情報やコミュニティは、HSPTV!サイトにて�
 http://hsp.tv/
 
 
-・将来の予定
+##将来の予定
 
 HSP3標準ランタイム、及びヘルプリファレンスや周辺ツールなどHSP3で用意されている
 機能なども、今後追加される予定です。
@@ -174,24 +180,24 @@ HSPについての一般的な質問や、スクリプトの作り方に関す�
 お勧め致します。
 
 
-・謝辞
+##謝辞
 
-HSPスクリプトエディタ(hsed)は、K-K(瓶詰堂)さんのご協力により作成されています。
-HSP3及びOpenHSPに多大なご協力を頂いた以下の皆様に感謝致します。
-
+HSPスクリプトエディタ(hsed)は、K-K(瓶詰堂)さんのご協力により作成されています。  
+HSP3及びOpenHSPに多大なご協力を頂いた以下の皆様に感謝致します。  
+  
 Senchaさん、ゆめゆめゆうかさん、Lonely Wolfさん、Shark++さん、
 HyperPageProjectさん、ちょくとさん、S.Programsさん、zakkiさん、
 山田 雄己(Yuki)さん、K-Kさん、USKさん、NGND001さん、yoshisさん、
 nakaさん、JETさん、ellerさん、さくらさん、うすあじさん、悠黒喧史さん、tomさん、
-ぷまさん、arueさん、mjhd_otsukaさん、tds12さん、fujidigさん、naznyarkさん
-
+ぷまさん、arueさん、mjhd_otsukaさん、tds12さん、fujidigさん、naznyarkさん  
+  
 その他、HSP周辺ツール開発者ML(HSPDev-ML)の皆様及び、β版のテスト報告や、
-ご意見をお寄せいただいた多くの方々に感謝致します。
+ご意見をお寄せいただいた多くの方々に感謝致します。  
 
 
-・ライセンス
+##ライセンス
 
-HSP3 Linuxは、OpenHSPの派生物として取り扱い、ライセンスもOpenHSP/HSP3に準拠した修正BSDライセンスとなります。
+HSP3 Linuxは、OpenHSPの派生物として取り扱い、ライセンスもOpenHSP/HSP3に準拠した修正BSDライセンスとなります。  
 
 -------------------------------------------------------------------------------
 Hot Soup Processor (HSP) / OpenHSP
