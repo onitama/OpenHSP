@@ -1,6 +1,7 @@
 ------------------------------------------------------------------------------
 HSP : Hot Soup Processor
-ホットスーププロセッサ          copyright 1997-2018 (c) onion software/onitama
+ホットスーププロセッサ
+copyright 1997-2018 (c) onion software/onitama
 ------------------------------------------------------------------------------
 
 ・はじめに
@@ -45,17 +46,23 @@ hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作
 (描画に関する機能は、OpenGL及びSDLライブラリを使用して動作しています。)
 アーカイブの内容を任意のディレクトリに展開して、ソースをコンパイルしてください。
 コンパイルには、gcc及びmakeを実行できる環境が必要になります。
-
-	tar -vxzf hsplinux???.tar.gz   (???はバージョン)
-		
 コンパイルの際には、追加のライブラリが必要になります。ネットワークに
 接続されている状態で以下のコマンドを実行することで取得できます。
 
 	sudo apt-get install libgtk2.0-dev
 	sudo apt-get install libglew-dev
 	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
-		
-アーカイブにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
+
+hsplinuxリポジトリの最新版を取得してください。
+アーカイブ、hsplinux???.tgzファイルを取得した場合は、解凍を行ってください。
+
+	tar -vxzf hsplinux???.tgz   (???はバージョン)
+
+githubから最新のリポジトリを取得して使用することも可能です。
+
+	git clone http://github.com/onitama/OpenHSP
+
+hsplinuxアーカイブにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
 
 	make -f makefile.raspbian
 		
@@ -187,12 +194,13 @@ nakaさん、JETさん、ellerさん、さくらさん、うすあじさん、�
 HSP3 Linuxは、OpenHSPの派生物として取り扱い、ライセンスもOpenHSP/HSP3に準拠した修正BSDライセンスとなります。
 
 -------------------------------------------------------------------------------
-Hot Soup Processor (HSP)
-Copyright (C) 1997-2018, Onion Software/onitama, all rights reserved.
-Made with base technology of OpenHSP.
-
-OpenHSP
-Copyright (C) 1997-2018, Onion Software/onitama, all rights reserved.
+Hot Soup Processor (HSP) / OpenHSP
+Copyright (c) 1997-2018, onion software/onitama
+in collaboration with Sencha, Yume-Yume Yuuka, Y-JINN, chobin,
+Usuaji, Kenji Yuukoku, puma, tom, sakura, fujidig, zakki, naznyark,
+Lonely Wolf, Shark++, HyperPageProject, Chokuto, S.Programs, 
+Yuki, K-K, USK, NGND001, yoshis, naka, JET, eller, arue, mjhd_otsuka, tds12
+All rights reserved.
 
 These softwares are provided by the copyright holders and contributors "as is" and
 any express or implied warranties, including, but not limited to, the implied
