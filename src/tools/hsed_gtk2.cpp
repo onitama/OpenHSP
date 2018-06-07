@@ -446,7 +446,7 @@ static void HSP_run(GtkWidget *w,int flag)
 	}
 
 #ifdef HSPRASPBIAN
-	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hsp3dish __hsptmp.ax\" >%s/.hspres"
+	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hsp3dish __hsptmp.ax >%s/.hspres\""
 			, mydir, hspdir, hspdir );
 #else
 	sprintf(cmd,"%s/hsp3dish __hsptmp.ax >%s/.hspres",hspdir,hspdir);

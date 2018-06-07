@@ -1,0 +1,49 @@
+;Kaki Get!
+
+	dim kx,32 :dim ky,32
+	repeat 16 :ky(cnt)=488 :loop
+	x=320 :y=440 :sc=0 :hp=3
+
+	repeat
+		redraw 0 :color :boxf 0,0,640,480
+
+		i=rnd(16) :m=sc/5+5 :if m>30 :m=30
+
+		if rnd(30)<m and ky(i)>=480 {
+			kx(i)=rnd(600) :ky(i)=0 :ks(i)=9+rnd(18) :ka(i)=rnd(2)
+		}
+
+		repeat 16
+			if ky(cnt)<480 {
+				color 255-191*ka(cnt),64,64*ka(cnt)
+				circle kx(cnt)-20,ky(cnt)-20,kx(cnt)+20,ky(cnt)+20
+				if ka(cnt)=0 {
+					color 0,240,0
+					boxf kx(cnt)-10,ky(cnt)-24,kx(cnt)+10,ky(cnt)-16
+				}
+				ky(cnt)=ky(cnt)+ks(cnt)
+			}
+			if abs(x-kx(cnt))<20 and abs(y-ky(cnt))<20 {
+				ky(cnt)=488
+				if ka(cnt) :hp=hp-1 :else :sc=sc+(ks(cnt)/8)
+			}
+		loop
+
+		stick key,255
+		if key=1 {
+			x=x-8 :if x<20 :x=20
+		}
+		if key=4 {
+			x=x+8 :if x>620 :x=620
+		}
+		color 160,80,0
+		boxf x-20,y-20,x+20,y+20 :boxf x-28,y-20,x+28,y-12
+
+		pos 0,0 :mes "Score:"+sc+" Life:"+hp
+
+		if hp<1 :break
+
+		redraw 1 :await 8
+	loop
+
+stop

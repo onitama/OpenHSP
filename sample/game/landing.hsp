@@ -1,0 +1,110 @@
+;Landing Game
+
+	dim map,768
+	hi=0
+
+*start
+	stg=0 :sc=0 :e=0 :ov=0
+
+*stgmk
+	stg=stg+1 :x=15 :w=13-(stg/3) :if w<5 :w=5
+	repeat 672 :map(96+cnt)=1 :loop		; 32*21=672
+	repeat 20
+		y=3+cnt :x=x+(rnd(5)-2) :ww=w-(cnt/8)
+		repeat ww
+			xx=x-(ww/2) :if xx<0 :xx=0
+			map(y*32+xx+cnt)=0
+		loop
+	loop
+
+	sc=sc+e :if sc>hi :hi=sc
+
+	px=320 :py=15 :gx=0 :gy=0 :e=500 :key=0
+
+	redraw 0 :gosub *stgpr :x=px :y=py :gosub *ship
+	color 255,255,255
+	pos 0,0 :mes "STG:"+stg+" HIT SPACE KEY TO START!"
+	redraw 1 :gosub *pause
+
+	repeat
+		redraw 0 :gosub *stgpr
+		color 255,255,255
+		pos 0,0 :mes "STG:"+stg+" EN:"+e+" SC:"+sc+" HI-SC:"+hi
+
+		gy=gy+(gy<30)
+
+		px=px+(gx/2) :py=py+(gy/3)
+		if px<0 :px=0
+		if px>640 :px=640
+		if py<0 :py=0
+
+		if py>445 {
+			if abs(gy)<8 {
+				x=px :y=py :gosub *ship
+				pos 216,232 :mes "GOOD LANDING!" :redraw 1 :await 3000 :break
+			} else {
+				gosub *bomb :break
+			}
+		} else {
+			x=px/20 :y=py/20
+			if map(y*32+x)=1 :gosub *bomb :break
+		}
+
+		x=px :y=py :gosub *ship
+
+		redraw 1
+		await 100
+	loop
+
+	if ov=1 :goto *start :else :goto *stgmk
+
+stop
+
+*pause
+	wait 100
+	repeat
+		stick key :if key & 16 :break
+		await 50
+	loop
+	return
+
+*stgpr
+	color 160,0,0 :boxf 0,0,640,480
+	color
+	repeat 768
+		x=20*(cnt\32) :y=20*(cnt/32)
+		if map(cnt)=0 :boxf x,y,x+20,y+20
+	loop
+	return
+
+*ship
+	color 160,160,160
+	boxf x-8,y-8,x+8,y+10
+	boxf x-7,y+8,x-15,y+15
+	boxf x+7,y+8,x+15,y+15
+	color 0,240,255
+	boxf x-3,y-2,x+3,y+3
+	color 255,255,0
+
+	stick key,255
+	if e>1 {
+		if key & 1 :e=e-1 :gx=gx+(gx<20) :boxf x-18,y+11,x-20-rnd(6),y+13
+		if key & 4 :e=e-1 :gx=gx-(gx>-20) :boxf x+18,y+11,x+20+rnd(6),y+13
+		if key & 26 {
+			e=e-2 :gy=gy-2*(gy>-10)
+			boxf x-1,y+13,x+1,y+23+rnd(10)
+			line x,y+13,x+rnd(10)-5,y+13+rnd(10)
+		}
+	}
+	return
+
+*bomb
+	color 160,160,160
+	repeat 9
+		rx=rnd(30)-15 :ry=rnd(30)-15 :b=1+rnd(6)
+		x=px+rx-3 :y=py+ry-3
+		boxf x,y,x+b,y+b
+	loop
+	redraw 1
+	gosub *pause :ov=1
+	return

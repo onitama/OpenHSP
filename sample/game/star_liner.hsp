@@ -1,0 +1,34 @@
+; Star Liner
+
+	m=50
+	dim x,m :dim y,m :dim dx,m :dim dy,m
+	dim x_o,m :dim y_o,m :dim flag,m
+
+repeat
+	n=rnd(m)
+	if flag(n)=0 :gosub *set_star
+
+	redraw 0
+	color :boxf 0,0,639,479
+	color 255,255,0
+
+	repeat m
+		if flag(cnt) {
+			line x_o(cnt),y_o(cnt),x(cnt),y(cnt)
+			x_o(cnt)=x(cnt) :y_o(cnt)=y(cnt)
+			x(cnt)=x(cnt)+dx(cnt) :y(cnt)=y(cnt)+dy(cnt)
+			dx(cnt)=dx(cnt)*13/10 :dy(cnt)=dy(cnt)*13/10
+		}
+		flag(cnt)=( x(cnt)>0 and x(cnt)<639 and y(cnt)>0 and y(cnt)<479 )
+	loop
+
+	redraw 1
+	await 33
+loop
+
+*set_star
+	x(n)=320+rnd(16)-8 :y(n)=240+rnd(16)-8
+	dx(n)=x(n)-320 :dy(n)=y(n)-240
+	if abs(dx(n))<3 and abs(dy(n))<3 :goto *set_star
+	x_o(n)=x(n) :y_o(n)=y(n) :flag(n)=1
+	return
