@@ -442,7 +442,7 @@ hsp3cl: $(OBJS_CL)
 	$(CXX) $(CFLAGS_CL) -c $< -o $*.o
 
 hsed: src/tools/hsed_gtk2.cpp
-	$(CXX) -O2 -Wall -o hsed src/tools/hsed_gtk2.cpp `pkg-config --cflags --libs gtk+-2.0`
+	$(CXX) -O2 -Wno-write-strings -o hsed src/tools/hsed_gtk2.cpp `pkg-config --cflags --libs gtk+-2.0`
 
 libgameplay.a: $(OBJS_GAMEPLAY)
 	rm -f $@
