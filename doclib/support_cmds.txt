@@ -1,4 +1,4 @@
-HSP3Dishサポート済みコマンド
+HSP3Dish�T�|�[�g�ς݃R�}���h
 
 goto	,sys|func
 gosub	,sys|func
@@ -78,7 +78,7 @@ mmstop	,sys|func
 setease	,sys|func
 
 
-HSP3Dishサポート済みシステム変数・関数
+HSP3Dish�T�|�[�g�ς݃V�X�e���ϐ��E�֐�
 
 system	,sys|func
 hspstat	,sys|func
@@ -140,7 +140,7 @@ getease	,sys|func
 geteasef	,sys|func
 
 
-HSP3Dishサポート済みプリプロセッサ命令
+HSP3Dish�T�|�[�g�ς݃v���v���Z�b�T����
 
 #addition	,pre|func
 #const	,pre|func
@@ -164,7 +164,7 @@ HSP3Dishサポート済みプリプロセッサ命令
 #cmpopt	,pre|func
 
 
-HSP3Dishサポート済みマクロ
+HSP3Dish�T�|�[�g�ς݃}�N��
 
 __hspver__	,sys|macro
 __hsp30__	,sys|macro
@@ -218,8 +218,8 @@ rad2deg	,sys|macro
 deg2rad	,sys|macro
 
 
-HSP3Dish非互換コマンド
-(これらの命令はデバイスにより異なる仕様が含まれています)
+HSP3Dish��݊��R�}���h
+(�����̖��߂̓f�o�C�X�ɂ��قȂ�d�l���܂܂�Ă��܂�)
 
 screen	,sys|func
 bgscr	,sys|func
@@ -236,8 +236,8 @@ exec	,sys|func
 dialog	,sys|func
 
 
-HSP3Dish非互換コマンド
-(これらの命令はWindows上でのみ動作し、他のデバイスでは無視されます)
+HSP3Dish��݊��R�}���h
+(�����̖��߂�Windows��ł̂ݓ��삵�A���̃f�o�C�X�ł͖�������܂�)
 
 chdpm	,sys|func
 memfile	,sys|func
@@ -260,7 +260,7 @@ sendmsg	,sys|func|1
 #cfunc	,pre|func
 
 
-HSP3Dishサポート外コマンド
+HSP3Dish�T�|�[�g�O�R�}���h
 
 mouse	,sys|func
 run	,sys|func
@@ -322,7 +322,7 @@ objmode	,sys|func
 #modinit	,pre|func
 #modterm	,pre|func
 
-HSP3Dishサポート外システム変数・関数・マクロ
+HSP3Dish�T�|�[�g�O�V�X�e���ϐ��E�֐��E�}�N��
 
 hwnd	,sys|func
 hinstance	,sys|func

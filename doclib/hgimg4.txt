@@ -1,997 +1,997 @@
 ------------------------------------------------------------------------------
 HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin  
-ＨＳＰ拡張ランタイムリファレンス      copyright 2001-2017 (c) onion software  
+�g�r�o�g�������^�C�����t�@�����X      copyright 2001-2017 (c) onion software  
 ------------------------------------------------------------------------------
 
-・はじめに
+�E�͂��߂�
 
-	HGIMG4は、Hot Soup Processor ver3.5以降とともに使用することで、
-	画面の描画に関する様々な機能拡張を提供します。
+	HGIMG4�́AHot Soup Processor ver3.5�ȍ~�ƂƂ��Ɏg�p���邱�ƂŁA
+	��ʂ̕`��Ɋւ���l�X�ȋ@�\�g����񋟂��܂��B
 
-	HGIMG4の特徴
+	HGIMG4�̓���
 
-	・HSP3Dishの上位互換として動作
-	・OpenGL/ESまたはDirectX9による描画、シェーダー言語サポート
-	・シーン管理と統合化された物理エンジン(Bullet)サポート
-	・FBX形式のモデルファイル読み込み、アニメーションサポート
-	・カスタムシェーダーによるマテリアル、ライティングをサポート
-	・フォントデータ(TTF)のレンダリングサポート
-	・オフスクリーンレンダリング及び各種ポストエフェクトサポート
-	・WindowsだけでなくLinux,iOS,Android,WebGL上での動作をサポート
-	・HSP及びHSP3Dishと同様のライセンス規約、オープンソース 
+	�EHSP3Dish�̏�ʌ݊��Ƃ��ē���
+	�EOpenGL/ES�܂���DirectX9�ɂ��`��A�V�F�[�_�[����T�|�[�g
+	�E�V�[���Ǘ��Ɠ��������ꂽ�����G���W��(Bullet)�T�|�[�g
+	�EFBX�`���̃��f���t�@�C���ǂݍ��݁A�A�j���[�V�����T�|�[�g
+	�E�J�X�^���V�F�[�_�[�ɂ��}�e���A���A���C�e�B���O���T�|�[�g
+	�E�t�H���g�f�[�^(TTF)�̃����_�����O�T�|�[�g
+	�E�I�t�X�N���[�������_�����O�y�ъe��|�X�g�G�t�F�N�g�T�|�[�g
+	�EWindows�����łȂ�Linux,iOS,Android,WebGL��ł̓�����T�|�[�g
+	�EHSP�y��HSP3Dish�Ɠ��l�̃��C�Z���X�K��A�I�[�v���\�[�X 
 
 
-・動作環境
+�E�����
 
-	HGIMG4は、OpenGL版とDirectX9(angle)版を選択することができます。
-	OpenGL版は、Windows7以降で、OpenGLバージョン3.1以上がインストールされた環境で動作します。
-	DirectX9(angle)版は、Windows7以降で、DirectX9最新版のランタイムがインストールされた環境で動作します。
-	DirectX9(angle)版は、実行にあたって以下のDLLを必要とします。
-	(このDLLは、HSPインストールフォルダに付属しています。
-	ユーザーが製作したアプリケーションを配布する場合は、このDLLも配布する
-	必要があります)
+	HGIMG4�́AOpenGL�ł�DirectX9(angle)�ł�I�����邱�Ƃ��ł��܂��B
+	OpenGL�ł́AWindows7�ȍ~�ŁAOpenGL�o�[�W����3.1�ȏオ�C���X�g�[�����ꂽ���œ��삵�܂��B
+	DirectX9(angle)�ł́AWindows7�ȍ~�ŁADirectX9�ŐV�ł̃����^�C�����C���X�g�[�����ꂽ���œ��삵�܂��B
+	DirectX9(angle)�ł́A���s�ɂ������Ĉȉ���DLL��K�v�Ƃ��܂��B
+	(����DLL�́AHSP�C���X�g�[���t�H���_�ɕt�����Ă��܂��B
+	���[�U�[�����삵���A�v���P�[�V������z�z����ꍇ�́A����DLL���z�z����
+	�K�v������܂�)
 
-		d3dcompiler_47.dll	追加DLL
-		libEGL.dll		追加DLL
-		libGLESv2.dll		追加DLL
+		d3dcompiler_47.dll	�ǉ�DLL
+		libEGL.dll		�ǉ�DLL
+		libGLESv2.dll		�ǉ�DLL
 
-	これらのDLLは、OpenGL版を使用する場合は必要ありません。
+	������DLL�́AOpenGL�ł��g�p����ꍇ�͕K�v����܂���B
 
-	HGIMG4は、以下のようなファイルで構成されています。
+	HGIMG4�́A�ȉ��̂悤�ȃt�@�C���ō\������Ă��܂��B
 
-		hsp3gp.exe (OpenGL実行用ランタイム)
-		hsp3gpdx.exe (DirectX実行用ランタイム)
+		hsp3gp.exe (OpenGL���s�p�����^�C��)
+		hsp3gpdx.exe (DirectX���s�p�����^�C��)
 
-		docs/hgimg4.txt (このファイル)
-		commonフォルダ (HGIMG4ヘッダファイル)
-		hsphelpフォルダ (HGIMG4ヘルプファイル)
-		runtimeフォルダ (HGIMG4カスタムランタイム)
-		sampleフォルダ (HGIMG4サンプルスクリプト & データ)
+		docs/hgimg4.txt (���̃t�@�C��)
+		common�t�H���_ (HGIMG4�w�b�_�t�@�C��)
+		hsphelp�t�H���_ (HGIMG4�w���v�t�@�C��)
+		runtime�t�H���_ (HGIMG4�J�X�^�������^�C��)
+		sample�t�H���_ (HGIMG4�T���v���X�N���v�g & �f�[�^)
 
-	HGIMG4は、HSP3Dishの上位ランタイムと位置付けられています。
-	HSP3Dishの機能は内包した上で、高機能な描画機能を持っています。
-	通常のHSP3Dishのスクリプトを動作させることも可能です。
-	マルチプラットフォームとして、以下の環境をサポートしています。
+	HGIMG4�́AHSP3Dish�̏�ʃ����^�C���ƈʒu�t�����Ă��܂��B
+	HSP3Dish�̋@�\�͓������ŁA���@�\�ȕ`��@�\�������Ă��܂��B
+	�ʏ��HSP3Dish�̃X�N���v�g�𓮍삳���邱�Ƃ��\�ł��B
+	�}���`�v���b�g�t�H�[���Ƃ��āA�ȉ��̊����T�|�[�g���Ă��܂��B
 
-		Windows 7以降(OpenGL版)、XP以降(DirectX9版)
-		Android 2.3.3以降
-		iOS 8以降
+		Windows 7�ȍ~(OpenGL��)�AXP�ȍ~(DirectX9��)
+		Android 2.3.3�ȍ~
+		iOS 8�ȍ~
 		Raspberry Pi (raspbian)
-		SDL/OpenGLをサポートするLinux環境
-		WebGL/html5をサポートする各種webブラウザ
+		SDL/OpenGL���T�|�[�g����Linux��
+		WebGL/html5���T�|�[�g����e��web�u���E�U
 
-	Android、iOS環境では、HSP3Dishと同様のC++コード変換機能により
-	ネイティブなコードを生成し、ストアアプリとしても登録が可能です。
+	Android�AiOS���ł́AHSP3Dish�Ɠ��l��C++�R�[�h�ϊ��@�\�ɂ��
+	�l�C�e�B�u�ȃR�[�h�𐶐����A�X�g�A�A�v���Ƃ��Ă��o�^���\�ł��B
 
 
-・使用方法
+�E�g�p���@
 
-	HGIMG4を使用したスクリプトを作成する場合には、スクリプトの先頭に
+	HGIMG4���g�p�����X�N���v�g���쐬����ꍇ�ɂ́A�X�N���v�g�̐擪��
 
 	#include "hgimg4.as"
 
-	という行を追加してください。
-	以上で、HSPの機能が拡張され、このリファレンスで説明をしている命令を
-	使用することができるようになります。
+	�Ƃ����s��ǉ����Ă��������B
+	�ȏ�ŁAHSP�̋@�\���g������A���̃��t�@�����X�Ő��������Ă��閽�߂�
+	�g�p���邱�Ƃ��ł���悤�ɂȂ�܂��B
 
-	HGIMG4 DirectX9版ランタイムを使用する場合には、
+	HGIMG4 DirectX9�Ń����^�C�����g�p����ꍇ�ɂ́A
 
 	#include "hgimg4dx.as"
 
-	をスクリプトの先頭に記述してください。
+	���X�N���v�g�̐擪�ɋL�q���Ă��������B
 
 	#include "hgimg4.as"
 
-	を記述した場合は、OpenGL版ランタイムが使用されます。
-	どちらのランタイムも使用できる機能に違いはありません。
+	���L�q�����ꍇ�́AOpenGL�Ń����^�C�����g�p����܂��B
+	�ǂ���̃����^�C�����g�p�ł���@�\�ɈႢ�͂���܂���B
 
-	まず最初に、付属のサンプルスクリプトを実行してみてください。
-	拡張された機能の簡単な使用例を見ることができるはずです。
-	サンプルスクリプトは、HSPインストールフォルダ以下のsample/hgimg4
-	に用意されています。
+	�܂��ŏ��ɁA�t���̃T���v���X�N���v�g�����s���Ă݂Ă��������B
+	�g�����ꂽ�@�\�̊ȒP�Ȏg�p������邱�Ƃ��ł���͂��ł��B
+	�T���v���X�N���v�g�́AHSP�C���X�g�[���t�H���_�ȉ���sample/hgimg4
+	�ɗp�ӂ���Ă��܂��B
 
 
-・リソースフォルダについて
+�E���\�[�X�t�H���_�ɂ���
 
-	HGIMG4では、起動時に実行するスクリプトと同じフォルダにある
-	「res」フォルダから必要なリソースを読み込みます。
-	リソースファイルは、「sample/hgimg4/res」のフォルダに含まれています。
-	以下のファイルは、起動のために必要ですので、実行ファイル作成時なども必ず入れておいてください。
+	HGIMG4�ł́A�N�����Ɏ��s����X�N���v�g�Ɠ����t�H���_�ɂ���
+	�ures�v�t�H���_����K�v�ȃ��\�[�X��ǂݍ��݂܂��B
+	���\�[�X�t�@�C���́A�usample/hgimg4/res�v�̃t�H���_�Ɋ܂܂�Ă��܂��B
+	�ȉ��̃t�@�C���́A�N���̂��߂ɕK�v�ł��̂ŁA���s�t�@�C���쐬���Ȃǂ��K������Ă����Ă��������B
 
 	res/font.gpb
-	res/shaders フォルダ(中のファイルも含む)
-
-
-・注意点
-
-	HGIMG4は、外部DLLファイルによる拡張プラグインではありません。
-	HSP3DISHの機能を内包したランタイムファイルとして提供されています。
-	必ず、HGIMG4のランタイムに対応したバージョンのコンパイラ
-	(hspcmp.dll)やスクリプトエディタをご使用下さい。
-	また、HSP3は実行ランタイムに対応したコードジェネレーター(hspcmp.dll)
-	をご使用ください。(HSP3.5以上を推奨)
-
-	DirectX9版ランタイムの実行ファイル作成時には、「d3dcompiler_47.dll」
-	「libEGL.dll」「libGLESv2.dll」の3ファイルが実行ファイルと同じフォルダに
-	必要となりますので注意してください。
-
-
-・命令一覧(メイン)
-
-	setcls mode,color,tex				画面消去設定
-	gpviewport x,y,sx,sy				ビューポート設定
-	setborder sx,sy,sz,option			オブジェクト有効範囲設定
-	gpgetlog var					HGIMG4エラーログを取得
-
-	gpreset	option					シーンを描画
-	gppostefx  postid,opt1,opt2			ポストエフェクト生成
-	gpuselight objid				ライトオブジェクトの切り替え
-	gpusecamera objid				カメラオブジェクトの切り替え
-	gpusescene sceneid				シーンの切り替え
-
-	gpobjpool start,num				オブジェクトID生成の設定
-	delobj objid					オブジェクトの破棄
-	gpsetprm objid,prmid,value			オブジェクトのコアパラメーター設定
-	gpgetprm var,objid,prmid			オブジェクトのコアパラメーター取得
-	setobjname objid,"name"				オブジェクトのノード名を設定する
-	getobjname var,objid				オブジェクトのノード名を取得する
-	setobjmode id,mode,sw				オブジェクトのモード設定
-	setcoli id,mygroup,enegroup			オブジェクトのコリジョン設定
-	getcoli val,id,distance				オブジェクトのコリジョン判定
-	findobj exmode,group				オブジェクト検索
-	nextobj val					次のオブジェクト検索
-
-	gpcolormat var,color,opt			カラーマテリアルの生成
-	gptexmat var,"file",opt				テクスチャマテリアルの生成
-	gpusermat var,"vsh","fsh","defs",color,opt	カスタムマテリアルの生成
-	gpmatprm objid,"name",x,y,z			マテリアルのパラメーター設定
-	gpmatprm objid,"name",value			マテリアルのパラメーター設定(2)
-	gpmatprm objid,"name",x,y,z,w			マテリアルのパラメーター設定(3)
-	gpmatstate objid,"name","value"			マテリアルのステート設定
-
-	gpbox var,size,color,matobj			箱ノードを生成
-	gpfloor var,sizex,sizey,color,matobj		床ノードを生成
-	gpplate var,sizex,sizey,color,matobj		板ノードを生成
-	gpload var,"file","name"			3Dモデルノードを生成
-	gpspr var,bufid,celid,gmode			2Dスプライトノード生成
-	gpnull var					ヌルノードを生成
-
-	gplight id,opt,range,inner,outer		ライトノードを設定
-	gpcamera id,fov,aspect,near,far			カメラノードを設定
-
-	gpclone var,objid				ノードを複製
-	setobjmode objid,value,mode			オブジェクトのモード設定
-	setalpha objid,value				オブジェクトの透明度(α値)設定
-	gplookat objid,x,y,z				指定座標に向けてノードを回転
-
-	gppbind objid,mass,friction			ノードに標準的な物理特性を設定
-	gppset objid,prmid,x,y,z			ノードの物理パラメーターを設定
-	gppapply objid,action,x,y,z			ノードに物理的な力を適用する
-
-	celputm vxpos,vypos,vcelid,bufid,count		セルをまとめて描画する
-	gpdraw option					シーン内の全オブジェクトを描画する
-
-	gpaddanim objid,"name",start,end,option		アニメーションクリップを追加
-	gpact objid,"name",option			アニメーションクリップを再生/停止
-	gpgetanim var,objid,index,prmid			アニメーションクリップ設定を取得
-	gpsetanim objid,index,prmid,value		アニメーションクリップ設定を更新
-
-
-・命令一覧(オブジェクト操作)
-
-	getpos id,x,y,z					ノード座標を取得
-	setpos id,x,y,z					ノード座標を設定
-	addpos id,x,y,z					ノード座標を加算
-	getposi id,x,y,z				ノード座標を取得(整数値)
-
-	setang id,x,y,z					ノード回転を設定
-	setangr id,x,y,z				ノード回転を設定(整数値)
-	addang id,x,y,z					ノード回転を加算
-	addangr id,x,y,z				ノード回転を加算(整数値)
-
-	getscale id,x,y,z				ノード倍率を取得
-	setscale id,x,y,z				ノード倍率を設定
-	addscale id,x,y,z				ノード倍率を加算
-	getscalei id,x,y,z				ノード倍率を取得(整数値)
-
-	getdir id,x,y,z					ノード移動量を取得
-	setdir id,x,y,z					ノード移動量を設定
-	adddir id,x,y,z					ノード移動量を加算
-	getdiri id,x,y,z				ノード移動量を取得(整数値)
-
-	getwork id,x,y,z				ノードワーク値を取得
-	setwork id,x,y,z				ノードワーク値を設定
-	addwork id,x,y,z				ノードワーク値を加算
-	getworki id,x,y,z				ノードワーク値を取得(整数値)
+	res/shaders �t�H���_(���̃t�@�C�����܂�)
+
+
+�E���ӓ_
+
+	HGIMG4�́A�O��DLL�t�@�C���ɂ��g���v���O�C���ł͂���܂���B
+	HSP3DISH�̋@�\�����������^�C���t�@�C���Ƃ��Ē񋟂���Ă��܂��B
+	�K���AHGIMG4�̃����^�C���ɑΉ������o�[�W�����̃R���p�C��
+	(hspcmp.dll)��X�N���v�g�G�f�B�^�����g�p�������B
+	�܂��AHSP3�͎��s�����^�C���ɑΉ������R�[�h�W�F�l���[�^�[(hspcmp.dll)
+	�����g�p���������B(HSP3.5�ȏ�𐄏�)
+
+	DirectX9�Ń����^�C���̎��s�t�@�C���쐬���ɂ́A�ud3dcompiler_47.dll�v
+	�ulibEGL.dll�v�ulibGLESv2.dll�v��3�t�@�C�������s�t�@�C���Ɠ����t�H���_��
+	�K�v�ƂȂ�܂��̂Œ��ӂ��Ă��������B
+
+
+�E���߈ꗗ(���C��)
+
+	setcls mode,color,tex				��ʏ����ݒ�
+	gpviewport x,y,sx,sy				�r���[�|�[�g�ݒ�
+	setborder sx,sy,sz,option			�I�u�W�F�N�g�L���͈͐ݒ�
+	gpgetlog var					HGIMG4�G���[���O���擾
+
+	gpreset	option					�V�[����`��
+	gppostefx  postid,opt1,opt2			�|�X�g�G�t�F�N�g����
+	gpuselight objid				���C�g�I�u�W�F�N�g�̐؂�ւ�
+	gpusecamera objid				�J�����I�u�W�F�N�g�̐؂�ւ�
+	gpusescene sceneid				�V�[���̐؂�ւ�
+
+	gpobjpool start,num				�I�u�W�F�N�gID�����̐ݒ�
+	delobj objid					�I�u�W�F�N�g�̔j��
+	gpsetprm objid,prmid,value			�I�u�W�F�N�g�̃R�A�p�����[�^�[�ݒ�
+	gpgetprm var,objid,prmid			�I�u�W�F�N�g�̃R�A�p�����[�^�[�擾
+	setobjname objid,"name"				�I�u�W�F�N�g�̃m�[�h����ݒ肷��
+	getobjname var,objid				�I�u�W�F�N�g�̃m�[�h�����擾����
+	setobjmode id,mode,sw				�I�u�W�F�N�g�̃��[�h�ݒ�
+	setcoli id,mygroup,enegroup			�I�u�W�F�N�g�̃R���W�����ݒ�
+	getcoli val,id,distance				�I�u�W�F�N�g�̃R���W��������
+	findobj exmode,group				�I�u�W�F�N�g����
+	nextobj val					���̃I�u�W�F�N�g����
+
+	gpcolormat var,color,opt			�J���[�}�e���A���̐���
+	gptexmat var,"file",opt				�e�N�X�`���}�e���A���̐���
+	gpusermat var,"vsh","fsh","defs",color,opt	�J�X�^���}�e���A���̐���
+	gpmatprm objid,"name",x,y,z			�}�e���A���̃p�����[�^�[�ݒ�
+	gpmatprm objid,"name",value			�}�e���A���̃p�����[�^�[�ݒ�(2)
+	gpmatprm objid,"name",x,y,z,w			�}�e���A���̃p�����[�^�[�ݒ�(3)
+	gpmatstate objid,"name","value"			�}�e���A���̃X�e�[�g�ݒ�
+
+	gpbox var,size,color,matobj			���m�[�h�𐶐�
+	gpfloor var,sizex,sizey,color,matobj		���m�[�h�𐶐�
+	gpplate var,sizex,sizey,color,matobj		�m�[�h�𐶐�
+	gpload var,"file","name"			3D���f���m�[�h�𐶐�
+	gpspr var,bufid,celid,gmode			2D�X�v���C�g�m�[�h����
+	gpnull var					�k���m�[�h�𐶐�
+
+	gplight id,opt,range,inner,outer		���C�g�m�[�h��ݒ�
+	gpcamera id,fov,aspect,near,far			�J�����m�[�h��ݒ�
+
+	gpclone var,objid				�m�[�h�𕡐�
+	setobjmode objid,value,mode			�I�u�W�F�N�g�̃��[�h�ݒ�
+	setalpha objid,value				�I�u�W�F�N�g�̓����x(���l)�ݒ�
+	gplookat objid,x,y,z				�w����W�Ɍ����ăm�[�h����]
+
+	gppbind objid,mass,friction			�m�[�h�ɕW���I�ȕ���������ݒ�
+	gppset objid,prmid,x,y,z			�m�[�h�̕����p�����[�^�[��ݒ�
+	gppapply objid,action,x,y,z			�m�[�h�ɕ����I�ȗ͂�K�p����
+
+	celputm vxpos,vypos,vcelid,bufid,count		�Z�����܂Ƃ߂ĕ`�悷��
+	gpdraw option					�V�[�����̑S�I�u�W�F�N�g��`�悷��
+
+	gpaddanim objid,"name",start,end,option		�A�j���[�V�����N���b�v��ǉ�
+	gpact objid,"name",option			�A�j���[�V�����N���b�v���Đ�/��~
+	gpgetanim var,objid,index,prmid			�A�j���[�V�����N���b�v�ݒ���擾
+	gpsetanim objid,index,prmid,value		�A�j���[�V�����N���b�v�ݒ���X�V
+
+
+�E���߈ꗗ(�I�u�W�F�N�g����)
+
+	getpos id,x,y,z					�m�[�h���W���擾
+	setpos id,x,y,z					�m�[�h���W��ݒ�
+	addpos id,x,y,z					�m�[�h���W�����Z
+	getposi id,x,y,z				�m�[�h���W���擾(�����l)
+
+	setang id,x,y,z					�m�[�h��]��ݒ�
+	setangr id,x,y,z				�m�[�h��]��ݒ�(�����l)
+	addang id,x,y,z					�m�[�h��]�����Z
+	addangr id,x,y,z				�m�[�h��]�����Z(�����l)
+
+	getscale id,x,y,z				�m�[�h�{�����擾
+	setscale id,x,y,z				�m�[�h�{����ݒ�
+	addscale id,x,y,z				�m�[�h�{�������Z
+	getscalei id,x,y,z				�m�[�h�{�����擾(�����l)
+
+	getdir id,x,y,z					�m�[�h�ړ��ʂ��擾
+	setdir id,x,y,z					�m�[�h�ړ��ʂ�ݒ�
+	adddir id,x,y,z					�m�[�h�ړ��ʂ����Z
+	getdiri id,x,y,z				�m�[�h�ړ��ʂ��擾(�����l)
+
+	getwork id,x,y,z				�m�[�h���[�N�l���擾
+	setwork id,x,y,z				�m�[�h���[�N�l��ݒ�
+	addwork id,x,y,z				�m�[�h���[�N�l�����Z
+	getworki id,x,y,z				�m�[�h���[�N�l���擾(�����l)
 
-	getwork2 id,x,y,z				ノードワーク値2を取得
-	setwork2 id,x,y,z				ノードワーク値2を設定
-	addwork2 id,x,y,z				ノードワーク値2を加算
-	getwork2i id,x,y,z				ノードワーク値2を取得(整数値)
+	getwork2 id,x,y,z				�m�[�h���[�N�l2���擾
+	setwork2 id,x,y,z				�m�[�h���[�N�l2��ݒ�
+	addwork2 id,x,y,z				�m�[�h���[�N�l2�����Z
+	getwork2i id,x,y,z				�m�[�h���[�N�l2���擾(�����l)
 
-	getcolor id,x,y,z				ノードRGBカラーを取得
-	setcolor id,x,y,z				ノードRGBカラーを設定
-	addcolor id,x,y,z				ノードRGBカラーを加算
-	getcolori id,x,y,z				ノードRGBカラーを取得(整数値)
+	getcolor id,x,y,z				�m�[�hRGB�J���[���擾
+	setcolor id,x,y,z				�m�[�hRGB�J���[��ݒ�
+	addcolor id,x,y,z				�m�[�hRGB�J���[�����Z
+	getcolori id,x,y,z				�m�[�hRGB�J���[���擾(�����l)
 
 
-・命令一覧(補助)
+�E���߈ꗗ(�⏕)
 
-	selpos id					移動座標をMOC情報に設定
-	selang id					回転角度をMOC情報に設定
-	selscale id					スケールをMOC情報に設定
-	seldir id					移動量をMOC情報に設定
+	selpos id					�ړ����W��MOC���ɐݒ�
+	selang id					��]�p�x��MOC���ɐݒ�
+	selscale id					�X�P�[����MOC���ɐݒ�
+	seldir id					�ړ��ʂ�MOC���ɐݒ�
 
-	objsetf3 x,y,z					選択中のMOC情報を設定
-	objaddf3 x,y,z					選択中のMOC情報を加算
+	objsetf3 x,y,z					�I�𒆂�MOC����ݒ�
+	objaddf3 x,y,z					�I�𒆂�MOC�������Z
 
-	objgetfv fv					選択中のMOC情報を取得
-	objsetfv fv					選択中のMOC情報を設定
-	objaddfv fv					選択中のMOC情報を加算
+	objgetfv fv					�I�𒆂�MOC�����擾
+	objsetfv fv					�I�𒆂�MOC����ݒ�
+	objaddfv fv					�I�𒆂�MOC�������Z
 
-	fvset fv,x,y,z					ベクトル設定
-	fvseti fv,x,y,z					整数値からベクトル設定
-	fvadd fv,x,y,z					ベクトル加算
-	fvsub fv,x,y,z					ベクトル減算
-	fvmul fv,x,y,z					ベクトル乗算
-	fvdiv fv,x,y,z					ベクトル除算
-	fvdir fv,x,y,z					ベクトル回転
-	fvmin fv,x,y,z					ベクトル最大値
-	fvmax fv,x,y,z					ベクトル最小値
-	fvouter fv,x,y,z				ベクトル外積
-	fvinner fv,x,y,z				ベクトル内積
-	fvface fv,x,y,z					座標から角度を得る
-	fvunit fv						ベクトル正規化
-	fsin fval,rot					サインを求める
-	fcos fval,rot					コサインを求める
-	fsqr fval,prm					平方根を求める
-	froti fval,prm					整数値角度を小数値に変換
+	fvset fv,x,y,z					�x�N�g���ݒ�
+	fvseti fv,x,y,z					�����l����x�N�g���ݒ�
+	fvadd fv,x,y,z					�x�N�g�����Z
+	fvsub fv,x,y,z					�x�N�g�����Z
+	fvmul fv,x,y,z					�x�N�g����Z
+	fvdiv fv,x,y,z					�x�N�g�����Z
+	fvdir fv,x,y,z					�x�N�g����]
+	fvmin fv,x,y,z					�x�N�g���ő�l
+	fvmax fv,x,y,z					�x�N�g���ŏ��l
+	fvouter fv,x,y,z				�x�N�g���O��
+	fvinner fv,x,y,z				�x�N�g������
+	fvface fv,x,y,z					���W����p�x�𓾂�
+	fvunit fv						�x�N�g�����K��
+	fsin fval,rot					�T�C�������߂�
+	fcos fval,rot					�R�T�C�������߂�
+	fsqr fval,prm					�����������߂�
+	froti fval,prm					�����l�p�x�������l�ɕϊ�
 
-	fv2str fv					ベクトルを文字列に変換
-	str2fv fv,"x,y,z"				文字列をベクトルに変換
+	fv2str fv					�x�N�g���𕶎���ɕϊ�
+	str2fv fv,"x,y,z"				��������x�N�g���ɕϊ�
 
 
-・HGIMG4の制限
+�EHGIMG4�̐���
 
-	HGIMG4は、HSP3Dishランタイムを拡張する形で実装されています。
-	HSP3Dishが持つ命令をすべてサポートしているほか、いくつかの拡張が行なわれています。
-	ただし、HSP3Dishによる制約(COMオブジェクト、各種配置オブジェクトの使用不可、出力は単一のスクリーンなど)も
-	同様に発生します。基本的な文法、プログラム制御はHSP3と同様です。
-	HSP3Dishについての詳細は、HSP3Dish プログラミングマニュアル・基本仕様ガイド(hsp3dish_prog.htm)を
-	参照してください。
+	HGIMG4�́AHSP3Dish�����^�C�����g������`�Ŏ�������Ă��܂��B
+	HSP3Dish�������߂����ׂăT�|�[�g���Ă���ق��A�������̊g�����s�Ȃ��Ă��܂��B
+	�������AHSP3Dish�ɂ�鐧��(COM�I�u�W�F�N�g�A�e��z�u�I�u�W�F�N�g�̎g�p�s�A�o�͂͒P��̃X�N���[���Ȃ�)��
+	���l�ɔ������܂��B��{�I�ȕ��@�A�v���O���������HSP3�Ɠ��l�ł��B
+	HSP3Dish�ɂ��Ă̏ڍׂ́AHSP3Dish �v���O���~���O�}�j���A���E��{�d�l�K�C�h(hsp3dish_prog.htm)��
+	�Q�Ƃ��Ă��������B
 
 
-・HSP3.5β5版との違い
+�EHSP3.5��5�łƂ̈Ⴂ
 
-	HSP3.5β6版で追加変更された項目の概要は以下の通りです。
+	HSP3.5��6�łŒǉ��ύX���ꂽ���ڂ̊T�v�͈ȉ��̒ʂ�ł��B
 
-	・クォータニオン値の設定・取得
+	�E�N�H�[�^�j�I���l�̐ݒ�E�擾
 
-	getquat,setquat命令により、クォータニオンによる回転情報の取得・設定が可能になっています。
-	クォータニオンは、4つの実数(x,y,z,w)によって示されます。
-	HGIMG4では、すべてのノード情報をクォータニオン値によって保持されています。
+	getquat,setquat���߂ɂ��A�N�H�[�^�j�I���ɂ���]���̎擾�E�ݒ肪�\�ɂȂ��Ă��܂��B
+	�N�H�[�^�j�I���́A4�̎���(x,y,z,w)�ɂ���Ď�����܂��B
+	HGIMG4�ł́A���ׂẴm�[�h�����N�H�[�^�j�I���l�ɂ���ĕێ�����Ă��܂��B
 
-	・イベント制御機能を追加
+	�E�C�x���g����@�\��ǉ�
 
-	HGIMG3と同様のイベント制御機能を追加しています。
-	イベントは、プログラムのようにあらかじめ登録された手順でオブジェクトを
-	制御することのできる機構です。
-	詳しくは、イベント機能についての説明を参照してください。
+	HGIMG3�Ɠ��l�̃C�x���g����@�\��ǉ����Ă��܂��B
+	�C�x���g�́A�v���O�����̂悤�ɂ��炩���ߓo�^���ꂽ�菇�ŃI�u�W�F�N�g��
+	���䂷�邱�Ƃ̂ł���@�\�ł��B
+	�ڂ����́A�C�x���g�@�\�ɂ��Ă̐������Q�Ƃ��Ă��������B
 
-	・アニメーション更新を固定フレームレートに対応
+	�E�A�j���[�V�����X�V���Œ�t���[�����[�g�ɑΉ�
 
-	3Dモデルのアニメーション再生時に、経過時間をベースにしていましたが
-	フレームの更新と同期した細かい制御が難しかったため、フレームレートに
-	応じたアニメーションの更新を行なうモードを追加しました。
-	setreq命令によりSYSREQ_FIXEDFRAMEパラメーターを設定することで、
-	固定フレームレートによるアニメーション更新となります。
+	3D���f���̃A�j���[�V�����Đ����ɁA�o�ߎ��Ԃ��x�[�X�ɂ��Ă��܂�����
+	�t���[���̍X�V�Ɠ��������ׂ������䂪����������߁A�t���[�����[�g��
+	�������A�j���[�V�����̍X�V���s�Ȃ����[�h��ǉ����܂����B
+	setreq���߂ɂ��SYSREQ_FIXEDFRAME�p�����[�^�[��ݒ肷�邱�ƂŁA
+	�Œ�t���[�����[�g�ɂ��A�j���[�V�����X�V�ƂȂ�܂��B
 
-		例:
-		setreq SYSREQ_FIXEDFRAME,12	; 12msごとにアニメーション更新
+		��:
+		setreq SYSREQ_FIXEDFRAME,12	; 12ms���ƂɃA�j���[�V�����X�V
 
-	上の例では、12msごとにアニメーションが更新されます。
-	経過時間ベースの更新にする場合は、-1を設定してください。
-	デフォルトの挙動は、経過時間ベースに設定されています。
+	��̗�ł́A12ms���ƂɃA�j���[�V�������X�V����܂��B
+	�o�ߎ��ԃx�[�X�̍X�V�ɂ���ꍇ�́A-1��ݒ肵�Ă��������B
+	�f�t�H���g�̋����́A�o�ߎ��ԃx�[�X�ɐݒ肳��Ă��܂��B
 
-	・オブジェクトのフェード機能を追加
+	�E�I�u�W�F�N�g�̃t�F�[�h�@�\��ǉ�
 
-	オブジェクトのフェードを自動化するための機能が追加されています。
-	オブジェクトパラメーター、PRMSET_FADEに値を設定するだけで、
-	フェードイン・フェードアウトなどの挙動を設定することができます。
-	フェードアウト後は、自動的にオブジェクトが消去されます。
+	�I�u�W�F�N�g�̃t�F�[�h�����������邽�߂̋@�\���ǉ�����Ă��܂��B
+	�I�u�W�F�N�g�p�����[�^�[�APRMSET_FADE�ɒl��ݒ肷�邾���ŁA
+	�t�F�[�h�C���E�t�F�[�h�A�E�g�Ȃǂ̋�����ݒ肷�邱�Ƃ��ł��܂��B
+	�t�F�[�h�A�E�g��́A�����I�ɃI�u�W�F�N�g����������܂��B
 
-		例:
-		gpsetprm id, PRMSET_FADE, -4	; フェードアウト
+		��:
+		gpsetprm id, PRMSET_FADE, -4	; �t�F�[�h�A�E�g
 
-	上の例では、idが示すオブジェクトを1フレームごとに4ずつ透明度を
-	減算してフェードアウトします。
+	��̗�ł́Aid�������I�u�W�F�N�g��1�t���[�����Ƃ�4�������x��
+	���Z���ăt�F�[�h�A�E�g���܂��B
 
-	・新規命令の追加
+	�E�V�K���߂̒ǉ�
 
-	3Dオブジェクトが2D上に表示される際の座標を取得するgpcnvaxis命令が実装されました。
-	HGIMG3と同様にお使い頂けます。
+	3D�I�u�W�F�N�g��2D��ɕ\�������ۂ̍��W���擾����gpcnvaxis���߂���������܂����B
+	HGIMG3�Ɠ��l�ɂ��g�������܂��B
 
-	・システムの安定化とメモリリークの修正
+	�E�V�X�e���̈��艻�ƃ��������[�N�̏C��
 
-	オブジェクト破棄時などに発生していた、いくつかのメモリリークを修正しました。
-	β5版を使用されている方は、アップデートを推奨致します。
+	�I�u�W�F�N�g�j�����Ȃǂɔ������Ă����A�������̃��������[�N���C�����܂����B
+	��5�ł��g�p����Ă�����́A�A�b�v�f�[�g�𐄏��v���܂��B
 
 
-・HSP3.5β4版との違い
+�EHSP3.5��4�łƂ̈Ⴂ
 
-	HSP3.5β5版では、それまでのHGIMG4から大きく修正を行なっています。
-	より強力で使いやすくなるよう、各種機能を見直しました。
-	以前のバージョンからの上位互換で動作するよう設計されていますが、
-	一部の機能で動作が異なる場合がありますので、過去に作成したスクリプトを
-	動作させる際にはご注意ください。
-	HSP3.5β5版で追加変更された項目の概要は以下の通りです。
+	HSP3.5��5�łł́A����܂ł�HGIMG4����傫���C�����s�Ȃ��Ă��܂��B
+	��苭�͂Ŏg���₷���Ȃ�悤�A�e��@�\���������܂����B
+	�ȑO�̃o�[�W��������̏�ʌ݊��œ��삷��悤�݌v����Ă��܂����A
+	�ꕔ�̋@�\�œ��삪�قȂ�ꍇ������܂��̂ŁA�ߋ��ɍ쐬�����X�N���v�g��
+	���삳����ۂɂ͂����ӂ��������B
+	HSP3.5��5�łŒǉ��ύX���ꂽ���ڂ̊T�v�͈ȉ��̒ʂ�ł��B
 
-	・システムの安定化とエラーログ取得
+	�E�V�X�e���̈��艻�ƃG���[���O�擾
 
-	HGIMG4の3D描画エンジンであるgameplay3Dのアップデートを反映しました。
-	3Dモデルのコンバーターや、モデルの表示、アニメーション再生などのシステム安定性が向上しています。
-	また、データの不備やエラーがあった場合にもできる限りエラー表示を行なうよう修正し、
-	さらに詳細なエラーログを取得するためのgpgetlog命令を追加しました。
+	HGIMG4��3D�`��G���W���ł���gameplay3D�̃A�b�v�f�[�g�𔽉f���܂����B
+	3D���f���̃R���o�[�^�[��A���f���̕\���A�A�j���[�V�����Đ��Ȃǂ̃V�X�e�����萫�����サ�Ă��܂��B
+	�܂��A�f�[�^�̕s����G���[���������ꍇ�ɂ��ł������G���[�\�����s�Ȃ��悤�C�����A
+	����ɏڍׂȃG���[���O���擾���邽�߂�gpgetlog���߂�ǉ����܂����B
 
-	・新しいシェーダーシステム
+	�E�V�����V�F�[�_�[�V�X�e��
 
-	以前のバージョンからシェーダーの構成が変更され、より自由度の高いシステムになっています。
-	(以前のバージョンとシェーダー名や定義名が変わっているものがあるのでご注意ください)
-	ユーザーが作成した独自のシェーダー(GLSL)も十分に活用できるよう拡張されています。
-	gcopyやcelputなど、2D系の描画命令で使用するシェーダーも自由に割り当てが可能になります。
+	�ȑO�̃o�[�W��������V�F�[�_�[�̍\�����ύX����A��莩�R�x�̍����V�X�e���ɂȂ��Ă��܂��B
+	(�ȑO�̃o�[�W�����ƃV�F�[�_�[�����`�����ς���Ă�����̂�����̂ł����ӂ�������)
+	���[�U�[���쐬�����Ǝ��̃V�F�[�_�[(GLSL)���\���Ɋ��p�ł���悤�g������Ă��܂��B
+	gcopy��celput�ȂǁA2D�n�̕`�施�߂Ŏg�p����V�F�[�_�[�����R�Ɋ��蓖�Ă��\�ɂȂ�܂��B
 
-	・アニメーションクリップの作成
+	�E�A�j���[�V�����N���b�v�̍쐬
 
-	3Dモデルのアニメーションデータをクリップとして自由に取り出して使用することができます。
-	複数のアニメーション切り替えや、モーションのブレンドなど多彩な処理が可能になります。
+	3D���f���̃A�j���[�V�����f�[�^���N���b�v�Ƃ��Ď��R�Ɏ��o���Ďg�p���邱�Ƃ��ł��܂��B
+	�����̃A�j���[�V�����؂�ւ���A���[�V�����̃u�����h�ȂǑ��ʂȏ������\�ɂȂ�܂��B
 
-	・レンダリングバッファとポストエフェクト機能
+	�E�����_�����O�o�b�t�@�ƃ|�X�g�G�t�F�N�g�@�\
 
-	buffer命令で作成したオフスクリーンをレンダリングバッファとして描画することができます。
-	これによりレンダリングパイプラインを構築して、ポストエフェクト(画面全体の効果)などに利用することが可能です。
-	サンプルとして標準的に使用できるポストエフェクトとして、
-	セピア調フィルタ、グレースケールフィルター、ブラー(ぼかし)、モザイク、
-	輪郭抽出、古いフィルム効果、グロー(発光)などのシェーダーを用意しています。
+	buffer���߂ō쐬�����I�t�X�N���[���������_�����O�o�b�t�@�Ƃ��ĕ`�悷�邱�Ƃ��ł��܂��B
+	����ɂ�背���_�����O�p�C�v���C�����\�z���āA�|�X�g�G�t�F�N�g(��ʑS�̂̌���)�Ȃǂɗ��p���邱�Ƃ��\�ł��B
+	�T���v���Ƃ��ĕW���I�Ɏg�p�ł���|�X�g�G�t�F�N�g�Ƃ��āA
+	�Z�s�A���t�B���^�A�O���[�X�P�[���t�B���^�[�A�u���[(�ڂ���)�A���U�C�N�A
+	�֊s���o�A�Â��t�B�������ʁA�O���[(����)�Ȃǂ̃V�F�[�_�[��p�ӂ��Ă��܂��B
 
-	・プラットフォームサポートの追加
+	�E�v���b�g�t�H�[���T�|�[�g�̒ǉ�
 
-	Windows,Android,WebGLに加えて、Linux,Raspbian,iOS上での動作をサポートしました。
-	幅広いプラットフォームでHGIMG4の高度な機能を利用することができます。
-	また、モーションセンサー(加速度・ジャイロ)の値を取得可能になっています。
-	(Android,iOS版)
+	Windows,Android,WebGL�ɉ����āALinux,Raspbian,iOS��ł̓�����T�|�[�g���܂����B
+	���L���v���b�g�t�H�[����HGIMG4�̍��x�ȋ@�\�𗘗p���邱�Ƃ��ł��܂��B
+	�܂��A���[�V�����Z���T�[(�����x�E�W���C��)�̒l���擾�\�ɂȂ��Ă��܂��B
+	(Android,iOS��)
 
-	・addscale命令の変更
+	�Eaddscale���߂̕ύX
 
-	従来のバージョン(3.5β4)では、addscale命令は元のスケールに対する乗算となっていました。
-	これをHGIMG3に準拠したスケール値の加算に変更しています。
-	これにより、従来のスクリプトでaddscale命令を使用していた場合、修正が必要となります。
+	�]���̃o�[�W����(3.5��4)�ł́Aaddscale���߂͌��̃X�P�[���ɑ΂����Z�ƂȂ��Ă��܂����B
+	�����HGIMG3�ɏ��������X�P�[���l�̉��Z�ɕύX���Ă��܂��B
+	����ɂ��A�]���̃X�N���v�g��addscale���߂��g�p���Ă����ꍇ�A�C�����K�v�ƂȂ�܂��B
 
-	・getcoli命令の動作変更
+	�Egetcoli���߂̓���ύX
 
-	従来のバージョン(3.5β4)までは、getcoli命令で使用する衝突検出範囲(distance)は
-	元のモデルが持つ衝突範囲に対する倍率(相対値)になっていました。
-	β5以降では、HGIMG3と共通の仕様となるようにモデルの中心座標に対する半径(実数値)に修正されました。
-	これにより、従来のスクリプトでgetcoli命令を使用していた場合、修正が必要となります。
-	従来と同様の動作にするためには、衝突検出範囲(distance)にマイナス値を指定してください。
-	従来1.5と指定されていた場合は-1.5と指定することにより、同じ動作になります。
+	�]���̃o�[�W����(3.5��4)�܂ł́Agetcoli���߂Ŏg�p����Փˌ��o�͈�(distance)��
+	���̃��f�������Փ˔͈͂ɑ΂���{��(���Βl)�ɂȂ��Ă��܂����B
+	��5�ȍ~�ł́AHGIMG3�Ƌ��ʂ̎d�l�ƂȂ�悤�Ƀ��f���̒��S���W�ɑ΂��锼�a(�����l)�ɏC������܂����B
+	����ɂ��A�]���̃X�N���v�g��getcoli���߂��g�p���Ă����ꍇ�A�C�����K�v�ƂȂ�܂��B
+	�]���Ɠ��l�̓���ɂ��邽�߂ɂ́A�Փˌ��o�͈�(distance)�Ƀ}�C�i�X�l���w�肵�Ă��������B
+	�]��1.5�Ǝw�肳��Ă����ꍇ��-1.5�Ǝw�肷�邱�Ƃɂ��A��������ɂȂ�܂��B
 
-	・その他不具合の修正、機能修正など
+	�E���̑��s��̏C���A�@�\�C���Ȃ�
 
-	findobj命令の第２パラメータをPRMSET_MYGROUPでなかった不具合を修正(HGIMG3と同一に)
-	gpobjpool命令の第２パラメータが「最大割り当て数」ではなく「終了ID+1」になっている不具合を修正
-	Windowsランタイムの実行ファイルで標準のウインドウタイトルを出さないように修正
-	Windowsランタイムはシステム変数hwnd,hinstを返すように修正
+	findobj���߂̑�Q�p�����[�^��PRMSET_MYGROUP�łȂ������s����C��(HGIMG3�Ɠ����)
+	gpobjpool���߂̑�Q�p�����[�^���u�ő劄�蓖�Đ��v�ł͂Ȃ��u�I��ID+1�v�ɂȂ��Ă���s����C��
+	Windows�����^�C���̎��s�t�@�C���ŕW���̃E�C���h�E�^�C�g�����o���Ȃ��悤�ɏC��
+	Windows�����^�C���̓V�X�e���ϐ�hwnd,hinst��Ԃ��悤�ɏC��
 
 
-・HGIMG3との違い
+�EHGIMG3�Ƃ̈Ⴂ
 
-	HGIMG4では、基本的にHGIMG3とソースコードの互換性はありません。
-	しかし、HGIMG3に触れたことがあるユーザーであれば、命令体系やシステム的に継承されている
-	点が多いため比較的容易に移行することができるでしょう。
+	HGIMG4�ł́A��{�I��HGIMG3�ƃ\�[�X�R�[�h�̌݊����͂���܂���B
+	�������AHGIMG3�ɐG�ꂽ���Ƃ����郆�[�U�[�ł���΁A���ߑ̌n��V�X�e���I�Ɍp������Ă���
+	�_���������ߔ�r�I�e�ՂɈڍs���邱�Ƃ��ł���ł��傤�B
 
-	HGIMG3との主な違いは以下の通りです。
+	HGIMG3�Ƃ̎�ȈႢ�͈ȉ��̒ʂ�ł��B
 
-	・HGIMG3ではモデルを生成して、オブジェクトに割り当てていましたが、HGIMG4では
-	　オブジェクト(ノードオブジェクト)を直接生成して配置する形になります。
-	・ライトの反映、テクスチャ、色、半透明設定などの情報はマテリアルオブジェクトとして
-	　生成され、オブジェクトに割り当てる形になります。
-	・HGIMG3でsetefx命令により指定されていた半透明マテリアルの設定は利用できません。
-	・HGIMG4はOpenGLによる右手座標系が使用されています。Y軸やZ軸の正方向がHGIMG3と異なります
-	・HGIMG4ではオブジェクトの回転情報を内部ではクォータニオン形式で保持しています。
-	　HGIMG3と同様にX,Y,Z回転の角度を与えることも可能ですが、HGIMG3と異なる回転姿勢になる
-	　可能性があります。
-	・同じモデルを複数配置するような場合は、クローン(gpclone命令)を利用することが推奨されます。
+	�EHGIMG3�ł̓��f���𐶐����āA�I�u�W�F�N�g�Ɋ��蓖�ĂĂ��܂������AHGIMG4�ł�
+	�@�I�u�W�F�N�g(�m�[�h�I�u�W�F�N�g)�𒼐ڐ������Ĕz�u����`�ɂȂ�܂��B
+	�E���C�g�̔��f�A�e�N�X�`���A�F�A�������ݒ�Ȃǂ̏��̓}�e���A���I�u�W�F�N�g�Ƃ���
+	�@��������A�I�u�W�F�N�g�Ɋ��蓖�Ă�`�ɂȂ�܂��B
+	�EHGIMG3��setefx���߂ɂ��w�肳��Ă����������}�e���A���̐ݒ�͗��p�ł��܂���B
+	�EHGIMG4��OpenGL�ɂ��E����W�n���g�p����Ă��܂��BY����Z���̐�������HGIMG3�ƈقȂ�܂�
+	�EHGIMG4�ł̓I�u�W�F�N�g�̉�]��������ł̓N�H�[�^�j�I���`���ŕێ����Ă��܂��B
+	�@HGIMG3�Ɠ��l��X,Y,Z��]�̊p�x��^���邱�Ƃ��\�ł����AHGIMG3�ƈقȂ��]�p���ɂȂ�
+	�@�\��������܂��B
+	�E�������f���𕡐��z�u����悤�ȏꍇ�́A�N���[��(gpclone����)�𗘗p���邱�Ƃ���������܂��B
 
 
-・初期化と描画の方法
+�E�������ƕ`��̕��@
 
-	初期化を以下の手順に従って行なって下さい。
+	���������ȉ��̎菇�ɏ]���čs�Ȃ��ĉ������B
 
-		gpreset				; hgimgの初期化
+		gpreset				; hgimg�̏�����
 
-	gpreset命令は、システム全初期化を行なう命令です。
-	初期化はいつでも、何度でも行なうことが可能です。
+	gpreset���߂́A�V�X�e���S���������s�Ȃ����߂ł��B
+	�������͂��ł��A���x�ł��s�Ȃ����Ƃ��\�ł��B
 
-	初期化が終わったら、いつでも登録されているオブジェクトを表示可能な
-	状態になります。
-	HGIMG4では、描画を以下のようなループで行ないます。
+	���������I�������A���ł��o�^����Ă���I�u�W�F�N�g��\���\��
+	��ԂɂȂ�܂��B
+	HGIMG4�ł́A�`����ȉ��̂悤�ȃ��[�v�ōs�Ȃ��܂��B
 
 	;------------------------------------------------------------------
 	*main
-		;	描画メイン
+		;	�`�惁�C��
 		;
-		redraw 0			; 描画開始(画面クリア)
+		redraw 0			; �`��J�n(��ʃN���A)
 
 		;	
-		;	各種描画を行なう
+		;	�e��`����s�Ȃ�
 		;	
 
-		redraw 1			; 描画終了
-		await 1000/60			; 時間待ち(60フレーム/秒)
+		redraw 1			; �`��I��
+		await 1000/60			; ���ԑ҂�(60�t���[��/�b)
 		goto *main
 	;------------------------------------------------------------------
 
-	画面の書き換えに関するソースは、redraw 0で描画開始を知らせて、
-	redraw 1により描画終了タイミングを知らせるようにしてください。
-	通常のHSP3とは違い、「redraw 0」を指定することにより、スクリーンが
-	一旦クリアされます。
+	��ʂ̏��������Ɋւ���\�[�X�́Aredraw 0�ŕ`��J�n��m�点�āA
+	redraw 1�ɂ��`��I���^�C�~���O��m�点��悤�ɂ��Ă��������B
+	�ʏ��HSP3�Ƃ͈Ⴂ�A�uredraw 0�v���w�肷�邱�Ƃɂ��A�X�N���[����
+	��U�N���A����܂��B
 
-	描画を開始してから、box、mes等の描画命令を自由に記述することができます。
-	その後、await命令で時間待ち(ウェイト)をします。「await 10」の場合は、
-	最低でも10msだけの待ち時間を入れます。
+	�`����J�n���Ă���Abox�Ames���̕`�施�߂����R�ɋL�q���邱�Ƃ��ł��܂��B
+	���̌�Aawait���߂Ŏ��ԑ҂�(�E�F�C�g)�����܂��B�uawait 10�v�̏ꍇ�́A
+	�Œ�ł�10ms�����̑҂����Ԃ����܂��B
 
-	これらのルールは、HSP3Dishと同様です。
-	2D描画に使用可能な描画命令と仕様についても、基本的にHSP3Dishと同じになっています。
-	サポートされている命令の詳細は、support_cmds.txtを参照してください。
+	�����̃��[���́AHSP3Dish�Ɠ��l�ł��B
+	2D�`��Ɏg�p�\�ȕ`�施�߂Ǝd�l�ɂ��Ă��A��{�I��HSP3Dish�Ɠ����ɂȂ��Ă��܂��B
+	�T�|�[�g����Ă��閽�߂̏ڍׂ́Asupport_cmds.txt���Q�Ƃ��Ă��������B
 
 
-・3D動作の概要
+�E3D����̊T�v
 
-	HGIMG4は、シンプルで柔軟性のある3D描画システムを提供します。
-	重要な構成単位が、「ノードオブジェクト」になります。
+	HGIMG4�́A�V���v���ŏ_��̂���3D�`��V�X�e����񋟂��܂��B
+	�d�v�ȍ\���P�ʂ��A�u�m�[�h�I�u�W�F�N�g�v�ɂȂ�܂��B
 
-	「ノードオブジェクト」は、HGIMG4の操作対象となるもので、
-	「ノード」または「オブジェクト」とも呼ばれます。
-	「ノードオブジェクト」は、3D世界を構成する要素すべてを含んでおり、
-	それぞれが独自の番号(ID)を持っています。
+	�u�m�[�h�I�u�W�F�N�g�v�́AHGIMG4�̑���ΏۂƂȂ���̂ŁA
+	�u�m�[�h�v�܂��́u�I�u�W�F�N�g�v�Ƃ��Ă΂�܂��B
+	�u�m�[�h�I�u�W�F�N�g�v�́A3D���E���\������v�f���ׂĂ��܂�ł���A
+	���ꂼ�ꂪ�Ǝ��̔ԍ�(ID)�������Ă��܂��B
 
-	ノードオブジェクトは、以下の情報を持っています。
+	�m�[�h�I�u�W�F�N�g�́A�ȉ��̏��������Ă��܂��B
 
-		識別番号(ID)
-		ノード名(Name)
-		X,Y,Z座標(Pos)
-		X,Y,Z回転(Ang)
-		X,Y,Z倍率(Scale)
-		X,Y,Z移動量(Dir)
-		R,G,Bカラー(Color)
-		ワーク値(X,Y,Z,W)(Work,Work2)
-		マテリアル特性(MatID)
-		物理特性(Physics)
-		カメラ(視点)設定(Camera)
-		ライト(光源)設定(Light)
-		エミッター(パーティクル発生源)設定(Emitter)
+		���ʔԍ�(ID)
+		�m�[�h��(Name)
+		X,Y,Z���W(Pos)
+		X,Y,Z��](Ang)
+		X,Y,Z�{��(Scale)
+		X,Y,Z�ړ���(Dir)
+		R,G,B�J���[(Color)
+		���[�N�l(X,Y,Z,W)(Work,Work2)
+		�}�e���A������(MatID)
+		��������(Physics)
+		�J����(���_)�ݒ�(Camera)
+		���C�g(����)�ݒ�(Light)
+		�G�~�b�^�[(�p�[�e�B�N��������)�ݒ�(Emitter)
 
-	「シーン」は、複数の「ノードオブジェクト」を含めた世界全体を指します。
-	HGIMG4では、「シーン」に登録された「ノードオブジェクト」がレンダリング(描画)の
-	対象となります。
-	一般的なプログラムの流れとしては、以下のようになります。
+	�u�V�[���v�́A�����́u�m�[�h�I�u�W�F�N�g�v���܂߂����E�S�̂��w���܂��B
+	HGIMG4�ł́A�u�V�[���v�ɓo�^���ꂽ�u�m�[�h�I�u�W�F�N�g�v�������_�����O(�`��)��
+	�ΏۂƂȂ�܂��B
+	��ʓI�ȃv���O�����̗���Ƃ��ẮA�ȉ��̂悤�ɂȂ�܂��B
 
-		gpreset命令でシーン全体をリセット
-			↓
-		必要なノードオブジェクトをシーンに登録する
-			↓
-		ノードオブジェクト情報の設定を適切に行なう
-			↓
-		gpdraw命令でシーンの描画を行なう
+		gpreset���߂ŃV�[���S�̂����Z�b�g
+			��
+		�K�v�ȃm�[�h�I�u�W�F�N�g���V�[���ɓo�^����
+			��
+		�m�[�h�I�u�W�F�N�g���̐ݒ��K�؂ɍs�Ȃ�
+			��
+		gpdraw���߂ŃV�[���̕`����s�Ȃ�
 
-	シーンにノードオブジェクトを追加するための命令として以下が用意されています。
+	�V�[���Ƀm�[�h�I�u�W�F�N�g��ǉ����邽�߂̖��߂Ƃ��Ĉȉ����p�ӂ���Ă��܂��B
 
-		gpbox var,size,color,matobj			箱ノードを生成
-		gpfloor var,sizex,sizey,color,matobj		床ノードを生成
-		gpplate var,sizex,sizey,color,matobj		板ノードを生成
-		gpload var,"file","name"			gpbモデルノードを生成
-		gpnull var					ヌルノードを生成
-		gpclone var,objid				ノードを複製
+		gpbox var,size,color,matobj			���m�[�h�𐶐�
+		gpfloor var,sizex,sizey,color,matobj		���m�[�h�𐶐�
+		gpplate var,sizex,sizey,color,matobj		�m�[�h�𐶐�
+		gpload var,"file","name"			gpb���f���m�[�h�𐶐�
+		gpnull var					�k���m�[�h�𐶐�
+		gpclone var,objid				�m�[�h�𕡐�
 
-	それぞれの命令詳細は、命令のヘルプ(F1キー)を参照してください。
-	シーンに追加されたノードオブジェクトIDは、生成時に指定された変数に代入されます。
-	以降は、ノードオブジェクトIDを介して各種情報を操作することが可能です。
+	���ꂼ��̖��ߏڍׂ́A���߂̃w���v(F1�L�[)���Q�Ƃ��Ă��������B
+	�V�[���ɒǉ����ꂽ�m�[�h�I�u�W�F�N�gID�́A�������Ɏw�肳�ꂽ�ϐ��ɑ������܂��B
+	�ȍ~�́A�m�[�h�I�u�W�F�N�gID����Ċe����𑀍삷�邱�Ƃ��\�ł��B
 
-	生成されたオブジェクトは、通常(0,0,0)の座標に配置されます。
-	3D座標は、右手座標系が使用されています。Z座標値が大きいほど手前に、
-	Y座標が大きいほど天井方向に配置されます。
+	�������ꂽ�I�u�W�F�N�g�́A�ʏ�(0,0,0)�̍��W�ɔz�u����܂��B
+	3D���W�́A�E����W�n���g�p����Ă��܂��BZ���W�l���傫���قǎ�O�ɁA
+	Y���W���傫���قǓV������ɔz�u����܂��B
 
-	オブジェクトの座標、角度、スケールを設定するための基本的な命令は以下になります。
+	�I�u�W�F�N�g�̍��W�A�p�x�A�X�P�[����ݒ肷�邽�߂̊�{�I�Ȗ��߂͈ȉ��ɂȂ�܂��B
 
-		setpos id,x,y,z		X,Y,Z座標(Pos)を設定
-		setang id,x,y,z		X,Y,Z回転(Ang)を設定
-		setangr id,x,y,z	X,Y,Z回転(Ang)を設定(整数値)
-		setscale id,x,y,z	X,Y,Z倍率(Scale)を設定
+		setpos id,x,y,z		X,Y,Z���W(Pos)��ݒ�
+		setang id,x,y,z		X,Y,Z��](Ang)��ݒ�
+		setangr id,x,y,z	X,Y,Z��](Ang)��ݒ�(�����l)
+		setscale id,x,y,z	X,Y,Z�{��(Scale)��ݒ�
 
-	ノードオブジェクトIDとx,y,zパラメーター(実数値を使用可能)によって指定します。
+	�m�[�h�I�u�W�F�N�gID��x,y,z�p�����[�^�[(�����l���g�p�\)�ɂ���Ďw�肵�܂��B
 
-		例:
+		��:
 		setpos 3, 5, 1.2, 0.5
 
-	上の例では、ノードオブジェクトID3の物体を座標( 5.0, 1.2, 0.5 )の位置に設定します。
-	setang命令では、オブジェクトの向いているX,Y,Z角度を指定して回転を行ないます。
-	(角度の単位はラジアン(1周でπ*2)になります)
-	また、高速化のため角度を整数値で設定することのできるsetangr命令も用意されています。
-	この場合は、256で一周(360度)の単位で指定を行ないます。
-	(0が0度、64が90度、128が180度…となります。)
-	値にも、以下の情報を設定するための命令が用意されています。
+	��̗�ł́A�m�[�h�I�u�W�F�N�gID3�̕��̂����W( 5.0, 1.2, 0.5 )�̈ʒu�ɐݒ肵�܂��B
+	setang���߂ł́A�I�u�W�F�N�g�̌����Ă���X,Y,Z�p�x���w�肵�ĉ�]���s�Ȃ��܂��B
+	(�p�x�̒P�ʂ̓��W�A��(1���Ń�*2)�ɂȂ�܂�)
+	�܂��A�������̂��ߊp�x�𐮐��l�Őݒ肷�邱�Ƃ̂ł���setangr���߂��p�ӂ���Ă��܂��B
+	���̏ꍇ�́A256�ň��(360�x)�̒P�ʂŎw����s�Ȃ��܂��B
+	(0��0�x�A64��90�x�A128��180�x�c�ƂȂ�܂��B)
+	�l�ɂ��A�ȉ��̏���ݒ肷�邽�߂̖��߂��p�ӂ���Ă��܂��B
 
-		setdir id,x,y,z		X,Y,Z移動量(Dir)を設定
-		setcolor id,x,y,z	R,G,Bカラー(Color)を設定
-		setwork id,x,y,z	ワーク値(X,Y,Z)を設定
-		setwork2 id,x,y,z	ワーク2値(X,Y,Z)を設定
+		setdir id,x,y,z		X,Y,Z�ړ���(Dir)��ݒ�
+		setcolor id,x,y,z	R,G,B�J���[(Color)��ݒ�
+		setwork id,x,y,z	���[�N�l(X,Y,Z)��ݒ�
+		setwork2 id,x,y,z	���[�N2�l(X,Y,Z)��ݒ�
 
-	X,Y,Z移動量(Dir)はオブジェクトの自動移動モード(OBJ_MOVE)が選択された際に参照される
-	移動量になります。R,G,Bカラー(Color)は、ライトなど一部のオブジェクトで色情報を設定する
-	際に使用されます。
-	ワーク値、ワーク値2は、ユーザーが自由に使用できる数値格納用に用意されています。
+	X,Y,Z�ړ���(Dir)�̓I�u�W�F�N�g�̎����ړ����[�h(OBJ_MOVE)���I�����ꂽ�ۂɎQ�Ƃ����
+	�ړ��ʂɂȂ�܂��BR,G,B�J���[(Color)�́A���C�g�Ȃǈꕔ�̃I�u�W�F�N�g�ŐF����ݒ肷��
+	�ۂɎg�p����܂��B
+	���[�N�l�A���[�N�l2�́A���[�U�[�����R�Ɏg�p�ł��鐔�l�i�[�p�ɗp�ӂ���Ă��܂��B
 
-	直接値を設定するだけでなく加算を行なうadd～系の命令が用意されています。
+	���ڒl��ݒ肷�邾���łȂ����Z���s�Ȃ�add�`�n�̖��߂��p�ӂ���Ă��܂��B
 
-		addpos id,x,y,z		X,Y,Z座標(Pos)を加算
-		addang id,x,y,z		X,Y,Z回転(Ang)を加算
-		addangr id,x,y,z	X,Y,Z回転(Ang)を加算(整数値)
-		addscale id,x,y,z	X,Y,Z倍率(Scale)を加算
+		addpos id,x,y,z		X,Y,Z���W(Pos)�����Z
+		addang id,x,y,z		X,Y,Z��](Ang)�����Z
+		addangr id,x,y,z	X,Y,Z��](Ang)�����Z(�����l)
+		addscale id,x,y,z	X,Y,Z�{��(Scale)�����Z
 
-	これらは、もともと設定されていた値に対して、指定した値を加算します。
-	add～系の命令は、set～系の命令と同様の種類が用意されています。
+	�����́A���Ƃ��Ɛݒ肳��Ă����l�ɑ΂��āA�w�肵���l�����Z���܂��B
+	add�`�n�̖��߂́Aset�`�n�̖��߂Ɠ��l�̎�ނ��p�ӂ���Ă��܂��B
 
-	また、設定済みの情報を取得するために、get～系の命令が用意されています。
+	�܂��A�ݒ�ς݂̏����擾���邽�߂ɁAget�`�n�̖��߂��p�ӂ���Ă��܂��B
 
-		getpos id,x,y,z		X,Y,Z座標(Pos)を取得
-		getscale id,x,y,z	X,Y,Z倍率(Scale)を取得
-		getdir id,x,y,z		X,Y,Z移動量(Dir)を取得
-		getwork id,x,y,z	ワーク値(X,Y,Z)を取得
-		getwork2 id,x,y,z	ワーク2値(X,Y,Z)を取得
+		getpos id,x,y,z		X,Y,Z���W(Pos)���擾
+		getscale id,x,y,z	X,Y,Z�{��(Scale)���擾
+		getdir id,x,y,z		X,Y,Z�ړ���(Dir)���擾
+		getwork id,x,y,z	���[�N�l(X,Y,Z)���擾
+		getwork2 id,x,y,z	���[�N2�l(X,Y,Z)���擾
 
-	これらの命令では、x,y,zに読み出し先の変数名を指定します。
+	�����̖��߂ł́Ax,y,z�ɓǂݏo����̕ϐ������w�肵�܂��B
 
-		例:
-			; カメラのXYZ座標を変数a,b,cに読み出す
+		��:
+			; �J������XYZ���W��ϐ�a,b,c�ɓǂݏo��
 			getpos GPOBJ_CAMERA,a,b,c
 
-	上の例では、変数aにX座標が、変数bにY座標が、変数cにZ座標が
-	それぞれ実数型で代入されます。
-	整数値でパラメーターを取得する場合は、以下の命令を使用します。
+	��̗�ł́A�ϐ�a��X���W���A�ϐ�b��Y���W���A�ϐ�c��Z���W��
+	���ꂼ������^�ő������܂��B
+	�����l�Ńp�����[�^�[���擾����ꍇ�́A�ȉ��̖��߂��g�p���܂��B
 
-		getposi id,x,y,z	X,Y,Z座標(Pos)を整数値で取得
-		getscalei id,x,y,z	X,Y,Z倍率(Scale)を整数値で取得
-		getdiri id,x,y,z	X,Y,Z移動量(Dir)を整数値で取得
-		getworki id,x,y,z	ワーク値(X,Y,Z)を整数値で取得
-		getwork2i id,x,y,z	ワーク2値(X,Y,Z)を整数値で取得
+		getposi id,x,y,z	X,Y,Z���W(Pos)�𐮐��l�Ŏ擾
+		getscalei id,x,y,z	X,Y,Z�{��(Scale)�𐮐��l�Ŏ擾
+		getdiri id,x,y,z	X,Y,Z�ړ���(Dir)�𐮐��l�Ŏ擾
+		getworki id,x,y,z	���[�N�l(X,Y,Z)�𐮐��l�Ŏ擾
+		getwork2i id,x,y,z	���[�N2�l(X,Y,Z)�𐮐��l�Ŏ擾
 
-	最後に「i」が付加された命令は、整数値で変数に代入されます。
-	座標を整数のみで扱う場合や、高速化を行ないたい場合に使用する
-	ことができます。
-	回転の情報取得には注意が必要です。3Dノードオブジェクトは、内部的な
-	回転情報をクォータニオン形式を保持しており、正確なX,Y,Zの回転角度を
-	求めることが困難です。このため、setangやaddang命令など回転の設定では、
-	X,Y,Z角度を指定することができましたが、取得に関してはサポートしていません。
-
-
-・2D描画の概要
-
-	HGIMG4は、2D描画に関する様々な機能が用意されています。
-	2D描画の方法は、大きく2つのカテゴリに分かれます。
-
-	・直接描画
-
-		mes命令、boxf命令などHSP3Dishがサポートしている標準的な
-		描画命令(celput,gcopy,gzoomなど)を利用可能です。
-		redraw 0～redraw 1までの描画ループ(1フレームの描画単位)内に
-		記述することで描画が実行されます。
-
-	・スプライトオブジェクトによる描画
-
-		オブジェクトの1つとしてシーン内にスプライトオブジェクトを
-		登録して管理することができます。
-		スプライトオブジェクトは、3Dのノードオブジェクトと同様に
-		オブジェクトIDが割り振られ、座標や角度、倍率などを設定することが可能です。
-
-	必要に応じて、使いやすい方法を選択してください。
-	たとえば、背景に大きな2D画像を表示する場合はgcopy命令などの直接描画を、
-	敵キャラクターなど大量に登場するものはスプライトオブジェクトといった具合に
-	用途を振り分けることができます。
-
-	スプライトオブジェクトを生成する場合は、gpspr命令を使用します。
-
-		gpspr var,bufid,celid,gmode			2Dスプライトを生成
-
-	bufidで読み込まれた画像のバッファID、celidでセルのID、gmodeで合成モードを指定して
-	スプライトオブジェクトを生成します。
-	生成されたオブジェクトIDがvarで指定された変数に代入されます。
-
-	生成されたスプライトオブジェクトは、通常(0,0)の座標に配置されます。
-	2D座標は、スクリーン座標(画面のドットと１対１に対応した値)で管理され、
-	画面の左上が(0,0)の座標となります。
-
-	登録されたスプライトオブジェクトは、gpdraw命令でシーンの描画が行なわれるタイミングで
-	自動的に描画されます。その際には、設定されたX,Y倍率、Z回転角度が適用されます。
-	スプライトオブジェクトは、オブジェクトが持つ当たり判定(コリジョン)や、モードによる制御など
-	様々な機能を活用することができます。
+	�Ō�Ɂui�v���t�����ꂽ���߂́A�����l�ŕϐ��ɑ������܂��B
+	���W�𐮐��݂̂ň����ꍇ��A���������s�Ȃ������ꍇ�Ɏg�p����
+	���Ƃ��ł��܂��B
+	��]�̏��擾�ɂ͒��ӂ��K�v�ł��B3D�m�[�h�I�u�W�F�N�g�́A�����I��
+	��]�����N�H�[�^�j�I���`����ێ����Ă���A���m��X,Y,Z�̉�]�p�x��
+	���߂邱�Ƃ�����ł��B���̂��߁Asetang��addang���߂Ȃǉ�]�̐ݒ�ł́A
+	X,Y,Z�p�x���w�肷�邱�Ƃ��ł��܂������A�擾�Ɋւ��Ă̓T�|�[�g���Ă��܂���B
 
 
-・オブジェクトのモード設定
+�E2D�`��̊T�v
 
-	表示オブジェクト(ノードオブジェクト、スプライトオブジェクト)には、ON/OFF可能な
-	モード設定が用意されています。
+	HGIMG4�́A2D�`��Ɋւ���l�X�ȋ@�\���p�ӂ���Ă��܂��B
+	2D�`��̕��@�́A�傫��2�̃J�e�S���ɕ�����܂��B
 
-		setobjmode id,mode,sw			オブジェクトのモード設定
+	�E���ڕ`��
 
-		ObjID    : オブジェクトID
-		mode     : モード値
-		sw       : 設定スイッチ
+		mes���߁Aboxf���߂Ȃ�HSP3Dish���T�|�[�g���Ă���W���I��
+		�`�施��(celput,gcopy,gzoom�Ȃ�)�𗘗p�\�ł��B
+		redraw 0�`redraw 1�܂ł̕`�惋�[�v(1�t���[���̕`��P��)����
+		�L�q���邱�Ƃŕ`�悪���s����܂��B
 
-	swは、以下のように動作します。
+	�E�X�v���C�g�I�u�W�F�N�g�ɂ��`��
 
-		sw = 0 : 指定したモード値を追加
-		sw = 1 : 指定したモード値を削除
-		sw = 2 : 指定したモード値だけを設定
+		�I�u�W�F�N�g��1�Ƃ��ăV�[�����ɃX�v���C�g�I�u�W�F�N�g��
+		�o�^���ĊǗ����邱�Ƃ��ł��܂��B
+		�X�v���C�g�I�u�W�F�N�g�́A3D�̃m�[�h�I�u�W�F�N�g�Ɠ��l��
+		�I�u�W�F�N�gID������U���A���W��p�x�A�{���Ȃǂ�ݒ肷�邱�Ƃ��\�ł��B
 
-	モードフラグ値は以下の中から選択します。
+	�K�v�ɉ����āA�g���₷�����@��I�����Ă��������B
+	���Ƃ��΁A�w�i�ɑ傫��2D�摜��\������ꍇ��gcopy���߂Ȃǂ̒��ڕ`����A
+	�G�L�����N�^�[�ȂǑ�ʂɓo�ꂷ����̂̓X�v���C�g�I�u�W�F�N�g�Ƃ��������
+	�p�r��U�蕪���邱�Ƃ��ł��܂��B
 
-		ラベル             |        内容
+	�X�v���C�g�I�u�W�F�N�g�𐶐�����ꍇ�́Agpspr���߂��g�p���܂��B
+
+		gpspr var,bufid,celid,gmode			2D�X�v���C�g�𐶐�
+
+	bufid�œǂݍ��܂ꂽ�摜�̃o�b�t�@ID�Acelid�ŃZ����ID�Agmode�ō������[�h���w�肵��
+	�X�v���C�g�I�u�W�F�N�g�𐶐����܂��B
+	�������ꂽ�I�u�W�F�N�gID��var�Ŏw�肳�ꂽ�ϐ��ɑ������܂��B
+
+	�������ꂽ�X�v���C�g�I�u�W�F�N�g�́A�ʏ�(0,0)�̍��W�ɔz�u����܂��B
+	2D���W�́A�X�N���[�����W(��ʂ̃h�b�g�ƂP�΂P�ɑΉ������l)�ŊǗ�����A
+	��ʂ̍��オ(0,0)�̍��W�ƂȂ�܂��B
+
+	�o�^���ꂽ�X�v���C�g�I�u�W�F�N�g�́Agpdraw���߂ŃV�[���̕`�悪�s�Ȃ���^�C�~���O��
+	�����I�ɕ`�悳��܂��B���̍ۂɂ́A�ݒ肳�ꂽX,Y�{���AZ��]�p�x���K�p����܂��B
+	�X�v���C�g�I�u�W�F�N�g�́A�I�u�W�F�N�g���������蔻��(�R���W����)��A���[�h�ɂ�鐧��Ȃ�
+	�l�X�ȋ@�\�����p���邱�Ƃ��ł��܂��B
+
+
+�E�I�u�W�F�N�g�̃��[�h�ݒ�
+
+	�\���I�u�W�F�N�g(�m�[�h�I�u�W�F�N�g�A�X�v���C�g�I�u�W�F�N�g)�ɂ́AON/OFF�\��
+	���[�h�ݒ肪�p�ӂ���Ă��܂��B
+
+		setobjmode id,mode,sw			�I�u�W�F�N�g�̃��[�h�ݒ�
+
+		ObjID    : �I�u�W�F�N�gID
+		mode     : ���[�h�l
+		sw       : �ݒ�X�C�b�`
+
+	sw�́A�ȉ��̂悤�ɓ��삵�܂��B
+
+		sw = 0 : �w�肵�����[�h�l��ǉ�
+		sw = 1 : �w�肵�����[�h�l���폜
+		sw = 2 : �w�肵�����[�h�l������ݒ�
+
+	���[�h�t���O�l�͈ȉ��̒�����I�����܂��B
+
+		���x��             |        ���e
 		--------------------------------------------------------------
-		OBJ_HIDE             非表示(画面から消す)
-		OBJ_CLIP             3Dクリッピングを有効にする
-		OBJ_XFRONT           正面属性(常に画面に正面を向く)
-		OBJ_WIRE             ワイヤーフレームで描画する
-		OBJ_MOVE             自動移動を行なう(XYZ移動量を参照する)
-		OBJ_FLIP             ボーダー領域で反転する
-		OBJ_BORDER           ボーダー領域を有効にする
-		OBJ_2D               2Dスプライト
-		OBJ_TIMER            タイマーを有効にする
-		OBJ_LATE             後から描画される(半透明オブジェクト用)
+		OBJ_HIDE             ��\��(��ʂ������)
+		OBJ_CLIP             3D�N���b�s���O��L���ɂ���
+		OBJ_XFRONT           ���ʑ���(��ɉ�ʂɐ��ʂ�����)
+		OBJ_WIRE             ���C���[�t���[���ŕ`�悷��
+		OBJ_MOVE             �����ړ����s�Ȃ�(XYZ�ړ��ʂ��Q�Ƃ���)
+		OBJ_FLIP             �{�[�_�[�̈�Ŕ��]����
+		OBJ_BORDER           �{�[�_�[�̈��L���ɂ���
+		OBJ_2D               2D�X�v���C�g
+		OBJ_TIMER            �^�C�}�[��L���ɂ���
+		OBJ_LATE             �ォ��`�悳���(�������I�u�W�F�N�g�p)
 
-	複数の項目を同時に選択する場合は、「OBJ_LATE|OBJ_MOVE」のように
-	「|」で区切って指定することができます。何も指定しない場合は、0にするか
-	省略して構いません。
+	�����̍��ڂ𓯎��ɑI������ꍇ�́A�uOBJ_LATE|OBJ_MOVE�v�̂悤��
+	�u|�v�ŋ�؂��Ďw�肷�邱�Ƃ��ł��܂��B�����w�肵�Ȃ��ꍇ�́A0�ɂ��邩
+	�ȗ����č\���܂���B
 
-		例:
+		��:
 		setobjmode id, OBJ_MOVE, 0
 
-	上の例では、変数idで指定されるオブジェクトに、OBJ_MOVE(自動移動を行なう)設定を
-	追加します。これにより、このオブジェクトはXYZ移動量(setdir命令で設定される)を
-	もとに自動的に移動するようになります。
+	��̗�ł́A�ϐ�id�Ŏw�肳���I�u�W�F�N�g�ɁAOBJ_MOVE(�����ړ����s�Ȃ�)�ݒ��
+	�ǉ����܂��B����ɂ��A���̃I�u�W�F�N�g��XYZ�ړ���(setdir���߂Őݒ肳���)��
+	���ƂɎ����I�Ɉړ�����悤�ɂȂ�܂��B
 
 
-・カメラの設定
+�E�J�����̐ݒ�
 
-	カメラ(視点)は、3Dシーンを描画する基点の座標を持つものです。
-	カメラは、ノードオブジェクトの1つとして扱われ、固有のオブジェクトIDを持っています。
+	�J����(���_)�́A3D�V�[����`�悷���_�̍��W�������̂ł��B
+	�J�����́A�m�[�h�I�u�W�F�N�g��1�Ƃ��Ĉ����A�ŗL�̃I�u�W�F�N�gID�������Ă��܂��B
 
-	シーンがリセットされると、デフォルトのカメラが配置されます。
-	デフォルトのカメラには、GPOBJ_CAMERAマクロを使用してアクセスすることができます。
+	�V�[�������Z�b�g�����ƁA�f�t�H���g�̃J�������z�u����܂��B
+	�f�t�H���g�̃J�����ɂ́AGPOBJ_CAMERA�}�N�����g�p���ăA�N�Z�X���邱�Ƃ��ł��܂��B
 
-		例:
-		setpos GPOBJ_CAMERA, 0,1,5		; カメラ位置を設定
+		��:
+		setpos GPOBJ_CAMERA, 0,1,5		; �J�����ʒu��ݒ�
 
-	上の例では、デフォルトのカメラを(0,1,5)の座標に設定します。
-	カメラは3Dシーンを見るための視点座標となり、ノードオブジェクトの回転により視点方向が
-	決定されます。指定された座標をカメラから見るための角度を設定することのできる
-	gplookat命令も利用できます。
+	��̗�ł́A�f�t�H���g�̃J������(0,1,5)�̍��W�ɐݒ肵�܂��B
+	�J������3D�V�[�������邽�߂̎��_���W�ƂȂ�A�m�[�h�I�u�W�F�N�g�̉�]�ɂ�莋�_������
+	���肳��܂��B�w�肳�ꂽ���W���J�������猩�邽�߂̊p�x��ݒ肷�邱�Ƃ̂ł���
+	gplookat���߂����p�ł��܂��B
 
-		例:
-		gplookat GPOBJ_CAMERA, 0,1,0		; カメラ注視点を設定
+		��:
+		gplookat GPOBJ_CAMERA, 0,1,0		; �J���������_��ݒ�
 
-	上の例では、(0,1,0)の座標を見るための角度がカメラに適用されます。
+	��̗�ł́A(0,1,0)�̍��W�����邽�߂̊p�x���J�����ɓK�p����܂��B
 
-	デフォルトのカメラだけでなく、シーン内にカメラを複数設定して切り替えることも可能です。
+	�f�t�H���g�̃J���������łȂ��A�V�[�����ɃJ�����𕡐��ݒ肵�Đ؂�ւ��邱�Ƃ��\�ł��B
 
-		例:
-		gpnull id_camera			; ヌルノードを生成する
-		gpcamera id_camera, 45, 1.5, 0.5, 768	; カメラとして設定する
-		gpusecamera id_camera			; 使用するカメラを選択する
-		setpos id_camera, 0,20,20		; カメラ位置を設定する
+		��:
+		gpnull id_camera			; �k���m�[�h�𐶐�����
+		gpcamera id_camera, 45, 1.5, 0.5, 768	; �J�����Ƃ��Đݒ肷��
+		gpusecamera id_camera			; �g�p����J������I������
+		setpos id_camera, 0,20,20		; �J�����ʒu��ݒ肷��
 
-	シーン内に配置されたカメラは、gpusecamera命令により切り替えることができます。
-	独自のカメラを生成することにより、FOV(画角)やZ軸の範囲(Zクリッピング範囲)を独自に
-	設定することができます。
-
-
-・ライトの設定
-
-	ライト(光源)は、3Dシーンに配置可能な照明の情報です。
-	ライトは、ノードオブジェクトの1つとして扱われ、固有のオブジェクトIDを持っています。
-
-	シーンがリセットされると、デフォルトのライトが配置されます。
-	デフォルトのライトには、GPOBJ_LIGHTマクロを使用してアクセスすることができます。
-
-		例:
-		setcolor GPOBJ_LIGHT, 1,1,1		; ライトカラーを設定
-		setdir GPOBJ_LIGHT, 0.5,0.5,0.5		; アンビエントカラーを設定
-
-	上の例では、デフォルトのライト色を(1,1,1)に設定します。
-	色の設定は、0～1の値でRGBごとに指定することができます。1は最大の輝度となるため、
-	RGBの段階で表現すると、(R=255,G=255,B=255)になります。
-	ライトの場合は、setdirによりアンビエント(環境)カラーを設定します。
-	上の例では、(R=128,G=128,B=128)がアンビエント(環境)カラーになります。
-	ライトの回転角度を変更することで、照明を当てる方向が変わります。
-	スポットライト、ポイントライトが設定されている場合は、ライトの座標もパラメーター要素の
-	１つとなります。(現在のバージョンでは、スポットライト、ポイントライトはサポートしていません)
-
-	デフォルトのライトだけでなく、シーン内にライトを複数設定して切り替えることも可能です。
-
-		例:
-		gpnull id_alight			; ヌルノードを生成する
-		gplight id_alight, GPOBJ_LGTOPT_NORMAL	; ライトとして登録する
-		gpuselight id_alight			; デフォルトのライトに設定
-
-	シーン内に配置されたライトは、gpuselight命令により切り替えることができます。
+	�V�[�����ɔz�u���ꂽ�J�����́Agpusecamera���߂ɂ��؂�ւ��邱�Ƃ��ł��܂��B
+	�Ǝ��̃J�����𐶐����邱�Ƃɂ��AFOV(��p)��Z���͈̔�(Z�N���b�s���O�͈�)��Ǝ���
+	�ݒ肷�邱�Ƃ��ł��܂��B
 
 
-・コリジョングループ設定と衝突検知
+�E���C�g�̐ݒ�
 
-	オブジェクトごとに、コリジョングループを設定することにより、
-	種別を識別しやすくし、衝突検知などの機能が利用できるようになります。
+	���C�g(����)�́A3D�V�[���ɔz�u�\�ȏƖ��̏��ł��B
+	���C�g�́A�m�[�h�I�u�W�F�N�g��1�Ƃ��Ĉ����A�ŗL�̃I�u�W�F�N�gID�������Ă��܂��B
 
-	setcoli id,mygroup,enegroup		オブジェクトのコリジョン設定
+	�V�[�������Z�b�g�����ƁA�f�t�H���g�̃��C�g���z�u����܂��B
+	�f�t�H���g�̃��C�g�ɂ́AGPOBJ_LIGHT�}�N�����g�p���ăA�N�Z�X���邱�Ƃ��ł��܂��B
 
-		id       : オブジェクトID
-		mygroup  : 自分が属するグループ値
-		enegroup : 衝突を検出する対象となるグループ値
+		��:
+		setcolor GPOBJ_LIGHT, 1,1,1		; ���C�g�J���[��ݒ�
+		setdir GPOBJ_LIGHT, 0.5,0.5,0.5		; �A���r�G���g�J���[��ݒ�
 
-		オブジェクトに対してコリジョン情報を設定します。
-		グループ値は、
-		1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768…
-		の中から1つだけを選択可能です。(32ビット値まで指定可能)
+	��̗�ł́A�f�t�H���g�̃��C�g�F��(1,1,1)�ɐݒ肵�܂��B
+	�F�̐ݒ�́A0�`1�̒l��RGB���ƂɎw�肷�邱�Ƃ��ł��܂��B1�͍ő�̋P�x�ƂȂ邽�߁A
+	RGB�̒i�K�ŕ\������ƁA(R=255,G=255,B=255)�ɂȂ�܂��B
+	���C�g�̏ꍇ�́Asetdir�ɂ��A���r�G���g(��)�J���[��ݒ肵�܂��B
+	��̗�ł́A(R=128,G=128,B=128)���A���r�G���g(��)�J���[�ɂȂ�܂��B
+	���C�g�̉�]�p�x��ύX���邱�ƂŁA�Ɩ��𓖂Ă�������ς��܂��B
+	�X�|�b�g���C�g�A�|�C���g���C�g���ݒ肳��Ă���ꍇ�́A���C�g�̍��W���p�����[�^�[�v�f��
+	�P�ƂȂ�܂��B(���݂̃o�[�W�����ł́A�X�|�b�g���C�g�A�|�C���g���C�g�̓T�|�[�g���Ă��܂���)
 
-	コリジョングループが設定されているオブジェクト同士は、getcoli命令により
-	指定範囲内の衝突を検出できるようになります。
+	�f�t�H���g�̃��C�g�����łȂ��A�V�[�����Ƀ��C�g�𕡐��ݒ肵�Đ؂�ւ��邱�Ƃ��\�ł��B
 
-	getcoli var,id,distance			オブジェクトのコリジョン判定
+		��:
+		gpnull id_alight			; �k���m�[�h�𐶐�����
+		gplight id_alight, GPOBJ_LGTOPT_NORMAL	; ���C�g�Ƃ��ēo�^����
+		gpuselight id_alight			; �f�t�H���g�̃��C�g�ɐݒ�
 
-		var      : 結果が代入される変数名
-		id       : オブジェクトID
-		distance : 衝突を検出する範囲(実数値)
-
-		指定したオブジェクトが持つコリジョン情報をもとに、その
-		オブジェクトが衝突している別なオブジェクトのIDを調べます。
-		distanceは、衝突する範囲(半径)をfloat値で指定します。
-		衝突が検出された場合は、変数にオブジェクトIDが代入されます。
-		何も衝突が検出されなかった場合は、-1が代入されます。
-
-	コリジョングループ設定と衝突検知は、3Dノードオブジェクト、2Dのスプライトオブジェクト
-	どちらでも利用できます。ただし、3Dノードオブジェクトとスプライトオブジェクト同士は
-	座標系が異なるため衝突は検知されません。
+	�V�[�����ɔz�u���ꂽ���C�g�́Agpuselight���߂ɂ��؂�ւ��邱�Ƃ��ł��܂��B
 
 
-・物理挙動の設定
+�E�R���W�����O���[�v�ݒ�ƏՓˌ��m
 
-	HGIMG4では、Bullet Physics Libraryによる物理挙動を3Dノードオブジェクトに統合しています。
-	シーン内に配置された物体に物理特性を設定することで、物理法則に従った動作を行ないます。
-	物理挙動の対象となるのは、箱ノード(gpboxで生成)、床ノード(gpfloorで生成)、板ノード(gpplateで生成)
-	及びgpbモデルノード(gploadで生成)となります。
-	ノードオブジェクトを生成した段階では、物理設定は行なわれていません。
-	物理設定を行なう場合は、gppbind命令を使用してください。
+	�I�u�W�F�N�g���ƂɁA�R���W�����O���[�v��ݒ肷�邱�Ƃɂ��A
+	��ʂ����ʂ��₷�����A�Փˌ��m�Ȃǂ̋@�\�����p�ł���悤�ɂȂ�܂��B
 
-		gppbind objid,mass,friction		ノードに標準的な物理特性を設定
+	setcoli id,mygroup,enegroup		�I�u�W�F�N�g�̃R���W�����ݒ�
 
-	最初に、gppbind命令により基本的な物理設定を行なってください。
-	パラメーターmassは、物体の重さ。frictionは摩擦係数です。値を省略した場合は、デフォルト値が使用されます。
-	重さ(mass)を0にすることで静的剛体(衝突はするが、動かない)として設定されます。
-	それ以外の場合は、物理法則に従って床のある場所まで落下します。
+		id       : �I�u�W�F�N�gID
+		mygroup  : ������������O���[�v�l
+		enegroup : �Փ˂����o����ΏۂƂȂ�O���[�v�l
 
-	※物理挙動を設定する場合は、必ず床(地面)となる部分を作成しておいてください。
-	　gpfloor命令によって生成された床に標準的な物理特性を設定することで、固定された床面を
-	　生成することができます。床が存在しなかった場合、物体は永遠に落下を続けることになります。
+		�I�u�W�F�N�g�ɑ΂��ăR���W��������ݒ肵�܂��B
+		�O���[�v�l�́A
+		1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768�c
+		�̒�����1������I���\�ł��B(32�r�b�g�l�܂Ŏw��\)
 
-	物理挙動で使用される形状は、基本的にもとの形状と同じになりますが、gpbモデルノードの場合はモデル全体を
-	包み込むバウンディング球が使用されます。
+	�R���W�����O���[�v���ݒ肳��Ă���I�u�W�F�N�g���m�́Agetcoli���߂ɂ��
+	�w��͈͓��̏Փ˂����o�ł���悤�ɂȂ�܂��B
 
-	物理設定を行なったノードオブジェクトは、それ以降自立して動作するようになり、
-	setposなどの座標変更は無効となります。
-	物体に力を加えたい場合は、gppapply命令を使用してください。
+	getcoli var,id,distance			�I�u�W�F�N�g�̃R���W��������
 
-		gppapply objid,action,x,y,z		ノードに物理的な力を適用する
+		var      : ���ʂ���������ϐ���
+		id       : �I�u�W�F�N�gID
+		distance : �Փ˂����o����͈�(�����l)
 
-	gppapply命令は、ノードに対して(x,y,z)で指定したベクトルの物理的な力を適用します。
-	パラメーターactionで設定できるタイプは、以下の通りです。
+		�w�肵���I�u�W�F�N�g�����R���W�����������ƂɁA����
+		�I�u�W�F�N�g���Փ˂��Ă���ʂȃI�u�W�F�N�g��ID�𒲂ׂ܂��B
+		distance�́A�Փ˂���͈�(���a)��float�l�Ŏw�肵�܂��B
+		�Փ˂����o���ꂽ�ꍇ�́A�ϐ��ɃI�u�W�F�N�gID���������܂��B
+		�����Փ˂����o����Ȃ������ꍇ�́A-1���������܂��B
 
-	        マクロ名                     内容
+	�R���W�����O���[�v�ݒ�ƏՓˌ��m�́A3D�m�[�h�I�u�W�F�N�g�A2D�̃X�v���C�g�I�u�W�F�N�g
+	�ǂ���ł����p�ł��܂��B�������A3D�m�[�h�I�u�W�F�N�g�ƃX�v���C�g�I�u�W�F�N�g���m��
+	���W�n���قȂ邽�ߏՓ˂͌��m����܂���B
+
+
+�E���������̐ݒ�
+
+	HGIMG4�ł́ABullet Physics Library�ɂ�镨��������3D�m�[�h�I�u�W�F�N�g�ɓ������Ă��܂��B
+	�V�[�����ɔz�u���ꂽ���̂ɕ���������ݒ肷�邱�ƂŁA�����@���ɏ]����������s�Ȃ��܂��B
+	���������̑ΏۂƂȂ�̂́A���m�[�h(gpbox�Ő���)�A���m�[�h(gpfloor�Ő���)�A�m�[�h(gpplate�Ő���)
+	�y��gpb���f���m�[�h(gpload�Ő���)�ƂȂ�܂��B
+	�m�[�h�I�u�W�F�N�g�𐶐������i�K�ł́A�����ݒ�͍s�Ȃ��Ă��܂���B
+	�����ݒ���s�Ȃ��ꍇ�́Agppbind���߂��g�p���Ă��������B
+
+		gppbind objid,mass,friction		�m�[�h�ɕW���I�ȕ���������ݒ�
+
+	�ŏ��ɁAgppbind���߂ɂ���{�I�ȕ����ݒ���s�Ȃ��Ă��������B
+	�p�����[�^�[mass�́A���̂̏d���Bfriction�͖��C�W���ł��B�l���ȗ������ꍇ�́A�f�t�H���g�l���g�p����܂��B
+	�d��(mass)��0�ɂ��邱�ƂŐÓI����(�Փ˂͂��邪�A�����Ȃ�)�Ƃ��Đݒ肳��܂��B
+	����ȊO�̏ꍇ�́A�����@���ɏ]���ď��̂���ꏊ�܂ŗ������܂��B
+
+	������������ݒ肷��ꍇ�́A�K����(�n��)�ƂȂ镔�����쐬���Ă����Ă��������B
+	�@gpfloor���߂ɂ���Đ������ꂽ���ɕW���I�ȕ���������ݒ肷�邱�ƂŁA�Œ肳�ꂽ���ʂ�
+	�@�������邱�Ƃ��ł��܂��B�������݂��Ȃ������ꍇ�A���͉̂i���ɗ����𑱂��邱�ƂɂȂ�܂��B
+
+	���������Ŏg�p�����`��́A��{�I�ɂ��Ƃ̌`��Ɠ����ɂȂ�܂����Agpb���f���m�[�h�̏ꍇ�̓��f���S�̂�
+	��ݍ��ރo�E���f�B���O�����g�p����܂��B
+
+	�����ݒ���s�Ȃ����m�[�h�I�u�W�F�N�g�́A����ȍ~�������ē��삷��悤�ɂȂ�A
+	setpos�Ȃǂ̍��W�ύX�͖����ƂȂ�܂��B
+	���̂ɗ͂����������ꍇ�́Agppapply���߂��g�p���Ă��������B
+
+		gppapply objid,action,x,y,z		�m�[�h�ɕ����I�ȗ͂�K�p����
+
+	gppapply���߂́A�m�[�h�ɑ΂���(x,y,z)�Ŏw�肵���x�N�g���̕����I�ȗ͂�K�p���܂��B
+	�p�����[�^�[action�Őݒ�ł���^�C�v�́A�ȉ��̒ʂ�ł��B
+
+	        �}�N����                     ���e
 	    ----------------------------------------------------------------------------
-		GPPAPPLY_FORCE               移動しようとする力を加算する
-		GPPAPPLY_IMPULSE             瞬間的な衝撃を与える
-		GPPAPPLY_TORQUE              トルク(ねじる)力を与える
-		GPPAPPLY_TORQUE_IMPULSE      トルク+衝撃を与える
+		GPPAPPLY_FORCE               �ړ����悤�Ƃ���͂����Z����
+		GPPAPPLY_IMPULSE             �u�ԓI�ȏՌ���^����
+		GPPAPPLY_TORQUE              �g���N(�˂���)�͂�^����
+		GPPAPPLY_TORQUE_IMPULSE      �g���N+�Ռ���^����
 
-	より詳細な物理設定を行なう場合は、gppset命令を使用してください。
+	���ڍׂȕ����ݒ���s�Ȃ��ꍇ�́Agppset���߂��g�p���Ă��������B
 
-		gppset objid,prmid,x,y,z		ノードの物理パラメーターを設定
+		gppset objid,prmid,x,y,z		�m�[�h�̕����p�����[�^�[��ݒ�
 
-	パラメーターprmidで、設定する項目を指定することができます。
-	X,Y,Zに指定された値が、それぞれの項目に適用されます。
+	�p�����[�^�[prmid�ŁA�ݒ肷�鍀�ڂ��w�肷�邱�Ƃ��ł��܂��B
+	X,Y,Z�Ɏw�肳�ꂽ�l���A���ꂼ��̍��ڂɓK�p����܂��B
 
-	        マクロ名                          内容
+	        �}�N����                          ���e
 	    ----------------------------------------------------------------------------
-		GPPSET_ENABLE                     X=物理挙動のON/OFF(0=無効)
-		GPPSET_FRICTION                   X=摩擦係数, Y=弾力設定
-		GPPSET_DAMPING                    X=linear反発(0～1.0), Y=angular反発(0～1.0)
-		GPPSET_KINEMATIC                  X=Kinematic設定のON/OFF(0=無効)
-		GPPSET_ANISOTROPIC_FRICTION       X,Y,Z=異方性の摩擦
-		GPPSET_GRAVITY                    X,Y,Z=重力
-		GPPSET_LINEAR_FACTOR              X,Y,Z=ベクトルに沿った移動の設定
-		GPPSET_ANGULAR_FACTOR             X,Y,Z=ベクトルに沿った回転の設定
-		GPPSET_ANGULAR_VELOCITY           X,Y,Z=回転ベロシティー
-		GPPSET_LINEAR_VELOCITY            X,Y,Z=リニアベロシティー
+		GPPSET_ENABLE                     X=����������ON/OFF(0=����)
+		GPPSET_FRICTION                   X=���C�W��, Y=�e�͐ݒ�
+		GPPSET_DAMPING                    X=linear����(0�`1.0), Y=angular����(0�`1.0)
+		GPPSET_KINEMATIC                  X=Kinematic�ݒ��ON/OFF(0=����)
+		GPPSET_ANISOTROPIC_FRICTION       X,Y,Z=�ٕ����̖��C
+		GPPSET_GRAVITY                    X,Y,Z=�d��
+		GPPSET_LINEAR_FACTOR              X,Y,Z=�x�N�g���ɉ������ړ��̐ݒ�
+		GPPSET_ANGULAR_FACTOR             X,Y,Z=�x�N�g���ɉ�������]�̐ݒ�
+		GPPSET_ANGULAR_VELOCITY           X,Y,Z=��]�x���V�e�B�[
+		GPPSET_LINEAR_VELOCITY            X,Y,Z=���j�A�x���V�e�B�[
 
 
-・マテリアルの設定
+�E�}�e���A���̐ݒ�
 
-	マテリアルは、描画(レンダリング)に関する詳細な設定情報です。
-	色に関する情報からテクスチャ画像、シェーダーの設定など幅広い情報を扱います。
-	通常のノードオブジェクト生成では、標準的なマテリアルが自動的に適用されます。
+	�}�e���A���́A�`��(�����_�����O)�Ɋւ���ڍׂȐݒ���ł��B
+	�F�Ɋւ����񂩂�e�N�X�`���摜�A�V�F�[�_�[�̐ݒ�ȂǕ��L�����������܂��B
+	�ʏ�̃m�[�h�I�u�W�F�N�g�����ł́A�W���I�ȃ}�e���A���������I�ɓK�p����܂��B
 
-		例:
-		gpbox id_model, 1, 0xffffff	; 白い色の箱ノードを追加
+		��:
+		gpbox id_model, 1, 0xffffff	; �����F�̔��m�[�h��ǉ�
 
-	上の例では、白い色の立方体が生成されます。
-	ユーザーがマテリアルを独自に生成することにより、別な質感の設定が可能になります。
-	マテリアルを生成するための命令は以下の通りです。
+	��̗�ł́A�����F�̗����̂���������܂��B
+	���[�U�[���}�e���A����Ǝ��ɐ������邱�Ƃɂ��A�ʂȎ����̐ݒ肪�\�ɂȂ�܂��B
+	�}�e���A���𐶐����邽�߂̖��߂͈ȉ��̒ʂ�ł��B
 
-		gpcolormat var,color,opt			カラーマテリアルの生成
-		gptexmat var,"file",opt				テクスチャマテリアルの生成
-		gpusermat var,"vsh","fsh","defs",color,opt	カスタムマテリアルの生成
+		gpcolormat var,color,opt			�J���[�}�e���A���̐���
+		gptexmat var,"file",opt				�e�N�X�`���}�e���A���̐���
+		gpusermat var,"vsh","fsh","defs",color,opt	�J�X�^���}�e���A���̐���
 
-	いずれの場合も、マテリアルが生成されると、マテリアルIDと呼ばれる整数値が
-	変数に代入されます。以降は、マテリアルIDを介して各種設定を変更することが
-	可能となります。
+	������̏ꍇ���A�}�e���A�������������ƁA�}�e���A��ID�ƌĂ΂�鐮���l��
+	�ϐ��ɑ������܂��B�ȍ~�́A�}�e���A��ID����Ċe��ݒ��ύX���邱�Ƃ�
+	�\�ƂȂ�܂��B
 
-	gpcolormat命令は、単色のカラーマテリアルを生成します。
+	gpcolormat���߂́A�P�F�̃J���[�}�e���A���𐶐����܂��B
 
-		例:
+		��:
 		gpcolormat mat_id,0xff00ff,GPOBJ_MATOPT_NOLIGHT
 		gpbox id_model, 1, , mat_id
 
-	上の例では、RGBカラーが0xff00ff(紫)の、ライティングを行なわないマテリアルを持った、
-	立方体のノードオブジェクトが生成されます。
-	ユーザーが生成したマテリアルIDを、オブジェクトが生成時に指定することにより
-	独自のマテリアルを持たせることが可能になります。
-	マテリアル生成時のオプションで、以下を指定することにより設定を変更することができます。
-	これらの設定は、gpmatstate命令で別途設定することも可能です。
+	��̗�ł́ARGB�J���[��0xff00ff(��)�́A���C�e�B���O���s�Ȃ�Ȃ��}�e���A�����������A
+	�����̂̃m�[�h�I�u�W�F�N�g����������܂��B
+	���[�U�[�����������}�e���A��ID���A�I�u�W�F�N�g���������Ɏw�肷�邱�Ƃɂ��
+	�Ǝ��̃}�e���A�����������邱�Ƃ��\�ɂȂ�܂��B
+	�}�e���A���������̃I�v�V�����ŁA�ȉ����w�肷�邱�Ƃɂ��ݒ��ύX���邱�Ƃ��ł��܂��B
+	�����̐ݒ�́Agpmatstate���߂ŕʓr�ݒ肷�邱�Ƃ��\�ł��B
 
-	        マクロ名                内容
+	        �}�N����                ���e
 	    ----------------------------------------------------------------------------
-		GPOBJ_MATOPT_NOLIGHT    ライティングを行なわない
-		GPOBJ_MATOPT_NOMIPMAP   MIPMAPを生成しない
-		GPOBJ_MATOPT_NOCULL     カリングを無効にする
-		GPOBJ_MATOPT_NOZTEST    Zテストを無効にする
-		GPOBJ_MATOPT_NOZWRITE   Zバッファ書き込みを無効にする
-		GPOBJ_MATOPT_BLENDADD   プレンドモードを加算に設定する
+		GPOBJ_MATOPT_NOLIGHT    ���C�e�B���O���s�Ȃ�Ȃ�
+		GPOBJ_MATOPT_NOMIPMAP   MIPMAP�𐶐����Ȃ�
+		GPOBJ_MATOPT_NOCULL     �J�����O�𖳌��ɂ���
+		GPOBJ_MATOPT_NOZTEST    Z�e�X�g�𖳌��ɂ���
+		GPOBJ_MATOPT_NOZWRITE   Z�o�b�t�@�������݂𖳌��ɂ���
+		GPOBJ_MATOPT_BLENDADD   �v�����h���[�h�����Z�ɐݒ肷��
 
-	gptexmat命令は、テクスチャ(画像)を持ったマテリアルを生成します。
+	gptexmat���߂́A�e�N�X�`��(�摜)���������}�e���A���𐶐����܂��B
 
-		例:
-		gptexmat id_texmat, "res/qbox.png"	; テクスチャマテリアル作成
-		gpbox id_model, 1, , id_texmat		; 箱ノードを追加
+		��:
+		gptexmat id_texmat, "res/qbox.png"	; �e�N�X�`���}�e���A���쐬
+		gpbox id_model, 1, , id_texmat		; ���m�[�h��ǉ�
 
-	上の例では、resフォルダ内のqbox.pngをテクスチャとして持ったマテリアルを生成します。
+	��̗�ł́Ares�t�H���_����qbox.png���e�N�X�`���Ƃ��Ď������}�e���A���𐶐����܂��B
 
-	gpusermat命令は、カスタムマテリアルを生成するもので、任意のシェーダーを使って
-	描画のすべてをコントロールすることができるようになります。
-	これは、シェーダーについての知識がある上級者向けの拡張機能ですので、通常は
-	使用する必要はありません。
+	gpusermat���߂́A�J�X�^���}�e���A���𐶐�������̂ŁA�C�ӂ̃V�F�[�_�[���g����
+	�`��̂��ׂĂ��R���g���[�����邱�Ƃ��ł���悤�ɂȂ�܂��B
+	����́A�V�F�[�_�[�ɂ��Ă̒m��������㋉�Ҍ����̊g���@�\�ł��̂ŁA�ʏ��
+	�g�p����K�v�͂���܂���B
 
-		gpusermat var,"vsh","fsh","defs",color,opt	カスタムマテリアルの生成
+		gpusermat var,"vsh","fsh","defs",color,opt	�J�X�^���}�e���A���̐���
 
-		var      : 結果が代入される変数名
-		"vsh"    : バーテックスシェーダーファイル名
-		"fsh"    : フラグメントシェーダーファイル名
-		"defs"   : 追加のラベル定義
-		color    : RGBカラーコード
-		opt      : マテリアルオプション指定
+		var      : ���ʂ���������ϐ���
+		"vsh"    : �o�[�e�b�N�X�V�F�[�_�[�t�@�C����
+		"fsh"    : �t���O�����g�V�F�[�_�[�t�@�C����
+		"defs"   : �ǉ��̃��x����`
+		color    : RGB�J���[�R�[�h
+		opt      : �}�e���A���I�v�V�����w��
 
-	カスタムマテリアルを生成した場合は、gpmatprm命令によってシェーダーパラメーターに
-	渡すための値を設定することができます。
+	�J�X�^���}�e���A���𐶐������ꍇ�́Agpmatprm���߂ɂ���ăV�F�[�_�[�p�����[�^�[��
+	�n�����߂̒l��ݒ肷�邱�Ƃ��ł��܂��B
 
-		例:
-		gpmatprm objid,"u_diffuseColor",1,0,0.5 ; マテリアルのパラメーター設定
+		��:
+		gpmatprm objid,"u_diffuseColor",1,0,0.5 ; �}�e���A���̃p�����[�^�[�ݒ�
 
-	上の例では、u_diffuseColorという名称のパラメーターに( 1.0, 0.0, 0.5 )のベクトル値を
-	設定します。これにより、マテリアルごとに異なるパラメーターをシェーダーに渡すことが
-	可能になります。
+	��̗�ł́Au_diffuseColor�Ƃ������̂̃p�����[�^�[��( 1.0, 0.0, 0.5 )�̃x�N�g���l��
+	�ݒ肵�܂��B����ɂ��A�}�e���A�����ƂɈقȂ�p�����[�^�[���V�F�[�_�[�ɓn�����Ƃ�
+	�\�ɂȂ�܂��B
 
-	gpmatstate命令は、マテリアルIDを介して表示のためのステート設定を変更します。
+	gpmatstate���߂́A�}�e���A��ID����ĕ\���̂��߂̃X�e�[�g�ݒ��ύX���܂��B
 
-		gpmatstate objid,"name","value"		マテリアルのステート設定
+		gpmatstate objid,"name","value"		�}�e���A���̃X�e�[�g�ݒ�
 
-	文字列としてnameで指定された項目に対して、valueで指定された内容を設定します。
-	項目と設定内容はすべて文字列で行なうので注意してください。
-	設定項目と、内容についての詳細は以下の通りです。
+	������Ƃ���name�Ŏw�肳�ꂽ���ڂɑ΂��āAvalue�Ŏw�肳�ꂽ���e��ݒ肵�܂��B
+	���ڂƐݒ���e�͂��ׂĕ�����ōs�Ȃ��̂Œ��ӂ��Ă��������B
+	�ݒ荀�ڂƁA���e�ɂ��Ă̏ڍׂ͈ȉ��̒ʂ�ł��B
 
 		name             value
 	    --------------------------------------------------------------------
-		"blend"          プレンドの有効/無効切り替え
-	                         (true または false を指定)
-		"blendSrc"       ブレンド元を選択(下記参照)
-		"blendDst"       ブレンド先を選択(下記参照)
-		"cullFace"       隠面除去(カリング)の有効/無効切り替え
-	                         (true または false を指定)
-		"cullFaceSide"   隠面除去(カリング)の面指定
-		"depthTest"      true または false
-	                         (true または false を指定)
-		"depthWrite"     Zバッファ書き込みの有効/無効切り替え
-	                         (true または false を指定)
-		"depthFunc"      Z値比較方法を選択(下記参照)
+		"blend"          �v�����h�̗L��/�����؂�ւ�
+	                         (true �܂��� false ���w��)
+		"blendSrc"       �u�����h����I��(���L�Q��)
+		"blendDst"       �u�����h���I��(���L�Q��)
+		"cullFace"       �B�ʏ���(�J�����O)�̗L��/�����؂�ւ�
+	                         (true �܂��� false ���w��)
+		"cullFaceSide"   �B�ʏ���(�J�����O)�̖ʎw��
+		"depthTest"      true �܂��� false
+	                         (true �܂��� false ���w��)
+		"depthWrite"     Z�o�b�t�@�������݂̗L��/�����؂�ւ�
+	                         (true �܂��� false ���w��)
+		"depthFunc"      Z�l��r���@��I��(���L�Q��)
 
-		(*)blendSrc,blendDstで設定できる文字列
+		(*)blendSrc,blendDst�Őݒ�ł��镶����
 
-		"ZERO"                     即値(0)
-		"ONE"                      即値(1)
-		"SRC_COLOR"                書き込み元カラー
-		"ONE_MINUS_SRC_COLOR"      書き込み元カラー(反転値)
-		"DST_COLOR"                書き込み先カラー
-		"ONE_MINUS_DST_COLOR"      書き込み先カラー(反転値)
-		"SRC_ALPHA"                書き込み元α
-		"ONE_MINUS_SRC_ALPHA"      書き込み元α(反転値)
-		"DST_ALPHA"                書き込み先α
-		"ONE_MINUS_DST_ALPHA"      書き込み先α(反転値)
-		"CONSTANT_ALPHA"           α固定値
-		"ONE_MINUS_CONSTANT_ALPHA" α固定値(反転値)
-		"SRC_ALPHA_SATURATE"       書き込み元α反転値
+		"ZERO"                     ���l(0)
+		"ONE"                      ���l(1)
+		"SRC_COLOR"                �������݌��J���[
+		"ONE_MINUS_SRC_COLOR"      �������݌��J���[(���]�l)
+		"DST_COLOR"                �������ݐ�J���[
+		"ONE_MINUS_DST_COLOR"      �������ݐ�J���[(���]�l)
+		"SRC_ALPHA"                �������݌���
+		"ONE_MINUS_SRC_ALPHA"      �������݌���(���]�l)
+		"DST_ALPHA"                �������ݐ惿
+		"ONE_MINUS_DST_ALPHA"      �������ݐ惿(���]�l)
+		"CONSTANT_ALPHA"           ���Œ�l
+		"ONE_MINUS_CONSTANT_ALPHA" ���Œ�l(���]�l)
+		"SRC_ALPHA_SATURATE"       �������݌������]�l
 
-		(*)cullFaceSideで設定できる文字列
+		(*)cullFaceSide�Őݒ�ł��镶����
 
-		BACK             裏面をカリング
-		FRONT            表面をカリング
-		FRONT_AND_BACK   両面をカリング
+		BACK             ���ʂ��J�����O
+		FRONT            �\�ʂ��J�����O
+		FRONT_AND_BACK   ���ʂ��J�����O
 
-		(*)depthFuncで設定できる文字列
+		(*)depthFunc�Őݒ�ł��镶����
 
-		NEVER            常に拒否
-		LESS             小さい値の時のみ許可
-		EQUAL            同一値のみ許可
-		LEQUAL           同一か小さい値の時のみ許可
-		GREATER          大きい値の時のみ許可
-		NOTEQUAL         同一でない値のみ許可
-		GEQUAL           同一か大きい値の時のみ許可
-		ALWAYS           常に許可
+		NEVER            ��ɋ���
+		LESS             �������l�̎��̂݋���
+		EQUAL            ����l�̂݋���
+		LEQUAL           ���ꂩ�������l�̎��̂݋���
+		GREATER          �傫���l�̎��̂݋���
+		NOTEQUAL         ����łȂ��l�̂݋���
+		GEQUAL           ���ꂩ�傫���l�̎��̂݋���
+		ALWAYS           ��ɋ���
 
 
-・3Dモデルデータの表示
+�E3D���f���f�[�^�̕\��
 
-	gpload命令により、ファイル化された3Dモデルデータ(.gpbファイル)を
-	読み込み表示させることができます。
+	gpload���߂ɂ��A�t�@�C�������ꂽ3D���f���f�[�^(.gpb�t�@�C��)��
+	�ǂݍ��ݕ\�������邱�Ƃ��ł��܂��B
 
-		例:
-		gpload id_model,"res/duck"		; モデル読み込み
+		��:
+		gpload id_model,"res/duck"		; ���f���ǂݍ���
 
-	上の例では、resフォルダ内にあるduck.gpbファイルを読み込みます。
-	その際に、マテリアル情報が書かれているduck.materialファイルが参照されます。
-	さらに、テクスチャが必要な場合は、同じフォルダ内の画像ファイルも読み込まれます。
+	��̗�ł́Ares�t�H���_���ɂ���duck.gpb�t�@�C����ǂݍ��݂܂��B
+	���̍ۂɁA�}�e���A����񂪏�����Ă���duck.material�t�@�C�����Q�Ƃ���܂��B
+	����ɁA�e�N�X�`�����K�v�ȏꍇ�́A�����t�H���_���̉摜�t�@�C�����ǂݍ��܂�܂��B
 
-	gpload命令で読み込むためのファイル(.gpb形式)は、gameplay3Dで標準的に使用されている
-	データ形式です。HGIMG4では、.gpb形式を生成するためのGPBコンバーターを用意しています。
+	gpload���߂œǂݍ��ނ��߂̃t�@�C��(.gpb�`��)�́Agameplay3D�ŕW���I�Ɏg�p����Ă���
+	�f�[�^�`���ł��BHGIMG4�ł́A.gpb�`���𐶐����邽�߂�GPB�R���o�[�^�[��p�ӂ��Ă��܂��B
 
 		gpbconv.exe
 
-	を起動することで、GUIによるファイル変換ツールが起動します。
-	(内部でコマンドラインツールのgameplay-encoder.exeを呼び出します)
+	���N�����邱�ƂŁAGUI�ɂ��t�@�C���ϊ��c�[�����N�����܂��B
+	(�����ŃR�}���h���C���c�[����gameplay-encoder.exe���Ăяo���܂�)
 
-	.gpb形式とともに読み込まれるマテリアル情報(.material)も、GPBコンバーターから
-	出力が可能です。
+	.gpb�`���ƂƂ��ɓǂݍ��܂��}�e���A�����(.material)���AGPB�R���o�[�^�[����
+	�o�͂��\�ł��B
 
-	.gpb形式はfbx形式から変換することが可能です。
-	fbx形式は、Autodesk社の3Dツールで使用されている標準的な3D形式です。
-	他の形式からfbxに変換するためのFBX Converterが公開されています。
-	これにより、OBJ, DXF, DAE(Collada), 3DSの形式から変換することができます。
+	.gpb�`����fbx�`������ϊ����邱�Ƃ��\�ł��B
+	fbx�`���́AAutodesk�Ђ�3D�c�[���Ŏg�p����Ă���W���I��3D�`���ł��B
+	���̌`������fbx�ɕϊ����邽�߂�FBX Converter�����J����Ă��܂��B
+	����ɂ��AOBJ, DXF, DAE(Collada), 3DS�̌`������ϊ����邱�Ƃ��ł��܂��B
 	http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775855
 
-	現在、fbxの出力とgpbの変換を確認しているツールは、Blender及びMayaになります。
+	���݁Afbx�̏o�͂�gpb�̕ϊ����m�F���Ă���c�[���́ABlender�y��Maya�ɂȂ�܂��B
 
 
-・3Dモデルデータのマテリアルについて
+�E3D���f���f�[�^�̃}�e���A���ɂ���
 
-	.gpb形式とともに読み込まれるマテリアル情報(.materialファイル)には、モデルが持つマテリアル(質感)についての詳細な情報が含まれています。
-	.materialファイルは、テキスト形式のファイルなので、通常のテキストエディタで
-	閲覧したり、必要に応じて内容を編集することが可能です。
-	以下は、テキスト内容の例です。
-	複数のマテリアルが含まれている場合は、「material マテリアル名」に続く「{」から「}」の範囲が設定になります。
+	.gpb�`���ƂƂ��ɓǂݍ��܂��}�e���A�����(.material�t�@�C��)�ɂ́A���f�������}�e���A��(����)�ɂ��Ă̏ڍׂȏ�񂪊܂܂�Ă��܂��B
+	.material�t�@�C���́A�e�L�X�g�`���̃t�@�C���Ȃ̂ŁA�ʏ�̃e�L�X�g�G�f�B�^��
+	�{��������A�K�v�ɉ����ē��e��ҏW���邱�Ƃ��\�ł��B
+	�ȉ��́A�e�L�X�g���e�̗�ł��B
+	�����̃}�e���A�����܂܂�Ă���ꍇ�́A�umaterial �}�e���A�����v�ɑ����u{�v����u}�v�͈̔͂��ݒ�ɂȂ�܂��B
 
 	material colored
 	{
@@ -1014,60 +1014,60 @@ HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin
 	    }
 	}
 
-	renderState設定部分で、マテリアルごとのレンダリング設定を定義しています。
+	renderState�ݒ蕔���ŁA�}�e���A�����Ƃ̃����_�����O�ݒ���`���Ă��܂��B
 
-		ステート名           内容
+		�X�e�[�g��           ���e
 		-------------------------------------------------
-		cullFace             裏面の消去(true/false)
-		depthTest            Zテスト(true/false)
-		depthWrite           Z書き込み(true/false)
-		stencilTest          ステンシルテスト(true/false)
-		stencilWrite         ステンシル書き込み(true/false)
-		blend                ピクセルブレンドの設定(true/false)
-		blendSrc             ブレンド元設定(*1)
-		blendDst             ブレンド先設定(*1)
-		depthFunc            Zテスト機能(*2)
+		cullFace             ���ʂ̏���(true/false)
+		depthTest            Z�e�X�g(true/false)
+		depthWrite           Z��������(true/false)
+		stencilTest          �X�e���V���e�X�g(true/false)
+		stencilWrite         �X�e���V����������(true/false)
+		blend                �s�N�Z���u�����h�̐ݒ�(true/false)
+		blendSrc             �u�����h���ݒ�(*1)
+		blendDst             �u�����h��ݒ�(*1)
+		depthFunc            Z�e�X�g�@�\(*2)
 
-		(*1) 以下から選択
+		(*1) �ȉ�����I��
 		ZERO / ONE / SRC_COLOR / ONE_MINUS_SRC_COLOR / 
 		DST_COLOR / ONE_MINUS_DST_COLOR / SRC_ALPHA / 
 		ONE_MINUS_SRC_ALPHA / DST_ALPHA / ONE_MINUS_DST_ALPHA / 
 		CONSTANT_ALPHA / ONE_MINUS_CONSTANT_ALPHA / SRC_ALPHA_SATURATE
 
-		(*2) 以下から選択
+		(*2) �ȉ�����I��
 		NEVER / LESS / EQUAL / LEQUAL / GREATER / GEQUAL / 
 		NOTEQUAL / ALWAYS
 
-	pass設定部分で、マテリアルごとのシェーダー設定を定義しています。
+	pass�ݒ蕔���ŁA�}�e���A�����Ƃ̃V�F�[�_�[�ݒ���`���Ă��܂��B
 
-		設定名               内容
+		�ݒ薼               ���e
 		-------------------------------------------------
-		defines              シェーダーコンパイル時のラベル定義
-		vertexShader         バーテックスシェーダーファイルのパス
-		fragmentShader       フラグメントシェーダーファイルのパス
+		defines              �V�F�[�_�[�R���p�C�����̃��x����`
+		vertexShader         �o�[�e�b�N�X�V�F�[�_�[�t�@�C���̃p�X
+		fragmentShader       �t���O�����g�V�F�[�_�[�t�@�C���̃p�X
 
-	sampler設定部分で、マテリアルごとのテクスチャ設定を定義しています。
+	sampler�ݒ蕔���ŁA�}�e���A�����Ƃ̃e�N�X�`���ݒ���`���Ă��܂��B
 
-		設定名               内容
+		�ݒ薼               ���e
 		-------------------------------------------------
-		path                 画像ファイルのパス
-		wrapS                横方向のラップ設定(REPEAT/CLAMP)
-		wrapT                縦方向のラップ設定(REPEAT/CLAMP)
-		mipmap               ミップマップ設定(true/false)
-		minFilter            縮小フィルター設定(*1)
-		magFilter            拡大フィルター設定(*1)
+		path                 �摜�t�@�C���̃p�X
+		wrapS                �������̃��b�v�ݒ�(REPEAT/CLAMP)
+		wrapT                �c�����̃��b�v�ݒ�(REPEAT/CLAMP)
+		mipmap               �~�b�v�}�b�v�ݒ�(true/false)
+		minFilter            �k���t�B���^�[�ݒ�(*1)
+		magFilter            �g��t�B���^�[�ݒ�(*1)
 
-		(*1) 以下から選択
+		(*1) �ȉ�����I��
 		NEAREST / LINEAR / NEAREST_MIPMAP_NEAREST / 
 		LINEAR_MIPMAP_NEAREST / NEAREST_MIPMAP_LINEAR / 
 		LINEAR_MIPMAP_LINEAR
 
-	現在のバージョンでは、FBXが参照するテクスチャによっては、マテリアル情報(.material)に
-	出力されるテクスチャファイル名にパス名(フォルダ)が付加されることがあり、正しく読み込みが
-	できないことがあります。その場合は、生成された.materialファイルの
-	テクスチャファイル名部分を直接修正するようにしてください。
-	以下の例では、「path = 」に続く文字列がファイルのパス名になります。
-	該当するテクスチャは、「res/Metal_Corrogated_Shiny.png」から読み込まれることを示しています。
+	���݂̃o�[�W�����ł́AFBX���Q�Ƃ���e�N�X�`���ɂ���ẮA�}�e���A�����(.material)��
+	�o�͂����e�N�X�`���t�@�C�����Ƀp�X��(�t�H���_)���t������邱�Ƃ�����A�������ǂݍ��݂�
+	�ł��Ȃ����Ƃ�����܂��B���̏ꍇ�́A�������ꂽ.material�t�@�C����
+	�e�N�X�`���t�@�C���������𒼐ڏC������悤�ɂ��Ă��������B
+	�ȉ��̗�ł́A�upath = �v�ɑ��������񂪃t�@�C���̃p�X���ɂȂ�܂��B
+	�Y������e�N�X�`���́A�ures/Metal_Corrogated_Shiny.png�v����ǂݍ��܂�邱�Ƃ������Ă��܂��B
 
 	    sampler u_diffuseTexture
 	    {
@@ -1076,26 +1076,26 @@ HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin
 	        wrapT = REPEAT
 	    }
 
-	.materialファイルは、複雑なモデルの定義などの場合、手で修正することが
-	困難になります。今後のバージョンでは、ツールによるサポートを予定しています。
+	.material�t�@�C���́A���G�ȃ��f���̒�`�Ȃǂ̏ꍇ�A��ŏC�����邱�Ƃ�
+	����ɂȂ�܂��B����̃o�[�W�����ł́A�c�[���ɂ��T�|�[�g��\�肵�Ă��܂��B
 
 
-・3Dモデルデータのライティング
+�E3D���f���f�[�^�̃��C�e�B���O
 
-	gpload命令で読み込まれたモデルは、変換時のfbxに記録されている
-	シェーディング情報を元にマテリアル設定が行なわれます。
-	つまり、モデルのライティング設定は、.materialファイルによって決まります。
+	gpload���߂œǂݍ��܂ꂽ���f���́A�ϊ�����fbx�ɋL�^����Ă���
+	�V�F�[�f�B���O�������Ƀ}�e���A���ݒ肪�s�Ȃ��܂��B
+	�܂�A���f���̃��C�e�B���O�ݒ�́A.material�t�@�C���ɂ���Č��܂�܂��B
 
-	ライティングされないモデルに対して、ライティングを適用する場合には、
-	.materialファイル内のdefine定義を修正する必要があります。
-	pass設定部分のdefine定義に「DIRECTIONAL_LIGHT_COUNT 1」が指定されている
-	マテリアルはライティング計算の対象になります。
-	define定義は、「;」記号で区切ることで複数の定義を記述できます。
-	「SPECULAR;DIRECTIONAL_LIGHT_COUNT 1」のように記述した場合には、
-	ライティング計算とスペキュラーが適用されます。
+	���C�e�B���O����Ȃ����f���ɑ΂��āA���C�e�B���O��K�p����ꍇ�ɂ́A
+	.material�t�@�C������define��`���C������K�v������܂��B
+	pass�ݒ蕔����define��`�ɁuDIRECTIONAL_LIGHT_COUNT 1�v���w�肳��Ă���
+	�}�e���A���̓��C�e�B���O�v�Z�̑ΏۂɂȂ�܂��B
+	define��`�́A�u;�v�L���ŋ�؂邱�Ƃŕ����̒�`���L�q�ł��܂��B
+	�uSPECULAR;DIRECTIONAL_LIGHT_COUNT 1�v�̂悤�ɋL�q�����ꍇ�ɂ́A
+	���C�e�B���O�v�Z�ƃX�y�L�����[���K�p����܂��B
 
-	ライティング及びスペキュラーを適用する場合には、material設定部分に
-	以下の定義を追加する必要があります。
+	���C�e�B���O�y�уX�y�L�����[��K�p����ꍇ�ɂ́Amaterial�ݒ蕔����
+	�ȉ��̒�`��ǉ�����K�v������܂��B
 
             u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
             u_cameraPosition = CAMERA_WORLD_POSITION
@@ -1103,536 +1103,536 @@ HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin
 	    u_directionalLightColor[0] = 1, 1, 1
 	    u_directionalLightDirection[0] = 0, 0, -1
 
-	これらは、シェーダーに渡されるデフォルトのパラメーターになります。
-	「u_worldViewProjectionMatrix」の定義を行なっている行の下に追加してください。
-	(「u_specularExponent」はスペキュラーの強度を示します。)
+	�����́A�V�F�[�_�[�ɓn�����f�t�H���g�̃p�����[�^�[�ɂȂ�܂��B
+	�uu_worldViewProjectionMatrix�v�̒�`���s�Ȃ��Ă���s�̉��ɒǉ����Ă��������B
+	(�uu_specularExponent�v�̓X�y�L�����[�̋��x�������܂��B)
 
 
-・シーンの描画について
+�E�V�[���̕`��ɂ���
 
-	gpdraw命令は、シーン内のオブジェクトをすべて描画する命令です。
-	以下のオプションを指定することで、限られた項目の描画だけを行なうことができます。
+	gpdraw���߂́A�V�[�����̃I�u�W�F�N�g�����ׂĕ`�悷�閽�߂ł��B
+	�ȉ��̃I�v�V�������w�肷�邱�ƂŁA����ꂽ���ڂ̕`�悾�����s�Ȃ����Ƃ��ł��܂��B
 
-	        マクロ名                      内容
+	        �}�N����                      ���e
 	    --------------------------------------------------------------------
-		GPDRAW_OPT_OBJUPDATE          オブジェクトの自動移動処理
-		GPDRAW_OPT_DRAWSCENE          3Dシーン描画処理
-		GPDRAW_OPT_DRAWSCENE_LATE     3Dシーン描画処理(OBJ_LATE)
-		GPDRAW_OPT_DRAW2D             2Dスプライト描画処理
-		GPDRAW_OPT_DRAW2D_LATE        2Dスプライト描画処理(OBJ_LATE)
+		GPDRAW_OPT_OBJUPDATE          �I�u�W�F�N�g�̎����ړ�����
+		GPDRAW_OPT_DRAWSCENE          3D�V�[���`�揈��
+		GPDRAW_OPT_DRAWSCENE_LATE     3D�V�[���`�揈��(OBJ_LATE)
+		GPDRAW_OPT_DRAW2D             2D�X�v���C�g�`�揈��
+		GPDRAW_OPT_DRAW2D_LATE        2D�X�v���C�g�`�揈��(OBJ_LATE)
 
-	OBJ_LATEのモードが付加されたもの(半透明α値が設定されているものを含む)は、
-	不透明のオブジェクトよりも後に描画するため、項目が分けられています。
-	複数の項目を「|」で区切って指定することもできます。
+	OBJ_LATE�̃��[�h���t�����ꂽ����(���������l���ݒ肳��Ă�����̂��܂�)�́A
+	�s�����̃I�u�W�F�N�g������ɕ`�悷�邽�߁A���ڂ��������Ă��܂��B
+	�����̍��ڂ��u|�v�ŋ�؂��Ďw�肷�邱�Ƃ��ł��܂��B
 
-		例:
+		��:
 		gpdraw GPDRAW_OPT_DRAW2D|GPDRAW_OPT_DRAW2D_LATE
 
-	上の例では、2Dスプライト描画処理、2Dスプライト描画処理(OBJ_LATE)だけを実行します。
-	これを利用すると、3Dシーン描画と2Dスプライト描画の間にgcopy命令など別な描画命令による
-	表示を行なうことが可能になります。
+	��̗�ł́A2D�X�v���C�g�`�揈���A2D�X�v���C�g�`�揈��(OBJ_LATE)���������s���܂��B
+	����𗘗p����ƁA3D�V�[���`���2D�X�v���C�g�`��̊Ԃ�gcopy���߂ȂǕʂȕ`�施�߂ɂ��
+	�\�����s�Ȃ����Ƃ��\�ɂȂ�܂��B
 
-	gpdraw命令のパラメーターを省略した場合は、すべての項目が選択されている状態になります。
-	通常は、パラメーターを指定しなくても問題ありません。
-	また、2Dの直接描画命令だけを使用して、オブジェクトによる描画が不要な場合は、
-	gpdraw命令を記述する必要もありません。
-
-
-・半透明オブジェクトの描画について
-
-	αチャンネル値の設定により、2Dスプライトオブジェクト及び3Dノードオブジェクトの
-	透明度を変更することができます。
-
-		setalpha オブジェクトID, α値
-
-	α値は、0～255までの整数値で、0が完全な透明、255が完全な不透明となります。
-	α値が255以外(半透明)の状態となったオブジェクトは、描画順序が前面に変更されます。
-	(OBJ_LATEのモードが指定されたのと同じ状態)
+	gpdraw���߂̃p�����[�^�[���ȗ������ꍇ�́A���ׂĂ̍��ڂ��I������Ă����ԂɂȂ�܂��B
+	�ʏ�́A�p�����[�^�[���w�肵�Ȃ��Ă���肠��܂���B
+	�܂��A2D�̒��ڕ`�施�߂������g�p���āA�I�u�W�F�N�g�ɂ��`�悪�s�v�ȏꍇ�́A
+	gpdraw���߂��L�q����K�v������܂���B
 
 
-・オブジェクトIDプールについて
+�E�������I�u�W�F�N�g�̕`��ɂ���
 
-	オブジェクトIDは、あらかじめ決められた最大数の中で、使用されていないID番号が
-	割り当てられます。オブジェクト最大数は、デフォルトで1024個となっており、
-	sysreq命令によって拡張することが可能です。
+	���`�����l���l�̐ݒ�ɂ��A2D�X�v���C�g�I�u�W�F�N�g�y��3D�m�[�h�I�u�W�F�N�g��
+	�����x��ύX���邱�Ƃ��ł��܂��B
 
-		例:
-		setreq SYSREQ_MAXOBJ,4096	; オブジェクト最大数を4096に拡張する
+		setalpha �I�u�W�F�N�gID, ���l
 
-	ID番号の割り当て範囲を任意に変更するためにgpobjpool命令が用意されています。
-
-		例:
-		gpobjpool 100,50	; オブジェクトID生成の設定変更
-
-	上の例では、ID番号100～150のみを割り当て対象に変更します。
-	これ以降のオブジェクト生成命令(gpboxやgpnullなど)では、指定された
-	範囲内のオブジェクトIDのみが割り当てられます。
-	オブジェクト全体の中で特定の個数までしか生成されないように制限したい場合や、
-	表示順序をある程度コントロールしたい場合に利用できます。
-	gpobjpool命令によって、あらかじめ設定されたオブジェクト最大数を拡張することは
-	できません。必ず最大数の範囲内で設定を行なうよう注意してください。
+	���l�́A0�`255�܂ł̐����l�ŁA0�����S�ȓ����A255�����S�ȕs�����ƂȂ�܂��B
+	���l��255�ȊO(������)�̏�ԂƂȂ����I�u�W�F�N�g�́A�`�揇�����O�ʂɕύX����܂��B
+	(OBJ_LATE�̃��[�h���w�肳�ꂽ�̂Ɠ������)
 
 
-・オブジェクトのコアパラメーター
+�E�I�u�W�F�N�gID�v�[���ɂ���
 
-	オブジェクトごとに保持されている重要な設定値をコアパラメーターと呼びます。
-	コアパラメーターは、32bit整数値で、以下の命令を介して読み書きが可能です。
+	�I�u�W�F�N�gID�́A���炩���ߌ��߂�ꂽ�ő吔�̒��ŁA�g�p����Ă��Ȃ�ID�ԍ���
+	���蓖�Ă��܂��B�I�u�W�F�N�g�ő吔�́A�f�t�H���g��1024�ƂȂ��Ă���A
+	sysreq���߂ɂ���Ċg�����邱�Ƃ��\�ł��B
 
-	gpsetprm objid,prmid,value			オブジェクトのコアパラメーター設定
-	gpgetprm var,objid,prmid			オブジェクトのコアパラメーター取得
+		��:
+		setreq SYSREQ_MAXOBJ,4096	; �I�u�W�F�N�g�ő吔��4096�Ɋg������
 
-	コアパラメーターのIDとして指定可能な項目は以下の通りです。
+	ID�ԍ��̊��蓖�Ĕ͈͂�C�ӂɕύX���邽�߂�gpobjpool���߂��p�ӂ���Ă��܂��B
 
-		マクロ名             | 内容
+		��:
+		gpobjpool 100,50	; �I�u�W�F�N�gID�����̐ݒ�ύX
+
+	��̗�ł́AID�ԍ�100�`150�݂̂����蓖�đΏۂɕύX���܂��B
+	����ȍ~�̃I�u�W�F�N�g��������(gpbox��gpnull�Ȃ�)�ł́A�w�肳�ꂽ
+	�͈͓��̃I�u�W�F�N�gID�݂̂����蓖�Ă��܂��B
+	�I�u�W�F�N�g�S�̂̒��œ���̌��܂ł�����������Ȃ��悤�ɐ����������ꍇ��A
+	�\��������������x�R���g���[���������ꍇ�ɗ��p�ł��܂��B
+	gpobjpool���߂ɂ���āA���炩���ߐݒ肳�ꂽ�I�u�W�F�N�g�ő吔���g�����邱�Ƃ�
+	�ł��܂���B�K���ő吔�͈͓̔��Őݒ���s�Ȃ��悤���ӂ��Ă��������B
+
+
+�E�I�u�W�F�N�g�̃R�A�p�����[�^�[
+
+	�I�u�W�F�N�g���Ƃɕێ�����Ă���d�v�Ȑݒ�l���R�A�p�����[�^�[�ƌĂт܂��B
+	�R�A�p�����[�^�[�́A32bit�����l�ŁA�ȉ��̖��߂���ēǂݏ������\�ł��B
+
+	gpsetprm objid,prmid,value			�I�u�W�F�N�g�̃R�A�p�����[�^�[�ݒ�
+	gpgetprm var,objid,prmid			�I�u�W�F�N�g�̃R�A�p�����[�^�[�擾
+
+	�R�A�p�����[�^�[��ID�Ƃ��Ďw��\�ȍ��ڂ͈ȉ��̒ʂ�ł��B
+
+		�}�N����             | ���e
 		--------------------------------------------------------------
-		PRMSET_FLAG            オブジェクト登録フラグ(*)
-		PRMSET_MODE            モードフラグ値
-		PRMSET_ID              オブジェクトID(*)
-		PRMSET_ALPHA           透明度(α値)
-		PRMSET_TIMER           タイマー値
-		PRMSET_MYGROUP         自身のコリジョングループ
-		PRMSET_COLGROUP        衝突検出するコリジョングループ
-		PRMSET_SHAPE           形状ID(*)
-		PRMSET_USEGPMAT        マテリアルID
-		PRMSET_USEGPPHY        物理設定ID
-		PRMSET_COLILOG         コリジョンログID(*)
-		PRMSET_SPRID           ソースバッファID(スプライトのみ)
-		PRMSET_SPRCELID        ソースのセルID(スプライトのみ)
-		PRMSET_SPRGMODE        コピーモード(スプライトのみ)
+		PRMSET_FLAG            �I�u�W�F�N�g�o�^�t���O(*)
+		PRMSET_MODE            ���[�h�t���O�l
+		PRMSET_ID              �I�u�W�F�N�gID(*)
+		PRMSET_ALPHA           �����x(���l)
+		PRMSET_TIMER           �^�C�}�[�l
+		PRMSET_MYGROUP         ���g�̃R���W�����O���[�v
+		PRMSET_COLGROUP        �Փˌ��o����R���W�����O���[�v
+		PRMSET_SHAPE           �`��ID(*)
+		PRMSET_USEGPMAT        �}�e���A��ID
+		PRMSET_USEGPPHY        �����ݒ�ID
+		PRMSET_COLILOG         �R���W�������OID(*)
+		PRMSET_SPRID           �\�[�X�o�b�t�@ID(�X�v���C�g�̂�)
+		PRMSET_SPRCELID        �\�[�X�̃Z��ID(�X�v���C�g�̂�)
+		PRMSET_SPRGMODE        �R�s�[���[�h(�X�v���C�g�̂�)
 
-	(*)が付いたコアパラメーターは、書き込みを行なうことができません。
+	(*)���t�����R�A�p�����[�^�[�́A�������݂��s�Ȃ����Ƃ��ł��܂���B
 
-	PRMSET_MODEで設定されるモードフラグ値では、ビットごとにオブジェクトの
-	挙動を設定することができます。
-	特定のモードフラグ値だけを設定・消去するためのsetobjmode命令も用意されています。
-	詳しくは、「オブジェクトのモード設定」を参照してください。
-
-
-・オブジェクトのクローン
-
-	クローン機能は、既に存在するオブジェクトと同じ設定で、新しいオブジェクトを
-	生成するものです。同一の形状、パラメーター設定(物理設定を除く)を持ちますが座標や角度
-	などを新しく設定することができます。
-	同一の物体を複数生成する場合に、設定や読み込みを何度も行なう手間を軽減し高速化にも
-	つながります。
-
-		例:
-		gpload id_model,"res/duck"	; モデル読み込み
-		gpclone i, id_model		; 同じものをクローン
-
-	※現在のバージョンでは、シーン内に存在する表示可能なオブジェクト以外は
-	　クローンすることができませんので注意してください。
+	PRMSET_MODE�Őݒ肳��郂�[�h�t���O�l�ł́A�r�b�g���ƂɃI�u�W�F�N�g��
+	������ݒ肷�邱�Ƃ��ł��܂��B
+	����̃��[�h�t���O�l������ݒ�E�������邽�߂�setobjmode���߂��p�ӂ���Ă��܂��B
+	�ڂ����́A�u�I�u�W�F�N�g�̃��[�h�ݒ�v���Q�Ƃ��Ă��������B
 
 
-・実数ベクトルサポート命令
+�E�I�u�W�F�N�g�̃N���[��
 
-	実数ベクトルサポート命令は、小数値、ベクトル値などの情報を扱うための
-	命令群です。ベクトルを変数に格納する方法としてFV値という表現が出て
-	きますが、これは「変数名=1.0」のように1つの値を代入するのではなく
-	「変数名(0)=X:変数名(1)=Y:変数名(2)=Z」のように実数型の配列変数として
-	3つの要素(X,Y,Z)を格納しておく形式です。
+	�N���[���@�\�́A���ɑ��݂���I�u�W�F�N�g�Ɠ����ݒ�ŁA�V�����I�u�W�F�N�g��
+	����������̂ł��B����̌`��A�p�����[�^�[�ݒ�(�����ݒ������)�������܂������W��p�x
+	�Ȃǂ�V�����ݒ肷�邱�Ƃ��ł��܂��B
+	����̕��̂𕡐���������ꍇ�ɁA�ݒ��ǂݍ��݂����x���s�Ȃ���Ԃ��y�����������ɂ�
+	�Ȃ���܂��B
 
-	FV値を使用することで、３次元座標やベクトルなどの情報を比較的
-	整理して扱うことができます。FV値を演算する命令では、同時に3つの要素に
-	対して計算されるため、１つの要素ごとに計算するよりもシンプルで高速に
-	処理を行なうことができます。
+		��:
+		gpload id_model,"res/duck"	; ���f���ǂݍ���
+		gpclone i, id_model		; �������̂��N���[��
 
-	fvseti fv,x,y,z					整数値からベクトル設定
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 整数値
-
-		(x,y,z)で指定された整数値をベクトルとしてFV値に代入する。
-
-	fvset fv,x,y,z					ベクトル設定
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 実数値
-
-		(x,y,z)で指定された整数値をベクトルとしてFV値に代入する。
-
-	fvadd fv,x,y,z					ベクトル加算
-	fvsub fv,x,y,z					ベクトル減算
-	fvmul fv,x,y,z					ベクトル乗算
-	fvdiv fv,x,y,z					ベクトル除算
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 計算値(実数値)
-
-		fvで指定された変数に格納されているFV値と、指定された
-		小数値(X,Y,Z)の演算を並列で行ないます。
-
-	fvdir fv,x,y,z					ベクトル回転
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 回転角度(実数値)
-
-		fvで指定された変数に格納されているベクトル(FV値)を、
-		小数値(X,Y,Z)で指定されたX,Y,Z角度に回転させます。
-
-	fvmin fv,x,y,z					ベクトル最大値
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 比較値(実数値)
-
-		fvで指定された変数に格納されているFV値と、
-		小数値(X,Y,Z)を比較して、値の大きいものを代入します。
-		FV値の各要素を最小値までに切り詰める場合に使用します。
-
-	fvmax fv,x,y,z					ベクトル最小値
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 比較値(実数値)
-
-		fvで指定された変数に格納されているFV値と、
-		小数値(X,Y,Z)を比較して、値の小さいものを代入します。
-		FV値の各要素を最大値までに切り詰める場合に使用します。
-
-	fvouter fv,x,y,z				ベクトル外積
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 演算するベクトル値(実数値)
-
-		fvで指定された変数に格納されているFV値と、
-		小数値(X,Y,Z)で指定するベクトルの外積を求めて代入します。
-
-	fvinner fv,x,y,z				ベクトル内積
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = 演算するベクトル値(実数値)
-
-		fvで指定された変数に格納されているFV値と、
-		小数値(X,Y,Z)で指定するベクトルの内積を求めてfv.0に代入します。
-
-	fvface fv,x,y,z					座標から角度を得る
-
-		fv      = FV値が代入される変数名
-		(x,y,z) = X,Y,Z座標値(実数値)
-
-		fvで指定された変数に格納されているベクトル(FV値)を基点とする
-		X,Y,Z座標から、指定されたX,Y,Z座標を直線で見るための回転角度を求めて
-		代入します。
-
-	fvunit fv						ベクトル正規化
-
-		fv      = FV値が代入される変数名
-
-		fvで指定された変数に格納されているベクトル(FV値)を正規化します。
-
-	fv2str fv						ベクトルを文字列に変換
-
-		fvで指定された変数に格納されているベクトル(FV値)を文字列に
-		変換してシステム変数refstrに結果を返します。
-
-	str2fv fv,"x,y,z"				文字列をベクトルに変換
-
-		"x,y,z"で指定された文字列情報を「,」で区切られたX,Y,Z小数値として
-		読み出し、fvで指定された変数に格納します。
-
-	str2f fval,"val"				文字列を小数値に変換
-
-		"val"で指定された文字列情報を小数値として読み出し、
-		fvalで指定された変数に格納します。
-
-	f2str val,fval					小数値を文字列に変換
-
-		fvalで指定された小数値を文字列に変換して、valで指定された文字列型の
-		変数に結果を返します。
-
-	FV値が代入された変数名で、オブジェクトのパラメーターを設定したり、取得することができます。
-
-		例:
-		fvset fv, 1,5,2				; FV値を代入
-		selpos GPOBJ_CAMERA			; カメラの座標設定を選択
-		objsetfv fv				; カメラにFV値を設定
-
-	上の例では、カメラの座標を(1,5,2)に設定しています。
-	sel～系の命令で設定先を選択した後、objsetfv等の命令で選択されたオブジェクトに
-	アクセスすることができます。
-
-		selpos id				X,Y,Z座標(Pos)を選択
-		selang id				X,Y,Z回転(Ang)を選択
-		selscale id				X,Y,Z倍率(Scale)を選択
-		seldir id				X,Y,Z移動量(Dir)を選択
-		selcolor id				R,G,Bカラー(Color)を選択
-		selwork id				ワーク値(X,Y,Z)を選択
-		selwork2 id				ワーク2値(X,Y,Z)を選択
-
-	これらsel～系の命令で設定先を選択した後、以下の命令で取得・設定・加算などを
-	行なうことが可能です。
-
-		objgetfv fv				選択中のMOC情報を取得
-		objsetfv fv				選択中のMOC情報を設定
-		objaddfv fv				選択中のMOC情報を加算
-
-	実数ベクトルサポート命令は、必ずしもすべての人が使う必要はありません。
-	中上級者の方が場面に合わせて使用の選択するといいでしょう。
+	�����݂̃o�[�W�����ł́A�V�[�����ɑ��݂���\���\�ȃI�u�W�F�N�g�ȊO��
+	�@�N���[�����邱�Ƃ��ł��܂���̂Œ��ӂ��Ă��������B
 
 
-・フレームレートの取得
+�E�����x�N�g���T�|�[�g����
 
-	getreq命令により、描画時のフレームレートを取得することができます。
+	�����x�N�g���T�|�[�g���߂́A�����l�A�x�N�g���l�Ȃǂ̏����������߂�
+	���ߌQ�ł��B�x�N�g����ϐ��Ɋi�[������@�Ƃ���FV�l�Ƃ����\�����o��
+	���܂����A����́u�ϐ���=1.0�v�̂悤��1�̒l��������̂ł͂Ȃ�
+	�u�ϐ���(0)=X:�ϐ���(1)=Y:�ϐ���(2)=Z�v�̂悤�Ɏ����^�̔z��ϐ��Ƃ���
+	3�̗v�f(X,Y,Z)���i�[���Ă����`���ł��B
+
+	FV�l���g�p���邱�ƂŁA�R�������W��x�N�g���Ȃǂ̏����r�I
+	�������Ĉ������Ƃ��ł��܂��BFV�l�����Z���閽�߂ł́A������3�̗v�f��
+	�΂��Čv�Z����邽�߁A�P�̗v�f���ƂɌv�Z��������V���v���ō�����
+	�������s�Ȃ����Ƃ��ł��܂��B
+
+	fvseti fv,x,y,z					�����l����x�N�g���ݒ�
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = �����l
+
+		(x,y,z)�Ŏw�肳�ꂽ�����l���x�N�g���Ƃ���FV�l�ɑ������B
+
+	fvset fv,x,y,z					�x�N�g���ݒ�
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = �����l
+
+		(x,y,z)�Ŏw�肳�ꂽ�����l���x�N�g���Ƃ���FV�l�ɑ������B
+
+	fvadd fv,x,y,z					�x�N�g�����Z
+	fvsub fv,x,y,z					�x�N�g�����Z
+	fvmul fv,x,y,z					�x�N�g����Z
+	fvdiv fv,x,y,z					�x�N�g�����Z
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = �v�Z�l(�����l)
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���FV�l�ƁA�w�肳�ꂽ
+		�����l(X,Y,Z)�̉��Z�����ōs�Ȃ��܂��B
+
+	fvdir fv,x,y,z					�x�N�g����]
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = ��]�p�x(�����l)
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���x�N�g��(FV�l)���A
+		�����l(X,Y,Z)�Ŏw�肳�ꂽX,Y,Z�p�x�ɉ�]�����܂��B
+
+	fvmin fv,x,y,z					�x�N�g���ő�l
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = ��r�l(�����l)
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���FV�l�ƁA
+		�����l(X,Y,Z)���r���āA�l�̑傫�����̂������܂��B
+		FV�l�̊e�v�f���ŏ��l�܂łɐ؂�l�߂�ꍇ�Ɏg�p���܂��B
+
+	fvmax fv,x,y,z					�x�N�g���ŏ��l
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = ��r�l(�����l)
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���FV�l�ƁA
+		�����l(X,Y,Z)���r���āA�l�̏��������̂������܂��B
+		FV�l�̊e�v�f���ő�l�܂łɐ؂�l�߂�ꍇ�Ɏg�p���܂��B
+
+	fvouter fv,x,y,z				�x�N�g���O��
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = ���Z����x�N�g���l(�����l)
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���FV�l�ƁA
+		�����l(X,Y,Z)�Ŏw�肷��x�N�g���̊O�ς����߂đ�����܂��B
+
+	fvinner fv,x,y,z				�x�N�g������
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = ���Z����x�N�g���l(�����l)
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���FV�l�ƁA
+		�����l(X,Y,Z)�Ŏw�肷��x�N�g���̓��ς����߂�fv.0�ɑ�����܂��B
+
+	fvface fv,x,y,z					���W����p�x�𓾂�
+
+		fv      = FV�l����������ϐ���
+		(x,y,z) = X,Y,Z���W�l(�����l)
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���x�N�g��(FV�l)����_�Ƃ���
+		X,Y,Z���W����A�w�肳�ꂽX,Y,Z���W�𒼐��Ō��邽�߂̉�]�p�x�����߂�
+		������܂��B
+
+	fvunit fv						�x�N�g�����K��
+
+		fv      = FV�l����������ϐ���
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���x�N�g��(FV�l)�𐳋K�����܂��B
+
+	fv2str fv						�x�N�g���𕶎���ɕϊ�
+
+		fv�Ŏw�肳�ꂽ�ϐ��Ɋi�[����Ă���x�N�g��(FV�l)�𕶎����
+		�ϊ����ăV�X�e���ϐ�refstr�Ɍ��ʂ�Ԃ��܂��B
+
+	str2fv fv,"x,y,z"				��������x�N�g���ɕϊ�
+
+		"x,y,z"�Ŏw�肳�ꂽ����������u,�v�ŋ�؂�ꂽX,Y,Z�����l�Ƃ���
+		�ǂݏo���Afv�Ŏw�肳�ꂽ�ϐ��Ɋi�[���܂��B
+
+	str2f fval,"val"				������������l�ɕϊ�
+
+		"val"�Ŏw�肳�ꂽ��������������l�Ƃ��ēǂݏo���A
+		fval�Ŏw�肳�ꂽ�ϐ��Ɋi�[���܂��B
+
+	f2str val,fval					�����l�𕶎���ɕϊ�
+
+		fval�Ŏw�肳�ꂽ�����l�𕶎���ɕϊ����āAval�Ŏw�肳�ꂽ������^��
+		�ϐ��Ɍ��ʂ�Ԃ��܂��B
+
+	FV�l��������ꂽ�ϐ����ŁA�I�u�W�F�N�g�̃p�����[�^�[��ݒ肵����A�擾���邱�Ƃ��ł��܂��B
+
+		��:
+		fvset fv, 1,5,2				; FV�l����
+		selpos GPOBJ_CAMERA			; �J�����̍��W�ݒ��I��
+		objsetfv fv				; �J������FV�l��ݒ�
+
+	��̗�ł́A�J�����̍��W��(1,5,2)�ɐݒ肵�Ă��܂��B
+	sel�`�n�̖��߂Őݒ���I��������Aobjsetfv���̖��߂őI�����ꂽ�I�u�W�F�N�g��
+	�A�N�Z�X���邱�Ƃ��ł��܂��B
+
+		selpos id				X,Y,Z���W(Pos)��I��
+		selang id				X,Y,Z��](Ang)��I��
+		selscale id				X,Y,Z�{��(Scale)��I��
+		seldir id				X,Y,Z�ړ���(Dir)��I��
+		selcolor id				R,G,B�J���[(Color)��I��
+		selwork id				���[�N�l(X,Y,Z)��I��
+		selwork2 id				���[�N2�l(X,Y,Z)��I��
+
+	�����sel�`�n�̖��߂Őݒ���I��������A�ȉ��̖��߂Ŏ擾�E�ݒ�E���Z�Ȃǂ�
+	�s�Ȃ����Ƃ��\�ł��B
+
+		objgetfv fv				�I�𒆂�MOC�����擾
+		objsetfv fv				�I�𒆂�MOC����ݒ�
+		objaddfv fv				�I�𒆂�MOC�������Z
+
+	�����x�N�g���T�|�[�g���߂́A�K���������ׂĂ̐l���g���K�v�͂���܂���B
+	���㋉�҂̕�����ʂɍ��킹�Ďg�p�̑I������Ƃ����ł��傤�B
+
+
+�E�t���[�����[�g�̎擾
+
+	getreq���߂ɂ��A�`�掞�̃t���[�����[�g���擾���邱�Ƃ��ł��܂��B
 
 		getreq fps,SYSREQ_FPS
 
-	上の例では、変数fpsにフレームレート(1秒間に画面が描画された回数)を代入します。
-	フレームレートは、基本的に描画ループ(redraw 0～redraw 1の繰り返し)で指定される
-	await命令の待ち時間で決定されます。
-	フレームレートを一定に保ち、画面のちらつき(ティアリング)を防止するために、
-	VSYNC待ち(垂直同期待ち)を指定することができます。
+	��̗�ł́A�ϐ�fps�Ƀt���[�����[�g(1�b�Ԃɉ�ʂ��`�悳�ꂽ��)�������܂��B
+	�t���[�����[�g�́A��{�I�ɕ`�惋�[�v(redraw 0�`redraw 1�̌J��Ԃ�)�Ŏw�肳���
+	await���߂̑҂����ԂŌ��肳��܂��B
+	�t���[�����[�g�����ɕۂ��A��ʂ̂����(�e�B�A�����O)��h�~���邽�߂ɁA
+	VSYNC�҂�(���������҂�)���w�肷�邱�Ƃ��ł��܂��B
 
 		setreq SYSREQ_VSYNC,1
 		gpreset
 
-	上のように、gpresetの前でsetreq命令によりVSYNC待ちを有効にしてください。
-	これにより、通常は秒間60フレームごとの動作となります。
-	(その場合でも、await命令は入れるようにしてください)
+	��̂悤�ɁAgpreset�̑O��setreq���߂ɂ��VSYNC�҂���L���ɂ��Ă��������B
+	����ɂ��A�ʏ�͕b��60�t���[�����Ƃ̓���ƂȂ�܂��B
+	(���̏ꍇ�ł��Aawait���߂͓����悤�ɂ��Ă�������)
 
 
-・アニメーションクリップの作成
+�E�A�j���[�V�����N���b�v�̍쐬
 
-	モデルデータ(.gpbファイル)から読み込まれたアニメーションを、
-	複数のクリップとして取り出して再生することができます。
-	モデルに複数のアニメーションを持たせるためには、あらかじめ
-	1つの長いアニメーションとして登録したものを用意する必要があります。
+	���f���f�[�^(.gpb�t�@�C��)����ǂݍ��܂ꂽ�A�j���[�V�������A
+	�����̃N���b�v�Ƃ��Ď��o���čĐ����邱�Ƃ��ł��܂��B
+	���f���ɕ����̃A�j���[�V�������������邽�߂ɂ́A���炩����
+	1�̒����A�j���[�V�����Ƃ��ēo�^�������̂�p�ӂ���K�v������܂��B
 
-	アニメーションクリップは、アニメーションデータ内の任意の区間を
-	アニメーションとして再生するためのセットです。
-	アニメーションクリップには、文字列で名前を設定することができます。
+	�A�j���[�V�����N���b�v�́A�A�j���[�V�����f�[�^���̔C�ӂ̋�Ԃ�
+	�A�j���[�V�����Ƃ��čĐ����邽�߂̃Z�b�g�ł��B
+	�A�j���[�V�����N���b�v�ɂ́A������Ŗ��O��ݒ肷�邱�Ƃ��ł��܂��B
 
-	gpaddanim id_model,"run",0,700		; "run"クリップを設定
+	gpaddanim id_model,"run",0,700		; "run"�N���b�v��ݒ�
 
-	上の例では、「run」という名前のアニメーションクリップを設定しています。
-	「run」のアニメーションクリップは、0(ミリ秒)から700(ミリ秒)のフレームを
-	繰り返すアニメーションとして設定されます。
-	設定されたアニメーションクリップは、gpact命令で再生できます。
-	(複数のアニメーションクリップを同時に再生することができます)
+	��̗�ł́A�urun�v�Ƃ������O�̃A�j���[�V�����N���b�v��ݒ肵�Ă��܂��B
+	�urun�v�̃A�j���[�V�����N���b�v�́A0(�~���b)����700(�~���b)�̃t���[����
+	�J��Ԃ��A�j���[�V�����Ƃ��Đݒ肳��܂��B
+	�ݒ肳�ꂽ�A�j���[�V�����N���b�v�́Agpact���߂ōĐ��ł��܂��B
+	(�����̃A�j���[�V�����N���b�v�𓯎��ɍĐ����邱�Ƃ��ł��܂�)
 
-	gpact id_model,"run"			; "run"クリップを再生
+	gpact id_model,"run"			; "run"�N���b�v���Đ�
 
-	gpact命令は、指定されたアニメーションクリップの再生・停止・一時停止
-	などのコントロールが可能です。
+	gpact���߂́A�w�肳�ꂽ�A�j���[�V�����N���b�v�̍Đ��E��~�E�ꎞ��~
+	�Ȃǂ̃R���g���[�����\�ł��B
 
-		gpact objid,"name",option	アニメーションクリップを再生/停止
+		gpact objid,"name",option	�A�j���[�V�����N���b�v���Đ�/��~
 
-		objid(0)  : オブジェクトID
-		"name"(""): アニメーションクリップ名
-		option(1) : 再生オプション
+		objid(0)  : �I�u�W�F�N�gID
+		"name"(""): �A�j���[�V�����N���b�v��
+		option(1) : �Đ��I�v�V����
 
-		    option値
+		    option�l
 
-		        マクロ名              値          内容
+		        �}�N����              �l          ���e
 		    -----------------------------------------------
-			GPACT_STOP            0           停止
-			GPACT_PLAY            1           開始
-			GPACT_PAUSE           2           一時停止
+			GPACT_STOP            0           ��~
+			GPACT_PLAY            1           �J�n
+			GPACT_PAUSE           2           �ꎞ��~
 
-	さらに、アニメーションクリップの状態を取得するための、gpgetanim命令が
-	用意されています。
+	����ɁA�A�j���[�V�����N���b�v�̏�Ԃ��擾���邽�߂́Agpgetanim���߂�
+	�p�ӂ���Ă��܂��B
 
-		gpgetanim var,objid,index,prmid		アニメーションクリップ設定を取得
+		gpgetanim var,objid,index,prmid		�A�j���[�V�����N���b�v�ݒ���擾
 
-		var   : 情報が代入される変数
-		objid(0) : オブジェクトID
-		index(0) : アニメーションクリップのインデックス(0～)
-		prmid(0) : パラメーターID
+		var   : ��񂪑�������ϐ�
+		objid(0) : �I�u�W�F�N�gID
+		index(0) : �A�j���[�V�����N���b�v�̃C���f�b�N�X(0�`)
+		prmid(0) : �p�����[�^�[ID
 
 
-	objidで設定を取得するオブジェクトIDを、indexにアニメーションクリップの
-	インデックスを指定します。
-	アニメーションクリップのインデックスは、オブジェクトが保持している
-	アニメーションクリップに順番に割り振られる番号です。0,1,2,3…のような
-	0から始まる整数値で、存在しないインデックスが指定された場合は
-	システム変数に-1(エラー)が代入されます。
-	prmidでどのような情報を取得するかを指定します。
-	prmidで指定できる値は以下の通りです。
+	objid�Őݒ���擾����I�u�W�F�N�gID���Aindex�ɃA�j���[�V�����N���b�v��
+	�C���f�b�N�X���w�肵�܂��B
+	�A�j���[�V�����N���b�v�̃C���f�b�N�X�́A�I�u�W�F�N�g���ێ����Ă���
+	�A�j���[�V�����N���b�v�ɏ��ԂɊ���U����ԍ��ł��B0,1,2,3�c�̂悤��
+	0����n�܂鐮���l�ŁA���݂��Ȃ��C���f�b�N�X���w�肳�ꂽ�ꍇ��
+	�V�X�e���ϐ���-1(�G���[)���������܂��B
+	prmid�łǂ̂悤�ȏ����擾���邩���w�肵�܂��B
+	prmid�Ŏw��ł���l�͈ȉ��̒ʂ�ł��B
 
-	        マクロ名                   値          内容
+	        �}�N����                   �l          ���e
 	    --------------------------------------------------------
-		GPANIM_OPT_START_FRAME     0           開始フレーム(ミリ秒単位)
-		GPANIM_OPT_END_FRAME       1           終了フレーム(ミリ秒単位)
-		GPANIM_OPT_DURATION        2           再生の長さ(ミリ秒単位)
-		GPANIM_OPT_ELAPSED         3           経過時間(ミリ秒単位)
-		GPANIM_OPT_BLEND           4           ブレンド係数(%単位)
-		GPANIM_OPT_PLAYING         5           再生中フラグ(0=停止/1=再生)
-		GPANIM_OPT_SPEED           6           再生スピード(%単位)
-		GPANIM_OPT_NAME            16          アニメーションクリップ名
+		GPANIM_OPT_START_FRAME     0           �J�n�t���[��(�~���b�P��)
+		GPANIM_OPT_END_FRAME       1           �I���t���[��(�~���b�P��)
+		GPANIM_OPT_DURATION        2           �Đ��̒���(�~���b�P��)
+		GPANIM_OPT_ELAPSED         3           �o�ߎ���(�~���b�P��)
+		GPANIM_OPT_BLEND           4           �u�����h�W��(%�P��)
+		GPANIM_OPT_PLAYING         5           �Đ����t���O(0=��~/1=�Đ�)
+		GPANIM_OPT_SPEED           6           �Đ��X�s�[�h(%�P��)
+		GPANIM_OPT_NAME            16          �A�j���[�V�����N���b�v��
 
-	また、gpsetanim命令でアニメーションクリップの詳細な設定を行なうことが可能です。
+	�܂��Agpsetanim���߂ŃA�j���[�V�����N���b�v�̏ڍׂȐݒ���s�Ȃ����Ƃ��\�ł��B
 
-		gpsetanim objid,index,prmid,value	アニメーションクリップ設定を更新
+		gpsetanim objid,index,prmid,value	�A�j���[�V�����N���b�v�ݒ���X�V
 
-		objid(0) : オブジェクトID
-		index(0) : アニメーションクリップのインデックス(0～)
-		prmid(0) : パラメーターID
-		value(0) : 設定される値(整数値)
+		objid(0) : �I�u�W�F�N�gID
+		index(0) : �A�j���[�V�����N���b�v�̃C���f�b�N�X(0�`)
+		prmid(0) : �p�����[�^�[ID
+		value(0) : �ݒ肳���l(�����l)
 
-	指定されたアニメーションクリップの設定をvalueで指定される新しい値で更新します。
-	objid、indexの指定は、gpgetanim命令と同様です。
-	prmidでどのような情報を設定するかを指定します。prmidで指定できる値は以下の通りです。
+	�w�肳�ꂽ�A�j���[�V�����N���b�v�̐ݒ��value�Ŏw�肳���V�����l�ōX�V���܂��B
+	objid�Aindex�̎w��́Agpgetanim���߂Ɠ��l�ł��B
+	prmid�łǂ̂悤�ȏ���ݒ肷�邩���w�肵�܂��Bprmid�Ŏw��ł���l�͈ȉ��̒ʂ�ł��B
 
-	        マクロ名                   値          内容
+	        �}�N����                   �l          ���e
 	    --------------------------------------------------------------
-		GPANIM_OPT_DURATION        2           再生の長さ(ミリ秒単位)
-		GPANIM_OPT_BLEND           4           ブレンド係数(%単位)
-		GPANIM_OPT_SPEED           6           再生スピード(%単位)
+		GPANIM_OPT_DURATION        2           �Đ��̒���(�~���b�P��)
+		GPANIM_OPT_BLEND           4           �u�����h�W��(%�P��)
+		GPANIM_OPT_SPEED           6           �Đ��X�s�[�h(%�P��)
 
-	これにより、アニメーションクリップごとの再生スピードや再生ブレンド係数を変更することができます。
+	����ɂ��A�A�j���[�V�����N���b�v���Ƃ̍Đ��X�s�[�h��Đ��u�����h�W����ύX���邱�Ƃ��ł��܂��B
 
 
-・2D描画時の独自シェーダー設定
+�E2D�`�掞�̓Ǝ��V�F�[�_�[�ݒ�
 
-	3D描画時に使用されるシェーダー(GLSL)は、.materialファイル内で指定されている
-	シェーダーファイルを変更することで描画を細かく変更することができます。
-	これに対して、gcopy,celputなど2Dで直接描画を行なう命令は、スプライト描画シェーダー
-	が標準で使用されます。(sprite.frag/sprite.vert)
-	これをユーザーが作成した別なシェーダーに置き換えることで、2Dの直接描画を独自に拡張することができます。
-	2D描画に使用する元の画像バッファに、シェーダーを割り当てます。
+	3D�`�掞�Ɏg�p�����V�F�[�_�[(GLSL)�́A.material�t�@�C�����Ŏw�肳��Ă���
+	�V�F�[�_�[�t�@�C����ύX���邱�Ƃŕ`����ׂ����ύX���邱�Ƃ��ł��܂��B
+	����ɑ΂��āAgcopy,celput�Ȃ�2D�Œ��ڕ`����s�Ȃ����߂́A�X�v���C�g�`��V�F�[�_�[
+	���W���Ŏg�p����܂��B(sprite.frag/sprite.vert)
+	��������[�U�[���쐬�����ʂȃV�F�[�_�[�ɒu�������邱�ƂŁA2D�̒��ڕ`���Ǝ��Ɋg�����邱�Ƃ��ł��܂��B
+	2D�`��Ɏg�p���錳�̉摜�o�b�t�@�ɁA�V�F�[�_�[�����蓖�Ă܂��B
 
 		gpusershader "res/shaders/user.vert", "res/shaders/user.frag", ""
 		buffer 1,512,512,screen_usergcopy
 
-	上の例では、バッファID1を512×512ドットのサイズで初期化して、
-	user.vert/user.fragのシェーダーを割り当てています。
-	(user.vertとuser.fragのシェーダーファイルはあらかじめ用意しておく必要があります)
-	gpusershader命令は、ユーザー定義のシェーダーを指定するための命令です。
+	��̗�ł́A�o�b�t�@ID1��512�~512�h�b�g�̃T�C�Y�ŏ��������āA
+	user.vert/user.frag�̃V�F�[�_�[�����蓖�ĂĂ��܂��B
+	(user.vert��user.frag�̃V�F�[�_�[�t�@�C���͂��炩���ߗp�ӂ��Ă����K�v������܂�)
+	gpusershader���߂́A���[�U�[��`�̃V�F�[�_�[���w�肷�邽�߂̖��߂ł��B
 
-		gpusershader "vsh","fsh","defs"		ユーザーシェーダーの指定
+		gpusershader "vsh","fsh","defs"		���[�U�[�V�F�[�_�[�̎w��
 
-		"vsh"     : バーテックスシェーダーファイル名
-		"fsh"     : フラグメントシェーダーファイル名
-		"defs"    : 追加のラベル定義
+		"vsh"     : �o�[�e�b�N�X�V�F�[�_�[�t�@�C����
+		"fsh"     : �t���O�����g�V�F�[�_�[�t�@�C����
+		"defs"    : �ǉ��̃��x����`
 
-	OpenGLシェーダー言語(GLSL)記述の詳細は、多岐に渡るためここでは
-	取り上げていません。別途シェーダーについての資料などを参照してください。
+	OpenGL�V�F�[�_�[����(GLSL)�L�q�̏ڍׂ́A����ɓn�邽�߂����ł�
+	���グ�Ă��܂���B�ʓr�V�F�[�_�[�ɂ��Ă̎����Ȃǂ��Q�Ƃ��Ă��������B
 
-・レンダリングバッファ
+�E�����_�����O�o�b�t�@
 
-	buffer命令による画像バッファの初期化時のオプション指定により、
-	レンダリングバッファを作成することが可能です。
-	これにより、描画先をレンダリングバッファに指定して、メイン画面に
-	書き込む前に画像を作成するなど、複雑なレンダリングパイプラインを
-	構築することができます。
+	buffer���߂ɂ��摜�o�b�t�@�̏��������̃I�v�V�����w��ɂ��A
+	�����_�����O�o�b�t�@���쐬���邱�Ƃ��\�ł��B
+	����ɂ��A�`���������_�����O�o�b�t�@�Ɏw�肵�āA���C����ʂ�
+	�������ޑO�ɉ摜���쐬����ȂǁA���G�ȃ����_�����O�p�C�v���C����
+	�\�z���邱�Ƃ��ł��܂��B
 
 		buffer 1,512,512,screen_offscreen
 
-	上の例では、バッファID1を512×512ドットのサイズで初期化して、
-	レンダリングバッファに設定しています。
-	(この設定を行なっていない画面は、描画先として使用できません)
-	実際に描画先のバッファIDを切り替える場合は、gsel命令を使用します。
-	「gsel 1」を指定すると、以降の描画命令はバッファID1に対して
-	行なわれます。「gsel 0」を指定すると、メイン画面が描画先になります。
-	redraw命令によるフレームの切り替えは、描画先のバッファごとに行なってください。
+	��̗�ł́A�o�b�t�@ID1��512�~512�h�b�g�̃T�C�Y�ŏ��������āA
+	�����_�����O�o�b�t�@�ɐݒ肵�Ă��܂��B
+	(���̐ݒ���s�Ȃ��Ă��Ȃ���ʂ́A�`���Ƃ��Ďg�p�ł��܂���)
+	���ۂɕ`���̃o�b�t�@ID��؂�ւ���ꍇ�́Agsel���߂��g�p���܂��B
+	�ugsel 1�v���w�肷��ƁA�ȍ~�̕`�施�߂̓o�b�t�@ID1�ɑ΂���
+	�s�Ȃ��܂��B�ugsel 0�v���w�肷��ƁA���C����ʂ��`���ɂȂ�܂��B
+	redraw���߂ɂ��t���[���̐؂�ւ��́A�`���̃o�b�t�@���Ƃɍs�Ȃ��Ă��������B
 
-		gsel 1			; 描画先をバッファID1に設定
+		gsel 1			; �`�����o�b�t�@ID1�ɐݒ�
 		redraw 0
 		color 255,0,0
 		boxf 0,0,100,100
 		redraw 1
-		gsel 0			; 描画先をメイン画面に設定
+		gsel 0			; �`�������C����ʂɐݒ�
 		redraw 0
 		gmode 0
 		celput 1
 		redraw 1
 
-	画面の更新は、あくまでもメイン画面(バッファID0)が更新される
-	タイミングになります。それまでの間に、他のレンダリングバッファを
-	自由に更新することができます。
+	��ʂ̍X�V�́A�����܂ł����C�����(�o�b�t�@ID0)���X�V�����
+	�^�C�~���O�ɂȂ�܂��B����܂ł̊ԂɁA���̃����_�����O�o�b�t�@��
+	���R�ɍX�V���邱�Ƃ��ł��܂��B
 
-	レンダリングバッファと2D描画時のシェーダー定義を併用することで
-	ポストエフェクト(画面全体の効果)などに応用することができます。
+	�����_�����O�o�b�t�@��2D�`�掞�̃V�F�[�_�[��`�𕹗p���邱�Ƃ�
+	�|�X�g�G�t�F�N�g(��ʑS�̂̌���)�Ȃǂɉ��p���邱�Ƃ��ł��܂��B
 
 		gpusershader "res/shaders/sprite.vert", "res/shaders/p_sepia.frag", ""
 		buffer 1,sx,sy,screen_offscreen + screen_usergcopy
 
-		;	バッファID1にシーンの描画を行なう
+		;	�o�b�t�@ID1�ɃV�[���̕`����s�Ȃ�
 		gsel 1
-		redraw 0			; 描画開始
-		gpdraw				; シーンの描画
-		redraw 1			; 描画終了
+		redraw 0			; �`��J�n
+		gpdraw				; �V�[���̕`��
+		redraw 1			; �`��I��
 
-		;	バッファID1からメイン画面にエフェクトの描画
+		;	�o�b�t�@ID1���烁�C����ʂɃG�t�F�N�g�̕`��
 		gsel 0
-		redraw 0			; 描画開始
+		redraw 0			; �`��J�n
 		pos 0,0:gmode 0
 		celput 1
 
-	上の例はポストエフェクトサンプル(sample/hgimg4/posteffect.hsp)の一部です。
-	3Dの描画などをバッファID1に対して行なっておいた後、その画像にエフェクトを
-	かけるシェーダー(セピアフィルター)を使ってメイン画面にcelput命令で描画しています。
-	レンダリングバッファやシェーダーによるエフェクトは、高い効果が得られますが
-	GPU処理が大きくなり、負荷がかかることになるのでモバイル端末などではフレームレートが
-	低下する場合がありますので注意して使用してください。
+	��̗�̓|�X�g�G�t�F�N�g�T���v��(sample/hgimg4/posteffect.hsp)�̈ꕔ�ł��B
+	3D�̕`��Ȃǂ��o�b�t�@ID1�ɑ΂��čs�Ȃ��Ă�������A���̉摜�ɃG�t�F�N�g��
+	������V�F�[�_�[(�Z�s�A�t�B���^�[)���g���ă��C����ʂ�celput���߂ŕ`�悵�Ă��܂��B
+	�����_�����O�o�b�t�@��V�F�[�_�[�ɂ��G�t�F�N�g�́A�������ʂ������܂���
+	GPU�������傫���Ȃ�A���ׂ������邱�ƂɂȂ�̂Ń��o�C���[���Ȃǂł̓t���[�����[�g��
+	�ቺ����ꍇ������܂��̂Œ��ӂ��Ďg�p���Ă��������B
 
 
-・オブジェクトのフェード
+�E�I�u�W�F�N�g�̃t�F�[�h
 
-	フェードパラメーターにより、オブジェクトの透明度(Alpha値)を自動的に
-	変化させることが可能です。フェードアウトやフェードインなどを手軽に
-	実現することができます。
-	フェードパラメーターは、gpsetprm命令により設定します。
+	�t�F�[�h�p�����[�^�[�ɂ��A�I�u�W�F�N�g�̓����x(Alpha�l)�������I��
+	�ω������邱�Ƃ��\�ł��B�t�F�[�h�A�E�g��t�F�[�h�C���Ȃǂ���y��
+	�������邱�Ƃ��ł��܂��B
+	�t�F�[�h�p�����[�^�[�́Agpsetprm���߂ɂ��ݒ肵�܂��B
 
-		例:
-		gpsetprm id, PRMSET_FADE, -4	; フェードアウト
+		��:
+		gpsetprm id, PRMSET_FADE, -4	; �t�F�[�h�A�E�g
 
-	上の例では、idが示すオブジェクトを1フレームごとに4ずつ透明度を
-	減算してフェードアウトします。
-	フェードアウト後は、自動的にオブジェクトが消去されます。
-	gpsetprmで設定する値が、マイナス値の場合はフェードアウト、
-	プラス値の場合はフェードインになります。
-	値が大きいほど、変化の速度も速くなります。
-	いずれの場合も、オブジェクトのアルファ値(PRMSET_ALPHAやsetalpha命令で
-	設定される0～255の値)に対して、加算・減算が行なわれます。
+	��̗�ł́Aid�������I�u�W�F�N�g��1�t���[�����Ƃ�4�������x��
+	���Z���ăt�F�[�h�A�E�g���܂��B
+	�t�F�[�h�A�E�g��́A�����I�ɃI�u�W�F�N�g����������܂��B
+	gpsetprm�Őݒ肷��l���A�}�C�i�X�l�̏ꍇ�̓t�F�[�h�A�E�g�A
+	�v���X�l�̏ꍇ�̓t�F�[�h�C���ɂȂ�܂��B
+	�l���傫���قǁA�ω��̑��x�������Ȃ�܂��B
+	������̏ꍇ���A�I�u�W�F�N�g�̃A���t�@�l(PRMSET_ALPHA��setalpha���߂�
+	�ݒ肳���0�`255�̒l)�ɑ΂��āA���Z�E���Z���s�Ȃ��܂��B
 
 
-・イベントリストについて
+�E�C�x���g���X�g�ɂ���
 
-	イベントリストは、決まった流れの処理(イベント)をあらかじめ用意
-	しておいて、それを個々のオブジェクトに対して適用させるための
-	機能です。
+	�C�x���g���X�g�́A���܂�������̏���(�C�x���g)�����炩���ߗp��
+	���Ă����āA������X�̃I�u�W�F�N�g�ɑ΂��ēK�p�����邽�߂�
+	�@�\�ł��B
 
-	イベントリストを使用するためには、大きく分けて
+	�C�x���g���X�g���g�p���邽�߂ɂ́A�傫��������
 
-		「イベントリストの作成」と「イベントリストの適用」
+		�u�C�x���g���X�g�̍쐬�v�Ɓu�C�x���g���X�g�̓K�p�v
 
-	という２つの段階があります。
-	まず、「イベントリストの作成」であらかじめ特定の処理を決めて
-	おきます。たとえば、「○○の座標に移動する」とか「X座標を1足す」
-	など各種パラメーターに対して細かい動作を決めることができます。
-	こうした処理をイベントと呼び、それを複数まとめたものをイベントリスト
-	と呼ぶようにしています。
+	�Ƃ����Q�̒i�K������܂��B
+	�܂��A�u�C�x���g���X�g�̍쐬�v�ł��炩���ߓ���̏��������߂�
+	�����܂��B���Ƃ��΁A�u�����̍��W�Ɉړ�����v�Ƃ��uX���W��1�����v
+	�ȂǊe��p�����[�^�[�ɑ΂��čׂ�����������߂邱�Ƃ��ł��܂��B
+	���������������C�x���g�ƌĂсA����𕡐��܂Ƃ߂����̂��C�x���g���X�g
+	�ƌĂԂ悤�ɂ��Ă��܂��B
 
-	イベントリストを作成するには、以下のように記述します。
+	�C�x���g���X�g���쐬����ɂ́A�ȉ��̂悤�ɋL�q���܂��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_setpos ev1, 10,20,30
 
-	上の例では、座標パラメーターとして(10,20,30)を設定するための
-	イベントを作成して、そのIDを変数ev1に代入しています。
-	新しくイベントを作成する場合には、必ずnewevent命令でイベントIDを
-	取得しておきます。次に、event_setpos等のイベント登録用の命令で、
-	指定されたイベントIDにイベントを追加していきます。
-	一度取得されたイベントIDは、シーンのリセット(gpreset命令)が
-	行なわれるか、またはdelevent命令によってイベントリストが削除
-	されるまでは保持されます。
+	��̗�ł́A���W�p�����[�^�[�Ƃ���(10,20,30)��ݒ肷�邽�߂�
+	�C�x���g���쐬���āA����ID��ϐ�ev1�ɑ�����Ă��܂��B
+	�V�����C�x���g���쐬����ꍇ�ɂ́A�K��newevent���߂ŃC�x���gID��
+	�擾���Ă����܂��B���ɁAevent_setpos���̃C�x���g�o�^�p�̖��߂ŁA
+	�w�肳�ꂽ�C�x���gID�ɃC�x���g��ǉ����Ă����܂��B
+	��x�擾���ꂽ�C�x���gID�́A�V�[���̃��Z�b�g(gpreset����)��
+	�s�Ȃ��邩�A�܂���delevent���߂ɂ���ăC�x���g���X�g���폜
+	�����܂ł͕ێ�����܂��B
 
-	こうしてできたイベントは、好きな時にオブジェクトに対して適用
-	させることができます。
+	�������Ăł����C�x���g�́A�D���Ȏ��ɃI�u�W�F�N�g�ɑ΂��ēK�p
+	�����邱�Ƃ��ł��܂��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_setpos ev1, 10,20,30
-			; objidのオブジェクトにev1のイベントを適用
+			; objid�̃I�u�W�F�N�g��ev1�̃C�x���g��K�p
 			setevent objid, ev1
 
-	この例では、objidが示すオブジェクトに対してev1のイベントリスト、
-	つまり(10,20,30)を座標として設定するという処理を適用します。
-	このように、イベントではパラメーターに対しての動作をまとめて
-	登録することができ、それを特定のオブジェクトに反映させる働きを
-	持ちます。
-	event_setposでは、座標設定のイベントを登録しますが、それ以外の
-	パラメーターを設定するための命令も用意されています。
+	���̗�ł́Aobjid�������I�u�W�F�N�g�ɑ΂���ev1�̃C�x���g���X�g�A
+	�܂�(10,20,30)�����W�Ƃ��Đݒ肷��Ƃ���������K�p���܂��B
+	���̂悤�ɁA�C�x���g�ł̓p�����[�^�[�ɑ΂��Ă̓�����܂Ƃ߂�
+	�o�^���邱�Ƃ��ł��A��������̃I�u�W�F�N�g�ɔ��f�����铭����
+	�����܂��B
+	event_setpos�ł́A���W�ݒ�̃C�x���g��o�^���܂����A����ȊO��
+	�p�����[�^�[��ݒ肷�邽�߂̖��߂��p�ӂ���Ă��܂��B
 
 		event_setpos eventid, x, y, z
 		event_setangr eventid, x, y, z
@@ -1640,22 +1640,22 @@ HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin
 		event_setdir eventid, x, y, z
 		event_setwork eventid, x, y, z
 
-	それぞれのグループに設定するX,Y,Z値を実数または整数値で指定
-	することができます。
-	また、
+	���ꂼ��̃O���[�v�ɐݒ肷��X,Y,Z�l�������܂��͐����l�Ŏw��
+	���邱�Ƃ��ł��܂��B
+	�܂��A
 
 		event_setpos eventid, x1, y1, z1, x2, y2, z2
 
-	のように、X,Y,Zの範囲を指定することにより、乱数で指定された
-	範囲内の値を自動的に生成させることもできます。
+	�̂悤�ɁAX,Y,Z�͈̔͂��w�肷�邱�Ƃɂ��A�����Ŏw�肳�ꂽ
+	�͈͓��̒l�������I�ɐ��������邱�Ƃ��ł��܂��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_setpos ev1, 10,20,30,30,20,50
 
-	上の例では、XYZ=(10～30,20,30～50)までの値が設定されます。
-	設定だけでなく、パラメーター値に対して加算を行なうイベントも
-	登録することができます。
+	��̗�ł́AXYZ=(10�`30,20,30�`50)�܂ł̒l���ݒ肳��܂��B
+	�ݒ肾���łȂ��A�p�����[�^�[�l�ɑ΂��ĉ��Z���s�Ȃ��C�x���g��
+	�o�^���邱�Ƃ��ł��܂��B
 
 		event_addpos eventid, x, y, z
 		event_addangr eventid, x, y, z
@@ -1663,29 +1663,29 @@ HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin
 		event_adddir eventid, x, y, z
 		event_addwork eventid, x, y, z
 
-	これらの命令は、特定グループのパラメーターに対して(X,Y,Z)の
-	値を加算します。(マイナス値を指定することで減算になります。)
+	�����̖��߂́A����O���[�v�̃p�����[�^�[�ɑ΂���(X,Y,Z)��
+	�l�����Z���܂��B(�}�C�i�X�l���w�肷�邱�ƂŌ��Z�ɂȂ�܂��B)
 
-	イベントでは、パラメーター設定の他にも時間経過に応じた処理を
-	追加することができます。
+	�C�x���g�ł́A�p�����[�^�[�ݒ�̑��ɂ����Ԍo�߂ɉ�����������
+	�ǉ����邱�Ƃ��ł��܂��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_pos ev1, 20, 0,10,20
 
-	上の例では、２０フレーム後に(0,10,20)の座標に移動するイベントが
-	登録されます。このイベントが適用されたオブジェクトは、自動的に
-	２０フレームの間指定された座標まで移動を行ないます。
+	��̗�ł́A�Q�O�t���[�����(0,10,20)�̍��W�Ɉړ�����C�x���g��
+	�o�^����܂��B���̃C�x���g���K�p���ꂽ�I�u�W�F�N�g�́A�����I��
+	�Q�O�t���[���̊Ԏw�肳�ꂽ���W�܂ňړ����s�Ȃ��܂��B
 
-	単純な待ち時間を登録するためのevent_wait命令も用意されています。
-	event_waitイベントでは、指定されたフレーム数が経過するまで次の
-	イベント処理を待ちます。
+	�P���ȑ҂����Ԃ�o�^���邽�߂�event_wait���߂��p�ӂ���Ă��܂��B
+	event_wait�C�x���g�ł́A�w�肳�ꂽ�t���[�������o�߂���܂Ŏ���
+	�C�x���g������҂��܂��B
 
-	複数のevent_posイベントを登録することにより、移動の経路を
-	細かく指定しておくことが可能です。
+	������event_pos�C�x���g��o�^���邱�Ƃɂ��A�ړ��̌o�H��
+	�ׂ����w�肵�Ă������Ƃ��\�ł��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_pos ev1, 20, 10,0,0
 			event_wait ev1, 20
 			event_pos ev1, 20, 10,10,0
@@ -1695,16 +1695,16 @@ HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin
 			event_pos ev1, 20, 0,0,0
 			event_wait ev1, 20
 
-	上の例では、(10,0,0)→(10,10,0)→(0,10,0)→(0,0,0)の順番に
-	移動を行ないます。
-	event_posなど座標移動の補間には、デフォルトでスプラインが使用されます。
-	(命令のオプションで補間方法を任意に指定することも可能です)
+	��̗�ł́A(10,0,0)��(10,10,0)��(0,10,0)��(0,0,0)�̏��Ԃ�
+	�ړ����s�Ȃ��܂��B
+	event_pos�ȂǍ��W�ړ��̕�Ԃɂ́A�f�t�H���g�ŃX�v���C�����g�p����܂��B
+	(���߂̃I�v�V�����ŕ�ԕ��@��C�ӂɎw�肷�邱�Ƃ��\�ł�)
 
-	パラメーターを相対的(もとの値からの差分)に指定したい場合は、
-	相対指定オプションを指定します。
+	�p�����[�^�[�𑊑ΓI(���Ƃ̒l����̍���)�Ɏw�肵�����ꍇ�́A
+	���Ύw��I�v�V�������w�肵�܂��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_pos ev1, 20, 10,10,0, 3
 			event_wait ev1, 20
 			event_pos ev1, 20, 10,-10,0, 3
@@ -1714,171 +1714,171 @@ HGIMG4 REFERENCE MANUAL                High Performance Graphic Image Plugin
 			event_pos ev1, 20, 10,-10,0, 3
 			event_wait ev1, 20
 
-	上の例では、もとの座標が(0,0,0)にあった場合、
-	(10,10,0)→(20,0,0)→(30,10,0)→(40,0,0)の順番に移動を行ないます。
+	��̗�ł́A���Ƃ̍��W��(0,0,0)�ɂ������ꍇ�A
+	(10,10,0)��(20,0,0)��(30,10,0)��(40,0,0)�̏��ԂɈړ����s�Ȃ��܂��B
 
-	パラメーター加算とevent_waitイベントを組み合わせることで、
-	連続的なパラメーター変化をさせることができます。
+	�p�����[�^�[���Z��event_wait�C�x���g��g�ݍ��킹�邱�ƂŁA
+	�A���I�ȃp�����[�^�[�ω��������邱�Ƃ��ł��܂��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_addpos ev1, 0,1,0
 			event_wait ev1, 10
 			event_addpos ev1, -1,0,0
 			event_wait ev1, 20
 
-	上の例では、最初の１０フレームはYに１を加算し続け、その後
-	２０フレームは、X座標を-1し続けることになります。
-	さらに、イベントを繰り返し処理させるためにevent_jump命令を
-	使用することができます。
+	��̗�ł́A�ŏ��̂P�O�t���[����Y�ɂP�����Z�������A���̌�
+	�Q�O�t���[���́AX���W��-1�������邱�ƂɂȂ�܂��B
+	����ɁA�C�x���g���J��Ԃ����������邽�߂�event_jump���߂�
+	�g�p���邱�Ƃ��ł��܂��B
 
-		例:
-			newevent ev1	; 新しいイベントIDを取得
+		��:
+			newevent ev1	; �V�����C�x���gID���擾
 			event_addpos ev1, 0,1,0
 			event_wait ev1, 20
 			event_addpos ev1, 0,-1,0
 			event_wait ev1, 20
 			event_jump ev1, 0, 100
 
-	上の例では、２０フレームごとにY座標を1だけ加算・減算する
-	という処理を繰り返し行なうことになります。
-	event_jumpは、登録されているイベントリストの中で指定された
-	場所に処理を戻します。これにより、永遠に特定の処理をし続ける
-	イベントリストを作成することが可能になります。
+	��̗�ł́A�Q�O�t���[�����Ƃ�Y���W��1�������Z�E���Z����
+	�Ƃ����������J��Ԃ��s�Ȃ����ƂɂȂ�܂��B
+	event_jump�́A�o�^����Ă���C�x���g���X�g�̒��Ŏw�肳�ꂽ
+	�ꏊ�ɏ�����߂��܂��B����ɂ��A�i���ɓ���̏�������������
+	�C�x���g���X�g���쐬���邱�Ƃ��\�ɂȂ�܂��B
 
-	event_prmset命令は、オブジェクトの各種パラメーターを設定するための
-	イベントを登録します。
-	gpsetprm命令で指定する各種フラグの設定をイベントから行なうことができます。
-	以下のパラメーターIDに、指定された値を直接設定します。
+	event_prmset���߂́A�I�u�W�F�N�g�̊e��p�����[�^�[��ݒ肷�邽�߂�
+	�C�x���g��o�^���܂��B
+	gpsetprm���߂Ŏw�肷��e��t���O�̐ݒ���C�x���g����s�Ȃ����Ƃ��ł��܂��B
+	�ȉ��̃p�����[�^�[ID�ɁA�w�肳�ꂽ�l�𒼐ڐݒ肵�܂��B
 
-		パラメーターID   内容
+		�p�����[�^�[ID   ���e
 		---------------------------------------
-		PRMSET_FLAG            オブジェクト登録フラグ(*)
-		PRMSET_MODE            モード値
-		PRMSET_ID              オブジェクトID(*)
-		PRMSET_ALPHA           透明度(α値)
-		PRMSET_TIMER           タイマー値
-		PRMSET_MYGROUP         自身のコリジョングループ
-		PRMSET_COLGROUP        衝突検出するコリジョングループ
-		PRMSET_SHAPE           形状ID(*)
-		PRMSET_USEGPMAT        マテリアルID
-		PRMSET_COLILOG         コリジョンログID(*)
-		PRMSET_FADE            フェードパラメーター
-		PRMSET_SPRID           ソースバッファID(スプライトのみ)
-		PRMSET_SPRCELID        ソースのセルID(スプライトのみ)
-		PRMSET_SPRGMODE        コピーモード(スプライトのみ)
+		PRMSET_FLAG            �I�u�W�F�N�g�o�^�t���O(*)
+		PRMSET_MODE            ���[�h�l
+		PRMSET_ID              �I�u�W�F�N�gID(*)
+		PRMSET_ALPHA           �����x(���l)
+		PRMSET_TIMER           �^�C�}�[�l
+		PRMSET_MYGROUP         ���g�̃R���W�����O���[�v
+		PRMSET_COLGROUP        �Փˌ��o����R���W�����O���[�v
+		PRMSET_SHAPE           �`��ID(*)
+		PRMSET_USEGPMAT        �}�e���A��ID
+		PRMSET_COLILOG         �R���W�������OID(*)
+		PRMSET_FADE            �t�F�[�h�p�����[�^�[
+		PRMSET_SPRID           �\�[�X�o�b�t�@ID(�X�v���C�g�̂�)
+		PRMSET_SPRCELID        �\�[�X�̃Z��ID(�X�v���C�g�̂�)
+		PRMSET_SPRGMODE        �R�s�[���[�h(�X�v���C�g�̂�)
 
-	特定のモードフラグ値だけを設定・消去するためのevent_prmon,event_prmoff
-	命令も用意されています。
+	����̃��[�h�t���O�l������ݒ�E�������邽�߂�event_prmon,event_prmoff
+	���߂��p�ӂ���Ă��܂��B
 
-		例:
+		��:
 			event_prmon ev1,PRMSET_MODE,OBJ_HIDE
 
-	上の例では、非表示フラグのみを設定し、それ以外のフラグはそのままになります。
-	event_prmoff命令は、指定されたフラグのみを消去し、それ以外のフラグはそのままになります。
+	��̗�ł́A��\���t���O�݂̂�ݒ肵�A����ȊO�̃t���O�͂��̂܂܂ɂȂ�܂��B
+	event_prmoff���߂́A�w�肳�ꂽ�t���O�݂̂��������A����ȊO�̃t���O�͂��̂܂܂ɂȂ�܂��B
 
-	オブジェクトがイベントリストに登録されたイベントをすべて実行した場合は
-	そのまま登録から消去されます。(イベントリストそのものは残っています)
+	�I�u�W�F�N�g���C�x���g���X�g�ɓo�^���ꂽ�C�x���g�����ׂĎ��s�����ꍇ��
+	���̂܂ܓo�^�����������܂��B(�C�x���g���X�g���̂��͎̂c���Ă��܂�)
 
-	event_suicide命令は、イベントが実行されているオブジェクトそのものを
-	廃棄するためのイベントを登録します。
-	このイベントを実行するとともに、オブジェクトは破棄されます。
-
-
-	イベントリストより、ゲーム等で起きる定型の処理(爆発やミサイルの軌道など)を
-	スマートに分離して管理することができます。
-	イベントリストは、非常に応用範囲が広い反面、命令の種類も多く
-	最初は難しく感じるかもしれませんが、１つ１つ使いながら覚えて
-	いけばスクリプトで行なう手間を大幅に削減することができるはずです。
-
-	setevent命令によって設定されるイベントは、オブジェクト１つ
-	あたり４つまで同時に適用することが可能です。
-	複数のイベントを多重に実行させないようにするためには、
-	setevent命令で登録するスロットを固定して指定するようにしてください。
-
-	また、setevent命令によりオブジェクトに設定されたイベントを削除
-	することも可能です。詳しくは、命令リファレンスを参照してください。
+	event_suicide���߂́A�C�x���g�����s����Ă���I�u�W�F�N�g���̂��̂�
+	�p�����邽�߂̃C�x���g��o�^���܂��B
+	���̃C�x���g�����s����ƂƂ��ɁA�I�u�W�F�N�g�͔j������܂��B
 
 
-・登録の限界数について
+	�C�x���g���X�g���A�Q�[�����ŋN�����^�̏���(������~�T�C���̋O���Ȃ�)��
+	�X�}�[�g�ɕ������ĊǗ����邱�Ƃ��ł��܂��B
+	�C�x���g���X�g�́A���ɉ��p�͈͂��L�����ʁA���߂̎�ނ�����
+	�ŏ��͓�������邩������܂��񂪁A�P�P�g���Ȃ���o����
+	�����΃X�N���v�g�ōs�Ȃ���Ԃ�啝�ɍ팸���邱�Ƃ��ł���͂��ł��B
 
-	登録するオブジェクト数や、マテリアル数が足りない場合は、別途
-	setreq命令により最大数を設定する必要があります。
-	以下の例は、オブジェクト最大数を4096に設定します。
+	setevent���߂ɂ���Đݒ肳���C�x���g�́A�I�u�W�F�N�g�P��
+	������S�܂œ����ɓK�p���邱�Ƃ��\�ł��B
+	�����̃C�x���g�𑽏d�Ɏ��s�����Ȃ��悤�ɂ��邽�߂ɂ́A
+	setevent���߂œo�^����X���b�g���Œ肵�Ďw�肷��悤�ɂ��Ă��������B
 
-		setreq SYSREQ_MAXOBJ,4096	; オブジェクト最大数を拡張する
+	�܂��Asetevent���߂ɂ��I�u�W�F�N�g�ɐݒ肳�ꂽ�C�x���g���폜
+	���邱�Ƃ��\�ł��B�ڂ����́A���߃��t�@�����X���Q�Ƃ��Ă��������B
 
-	setreqで設定できる主な項目は以下の通りです。(カッコ内はデフォルト値)
 
-		マクロ名              内容
+�E�o�^�̌��E���ɂ���
+
+	�o�^����I�u�W�F�N�g����A�}�e���A����������Ȃ��ꍇ�́A�ʓr
+	setreq���߂ɂ��ő吔��ݒ肷��K�v������܂��B
+	�ȉ��̗�́A�I�u�W�F�N�g�ő吔��4096�ɐݒ肵�܂��B
+
+		setreq SYSREQ_MAXOBJ,4096	; �I�u�W�F�N�g�ő吔���g������
+
+	setreq�Őݒ�ł����ȍ��ڂ͈ȉ��̒ʂ�ł��B(�J�b�R���̓f�t�H���g�l)
+
+		�}�N����              ���e
 		---------------------------------------------------------
-		SYSREQ_MAXOBJ         オブジェクト最大数(1024)
-		SYSREQ_MAXMATERIAL    マテリアル最大数(128)
-		SYSREQ_MAXEVENT       イベント最大数(1024)
-		SYSREQ_VSYNC          VSync待ちを有効にする(0)
-		SYSREQ_THROUGHFLAG    座標のボーダー処理フラグ(0)
-		SYSREQ_FPS            フレームレート(取得のみ)
+		SYSREQ_MAXOBJ         �I�u�W�F�N�g�ő吔(1024)
+		SYSREQ_MAXMATERIAL    �}�e���A���ő吔(128)
+		SYSREQ_MAXEVENT       �C�x���g�ő吔(1024)
+		SYSREQ_VSYNC          VSync�҂���L���ɂ���(0)
+		SYSREQ_THROUGHFLAG    ���W�̃{�[�_�[�����t���O(0)
+		SYSREQ_FPS            �t���[�����[�g(�擾�̂�)
 
-	この他に、HSP3Dishがサポートする設定項目も使用可能です。
-
-
-・Windows上での実行ファイル作成
-
-	Windows上での実行ファイル作成は、HSP3Dishと同様に画面サイズを
-	#packoptで指定する形で作成してください。
-
-	#packopt name "ファイル名"
-	#packopt xsize 960		; 横サイズ
-	#packopt ysize 640		; 縦サイズ
-
-	dpmファイルによるモデルデータの読み込みには、現時点では対応していません。
+	���̑��ɁAHSP3Dish���T�|�[�g����ݒ荀�ڂ��g�p�\�ł��B
 
 
-・現バージョンでの注意点
+�EWindows��ł̎��s�t�@�C���쐬
 
-	以下の機能は未実装です。将来のバージョンでサポートされる予定です。
+	Windows��ł̎��s�t�@�C���쐬�́AHSP3Dish�Ɠ��l�ɉ�ʃT�C�Y��
+	#packopt�Ŏw�肷��`�ō쐬���Ă��������B
 
-	・コリジョンオブジェクトの詳細な接触判定
-	・日本語フォントのサポート
-	・パーティクルとエミッターの詳細設定
-	・マルチテクスチャ、バップマップ、ハイトマップ、LODサポート
+	#packopt name "�t�@�C����"
+	#packopt xsize 960		; ���T�C�Y
+	#packopt ysize 640		; �c�T�C�Y
 
-
-・OpenGLについて
-
-	HGIMG4は、描画のベースシステムとしてOpenGLを使用しています。
-	Windows用の3D描画ベースライブラリとしては、HGIMG3でDirectXを使用
-	していましたが、今回は大きく方向を転換しています。
-	OpenGLは、DirectXと同様にランタイムライブラリが必要となりますが、
-	その多くはビデオドライバと同時にインストールされます。
-	また、古くからサポートされていたDirectXと異なりOpenGL(3.1)は
-	新しいハードウェアしかサポートされていません。
-	主に2006年以降のnVidiaやAMD製のグラフィックカード及びintel製の
-	グラフィックチップ搭載マザーボード等でサポートされています。
-	Windows7以降の多くのシステムで、サポートされていると思われますが、
-	古いパソコンでの互換性が持てない場合もあります。
-	その一方で、OpenGLはiOS及びAndroidなどのスマートフォン、タブレット
-	端末において標準的な描画ライブラリとして採用されています。
-	HSP3Dishをベースに作成されているHGIMG4は、これらの端末上での動作も
-	視野に入れて開発されており、今後Windowsでも普及が進むと考えられる
-	OpenGLを全面的に採用しています。
+	dpm�t�@�C���ɂ�郂�f���f�[�^�̓ǂݍ��݂ɂ́A�����_�ł͑Ή����Ă��܂���B
 
 
-・謝辞
+�E���o�[�W�����ł̒��ӓ_
 
-DirectX9(angle)版のランタイムは、zakkiさんが製作されたものを同梱させていただきました。
-zakkiさん及び、ご意見をお寄せいただいた多くの方々に感謝致します。
+	�ȉ��̋@�\�͖������ł��B�����̃o�[�W�����ŃT�|�[�g�����\��ł��B
+
+	�E�R���W�����I�u�W�F�N�g�̏ڍׂȐڐG����
+	�E���{��t�H���g�̃T�|�[�g
+	�E�p�[�e�B�N���ƃG�~�b�^�[�̏ڍאݒ�
+	�E�}���`�e�N�X�`���A�o�b�v�}�b�v�A�n�C�g�}�b�v�ALOD�T�|�[�g
 
 
-・著作権とライセンス
+�EOpenGL�ɂ���
 
-ユーザーがHGIMG4を使って作成したオリジナルのソフトウェア(実行ファイル)の権利は、それを作成したユーザーに属します。
-ユーザーがHGIMG4を使って作成したオリジナルのソフトウェア(実行ファイル)を、
-自由に通信、即売会、店頭などで展示、配布、販売することができます。
-ライセンス料は必要ありません。
-HGIMG4とそのソースコードは、HSP開発セットと同様の修正BSDライセンスが適用されます。
+	HGIMG4�́A�`��̃x�[�X�V�X�e���Ƃ���OpenGL���g�p���Ă��܂��B
+	Windows�p��3D�`��x�[�X���C�u�����Ƃ��ẮAHGIMG3��DirectX���g�p
+	���Ă��܂������A����͑傫��������]�����Ă��܂��B
+	OpenGL�́ADirectX�Ɠ��l�Ƀ����^�C�����C�u�������K�v�ƂȂ�܂����A
+	���̑����̓r�f�I�h���C�o�Ɠ����ɃC���X�g�[������܂��B
+	�܂��A�Â�����T�|�[�g����Ă���DirectX�ƈقȂ�OpenGL(3.1)��
+	�V�����n�[�h�E�F�A�����T�|�[�g����Ă��܂���B
+	���2006�N�ȍ~��nVidia��AMD���̃O���t�B�b�N�J�[�h�y��intel����
+	�O���t�B�b�N�`�b�v���ڃ}�U�[�{�[�h���ŃT�|�[�g����Ă��܂��B
+	Windows7�ȍ~�̑����̃V�X�e���ŁA�T�|�[�g����Ă���Ǝv���܂����A
+	�Â��p�\�R���ł̌݊��������ĂȂ��ꍇ������܂��B
+	���̈���ŁAOpenGL��iOS�y��Android�Ȃǂ̃X�}�[�g�t�H���A�^�u���b�g
+	�[���ɂ����ĕW���I�ȕ`�惉�C�u�����Ƃ��č̗p����Ă��܂��B
+	HSP3Dish���x�[�X�ɍ쐬����Ă���HGIMG4�́A�����̒[����ł̓����
+	����ɓ���ĊJ������Ă���A����Windows�ł����y���i�ނƍl������
+	OpenGL��S�ʓI�ɍ̗p���Ă��܂��B
 
-HGIMG4は以下のライブラリを使用して開発されています。
+
+�E�ӎ�
+
+DirectX9(angle)�ł̃����^�C���́Azakki���񂪐��삳�ꂽ���̂𓯍������Ă��������܂����B
+zakki����y�сA���ӌ������񂹂��������������̕��X�Ɋ��Ӓv���܂��B
+
+
+�E���쌠�ƃ��C�Z���X
+
+���[�U�[��HGIMG4���g���č쐬�����I���W�i���̃\�t�g�E�F�A(���s�t�@�C��)�̌����́A������쐬�������[�U�[�ɑ����܂��B
+���[�U�[��HGIMG4���g���č쐬�����I���W�i���̃\�t�g�E�F�A(���s�t�@�C��)���A
+���R�ɒʐM�A������A�X���ȂǂœW���A�z�z�A�̔����邱�Ƃ��ł��܂��B
+���C�Z���X���͕K�v����܂���B
+HGIMG4�Ƃ��̃\�[�X�R�[�h�́AHSP�J���Z�b�g�Ɠ��l�̏C��BSD���C�Z���X���K�p����܂��B
+
+HGIMG4�͈ȉ��̃��C�u�������g�p���ĊJ������Ă��܂��B
 
 GamePlay3D v3.0.0
 http://www.gameplay3d.io/
@@ -1920,21 +1920,21 @@ Redistributions of source code must retain the above copyright notice, this list
 Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
 Neither the name of the Onion Software nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
 
-ソースコード形式かバイナリ形式か、変更するかしないかを問わず、以下の条件を満たす場合に限り、再頒布および使用が許可されます。 
+�\�[�X�R�[�h�`�����o�C�i���`�����A�ύX���邩���Ȃ������킸�A�ȉ��̏����𖞂����ꍇ�Ɍ���A�ĔЕz����юg�p��������܂��B 
 
-・ソースコードを再頒布する場合、上記の著作権表示、本条件一覧、および下記免責条項を含めること。 
-・バイナリ形式で再頒布する場合、頒布物に付属のドキュメント等の資料に、上記の著作権表示、本条件一覧、および下記免責条項を含めること。 
-・書面による特別の許可なしに、本ソフトウェアから派生した製品の宣伝または販売促進に、Onion Softwareの名前またはコントリビューターの名前を使用してはならない。 
+�E�\�[�X�R�[�h���ĔЕz����ꍇ�A��L�̒��쌠�\���A�{�����ꗗ�A����щ��L�Ɛӏ������܂߂邱�ƁB 
+�E�o�C�i���`���ōĔЕz����ꍇ�A�Еz���ɕt���̃h�L�������g���̎����ɁA��L�̒��쌠�\���A�{�����ꗗ�A����щ��L�Ɛӏ������܂߂邱�ƁB 
+�E���ʂɂ����ʂ̋��Ȃ��ɁA�{�\�t�g�E�F�A����h���������i�̐�`�܂��͔̔����i�ɁAOnion Software�̖��O�܂��̓R���g���r���[�^�[�̖��O���g�p���Ă͂Ȃ�Ȃ��B 
 
-本ソフトウェアは、著作権者およびコントリビューターによって「現状のまま」提供されており、明示黙示を問わず、商業的な使用可能性、および特定の目的に対する適合性に関する暗黙の保証も含め、またそれに限定されない、いかなる保証もありません。著作権者もコントリビューターも、事由のいかんを問わず、 損害発生の原因いかんを問わず、かつ責任の根拠が契約であるか厳格責任であるか（過失その他の）不法行為であるかを問わず、仮にそのような損害が発生する可能性を知らされていたとしても、本ソフトウェアの使用によって発生した（代替品または代用サービスの調達、使用の喪失、データの喪失、利益の喪失、業務の中断も含め、またそれに限定されない）直接損害、間接損害、偶発的な損害、特別損害、懲罰的損害、または結果損害について、一切責任を負わないものとします。 
+�{�\�t�g�E�F�A�́A���쌠�҂���уR���g���r���[�^�[�ɂ���āu����̂܂܁v�񋟂���Ă���A�����َ����킸�A���ƓI�Ȏg�p�\���A����ѓ���̖ړI�ɑ΂���K�����Ɋւ���Öق̕ۏ؂��܂߁A�܂�����Ɍ��肳��Ȃ��A�����Ȃ�ۏ؂�����܂���B���쌠�҂��R���g���r���[�^�[���A���R�̂�������킸�A ���Q�����̌�����������킸�A���ӔC�̍������_��ł��邩���i�ӔC�ł��邩�i�ߎ����̑��́j�s�@�s�ׂł��邩���킸�A���ɂ��̂悤�ȑ��Q����������\����m�炳��Ă����Ƃ��Ă��A�{�\�t�g�E�F�A�̎g�p�ɂ���Ĕ��������i��֕i�܂��͑�p�T�[�r�X�̒��B�A�g�p�̑r���A�f�[�^�̑r���A���v�̑r���A�Ɩ��̒��f���܂߁A�܂�����Ɍ��肳��Ȃ��j���ڑ��Q�A�Ԑڑ��Q�A�����I�ȑ��Q�A���ʑ��Q�A�����I���Q�A�܂��͌��ʑ��Q�ɂ��āA��ؐӔC�𕉂�Ȃ����̂Ƃ��܂��B 
 
 
-・DirectX9版のライセンスについて
+�EDirectX9�ł̃��C�Z���X�ɂ���
 
-HGIMG4 DirectX9版ランタイム及び付属のDLLは、ANGLE Projectの
-ソースをもとに作成されています。再配布を行なう場合は、
-以下のコピーライト表示か、または「ANGLE Project_LICENSE.txt」を
-同梱するようにしてください。
+HGIMG4 DirectX9�Ń����^�C���y�ѕt����DLL�́AANGLE Project��
+�\�[�X�����Ƃɍ쐬����Ă��܂��B�Ĕz�z���s�Ȃ��ꍇ�́A
+�ȉ��̃R�s�[���C�g�\�����A�܂��́uANGLE Project_LICENSE.txt�v��
+��������悤�ɂ��Ă��������B
 
 Copyright (C) 2002-2013 The ANGLE Project Authors. 
 All rights reserved.

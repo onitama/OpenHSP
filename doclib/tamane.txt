@@ -1,113 +1,113 @@
 ------------------------------------------------------------------------------
-HSP3オフィシャル2D・3D素材 "珠音（たまね）"
-copyright 2014 (c) オガワコウサク(チームグリグリ)/HSPTV!
+HSP3�I�t�B�V����2D�E3D�f�� "�쉹�i���܂ˁj"
+copyright 2014 (c) �I�K���R�E�T�N(�`�[���O���O��)/HSPTV!
 ------------------------------------------------------------------------------
 
-■HSP3オフィシャル3D素材 "珠音（たまね）"
+��HSP3�I�t�B�V����3D�f�� "�쉹�i���܂ˁj"
 
-HSP3オフィシャル3D素材 "珠音（たまね）"は、Hot Soup Processor(HSP)とともに使用することのできるオフィシャルな素材です。
-HSP3により表示可能なデータとスクリプト、及び元データがすべて収められています。
-カテゴリごとに以下のようなディレクトリ構成になっています。
-このデータは、自作のソフトに組み込むことが可能です。
-詳しくは、「著作権とライセンス」項目をご覧ください。
+HSP3�I�t�B�V����3D�f�� "�쉹�i���܂ˁj"�́AHot Soup Processor(HSP)�ƂƂ��Ɏg�p���邱�Ƃ̂ł���I�t�B�V�����ȑf�ނł��B
+HSP3�ɂ��\���\�ȃf�[�^�ƃX�N���v�g�A�y�ь��f�[�^�����ׂĎ��߂��Ă��܂��B
+�J�e�S�����ƂɈȉ��̂悤�ȃf�B���N�g���\���ɂȂ��Ă��܂��B
+���̃f�[�^�́A����̃\�t�g�ɑg�ݍ��ނ��Ƃ��\�ł��B
+�ڂ����́A�u���쌠�ƃ��C�Z���X�v���ڂ��������������B
 
-公式ページにて "珠音（たまね）"の最新情報もチェックしてみてください!
+�����y�[�W�ɂ� "�쉹�i���܂ˁj"�̍ŐV�����`�F�b�N���Ă݂Ă�������!
 http://hsp.tv/make/tamane3d.html
 
 
-■HSP3オフィシャル2D素材 "珠音（たまね）"
+��HSP3�I�t�B�V����2D�f�� "�쉹�i���܂ˁj"
 
-HSP3により表示可能な2D素材が標準で収録されています。
-珠音のカード向け図柄の「tamaface.bmp」及び「tamaface.png」、
-ドット絵によるアニメーションパターン(「tamadot.bmp」及び「tamadot.png」)など
-幅広く活用できる素材が提供されています。
-また、サンプルゲーム「珠音のジャンプアップ♪」「ドロップパズル」「カードバトル」等も含まれています。
-公式ページにて2D素材の最新情報もチェックしてみてください!
+HSP3�ɂ��\���\��2D�f�ނ��W���Ŏ��^����Ă��܂��B
+�쉹�̃J�[�h�����}���́utamaface.bmp�v�y�сutamaface.png�v�A
+�h�b�g�G�ɂ��A�j���[�V�����p�^�[��(�utamadot.bmp�v�y�сutamadot.png�v)�Ȃ�
+���L�����p�ł���f�ނ��񋟂���Ă��܂��B
+�܂��A�T���v���Q�[���u�쉹�̃W�����v�A�b�v��v�u�h���b�v�p�Y���v�u�J�[�h�o�g���v�����܂܂�Ă��܂��B
+�����y�[�W�ɂ�2D�f�ނ̍ŐV�����`�F�b�N���Ă݂Ă�������!
 http://hsp.tv/make/tamane2d.html
 
 
-■サンプルの実行について
+���T���v���̎��s�ɂ���
 
-HSP3からサンプルを実行する場合は、必ず最新版(HSP3.4以降)をご使用ください
+HSP3����T���v�������s����ꍇ�́A�K���ŐV��(HSP3.4�ȍ~)�����g�p��������
 
-Hot Soup Processor(HSP)の情報とダウンロードは、以下の公式ページにて公開されています。
+Hot Soup Processor(HSP)�̏��ƃ_�E�����[�h�́A�ȉ��̌����y�[�W�ɂČ��J����Ă��܂��B
 http://hsp.tv/
 
-フォルダ構成は以下のようになっています。
+�t�H���_�\���͈ȉ��̂悤�ɂȂ��Ă��܂��B
 
-+---hsptv			2D素材データ(BMP,PNG形式)
++---hsptv			2D�f�ރf�[�^(BMP,PNG�`��)
 +---sample
-        +---hgimg3		HGIMG3ランタイム用データ&スクリプト
+        +---hgimg3		HGIMG3�����^�C���p�f�[�^&�X�N���v�g
         |
-        +---hgimg4		HGIMG4ランタイム用データ&スクリプト
-              +---fbx		3Dデータ(FBX形式)
+        +---hgimg4		HGIMG4�����^�C���p�f�[�^&�X�N���v�g
+              +---fbx		3D�f�[�^(FBX�`��)
 
 
-■著作権とライセンス
+�����쌠�ƃ��C�Z���X
 
-3D素材 "珠音（たまね）"は、オガワコウサク(チームグリグリ)氏により製作されたものを
-onion softwareが公開しているものです。
-onion softwareは、本データによって生じた、いかなる損害についても保証いたしません。
-自己の責任の範囲で使用してください。
+3D�f�� "�쉹�i���܂ˁj"�́A�I�K���R�E�T�N(�`�[���O���O��)���ɂ�萻�삳�ꂽ���̂�
+onion software�����J���Ă�����̂ł��B
+onion software�́A�{�f�[�^�ɂ���Đ������A�����Ȃ鑹�Q�ɂ��Ă��ۏ؂������܂���B
+���Ȃ̐ӔC�͈̔͂Ŏg�p���Ă��������B
 
-3D素材 "珠音（たまね）"の著作権は、オガワコウサク(チームグリグリ)氏にあります。
-3D素材 "珠音（たまね）"のデータ及び、付随するサンプルスクリプト・データは、
-修正BSDライセンスのもと有償・無償を問わず添付、複製、改編、再配布することができます。
-ライセンス料は必要ありません。
+3D�f�� "�쉹�i���܂ˁj"�̒��쌠�́A�I�K���R�E�T�N(�`�[���O���O��)���ɂ���܂��B
+3D�f�� "�쉹�i���܂ˁj"�̃f�[�^�y�сA�t������T���v���X�N���v�g�E�f�[�^�́A
+�C��BSD���C�Z���X�̂��ƗL���E�������킸�Y�t�A�����A���ҁA�Ĕz�z���邱�Ƃ��ł��܂��B
+���C�Z���X���͕K�v����܂���B
 
-ユーザーが3D素材 "珠音（たまね）"を組み込み、作成したオリジナルのソフトウェア(実行ファイル)の権利は、
-それを作成したユーザーに属します。
-素材データの著作権に関する表記は、必須ではありません。
-もし、ドキュメント等で明記したい場合は、以下のフォーマットをお使い下さい。
+���[�U�[��3D�f�� "�쉹�i���܂ˁj"��g�ݍ��݁A�쐬�����I���W�i���̃\�t�g�E�F�A(���s�t�@�C��)�̌����́A
+������쐬�������[�U�[�ɑ����܂��B
+�f�ރf�[�^�̒��쌠�Ɋւ���\�L�́A�K�{�ł͂���܂���B
+�����A�h�L�������g���Ŗ��L�������ꍇ�́A�ȉ��̃t�H�[�}�b�g�����g���������B
 ------------------------------------------------------------------------------
-HSP3オフィシャル3D素材 "珠音（たまね）"
-copyright 2014-2016 (c) オガワコウサク(チームグリグリ)
+HSP3�I�t�B�V����3D�f�� "�쉹�i���܂ˁj"
+copyright 2014-2016 (c) �I�K���R�E�T�N(�`�[���O���O��)
 http://www.gris2.com/
 ------------------------------------------------------------------------------
 
 
-■fbxフォルダ
+��fbx�t�H���_
 
-元となる3DデータをFBX形式で収録しています。
-このデータを直接、HSP3から読み込むことはできません。
+���ƂȂ�3D�f�[�^��FBX�`���Ŏ��^���Ă��܂��B
+���̃f�[�^�𒼐ځAHSP3����ǂݍ��ނ��Ƃ͂ł��܂���B
 
-	high_school_girl ・・・ 通常体型のモデル
-	high_school_girlSD ・・ デフォルメ体型のモデル
-
-
-■hgimg3フォルダ
-
-hgimg3ランタイム上で動作するデータ及びスクリプトが収録されています。
-sample1～4がサンプルスクリプトとなります。
-シンプルなモデルの表示から、起伏のある地形を走り回るデモが含まれています。
-読み込み可能なモデルファイル(.x形式)は以下の通りです。
-
-	tamane_s.x	"珠音（たまね）" 待機ポーズ
-	tamane_w.x	"珠音（たまね）" 歩きポーズ
-	tamane_r.x	"珠音（たまね）" 走りポーズ
-
-	tamane2_s.x	デフォルメ版 "珠音（たまね）" 待機ポーズ
-	tamane2_w.x	デフォルメ版 "珠音（たまね）" 歩きポーズ
-	tamane2_r.x	デフォルメ版 "珠音（たまね）" 走りポーズ
+	high_school_girl �E�E�E �ʏ�̌^�̃��f��
+	high_school_girlSD �E�E �f�t�H�����̌^�̃��f��
 
 
-■hgimg4フォルダ
+��hgimg3�t�H���_
 
-hgimg4ランタイム上で動作するデータ及びスクリプトが収録されています。
-(実行ファイルを作成した場合にも、必ずresフォルダ以下に含まれるデータが必要となります。)
-hgimg4は、開発中のプラグインであり、モデル表示及びアニメーションのプレビュー版となります。
-今後のバージョンでは、より細かいアニメーションの制御(モーションブレンディング等)がサポート
-される予定です。
-読み込み可能なモデルファイル(.x形式)は以下の通りです。
+hgimg3�����^�C����œ��삷��f�[�^�y�уX�N���v�g�����^����Ă��܂��B
+sample1�`4���T���v���X�N���v�g�ƂȂ�܂��B
+�V���v���ȃ��f���̕\������A�N���̂���n�`�𑖂���f�����܂܂�Ă��܂��B
+�ǂݍ��݉\�ȃ��f���t�@�C��(.x�`��)�͈ȉ��̒ʂ�ł��B
 
-	tamane.gpb	"珠音（たまね）" 待機ポーズ
-	tamane2.gpb	デフォルメ版 "珠音（たまね）" 待機ポーズ
+	tamane_s.x	"�쉹�i���܂ˁj" �ҋ@�|�[�Y
+	tamane_w.x	"�쉹�i���܂ˁj" �����|�[�Y
+	tamane_r.x	"�쉹�i���܂ˁj" ����|�[�Y
+
+	tamane2_s.x	�f�t�H������ "�쉹�i���܂ˁj" �ҋ@�|�[�Y
+	tamane2_w.x	�f�t�H������ "�쉹�i���܂ˁj" �����|�[�Y
+	tamane2_r.x	�f�t�H������ "�쉹�i���܂ˁj" ����|�[�Y
 
 
-■謝辞
+��hgimg4�t�H���_
 
-素晴らしいモデルを作成頂いた、オガワコウサク(チームグリグリ)氏に感謝致します。
-オガワコウサク氏が代表を務めるチームグリグリのサイトはこちらです。
+hgimg4�����^�C����œ��삷��f�[�^�y�уX�N���v�g�����^����Ă��܂��B
+(���s�t�@�C�����쐬�����ꍇ�ɂ��A�K��res�t�H���_�ȉ��Ɋ܂܂��f�[�^���K�v�ƂȂ�܂��B)
+hgimg4�́A�J�����̃v���O�C���ł���A���f���\���y�уA�j���[�V�����̃v���r���[�łƂȂ�܂��B
+����̃o�[�W�����ł́A���ׂ����A�j���[�V�����̐���(���[�V�����u�����f�B���O��)���T�|�[�g
+�����\��ł��B
+�ǂݍ��݉\�ȃ��f���t�@�C��(.x�`��)�͈ȉ��̒ʂ�ł��B
+
+	tamane.gpb	"�쉹�i���܂ˁj" �ҋ@�|�[�Y
+	tamane2.gpb	�f�t�H������ "�쉹�i���܂ˁj" �ҋ@�|�[�Y
+
+
+���ӎ�
+
+�f���炵�����f�����쐬�������A�I�K���R�E�T�N(�`�[���O���O��)���Ɋ��Ӓv���܂��B
+�I�K���R�E�T�N������\�𖱂߂�`�[���O���O���̃T�C�g�͂�����ł��B
 http://www.gris2.com/
 
 

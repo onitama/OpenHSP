@@ -21,6 +21,9 @@ static int	text_mod;
 static gint context_id;
 
 #define HSED_VER "ver.0.5"
+#define TEMP_HSP "__hsptmp.hsp"
+#define TEMP_AX "__hsptmp.ax"
+
 
 // dialog
 
@@ -360,9 +363,6 @@ void HSP_view_log(){
 	gtk_widget_show(log);
 	//gtk_editable_insert_text(GTK_EDITABLE(log),complog,strlen(complog),&i);
 
- 
-
-
 	gtk_widget_show(window);
 	//gtk_grab_add(GTK_WIDGET(window));
 	gtk_main();
@@ -384,10 +384,16 @@ static void HSP_run(GtkWidget *w,int flag)
 	int size=strlen(buf);
 	char cmd[1024];
 	char mydir[1024];
+	char runtime[128];
+	char option[16];
+	int result;
+	int needres=0;			// .hspresによるエラー解析を行うか?
 	char *err;
-	int p=0;
+	char a1;
+	int p = 0;
+	int sch = 0;
 
-	FILE *fp=fopen("__hsptmp.hsp","w");
+	FILE *fp=fopen( TEMP_HSP, "w" );
 	if(fp == NULL)
 		return;
 	fwrite(buf,1,size,fp);
@@ -402,7 +408,7 @@ static void HSP_run(GtkWidget *w,int flag)
 		sprintf(cmd,"./hspcmp -i -u %s/start.ax",mydir);
 		break;
 	default:
-		sprintf(cmd,"./hspcmp -d -i -u %s/__hsptmp",mydir);  // -o obj
+		sprintf(cmd,"./hspcmp -d -i -u %s/%s",mydir,TEMP_HSP);  // -o obj
 		break;
 	}
 
@@ -415,7 +421,6 @@ static void HSP_run(GtkWidget *w,int flag)
 	complog[p]='\0';
 	printf(complog);
 	if(pclose(fp)){
-	//if(system(cmd)){
 		printf("hsed: Compile error.\n");
 		HSP_view_log();
 		chdir(mydir);
@@ -445,33 +450,76 @@ static void HSP_run(GtkWidget *w,int flag)
 		return;
 	}
 
-#ifdef HSPRASPBIAN
-	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hsp3dish __hsptmp.ax >%s/.hspres\""
-			, mydir, hspdir, hspdir );
-#else
-	sprintf(cmd,"%s/hsp3dish __hsptmp.ax >%s/.hspres",hspdir,hspdir);
-#endif
-
-	system(cmd);
-
-	//	error detect
-
+	// ランタイムを取得する
 	p = 0;
-	sprintf(cmd,"%s/.hspres", hspdir);
-
-	fp=fopen(cmd,"r");
+	sprintf(cmd,"%s/hspcmp -e0 %s", hspdir,TEMP_AX);
+	fp=popen(cmd,"r");
 	while(feof(fp)==0){
 		p+=fread(complog+p,1,400,fp);
 	}
 	complog[p]='\0';
+	printf(complog);
+	pclose(fp);
 
-	err = strstr( complog, "#Error" );
+	sch = 0;
+	*runtime=0;
+	err = strstr( complog, "Runtime[" );
 	if( err != NULL ){
-		HSP_view_log();
-		return;
+		err += 8;
+		while(1) {
+			a1 = *err++;
+			if ( a1 == 0 ) break;
+			if ( a1 == ']' ) break;
+			runtime[sch++] = a1;
+		}
+		runtime[sch++] = 0;
 	}
 
-	//system("./runhsp hsptmp&");
+	needres = 1;
+	option[0] = '-';
+	option[1] = 'e';
+	option[2] = 0;
+	if ( strcmp(runtime,"hsp3cl")==0 ) needres = 0;		// hsp3clはそのまま
+	printf("hsed: Runtime [%s].\n",runtime);
+
+#ifdef HSPRASPBIAN
+	if ( needres ) {
+		option[1] = 'r';			// エラー時に停止するオプション
+	}
+	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hspcmp %s %s --syspath=%s/\""
+			, mydir, hspdir, option, TEMP_AX, hspdir );
+#else
+	sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
+#endif
+
+	result = system(cmd);
+	if ( WIFEXITED(result) ) {
+		result = WEXITSTATUS(result);
+		printf("hsed: Process end %d.\n",result);
+	} else {
+		printf("hsed: Process error.\n");
+	}
+
+	//	error detect
+	
+/*
+	if ( needres ) {
+		p = 0;
+		sprintf(cmd,"%s/.hspres", hspdir);
+
+		fp=fopen(cmd,"r");
+		while(feof(fp)==0){
+			p+=fread(complog+p,1,400,fp);
+		}
+		complog[p]='\0';
+
+		err = strstr( complog, "#Error" );
+		if( err != NULL ){
+			HSP_view_log();
+			return;
+		}
+	}
+*/
 }
 
 /////////////////////////  MENU ///////////////////////////////
@@ -576,7 +624,6 @@ int main(int argc, char *argv[], char *envp[]){
 		file_open_read(argv[1]);
 		printf("%s %s\n",curdir,argv[1]);
 	}
-
 
 	gtk_widget_show(window);
 	gtk_main();
