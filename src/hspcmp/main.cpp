@@ -3,6 +3,9 @@
 //	HSPCC : HSP Code Compiler Manager
 //				onion software 2002/12
 //
+#ifdef HSPWIN
+#include <windows.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,7 +32,7 @@ static 	char *p[] = {
 	"       -u    output UTF-8 strings",
 	"       -w    force debug window on",
 	"       -e?   execute/view .ax runtime",
-	"       -r    execute runtime with result log",
+	"       -r    execute runtime with result",
 	"       --syspath=??? set system folder for execute",
 	"       --compath=??? set common path to ???",
 	NULL };

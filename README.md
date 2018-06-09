@@ -55,6 +55,7 @@ hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作
 コンパイルの際には、追加のライブラリが必要になります。ネットワークに
 接続されている状態で以下のコマンドを実行することで取得できます。
 
+	sudo apt-get update
 	sudo apt-get install libgtk2.0-dev
 	sudo apt-get install libglew-dev
 	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
