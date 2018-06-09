@@ -107,15 +107,37 @@ static int statusbar_set( gchar *msg )
 	return 0;
 }
 
+static int statusbar_setline( int line )
+{
+	sprintf( barmsg,"line:%d", line );
+	gtk_statusbar_pop(GTK_STATUSBAR(status_bar), context_id );
+	gtk_statusbar_push(GTK_STATUSBAR(status_bar), context_id, barmsg);
+	return 0;
+}
 
 /* Links can also be activated by clicking or tapping.
  */
-static gboolean
-event_cb (GtkWidget *text_view,
-          GdkEvent  *ev)
-{
+
+void update_statusbar(GtkTextBuffer *buffer, gpointer user_data) {
+
+  int line;
+  GtkTextIter iter;
+
   text_mod = 1;
-  return FALSE;
+
+  gtk_text_buffer_get_iter_at_mark(buffer,
+      &iter, gtk_text_buffer_get_insert(buffer));
+  line = (int)gtk_text_iter_get_line( &iter ) + 1;
+  statusbar_setline( line );
+}
+
+static void mark_set_callback(GtkTextBuffer *buffer,
+    const GtkTextIter *iter, GtkTextMark *mark,
+    gpointer data) {
+
+  int line;
+  line = (int)gtk_text_iter_get_line( iter ) + 1;
+  statusbar_setline( line );
 }
 
 // file
@@ -561,6 +583,7 @@ int main(int argc, char *argv[], char *envp[]){
 	GtkWidget *vbox;
 	GtkWidget *menu;
 	GtkWidget *scroll;
+	GtkTextBuffer *buffer;
 
 	int i=0,p=-1;
 	gtk_set_locale();
@@ -589,21 +612,26 @@ int main(int argc, char *argv[], char *envp[]){
 	//edit = gtk_text_new(0,0);
 	edit = gtk_text_view_new();
 
-	g_signal_connect (G_OBJECT(window), "key-press-event",
-		G_CALLBACK (event_cb), NULL);
+	//g_signal_connect (G_OBJECT(window), "key-press-event",
+	//	G_CALLBACK (event_cb), NULL);
 	//g_signal_connect (edit, "event", G_CALLBACK (event_cb), NULL);
 
 	gtk_container_add(GTK_CONTAINER(scroll), edit);
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),TRUE);
 	gtk_widget_show(edit);
 	text_mod = 0;
-	//
+	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
 
     status_bar = gtk_statusbar_new();
     gtk_box_pack_start(GTK_BOX (vbox), status_bar, FALSE, TRUE, 0);
     gtk_widget_show (status_bar);
     context_id = gtk_statusbar_get_context_id(
 			GTK_STATUSBAR(status_bar), "Ready.");
+
+	g_signal_connect(buffer, "changed",
+		G_CALLBACK(update_statusbar), GINT_TO_POINTER(0) );
+	g_signal_connect_object(buffer, "mark-set",
+		G_CALLBACK(mark_set_callback), GINT_TO_POINTER(0),G_CONNECT_SWAPPED );
 
 	getcwd(curdir,512);
 	strcpy(hspdir,argv[0]);
