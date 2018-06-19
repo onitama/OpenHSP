@@ -43,6 +43,8 @@ struct engine;
 #include "../obaq/hsp3dw.h"
 #endif
 
+extern char *hsp_mainpath;
+
 //typedef BOOL (CALLBACK *HSP3DBGFUNC)(HSP3DEBUG *,int,int,int);
 
 /*----------------------------------------------------------*/
@@ -507,6 +509,8 @@ int hsp3dish_init( char *startfile )
 		hsp3dish_dialog( "Startup failed." );
 		return 1;
 	}
+
+	hgio_setmainarg( hsp_mainpath, startfile );
 
 	sx = 0; sy = 0; autoscale = 0;
 //#ifdef HSPDEBUG

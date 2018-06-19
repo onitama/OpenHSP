@@ -44,6 +44,7 @@
 #endif
 
 #if defined(HSPLINUX)
+#include <unistd.h>
 #include <GL/gl.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
@@ -597,6 +598,16 @@ int hgio_title( char *str1 )
 #ifdef HSPWIN
 	SetWindowText( master_wnd, str1 );
 #endif
+
+#if defined(HSPEMSCRIPTEN)
+	SDL_WM_SetCaption( (const char *)str1, NULL );
+#endif
+#if defined(HSPLINUX)
+#ifndef HSPRASPBIAN
+	SDL_WM_SetCaption( (const char *)str1, NULL );
+#endif
+#endif
+
 	return 0;
 }
 
@@ -1400,6 +1411,21 @@ int hgio_gettick( void )
     return (int)(total_tick * 1000.0 );
 #endif
 
+#if defined(HSPEMSCRIPTEN)
+	int i;
+	timespec ts;
+	double nsec;
+	static bool init = false;
+	static int initTime = 0;
+	clock_gettime(CLOCK_REALTIME,&ts);
+	nsec = (double)(ts.tv_nsec) * 0.001 * 0.001;
+	i = (int)ts.tv_sec * 1000 + (int)nsec;
+	if (!init) {
+		init = true;
+		initTime = i;
+	}
+	return i - initTime;
+#endif
 }
 
 
@@ -1792,5 +1818,66 @@ void hgio_touch( int xx, int yy, int button )
     }
 }
 
+#endif
+
+
+/*-------------------------------------------------------------------------------*/
+
+#if defined(HSPLINUX)
+
+static	char dir_hsp[HSP_MAX_PATH+1];
+static	char dir_cmdline[HSP_MAX_PATH+1];
+
+void hgio_setmainarg( char *hsp_mainpath, char *cmdprm )
+{
+	int p,i;
+	strcpy( dir_hsp, hsp_mainpath );
+
+	p = 0; i = 0;
+	while(dir_hsp[i]){
+		if(dir_hsp[i]=='/' || dir_hsp[i]=='\\') p=i;
+		i++;
+	}
+	dir_hsp[p]=0;
+
+	strcpy( dir_cmdline, cmdprm );
+}
+
+char *hgio_getdir( int id )
+{
+	//		dirinfo命令の内容を設定する
+	//
+	char dirtmp[HSP_MAX_PATH+1];
+	char *p;
+	
+	*dirtmp = 0;
+	p = dirtmp;
+
+	switch( id ) {
+	case 0:				//    カレント(現在の)ディレクトリ
+		getcwd( p, HSP_MAX_PATH );
+		break;
+	case 1:				//    HSPの実行ファイルがあるディレクトリ
+		p = dir_hsp;
+		break;
+	case 2:				//    Windowsディレクトリ
+		break;
+	case 3:				//    Windowsのシステムディレクトリ
+		break;
+	case 4:				//    コマンドライン文字列
+		p = dir_cmdline;
+		break;
+	case 5:				//    HSPTV素材があるディレクトリ
+		strcpy( p, dir_hsp );
+		strcat( p, "/hsptv" );
+		break;
+	default:
+		throw HSPERR_ILLEGAL_FUNCTION;
+	}
+	return p;
+}
 
 #endif
+
+/*-------------------------------------------------------------------------------*/
+

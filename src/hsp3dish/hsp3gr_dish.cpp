@@ -166,7 +166,7 @@ static void ExecFile( char *stmp, char *ps, int mode )
 	//	外部ファイル実行
 	hgio_exec( stmp, ps, mode );
 }
-		
+
 static char *getdir( int id )
 {
 	//		dirinfo命令の内容をstmpに設定する
@@ -4004,7 +4004,11 @@ static void *reffunc_function( int *type_res, int arg )
 
 	case 0x002:								// dirinfo
 		p1 = code_geti();
+#if defined(HSPLINUX)
+		ptr = hgio_getdir( p1 );
+#else
 		ptr = getdir( p1 );
+#endif
 		*type_res = HSPVAR_FLAG_STR;
 		break;
 

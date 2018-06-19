@@ -12,11 +12,15 @@
 #include "hsp3dish.h"
 
 /*----------------------------------------------------------*/
+
+char *hsp_mainpath;
+
 int main( int argc, char *argv[] )
 {
 	int res;
 	char *p;
 
+	hsp_mainpath = argv[ 0 ];
 	if ( argc > 1 ) p = argv[ 1 ]; else p = "";
 
 	res = hsp3dish_init( p );

@@ -5,13 +5,15 @@ Hot Soup Processor ver3.51                          HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
-	2018/06/08 3.51
+	2018/06/19 3.51
 
 	[HSP3Dish][Linux] Linux版スクリプトエディタの更新
+	[HSP3Dish][Linux] dirinfo関数の取得に対応
 	[hspcmp] オブジェクトファイルからランタイムを取得して起動する機能を追加
 	コンソール版HSP3のランタイムを指定するhsp3cl.asを追加
 	文字列型変数の配列自動拡張時にメモリが解放されないことがある不具合を修正
 	HSP Docs Library(ドキュメントビューアー)、Artlet2D、d3module,SQLeleを最新版に更新
+	スクリプトを実行ファイルに変換するサンプル(mkexe.hsp)を追加
 	inoviaさん、Tetr@podさんによる改造版HSP3スクリプトエディタの更新を取り込み、以下の機能を追加しています
 	->カスタムキーワード色分け/ファイルの自動バックアップ/ウィンドウの分割
 	->各種フォントの対応/背景画像表示/リンクラベル/置換機能の高速化

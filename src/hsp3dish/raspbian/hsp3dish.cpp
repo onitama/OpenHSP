@@ -59,6 +59,8 @@
 
 //typedef BOOL (CALLBACK *HSP3DBGFUNC)(HSP3DEBUG *,int,int,int);
 
+extern char *hsp_mainpath;
+
 /*----------------------------------------------------------*/
 
 static Hsp3 *hsp = NULL;
@@ -904,6 +906,8 @@ int hsp3dish_init( char *startfile )
 		hsp3dish_dialog( "Startup failed." );
 		return 1;
 	}
+
+	hgio_setmainarg( hsp_mainpath, startfile );
 
 	//		Initalize Window
 	//

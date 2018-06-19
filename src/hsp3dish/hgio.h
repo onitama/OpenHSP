@@ -80,6 +80,8 @@ HSPREAL hgio_getinfo( int type );
 char *hgio_sysinfo( int p2, int *res, char *outbuf );
 void hgio_setstorage( char *path );
 char *hgio_getstorage( char *fname );
+char *hgio_getdir( int id );
+void hgio_setmainarg( char *hsp_mainpath, char *cmdprm );
 
 // for HGIMG4
 void hgio_draw_gpsprite( Bmscr *bmscr, bool lateflag );
