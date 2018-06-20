@@ -92,8 +92,8 @@
 
 #define global gsquare_grad (-257)
 
-#define global msgothic "ＭＳ ゴシック"
-#define global msmincho "ＭＳ 明朝"
+#define global msgothic ""
+#define global msmincho ""
 
 #define global do  %tbreak %i0 %tcontinue %i0 %tdo *%i
 #define global until(%1=1) %tcontinue *%o : %tdo if (%1)=0 { goto *%o } %tbreak *%o

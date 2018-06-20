@@ -791,7 +791,7 @@ int main(int argc, char *argv[], char *envp[]){
 	PangoLanguage *lang = gtk_get_default_language();
 	strncpy( langstr, pango_language_to_string(lang), 8 );
 	jpflag = 0;
-	if ( strcmp(langstr,"ja") == 0 ) jpflag = 1;
+	if ( strncmp(langstr,"ja",2) == 0 ) jpflag = 1;
 	//printf( "lang[%s]",pango_language_to_string(lang) );
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
