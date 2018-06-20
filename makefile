@@ -1,10 +1,10 @@
 CC = gcc
 CXX = g++
 AR = ar
-CFLAGS_DISH = -Wall --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ
-CFLAGS_GP = -Wall --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11
-CFLAGS_CL = -Wall -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
-CFLAGS_CMP = -Wall -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
+CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ
+CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11
+CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
+CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
 
 OBJS = \
 	src/hsp3/dpmread.do \

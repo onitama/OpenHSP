@@ -46,7 +46,10 @@
 #if defined(HSPLINUX)
 #include <SDL/SDL_ttf.h>
 #define TTF_FONTFILE "/ipaexg.ttf"
-#include "font_data.h"
+#define USE_JAVA_FONT
+#define FONT_TEX_SX 512
+#define FONT_TEX_SY 128
+//#include "font_data.h"
 #endif
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
@@ -248,12 +251,20 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	Alertf( "Init:HGIOScreen(%d,%d)",sx,sy );
 
 	//フォント準備
-#if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+#if defined(HSPNDK) || defined(HSPEMSCRIPTEN)
 	#ifdef USE_JAVA_FONT
 	//font_texid = MakeEmptyTex( FONT_TEX_SX, FONT_TEX_SY );
 	#else
+	font_texid = RegistTexMem( font_data, font_data_size );
+	font_sx = 16;
+	font_sy = 16;
+	#endif
+#endif
 
-#if 1
+#if defined(HSPLINUX)
+	#ifdef USE_JAVA_FONT
+
+	//TTF初期化
 	char fontpath[HSP_MAX_PATH+1];
 	strcpy( fontpath, hgio_getdir(1) );
 	strcat( fontpath, TTF_FONTFILE );
@@ -261,54 +272,14 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	if ( TTF_Init() ) {
 		Alertf( "Init:TTF_Init error" );
 	}
-	TTF_Font *font = TTF_OpenFont( fontpath, 16 );
-	if (font == NULL){
-		Alertf( "Init:TTF_OpenFont error" );
-	}
-	SDL_Color dcolor={255,255,255,255};
-	SDL_Surface *surf = TTF_RenderUTF8_Blended(font, "おにたま Test", dcolor );
-    if (surf == NULL){
-    }
+	TexFontInit( fontpath, 18 );
 
-	int psx,psy,colors;
-	GLuint texture_format = 0;
-	psx = surf->w;
-	psy = surf->h;
-	colors = surf->format->BytesPerPixel;
-	Alertf( "Init:Surface(%d,%d) %d mask%x",psx,psy,colors,surf->format->Rmask );
-
-	font_texid = MakeEmptyTex( psx, psy );
-	TEXINF *tex = GetTex( font_texid );
-	ChangeTex( tex->texid );
-
-#ifdef HSPRASPBIAN
-
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, psx, psy, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels );
-
-#else
-	if (colors == 4) {   // alpha
-		if (surf->format->Rmask == 0x000000ff)
-			texture_format = GL_RGBA;
-			else texture_format = GL_BGRA_EXT;
-	} else {             // no alpha
-		if (surf->format->Rmask == 0x000000ff)
-			texture_format = GL_RGB;
-			else texture_format = GL_BGR_EXT;
-	}
-	glTexImage2D( GL_TEXTURE_2D, 0, colors, psx, psy, 0, texture_format, GL_UNSIGNED_BYTE, surf->pixels );
-#endif
-
-    //Clean up the surface and font
-    SDL_FreeSurface(surf);
-    TTF_CloseFont(font);
-#endif
-#endif
-
+	#else
 	font_texid = RegistTexMem( font_data, font_data_size );
-#endif
-
 	font_sx = 16;
 	font_sy = 16;
+	#endif
+#endif
 
 	//		infovalをリセット
 	//
@@ -888,11 +859,20 @@ bool hgio_getkey( int kcode )
 
 int hgio_font( char *fontname, int size, int style )
 {
+#ifdef HSPLINUX
+	#ifdef USE_JAVA_FONT
+	if ( font_size != size ) {
+		TexFontInit( fontname, size );
+	}
+	#endif
+#endif
+
 	font_size = size;
 	font_style = style;
 #ifdef HSPIOS
     gb_font( size, style, fontname );
 #endif
+
 	return 0;
 }
 

@@ -23,10 +23,6 @@ githubから最新のリポジトリを取得してご使用ください。
 
 	git clone http://github.com/onitama/OpenHSP
 
-ダウンロードしたアーカイブのを展開することも可能です。
-
-	tar -vxzf hsplinux-???.tar.gz   (???はバージョン)
-
 取得したリポジトリのソースをコンパイルしてください。
 コンパイルには、gcc及びmakeを実行できる環境が必要です。
 コンパイルの際には、以下のライブラリが必要になりますので、あらかじめ確認を行なって下さい。
@@ -47,7 +43,7 @@ githubから最新のリポジトリを取得してご使用ください。
 
 # Raspberry Piインストール
 
-Raspberry Pi上のRaspbian上で動作します。(推奨バージョンは、September 2017 Kernel version4.9です)
+Raspberry Pi上のRaspbian上で動作します。(推奨バージョンは、September 2017 Kernel version4.9以降です)
 hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作します。
 (描画に関する機能は、OpenGL及びSDLライブラリを使用して動作しています。)
 アーカイブの内容を任意のディレクトリに展開して、ソースをコンパイルしてください。
@@ -60,12 +56,7 @@ hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作
 	sudo apt-get install libglew-dev
 	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
 
-hsplinuxリポジトリの最新版を取得してください。
-アーカイブ、hsplinux???.tgzファイルを取得した場合は、解凍を行ってください。
-
-	tar -vxzf hsplinux???.tgz   (???はバージョン)
-
-githubから最新のリポジトリを取得して使用することも可能です。
+githubから最新版を取得してください。
 
 	git clone http://github.com/onitama/OpenHSP
 

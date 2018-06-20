@@ -63,6 +63,7 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_opengl.h"
+#include <SDL/SDL_ttf.h>
 
 #endif
 
@@ -76,6 +77,44 @@ static TEXINF texinf[TEXINF_MAX];
 static int curtex;				// 現在選択されているテクスチャID
 static int curmestex;			// メッセージ用にキャッシュされたテクスチャ数
 
+/*-------------------------------------------------------------------------------*/
+/*
+		Font Manage Routines
+*/
+/*-------------------------------------------------------------------------------*/
+
+#if defined(HSPLINUX)
+static	char fontpath[HSP_MAX_PATH+1];
+static	TTF_Font *font = NULL;
+static	int font_defsize;
+
+void TexFontTerm( void )
+{
+	if ( font != NULL ) {
+	    TTF_CloseFont(font);
+	    font = NULL;
+	}
+}
+
+int TexFontInit( char *path, int size )
+{
+	if ( font != NULL ) TexFontTerm();
+
+	if (*path != 0) {
+		strcpy ( fontpath, path );
+	}
+	font = TTF_OpenFont( fontpath, size );
+	font_defsize = size;
+
+	if (font == NULL){
+		Alertf( "Init:TTF_OpenFont error" );
+		return -2;
+	}
+	//Alertf( "Init:TTF_Init:%s (%x)",fontpath,font );
+	return 0;
+}
+
+#endif
 
 /*-------------------------------------------------------------------------------*/
 /*
@@ -306,6 +345,8 @@ int MakeEmptyTex( int width, int height )
 	int sx,sy;
 	unsigned char *pImg;
 
+//	sx = ( width );
+//	sy = ( height );
 	sx = Get2N( width );
 	sy = Get2N( height );
 
@@ -313,8 +354,9 @@ int MakeEmptyTex( int width, int height )
 	glBindTexture( GL_TEXTURE_2D, id );
 
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_ALPHA, sx, sy, 0, GL_ALPHA, GL_UNSIGNED_BYTE, NULL );
+
 	texid = SetTex( -1, TEXMODE_MES8, 0, sx, sy, width, height, id );
-	Alertf( "Tex:ID%d (%d,%d) Clear",texid,sx,sy );
+	//Alertf( "Tex:ID%d (%d,%d) Clear",texid,sx,sy );
 	return texid;
 }
 
@@ -591,7 +633,108 @@ int GetCacheMesTextureID( char *msg, int font_size, int font_style )
 	return texid;
 #endif
 
-#if defined(HSPLINUX)
-	return -1;
+#ifdef HSPLINUX
+
+	GLuint id;
+	int texid;
+	int tsx,tsy;
+	unsigned char *pImg;
+
+	TEXINF *t;
+	int mylen;
+	short mycache;
+	
+	mycache = str2hash( msg, &mylen );			// キャッシュを取得
+	if ( mylen <= 0 ) return -1;
+
+	texid = getCache( msg, mycache, font_size, font_style );
+	if ( texid >= 0 ) {
+		return texid;							// キャッシュがあった
+	}
+
+	//		キャッシュが存在しないので作成
+	if ( font == NULL ) {
+		//Alertf( "No font." );
+		return -1;
+	}
+
+	if ( font_size != font_defsize ) {
+		TexFontInit( fontpath, font_size );
+	}
+
+	SDL_Color dcolor={255,255,255,255};
+	SDL_Surface *surf = TTF_RenderUTF8_Blended(font, msg, dcolor );
+
+    if (surf == NULL) {
+		//Alertf( "TTF_RenderUTF8_Blended : error" );
+		return -1;
+	}
+
+	int colors;
+	GLuint texture_format = 0;
+	tsx = surf->w;
+	tsy = surf->h;
+	colors = surf->format->BytesPerPixel;
+	//Alertf( "Init:Surface(%d,%d) %d mask%x pitch%d",tsx,tsy,colors,surf->format->Rmask,surf->pitch );
+
+	texid = MakeEmptyTex( tsx, tsy );
+	if ( texid < 0 ) return -1;
+
+	t = GetTex( texid );
+	t->hash = mycache;
+	t->font_size = font_size;
+	t->font_style = font_style;
+
+	if ( curmestex >= GetSysReq(SYSREQ_MESCACHE_MAX) ) {	// エントリ数がオーバーしているものは次のフレームで破棄
+		t->life = 0;
+		t->buf[0] = 0;
+	} else {
+		//		キャッシュの登録
+		if ( mylen >= ( TEXMES_NAME_BUFFER - 1 ) ) {
+			t->text = (char *)malloc( mylen+1 );		// テキストハッシュネーム用バッファを作成する
+			strcpy( t->text, msg );
+		} else {
+			strcpy( t->buf, msg );						// 標準バッファにコピーする
+		}
+	}
+
+	id = (GLuint)t->texid;
+
+	glBindTexture( GL_TEXTURE_2D, id );
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1);
+
+#ifdef HSPRASPBIAN
+
+	//glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, tsx, tsy, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels );
+	glTexSubImage2D( GL_TEXTURE_2D, 0, (GLint)0, (GLint)0, (GLsizei)tsx, (GLsizei)tsy, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels );
+
+#else
+	if (colors == 4) {   // alpha
+		if (surf->format->Rmask == 0x000000ff)
+			texture_format = GL_RGBA;
+			else texture_format = GL_BGRA_EXT;
+	} else {             // no alpha
+		if (surf->format->Rmask == 0x000000ff)
+			texture_format = GL_RGB;
+			else texture_format = GL_BGR_EXT;
+	}
+
+	glTexSubImage2D( GL_TEXTURE_2D, 0, (GLint)0, (GLint)0, (GLsizei)tsx, (GLsizei)tsy, texture_format, GL_UNSIGNED_BYTE, surf->pixels );
+	//glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, tsx, tsy, 0, texture_format, GL_UNSIGNED_BYTE, surf->pixels );
 #endif
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+    //Clean up the surface
+    SDL_FreeSurface(surf);
+
+	return texid;
+#endif
+
+	return -1;
 }

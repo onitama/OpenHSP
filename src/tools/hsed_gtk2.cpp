@@ -20,10 +20,40 @@ static char barmsg[1024];
 static int	text_mod;
 static gint context_id;
 
-#define HSED_VER "ver.0.5"
+static int jpflag;				// 日本語環境フラグ
+static char langstr[8];
+
+#define HSED_VER "ver.0.6"
 #define TEMP_HSP "__hsptmp.hsp"
 #define TEMP_AX "__hsptmp.ax"
 
+//	MESSAGE
+//
+enum
+{
+MSG_TITLE = 0,
+MSG_NEEDSAVE,
+MSG_MAX
+};
+
+static	char *message_pool[] = {
+	"HSP Script editor",
+	"Script modified. Do you want to save?",
+	NULL };
+
+static	char *message_pool_ja[] = {
+	"HSPスクリプトエディタ",
+	"現在の内容が保存されていません。保存しますか?",
+	NULL };
+
+char *getmes( int id )
+{
+	if ((id<0)||(id>=MSG_MAX)) return "";
+	if ( jpflag ) {
+		return message_pool_ja[id];
+	}
+	return message_pool[id];
+}
 
 // dialog
 
@@ -95,7 +125,7 @@ static int dialog_openyn( gchar *title, gchar *msg )
 static void titlebar_set( char *msg )
 {
 	static char title[1024];
-	sprintf(title,"%s - HSP Script editor",msg);
+	sprintf(title,"%s - %s",msg,getmes(MSG_TITLE));
 	gtk_window_set_title (GTK_WINDOW(window), title);
 }
 
@@ -113,6 +143,16 @@ static int statusbar_setline( int line )
 	gtk_statusbar_pop(GTK_STATUSBAR(status_bar), context_id );
 	gtk_statusbar_push(GTK_STATUSBAR(status_bar), context_id, barmsg);
 	return 0;
+}
+
+static void reset_modified( void )
+{
+	gtk_text_buffer_set_modified( gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit)), FALSE );
+}
+
+static gboolean get_modified( void )
+{
+	return gtk_text_buffer_get_modified(gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit)));
 }
 
 /* Links can also be activated by clicking or tapping.
@@ -199,11 +239,11 @@ void file_open_read(const char *lpPath)
  
 //	free(buf);
 
-	char title[1024];
-	sprintf(title,"%s - HSP Script editor",filename);
-	gtk_window_set_title (GTK_WINDOW(window), title);
+	titlebar_set( filename );
+	reset_modified();
 }
 
+/*
 void file_open_ok(GtkWidget *widget, GtkFileSelection *fsel)
 {
 	const gchar* fname=gtk_file_selection_get_filename(GTK_FILE_SELECTION(fsel));
@@ -213,6 +253,7 @@ void file_open_ok(GtkWidget *widget, GtkFileSelection *fsel)
 	status=1;
 	gtk_main_quit();
 }
+*/
 
 void file_save_write(const char *lpPath)
 {
@@ -257,25 +298,75 @@ void file_save_write(const char *lpPath)
 	titlebar_set( filename );
 }
 
+/*
 void file_save_ok(GtkWidget *widget, GtkFileSelection *fsel)
 {
 	const gchar* fname=gtk_file_selection_get_filename(GTK_FILE_SELECTION(fsel));
-	file_save_write(fname);
+	strcpy( filename, fname );
+
+	file_save_write(filename);
 	//g_free(fname);
 
 	status=1;
+	reset_modified();
 	text_mod = 0;
 	gtk_main_quit();
 }
+*/
 
 static void file_save(GtkWidget *w,int d)
 {
+	int res;
+	char mydir[1024];
 	GtkWidget *fsel;
+
 	if (filename[0] && d) {
 		file_save_write(NULL);
+		reset_modified();
 		text_mod = 0;
 		return;
 	}
+
+	status=0;
+	getcwd(mydir,1024);
+
+	fsel = gtk_file_chooser_dialog_new( "save", GTK_WINDOW (window),
+	    GTK_FILE_CHOOSER_ACTION_SAVE,
+	    GTK_STOCK_CANCEL,
+	    GTK_RESPONSE_CANCEL ,
+	    GTK_STOCK_SAVE,
+	    GTK_RESPONSE_ACCEPT ,
+	    NULL);	
+
+	GtkFileChooser *chooser = GTK_FILE_CHOOSER (fsel);
+	gtk_file_chooser_set_current_folder (chooser,mydir);
+
+	GtkFileFilter *filter = gtk_file_filter_new();
+	gtk_file_filter_set_name (filter , "HSP Script");
+	gtk_file_filter_add_pattern (filter , "*.hsp");
+	gtk_file_chooser_add_filter ( chooser, filter);
+	filter = gtk_file_filter_new ();
+	gtk_file_filter_set_name (filter , "AllFiles");
+	gtk_file_filter_add_pattern (filter , "*");
+	gtk_file_chooser_add_filter ( chooser, filter);
+
+	res = gtk_dialog_run (GTK_DIALOG (fsel));
+	if (res == GTK_RESPONSE_ACCEPT) {
+		char *fname;
+		fname = gtk_file_chooser_get_filename (chooser);
+		strcpy( filename, fname );
+		if ( strstr(filename,".hsp") == NULL ) {
+			strcat( filename,".hsp" );
+		}
+		file_save_write(filename);
+		status=1;
+		reset_modified();
+		text_mod = 0;
+		g_free (fname);
+	}
+
+	gtk_widget_destroy(fsel);
+/*
 	status=0;
 	fsel=gtk_file_selection_new ("save");
 	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fsel)->ok_button),
@@ -289,15 +380,18 @@ static void file_save(GtkWidget *w,int d)
 	gtk_main();
 	gtk_grab_remove(GTK_WIDGET(fsel));
 	gtk_widget_destroy(GTK_WIDGET(fsel));
+*/
 }
 
 static void file_open(GtkWidget *w,int d)
 {
+	int res;
+	char mydir[1024];
 	GtkWidget *fsel;
 
-	if ( text_mod ) {
+	if ( get_modified() ) {
 		int res;
-		res = dialog_openyn( "Warning", "現在の内容が保存されていません。保存しますか?" );
+		res = dialog_openyn( "Warning", getmes(MSG_NEEDSAVE) );
 		if ( res == 1 ) {
 			file_save( w, 0 );
 			if ( status == 2 ) return;		// キャンセルされているか?
@@ -305,7 +399,40 @@ static void file_open(GtkWidget *w,int d)
 	}
 
 	status=0;
-	fsel=gtk_file_selection_new ("save");
+	getcwd(mydir,1024);
+
+	fsel = gtk_file_chooser_dialog_new( "load", GTK_WINDOW (window),
+	    GTK_FILE_CHOOSER_ACTION_OPEN ,
+	    GTK_STOCK_CANCEL ,
+	    GTK_RESPONSE_CANCEL ,
+	    GTK_STOCK_OPEN ,
+	    GTK_RESPONSE_ACCEPT ,
+	    NULL);	
+
+	GtkFileChooser *chooser = GTK_FILE_CHOOSER (fsel);
+	gtk_file_chooser_set_current_folder (chooser,mydir);
+
+	GtkFileFilter *filter = gtk_file_filter_new();
+	gtk_file_filter_set_name (filter , "HSP Script");
+	gtk_file_filter_add_pattern (filter , "*.hsp");
+	gtk_file_chooser_add_filter ( chooser, filter);
+	filter = gtk_file_filter_new ();
+	gtk_file_filter_set_name (filter , "AllFiles");
+	gtk_file_filter_add_pattern (filter , "*");
+	gtk_file_chooser_add_filter ( chooser, filter);
+
+	res = gtk_dialog_run (GTK_DIALOG (fsel));
+	if (res == GTK_RESPONSE_ACCEPT) {
+		char *fname;
+		fname = gtk_file_chooser_get_filename (chooser);
+		file_open_read(fname);
+		g_free (fname);
+	}
+
+	gtk_widget_destroy(fsel);
+/*
+	fsel=gtk_file_selection_new ("load");
+
 	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fsel)->ok_button),
 		"clicked", (GtkSignalFunc) file_open_ok, fsel);
 	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION (fsel)->cancel_button),
@@ -317,13 +444,14 @@ static void file_open(GtkWidget *w,int d)
 	gtk_main();
 	gtk_grab_remove(GTK_WIDGET(fsel));
 	gtk_widget_destroy(GTK_WIDGET(fsel));
+*/
 }
 
 static void file_new(GtkWidget *w,int d)
 {
-	if ( text_mod ) {
+	if ( get_modified() ) {
 		int res;
-		res = dialog_openyn( "Warning", "現在の内容が保存されていません。保存しますか?" );
+		res = dialog_openyn( "Warning", getmes(MSG_NEEDSAVE) );
 		if ( res == 1 ) {
 			file_save( w, 0 );
 			if ( status == 2 ) return;		// キャンセルされているか?
@@ -335,14 +463,15 @@ static void file_new(GtkWidget *w,int d)
 	//gtk_editable_delete_text(GTK_EDITABLE(edit),0,-1);
 	titlebar_set( "Untitled" );
 	filename[0]=0;
+	reset_modified();
 	text_mod = 0;
 }
 
 static gboolean delete_event( GtkWidget *w, GdkEvent *event, gpointer data )
 {
-	if ( text_mod ) {
+	if ( get_modified() ) {
 		int res;
-		res = dialog_openyn( "Warning", "現在の内容が保存されていません。保存しますか?" );
+		res = dialog_openyn( "Warning", getmes(MSG_NEEDSAVE) );
 		if ( res == 1 ) {
 			file_save( w, 0 );
 			if ( status == 2 ) return TRUE;		// キャンセルされているか?
@@ -351,6 +480,58 @@ static gboolean delete_event( GtkWidget *w, GdkEvent *event, gpointer data )
 	return FALSE;
 }
 
+static void edit_cut(GtkWidget *w,int d)
+{
+	GtkClipboard *clip = gtk_clipboard_get( GDK_SELECTION_CLIPBOARD );
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_cut_clipboard( tbuf,clip,TRUE );
+}
+
+static void edit_copy(GtkWidget *w,int d)
+{
+	GtkClipboard *clip = gtk_clipboard_get( GDK_SELECTION_CLIPBOARD );
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_copy_clipboard( tbuf,clip );
+}
+
+static void edit_paste(GtkWidget *w,int d)
+{
+	GtkClipboard *clip = gtk_clipboard_get( GDK_SELECTION_CLIPBOARD );
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_paste_clipboard( tbuf,clip, NULL, TRUE );
+}
+
+static void edit_delete(GtkWidget *w,int d)
+{
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_delete_selection( tbuf, TRUE, TRUE );
+}
+
+static void edit_undo(GtkWidget *w,int d)
+{
+	//GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	//gtk_source_buffer_redo(tbuf);
+}
+
+static void cursor_move(GtkWidget *w,int d)
+{
+    GtkTextIter start;
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+
+	if ( d == 0 ) {
+	    gtk_text_buffer_get_start_iter( tbuf, &start );
+	    gtk_text_buffer_place_cursor( tbuf, &start );
+	    gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(edit), &start, 0, FALSE, 0, 0);
+	    return;
+	}
+	if ( d == 1 ) {
+	    gtk_text_buffer_get_end_iter( tbuf, &start );
+	    gtk_text_buffer_place_cursor( tbuf, &start );
+	    gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(edit), &start, 0, FALSE, 0, 0);
+	    return;
+	}
+
+}
 
 /////////////////////////  HSP ///////////////////////////////
 void HSP_view_log(){
@@ -521,30 +702,10 @@ static void HSP_run(GtkWidget *w,int flag)
 	} else {
 		printf("hsed: Process error.\n");
 	}
-
-	//	error detect
-	
-/*
-	if ( needres ) {
-		p = 0;
-		sprintf(cmd,"%s/.hspres", hspdir);
-
-		fp=fopen(cmd,"r");
-		while(feof(fp)==0){
-			p+=fread(complog+p,1,400,fp);
-		}
-		complog[p]='\0';
-
-		err = strstr( complog, "#Error" );
-		if( err != NULL ){
-			HSP_view_log();
-			return;
-		}
-	}
-*/
 }
 
-/////////////////////////  MENU ///////////////////////////////
+//	MENU
+//
 static GtkItemFactoryEntry menu_items[] = {
 	{ "/_File",		NULL,		NULL, 0, "<Branch>" },
 	{ "/File/_New",		"<control>N",	(GtkSignalFunc)file_new, 0, NULL },
@@ -552,14 +713,47 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/File/_Save",	"<control>S",	(GtkSignalFunc)file_save, 1, NULL },
 	{ "/File/Save _As",	NULL,		(GtkSignalFunc)file_save, 0, NULL },
 	{ "/File/sep1",		NULL,		NULL, 0, "<Separator>" },
-	{ "/File/Quit",		"<control>Q",	(GtkSignalFunc)gtk_main_quit, 0, NULL },
+	{ "/File/_Quit",		"<control>Q",	(GtkSignalFunc)gtk_main_quit, 0, NULL },
+	{ "/_Edit",		NULL,		NULL, 0, "<Branch>" },
+	{ "/Edit/_Cut",		"<control>X",	(GtkSignalFunc)edit_cut, 0, NULL },
+	{ "/Edit/_Copy",	"<control>C",	(GtkSignalFunc)edit_copy, 0, NULL },
+	{ "/Edit/_Paste",	"<control>V",	(GtkSignalFunc)edit_paste, 0, NULL },
+	{ "/Edit/_Delete",	"Delete",	(GtkSignalFunc)edit_delete, 0, NULL },
+	{ "/_Cursor",		NULL,		NULL, 0, "<Branch>" },
+	{ "/Cursor/_Top",		"<control>T",	(GtkSignalFunc)cursor_move, 0, NULL },
+	{ "/Cursor/_Bottom",	"<control>B",	(GtkSignalFunc)cursor_move, 1, NULL },
 	{ "/_HSP",		NULL,		NULL, 0, "<Branch>" },
-	{ "/HSP/run",		"F5",		(GtkSignalFunc)HSP_run, 0, NULL },
-	{ "/HSP/make start.ax",	NULL,		(GtkSignalFunc)HSP_run, 1, NULL },
-	{ "/HSP/compile log",	"F7",		(GtkSignalFunc)HSP_run, 2, NULL },
+	{ "/HSP/_Run",		"F5",		(GtkSignalFunc)HSP_run, 0, NULL },
+	{ "/HSP/_Make start.ax",	NULL,		(GtkSignalFunc)HSP_run, 1, NULL },
+	{ "/HSP/_Compile log",	"F7",		(GtkSignalFunc)HSP_run, 2, NULL },
 	{ "/_Help",		NULL,		NULL, 0, "<Branch>" },
 	{ "/_Help/About", NULL,	(GtkSignalFunc)hsed_about,		0, NULL },
 };
+
+static GtkItemFactoryEntry menu_items_ja[] = {
+	{ "/_ファイル",		NULL,		NULL, 0, "<Branch>" },
+	{ "/ファイル/新規作成",		"<control>N",	(GtkSignalFunc)file_new, 0, NULL },
+	{ "/ファイル/開く...",	"<control>O",	(GtkSignalFunc)file_open, 0, NULL },
+	{ "/ファイル/上書き保存",	"<control>S",	(GtkSignalFunc)file_save, 1, NULL },
+	{ "/ファイル/名前を付けて保存...",	NULL,		(GtkSignalFunc)file_save, 0, NULL },
+	{ "/ファイル/sep1",		NULL,		NULL, 0, "<Separator>" },
+	{ "/ファイル/終了",		"<control>Q",	(GtkSignalFunc)gtk_main_quit, 0, NULL },
+	{ "/編集",		NULL,		NULL, 0, "<Branch>" },
+	{ "/編集/_切り取り",		"<control>X",	(GtkSignalFunc)edit_cut, 0, NULL },
+	{ "/編集/_コピー",	"<control>C",	(GtkSignalFunc)edit_copy, 0, NULL },
+	{ "/編集/_貼り付け",	"<control>V",	(GtkSignalFunc)edit_paste, 0, NULL },
+	{ "/編集/_削除",	"Delete",	(GtkSignalFunc)edit_delete, 0, NULL },
+	{ "/カーソル",		NULL,		NULL, 0, "<Branch>" },
+	{ "/カーソル/_先頭行に移動",		"<control>T",	(GtkSignalFunc)cursor_move, 0, NULL },
+	{ "/カーソル/_最終行に移動",	"<control>B",	(GtkSignalFunc)cursor_move, 1, NULL },
+	{ "/_HSP",		NULL,		NULL, 0, "<Branch>" },
+	{ "/HSP/コンパイル+実行",		"F5",		(GtkSignalFunc)HSP_run, 0, NULL },
+	{ "/HSP/START.AXファイル作成",	NULL,		(GtkSignalFunc)HSP_run, 1, NULL },
+	{ "/HSP/コンパイルのみ",	"F7",		(GtkSignalFunc)HSP_run, 2, NULL },
+	{ "/_ヘルプ",		NULL,		NULL, 0, "<Branch>" },
+	{ "/_ヘルプ/バージョン情報...", NULL,	(GtkSignalFunc)hsed_about,		0, NULL },
+};
+
 
 void init_menu(GtkWidget  *window, GtkWidget **menu){
 	GtkItemFactory *item_factory;
@@ -570,7 +764,12 @@ void init_menu(GtkWidget  *window, GtkWidget **menu){
 
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>",
 				accel_group);
-	gtk_item_factory_create_items(item_factory, nmenu_items, menu_items, NULL);
+
+	if ( jpflag ) {
+		gtk_item_factory_create_items(item_factory, nmenu_items, menu_items_ja, NULL);
+	} else {
+		gtk_item_factory_create_items(item_factory, nmenu_items, menu_items, NULL);
+	}
 
 	gtk_window_add_accel_group(GTK_WINDOW(window),accel_group);
 
@@ -588,6 +787,12 @@ int main(int argc, char *argv[], char *envp[]){
 	int i=0,p=-1;
 	gtk_set_locale();
 	gtk_init(&argc, &argv);
+
+	PangoLanguage *lang = gtk_get_default_language();
+	strncpy( langstr, pango_language_to_string(lang), 8 );
+	jpflag = 0;
+	if ( strcmp(langstr,"ja") == 0 ) jpflag = 1;
+	//printf( "lang[%s]",pango_language_to_string(lang) );
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_signal_connect (GTK_OBJECT(window), "destroy",

@@ -5,9 +5,10 @@ Hot Soup Processor ver3.51                          HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
-	2018/06/19 3.51
+	2018/06/20 3.51
 
-	[HSP3Dish][Linux] Linux版スクリプトエディタの更新
+	[HSP3Dish][Linux] Linux/Raspberry Pi版スクリプトエディタの更新
+	[HSP3Dish][Linux] Linux/Raspberry Pi版でTTFフォント表示に対応
 	[HSP3Dish][Linux] dirinfo関数の取得に対応
 	[hspcmp] オブジェクトファイルからランタイムを取得して起動する機能を追加
 	コンソール版HSP3のランタイムを指定するhsp3cl.asを追加
