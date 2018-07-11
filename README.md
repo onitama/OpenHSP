@@ -46,7 +46,19 @@ githubから最新のリポジトリを取得してご使用ください。
 Raspberry Pi上のRaspbian上で動作します。(推奨バージョンは、September 2017 Kernel version4.9以降です)
 hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作します。
 (描画に関する機能は、OpenGL及びSDLライブラリを使用して動作しています。)
-アーカイブの内容を任意のディレクトリに展開して、ソースをコンパイルしてください。
+
+githubから最新版を取得してください。
+
+	git clone http://github.com/onitama/OpenHSP
+
+Raspberry Piインストール用にpisetup.shスクリプトを同梱しています。
+/home/pi/OpenHSPに最新版を取得されている状態で、
+
+	bash /home/pi/OpenHSP/pisetup.sh
+
+を実行することで、HSPのコンパイル及びメニューへの登録を行います。
+
+自前でmakeコマンドを使用してHSPのツールセットを準備する場合は以下のような流れになります。
 コンパイルには、gcc及びmakeを実行できる環境が必要になります。
 コンパイルの際には、追加のライブラリが必要になります。ネットワークに
 接続されている状態で以下のコマンドを実行することで取得できます。
@@ -56,11 +68,7 @@ hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作
 	sudo apt-get install libglew-dev
 	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
 
-githubから最新版を取得してください。
-
-	git clone http://github.com/onitama/OpenHSP
-
-hsplinuxアーカイブにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
+makeによってコンパイルを行います。
 
 	make -f makefile.raspbian
 		
@@ -174,7 +182,9 @@ HSPについての一般的な質問や、スクリプトの作り方に関す�
 
 # 謝辞
 
-HSPスクリプトエディタ(hsed)は、K-K(瓶詰堂)さんのご協力により作成されています。  
+HSPスクリプトエディタ(hsed)は、K-K(瓶詰堂)さんのご協力により作成されています。  TTFフォントデータとしてIPAフォントを同梱させて頂きました。
+(ライセンスについては、IPAフォントライセンスv1.0を参照してください。)
+
 HSP3及びOpenHSPに多大なご協力を頂いた以下の皆様に感謝致します。  
   
 Senchaさん、ゆめゆめゆうかさん、Lonely Wolfさん、Shark++さん、
