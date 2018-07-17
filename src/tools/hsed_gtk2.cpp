@@ -23,9 +23,175 @@ static gint context_id;
 static int jpflag;				// 日本語環境フラグ
 static char langstr[8];
 
-#define HSED_VER "ver.0.6"
+static GdkColor colorBg;
+static GdkColor colorText;
+
+#define HSED_VER "ver.0.7"
 #define TEMP_HSP "__hsptmp.hsp"
 #define TEMP_AX "__hsptmp.ax"
+
+#define HSED_INI ".hsedconf"
+
+/*--------------------------------------------------------------------------------*/
+
+char *mem_ini( int size ) {
+	return (char *)calloc(size,1);
+}
+
+void mem_bye( void *ptr ) {
+	free(ptr);
+}
+
+int dpm_read( char *fname, void *readmem, int rlen, int seekofs )
+{
+	char *lpRd;
+	FILE *ff;
+	int a1;
+	int seeksize;
+
+	seeksize=seekofs;
+	if (seeksize<0) seeksize=0;
+
+	lpRd=(char *)readmem;
+
+	//	Read normal file
+
+	ff = fopen( fname, "rb" );
+	if ( ff == NULL ) return -1;
+	if ( seekofs>=0 ) fseek( ff, seeksize, SEEK_SET );
+	a1 = (int)fread( lpRd, 1, rlen, ff );
+	fclose( ff );
+	return a1;
+}
+
+int dpm_exist( char *fname )
+{
+	FILE *ff;
+	int length;
+
+	if ( *fname == 0 ) return -1;
+	ff=fopen( fname,"rb" );
+	if (ff==NULL) return -1;
+	fseek( ff,0,SEEK_END );
+	length=(int)ftell( ff );			// normal file size
+	fclose(ff);
+
+	return length;
+}
+
+char *dpm_readalloc( char *fname )
+{
+	char *p;
+	int len;
+	len = dpm_exist( fname );
+	if ( len < 0 ) return NULL;
+	p = mem_ini( len+1 );
+	dpm_read( fname, p, len, 0 );
+	p[len] = 0;
+	return p;
+}
+
+int dpm_save( char *fname, void *mem, int msize, int seekofs )
+{
+	FILE *fp;
+	int flen;
+
+	if (seekofs<0) {
+		fp=fopen(fname,"wb");
+	}
+	else {
+		fp=fopen(fname,"r+b");
+	}
+	if (fp==NULL) return -1;
+	if ( seekofs>=0 ) fseek( fp, seekofs, SEEK_SET );
+	flen = (int)fwrite( mem, 1, msize, fp );
+	fclose(fp);
+	return flen;
+}
+
+static	int splc;	// split pointer
+
+void strsp_ini( void )
+{
+	splc=0;
+}
+
+int strsp_getptr( void )
+{
+	return splc;
+}
+
+int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
+{
+	//		split string with parameters
+	//
+	unsigned char a1;
+	unsigned char a2;
+	int a;
+	int utf8cnt;
+	a=0;utf8cnt=0;
+	while(1) {
+		utf8cnt=0;
+		a1=srcstr[splc];
+		if (a1==0) break;
+		splc++;
+		if (a1>=128) {					// 多バイト文字チェック
+			if (a1>=192) utf8cnt++;
+			if (a1>=224) utf8cnt++;
+			if (a1>=240) utf8cnt++;
+			if (a1>=248) utf8cnt++;
+			if (a1>=252) utf8cnt++;
+		}
+
+		if (a1==splitchr) break;
+		if (a1==13) {
+			a2=srcstr[splc];
+			if (a2==10) splc++;
+			break;
+		}
+		if (a1==10) {
+			a2=srcstr[splc];
+			break;
+		}
+		dststr[a++]=a1;
+		if (utf8cnt>0) {
+			while(utf8cnt>0){
+				dststr[a++]=srcstr[splc++];
+				utf8cnt--;
+			}
+		}
+		if ( a>=len ) break;
+	}
+	dststr[a]=0;
+	return (int)a1;
+}
+
+/*--------------------------------------------------------------------------------*/
+
+static char conf_bgcolor[64];
+static char conf_fgcolor[64];
+static char conf_fontname[64];
+
+void config_init( void )
+{
+	strcpy( conf_bgcolor, "#000000" );
+	strcpy( conf_fgcolor, "#E0E0E0" );
+	strcpy( conf_fontname, "Monospace 12" );
+}
+
+void config_load( char *fname )
+{
+	char *buf = dpm_readalloc( fname );
+	if ( buf == NULL ) return;
+	//printf( "Use config file : %s\r\n",fname );
+	strsp_ini();
+	strsp_get( buf, conf_bgcolor, 0, 63 );
+	strsp_get( buf, conf_fgcolor, 0, 63 );
+	strsp_get( buf, conf_fontname, 0, 63 );
+	mem_bye( buf );
+}
+
+/*--------------------------------------------------------------------------------*/
 
 //	MESSAGE
 //
@@ -54,6 +220,8 @@ char *getmes( int id )
 	}
 	return message_pool[id];
 }
+
+/*--------------------------------------------------------------------------------*/
 
 // dialog
 
@@ -545,7 +713,7 @@ void HSP_view_log(){
 	gtk_signal_connect (GTK_OBJECT(window), "destroy",
 			GTK_SIGNAL_FUNC(gtk_main_quit), NULL);
 	gtk_window_set_title (GTK_WINDOW(window), "HSP Compile log");
-	gtk_window_set_default_size(GTK_WINDOW(window),320,240);
+	gtk_window_set_default_size(GTK_WINDOW(window),640,240);
 
 	vbox = gtk_vbox_new (FALSE, 1);
 	gtk_container_add(GTK_CONTAINER(window), vbox);
@@ -559,6 +727,12 @@ void HSP_view_log(){
 	log = gtk_text_view_new();
 	gtk_container_add(GTK_CONTAINER(scroll), log);
 	//gtk_text_set_editable(GTK_TEXT(log),TRUE);
+
+	gdk_color_parse("#C0C0C0", &colorBg);
+	gdk_color_parse("#222222", &colorText);
+
+    gtk_widget_modify_base (log, GTK_STATE_NORMAL, &colorBg);
+    gtk_widget_modify_text (log, GTK_STATE_NORMAL, &colorText);
 
         GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(log));
         gtk_text_buffer_set_text(tbuf,complog,strlen(complog));
@@ -783,7 +957,9 @@ int main(int argc, char *argv[], char *envp[]){
 	GtkWidget *menu;
 	GtkWidget *scroll;
 	GtkTextBuffer *buffer;
+	char config_file[1024];
 
+	// Init Locale
 	int i=0,p=-1;
 	gtk_set_locale();
 	gtk_init(&argc, &argv);
@@ -794,13 +970,35 @@ int main(int argc, char *argv[], char *envp[]){
 	if ( strncmp(langstr,"ja",2) == 0 ) jpflag = 1;
 	//printf( "lang[%s]",pango_language_to_string(lang) );
 
+	// Init System Directory
+	getcwd(curdir,512);
+	strcpy(hspdir,argv[0]);
+	while(hspdir[i]){
+		if(hspdir[i]=='/' || hspdir[i]=='\\') p=i;
+		i++;
+	}
+	hspdir[p]=0;
+	if(p>=0){
+		chdir(hspdir);
+		getcwd(hspdir,512);
+		chdir(curdir);
+	}else{
+		getcwd(hspdir,512);
+	}
+
+	// Init Config
+	config_init();
+	sprintf( config_file,"%s/%s",hspdir,HSED_INI );
+	config_load( config_file );
+
+	// Init Window
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_signal_connect (GTK_OBJECT(window), "destroy",
 			GTK_SIGNAL_FUNC(gtk_main_quit), NULL);
 	gtk_signal_connect (GTK_OBJECT(window), "delete-event",
 			G_CALLBACK (delete_event), NULL);
 	titlebar_set( "Untitled" );
-	gtk_window_set_default_size(GTK_WINDOW(window),640,600);
+	gtk_window_set_default_size(GTK_WINDOW(window),680,760);
 
 	vbox = gtk_vbox_new (FALSE, 1);
 	gtk_container_add(GTK_CONTAINER(window), vbox);
@@ -817,12 +1015,23 @@ int main(int argc, char *argv[], char *envp[]){
 	//edit = gtk_text_new(0,0);
 	edit = gtk_text_view_new();
 
+	gdk_color_parse(conf_bgcolor, &colorBg);
+	gdk_color_parse(conf_fgcolor, &colorText);
+
+    gtk_widget_modify_base (edit, GTK_STATE_NORMAL, &colorBg);
+    gtk_widget_modify_text (edit, GTK_STATE_NORMAL, &colorText);
+
+	 PangoFontDescription *fontDesc = pango_font_description_from_string(conf_fontname);
+
+	gtk_widget_modify_font(edit, fontDesc);
+
 	//g_signal_connect (G_OBJECT(window), "key-press-event",
 	//	G_CALLBACK (event_cb), NULL);
 	//g_signal_connect (edit, "event", G_CALLBACK (event_cb), NULL);
 
 	gtk_container_add(GTK_CONTAINER(scroll), edit);
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),TRUE);
+
 	gtk_widget_show(edit);
 	text_mod = 0;
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
@@ -837,21 +1046,6 @@ int main(int argc, char *argv[], char *envp[]){
 		G_CALLBACK(update_statusbar), GINT_TO_POINTER(0) );
 	g_signal_connect_object(buffer, "mark-set",
 		G_CALLBACK(mark_set_callback), GINT_TO_POINTER(0),G_CONNECT_SWAPPED );
-
-	getcwd(curdir,512);
-	strcpy(hspdir,argv[0]);
-	while(hspdir[i]){
-		if(hspdir[i]=='/' || hspdir[i]=='\\') p=i;
-		i++;
-	}
-	hspdir[p]=0;
-	if(p>=0){
-		chdir(hspdir);
-		getcwd(hspdir,512);
-		chdir(curdir);
-	}else{
-		getcwd(hspdir,512);
-	}
 
 	if(argc>1){
 		file_open_read(argv[1]);
