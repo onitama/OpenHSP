@@ -972,7 +972,10 @@ int main(int argc, char *argv[], char *envp[]){
 
 	// Init System Directory
 	getcwd(curdir,512);
-	strcpy(hspdir,argv[0]);
+
+	readlink( "/proc/self/exe", hspdir, 1023 );
+	//strcpy(hspdir,argv[0]);
+	//printf( "hspdir[%s]\r\n",hspdir );
 	while(hspdir[i]){
 		if(hspdir[i]=='/' || hspdir[i]=='\\') p=i;
 		i++;
