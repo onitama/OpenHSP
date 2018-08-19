@@ -2121,6 +2121,10 @@ void CToken::GenerateCodePP( char *buf )
 	//
 	int i;
 	GetTokenCG( GETTOKEN_DEFAULT );					// 最初の'#'を読み飛ばし
+	if (*cg_ptr != PickNextCodeCG()) {
+		// preprocesser command "#" 
+		throw CGERROR_UNKNOWN;
+	}
 	GetTokenCG( GETTOKEN_DEFAULT );
 
 	if ( ttype == TK_NONE ) {						// プリプロセッサから渡される行情報

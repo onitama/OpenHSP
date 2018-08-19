@@ -3035,12 +3035,15 @@ ppresult_t CToken::PreprocessNM( char *str )
 
 	word = (char *)s3;
 	wp = (unsigned char *)str;
+	unsigned char topUChar = *wp;
+	*s3 = 0;
 
 	if ( ahtmodel != NULL ) {
 		PreprocessCommentCheck( str );
 	}
 
 	type = GetToken();
+	if ( topUChar != *s3 ) return PPRESULT_UNKNOWN_DIRECTIVE;
 	if ( type != TK_OBJ ) return PPRESULT_UNKNOWN_DIRECTIVE;
 
 	//		ソース生成コントロール
@@ -3123,153 +3126,161 @@ ppresult_t CToken::Preprocess( char *str )
 	CALCVAR cres;
 
 	word = (char *)s3;
+	*s3 = 0;
 	wp = (unsigned char *)str;
+	unsigned char topUChar = *wp;
 	type = GetToken();
-	if ( type != TK_OBJ ) return PPRESULT_SUCCESS;
-
+	if (topUChar != *s3) {
+		type = TK_NONE;
+	}
 	//		ソース生成コントロール
 	//
-	if (tstrcmp(word,"if")) {			// generate control
-		if ( mulstr == LMODE_OFF ) {
-			res = PP_SwitchStart( 0 );
-		} else {
-			res = PPRESULT_SUCCESS;
-			if ( Calc(cres)==0 ) {
-				a = (int)cres;
-				res = PP_SwitchStart(a);
-			} else res=PPRESULT_ERROR;
+	if (type == TK_OBJ) {
+		if (tstrcmp(word, "if")) {			// generate control
+			if (mulstr == LMODE_OFF) {
+				res = PP_SwitchStart(0);
+			}
+			else {
+				res = PPRESULT_SUCCESS;
+				if (Calc(cres) == 0) {
+					a = (int)cres;
+					res = PP_SwitchStart(a);
+				}
+				else res = PPRESULT_ERROR;
+			}
+			return res;
 		}
-		return res;
-	}
 
+	}
 	//		これ以降は#off時に実行しません
 	//
-	if ( mulstr == LMODE_OFF ) { return PPRESULT_SUCCESS; }
+	if (mulstr == LMODE_OFF) { return PPRESULT_SUCCESS; }
 
 	//		コード生成コントロール
 	//
-	if (tstrcmp(word,"include")) {		// text include
-		res = PP_Include( 0 );
-		return res;
+	if (type == TK_OBJ) {
+		if (tstrcmp(word, "include")) {		// text include
+			res = PP_Include(0);
+			return res;
+		}
+		if (tstrcmp(word, "addition")) {		// text include
+			res = PP_Include(1);
+			return res;
+		}
+		if (tstrcmp(word, "const")) {		// constant define
+			res = PP_Const();
+			return res;
+		}
+		if (tstrcmp(word, "enum")) {			// constant enum define
+			res = PP_Enum();
+			return res;
+		}
+		/*
+			if (tstrcmp(word,"define")) {		// keyword define
+				res = PP_Define();
+				if ( res==6 ) SetError("bad macro parameter expression");
+				return res;
+			}
+		*/
+		if (tstrcmp(word, "module")) {		// module define
+			res = PP_Module();
+			return res;
+		}
+		if (tstrcmp(word, "global")) {		// module exit
+			res = PP_Global();
+			return res;
+		}
+		if (tstrcmp(word, "deffunc")) {		// module function
+			res = PP_Deffunc(0);
+			return res;
+		}
+		if (tstrcmp(word, "defcfunc")) {		// module function (1)
+			res = PP_Defcfunc(0);
+			return res;
+		}
+		if (tstrcmp(word, "modfunc")) {		// module function (2)
+			res = PP_Deffunc(1);
+			return res;
+		}
+		if (tstrcmp(word, "modcfunc")) {		// module function (2+)
+			res = PP_Defcfunc(1);
+			return res;
+		}
+		if (tstrcmp(word, "modinit")) {		// module function (3)
+			res = PP_Deffunc(2);
+			return res;
+		}
+		if (tstrcmp(word, "modterm")) {		// module function (4)
+			res = PP_Deffunc(3);
+			return res;
+		}
+		if (tstrcmp(word, "struct")) {		// struct define
+			res = PP_Struct();
+			return res;
+		}
+		if (tstrcmp(word, "func")) {			// DLL function
+			res = PP_Func("func");
+			return res;
+		}
+		if (tstrcmp(word, "cfunc")) {		// DLL function
+			res = PP_Func("cfunc");
+			return res;
+		}
+		if (tstrcmp(word, "cmd")) {			// DLL function (3.0)
+			res = PP_Cmd("cmd");
+			return res;
+		}
+		/*
+			if (tstrcmp(word,"func2")) {		// DLL function (2)
+				res = PP_Func( "func2" );
+				return res;
+			}
+		*/
+		if (tstrcmp(word, "comfunc")) {		// COM Object function
+			res = PP_Func("comfunc");
+			return res;
+		}
+		if (tstrcmp(word, "aht")) {			// AHT definition
+			res = PP_Aht();
+			return res;
+		}
+		if (tstrcmp(word, "ahtout")) {		// AHT command line output
+			res = PP_Ahtout();
+			return res;
+		}
+		if (tstrcmp(word, "ahtmes")) {		// AHT command line output (mes)
+			res = PP_Ahtmes();
+			return res;
+		}
+		if (tstrcmp(word, "pack")) {			// packfile process
+			res = PP_Pack(0);
+			return res;
+		}
+		if (tstrcmp(word, "epack")) {		// packfile process
+			res = PP_Pack(1);
+			return res;
+		}
+		if (tstrcmp(word, "packopt")) {		// packfile process
+			res = PP_PackOpt();
+			return res;
+		}
+		if (tstrcmp(word, "runtime")) {		// runtime process
+			res = PP_RuntimeOpt();
+			return res;
+		}
+		if (tstrcmp(word, "bootopt")) {		// boot option process
+			res = PP_BootOpt();
+			return res;
+		}
+		if (tstrcmp(word, "cmpopt")) {		// compile option process
+			res = PP_CmpOpt();
+			return res;
+		}
+		if (tstrcmp(word, "usecom")) {		// COM definition
+			res = PP_Usecom();
+			return res;
+		}
 	}
-	if (tstrcmp(word,"addition")) {		// text include
-		res = PP_Include( 1 );
-		return res;
-	}
-	if (tstrcmp(word,"const")) {		// constant define
-		res = PP_Const();
-		return res;
-	}
-	if (tstrcmp(word,"enum")) {			// constant enum define
-		res = PP_Enum();
-		return res;
-	}
-/*
-	if (tstrcmp(word,"define")) {		// keyword define
-		res = PP_Define();
-		if ( res==6 ) SetError("bad macro parameter expression");
-		return res;
-	}
-*/
-	if (tstrcmp(word,"module")) {		// module define
-		res = PP_Module();
-		return res;
-	}
-	if (tstrcmp(word,"global")) {		// module exit
-		res = PP_Global();
-		return res;
-	}
-	if (tstrcmp(word,"deffunc")) {		// module function
-		res = PP_Deffunc(0);
-		return res;
-	}
-	if (tstrcmp(word,"defcfunc")) {		// module function (1)
-		res = PP_Defcfunc(0);
-		return res;
-	}
-	if (tstrcmp(word,"modfunc")) {		// module function (2)
-		res = PP_Deffunc(1);
-		return res;
-	}
-	if (tstrcmp(word,"modcfunc")) {		// module function (2+)
-		res = PP_Defcfunc(1);
-		return res;
-	}
-	if (tstrcmp(word,"modinit")) {		// module function (3)
-		res = PP_Deffunc(2);
-		return res;
-	}
-	if (tstrcmp(word,"modterm")) {		// module function (4)
-		res = PP_Deffunc(3);
-		return res;
-	}
-	if (tstrcmp(word,"struct")) {		// struct define
-		res = PP_Struct();
-		return res;
-	}
-	if (tstrcmp(word,"func")) {			// DLL function
-		res = PP_Func( "func" );
-		return res;
-	}
-	if (tstrcmp(word,"cfunc")) {		// DLL function
-		res = PP_Func( "cfunc" );
-		return res;
-	}
-	if (tstrcmp(word,"cmd")) {			// DLL function (3.0)
-		res = PP_Cmd( "cmd" );
-		return res;
-	}
-/*
-	if (tstrcmp(word,"func2")) {		// DLL function (2)
-		res = PP_Func( "func2" );
-		return res;
-	}
-*/
-	if (tstrcmp(word,"comfunc")) {		// COM Object function
-		res = PP_Func( "comfunc" );
-		return res;
-	}
-	if (tstrcmp(word,"aht")) {			// AHT definition
-		res = PP_Aht();
-		return res;
-	}
-	if (tstrcmp(word,"ahtout")) {		// AHT command line output
-		res = PP_Ahtout();
-		return res;
-	}
-	if (tstrcmp(word,"ahtmes")) {		// AHT command line output (mes)
-		res = PP_Ahtmes();
-		return res;
-	}
-	if (tstrcmp(word,"pack")) {			// packfile process
-		res = PP_Pack( 0 );
-		return res;
-	}
-	if (tstrcmp(word,"epack")) {		// packfile process
-		res = PP_Pack( 1 );
-		return res;
-	}
-	if (tstrcmp(word,"packopt")) {		// packfile process
-		res = PP_PackOpt();
-		return res;
-	}
-	if (tstrcmp(word,"runtime")) {		// runtime process
-		res = PP_RuntimeOpt();
-		return res;
-	}
-	if (tstrcmp(word, "bootopt")) {		// boot option process
-		res = PP_BootOpt();
-		return res;
-	}
-	if (tstrcmp(word, "cmpopt")) {		// compile option process
-		res = PP_CmpOpt();
-		return res;
-	}
-	if (tstrcmp(word,"usecom")) {		// COM definition
-		res = PP_Usecom();
-		return res;
-	}
-
 	//		登録キーワード以外はコンパイラに渡す
 	//
 	wrtbuf->Put( (char)'#' );
