@@ -748,41 +748,48 @@ void CToken::Calc_compare( CALCVAR &v )
 	int v1i,v2i,op;
 	Calc_addsub(v1);
 	while( (ttype=='<')||(ttype=='>')||(ttype=='=')) {
-		op=ttype; Calc_token();
+		op=ttype; 
 		if (op=='=') {
+			Calc_token();
 			Calc_addsub(v2);
 			v1i = v1==v2;
 			v1=(CALCVAR)v1i; continue;
 		}
 		if (op=='<') {
-			if ( ttype=='=' ) {
+			if ( *wp=='=' ) {
+				wp++;
 				Calc_token();Calc_addsub(v2);
 				v1i=(v1<=v2); v1=(CALCVAR)v1i; continue;
 			}
-			if ( ttype=='<' ) {
+			if ( *wp=='<' ) {
+				wp++;
 				Calc_token();Calc_addsub(v2);
 				v1i = (int)v1;
 				v2i = (int)v2;
 				v1i<<=v2i;
 				v1=(CALCVAR)v1i; continue;
 			}
+			Calc_token();
 			Calc_addsub(v2);
 			v1i=(v1<v2);
 			v1=(CALCVAR)v1i; continue;
 		}
 		if (op=='>') {
-			if ( ttype=='=' ) {
+			if ( *wp=='=' ) {
+				wp++;
 				Calc_token();Calc_addsub(v2);
 				v1i=(v1>=v2);
 				v1=(CALCVAR)v1i; continue;
 			}
-			if ( ttype=='>' ) {
+			if ( *wp=='>' ) {
+				wp++;
 				Calc_token();Calc_addsub(v2);
 				v1i = (int)v1;
 				v2i = (int)v2;
 				v1i>>=v2i;
 				v1=(CALCVAR)v1i; continue;
 			}
+			Calc_token();
 			Calc_addsub(v2);
 			v1i=(v1>v2);
 			v1=(CALCVAR)v1i; continue;
