@@ -1337,7 +1337,17 @@ void CToken::CheckInternalProgCMD( int opt, int orgcs )
 		if ( ttype != TK_OBJ ) throw CGERROR_SYNTAX;
 		i = lb->Search( cg_str );
 		if ( i < 0 ) throw CGERROR_SYNTAX;
-		PutCS( lb->GetType(i), lb->GetOpt(i), EXFLG_2 );
+		{
+			int labelType = lb->GetType(i);
+			int labelOpt = lb->GetOpt(i);
+			if ((labelType == TYPE_PROGCMD) && (labelOpt == 0 || labelOpt == 1)) {
+				// goto or gosub
+				PutCS(labelType, labelOpt, EXFLG_2 );
+			}
+			else {
+				throw CGERROR_SYNTAX;
+			}
+		}
 		break;
 
 	case 0x08:					// await
