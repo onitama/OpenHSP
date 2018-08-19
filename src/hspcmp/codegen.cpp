@@ -1275,6 +1275,7 @@ void CToken::CheckInternalListenerCMD( int opt )
 	t = lb->GetType(i);
 	o = lb->GetOpt(i);
 	if ( t != TYPE_PROGCMD ) return;
+	if ( o != 0x001 && o != 0x000 ) return;// not either gosub or goto
 	if ( o == 0x001 ) { // gosub
 		PutCS(t, o & 0xffff, 0);
 	}
