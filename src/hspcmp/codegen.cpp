@@ -1350,14 +1350,14 @@ void CToken::CheckInternalProgCMD( int opt, int orgcs )
 	case 0x0d:					// dimtype
 	case 0x0e:					// dup
 	case 0x0f:					// dupptr
-		GetTokenCG( GETTOKEN_DEFAULT );
-		if ( ttype == TK_OBJ ) {
-			i = SetVarsFixed( cg_str, cg_defvarfix );
+		{
+			char *firstSymbolName = GetSymbolCG(cg_ptr);
+			if (firstSymbolName == NULL || isdigit(*reinterpret_cast<unsigned char *>(firstSymbolName)) ) break;
+			i = SetVarsFixed(firstSymbolName, cg_defvarfix );
 			//	変数の初期化フラグをセットする
 			lb->SetInitFlag( i, LAB_INIT_DONE );
 			//Mesf( "#initflag set [%s]", cg_str );
 		}
-		cg_ptr = cg_ptr_bak;
 		break;
 	}
 }
