@@ -851,6 +851,10 @@ int CToken::Calc( CALCVAR &val )
 		SetError("abnormal calculation");
 		return -1;
 	}
+	if (ttype != TK_NONE) {
+		SetError("expression syntax error");
+		return -1;
+	}
 	if ( wp==NULL ) { val = v; return 0; }
 	if ( *wp==0 ) { val = v; return 0; }
 	SetError("expression syntax error");
