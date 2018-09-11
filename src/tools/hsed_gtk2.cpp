@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <unistd.h>
+#include <termios.h>
+
 static GtkWidget *edit;
 static GtkWidget *window;
 static GtkWidget *status_bar;
@@ -18,6 +21,7 @@ static char curdir[1024];
 static char complog[65535];
 static char barmsg[1024];
 static int	text_mod;
+static int	current_line;
 static gint context_id;
 
 static int jpflag;				// 日本語環境フラグ
@@ -26,11 +30,32 @@ static char langstr[8];
 static GdkColor colorBg;
 static GdkColor colorText;
 
-#define HSED_VER "ver.0.7"
+#define HSED_VER "ver.0.8"
 #define TEMP_HSP "__hsptmp.hsp"
 #define TEMP_AX "__hsptmp.ax"
 
 #define HSED_INI ".hsedconf"
+
+static int event_timer;
+
+static struct termios orig_term_attr;
+static struct termios new_term_attr;
+
+void vTermBlock( int i ) 
+{
+    if ( i == 0 )
+    {
+        tcgetattr(fileno(stdin), &orig_term_attr);
+        memcpy(&new_term_attr, &orig_term_attr, sizeof(struct termios));
+        cfmakeraw(&new_term_attr);
+        tcsetattr(fileno(stdin), TCSANOW, &new_term_attr);
+    }
+    else
+    {
+        tcflush(fileno(stdin),TCIOFLUSH);
+        tcsetattr(fileno(stdin), TCSANOW, &orig_term_attr);
+    }
+}
 
 /*--------------------------------------------------------------------------------*/
 
@@ -335,7 +360,8 @@ void update_statusbar(GtkTextBuffer *buffer, gpointer user_data) {
 
   gtk_text_buffer_get_iter_at_mark(buffer,
       &iter, gtk_text_buffer_get_insert(buffer));
-  line = (int)gtk_text_iter_get_line( &iter ) + 1;
+  current_line = (int)gtk_text_iter_get_line( &iter );
+  line = current_line + 1;
   statusbar_setline( line );
 }
 
@@ -344,7 +370,8 @@ static void mark_set_callback(GtkTextBuffer *buffer,
     gpointer data) {
 
   int line;
-  line = (int)gtk_text_iter_get_line( iter ) + 1;
+  current_line = (int)gtk_text_iter_get_line( iter );
+  line = current_line + 1;
   statusbar_setline( line );
 }
 
@@ -373,6 +400,7 @@ void file_open_read(const char *lpPath)
 	int size;
  	char cdir[1024];
 	FILE *fp;
+   GtkTextIter start;
 
 	int i=0,p=-1;
 	while(lpPath[i]){
@@ -404,7 +432,12 @@ void file_open_read(const char *lpPath)
 
 	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
 	gtk_text_buffer_set_text(tbuf,buf,strlen(buf));
+	current_line = 0;
  
+   gtk_text_buffer_get_start_iter( tbuf, &start );
+   gtk_text_buffer_place_cursor( tbuf, &start );
+   gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(edit), &start, 0, FALSE, 0, 0);
+
 //	free(buf);
 
 	titlebar_set( filename );
@@ -627,6 +660,7 @@ static void file_new(GtkWidget *w,int d)
 	}
 	GtkTextBuffer *buf = gtk_text_buffer_new(NULL);
 	gtk_text_view_set_buffer(GTK_TEXT_VIEW(edit),buf);
+	current_line = 0;
 	g_object_unref(buf);
 	//gtk_editable_delete_text(GTK_EDITABLE(edit),0,-1);
 	titlebar_set( "Untitled" );
@@ -701,6 +735,18 @@ static void cursor_move(GtkWidget *w,int d)
 
 }
 
+static void cursor_move_line(GtkWidget *w,int d)
+{
+   GtkTextIter start;
+   GtkTextIter end;
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+
+	gtk_text_buffer_get_iter_at_line( tbuf, &start, d );
+	gtk_text_buffer_place_cursor( tbuf, &start );
+	gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(edit), &start, 0, FALSE, 0, 0);
+	return;
+}
+
 /////////////////////////  HSP ///////////////////////////////
 void HSP_view_log(){
 	GtkWidget *window;
@@ -741,13 +787,25 @@ void HSP_view_log(){
 	//gtk_editable_insert_text(GTK_EDITABLE(log),complog,strlen(complog),&i);
 
 	gtk_widget_show(window);
+
 	//gtk_grab_add(GTK_WIDGET(window));
 	gtk_main();
 }
 static void HSP_complog(GtkWidget *w,gpointer data )
 {
 	HSP_view_log();
+
 }
+
+static gint update_edit( gpointer data )
+{
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),TRUE);
+	g_source_remove( event_timer );
+	printf("hsed: Restored [%d].\n", current_line );
+	cursor_move_line( edit, current_line );
+	return 0;
+}
+
 static void HSP_run(GtkWidget *w,int flag)
 {
 	GtkTextIter start;
@@ -863,12 +921,16 @@ static void HSP_run(GtkWidget *w,int flag)
 	if ( needres ) {
 		option[1] = 'r';			// エラー時に停止するオプション
 	}
-	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hspcmp %s %s --syspath=%s/\""
-			, mydir, hspdir, option, TEMP_AX, hspdir );
+	sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
+//	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hspcmp %s %s --syspath=%s/\""
+//			, mydir, hspdir, option, TEMP_AX, hspdir );
 #else
 	sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
 #endif
 
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),FALSE);
+
+//	vTermBlock(0);
 	result = system(cmd);
 	if ( WIFEXITED(result) ) {
 		result = WEXITSTATUS(result);
@@ -876,6 +938,11 @@ static void HSP_run(GtkWidget *w,int flag)
 	} else {
 		printf("hsed: Process error.\n");
 	}
+
+	event_timer=g_timeout_add( 1000,(GSourceFunc)update_edit, NULL );
+//	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),TRUE);
+
+//	vTermBlock(1);
 }
 
 //	MENU
@@ -1037,6 +1104,7 @@ int main(int argc, char *argv[], char *envp[]){
 
 	gtk_widget_show(edit);
 	text_mod = 0;
+	current_line = 0;
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
 
     status_bar = gtk_statusbar_new();
