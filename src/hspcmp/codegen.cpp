@@ -1275,6 +1275,7 @@ void CToken::CheckInternalListenerCMD( int opt )
 	t = lb->GetType(i);
 	o = lb->GetOpt(i);
 	if ( t != TYPE_PROGCMD ) return;
+	if ( o != 0x001 && o != 0x000 ) return;// not either gosub or goto
 	if ( o == 0x001 ) { // gosub
 		PutCS(t, o & 0xffff, 0);
 	}
@@ -1337,7 +1338,17 @@ void CToken::CheckInternalProgCMD( int opt, int orgcs )
 		if ( ttype != TK_OBJ ) throw CGERROR_SYNTAX;
 		i = lb->Search( cg_str );
 		if ( i < 0 ) throw CGERROR_SYNTAX;
-		PutCS( lb->GetType(i), lb->GetOpt(i), EXFLG_2 );
+		{
+			int labelType = lb->GetType(i);
+			int labelOpt = lb->GetOpt(i);
+			if ((labelType == TYPE_PROGCMD) && (labelOpt == 0 || labelOpt == 1)) {
+				// goto or gosub
+				PutCS(labelType, labelOpt, EXFLG_2 );
+			}
+			else {
+				throw CGERROR_SYNTAX;
+			}
+		}
 		break;
 
 	case 0x08:					// await
@@ -1350,14 +1361,14 @@ void CToken::CheckInternalProgCMD( int opt, int orgcs )
 	case 0x0d:					// dimtype
 	case 0x0e:					// dup
 	case 0x0f:					// dupptr
-		GetTokenCG( GETTOKEN_DEFAULT );
-		if ( ttype == TK_OBJ ) {
-			i = SetVarsFixed( cg_str, cg_defvarfix );
+		{
+			char *firstSymbolName = GetSymbolCG(cg_ptr);
+			if (firstSymbolName == NULL || isdigit(*reinterpret_cast<unsigned char *>(firstSymbolName)) ) break;
+			i = SetVarsFixed(firstSymbolName, cg_defvarfix );
 			//	変数の初期化フラグをセットする
 			lb->SetInitFlag( i, LAB_INIT_DONE );
 			//Mesf( "#initflag set [%s]", cg_str );
 		}
-		cg_ptr = cg_ptr_bak;
 		break;
 	}
 }
@@ -2110,6 +2121,10 @@ void CToken::GenerateCodePP( char *buf )
 	//
 	int i;
 	GetTokenCG( GETTOKEN_DEFAULT );					// 最初の'#'を読み飛ばし
+	if (*cg_ptr != PickNextCodeCG()) {
+		// preprocesser command "#" 
+		throw CGERROR_UNKNOWN;
+	}
 	GetTokenCG( GETTOKEN_DEFAULT );
 
 	if ( ttype == TK_NONE ) {						// プリプロセッサから渡される行情報
