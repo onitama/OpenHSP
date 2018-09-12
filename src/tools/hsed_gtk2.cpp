@@ -36,6 +36,7 @@ static GdkColor colorText;
 #define HSED_VER "ver.0.8"
 #define TEMP_HSP "__hsptmp.hsp"
 #define TEMP_AX "__hsptmp.ax"
+#define TEMP_HSPRES ".hspres"
 
 #define HSED_INI ".hsedconf"
 
@@ -742,7 +743,6 @@ static void HSP_run(GtkWidget *w,int flag)
 	}
 
 	// ランタイムを取得する
-/*
 	p = 0;
 	sprintf(cmd,"%s/hspcmp -e0 %s", hspdir,TEMP_AX);
 	fp=popen(cmd,"r");
@@ -767,7 +767,6 @@ static void HSP_run(GtkWidget *w,int flag)
 		runtime[sch++] = 0;
 	}
 	printf("hsed: Runtime [%s].\n",runtime);
-*/
 
 	needres = 0;
 	event_errflag = -1;
@@ -775,12 +774,9 @@ static void HSP_run(GtkWidget *w,int flag)
 	option[0] = '-';
 	option[1] = 'e';
 	option[2] = 0;
-	//if ( strcmp(runtime,"hsp3cl")==0 ) needres = 0;		// hsp3clはそのまま
+	if ( strcmp(runtime,"hsp3cl")==0 ) needres = 1;		// hsp3clはエラー情報をファイルから取得する
 
 #ifdef HSPRASPBIAN
-	if ( needres ) {
-		option[1] = 'r';			// エラー時に停止するオプション
-	}
 	sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
 //	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hspcmp %s %s --syspath=%s/\""
 //			, mydir, hspdir, option, TEMP_AX, hspdir );
@@ -793,13 +789,32 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	//	HSPランタイム実行
 	p = 0;
-	fp=popen(cmd,"r");
-	while(feof(fp)==0){
-		p+=fread(complog+p,1,400,fp);
+
+	if ( needres == 0 ) {
+		//	プロセスから結果を取得
+		fp=popen(cmd,"r");
+		while(feof(fp)==0){
+			p+=fread(complog+p,1,400,fp);
+		}
+		if(!pclose(fp)){
+			p = 0;
+		}
+		complog[p]='\0';
+		printf(complog);
+
+	} else {
+		//	結果をファイルから取得
+		system(cmd);
+		p = dpm_exist( TEMP_HSPRES );
+		if ( p > 0 ) {
+			dpm_read( TEMP_HSPRES, complog, p, 0 );
+		} else {
+			p = 0;
+		}
+		complog[p]='\0';
 	}
-	complog[p]='\0';
-	printf(complog);
-	if(pclose(fp)){
+
+	if(p){
 		char *errinfo;
 		char str_errid[64];
 
