@@ -19,10 +19,10 @@
 #include "../token.h"
 #include "../ahtobj.h"
 
-#define DPM_SUPPORT		// DPMƒtƒ@ƒCƒ‹ƒ}ƒl[ƒWƒƒ‚ğƒTƒ|[ƒg
+#define DPM_SUPPORT		// DPMãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒãƒ¼ã‚¸ãƒ£ã‚’ã‚µãƒãƒ¼ãƒˆ
 #include "dpm.h"
 
-//	VC++‚Ìê‡
+//	VC++ã®å ´åˆ
 #ifdef __cplusplus
 #define EXPORT extern "C" __declspec (dllexport)
 #else
@@ -47,7 +47,7 @@ extern char *hsp_prestr[];
 
 /*
 	rev 54
-	gcc ‚Åƒrƒ‹ƒh‚µ‚½‚Æ‚«‚É DllMain ‚ªŒÄ‚Î‚ê‚é‚æ‚¤‚ÉC³B
+	gcc ã§ãƒ“ãƒ«ãƒ‰ã—ãŸã¨ãã« DllMain ãŒå‘¼ã°ã‚Œã‚‹ã‚ˆã†ã«ä¿®æ­£ã€‚
 */
 
 #if defined( __GNUC__ ) && defined( __cplusplus )
@@ -69,7 +69,7 @@ BOOL WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 
 static int GetFilePath( char *bname )
 {
-	//		ƒtƒ‹ƒpƒX–¼‚©‚çAƒtƒ@ƒCƒ‹ƒpƒX‚Ìæ“¾(\‚ğc‚·)
+	//		ãƒ•ãƒ«ãƒ‘ã‚¹åã‹ã‚‰ã€ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã®å–å¾—(\ã‚’æ®‹ã™)
 	//
 	int a,b,len;
 	char a1;
@@ -88,14 +88,14 @@ static int GetFilePath( char *bname )
 
 /*
 	rev 54
-	supio_win.cpp ‚Æ supio_linux.cpp ‚Å‚à cutext ‚ª’è‹`‚³‚ê‚Ä‚¢‚éB
-	‚»‚¿‚ç‚ğg‚¤‚æ‚¤‚É‚µ‚Ä‚±‚±‚Ì cutext ‚ÍíœB
+	supio_win.cpp ã¨ supio_linux.cpp ã§ã‚‚ cutext ãŒå®šç¾©ã•ã‚Œã¦ã„ã‚‹ã€‚
+	ãã¡ã‚‰ã‚’ä½¿ã†ã‚ˆã†ã«ã—ã¦ã“ã“ã® cutext ã¯å‰Šé™¤ã€‚
 */
 
 
 static void _sendstr( HWND hw, char *p1 )
 {
-	//		Win9x—p
+	//		Win9xç”¨
 	LPARAM lprm;
 	char *mes;
 	char a1;
@@ -114,7 +114,7 @@ static void _sendstr( HWND hw, char *p1 )
 
 static void _sendstr2( HWND hw, char *p1 )
 {
-	//		Win2000ˆÈ~—p
+	//		Win2000ä»¥é™ç”¨
 	LPARAM lprm;
 	unsigned char *mes;
 	unsigned char a1;
@@ -440,7 +440,7 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	GetFilePath( libpath );
 
 	i = hsc3->OpenPackfile();
-	if (i) { Alert( "packfile‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ" ); return -1; }
+	if (i) { Alert( "packfileãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“" ); return -1; }
 	hsc3->GetPackfileOption( hspexe, "runtime", "hsprt" );
 	strcat( libpath, hspexe );
 	strcpy( hspexe, libpath );
@@ -457,7 +457,7 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 
 	hsc3->ClosePackfile();
 
-	//		exe‚ğì¬
+	//		exeã‚’ä½œæˆ
 #ifdef DPM_SUPPORT
 	dpmc_ini( hsc3->errbuf, fname );
 	st=dpmc_pack( 0 );
@@ -507,7 +507,7 @@ EXPORT BOOL WINAPI aht_source( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_source var, "aht_file", "path", id (type$202)
-	//		(id<0‚Ìê‡‚Í©“®Šm•ÛA‚»‚¤‚Å‚È‚¯‚ê‚Îw’èID‚ÉŠm•Û)
+	//		(id<0ã®å ´åˆã¯è‡ªå‹•ç¢ºä¿ã€ãã†ã§ãªã‘ã‚Œã°æŒ‡å®šIDã«ç¢ºä¿)
 	//
 	PVal *pv;
 	APTR ap;
@@ -521,12 +521,12 @@ EXPORT BOOL WINAPI aht_source( HSPEXINFO *hei, int p1, int p2, int p3 )
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	p = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶š—ñ
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	p = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	strcpy( fn, p );
-	p = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^3:•¶š—ñ
+	p = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ–‡å­—åˆ—
 	strcpy( fpath, p );
-	ep1 = hei->HspFunc_prm_getdi( -1 );		// ƒpƒ‰ƒ[ƒ^4:”’l
+	ep1 = hei->HspFunc_prm_getdi( -1 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
 
 	if ( ep1 < 0 ) {
 		ahtmodel =aht->AddModel();
@@ -538,9 +538,9 @@ EXPORT BOOL WINAPI aht_source( HSPEXINFO *hei, int p1, int p2, int p3 )
 	ahtmodel->SetSource( fn );
 	ahtmodel->SetSourcePath( fpath );
 	res = ahtmodel->GetId();
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
-	//		AHT‚ğ‰ğÍ
+	//		AHTã‚’è§£æ
 	hsc3->ResetError();
 	if (orgcompath==0) {
 		GetModuleFileName( NULL,compath,_MAX_PATH );
@@ -560,7 +560,7 @@ EXPORT BOOL WINAPI aht_source( HSPEXINFO *hei, int p1, int p2, int p3 )
 	ahtmodel->TerminateExp();
 	hsc3->PreProcessEnd();
 
-	aht->BuildGlobalID();				// ƒOƒ[ƒoƒ‹ID‚ğXV‚·‚é
+	aht->BuildGlobalID();				// ã‚°ãƒ­ãƒ¼ãƒãƒ«IDã‚’æ›´æ–°ã™ã‚‹
 
 	if ( st != 0 ) return st;
 
@@ -627,7 +627,7 @@ EXPORT BOOL WINAPI aht_getpropcnt ( int *p1, int p2, int p3, int p4 )
 {
 	//
 	//		aht_getpropcnt var,modelID,sw  (type1)
-	//		( sw=0:ŒÂ”/1:•ÒWs” )
+	//		( sw=0:å€‹æ•°/1:ç·¨é›†è¡Œæ•° )
 	//
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
@@ -758,7 +758,7 @@ EXPORT BOOL WINAPI aht_make ( int *p1, char *p2, int p3, int p4 )
 		res |= hsc3->SaveAHTOutbuf( p2 );
 	}
 	if ( p4&4 ) {
-		//			AHTƒ}ƒl[ƒWƒƒ[—p‚Éƒ\[ƒX‚ğ\’z‚·‚é
+		//			AHTãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ç”¨ã«ã‚½ãƒ¼ã‚¹ã‚’æ§‹ç¯‰ã™ã‚‹
 		//
 		aht->AddMakeBufferInit( hsc3->ahtbuf->GetBuffer(), hsc3->ahtbuf->GetSize() );
 		aht->AddMakeBufferMain( hsc3->outbuf->GetBuffer(), hsc3->outbuf->GetSize() );
@@ -929,17 +929,17 @@ EXPORT BOOL WINAPI aht_getprjmax( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_getprjmax var (type$202)
-	//		var‚Émodel”‚ğ•Ô‚·
+	//		varã«modelæ•°ã‚’è¿”ã™
 	//
 	PVal *pv;
 	APTR ap;
 	int res;
 
 	if ( aht == NULL ) return -1;
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
 
 	res = aht->GetProjectFileModelMax();
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
@@ -948,7 +948,7 @@ EXPORT BOOL WINAPI aht_getprjsrc( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_getprjsrc var, var2, var3, id (type$202)
-	//		var‚ÉfnameAvar2‚ÉfpathAvar3‚ÉObjectID‚ğ•Ô‚·B
+	//		varã«fnameã€var2ã«fpathã€var3ã«ObjectIDã‚’è¿”ã™ã€‚
 	//
 	PVal *pv;
 	APTR ap;
@@ -962,17 +962,17 @@ EXPORT BOOL WINAPI aht_getprjsrc( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	if ( aht == NULL ) return -1;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );	// ƒpƒ‰ƒ[ƒ^2:•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );	// ƒpƒ‰ƒ[ƒ^3:•Ï”
-	ep1 = hei->HspFunc_prm_getdi( 0 );		// ƒpƒ‰ƒ[ƒ^4:”’l
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_getdi( 0 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
 
 	p = aht->GetProjectFileModel( ep1 );
-	hei->HspFunc_prm_setva( pv, ap, TYPE_STRING, p );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_STRING, p );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	p = aht->GetProjectFileModelPath( ep1 );
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_STRING, p );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_STRING, p );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	res = aht->GetProjectFileModelID( ep1 );
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
@@ -982,7 +982,7 @@ EXPORT BOOL WINAPI aht_prjload2( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_prjload2 model_id, id (type$202)
-	//		( ƒ‚ƒfƒ‹ƒf[ƒ^‚ÌXVBaht_prjload‚ÌŒã‚Éƒ‚ƒfƒ‹‚²‚Æ‚ÉÀs‚·‚éB )
+	//		( ãƒ¢ãƒ‡ãƒ«ãƒ‡ãƒ¼ã‚¿ã®æ›´æ–°ã€‚aht_prjloadã®å¾Œã«ãƒ¢ãƒ‡ãƒ«ã”ã¨ã«å®Ÿè¡Œã™ã‚‹ã€‚ )
 	//
 	int ep1,ep2;
 	int res;
@@ -990,8 +990,8 @@ EXPORT BOOL WINAPI aht_prjload2( HSPEXINFO *hei, int p1, int p2, int p3 )
 	if ( aht == NULL ) return -1;
 
 	res = 0;
-	ep1 = hei->HspFunc_prm_getdi( 0 );		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi( 0 );		// ƒpƒ‰ƒ[ƒ^2:”’l
+	ep1 = hei->HspFunc_prm_getdi( 0 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi( 0 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	aht->LoadProjectApply( ep1, ep2 );
 
@@ -1068,13 +1068,13 @@ EXPORT BOOL WINAPI aht_getpage( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	if ( aht == NULL ) return -1;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );	// ƒpƒ‰ƒ[ƒ^2:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
 
 	res = aht->GetCurrentPage();
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	res = aht->GetMaxPage();
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
@@ -1084,11 +1084,11 @@ EXPORT BOOL WINAPI aht_propupdate( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_propupdate model_id (type$202)
-	//		( ƒvƒƒpƒeƒB‚ÌXV )
+	//		( ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®æ›´æ–° )
 	//
 	int ep1;
 	if ( aht == NULL ) return -1;
-	ep1 = hei->HspFunc_prm_getdi( 0 );		// ƒpƒ‰ƒ[ƒ^1:”’l
+	ep1 = hei->HspFunc_prm_getdi( 0 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
 	aht->UpdateModelProperty( ep1 );
 	return 0;
 }
@@ -1103,9 +1103,9 @@ EXPORT BOOL WINAPI aht_parts( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char *ep2;
 	char path[256];
 	if ( aht == NULL ) return -1;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶š—ñ
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
 	strcpy( path, ep1 );
-	ep2 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶š—ñ
+	ep2 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	aht->BuildParts( ep2, path );
 	return 0;
 }
@@ -1115,7 +1115,7 @@ EXPORT BOOL WINAPI aht_getparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_getparts id, var,var2,var3 (type$202)
-	//					 ( ICONID,name,classname‚ª‘ã“ü‚³‚ê‚é )
+	//					 ( ICONID,name,classnameãŒä»£å…¥ã•ã‚Œã‚‹ )
 	//
 	PVal *pv;
 	APTR ap;
@@ -1129,17 +1129,17 @@ EXPORT BOOL WINAPI aht_getparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	if ( aht == NULL ) return -1;
 
-	ep1 = hei->HspFunc_prm_getdi( 0 );		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^2:•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );	// ƒpƒ‰ƒ[ƒ^3:•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );	// ƒpƒ‰ƒ[ƒ^4:•Ï”
+	ep1 = hei->HspFunc_prm_getdi( 0 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:å¤‰æ•°
 
 	res = aht->GetPartsIconID(ep1);
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	p = aht->GetPartsName(ep1);
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_STRING, p );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_STRING, p );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	p = aht->GetPartsClassName(ep1);
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_STRING, p );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_STRING, p );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
@@ -1157,10 +1157,10 @@ EXPORT BOOL WINAPI aht_listparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	if ( aht == NULL ) return -1;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶š—ñ
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	p = aht->SearchModelByClassName( ep1 );
-	hei->HspFunc_prm_setva( pv, ap, TYPE_STRING, p );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_STRING, p );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
@@ -1194,27 +1194,27 @@ EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	if ( aht == NULL ) return -1;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
 	res = aht->FindModel();
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	if ( res >= 0 ) {
 		m = aht->GetModel( res );
 		p = m->GetClass();
 		len = strlen( p ) - 5; if ( len < 0 ) len = 0;
-		if ( tstrcmp( p+len, ".home" ) ) {			// homeƒNƒ‰ƒX‚©‚Ç‚¤‚©Šm”F‚·‚é
+		if ( tstrcmp( p+len, ".home" ) ) {			// homeã‚¯ãƒ©ã‚¹ã‹ã©ã†ã‹ç¢ºèªã™ã‚‹
 			if ( homeid != -1 ) ahtbuild_error = 2;
 			homeid = res;
 		}
 	}
 
 	statval = 0;
-	i = aht->FindModelGetParentId();				// ƒŠƒ“ƒNŒ³ID‚ğæ“¾‚·‚é
+	i = aht->FindModelGetParentId();				// ãƒªãƒ³ã‚¯å…ƒIDã‚’å–å¾—ã™ã‚‹
 	if ( i >= 0 ) {
 		m = aht->GetModel( i );
 		p = m->GetClass();
 		len = strlen( p ) - 8; if ( len < 0 ) len = 0;
-		if ( tstrcmp( p+len, ".routine" ) ) {			// routineƒNƒ‰ƒX‚©‚Ç‚¤‚©Šm”F‚·‚é
+		if ( tstrcmp( p+len, ".routine" ) ) {			// routineã‚¯ãƒ©ã‚¹ã‹ã©ã†ã‹ç¢ºèªã™ã‚‹
 			statval = -1;
 		}
 	}
@@ -1227,7 +1227,7 @@ EXPORT BOOL WINAPI aht_findend( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_findend var, mode (type$202)
-	//		( mode=0:ERROR•\¦‚ ‚è/1:‚È‚µ )
+	//		( mode=0:ERRORè¡¨ç¤ºã‚ã‚Š/1:ãªã— )
 	//
 	PVal *pv;
 	APTR ap;
@@ -1235,8 +1235,8 @@ EXPORT BOOL WINAPI aht_findend( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char *err;
 
 	if ( aht == NULL ) return -1;
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ep1 = hei->HspFunc_prm_getdi( 0 );		// ƒpƒ‰ƒ[ƒ^2:”’l
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_getdi( 0 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	if ( homeid == -1 ) ahtbuild_error = 1;
 
@@ -1244,10 +1244,10 @@ EXPORT BOOL WINAPI aht_findend( HSPEXINFO *hei, int p1, int p2, int p3 )
 		err = NULL;
 		switch( ahtbuild_error ) {
 		case 1:
-			err = "ƒz[ƒ€‚Ìƒp[ƒc‚ª”z’u‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB\nÅ‰‚ÉÀs‚·‚éƒz[ƒ€‚ğ’u‚¢‚Ä‚­‚¾‚³‚¢B";
+			err = "ãƒ›ãƒ¼ãƒ ã®ãƒ‘ãƒ¼ãƒ„ãŒé…ç½®ã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚\næœ€åˆã«å®Ÿè¡Œã™ã‚‹ãƒ›ãƒ¼ãƒ ã‚’ç½®ã„ã¦ãã ã•ã„ã€‚";
 			break;
 		case 2:
-			err = "ƒz[ƒ€‚Ìƒp[ƒc‚ª•¡””z’u‚³‚ê‚Ä‚¢‚Ü‚·B\nƒz[ƒ€‚Í‚P‚Â‚¾‚¯’u‚¢‚Ä‚­‚¾‚³‚¢B";
+			err = "ãƒ›ãƒ¼ãƒ ã®ãƒ‘ãƒ¼ãƒ„ãŒè¤‡æ•°é…ç½®ã•ã‚Œã¦ã„ã¾ã™ã€‚\nãƒ›ãƒ¼ãƒ ã¯ï¼‘ã¤ã ã‘ç½®ã„ã¦ãã ã•ã„ã€‚";
 			break;
 		default:
 			break;
@@ -1255,7 +1255,7 @@ EXPORT BOOL WINAPI aht_findend( HSPEXINFO *hei, int p1, int p2, int p3 )
 		if ( err != NULL ) Alert( err );
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &ahtbuild_error );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &ahtbuild_error );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
@@ -1265,8 +1265,8 @@ EXPORT BOOL WINAPI aht_getexid( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
 	//
 	//		aht_getexid var, mode (type$202)
-	//			( var‚Éƒ‚ƒfƒ‹ID‚ğ‘ã“ü‚·‚é )
-	//			( mode:0=ƒŠƒ“ƒNŒ³ID/1=HOME‚ÌID )
+	//			( varã«ãƒ¢ãƒ‡ãƒ«IDã‚’ä»£å…¥ã™ã‚‹ )
+	//			( mode:0=ãƒªãƒ³ã‚¯å…ƒID/1=HOMEã®ID )
 	//
 	PVal *pv;
 	APTR ap;
@@ -1275,8 +1275,8 @@ EXPORT BOOL WINAPI aht_getexid( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	if ( aht == NULL ) return -1;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ep1 = hei->HspFunc_prm_getdi( 0 );		// ƒpƒ‰ƒ[ƒ^2:”’l
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_getdi( 0 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	res = -1;
 	switch( ep1 ) {
@@ -1290,7 +1290,7 @@ EXPORT BOOL WINAPI aht_getexid( HSPEXINFO *hei, int p1, int p2, int p3 )
 		break;
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// •Ï”‚É’l‚ğ‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }

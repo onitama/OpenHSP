@@ -1,33 +1,33 @@
 #/*-------------------------------------------------------------------------*/
 #
-#   HSP�R���p�C���̃r���h�B
+#   HSPコンパイラのビルド。
 #
-#   GNU make �p���C�N�t�@�C��
+#   GNU make 用メイクファイル
 #
-#   (�g����)
+#   (使い方)
 #   make ( PLATFORM [ OBJ ... ] [ release ] [ all ] ) | ( PLATFORM clean ) | cleanall
 #
-#   PLATFORM ��
+#   PLATFORM は
 #       linux
 #       win32_mingw
 #       win32dll_mingw
-#   �̂ǂꂩ�Ball, clean ���w�肷��ꍇ�� PLATFORM ���w�肷��B
+#   のどれか。all, clean を指定する場合も PLATFORM を指定する。
 #
-#   OBJ �Ƀt�@�C�����w�肷��Ǝw�肵���t�@�C���݂̂��r���h�Ώۂɂ���B
-#   �w�肵�Ȃ������ꍇ�� PLATFORM �ɑΉ��������s�t�@�C����Ώۂɂ���B
+#   OBJ にファイルを指定すると指定したファイルのみをビルド対象にする。
+#   指定しなかった場合は PLATFORM に対応した実行ファイルを対象にする。
 #
-#   release ���w�肷��ƃ����[�X�r���h�A����ȊO�̓f�o�b�O�r���h�B
+#   release を指定するとリリースビルド、それ以外はデバッグビルド。
 #
-#   all ���w�肷��� PLATFORM �Ɋ֌W�����I�u�W�F�N�g�t�@�C���E���s�t�@�C���S�Ẵ��r���h�B
-#   clean ���w�肷��� PLATFORM �Ɋ֌W�����I�u�W�F�N�g�t�@�C���E���s�t�@�C���̍폜�B
-#   cleanall ���w�肷��Ƃ��̃t�H���_���̂��ׂẴI�u�W�F�N�g�t�@�C���E���s�t�@�C���̍폜�B
+#   all を指定すると PLATFORM に関係したオブジェクトファイル・実行ファイル全てのリビルド。
+#   clean を指定すると PLATFORM に関係したオブジェクトファイル・実行ファイルの削除。
+#   cleanall を指定するとそのフォルダ内のすべてのオブジェクトファイル・実行ファイルの削除。
 #
 #/*-------------------------------------------------------------------------*/
 
 #/*-----------------------------------------------------------*/
 #
-#   �K�v�Ȃ�Ί��ɍ��킹�� includedir, libdir ��ݒ肷��B
-#   �p�X���󔒂ŋ�؂��ė񋓂���B(���p�X�y�[�X���܂ރp�X��""�ň͂�)
+#   必要ならば環境に合わせて includedir, libdir を設定する。
+#   パスを空白で区切って列挙する。(半角スペースを含むパスは""で囲む)
 #
 
 includedir =
@@ -39,7 +39,7 @@ RM = rm -f
 
 #/*-----------------------------------------------------------*/
 #
-#   �v���b�g�t�H�[������
+#   プラットフォーム判定
 #
 
 PLATFORM =
@@ -68,14 +68,14 @@ endif
 
 #/*-----------------------------------------------------------*/
 #
-#   �v���b�g�t�H�[�����Ƃ̐ݒ�
+#   プラットフォームごとの設定
 #
 
 #/*------------------------------------------*/
 #
-#   gcc �� linux �p���s�t�@�C�����r���h�B
+#   gcc で linux 用実行ファイルをビルド。
 #
-#   ���얢�m�F�B��肪����� makefile.linux �̓��e���Q�Ƃ��Ă��������B
+#   動作未確認。問題があれば makefile.linux の内容を参照してください。
 #
 
 ifneq ($(filter linux,$(PLATFORM)),)
@@ -120,9 +120,9 @@ endif
 
 #/*------------------------------------------*/
 #
-#   mingw �� Windows �p���s�t�@�C�����r���h�B
+#   mingw で Windows 用実行ファイルをビルド。
 #
-#   mingw32(gcc3.4.2) + msys �œ���m�F�B
+#   mingw32(gcc3.4.2) + msys で動作確認。
 #
 
 ifneq ($(filter win32_mingw,$(PLATFORM)),)
@@ -169,9 +169,9 @@ endif
 
 #/*------------------------------------------*/
 #
-#   mingw �� Windows �p DLL �t�@�C�����r���h�B
+#   mingw で Windows 用 DLL ファイルをビルド。
 #
-#   mingw32(gcc3.4.2) + msys �œ���m�F�B
+#   mingw32(gcc3.4.2) + msys で動作確認。
 #
 
 ifneq ($(filter win32dll_mingw,$(PLATFORM)),)

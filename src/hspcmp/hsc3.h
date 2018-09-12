@@ -13,23 +13,23 @@
 #define HSC3_OPT_MAKEPACK 4
 #define HSC3_OPT_READAHT 8
 #define HSC3_OPT_MAKEAHT 16
-#define HSC3_OPT_UTF8IN 32		// UTF8ƒ\[ƒX‚ğ“ü—Í
-#define HSC3_OPT_UTF8OUT 64		// UTF8ƒR[ƒh‚ğo—Í
+#define HSC3_OPT_UTF8IN 32		// UTF8ã‚½ãƒ¼ã‚¹ã‚’å…¥åŠ›
+#define HSC3_OPT_UTF8OUT 64		// UTF8ã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›
 
 #define HSC3_MODE_DEBUG 1
 #define HSC3_MODE_DEBUGWIN 2
-#define HSC3_MODE_UTF8 4		// UTF8ƒR[ƒh‚ğo—Í
+#define HSC3_MODE_UTF8 4		// UTF8ã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›
 
 class CMemBuf;
 class CToken;
 
 /*
 	rev 54
-	lb_info ‚ÌŒ^‚ğ void * ‚©‚ç CLabel * ‚É•ÏXB
+	lb_info ã®å‹ã‚’ void * ã‹ã‚‰ CLabel * ã«å¤‰æ›´ã€‚
 
 	hsc3.cpp:207
-	mingw : warning : void * Œ^‚Ì delete ‚Í–¢’è‹`
-	‚É‘ÎˆB
+	mingw : warning : void * å‹ã® delete ã¯æœªå®šç¾©
+	ã«å¯¾å‡¦ã€‚
 */
 
 class CLabel;

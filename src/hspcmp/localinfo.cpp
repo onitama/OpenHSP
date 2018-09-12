@@ -4,7 +4,7 @@
 /*----------------------------------------------------------------*/
 
 #ifdef HSPWIN
-#define USE_WINDOWS_API		// WINDOWS API‚ğg—p‚·‚é
+#define USE_WINDOWS_API		// WINDOWS APIã‚’ä½¿ç”¨ã™ã‚‹
 #endif
 
 
@@ -64,7 +64,7 @@ int CLocalInfo::GetTime( int index )
 	struct timeval tv;
 	struct tm *lt;
 
-	gettimeofday( &tv, NULL );	// MinGW‚¾‚ÆVer‚É‚æ‚Á‚Ä’Ê‚è‚Ü‚¹‚ñ
+	gettimeofday( &tv, NULL );	// MinGWã ã¨Verã«ã‚ˆã£ã¦é€šã‚Šã¾ã›ã‚“
 	lt = localtime( &tv.tv_sec );
 
 	switch( index ) {
@@ -85,7 +85,7 @@ int CLocalInfo::GetTime( int index )
 	case 7:
 		return (int)tv.tv_usec/10000;
 	case 8:
-		/*	ˆê‰ƒ}ƒCƒNƒ•b‚Ü‚Åæ‚ê‚é	*/
+		/*	ä¸€å¿œãƒã‚¤ã‚¯ãƒ­ç§’ã¾ã§å–ã‚Œã‚‹	*/
 		return (int)tv.tv_usec%10000;
 	}
 #endif

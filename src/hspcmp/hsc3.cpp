@@ -43,7 +43,7 @@ int CHsc3::GetErrorSize( void )
 
 void CHsc3::ResetError( void )
 {
-	//		ƒGƒ‰[ƒƒbƒZ[ƒWÁ‹
+	//		ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ¶ˆå»
 	//
 	if ( errbuf != NULL ) { delete errbuf; errbuf=NULL; }
 	errbuf = new CMemBuf( ERRBUF_SIZE );
@@ -92,7 +92,7 @@ void CHsc3::AddSystemMacros( CToken *tk, int option )
 int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 {
 	//		Preprocess execute (AHT)
-	//		(I—¹‚ÉPreProcessEnd‚ğŒÄ‚Ô‚±‚Æ)
+	//		(çµ‚äº†æ™‚ã«PreProcessEndã‚’å‘¼ã¶ã“ã¨)
 	//
 	int res;
 	char mm[512];
@@ -110,7 +110,7 @@ int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 		tk.SetAHTBuffer( ahtbuf );
 	}
 
-	sprintf( mm,"#AHT processor ver%s / onion software 1997-2017(c)", hspver );
+	sprintf( mm,"#AHT processor ver%s / onion software 1997-2018(c)", hspver );
 	tk.Mes( mm );
 	res = tk.ExpandFile( outbuf, fname, fname );
 	if ( res < 0 ) return -1;
@@ -120,20 +120,20 @@ int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 
 /*
 	rev 54
-	mingw : warning : packbuf ‚Í–¢‰Šú‰»‚Åg—p‚³‚ê‚¤‚é
-	–â‘è‚È‚³‚»‚¤Aˆê‰‘ÎˆB
+	mingw : warning : packbuf ã¯æœªåˆæœŸåŒ–ã§ä½¿ç”¨ã•ã‚Œã†ã‚‹
+	å•é¡Œãªã•ãã†ã€ä¸€å¿œå¯¾å‡¦ã€‚
 */
 
 int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void *ahtoption )
 {
 	//		Preprocess execute
-	//		(I—¹‚ÉPreProcessEnd‚ğŒÄ‚Ô‚±‚Æ)
+	//		(çµ‚äº†æ™‚ã«PreProcessEndã‚’å‘¼ã¶ã“ã¨)
 	//			option : bit0=ver2.55 mode(ON)
 	//			         bit1=debug mode(ON)
 	//			         bit2=make packfile(ON)
 	//					 bit3=read AHT file(on)
 	//					 bit4=write AHT file(on)
-	//					 bit5=UTF8(input)(“ü—Íƒ\[ƒX‚ªUTF8‚Å‚ ‚é‚±‚Æ‚ğ¦‚·)
+	//					 bit5=UTF8(input)(å…¥åŠ›ã‚½ãƒ¼ã‚¹ãŒUTF8ã§ã‚ã‚‹ã“ã¨ã‚’ç¤ºã™)
 	//
 	int res;
 	char mm[512];
@@ -161,7 +161,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2017(c)", HSC3TITLE, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2018(c)", HSC3TITLE, hspver );
 	tk.Mes( mm );
 	tk.SetAdditionMode( 1 );
 
@@ -177,7 +177,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		res = outbuf->SaveFile( outname );
 		if ( res<0 ) {
 #ifdef JPNMSG
-			tk.Mes( "#ƒvƒŠƒvƒƒZƒbƒTƒtƒ@ƒCƒ‹‚Ìo—Í‚É¸”s‚µ‚Ü‚µ‚½" );
+			tk.Mes( "#ãƒ—ãƒªãƒ—ãƒ­ã‚»ãƒƒã‚µãƒ•ã‚¡ã‚¤ãƒ«ã®å‡ºåŠ›ã«å¤±æ•—ã—ã¾ã—ãŸ" );
 #else
 			tk.Mes( "#Can't write output file." );
 #endif
@@ -187,7 +187,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 	outbuf->Put( (int)0 );
 
 #if 0
-	//		ƒ\[ƒX‚Ìƒ‰ƒxƒ‹‚ğ’Ç‰Á(’â~’†)
+	//		ã‚½ãƒ¼ã‚¹ã®ãƒ©ãƒ™ãƒ«ã‚’è¿½åŠ (åœæ­¢ä¸­)
 	if ( addkw != NULL ) { delete addkw; addkw=NULL; }
 	addkw = new CMemBuf( 0x1000 );
 	tk.LabelDump( addkw, DUMPMODE_DLLCMD );
@@ -202,7 +202,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		delete packbuf;
 		if ( res<0 ) {
 #ifdef JPNMSG
-			tk.Mes( "#packfile‚Ìo—Í‚É¸”s‚µ‚Ü‚µ‚½" );
+			tk.Mes( "#packfileã®å‡ºåŠ›ã«å¤±æ•—ã—ã¾ã—ãŸ" );
 #else
 			tk.Mes( "#Can't write packfile." );
 #endif
@@ -253,7 +253,7 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 	genmode = mode;
 	if ( cmpopt & CMPMODE_UTF8OUT ) genmode |= HSC3_MODE_UTF8;
 
-	if ( lb_info != NULL ) tk.SetLabelInfo( lb_info );		// ƒvƒŠƒvƒƒZƒbƒT‚Ìƒ‰ƒxƒ‹î•ñ
+	if ( lb_info != NULL ) tk.SetLabelInfo( lb_info );		// ãƒ—ãƒªãƒ—ãƒ­ã‚»ãƒƒã‚µã®ãƒ©ãƒ™ãƒ«æƒ…å ±
 
 	tk.SetErrorBuf( errbuf );
 	tk.SetCommonPath( common_path );
@@ -265,7 +265,7 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2017(c)", HSC3TITLE2, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2018(c)", HSC3TITLE2, hspver );
 	tk.Mes( mm );
 	if ( genmode & HSC3_MODE_UTF8 ) {
 		tk.Mes( "#use UTF-8 strings." );
@@ -296,8 +296,8 @@ int CHsc3::GetCmdList( int option )
 
 	tk.SetErrorBuf( errbuf );
 	tk.SetCommonPath( common_path );
-	tk.LabelRegist3( hsp_prestr );			// •W€ƒL[ƒ[ƒh
-	tk.LabelRegist3( hsp_prepp );			// ƒvƒŠƒvƒƒZƒbƒTƒL[ƒ[ƒh
+	tk.LabelRegist3( hsp_prestr );			// æ¨™æº–ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰
+	tk.LabelRegist3( hsp_prepp );			// ãƒ—ãƒªãƒ—ãƒ­ã‚»ãƒƒã‚µã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰
 	AddSystemMacros( &tk, option );
 
 	res = tk.ExpandFile( &outbuf, "hspdef.as", "hspdef.as" );

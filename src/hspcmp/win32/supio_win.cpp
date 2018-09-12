@@ -8,7 +8,7 @@
 #include "../../hsp3/hsp3config.h"
 
 #ifdef HSPWIN
-#define USE_WINDOWS_API		// WINDOWS API‚ğg—p‚·‚é
+#define USE_WINDOWS_API		// WINDOWS APIã‚’ä½¿ç”¨ã™ã‚‹
 #endif
 
 #ifdef USE_WINDOWS_API
@@ -213,13 +213,13 @@ void strcpy2( char *dest, const char *src, size_t size )
 
 /*
 	rev 54
-	‚Æ‚è‚ ‚¦‚¸‘‚«’¼‚µB
-	sjis‘SŠp‚ğŠÜ‚ŞƒpƒX‚É‘Î‰B
+	ã¨ã‚Šã‚ãˆãšæ›¸ãç›´ã—ã€‚
+	sjiså…¨è§’ã‚’å«ã‚€ãƒ‘ã‚¹ã«å¯¾å¿œã€‚
 */
 
 static int findext( char const * st )
 {
-	//	Šg’£q‚ğ‚³‚ª‚·B
+	//	æ‹¡å¼µå­ã‚’ã•ãŒã™ã€‚
 	//
 	int r = -1, f = 0;
 	for ( int i = 0; st[ i ] != '\0'; ++i ) {
@@ -251,7 +251,7 @@ void addext( char *st, const char *exstr )
 
 void cutext( char * st )
 {
-	//		Šg’£q‚ğæ‚èœ‚­
+	//		æ‹¡å¼µå­ã‚’å–ã‚Šé™¤ã
 	//
 	int i = findext( st );
 	if ( i >= 0 ) st[ i ] = '\0';
@@ -301,7 +301,7 @@ void cutlast2( char *st )
 
 char *strchr2( char *target, char code )
 {
-	//		str’†ÅŒã‚ÌcodeˆÊ’u‚ğ’T‚·(‘SŠp‘Î‰”Å)
+	//		strä¸­æœ€å¾Œã®codeä½ç½®ã‚’æ¢ã™(å…¨è§’å¯¾å¿œç‰ˆ)
 	//
 	unsigned char *p;
 	unsigned char a1;
@@ -311,8 +311,8 @@ char *strchr2( char *target, char code )
 	while(1) {
 		a1=*p;if ( a1==0 ) break;
 		if ( a1==code ) res=(char *)p;
-		p++;							// ŒŸõˆÊ’u‚ğˆÚ“®
-		if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 	}
@@ -321,8 +321,8 @@ char *strchr2( char *target, char code )
 
 int is_sjis_char_head( const unsigned char *str, int pos )
 {
-	//		Shift_JIS•¶š—ñ‚ÌposƒoƒCƒg–Ú‚ª•¶š‚Ìæ“ªƒoƒCƒg‚Å‚ ‚é‚©
-	//		ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š‚ÌŒã‘±ƒoƒCƒg‚È‚ç0A‚»‚êˆÈŠO‚È‚ç1‚ğ•Ô‚·
+	//		Shift_JISæ–‡å­—åˆ—ã®posãƒã‚¤ãƒˆç›®ãŒæ–‡å­—ã®å…ˆé ­ãƒã‚¤ãƒˆã§ã‚ã‚‹ã‹
+	//		ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—ã®å¾Œç¶šãƒã‚¤ãƒˆãªã‚‰0ã€ãã‚Œä»¥å¤–ãªã‚‰1ã‚’è¿”ã™
 	int result = 1;
 	while(pos != 0 && issjisleadbyte(str[--pos])) {
 		result = ! result;
@@ -331,10 +331,10 @@ int is_sjis_char_head( const unsigned char *str, int pos )
 }
 
 char *to_hsp_string_literal( const char *src ) {
-	//		•¶š—ñ‚ğHSP‚Ì•¶š—ñƒŠƒeƒ‰ƒ‹Œ`®‚É
-	//		–ß‚è’l‚Ìƒƒ‚ƒŠ‚ÍŒÄ‚Ño‚µ‘¤‚ªfree‚·‚é•K—v‚ª‚ ‚éB
-	//		HSP‚Ì•¶š—ñƒŠƒeƒ‰ƒ‹‚Å•\‚¹‚È‚¢•¶š‚Í
-	//		‚»‚Ì‚Ü‚Üo—Í‚³‚ê‚é‚Ì‚Å’ˆÓBi'\n'‚È‚Çj
+	//		æ–‡å­—åˆ—ã‚’HSPã®æ–‡å­—åˆ—ãƒªãƒ†ãƒ©ãƒ«å½¢å¼ã«
+	//		æˆ»ã‚Šå€¤ã®ãƒ¡ãƒ¢ãƒªã¯å‘¼ã³å‡ºã—å´ãŒfreeã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
+	//		HSPã®æ–‡å­—åˆ—ãƒªãƒ†ãƒ©ãƒ«ã§è¡¨ã›ãªã„æ–‡å­—ã¯
+	//		ãã®ã¾ã¾å‡ºåŠ›ã•ã‚Œã‚‹ã®ã§æ³¨æ„ã€‚ï¼ˆ'\n'ãªã©ï¼‰
 	//
 	size_t length = 2;
 	const unsigned char *s = (unsigned char *)src;
@@ -407,7 +407,7 @@ char *to_hsp_string_literal( const char *src ) {
 
 int atoi_allow_overflow( const char *s )
 {
-	//		ƒI[ƒo[ƒtƒ[ƒ`ƒFƒbƒN‚ğ‚µ‚È‚¢atoi
+	//		ã‚ªãƒ¼ãƒãƒ¼ãƒ•ãƒ­ãƒ¼ãƒã‚§ãƒƒã‚¯ã‚’ã—ãªã„atoi
 	//
 	int result = 0;
 	while (isdigit(*s)) {
@@ -419,7 +419,7 @@ int atoi_allow_overflow( const char *s )
 
 void CutLastChr( char *p, char code )
 {
-	//		ÅŒã‚Ì'\\'‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®'\\'ã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -438,11 +438,11 @@ void CutLastChr( char *p, char code )
 
 char *strchr3( char *target, int code, int sw, char **findptr )
 {
-	//		•¶š—ñ’†‚ÌcodeˆÊ’u‚ğ’T‚·(2ƒoƒCƒgƒR[ƒhA‘SŠp‘Î‰”Å)
-	//		sw = 0 : findptr = ÅŒã‚ÉŒ©‚Â‚©‚Á‚½codeˆÊ’u
-	//		sw = 1 : findptr = Å‰‚ÉŒ©‚Â‚©‚Á‚½codeˆÊ’u
-	//		sw = 2 : findptr = Å‰‚ÉŒ©‚Â‚©‚Á‚½codeˆÊ’u(Å‰‚Ì•¶š‚Ì‚İŒŸõ)
-	//		–ß‚è’l : Ÿ‚Ì•¶š‚É‚ ‚½‚éˆÊ’u
+	//		æ–‡å­—åˆ—ä¸­ã®codeä½ç½®ã‚’æ¢ã™(2ãƒã‚¤ãƒˆã‚³ãƒ¼ãƒ‰ã€å…¨è§’å¯¾å¿œç‰ˆ)
+	//		sw = 0 : findptr = æœ€å¾Œã«è¦‹ã¤ã‹ã£ãŸcodeä½ç½®
+	//		sw = 1 : findptr = æœ€åˆã«è¦‹ã¤ã‹ã£ãŸcodeä½ç½®
+	//		sw = 2 : findptr = æœ€åˆã«è¦‹ã¤ã‹ã£ãŸcodeä½ç½®(æœ€åˆã®æ–‡å­—ã®ã¿æ¤œç´¢)
+	//		æˆ»ã‚Šå€¤ : æ¬¡ã®æ–‡å­—ã«ã‚ãŸã‚‹ä½ç½®
 	//
 	unsigned char *p;
 	unsigned char a1;
@@ -474,8 +474,8 @@ char *strchr3( char *target, int code, int sw, char **findptr )
 				}
 			}
 		}
-		p++;							// ŒŸõˆÊ’u‚ğˆÚ“®
-		if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 		if ( res != NULL ) { *findptr = res; pres = (char *)p; res = NULL; }
@@ -494,7 +494,7 @@ char *strchr3( char *target, int code, int sw, char **findptr )
 
 void TrimCodeR( char *p, int code )
 {
-	//		ÅŒã‚Ìcode‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®codeã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -513,7 +513,7 @@ void TrimCodeR( char *p, int code )
 
 void TrimCode( char *p, int code )
 {
-	//		‚·‚×‚Ä‚Ìcode‚ğæ‚èœ‚­
+	//		ã™ã¹ã¦ã®codeã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -527,7 +527,7 @@ void TrimCode( char *p, int code )
 
 void TrimCodeL( char *p, int code )
 {
-	//		Å‰‚Ìcode‚ğæ‚èœ‚­
+	//		æœ€åˆã®codeã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -546,23 +546,23 @@ void TrimCodeL( char *p, int code )
 
 void dirinfo( char *p, int id )
 {
-	//		dirinfo–½—ß‚Ì“à—e‚ğstmp‚Éİ’è‚·‚é
+	//		dirinfoå‘½ä»¤ã®å†…å®¹ã‚’stmpã«è¨­å®šã™ã‚‹
 	//
 #ifdef USE_WINDOWS_API
 	char fname[_MAX_PATH+1];
 
 	switch( id ) {
-	case 0:				//    ƒJƒŒƒ“ƒg(Œ»İ‚Ì)ƒfƒBƒŒƒNƒgƒŠ
+	case 0:				//    ã‚«ãƒ¬ãƒ³ãƒˆ(ç¾åœ¨ã®)ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		_getcwd( p, _MAX_PATH );
 		break;
-	case 1:				//    Àsƒtƒ@ƒCƒ‹‚ª‚ ‚éƒfƒBƒŒƒNƒgƒŠ
+	case 1:				//    å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		GetModuleFileName( NULL,fname,_MAX_PATH );
 		getpath( fname, p, 32 );
 		break;
-	case 2:				//    WindowsƒfƒBƒŒƒNƒgƒŠ
+	case 2:				//    Windowsãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		GetWindowsDirectory( p, _MAX_PATH );
 		break;
-	case 3:				//    Windows‚ÌƒVƒXƒeƒ€ƒfƒBƒŒƒNƒgƒŠ
+	case 3:				//    Windowsã®ã‚·ã‚¹ãƒ†ãƒ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		GetSystemDirectory( p, _MAX_PATH );
 		break;
 	default:
@@ -574,7 +574,7 @@ void dirinfo( char *p, int id )
 		return;
 	}
 
-	//		ÅŒã‚Ì'\\'‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®'\\'ã‚’å–ã‚Šé™¤ã
 	//
 	CutLastChr( p, '\\' );
 #else
@@ -645,13 +645,13 @@ int ConvSJis2Utf8( char *pSource, char *pDist, int buffersize )
 {
 	int size = 0;
  
-   //ShiftJIS‚©‚çUTF-16‚Ö•ÏŠ·
+   //ShiftJISã‹ã‚‰UTF-16ã¸å¤‰æ›
    const int nSize = ::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pSource, -1, NULL, 0 );
  
    BYTE* buffUtf16 = new BYTE[ nSize * 2 + 2 ];
    ::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pSource, -1, (LPWSTR)buffUtf16, nSize );
  
-   //UTF-16‚©‚çUTF-8‚Ö•ÏŠ·
+   //UTF-16ã‹ã‚‰UTF-8ã¸å¤‰æ›
    const int nSizeUtf8 = ::WideCharToMultiByte( CP_UTF8, 0, (LPCWSTR)buffUtf16, -1, NULL, 0, NULL, NULL );
    if( pDist == NULL ){
        delete buffUtf16;

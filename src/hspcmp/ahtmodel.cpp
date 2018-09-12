@@ -38,7 +38,7 @@ void AHTMODEL::Mesf( char *format, ... )
 
 AHTPROP *AHTMODEL::GetPropertyFromAlias( char *propname )
 {
-	//		ƒvƒƒpƒeƒB–¼‚©‚çŒŸõ
+	//		ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£åã‹ã‚‰æ¤œç´¢
 	//
 	int i;
 	char tmp[128];
@@ -54,7 +54,7 @@ AHTPROP *AHTMODEL::GetPropertyFromAlias( char *propname )
 
 AHTPROP *AHTMODEL::GetProperty( char *propname )
 {
-	//		ƒvƒƒpƒeƒB–¼‚©‚çŒŸõ
+	//		ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£åã‹ã‚‰æ¤œç´¢
 	//
 	int i;
 	char tmp[128];
@@ -71,7 +71,7 @@ AHTPROP *AHTMODEL::GetProperty( char *propname )
 
 int AHTMODEL::GetPropertyID( char *propname )
 {
-	//		ƒvƒƒpƒeƒB–¼‚©‚çŒŸõ
+	//		ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£åã‹ã‚‰æ¤œç´¢
 	//
 	int i;
 	char tmp[128];
@@ -88,7 +88,7 @@ int AHTMODEL::GetPropertyID( char *propname )
 
 int AHTMODEL::GetGlobalId2( void )
 {
-	//		ƒOƒ[ƒoƒ‹ID‚ğ•Ô‚·
+	//		ã‚°ãƒ­ãƒ¼ãƒãƒ«IDã‚’è¿”ã™
 	//
 	if ( global_id < 0 ) return 0;
 	return global_id;
@@ -97,7 +97,7 @@ int AHTMODEL::GetGlobalId2( void )
 
 int AHTMODEL::GetPropertyPossibleLines( void )
 {
-	//		ƒvƒƒpƒeƒB•ÒW‚ªg—p‚·‚és”‚ğŒvZ‚·‚é
+	//		ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ç·¨é›†ãŒä½¿ç”¨ã™ã‚‹è¡Œæ•°ã‚’è¨ˆç®—ã™ã‚‹
 	//
 	int i;
 	int lines;
@@ -237,8 +237,8 @@ AHTPROP *AHTMODEL::SetPropertyType( char *propname, int type )
 
 AHTPROP *AHTMODEL::SetPropertyDefault( char *propname, char *value )
 {
-	//		ƒvƒƒpƒeƒB‚ÌƒfƒtƒHƒ‹ƒg’l‚ğİ’è
-	//		("`"‚ğ”»•Ê‚·‚é)
+	//		ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’è¨­å®š
+	//		("ï½"ã‚’åˆ¤åˆ¥ã™ã‚‹)
 	//
 	unsigned char *vp;
 	unsigned char a1;
@@ -266,7 +266,7 @@ AHTPROP *AHTMODEL::SetPropertyDefault( char *propname, char *value )
 		} else {
 			if ( a1 <= 32 ) break;
 		}
-		if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) {
 				vp++;
 			}
@@ -396,13 +396,13 @@ AHTPROP *AHTMODEL::SetProperty( char *propname, char *name, char *value )
 
 /*
 	rev 54
-	mingw : warning : ”äŠr‚Íí‚Éc
-	‚É‘ÎˆB
+	mingw : warning : æ¯”è¼ƒã¯å¸¸ã«â€¦
+	ã«å¯¾å‡¦ã€‚
 */
 
 int AHTMODEL::SetAHTPropertyString( char *propname, char *str )
 {
-	//		AHTİ’è•¶š—ñ‚ğ‰ğÍ‚·‚é
+	//		AHTè¨­å®šæ–‡å­—åˆ—ã‚’è§£æã™ã‚‹
 	//
 	int res;
 	int qmode;
@@ -417,19 +417,19 @@ int AHTMODEL::SetAHTPropertyString( char *propname, char *str )
 	p = SetProperty( propname, NULL, NULL );
 
 	while(1) {
-		//		ƒpƒ‰ƒ[ƒ^[–¼‚ğ’Šo
+		//		ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã‚’æŠ½å‡º
 		while(1) {
 			a1=*vp;if ((a1!=32)&&(a1!=9)) break;
 			vp++;
 		}
 		if ( a1 == 0 ) break;
-		pname = vp;					// ƒpƒ‰ƒ[ƒ^[–¼
+		pname = vp;					// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼å
 		while(1) {
 			a1=*vp;
 			if ( a1 == 0 ) break;
 			if ( a1 == ',' ) break;
 			if ( a1 == '=' ) break;
-			if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+			if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 				if ((a1<=159)||(a1>=224)) {
 					vp++;
 				}
@@ -438,7 +438,7 @@ int AHTMODEL::SetAHTPropertyString( char *propname, char *str )
 		}
 		*vp = 0;
 		if ( a1 == '=' ) {
-			//		ƒpƒ‰ƒ[ƒ^[‚ğ’Šo
+			//		ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’æŠ½å‡º
 			vp++;
 			qmode = 0;
 			if ( *vp == 0x22 ) { qmode = 1; vp++; }
@@ -457,7 +457,7 @@ int AHTMODEL::SetAHTPropertyString( char *propname, char *str )
 						vp++;
 					}
 				}
-				if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+				if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 					if ((a1<=159)||(a1>=224)) {
 						vp++;
 					}
@@ -466,7 +466,7 @@ int AHTMODEL::SetAHTPropertyString( char *propname, char *str )
 			}
 			if ( SetProp( p, pname, pvalue ) < 0 ) res = 1;
 		} else {
-			//		’P“Æƒ^ƒCƒv
+			//		å˜ç‹¬ã‚¿ã‚¤ãƒ—
 			//
 			amb = 1;
 			if (tstrcmp(pname,"withid")) {
@@ -749,7 +749,7 @@ AHTPROP::~AHTPROP( void )
 
 void AHTPROP::SetOutValue( char *data )
 {
-	//		ƒ_ƒuƒ‹ƒNƒH[ƒg•t‰Á‚Ì‘®“WŠJ
+	//		ãƒ€ãƒ–ãƒ«ã‚¯ã‚©ãƒ¼ãƒˆä»˜åŠ æ™‚ã®æ›¸å¼å±•é–‹
 	//
 	int i;
 	unsigned char a1;
@@ -795,7 +795,7 @@ void AHTPROP::SetOutValue( char *data )
 			*p++ = '\\';
 			a1 = 0x22;
 		}
-		if (a1>=129) {						// ‘SŠp•¶šƒ`ƒFƒbƒN
+		if (a1>=129) {						// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if (a1<=159) { *p++=a1;a1=*src++; }
 			else if (a1>=224) { *p++=a1;a1=*src++; }
 			if ( a1 == 0 ) break;

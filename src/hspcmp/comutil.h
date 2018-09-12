@@ -6,10 +6,10 @@
 #define __comutil_h
 
 typedef struct _COM_GUID {
-	int		Data1;      // 4ƒoƒCƒg
-	short   Data2;      // 2ƒoƒCƒg
-	short   Data3;      // 2ƒoƒCƒg
-	char	Data4[8];   // 1ƒoƒCƒg~8
+	int		Data1;      // 4ãƒã‚¤ãƒˆ
+	short   Data2;      // 2ãƒã‚¤ãƒˆ
+	short   Data3;      // 2ãƒã‚¤ãƒˆ
+	char	Data4[8];   // 1ãƒã‚¤ãƒˆÃ—8
 } COM_GUID;
 
 int ConvertIID( COM_GUID *guid, char *name );

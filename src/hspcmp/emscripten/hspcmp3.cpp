@@ -18,7 +18,7 @@
 #include "../token.h"
 #include "../ahtobj.h"
 
-#define DPM_SUPPORT		// DPMƒtƒ@ƒCƒ‹ƒ}ƒl[ƒWƒƒ‚ðƒTƒ|[ƒg
+#define DPM_SUPPORT		// DPMãƒ•ã‚¡ã‚¤ãƒ«ãƒžãƒãƒ¼ã‚¸ãƒ£ã‚’ã‚µãƒãƒ¼ãƒˆ
 #include "../win32dll/dpm.h"
 
 #define EXPORT extern "C" EMSCRIPTEN_KEEPALIVE
@@ -47,7 +47,7 @@ int main()
 
 static int GetFilePath( char *bname )
 {
-	//		ƒtƒ‹ƒpƒX–¼‚©‚çAƒtƒ@ƒCƒ‹ƒpƒX‚ÌŽæ“¾(\‚ðŽc‚·)
+	//		ãƒ•ãƒ«ãƒ‘ã‚¹åã‹ã‚‰ã€ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã®å–å¾—(\ã‚’æ®‹ã™)
 	//
 	int a,b,len;
 	char a1;
@@ -356,7 +356,7 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	GetFilePath( libpath );
 
 	i = hsc3->OpenPackfile();
-	if (i) { Alert( "packfile‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ" ); return -1; }
+	if (i) { Alert( "packfileãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“" ); return -1; }
 	hsc3->GetPackfileOption( hspexe, "runtime", "hsprt" );
 	strcat( libpath, hspexe );
 	strcpy( hspexe, libpath );
@@ -373,7 +373,7 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 
 	hsc3->ClosePackfile();
 
-	//		exe‚ðì¬
+	//		exeã‚’ä½œæˆ
 #ifdef DPM_SUPPORT
 	dpmc_ini( hsc3->errbuf, fname );
 	st=dpmc_pack( 0 );

@@ -56,9 +56,9 @@
 
 // option for 'GetTokenCG'
 #define GETTOKEN_DEFAULT 0
-#define GETTOKEN_NOFLOAT 1		// '.'‚ð¬”“_‚ÆŒ©‚È‚³‚È‚¢(®”‚Ì‚ÝŽæ“¾)
-#define GETTOKEN_LABEL 2		// '*'‚É‘±‚­–¼‘O‚ðƒ‰ƒxƒ‹‚Æ‚µ‚ÄŽæ“¾
-#define GETTOKEN_EXPRBEG 4		// Ž®‚Ìæ“ª
+#define GETTOKEN_NOFLOAT 1		// '.'ã‚’å°æ•°ç‚¹ã¨è¦‹ãªã•ãªã„(æ•´æ•°ã®ã¿å–å¾—)
+#define GETTOKEN_LABEL 2		// '*'ã«ç¶šãåå‰ã‚’ãƒ©ãƒ™ãƒ«ã¨ã—ã¦å–å¾—
+#define GETTOKEN_EXPRBEG 4		// å¼ã®å…ˆé ­
 
 #define CG_LOCALSTRUCT_MAX 256
 
@@ -97,22 +97,22 @@ typedef struct MACDEF {
 
 #define SWSTACK_MAX 32
 
-#define HEDINFO_RUNTIME 0x1000		// “®“Iƒ‰ƒ“ƒ^ƒCƒ€‚ð—LŒø‚É‚·‚é
-#define HEDINFO_NOMMTIMER 0x2000	// ƒ}ƒ‹ƒ`ƒƒfƒBƒAƒ^ƒCƒ}[‚ð–³Œø‚É‚·‚é
-#define HEDINFO_NOGDIP 0x4000		// GDI+‚É‚æ‚é•`‰æ‚ð–³Œø‚É‚·‚é
-#define HEDINFO_FLOAT32 0x8000		// ŽÀ”‚ð32bit float‚Æ‚µ‚Äˆ—‚·‚é
-#define HEDINFO_ORGRND 0x10000		// •W€‚Ì—””­¶‚ðŽg—p‚·‚é
-#define HEDINFO_UTF8 0x20000		// UTF8ƒ‰ƒ“ƒ^ƒCƒ€‚ðŽg—p‚·‚é(ƒR[ƒhŽ¯•Ê—p)
-#define HEDINFO_HSP64 0x40000		// 64bitƒ‰ƒ“ƒ^ƒCƒ€‚ðŽg—p‚·‚é(ƒR[ƒhŽ¯•Ê—p)
-#define HEDINFO_IORESUME 0x80000	// ƒtƒ@ƒCƒ‹I/OƒGƒ‰[‚ð–³Ž‹‚µ‚Äˆ—‚ð‘±s‚·‚é
+#define HEDINFO_RUNTIME 0x1000		// å‹•çš„ãƒ©ãƒ³ã‚¿ã‚¤ãƒ ã‚’æœ‰åŠ¹ã«ã™ã‚‹
+#define HEDINFO_NOMMTIMER 0x2000	// ãƒžãƒ«ãƒãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒžãƒ¼ã‚’ç„¡åŠ¹ã«ã™ã‚‹
+#define HEDINFO_NOGDIP 0x4000		// GDI+ã«ã‚ˆã‚‹æç”»ã‚’ç„¡åŠ¹ã«ã™ã‚‹
+#define HEDINFO_FLOAT32 0x8000		// å®Ÿæ•°ã‚’32bit floatã¨ã—ã¦å‡¦ç†ã™ã‚‹
+#define HEDINFO_ORGRND 0x10000		// æ¨™æº–ã®ä¹±æ•°ç™ºç”Ÿã‚’ä½¿ç”¨ã™ã‚‹
+#define HEDINFO_UTF8 0x20000		// UTF8ãƒ©ãƒ³ã‚¿ã‚¤ãƒ ã‚’ä½¿ç”¨ã™ã‚‹(ã‚³ãƒ¼ãƒ‰è­˜åˆ¥ç”¨)
+#define HEDINFO_HSP64 0x40000		// 64bitãƒ©ãƒ³ã‚¿ã‚¤ãƒ ã‚’ä½¿ç”¨ã™ã‚‹(ã‚³ãƒ¼ãƒ‰è­˜åˆ¥ç”¨)
+#define HEDINFO_IORESUME 0x80000	// ãƒ•ã‚¡ã‚¤ãƒ«I/Oã‚¨ãƒ©ãƒ¼ã‚’ç„¡è¦–ã—ã¦å‡¦ç†ã‚’ç¶šè¡Œã™ã‚‹
 
 enum ppresult_t {
-	PPRESULT_SUCCESS,				// ¬Œ÷
-	PPRESULT_ERROR,					// ƒGƒ‰[
-	PPRESULT_UNKNOWN_DIRECTIVE,		// •s–¾‚ÈƒvƒŠƒvƒƒZƒbƒT–½—ßiPreprocessNMj
-	PPRESULT_INCLUDED,				// #include ‚³‚ê‚½
-	PPRESULT_WROTE_LINE,			// 1s‘‚«ž‚Ü‚ê‚½
-	PPRESULT_WROTE_LINES,			// 2sˆÈã‘‚«ž‚Ü‚ê‚½
+	PPRESULT_SUCCESS,				// æˆåŠŸ
+	PPRESULT_ERROR,					// ã‚¨ãƒ©ãƒ¼
+	PPRESULT_UNKNOWN_DIRECTIVE,		// ä¸æ˜Žãªãƒ—ãƒªãƒ—ãƒ­ã‚»ãƒƒã‚µå‘½ä»¤ï¼ˆPreprocessNMï¼‰
+	PPRESULT_INCLUDED,				// #include ã•ã‚ŒãŸ
+	PPRESULT_WROTE_LINE,			// 1è¡Œæ›¸ãè¾¼ã¾ã‚ŒãŸ
+	PPRESULT_WROTE_LINES,			// 2è¡Œä»¥ä¸Šæ›¸ãè¾¼ã¾ã‚ŒãŸ
 };
 
 class CLabel;
@@ -407,10 +407,10 @@ private:
 		int len;
 	} undefined_symbol_t;
 	std::vector<undefined_symbol_t> undefined_symbols;
-	int cs_lastptr;					// ƒpƒ‰ƒ[ƒ^[‚Ì‰ŠúCSˆÊ’u
-	int cs_lasttype;				// ƒpƒ‰ƒ[ƒ^[‚Ìƒ^ƒCƒv(’PˆêŽž)
-	int calccount;					// ƒpƒ‰ƒ[ƒ^[ŒÂ”
-	int pp_utf8;					// ƒ\[ƒXƒR[ƒh‚ðUTF-8‚Æ‚µ‚Äˆ—‚·‚é(0=–³Œø)
+	int cs_lastptr;					// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã®åˆæœŸCSä½ç½®
+	int cs_lasttype;				// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã®ã‚¿ã‚¤ãƒ—(å˜ä¸€æ™‚)
+	int calccount;					// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼å€‹æ•°
+	int pp_utf8;					// ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã‚’UTF-8ã¨ã—ã¦å‡¦ç†ã™ã‚‹(0=ç„¡åŠ¹)
 
 	//		for CodeGenerator
 	//
@@ -457,7 +457,7 @@ private:
 	CMemBuf *hpi_buf;
 
 #ifdef HSP_DS_POOL
-	std::map<double, int> double_literal_table; // ’è”ƒv[ƒ‹—p
+	std::map<double, int> double_literal_table; // å®šæ•°ãƒ—ãƒ¼ãƒ«ç”¨
 	std::map<std::string, int> string_literal_table;
 #endif
 
@@ -484,8 +484,8 @@ private:
 
 	//		for SCNV
 	//
-	char *scnvbuf;			// SCNV•ÏŠ·ƒoƒbƒtƒ@
-	int	scnvsize;			// SCNV•ÏŠ·ƒoƒbƒtƒ@ƒTƒCƒY
+	char *scnvbuf;			// SCNVå¤‰æ›ãƒãƒƒãƒ•ã‚¡
+	int	scnvsize;			// SCNVå¤‰æ›ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º
 
 };
 

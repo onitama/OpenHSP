@@ -31,7 +31,7 @@ int CTagStack::StrCmp( char *str1, char *str2 )
 
 int CTagStack::SearchTagID( char *tag )
 {
-	//		ƒ^ƒO‚ğŒŸõ
+	//		ã‚¿ã‚°ã‚’æ¤œç´¢
 	//
 	int i;
 	if ( tagent==0 ) return -1;
@@ -44,7 +44,7 @@ int CTagStack::SearchTagID( char *tag )
 
 int CTagStack::RegistTagID( char *tag )
 {
-	//		ƒ^ƒO‚ğ“o˜^
+	//		ã‚¿ã‚°ã‚’ç™»éŒ²
 	//
 	int i,len;
 	if ( tagent>=TAGSTK_TAGMAX ) return -1;
@@ -57,7 +57,7 @@ int CTagStack::RegistTagID( char *tag )
 
 void CTagStack::GetTagUniqueName( int tagid, char *outname )
 {
-	//		ƒ^ƒOID‚É‘Î‰‚µ‚½ƒ†ƒj[ƒN–¼‚ğæ“¾
+	//		ã‚¿ã‚°IDã«å¯¾å¿œã—ãŸãƒ¦ãƒ‹ãƒ¼ã‚¯åã‚’å–å¾—
 	//
 	TAGINF *t;
 	if (( tagid < 0 )||( tagid >= TAGSTK_TAGMAX )) {
@@ -71,7 +71,7 @@ void CTagStack::GetTagUniqueName( int tagid, char *outname )
 
 int CTagStack::GetTagID( char *tag )
 {
-	//		ƒ^ƒO–¼->ƒ^ƒOID ‚É•ÏŠ·‚·‚é
+	//		ã‚¿ã‚°å->ã‚¿ã‚°ID ã«å¤‰æ›ã™ã‚‹
 	//
 	int i;
 	i = SearchTagID( tag );
@@ -82,7 +82,7 @@ int CTagStack::GetTagID( char *tag )
 
 char *CTagStack::GetTagName( int tagid )
 {
-	//		ƒ^ƒOID->ƒ^ƒO–¼ ‚É•ÏŠ·‚·‚é
+	//		ã‚¿ã‚°ID->ã‚¿ã‚°å ã«å¤‰æ›ã™ã‚‹
 	//
 	if (( tagid < 0 )||( tagid >= TAGSTK_TAGMAX )) return tagerr;
 	return mem_tag[tagid].name;
@@ -91,8 +91,8 @@ char *CTagStack::GetTagName( int tagid )
 
 int CTagStack::StackCheck( char *res )
 {
-	//		‚·‚×‚Ä‚ÌƒXƒ^ƒbƒN‚ª‰ğŒˆ‚³‚ê‚Ä‚¢‚é‚©‚ğƒ`ƒFƒbƒN
-	//			0=OK/1>=NG (res‚ÉƒGƒ‰[ƒXƒ^ƒbƒN‚ğŠÜ‚Şƒ^ƒOˆê——)
+	//		ã™ã¹ã¦ã®ã‚¹ã‚¿ãƒƒã‚¯ãŒè§£æ±ºã•ã‚Œã¦ã„ã‚‹ã‹ã‚’ãƒã‚§ãƒƒã‚¯
+	//			0=OK/1>=NG (resã«ã‚¨ãƒ©ãƒ¼ã‚¹ã‚¿ãƒƒã‚¯ã‚’å«ã‚€ã‚¿ã‚°ä¸€è¦§)
 	//
 	int i,n;
 	TAGDATA *t;
@@ -119,7 +119,7 @@ int CTagStack::StackCheck( char *res )
 
 int CTagStack::PushTag( int tagid, char *str )
 {
-	//		ƒ^ƒOID,str‚ğƒXƒ^ƒbƒN‚É“ü‚ê‚é
+	//		ã‚¿ã‚°ID,strã‚’ã‚¹ã‚¿ãƒƒã‚¯ã«å…¥ã‚Œã‚‹
 	//
 	int i,len;
 	TAGDATA *t;
@@ -136,7 +136,7 @@ int CTagStack::PushTag( int tagid, char *str )
 
 char *CTagStack::PopTag( int tagid )
 {
-	//		ƒ^ƒOID‚É‘Î‰‚µ‚½ƒXƒ^ƒbƒNstr‚ğæ‚èo‚·
+	//		ã‚¿ã‚°IDã«å¯¾å¿œã—ãŸã‚¹ã‚¿ãƒƒã‚¯strã‚’å–ã‚Šå‡ºã™
 	//
 	int i;
 	TAGDATA *t;
@@ -144,7 +144,7 @@ char *CTagStack::PopTag( int tagid )
 	if (( tagid < 0 )||( tagid >= TAGSTK_TAGMAX )) return NULL;
 	if ( lastidx<1 ) return NULL;
 	i = lastidx;
-	while(1) {							// ƒXƒ^ƒbƒN‚ğ’H‚é
+	while(1) {							// ã‚¹ã‚¿ãƒƒã‚¯ã‚’è¾¿ã‚‹
 		i--; if ( i<0 ) return NULL;
 		t = &mem_buf[i];
 		if ( t->tagid == tagid ) break;
@@ -164,8 +164,8 @@ char *CTagStack::PopTag( int tagid )
 
 char *CTagStack::LookupTag( int tagid, int level )
 {
-	//		ƒ^ƒOID‚É‘Î‰‚µ‚½ƒXƒ^ƒbƒNstr‚ğæ‚èo‚·(POP‚µ‚È‚¢)
-	//				(level=ƒXƒ^ƒbƒN’i”0,1,2c)
+	//		ã‚¿ã‚°IDã«å¯¾å¿œã—ãŸã‚¹ã‚¿ãƒƒã‚¯strã‚’å–ã‚Šå‡ºã™(POPã—ãªã„)
+	//				(level=ã‚¹ã‚¿ãƒƒã‚¯æ®µæ•°0,1,2â€¦)
 	//
 	int i,lv;
 	TAGDATA *t;
@@ -173,7 +173,7 @@ char *CTagStack::LookupTag( int tagid, int level )
 	if ( lastidx<1 ) return NULL;
 	lv = level;
 	i = lastidx;
-	while(1) {							// ƒXƒ^ƒbƒN‚ğ’H‚é
+	while(1) {							// ã‚¹ã‚¿ãƒƒã‚¯ã‚’è¾¿ã‚‹
 		i--;if ( i<0 ) return NULL;
 		t = &mem_buf[i];
 		if ( t->tagid == tagid ) {

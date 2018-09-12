@@ -80,7 +80,7 @@ typedef struct AHTPARTS
 
 
 
-// AHTƒƒCƒ“
+// AHTãƒ¡ã‚¤ãƒ³
 class CAht {
 public:
 	CAht();

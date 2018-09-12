@@ -62,16 +62,16 @@ static	int defseed1, defseed2;
 static	unsigned char *src;
 static	unsigned int srcbuf;
 
-#define	p_optr 0x04			// Àƒf[ƒ^ŠJnƒ|ƒCƒ“ƒ^
-#define p_dent 0x08			// ƒfƒBƒŒƒNƒgƒŠƒGƒ“ƒgƒŠ”
-#define p_dnam 0x0c			// ƒl[ƒ€ƒXƒy[ƒXŠm•ÛƒTƒCƒY(ver2.6)
+#define	p_optr 0x04			// å®Ÿãƒ‡ãƒ¼ã‚¿é–‹å§‹ãƒã‚¤ãƒ³ã‚¿
+#define p_dent 0x08			// ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚¨ãƒ³ãƒˆãƒªæ•°
+#define p_dnam 0x0c			// ãƒãƒ¼ãƒ ã‚¹ãƒšãƒ¼ã‚¹ç¢ºä¿ã‚µã‚¤ã‚º(ver2.6)
 
-#define d_farc 0x08			// ˆ³kflag(æ“ª‚ª'\0'‚Ì‚Ì‚İ—LŒø)
-#define d_fasz 0x0c			// ˆ³kŒãsize(æ“ª‚ª'\0'‚Ì‚Ì‚İ—LŒø)
-#define d_fnpt 0x10			// –¼‘OŠi”[ƒ|ƒCƒ“ƒ^(æ“ª‚ª'\0'‚Ì‚Ì‚İ—LŒø)
-#define d_fenc 0x14			// ˆÃ†‰»flag(æ“ª‚ª'\0'‚Ì‚Ì‚İ—LŒø)
-#define d_fent 0x18			// ƒtƒ@ƒCƒ‹Ši”[ƒ|ƒCƒ“ƒ^
-#define d_fsiz 0x1c			// ƒtƒ@ƒCƒ‹size
+#define d_farc 0x08			// åœ§ç¸®flag(å…ˆé ­ãŒ'\0'ã®æ™‚ã®ã¿æœ‰åŠ¹)
+#define d_fasz 0x0c			// åœ§ç¸®å¾Œsize(å…ˆé ­ãŒ'\0'ã®æ™‚ã®ã¿æœ‰åŠ¹)
+#define d_fnpt 0x10			// åå‰æ ¼ç´ãƒã‚¤ãƒ³ã‚¿(å…ˆé ­ãŒ'\0'ã®æ™‚ã®ã¿æœ‰åŠ¹)
+#define d_fenc 0x14			// æš—å·åŒ–flag(å…ˆé ­ãŒ'\0'ã®æ™‚ã®ã¿æœ‰åŠ¹)
+#define d_fent 0x18			// ãƒ•ã‚¡ã‚¤ãƒ«æ ¼ç´ãƒã‚¤ãƒ³ã‚¿
+#define d_fsiz 0x1c			// ãƒ•ã‚¡ã‚¤ãƒ«size
 
 /*----------------------------------------------------------*/
 
@@ -348,7 +348,7 @@ static int newfile( int mode )
 				}
 			}
 
-			//		longname buffer‚É‘‚«‚İ
+			//		longname bufferã«æ›¸ãè¾¼ã¿
 			//{
 			//int sz;
 			//cutlast2(s1);
@@ -357,7 +357,7 @@ static int newfile( int mode )
 			//fnam[dent]=idx_nam;
 			//}
 
-			//		Šg’£ƒtƒB[ƒ‹ƒh
+			//		æ‹¡å¼µãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰
 			fenc[dent]= encode;
 			fnam[dent]= -1;
 
@@ -370,9 +370,9 @@ static int newfile( int mode )
 	fclose(fp2);
 	if (efl) { free( mem_nam );return -1; }
 
-	//		‰ğ“ÇƒL[‚ğ¶¬‚·‚é
+	//		è§£èª­ã‚­ãƒ¼ã‚’ç”Ÿæˆã™ã‚‹
 	//
-	seed1 = defseed1; seed2 = defseed2;		// data.dpm—p‚ÌSEED
+	seed1 = defseed1; seed2 = defseed2;		// data.dpmç”¨ã®SEED
 
 	//	write header
 
@@ -467,7 +467,7 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	char p_ext[_MAX_EXT];
 
 
-	//		HSPƒwƒbƒ_[‚ğŒŸõ
+	//		HSPãƒ˜ãƒƒãƒ€ãƒ¼ã‚’æ¤œç´¢
 	//
 	strcpy( hrtfile, hspexe );
 	_splitpath( hrtfile, p_drive, p_dir, p_fname, p_ext );
@@ -504,13 +504,13 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	prt(tmp);
 	strcpy(sname,bname);
 
-	//		ì¬‚³‚ê‚éÀsƒtƒ@ƒCƒ‹–¼
+	//		ä½œæˆã•ã‚Œã‚‹å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«å
 	//
 	if (mode==2) strcat(sname,".scr");
 			else strcat(sname,".exe");
 
 
-	//		DPM‚Ìƒ`ƒFƒbƒNƒTƒ€‚ğì¬
+	//		DPMã®ãƒã‚§ãƒƒã‚¯ã‚µãƒ ã‚’ä½œæˆ
 	//
 	fp=fopen(fname,"rb");
 	if (fp==NULL) {
@@ -531,7 +531,7 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	//AlertV( "SUMSEED",sumseed );
 
 
-	//		ƒwƒbƒ_î•ñ‚ğ‘‚«‚İ
+	//		ãƒ˜ãƒƒãƒ€æƒ…å ±ã‚’æ›¸ãè¾¼ã¿
 	//
 	sidx2=sidx+36;
 	for(a1=0;a1<32;a1++) { s4[a1]=0; }
@@ -592,7 +592,7 @@ void dpmc_ini( CMemBuf *mesbuf, char *infile )
 	addext(fname,"dpm");
 	strcpy(aname,"packfile");
 	prt("Datafile Pack Manager ver.3.0 / onion software 1997-2012\r\n");
-	defseed1 = 0xaa; defseed2 = 0x55;			// data.dpm—p‚ÌƒfƒtƒHƒ‹ƒgSEED
+	defseed1 = 0xaa; defseed2 = 0x55;			// data.dpmç”¨ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆSEED
 }
 
 int dpmc_view( void )

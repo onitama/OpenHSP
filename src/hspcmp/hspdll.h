@@ -48,9 +48,9 @@ typedef struct BMSCR
 	HFONT	holdfon;			// FONT handle (old)
 	COLORREF color;				// text color code
 
-	HANDLE	hCld[objkazz];		// buttonÇÃhandle
-	int		owid[objkazz];		// buttonÇÃjump ID
-	int		owb;				// handleÇÃindex
+	HANDLE	hCld[objkazz];		// button„ÅÆhandle
+	int		owid[objkazz];		// button„ÅÆjump ID
+	int		owb;				// handle„ÅÆindex
 
 	int		textspeed;			// slow text speed
 	int		cx2,cy2;			// slow text cursor x,y

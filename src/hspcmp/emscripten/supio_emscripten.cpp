@@ -1,9 +1,9 @@
 
 //
 //	supio.cpp functions (for Linux)
-//	Linux—p‚Ìsupio.cpp‚ğ•Êƒtƒ@ƒCƒ‹‚Æ‚µ‚Äì¬‚µ‚Ü‚µ‚½B
+//	Linuxç”¨ã®supio.cppã‚’åˆ¥ãƒ•ã‚¡ã‚¤ãƒ«ã¨ã—ã¦ä½œæˆã—ã¾ã—ãŸã€‚
 //
-//	Special thanks to Charlotte at HSPŠJ”­wiki
+//	Special thanks to Charlotte at HSPé–‹ç™ºwiki
 //	http://hspdev-wiki.net/?OpenHSP%2FLinux%2Fhsp3
 //
 //
@@ -46,7 +46,7 @@
 //
 void _splitpath( const char *path, char *p_drive, char *dir, char *fname, char *ext )
 {
-	//		Linux—pƒtƒ@ƒCƒ‹ƒpƒXØ‚èo‚µ
+	//		Linuxç”¨ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹åˆ‡ã‚Šå‡ºã—
 	//
 	char *p, pathtmp[256];
 
@@ -73,7 +73,7 @@ void _splitpath( const char *path, char *p_drive, char *dir, char *fname, char *
 
 static int wildcard( char *text, char *wc )
 {
-	//		text‚É‘Î‚µ‚ÄƒƒCƒ‹ƒhƒJ[ƒhˆ—‚ğ“K‰
+	//		textã«å¯¾ã—ã¦ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰å‡¦ç†ã‚’é©å¿œ
 	//		return value: yes 1, no 0
 	//
 	if ( wc[0]=='\0' && *text=='\0' ) {
@@ -313,7 +313,7 @@ int changedir( char *name )
 int delfile( char *name )
 {
 	return unlink( name );
-	//return remove( name );		// ƒfƒBƒŒƒNƒgƒŠ‚É‚àƒtƒ@ƒCƒ‹‚É‚à‘Î‰
+	//return remove( name );		// ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«ã‚‚ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚‚å¯¾å¿œ
 }
 
 /*----------------------------------------------------------*/
@@ -390,7 +390,7 @@ void cutlast2( char *st )
 
 char *strchr2( char *target, char code )
 {
-	//		str’†ÅŒã‚ÌcodeˆÊ’u‚ğ’T‚·(‘SŠp‘Î‰”Å)
+	//		strä¸­æœ€å¾Œã®codeä½ç½®ã‚’æ¢ã™(å…¨è§’å¯¾å¿œç‰ˆ)
 	//
 	unsigned char *p;
 	unsigned char a1;
@@ -400,8 +400,8 @@ char *strchr2( char *target, char code )
 	while(1) {
 		a1=*p;if ( a1==0 ) break;
 		if ( a1==code ) res=(char *)p;
-		p++;							// ŒŸõˆÊ’u‚ğˆÚ“®
-		if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 	}
@@ -410,8 +410,8 @@ char *strchr2( char *target, char code )
 
 int is_sjis_char_head( const unsigned char *str, int pos )
 {
-	//		Shift_JIS•¶š—ñ‚ÌposƒoƒCƒg–Ú‚ª•¶š‚Ìæ“ªƒoƒCƒg‚Å‚ ‚é‚©
-	//		ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š‚ÌŒã‘±ƒoƒCƒg‚È‚ç0A‚»‚êˆÈŠO‚È‚ç1‚ğ•Ô‚·
+	//		Shift_JISæ–‡å­—åˆ—ã®posãƒã‚¤ãƒˆç›®ãŒæ–‡å­—ã®å…ˆé ­ãƒã‚¤ãƒˆã§ã‚ã‚‹ã‹
+	//		ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—ã®å¾Œç¶šãƒã‚¤ãƒˆãªã‚‰0ã€ãã‚Œä»¥å¤–ãªã‚‰1ã‚’è¿”ã™
 	int result = 1;
 	while(pos != 0 && issjisleadbyte(str[--pos])) {
 		result = ! result;
@@ -420,10 +420,10 @@ int is_sjis_char_head( const unsigned char *str, int pos )
 }
 
 char *to_hsp_string_literal( const char *src ) {
-	//		•¶š—ñ‚ğHSP‚Ì•¶š—ñƒŠƒeƒ‰ƒ‹Œ`®‚É
-	//		–ß‚è’l‚Ìƒƒ‚ƒŠ‚ÍŒÄ‚Ño‚µ‘¤‚ªfree‚·‚é•K—v‚ª‚ ‚éB
-	//		HSP‚Ì•¶š—ñƒŠƒeƒ‰ƒ‹‚Å•\‚¹‚È‚¢•¶š‚Í
-	//		‚»‚Ì‚Ü‚Üo—Í‚³‚ê‚é‚Ì‚Å’ˆÓBi'\n'‚È‚Çj
+	//		æ–‡å­—åˆ—ã‚’HSPã®æ–‡å­—åˆ—ãƒªãƒ†ãƒ©ãƒ«å½¢å¼ã«
+	//		æˆ»ã‚Šå€¤ã®ãƒ¡ãƒ¢ãƒªã¯å‘¼ã³å‡ºã—å´ãŒfreeã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
+	//		HSPã®æ–‡å­—åˆ—ãƒªãƒ†ãƒ©ãƒ«ã§è¡¨ã›ãªã„æ–‡å­—ã¯
+	//		ãã®ã¾ã¾å‡ºåŠ›ã•ã‚Œã‚‹ã®ã§æ³¨æ„ã€‚ï¼ˆ'\n'ãªã©ï¼‰
 	//
 	size_t length = 2;
 	const unsigned char *s = (unsigned char *)src;
@@ -496,7 +496,7 @@ char *to_hsp_string_literal( const char *src ) {
 
 int atoi_allow_overflow( const char *s )
 {
-	//		ƒI[ƒo[ƒtƒ[ƒ`ƒFƒbƒN‚ğ‚µ‚È‚¢atoi
+	//		ã‚ªãƒ¼ãƒãƒ¼ãƒ•ãƒ­ãƒ¼ãƒã‚§ãƒƒã‚¯ã‚’ã—ãªã„atoi
 	//
 	int result = 0;
 	while (isdigit(*s)) {
@@ -508,7 +508,7 @@ int atoi_allow_overflow( const char *s )
 
 void CutLastChr( char *p, char code )
 {
-	//		ÅŒã‚Ì'/'‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®'/'ã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -528,11 +528,11 @@ void CutLastChr( char *p, char code )
 
 char *strchr3( char *target, int code, int sw, char **findptr )
 {
-	//		•¶š—ñ’†‚ÌcodeˆÊ’u‚ğ’T‚·(2ƒoƒCƒgƒR[ƒhA‘SŠp‘Î‰”Å)
-	//		sw = 0 : findptr = ÅŒã‚ÉŒ©‚Â‚©‚Á‚½codeˆÊ’u
-	//		sw = 1 : findptr = Å‰‚ÉŒ©‚Â‚©‚Á‚½codeˆÊ’u
-	//		sw = 2 : findptr = Å‰‚ÉŒ©‚Â‚©‚Á‚½codeˆÊ’u(Å‰‚Ì•¶š‚Ì‚İŒŸõ)
-	//		–ß‚è’l : Ÿ‚Ì•¶š‚É‚ ‚½‚éˆÊ’u
+	//		æ–‡å­—åˆ—ä¸­ã®codeä½ç½®ã‚’æ¢ã™(2ãƒã‚¤ãƒˆã‚³ãƒ¼ãƒ‰ã€å…¨è§’å¯¾å¿œç‰ˆ)
+	//		sw = 0 : findptr = æœ€å¾Œã«è¦‹ã¤ã‹ã£ãŸcodeä½ç½®
+	//		sw = 1 : findptr = æœ€åˆã«è¦‹ã¤ã‹ã£ãŸcodeä½ç½®
+	//		sw = 2 : findptr = æœ€åˆã«è¦‹ã¤ã‹ã£ãŸcodeä½ç½®(æœ€åˆã®æ–‡å­—ã®ã¿æ¤œç´¢)
+	//		æˆ»ã‚Šå€¤ : æ¬¡ã®æ–‡å­—ã«ã‚ãŸã‚‹ä½ç½®
 	//
 	unsigned char *p;
 	unsigned char a1;
@@ -564,8 +564,8 @@ char *strchr3( char *target, int code, int sw, char **findptr )
 				}
 			}
 		}
-		p++;							// ŒŸõˆÊ’u‚ğˆÚ“®
-		if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 		if ( res != NULL ) { *findptr = res; pres = (char *)p; res = NULL; }
@@ -584,7 +584,7 @@ char *strchr3( char *target, int code, int sw, char **findptr )
 
 void TrimCodeR( char *p, int code )
 {
-	//		ÅŒã‚Ìcode‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®codeã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -603,7 +603,7 @@ void TrimCodeR( char *p, int code )
 
 void TrimCode( char *p, int code )
 {
-	//		‚·‚×‚Ä‚Ìcode‚ğæ‚èœ‚­
+	//		ã™ã¹ã¦ã®codeã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -617,7 +617,7 @@ void TrimCode( char *p, int code )
 
 void TrimCodeL( char *p, int code )
 {
-	//		Å‰‚Ìcode‚ğæ‚èœ‚­
+	//		æœ€åˆã®codeã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -636,21 +636,21 @@ void TrimCodeL( char *p, int code )
 
 void dirinfo( char *p, int id )
 {
-	//		dirinfo–½—ß‚Ì“à—e‚ğstmp‚Éİ’è‚·‚é
+	//		dirinfoå‘½ä»¤ã®å†…å®¹ã‚’stmpã«è¨­å®šã™ã‚‹
 	//
 	switch( id ) {
-	case 0:				//    ƒJƒŒƒ“ƒg(Œ»İ‚Ì)ƒfƒBƒŒƒNƒgƒŠ
-	case 1:				//    Àsƒtƒ@ƒCƒ‹‚ª‚ ‚éƒfƒBƒŒƒNƒgƒŠ
+	case 0:				//    ã‚«ãƒ¬ãƒ³ãƒˆ(ç¾åœ¨ã®)ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+	case 1:				//    å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		getcwd( p, _MAX_PATH);
 		break;
-	case 2:				//    WindowsƒfƒBƒŒƒNƒgƒŠ
-	case 3:				//    Windows‚ÌƒVƒXƒeƒ€ƒfƒBƒŒƒNƒgƒŠ
+	case 2:				//    Windowsãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+	case 3:				//    Windowsã®ã‚·ã‚¹ãƒ†ãƒ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 	default:
 		*p = 0;
 		return;
 	}
 
-	//		ÅŒã‚Ì'/'‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®'/'ã‚’å–ã‚Šé™¤ã
 	//
 	CutLastChr( p, '/' );
 }
