@@ -157,6 +157,7 @@ int main( int argc, char *argv[] )
 			result = system(execmd);
 			if ( WIFEXITED(result) ) {
 				result = WEXITSTATUS(result);
+				st = result;
 				printf("hsed: Process end %d.\n",result);
 				if ( execobj==2 ) {
 					if ( result != 0 ) {			// エラーがあった時

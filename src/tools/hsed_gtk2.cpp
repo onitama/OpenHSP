@@ -12,8 +12,11 @@
 #include <unistd.h>
 #include <termios.h>
 
+#include "supio.h"
+
 static GtkWidget *edit;
 static GtkWidget *window;
+static GtkWidget *wmenu;
 static GtkWidget *status_bar;
 static char filename[1024];
 static char hspdir[1024];
@@ -37,159 +40,11 @@ static GdkColor colorText;
 #define HSED_INI ".hsedconf"
 
 static int event_timer;
+static int event_jump;			// 行ジャンプフラグ(-1=なし)
+static int event_errflag;		// エラー発生フラグ(-1=no error)
 
-static struct termios orig_term_attr;
-static struct termios new_term_attr;
-
-void vTermBlock( int i ) 
-{
-    if ( i == 0 )
-    {
-        tcgetattr(fileno(stdin), &orig_term_attr);
-        memcpy(&new_term_attr, &orig_term_attr, sizeof(struct termios));
-        cfmakeraw(&new_term_attr);
-        tcsetattr(fileno(stdin), TCSANOW, &new_term_attr);
-    }
-    else
-    {
-        tcflush(fileno(stdin),TCIOFLUSH);
-        tcsetattr(fileno(stdin), TCSANOW, &orig_term_attr);
-    }
-}
-
-/*--------------------------------------------------------------------------------*/
-
-char *mem_ini( int size ) {
-	return (char *)calloc(size,1);
-}
-
-void mem_bye( void *ptr ) {
-	free(ptr);
-}
-
-int dpm_read( char *fname, void *readmem, int rlen, int seekofs )
-{
-	char *lpRd;
-	FILE *ff;
-	int a1;
-	int seeksize;
-
-	seeksize=seekofs;
-	if (seeksize<0) seeksize=0;
-
-	lpRd=(char *)readmem;
-
-	//	Read normal file
-
-	ff = fopen( fname, "rb" );
-	if ( ff == NULL ) return -1;
-	if ( seekofs>=0 ) fseek( ff, seeksize, SEEK_SET );
-	a1 = (int)fread( lpRd, 1, rlen, ff );
-	fclose( ff );
-	return a1;
-}
-
-int dpm_exist( char *fname )
-{
-	FILE *ff;
-	int length;
-
-	if ( *fname == 0 ) return -1;
-	ff=fopen( fname,"rb" );
-	if (ff==NULL) return -1;
-	fseek( ff,0,SEEK_END );
-	length=(int)ftell( ff );			// normal file size
-	fclose(ff);
-
-	return length;
-}
-
-char *dpm_readalloc( char *fname )
-{
-	char *p;
-	int len;
-	len = dpm_exist( fname );
-	if ( len < 0 ) return NULL;
-	p = mem_ini( len+1 );
-	dpm_read( fname, p, len, 0 );
-	p[len] = 0;
-	return p;
-}
-
-int dpm_save( char *fname, void *mem, int msize, int seekofs )
-{
-	FILE *fp;
-	int flen;
-
-	if (seekofs<0) {
-		fp=fopen(fname,"wb");
-	}
-	else {
-		fp=fopen(fname,"r+b");
-	}
-	if (fp==NULL) return -1;
-	if ( seekofs>=0 ) fseek( fp, seekofs, SEEK_SET );
-	flen = (int)fwrite( mem, 1, msize, fp );
-	fclose(fp);
-	return flen;
-}
-
-static	int splc;	// split pointer
-
-void strsp_ini( void )
-{
-	splc=0;
-}
-
-int strsp_getptr( void )
-{
-	return splc;
-}
-
-int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
-{
-	//		split string with parameters
-	//
-	unsigned char a1;
-	unsigned char a2;
-	int a;
-	int utf8cnt;
-	a=0;utf8cnt=0;
-	while(1) {
-		utf8cnt=0;
-		a1=srcstr[splc];
-		if (a1==0) break;
-		splc++;
-		if (a1>=128) {					// 多バイト文字チェック
-			if (a1>=192) utf8cnt++;
-			if (a1>=224) utf8cnt++;
-			if (a1>=240) utf8cnt++;
-			if (a1>=248) utf8cnt++;
-			if (a1>=252) utf8cnt++;
-		}
-
-		if (a1==splitchr) break;
-		if (a1==13) {
-			a2=srcstr[splc];
-			if (a2==10) splc++;
-			break;
-		}
-		if (a1==10) {
-			a2=srcstr[splc];
-			break;
-		}
-		dststr[a++]=a1;
-		if (utf8cnt>0) {
-			while(utf8cnt>0){
-				dststr[a++]=srcstr[splc++];
-				utf8cnt--;
-			}
-		}
-		if ( a>=len ) break;
-	}
-	dststr[a]=0;
-	return (int)a1;
-}
+#define STR_HSPERROR "#Error "		// ランタイムエラー識別用タグ
+#define STR_HSPERROR2 "in line "	// ランタイムエラー識別用タグ
 
 /*--------------------------------------------------------------------------------*/
 
@@ -800,9 +655,22 @@ static void HSP_complog(GtkWidget *w,gpointer data )
 static gint update_edit( gpointer data )
 {
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),TRUE);
+	gtk_widget_set_sensitive( wmenu, TRUE );
 	g_source_remove( event_timer );
-	printf("hsed: Restored [%d].\n", current_line );
-	cursor_move_line( edit, current_line );
+
+	if ( event_errflag >= 0 ) {
+		char msg[1024];
+		printf("hsed: Jump line [%d].\n", current_line+1 );
+		if ( event_jump >= 0 ) cursor_move_line( edit, current_line );
+
+		if ( jpflag ) {
+			sprintf( msg,"#Error %d in line %d\n-->%s", event_errflag, current_line+1, gethsperror(event_errflag) );
+		} else {
+			sprintf( msg,"#Error %d in line %d", event_errflag, current_line+1 );
+		}
+
+		dialog_open( "Error", msg );
+	}
 	return 0;
 }
 
@@ -864,18 +732,6 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	chdir(mydir);
 
-/*
-	int pid;
-	sprintf(cmd,"%s/hsp3dish",hspdir);
-	sigignore( SIGCLD );
-	if( (pid=fork()) < 0 ){ 
-	    return; 
-	} else if( pid == 0 ){ 
-	    execlp( cmd, cmd, "__hsptmp.ax", NULL );
-	    exit( -1 );
-	}
-*/
-
 	if(flag==1){
 		return;
 	}
@@ -886,6 +742,7 @@ static void HSP_run(GtkWidget *w,int flag)
 	}
 
 	// ランタイムを取得する
+/*
 	p = 0;
 	sprintf(cmd,"%s/hspcmp -e0 %s", hspdir,TEMP_AX);
 	fp=popen(cmd,"r");
@@ -909,13 +766,16 @@ static void HSP_run(GtkWidget *w,int flag)
 		}
 		runtime[sch++] = 0;
 	}
+	printf("hsed: Runtime [%s].\n",runtime);
+*/
 
-	needres = 1;
+	needres = 0;
+	event_errflag = -1;
+	event_jump = -1;
 	option[0] = '-';
 	option[1] = 'e';
 	option[2] = 0;
-	if ( strcmp(runtime,"hsp3cl")==0 ) needres = 0;		// hsp3clはそのまま
-	printf("hsed: Runtime [%s].\n",runtime);
+	//if ( strcmp(runtime,"hsp3cl")==0 ) needres = 0;		// hsp3clはそのまま
 
 #ifdef HSPRASPBIAN
 	if ( needres ) {
@@ -929,8 +789,51 @@ static void HSP_run(GtkWidget *w,int flag)
 #endif
 
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),FALSE);
+	gtk_widget_set_sensitive( wmenu, FALSE );
 
-//	vTermBlock(0);
+	//	HSPランタイム実行
+	p = 0;
+	fp=popen(cmd,"r");
+	while(feof(fp)==0){
+		p+=fread(complog+p,1,400,fp);
+	}
+	complog[p]='\0';
+	printf(complog);
+	if(pclose(fp)){
+		char *errinfo;
+		char str_errid[64];
+
+		errinfo = strstr2( complog, STR_HSPERROR );
+		if ( errinfo ) {
+			errinfo += strlen(STR_HSPERROR);
+			strsp_ini();
+			strsp_get( errinfo, str_errid, 32, 63 );
+			event_errflag = atoi( str_errid );
+
+			errinfo = strstr2( errinfo, STR_HSPERROR2 );
+			if ( errinfo ) {
+				errinfo += strlen(STR_HSPERROR2);
+				strsp_ini();
+				strsp_get( errinfo, str_errid, 32, 63 );
+				event_jump = atoi( str_errid );
+				current_line = event_jump - 1;
+			}
+
+			errinfo = strstr2( errinfo, TEMP_HSP );
+			if ( errinfo == NULL ) {
+				event_jump = -1;			// 異なるソースコードでエラーが出ている
+			}
+
+			if ( jpflag ) {
+				printf( "hsed: %s (エラー%d) %d行.\n", gethsperror(event_errflag), event_errflag, current_line+1 );
+			} else {
+				printf( "hsed: Runtime error %d line %d.\n", event_errflag, current_line+1 );
+			}
+
+		}
+	}
+
+/*
 	result = system(cmd);
 	if ( WIFEXITED(result) ) {
 		result = WEXITSTATUS(result);
@@ -938,11 +841,9 @@ static void HSP_run(GtkWidget *w,int flag)
 	} else {
 		printf("hsed: Process error.\n");
 	}
-
-	event_timer=g_timeout_add( 1000,(GSourceFunc)update_edit, NULL );
-//	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),TRUE);
-
-//	vTermBlock(1);
+*/
+	// 復帰用タイマーをセットする
+	event_timer=g_timeout_add( 500,(GSourceFunc)update_edit, NULL );
 }
 
 //	MENU
@@ -1021,7 +922,6 @@ void init_menu(GtkWidget  *window, GtkWidget **menu){
 
 int main(int argc, char *argv[], char *envp[]){
 	GtkWidget *vbox;
-	GtkWidget *menu;
 	GtkWidget *scroll;
 	GtkTextBuffer *buffer;
 	char config_file[1024];
@@ -1074,9 +974,9 @@ int main(int argc, char *argv[], char *envp[]){
 	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_widget_show(vbox);
 
-	init_menu(window, &menu);
-	gtk_box_pack_start(GTK_BOX(vbox), menu, FALSE, TRUE, 0);
-	gtk_widget_show(menu);
+	init_menu(window, &wmenu);
+	gtk_box_pack_start(GTK_BOX(vbox), wmenu, FALSE, TRUE, 0);
+	gtk_widget_show(wmenu);
 
 	scroll=gtk_scrolled_window_new(NULL,NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
