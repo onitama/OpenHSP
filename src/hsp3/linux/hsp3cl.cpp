@@ -6,12 +6,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <time.h>
 
 #include "../strbuf.h"
 #include "../hsp3.h"
 #include "../hsp3config.h"
 #include "../supio.h"
 #include "../hsp3gr.h"
+
+#include "hsp3cl.h"
 
 /*----------------------------------------------------------*/
 
@@ -23,8 +27,39 @@ static char fpas[]={ 'H'-48,'S'-48,'P'-48,'H'-48,
 static char optmes[] = "HSPHED~~\0_1_________2_________3______";
 
 static int hsp_wd;
+static int cl_option;
+static FILE *cl_fp;
+
+#define HSP3CL_RESFILE ".hspres"
 
 /*----------------------------------------------------------*/
+
+static void usage1( void )
+{
+static 	char *p[] = {
+	"usage: hsp3cl [options] [filename]",
+	"       -r    output result file to .hspres",
+	"       -p    pause when finished",
+	NULL };
+	int i;
+	for(i=0; p[i]; i++)
+		printf( "%s\n", p[i]);
+}
+
+/*----------------------------------------------------------*/
+
+int gettick( void )
+{
+	int i;
+	timespec ts;
+	double nsec;
+    clock_gettime(CLOCK_REALTIME,&ts);
+    nsec = (double)(ts.tv_nsec) * 0.001 * 0.001;
+    i = (int)ts.tv_sec * 1000 + (int)nsec;
+    //return ((double)(ts.tv_sec) + (double)(ts.tv_nsec) * 0.001 * 0.001 * 0.001);
+	return i;
+}
+
 
 void hsp3win_dialog( char *mes )
 {
@@ -34,35 +69,52 @@ void hsp3win_dialog( char *mes )
 
 void hsp3cl_msgfunc( HSPCTX *hspctx )
 {
+	int tick;
+
 	while(1) {
 
 		switch( hspctx->runmode ) {
 		case RUNMODE_STOP:
 			//		stop命令
-			hsp3win_dialog( "[STOP] Press any key..." );
-			getchar();
+			if ( cl_option & HSP3CL_OPT1_ERRSTOP ) {
+				hsp3win_dialog( "[STOP] Press any key..." );
+				getchar();
+			}
 			throw HSPERR_NONE;
 
 		case RUNMODE_WAIT:
 			//		wait命令による時間待ち
 			//		(実際はcode_exec_waitにtick countを渡す)
-			hspctx->runmode = RUNMODE_RUN;
+			printf( "wait-%d\n",( hspctx->waitcount) );
+			usleep( ( hspctx->waitcount) * 10000 );
 			//hspctx->runmode = code_exec_wait( tick );
+			hspctx->runmode = RUNMODE_RUN;
 			break;
 
 		case RUNMODE_AWAIT:
 			//		await命令による時間待ち
 			//		(実際はcode_exec_awaitにtick countを渡す)
-			hspctx->runmode = RUNMODE_RUN;
-			//hspctx->runmode = code_exec_await( tick );
+			tick = gettick();
+			if ( code_exec_await( tick ) != RUNMODE_RUN ) {
+					usleep( ( hspctx->waittick - tick) * 1000 );
+			} else {
+				tick = gettick();
+				while( tick < hspctx->waittick ) {	// 細かいwaitを取る
+					usleep( 10000 );
+					tick = gettick();
+				}
+				hspctx->lasttick = tick;
+				hspctx->runmode = RUNMODE_RUN;
+				//hspctx->runmode = RUNMODE_RUN;
+			}
 			break;
 
 		case RUNMODE_END:
 			//		end命令
-#if 0
-			hsp3win_dialog( "[END] Press any key..." );
-			getchar();
-#endif
+			if ( cl_option & HSP3CL_OPT1_ERRSTOP ) {
+				hsp3win_dialog( "[END] Press any key..." );
+				getchar();
+			}
 			throw HSPERR_NONE;
 
 		case RUNMODE_RETURN:
@@ -102,7 +154,8 @@ int hsp3cl_init( char *startfile )
 #ifdef HSPDEBUG
 
 	if ( *startfile == 0 ) {
-		printf( "OpenHSP CL ver%s / onion software 1997-2017\n", hspver );
+		printf( "OpenHSP CL ver%s / onion software 1997-2018\n", hspver );
+		usage1();
 		return -1;
 	}
 	hsp->SetFileName( startfile );
@@ -150,6 +203,8 @@ int hsp3cl_init( char *startfile )
 	hsp3typeinit_cl_extcmd( code_gettypeinfo( TYPE_EXTCMD ) );
 	hsp3typeinit_cl_extfunc( code_gettypeinfo( TYPE_EXTSYSVAR ) );
 
+	cl_option = 0;
+
 	return 0;
 }
 
@@ -159,6 +214,14 @@ static void hsp3cl_bye( void )
 	//		HSP関連の解放
 	//
 	delete hsp;
+}
+
+
+void hsp3cl_option( int opt )
+{
+	//		HSP3CLオプション設定
+	//
+	cl_option = opt;
 }
 
 
@@ -182,8 +245,15 @@ void hsp3cl_error( void )
 	}
 
 	hsp3win_dialog( errmsg );
-	hsp3win_dialog( "[ERROR] Press any key..." );
-	getchar();
+
+	if ( cl_option & HSP3CL_OPT1_RESOUT ) {
+		if ( cl_fp != NULL ) fputs( errmsg, cl_fp );
+	}
+
+	if ( cl_option & HSP3CL_OPT1_ERRSTOP ) {
+		hsp3win_dialog( "[ERROR] Press any key..." );
+		getchar();
+	}
 }
 
 
@@ -193,6 +263,11 @@ int hsp3cl_exec( void )
 	//
 	int runmode;
 	int endcode;
+
+	if ( cl_option & HSP3CL_OPT1_RESOUT ) {
+		cl_fp = fopen( HSP3CL_RESFILE, "w" );
+	}
+
 rerun:
 
 	//		実行の開始
@@ -221,6 +296,11 @@ rerun:
 		ctx->runmode = RUNMODE_RUN;
 		goto rerun;
 	}
+
+	if ( cl_option & HSP3CL_OPT1_RESOUT ) {
+		if ( cl_fp != NULL ) fclose( cl_fp );
+	}
+
 	endcode = ctx->endcode;
 	hsp3cl_bye();
 	return endcode;

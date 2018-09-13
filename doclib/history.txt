@@ -5,9 +5,13 @@ Hot Soup Processor ver3.6beta1                      HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
-	2018/09/12 3.6 beta1
+	2018/09/13 3.6 beta1
 
-	[HSP3Dish][Linux] Linux/Raspberry Pi版スクリプトエディタの更新
+	[HSP3Dish][Linux] Linux/Raspberry Pi版スクリプトエディタのエラーダイアログを更新
+	[HSP3Dish][Linux] Raspberry Pi版でI2Cデバイス制御機能を追加
+	[HSP3Dish][Linux] Raspberry Pi版で半透明描画にコンソール画面が重なる不具合を修正
+	[HSP3CL][Linux] 実行オプション -r、-pを追加
+	[HSP3CL][Linux] await/wait命令が正しく待機していない不具合を修正
 
 	Horiki017(github)さんの修正を反映
 	->プリプロセス時の演算に関して、"<<" ">>" "<=" "=>" 演算子の間に空白文字が許容されていたのを修正

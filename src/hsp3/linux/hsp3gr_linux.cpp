@@ -38,6 +38,116 @@ static int dispflg;
 extern int resY0, resY1;
 
 /*----------------------------------------------------------*/
+//					Raspberry Pi I2C support
+/*----------------------------------------------------------*/
+#ifdef HSPRASPBIAN
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+
+#define HSPI2C_CHMAX 16
+#define HSPI2C_DEVNAME "/dev/i2c-1"
+
+static int i2cfd_ch[HSPI2C_CHMAX];
+
+static void I2C_Init( void )
+{
+	int i;
+	for(i=0;i<HSPI2C_CHMAX;i++) {
+		i2cfd_ch[i] = 0;
+	}
+}
+
+static void I2C_Close( int ch )
+{
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return;
+	if ( i2cfd_ch[ch] == 0 ) return;
+
+	close( i2cfd_ch[ch] );
+	i2cfd_ch[ch] = 0;
+}
+
+static void I2C_Term( void )
+{
+	int i;
+	for(i=0;i<HSPI2C_CHMAX;i++) {
+		I2C_Close(i);
+	}
+}
+
+static int I2C_Open( int ch, int adr )
+{
+	int fd;
+	unsigned char i2cAddress;
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] ) I2C_Close( ch );
+
+	if((fd = open( HSPI2C_DEVNAME, O_RDWR )) < 0){
+        return 1;
+    }
+    i2cAddress = (unsigned char)(adr & 0x7f);
+    if (ioctl(fd, I2C_SLAVE, i2cAddress) < 0) {
+		close( fd );
+        return 2;
+    }
+
+	i2cfd_ch[ch] = fd;
+	return 0;
+}
+
+static int I2C_ReadByte( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] == 0 ) return -1;
+
+	res = read( i2cfd_ch[ch], data, 1 );
+	if ( res < 0 ) return -1;
+
+	res = (int)data[0];
+	return res;
+}
+
+static int I2C_ReadWord( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] == 0 ) return -1;
+
+	res = read( i2cfd_ch[ch], data, 2 );
+	if ( res < 0 ) return -1;
+
+	res = ((int)data[1]) << 8;
+	res += (int)data[0];
+	return res;
+}
+
+static int I2C_WriteByte( int ch, int value, int length )
+{
+	int res;
+	int len;
+	unsigned char *data;
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] == 0 ) return -1;
+	if ( ( length<0 )||( length>4 ) ) return -1;
+
+	len = length;
+	if ( len == 0 ) len = 1;
+	data = (unsigned char *)(&value);
+	res = write( i2cfd_ch[ch], data, len );
+	if ( res < 0 ) return -1;
+
+	return 0;
+}
+
+#endif
+
+/*----------------------------------------------------------*/
 //					HSP system support
 /*----------------------------------------------------------*/
 
@@ -295,6 +405,22 @@ static int devcontrol( char *cmd, int p1, int p2, int p3 )
 		if ( res == 0 ) return val;
 		return res;
 	}
+	if (( strcmp( cmd, "i2creadw" )==0 )||( strcmp( cmd, "I2CREADW" )==0 )) {
+		return I2C_ReadWord( p1 );
+	}
+	if (( strcmp( cmd, "i2cread" )==0 )||( strcmp( cmd, "I2CREAD" )==0 )) {
+		return I2C_ReadByte( p1 );
+	}
+	if (( strcmp( cmd, "i2cwrite" )==0 )||( strcmp( cmd, "I2CWRITE" )==0 )) {
+		return I2C_WriteByte( p3, p1, p2 );
+	}
+	if (( strcmp( cmd, "i2copen" )==0 )||( strcmp( cmd, "I2COPEN" )==0 )) {
+		return I2C_Open( p2, p1 );
+	}
+	if (( strcmp( cmd, "i2close" )==0 )||( strcmp( cmd, "I2CCLOSE" )==0 )) {
+		I2C_Close( p1 );
+		return 0;
+	}
 	return -1;
 }
 
@@ -528,6 +654,7 @@ static int termfunc_extcmd( int option )
 	//
 
 #ifdef HSPRASPBIAN
+	I2C_Term();
 	gpio_bye();
 #endif
 	return 0;
@@ -564,6 +691,7 @@ void hsp3typeinit_cl_extfunc( HSP3TYPEINFO *info )
 
 #ifdef HSPRASPBIAN
 	gpio_init();
+	I2C_Init();
 #endif
 }
 

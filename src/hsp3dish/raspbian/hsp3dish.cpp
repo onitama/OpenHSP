@@ -167,7 +167,9 @@ static int keyboardFd = -1;
 static int quit_flag = 0;
 static int mouse_x, mouse_y, mouse_btn1, mouse_btn2;
 
+#ifndef KEY_MAX
 #define KEY_MAX 256
+#endif
 static int key_map[KEY_MAX];
 
 struct input_event ev[64];
@@ -185,19 +187,19 @@ static void initKeyboard( void )
 	if(regcomp(&kbd,"event-kbd",0)!=0)
 	{
 	    printf("regcomp for kbd failed\n");
-	    return true;
+	    return;
 
 	}
 	if(regcomp(&mouse,"event-mouse",0)!=0)
 	{
 	    printf("regcomp for mouse failed\n");
-	    return true;
+	    return;
 
 	}
 
 	if ((dirp = opendir(dirName)) == NULL) {
 	    perror("couldn't open '/dev/input/by-id'");
-	    return true;
+	    return;
 	}
 
 	// Find any files that match the regex for keyboard or mouse
@@ -405,7 +407,13 @@ static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowt
       EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
       EGL_NONE
    };
-   
+
+	static VC_DISPMANX_ALPHA_T alpha= {
+	  DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS,
+	  255,
+	  NULL
+	};
+
 	EGLConfig config;
 	uint32_t width, height;
 
@@ -445,7 +453,7 @@ static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowt
    dispman_update = vc_dispmanx_update_start( 0 );
    dispman_element = vc_dispmanx_element_add ( dispman_update, dispman_display,
       0/*layer*/, &dst_rect, 0/*src*/,
-      &src_rect, DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0/*clamp*/, 0/*transform*/);
+      &src_rect, DISPMANX_PROTECTION_NONE, &alpha /*alpha*/, 0/*clamp*/, DISPMANX_NO_ROTATE /*transform*/);
       
    nativewindow.element = dispman_element;
    nativewindow.width = width;
@@ -638,6 +646,116 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 
 
 /*----------------------------------------------------------*/
+//					Raspberry Pi I2C support
+/*----------------------------------------------------------*/
+#ifdef HSPRASPBIAN
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+
+#define HSPI2C_CHMAX 16
+#define HSPI2C_DEVNAME "/dev/i2c-1"
+
+static int i2cfd_ch[HSPI2C_CHMAX];
+
+static void I2C_Init( void )
+{
+	int i;
+	for(i=0;i<HSPI2C_CHMAX;i++) {
+		i2cfd_ch[i] = 0;
+	}
+}
+
+static void I2C_Close( int ch )
+{
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return;
+	if ( i2cfd_ch[ch] == 0 ) return;
+
+	close( i2cfd_ch[ch] );
+	i2cfd_ch[ch] = 0;
+}
+
+static void I2C_Term( void )
+{
+	int i;
+	for(i=0;i<HSPI2C_CHMAX;i++) {
+		I2C_Close(i);
+	}
+}
+
+static int I2C_Open( int ch, int adr )
+{
+	int fd;
+	unsigned char i2cAddress;
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] ) I2C_Close( ch );
+
+	if((fd = open( HSPI2C_DEVNAME, O_RDWR )) < 0){
+        return 1;
+    }
+    i2cAddress = (unsigned char)(adr & 0x7f);
+    if (ioctl(fd, I2C_SLAVE, i2cAddress) < 0) {
+		close( fd );
+        return 2;
+    }
+
+	i2cfd_ch[ch] = fd;
+	return 0;
+}
+
+static int I2C_ReadByte( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] == 0 ) return -1;
+
+	res = read( i2cfd_ch[ch], data, 1 );
+	if ( res < 0 ) return -1;
+
+	res = (int)data[0];
+	return res;
+}
+
+static int I2C_ReadWord( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] == 0 ) return -1;
+
+	res = read( i2cfd_ch[ch], data, 2 );
+	if ( res < 0 ) return -1;
+
+	res = ((int)data[1]) << 8;
+	res += (int)data[0];
+	return res;
+}
+
+static int I2C_WriteByte( int ch, int value, int length )
+{
+	int res;
+	int len;
+	unsigned char *data;
+
+	if ( ( ch<0 )||( ch>=HSPI2C_CHMAX ) ) return -1;
+	if ( i2cfd_ch[ch] == 0 ) return -1;
+	if ( ( length<0 )||( length>4 ) ) return -1;
+
+	len = length;
+	if ( len == 0 ) len = 1;
+	data = (unsigned char *)(&value);
+	res = write( i2cfd_ch[ch], data, len );
+	if ( res < 0 ) return -1;
+
+	return 0;
+}
+
+#endif
+
+/*----------------------------------------------------------*/
 //		GPIOデバイスコントロール関連
 /*----------------------------------------------------------*/
 
@@ -805,6 +923,22 @@ static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
 		if ( res == 0 ) return val;
 		return res;
 	}
+	if (( strcmp( cmd, "i2creadw" )==0 )||( strcmp( cmd, "I2CREADW" )==0 )) {
+		return I2C_ReadWord( p1 );
+	}
+	if (( strcmp( cmd, "i2cread" )==0 )||( strcmp( cmd, "I2CREAD" )==0 )) {
+		return I2C_ReadByte( p1 );
+	}
+	if (( strcmp( cmd, "i2cwrite" )==0 )||( strcmp( cmd, "I2CWRITE" )==0 )) {
+		return I2C_WriteByte( p3, p1, p2 );
+	}
+	if (( strcmp( cmd, "i2copen" )==0 )||( strcmp( cmd, "I2COPEN" )==0 )) {
+		return I2C_Open( p2, p1 );
+	}
+	if (( strcmp( cmd, "i2close" )==0 )||( strcmp( cmd, "I2CCLOSE" )==0 )) {
+		I2C_Close( p1 );
+		return 0;
+	}
 	return -1;
 }
 
@@ -918,6 +1052,7 @@ int hsp3dish_init( char *startfile )
 
 	initKeyboard();
 	gpio_init();
+	I2C_Init();
 
 //#ifdef HSPDEBUG
 	if ( OpenIniFile( "hsp3dish.ini" ) == 0 ) {
@@ -1041,6 +1176,7 @@ static void hsp3dish_bye( void )
    eglTerminate( p_engine->display );
 
 	doneKeyboard();
+	I2C_Term();
 	gpio_bye();
 
 	bcm_host_deinit();

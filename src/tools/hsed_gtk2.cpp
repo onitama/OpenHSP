@@ -776,13 +776,14 @@ static void HSP_run(GtkWidget *w,int flag)
 	option[2] = 0;
 	if ( strcmp(runtime,"hsp3cl")==0 ) needres = 1;		// hsp3clはエラー情報をファイルから取得する
 
-#ifdef HSPRASPBIAN
-	sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
-//	sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hspcmp %s %s --syspath=%s/\""
+
+	if ( needres ) {
+		sprintf(cmd,"%s/%s -r %s",hspdir, runtime, TEMP_AX);
+	} else {
+//		sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hspcmp %s %s --syspath=%s/\""
 //			, mydir, hspdir, option, TEMP_AX, hspdir );
-#else
-	sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
-#endif
+		sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
+	}
 
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),FALSE);
 	gtk_widget_set_sensitive( wmenu, FALSE );
