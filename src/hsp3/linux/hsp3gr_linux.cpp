@@ -428,6 +428,17 @@ static int devcontrol( char *cmd, int p1, int p2, int p3 )
 
 /*------------------------------------------------------------*/
 /*
+		TCP/IP
+*/
+/*------------------------------------------------------------*/
+
+static int printmsggo(int p1){
+  printf("Number: %d\n", p1);
+  return 0;
+}
+
+/*------------------------------------------------------------*/
+/*
 		interface
 */
 /*------------------------------------------------------------*/
@@ -592,6 +603,15 @@ static int cmdfunc_extcmd( int cmd )
 		}
 
 #endif
+  case 0x60:              
+    {
+    char *cname;
+    int p_res;
+    p1 = code_getdi( 0 );
+    p_res = printmsggo(p1);
+    ctx->stat = p_res;
+    break;
+    }
 
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
