@@ -206,7 +206,9 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$05d 9 gmulcolor",				// (ver3.5)
 	"$05e 9 setcls",				// (ver3.5)
 	"$05f 9 celputm",				// (ver3.5)
-	"$060 9 printmsggo",				// (ver3.5)
+	"$060 9 sockopen",				// (ver3.5)
+	"$061 9 sockclose",				// (ver3.5)
+	"$062 9 sockreadbyte",				// (ver3.5)
 
 	//	enhanced command (ver3.0)
 

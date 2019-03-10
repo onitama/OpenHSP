@@ -1,0 +1,20 @@
+#include "hsp3dish.as"
+*init
+  domain = "127.0.0.1"
+  sockopen 0, domain, 12345
+  if stat != 0 {
+    mes "stat: " + stat
+    goto *endp
+  }
+
+*main
+  recv = 0
+  sockreadbyte
+  if stat >= 0 {
+    a = ""
+    poke a, 0, stat
+    mes "recv: " + a
+  }
+  goto *main
+
+*endp

@@ -148,6 +148,59 @@ static int I2C_WriteByte( int ch, int value, int length )
 #endif
 
 /*----------------------------------------------------------*/
+//					TCP/IP support
+/*----------------------------------------------------------*/
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+#define SOCKMAX 32
+static	int sockf=0;
+static	int soc[SOCKMAX];		/* Soket Descriptor */
+// static	SOCKET socsv[SOCKMAX];		/* Soket Descriptor (server) */
+static	int svstat[SOCKMAX];		/* Soket Thread Status (server) */
+// static	HANDLE svth[SOCKMAX];		/* Soket Thread Handle (server) */
+
+static int sockopen( int p1, char *p2, int p3){
+  struct sockaddr_in addr;
+  soc[p1] = socket(AF_INET, SOCK_STREAM, 0);
+  if(soc[p1]<0){ return -2; }
+
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr=inet_addr(p2);
+  addr.sin_port=htons(p3);
+  if(connect(soc[p1], (struct sockaddr*)&addr, sizeof(addr)) < 0){
+    return -4;
+  }
+  return 0;
+}
+
+static int sockclose(int p1){
+  close(soc[p1]);
+  return 0;
+}
+
+static int sockreadbyte(){
+  // No arguments
+  // Return read byte
+  int buf_len;
+  char buf[1];
+  memset(buf, 0, sizeof(buf));
+
+  buf_len = read(soc[p2], buf, sizeof(buf));
+  if(buf_len < 0){
+    return -2;
+  }
+  if(buf_len == 0){
+    return -1;
+  }
+  return (int)buf[0];
+}
+
+
+/*----------------------------------------------------------*/
 //					HSP system support
 /*----------------------------------------------------------*/
 
@@ -603,16 +656,36 @@ static int cmdfunc_extcmd( int cmd )
 		}
 
 #endif
-  case 0x60:              
+  case 0x60:              //sockopen
     {
-    char *cname;
+    char *address;
     int p_res;
     p1 = code_getdi( 0 );
-    p_res = printmsggo(p1);
+    address = code_stmpstr( code_gets() );
+    p3 = code_getdi( 0 );
+    p_res = sockopen(p1, address, p3);
     ctx->stat = p_res;
     break;
     }
-
+  case 0x61:              //sockclose
+    {
+    char *cname;
+    int p_res;
+    p_res = sockclose(p1);
+    ctx->stat = p_res;
+    break;
+    }
+  case 0x62:              //sockreadbyte
+    {
+    char *cname;
+    int p_res;
+    p_res = sockreadbyte();
+    if(p_res > 0){
+      printf("%c\n", p_res);
+    }
+    ctx->stat = p_res;
+    break;
+    }
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
 	}
