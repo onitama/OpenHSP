@@ -2,7 +2,7 @@
 
 HSPCMP := ../hspcmp
 HSP3DISH := ../hsp3dish
-HSP3CL := ../hsp3CL
+HSP3CL := ../hsp3cl
 COMPATH := ../common/
 
 .SUFFIXES: .hsp .ax
