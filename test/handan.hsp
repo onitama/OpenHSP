@@ -1,15 +1,2 @@
 #include "hsp3dish.as"
-
-	x=0
-  ; printmsggo 5
-*hata
-	redraw 0
-	font "",60
-	pos x,120
-	color 0,0,255
-	mes "こんにちは"
-	redraw 1
-	x=x+2
-	if x>640 : x=0
-	await 16
-	goto *hata
+printmsggo 5
