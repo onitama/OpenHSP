@@ -1,9 +1,10 @@
 # Usage: make TARGET=handan rundish
 
-HSPCMP := ../hspcmp
-HSP3DISH := ../hsp3dish
-HSP3CL := ../hsp3cl
-COMPATH := ../common/
+PREFIX ?= .
+HSPCMP := $(PREFIX)/../hspcmp
+HSP3DISH := $(PREFIX)/../hsp3dish
+HSP3CL := $(PREFIX)/../hsp3cl
+COMPATH := $(PREFIX)/../common/
 
 .SUFFIXES: .hsp .ax
 
