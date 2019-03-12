@@ -209,6 +209,8 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$060 9 sockopen",				// (ver3.5)
 	"$061 9 sockclose",				// (ver3.5)
 	"$062 9 sockreadbyte",				// (ver3.5)
+	"$063 9 sockget",
+	"$064 9 sockgetc",
 
 	//	enhanced command (ver3.0)
 

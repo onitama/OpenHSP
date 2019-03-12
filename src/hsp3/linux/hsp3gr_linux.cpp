@@ -182,6 +182,26 @@ static int sockclose(int p1){
   return 0;
 }
 
+static int sockget(char* buf, int size, int socid){
+	int recv_len;
+	memset(buf, 0, sizeof(buf));
+
+	recv_len = read(soc[socid], buf, size);
+	if(recv_len < 0) return -2;
+	if(recv_len == 0) return -1;
+	return 0;
+}
+
+static int sockgetc(int* buf, int socid){
+	int recv_len;
+	char recv;
+	recv_len = read(soc[socid], &recv, 1);
+	if(recv_len < 0) return -2;
+	if(recv_len == 0) return -1;
+	buf[0] = (int)recv;
+	return 0;
+}
+
 static int sockreadbyte(){
   // No arguments
   // Return read byte
@@ -198,7 +218,6 @@ static int sockreadbyte(){
   }
   return (int)buf[0];
 }
-
 
 /*----------------------------------------------------------*/
 //					HSP system support
@@ -686,6 +705,19 @@ static int cmdfunc_extcmd( int cmd )
     ctx->stat = p_res;
     break;
     }
+	case 0x63:	//sockget
+		{
+			PVal *pval;
+			char *ptr;
+			int size;
+			ptr = code_getvptr( &pval, &size );
+			p2 = code_getdi( 0 );
+			p3 = code_getdi( 0 );
+			int p_res;
+			p_res = sockget(pval->pt, p2, p3);
+			ctx->stat = p_res;
+			break;
+		}
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
 	}

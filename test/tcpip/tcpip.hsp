@@ -7,14 +7,18 @@
     goto *endp
   }
 
+sdim buf, 1024
 *main
   recv = 0
-  sockreadbyte
-  if stat >= 0 {
-    a = ""
-    poke a, 0, stat
-    mes "recv: " + a
+  sockget buf, 7, 0
+  if stat == -2 {
+    mes "ERROR"
+    goto *endp
   }
+  if stat == -1 {
+    goto *main
+  }
+  mes buf
   goto *main
 
 *endp

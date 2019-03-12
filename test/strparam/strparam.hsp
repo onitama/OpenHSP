@@ -1,0 +1,7 @@
+#include "hsp3cl.as"
+
+a = ""
+b = "abc"
+mes b
+setstring a
+mes a
