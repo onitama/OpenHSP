@@ -690,6 +690,7 @@ static int cmdfunc_extcmd( int cmd )
     {
     char *cname;
     int p_res;
+    p1 = code_geti();
     p_res = sockclose(p1);
     ctx->stat = p_res;
     break;
