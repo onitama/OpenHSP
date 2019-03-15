@@ -188,7 +188,7 @@ static int sockget(char* buf, int size, int socid){
 
 	recv_len = read(soc[socid], buf, size);
 	if(recv_len < 0) return -2;
-	if(recv_len == 0) return -1;
+	// if(recv_len == 0) return -1;
 	return 0;
 }
 
