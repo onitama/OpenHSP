@@ -28,8 +28,13 @@ main()
   len = sizeof(client);
   sock = accept(sock0, (struct sockaddr *)&client, &len);
 
+  printf("Connected\n");
+  while(1){
+    char message[1024];
+    if(scanf("%s", message) == EOF) break;
   /* 5文字送信 */
-  write(sock, "HELLO", 5);
+    write(sock, message, 5);
+  }
 
   /* TCPセッションの終了 */
   close(sock);

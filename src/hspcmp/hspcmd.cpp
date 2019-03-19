@@ -211,6 +211,7 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$062 9 sockreadbyte",				// (ver3.5)
 	"$063 9 sockget",
 	"$064 9 sockgetc",
+  "$065 9 sockgetm",
 
 	//	enhanced command (ver3.0)
 

@@ -156,6 +156,12 @@ static int I2C_WriteByte( int ch, int value, int length )
 #include <arpa/inet.h>
 #include <unistd.h>
 
+static int sockclose(int);
+static int sockget(char*, int, int);
+static int sockgetm(char*, int, int, int);
+static int sockclose(int);
+static int sockreadbyte();
+
 #define SOCKMAX 32
 static	int sockf=0;
 static	int soc[SOCKMAX];		/* Soket Descriptor */
@@ -183,21 +189,22 @@ static int sockclose(int p1){
 }
 
 static int sockget(char* buf, int size, int socid){
-	int recv_len;
-	memset(buf, 0, sizeof(buf));
+  return sockgetm(buf, size, socid, 0);
+}
 
-	recv_len = read(soc[socid], buf, size);
-	if(recv_len < 0) return -2;
-	// if(recv_len == 0) return -1;
-	return 0;
+static int sockgetm(char* buf, int size, int socid, int flag){
+  int recv_len;
+  memset(buf, 0, sizeof(buf));
+  recv_len = recv(soc[socid], buf, size, flag);
+  if(recv_len == -1) return errno;
+  return 0;
 }
 
 static int sockgetc(int* buf, int socid){
 	int recv_len;
 	char recv;
 	recv_len = read(soc[socid], &recv, 1);
-	if(recv_len < 0) return -2;
-	if(recv_len == 0) return -1;
+  if(recv_len < 0) return errno;
 	buf[0] = (int)recv;
 	return 0;
 }
@@ -716,6 +723,23 @@ static int cmdfunc_extcmd( int cmd )
 			p3 = code_getdi( 0 );
 			int p_res;
 			p_res = sockget(pval->pt, p2, p3);
+			ctx->stat = p_res;
+			break;
+		}
+	case 0x64:	//sockgetc
+		{
+		}
+	case 0x65:	//sockgetm
+		{
+			PVal *pval;
+			char *ptr;
+			int size;
+			ptr = code_getvptr( &pval, &size );
+			p2 = code_getdi( 0 );
+			p3 = code_getdi( 0 );
+			p4 = code_getdi( 0 );
+			int p_res;
+			p_res = sockgetm(pval->pt, p2, p3, p4);
 			ctx->stat = p_res;
 			break;
 		}
