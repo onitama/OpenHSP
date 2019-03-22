@@ -1,57 +1,53 @@
 #include "hsp3cl.as"
 
-
-sdim buf, 65536
-sdim tmpbuf, 65536
-
-#module 
-
-#defcfunc init_julius int sockidx
-  domain = "127.0.0.1"
-  PORT = 10500
-  sockopen sockidx, domain, PORT
-  if stat != 0 {
-    return -1
-  }
-  return 0
-
-#defcfunc is_recieved int sockidx
-  sockget tmpbuf@, 65536, 0
-  if stat < 0 {
-    return stat
-  }
-  buf@ = buf@ + tmpbuf@
-  if instr(buf@, 0, ".") != -1 {
-    return 1
-  }
-  return 0
-
-#defcfunc julius_read int sockidx
-  recv = buf@
-  buf@ = ""
-  return recv
+sockidx = 0
+domain = "127.0.0.1"
+PORT = 10500
 
 
-#global
+sockopen sockidx, domain, PORT
 
-res = init_julius(0)
-if res < 0 {
-  mes "Failed to initialize julius."
+if stat != 0 {
+  mes "Error in opening socket"
   end
 }
 
-sdim words, 65536
-repeat 10
-  mes cnt
-  is_recieved_res = is_recieved(0)
-  if is_recieved_res < 0 {
+sdim buf, 65536
+
+sdim words, 64, 128
+ddim cm, 64
+
+
+repeat -1
+  sockget buf, 1000, sockidx
+  if stat < 0 {
     mes "Error in recieving"
     end
   }
-  if is_recieved_res == 0 {
-    words = julius_read(0)
-    mes words
-  }
+  idx = 0
+  W_PREFIX = "WORD=\""
+  W_POSTFIX = "\""
+  CM_PREFIX = "CM=\""
+  CM_POSTFIX = "\""
+  W_PREFIX_LEN = 6
+  W_POSTFIX_LEN = 1
+  CM_PREFIX_LEN = 4
+  CM_POSTFIX_LEN = 1
+
+  mes buf
+
+  pidx = 0
+  repeat -1
+    p1 = instr(buf, pidx, W_PREFIX)
+    if p1 == -1 : break
+    p2 = instr(buf, p1+W_POSTFIX_LEN, W_POSTFIX)
+    if p2 == -1 : break
+    word = strmid(buf, p1+W_POSTFIX_LEN, p2-(p1-W_POSTFIX_LEN))
+    words(idx) = word
+    idx = idx+1
+    pidx = p2
+    ; mes "*WORD = " + word + "."
+  loop
 loop
 
 sockclose 0

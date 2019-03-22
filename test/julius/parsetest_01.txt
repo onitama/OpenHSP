@@ -1,0 +1,6 @@
+<RECOGOUT>
+<SHYPO RANK="1" SCORE="-26965.826172">
+<WHYPO WORD="" CLASSID="<s>" PHONE="silB" CM="0.689"/>
+<WHYPO WORD="あら" CLASSID="あら+感動詞" PHONE="a r a" CM="0.083"/>
+<WHYPO WORD="、" CLASSID="、+補助記号" PHONE="sp" CM="0.864"/>
+<WHYPO
