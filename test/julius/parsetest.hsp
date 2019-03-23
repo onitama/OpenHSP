@@ -13,8 +13,9 @@ CM_POSTFIX_LEN = 1
 pidx = 0
 
 repeat -1
-  p1 = instr(buf, pidx, W_PREFIX) + pidx
+  p1 = instr(buf, pidx, W_PREFIX)
   if p1 == -1 : end
+  p1 = p1 + pidx
   p2 = instr(buf, p1+W_PREFIX_LEN, W_POSTFIX)
   if p2 == -1 : end
   word = strmid(buf, p1+W_PREFIX_LEN, p2)
