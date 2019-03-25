@@ -20,7 +20,7 @@
         }
         return 0
 
-    #deffunc get_word_list array words
+    #deffunc get_word_list array words, array cm
         W_PREFIX = "WORD=\""
         W_POSTFIX = "\""
         CM_PREFIX = "CM=\""
@@ -41,6 +41,16 @@
           if p2 == -1 : break
           word = strmid(buf, p1+W_PREFIX_LEN, p2)
           words(idx) = word
+
+          pidx = p1+W_PREFIX_LEN+p2+W_POSTFIX_LEN
+
+          c1 = instr(buf, pidx, CM_PREFIX)
+          if c1 == -1 : break
+          c1 = c1 + pidx
+          c2 = instr(buf, c1+CM_PREFIX_LEN, CM_POSTFIX)
+          if c2 == -1 : break
+          cmprob = strmid(buf, c1+CM_PREFIX_LEN, c2)
+          cm(idx) = double(cmprob)
 
           idx = idx+1
           pidx = p1+W_PREFIX_LEN+p2+W_POSTFIX_LEN
