@@ -17,7 +17,6 @@ sdim buf, 65536
   wait 100
   recv = 0
   sockgetm buf, 30000, 0, 64;
-  mes stat
   if stat == 11 {
     mes "no content in buffer"
   } else : if stat < 0 {
