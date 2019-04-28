@@ -209,6 +209,25 @@ static int sockgetc(int* buf, int socid){
 	return 0;
 }
 
+static int sockgetb( TODO ){
+}
+
+static int sockput(int* buf, int socid){
+}
+
+static int sockputc(char c, int socid){
+}
+
+static int sockputb( TODO ){
+}
+
+static int sockmake(int socid, int port){
+}
+
+static int sockwait(int socid){
+}
+
+
 static int sockreadbyte(){
   // No arguments
   // Return read byte

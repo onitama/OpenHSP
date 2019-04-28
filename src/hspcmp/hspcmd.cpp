@@ -212,6 +212,12 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$063 9 sockget",
 	"$064 9 sockgetc",
   "$065 9 sockgetm",
+  "$066 9 sockgetb",
+  "$067 9 sockput",
+  "$068 9 sockputc",
+  "$069 9 sockputb",
+  "$070 9 sockmake",
+  "$071 9 sockwait",
 
 	//	enhanced command (ver3.0)
 
