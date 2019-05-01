@@ -166,6 +166,7 @@ static int sockreadbyte();
 static	int sockf=0;
 static	int soc[SOCKMAX];		/* Soket Descriptor */
 // static	SOCKET socsv[SOCKMAX];		/* Soket Descriptor (server) */
+static int socsv[SOCKMAX];
 static	int svstat[SOCKMAX];		/* Soket Thread Status (server) */
 // static	HANDLE svth[SOCKMAX];		/* Soket Thread Handle (server) */
 
@@ -209,22 +210,95 @@ static int sockgetc(int* buf, int socid){
 	return 0;
 }
 
-static int sockgetb( TODO ){
+static int sockgetbm( char *org_buf, int offset, int size, int socid, int flag){
+  int buf_len;
+  char* buf;
+  buf = org_buf + offset;
+  if(size == 0) size = 64;
+
+  buf_len = recv(soc[socid], buf, size, flag);
+  if(buf_len == -1) return errno;
+  return -(buf_len);
 }
 
-static int sockput(int* buf, int socid){
+static int sockgetb( char *org_buf, int offset, int size, int socid){
+  return sockgetbm(org_buf, offset, size, socid, 0);
 }
 
-static int sockputc(char c, int socid){
+static int sockputm(char* buf, int socid, int flag){
+  if(send(soc[socid], buf, strlen(buf), flag) == -1){   // FIXME: is `strlen(buf)` must be like `lstrlen()` in windows?
+    return errno;
+  }
+  return 0;
 }
 
-static int sockputb( TODO ){
+static int sockput(char* buf, int socid){
+  return sockputm(buf, socid, 0);
+}
+
+static int sockputc(int c, int socid){
+  char buf[2];
+  buf[0] = (char)c;
+  buf[1] = '\0';
+
+  if(send(soc[p3], buf, 1, 0) == -1){
+    return errno;
+  }
+  return 0;
+}
+
+static int sockputb(char* org_buf, int offset, int size, int socid){
+  char *buf;
+  int buf_len;
+  buf = org_buf + offset;
+  if(size == 0) size = 64;
+
+  buf_len = send(soc[socid], buf, size, 0);
+  if(buf_len == -1) return 0;
+  return -(buf_len);
 }
 
 static int sockmake(int socid, int port){
+
+  if(socsv[socid] == 0){
+    struct sockaddr_in addr;
+    int len = sizeof(struct sockaddr_in);
+
+    socsv[socid] = socket(AF_INET, SOCK_STREAM, 0);
+    if(socsv[socid] < 0){
+      return -2;
+    }
+
+    bzero((char *)&addr, sizeof(addr));
+    addr.sin_family = PF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(port);
+    if(bind(socsv[socid], (struct sockaddr *)&addr, len) < 0){
+      return -3;
+    }
+
+  }else{
+  }
+
+  svstat[socid] = 1;
+  if(listen(socsv[socid], SOMAXCONN) < 0){
+    svstat[socid] = 0;
+  }else{
+    svstat[socid]++;
+  }
 }
 
 static int sockwait(int socid){
+  fd_set fdsetread, fdsetwrite, fdseterror;
+
+  if(socsv[socid] == 0) return -2;
+  if(svstat[socid] == 0) return -4;
+  if(svstat[socid] != -2) return -3;
+
+  FD_ZERO(&fdsetread);
+  FD_ZERO(&fdsetwrite);
+  FD_ZERO(&fdseterror);
+  FD_SET(socsv[socid], &fdsetread);
 }
 
 
@@ -751,6 +825,35 @@ static int cmdfunc_extcmd( int cmd )
 			ctx->stat = p_res;
 			break;
 		}
+  case 0x66:  //sockgetb
+    {
+      PVal *pval;
+      char *ptr;
+      int size;
+      ptr = code_getvptr(&pval, &size);
+      p2 = code_getdi( 0 );
+      p3 = code_getdi( 0 );
+      p4 = code_getdi( 0 );
+      int p_res;
+      p_res = sockgetb(pval->pt, p2, p3, p4);
+      ctx->stat = p_res;
+      break;
+    }
+  case 0x67:  //sockgetbm
+    {
+      PVal *pval;
+      char *ptr;
+      int size;
+      ptr = code_getvptr(&pval, &size);
+      p2 = code_getdi( 0 );
+      p3 = code_getdi( 0 );
+      p4 = code_getdi( 0 );
+      p5 = code_getdi( 0 );
+      int p_res;
+      p_res = sockgetbm(pval->pt, p2, p3, p4, p5);
+      ctx->stat = p_res;
+      break;
+    }
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
 	}
