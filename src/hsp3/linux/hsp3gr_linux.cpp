@@ -156,10 +156,10 @@ static int I2C_WriteByte( int ch, int value, int length )
 #include <arpa/inet.h>
 #include <unistd.h>
 
+static int sockprep();
 static int sockclose(int);
 static int sockget(char*, int, int);
 static int sockgetm(char*, int, int, int);
-static int sockclose(int);
 static int sockreadbyte();
 
 #define SOCKMAX 32
@@ -170,8 +170,23 @@ static int socsv[SOCKMAX];
 static	int svstat[SOCKMAX];		/* Soket Thread Status (server) */
 // static	HANDLE svth[SOCKMAX];		/* Soket Thread Handle (server) */
 
+static int sockprep( void ){
+  sockf++;
+  for(int a = 0; a < SOCKMAX; a++){
+    soc[a] = -1;
+    socsv[a] = -1;
+    svstat[a] = 0;
+  }
+  return 0;
+}
+
 static int sockopen( int p1, char *p2, int p3){
   struct sockaddr_in addr;
+
+  if(sockf == 0){
+    if(sockprep()) return -1;;
+  }
+
   soc[p1] = socket(AF_INET, SOCK_STREAM, 0);
   if(soc[p1]<0){ return -2; }
 
@@ -185,7 +200,10 @@ static int sockopen( int p1, char *p2, int p3){
 }
 
 static int sockclose(int p1){
-  close(soc[p1]);
+  if(socsv[p1]!=-1) close(socsv[p1]);
+  if(soc[p1]!=-1) close(soc[p1]);
+
+  soc[p1]=-1;socsv[p1]=-1;svstat[p1]=0;
   return 0;
 }
 
@@ -260,7 +278,11 @@ static int sockputb(char* org_buf, int offset, int size, int socid){
 
 static int sockmake(int socid, int port){
 
-  if(socsv[socid] == 0){
+  if(sockf == 0){
+    if(sockprep()) return -1;
+  }
+
+  if(socsv[socid] == -1){
     struct sockaddr_in addr;
     int len = sizeof(struct sockaddr_in);
 
@@ -286,12 +308,18 @@ static int sockmake(int socid, int port){
   }else{
     svstat[socid]++;
   }
+  return 0;
 }
 
 static int sockwait(int socid){
+  int err;
   fd_set fdsetread, fdsetwrite, fdseterror;
+  struct timeval TimeVal={0,10000};
 
-  if(socsv[socid] == 0) return -2;
+  int soc2;
+  struct sockaddr_in from;
+
+  if(socsv[socid] == -1) return -2;
   if(svstat[socid] == 0) return -4;
   if(svstat[socid] != -2) return -3;
 
@@ -299,6 +327,27 @@ static int sockwait(int socid){
   FD_ZERO(&fdsetwrite);
   FD_ZERO(&fdseterror);
   FD_SET(socsv[socid], &fdsetread);
+  if((err = select(0, &fdsetread, &fdsetwrite, &fdseterror, &TimeVal))==0){
+    if(err == -1) return -4;
+    return -1;
+  }
+
+  svstat[socid] = 0;
+
+  unsigned int len = sizeof(from);
+  memset(&from, 0, len);
+  soc2 = accept(socsv[socid], (struct sockaddr *)&from, &len);
+
+  if(soc2 == -1){
+    close(socsv[socid]);
+    socsv[socid] = -1;
+    return -5;
+  }
+
+  char s1[128];
+  char s2[128];
+  sprintf(s1, "%s:%d", inet_ntoa(from.sin_addr), ntohs(from.sin_port));
+  return 0;
 }
 
 
@@ -852,6 +901,57 @@ static int cmdfunc_extcmd( int cmd )
       int p_res;
       p_res = sockgetbm(pval->pt, p2, p3, p4, p5);
       ctx->stat = p_res;
+      break;
+    }
+  case 0x68:  // sockput
+    {
+      PVal *pval;
+      char *ptr;
+      int size;
+      ptr = code_getvptr(&pval, &size);
+      p2 = code_getdi( 0 );
+      int p_res;
+      p_res = sockput(pval->pt, p2);
+      ctx->stat = p_res;
+      break;
+    }
+  case 0x69:  // sockputc
+    {
+      PVal *pval;
+      char *ptr;
+      int size;
+      p1 = code_getdi( 0 );
+      p2 = code_getdi( 0 );
+      int p_res;
+      p_res = sockputc(p1, p2);
+      ctx->stat = p_res;
+      break;
+    }
+  case 0x6a:  // sockputb
+    {
+      PVal *pval;
+      char *ptr;
+      int size;
+      ptr = code_getvptr(&pval, &size);
+      p2 = code_getdi( 0 );
+      p3 = code_getdi( 0 );
+      p4 = code_getdi( 0 );
+      int p_res;
+      p_res = sockputb(ptr, p2, p3, p4);
+      ctx->stat = p_res;
+      break;
+    }
+  case 0x6b:  // sockmake
+    {
+      p1 = code_getd();
+      p2 = code_getd();
+      int p_res = sockmake(p1, p2);
+      break;
+    }
+  case 0x6c:  // sockwait
+    {
+      p1 = code_getd();
+      int p_res = sockwait(p1);
       break;
     }
 	default:
