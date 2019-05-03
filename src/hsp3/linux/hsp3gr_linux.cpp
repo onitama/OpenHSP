@@ -320,14 +320,14 @@ static int sockwait(int socid){
   struct sockaddr_in from;
 
   if(socsv[socid] == -1) return -2;
-  if(svstat[socid] == 0) return -4;
-  if(svstat[socid] != -2) return -3;
+  if(svstat[socid] == -1) return -4;
+  if(svstat[socid] != 2) return -3;
 
   FD_ZERO(&fdsetread);
   FD_ZERO(&fdsetwrite);
   FD_ZERO(&fdseterror);
   FD_SET(socsv[socid], &fdsetread);
-  if((err = select(0, &fdsetread, &fdsetwrite, &fdseterror, &TimeVal))==0){
+  if((err = select(0, &fdsetread, &fdsetwrite, &fdseterror, 0))==0){
     if(err == -1) return -4;
     return -1;
   }
@@ -946,12 +946,14 @@ static int cmdfunc_extcmd( int cmd )
       p1 = code_getd();
       p2 = code_getd();
       int p_res = sockmake(p1, p2);
+      ctx->stat = p_res;
       break;
     }
   case 0x6c:  // sockwait
     {
       p1 = code_getd();
       int p_res = sockwait(p1);
+      ctx->stat = p_res;
       break;
     }
 	default:
