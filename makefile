@@ -1,5 +1,5 @@
-CC = gcc
-CXX = g++
+CC = gcc -ggdb3
+CXX = g++ -ggdb3
 AR = ar
 CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ
 CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11
@@ -414,35 +414,35 @@ all: $(TARGETS)
 
 .SUFFIXES: .cpp
 hsp3dish: $(OBJS)
-	$(CXX) $(CFLAGS_DISH) $(OBJS) -s -o $@ $(LIBS1)
+	$(CXX) $(CFLAGS_DISH) $(OBJS) -o $@ $(LIBS1)
 %.do: %.c
 	$(CC) $(CFLAGS_DISH) -c $< -o $*.do
 %.do: %.cpp
 	$(CXX) $(CFLAGS_DISH) -c $< -o $*.do
 
 hsp3gp: $(OBJS_GP) $(LIBS_GP)
-	$(CXX) $(CFLAGS_GP) $(OBJS_GP) -s -o $@ $(LIBS2) $(LIBS_GP)
+	$(CXX) $(CFLAGS_GP) $(OBJS_GP) -o $@ $(LIBS2) $(LIBS_GP)
 %.gpo: %.c
 	$(CC) $(CFLAGS_GP) -c $< -o $*.gpo
 %.gpo: %.cpp
 	$(CXX) $(CFLAGS_GP) -c $< -o $*.gpo
 
 hspcmp: $(OBJS_CMP)
-	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) -s -o $@
+	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CMP) -c $< -o $*.o
 %.o: %.cpp
 	$(CXX) $(CFLAGS_CMP) -c $< -o $*.o
 
 hsp3cl: $(OBJS_CL)
-	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -s -o $@
+	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CL) -c $< -o $*.o
 %.o: %.cpp
 	$(CXX) $(CFLAGS_CL) -c $< -o $*.o
 
 hsed: src/tools/hsed_gtk2.cpp src/tools/supio.cpp
-	$(CXX) -O2 -Wno-write-strings -o hsed src/tools/hsed_gtk2.cpp src/tools/supio.cpp `pkg-config --cflags --libs gtk+-2.0`
+	$(CXX) -Wno-write-strings -o hsed src/tools/hsed_gtk2.cpp src/tools/supio.cpp `pkg-config --cflags --libs gtk+-2.0`
 
 libgameplay.a: $(OBJS_GAMEPLAY)
 	rm -f $@
