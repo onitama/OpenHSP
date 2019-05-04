@@ -20,6 +20,10 @@
 
 #include "hsp3gr_linux.h"
 
+#ifndef MAX
+  #define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
 /*------------------------------------------------------------*/
 /*
 		system data
@@ -311,7 +315,9 @@ static int sockmake(int socid, int port){
   return 0;
 }
 
+
 static int sockwait(int socid){
+  static int maxfd = 0;
   int err;
   fd_set fdsetread, fdsetwrite, fdseterror;
   struct timeval TimeVal={0,10000};
@@ -327,7 +333,8 @@ static int sockwait(int socid){
   FD_ZERO(&fdsetwrite);
   FD_ZERO(&fdseterror);
   FD_SET(socsv[socid], &fdsetread);
-  if((err = select(0, &fdsetread, &fdsetwrite, &fdseterror, 0))==0){
+  maxfd = MAX(maxfd, socsv[socid]);
+  if((err = select(maxfd+1, &fdsetread, &fdsetwrite, &fdseterror, &TimeVal))==0){
     if(err == -1) return -4;
     return -1;
   }
@@ -343,6 +350,10 @@ static int sockwait(int socid){
     socsv[socid] = -1;
     return -5;
   }
+
+  soc[socid] = soc2;
+  close(socsv[socid]);
+  socsv[socid] = -1;
 
   char s1[128];
   char s2[128];
