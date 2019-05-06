@@ -20,6 +20,8 @@
 
 #include "hsp3gr_linux.h"
 
+#ifndef MCP3008TEST
+
 /*------------------------------------------------------------*/
 /*
 		system data
@@ -146,19 +148,22 @@ static int I2C_WriteByte( int ch, int value, int length )
 }
 #endif
 
+
+#endif // MCP3008TEST
 /*----------------------------------------------------------*/
 //					Raspberry Pi SPI support
 /*----------------------------------------------------------*/
 #ifdef HSPRASPBIAN
 #include <sys/ioctl.h>
+#include <stdint.h>
 #include <linux/spi/spidev.h>
 
 #define HSPSPI_CHMAX 16
 #define HSPSPI_DEVNAME "/dev/spidev.0."
 
-static int spifd_ch[HSPSPI_CHMAX];
+int spifd_ch[HSPSPI_CHMAX];
 
-static void SPI_Init( void )
+void SPI_Init( void )
 {
 	int i;
 	for(i=0;i<HSPSPI_CHMAX;i++) {
@@ -166,7 +171,7 @@ static void SPI_Init( void )
 	}
 }
 
-static void SPI_Close( int ch )
+void SPI_Close( int ch )
 {
 	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return;
 	if ( spifd_ch[ch] == 0 ) return;
@@ -175,7 +180,7 @@ static void SPI_Close( int ch )
 	spifd_ch[ch] = 0;
 }
 
-static void SPI_Term( void )
+void SPI_Term( void )
 {
 	int i;
 	for(i=0;i<HSPSPI_CHMAX;i++) {
@@ -183,7 +188,7 @@ static void SPI_Term( void )
 	}
 }
 
-static int SPI_Open( int ch, int ss )
+int SPI_Open( int ch, int ss )
 {
 	int fd;
   char ss_char[2];
@@ -231,7 +236,7 @@ static int SPI_Open( int ch, int ss )
 	return 0;
 }
 
-static int SPI_ReadByte( int ch )
+int SPI_ReadByte( int ch )
 {
 	int res;
 	unsigned char data[8];
@@ -246,7 +251,7 @@ static int SPI_ReadByte( int ch )
 	return res;
 }
 
-static int SPI_ReadWord( int ch )
+int SPI_ReadWord( int ch )
 {
 	int res;
 	unsigned char data[8];
@@ -262,7 +267,7 @@ static int SPI_ReadWord( int ch )
 	return res;
 }
 
-static int SPI_WriteByte( int ch, int value, int length )
+int SPI_WriteByte( int ch, int value, int length )
 {
 	int res;
 	int len;
@@ -281,28 +286,42 @@ static int SPI_WriteByte( int ch, int value, int length )
 	return 0;
 }
 
-static int SPI_FullDuplexByte(int ch, int* tx, int* rx, size_t size){
+int MCP3008_FullDuplex(int spich, int adcch){
+  const int COMM_SIZE = 3;
+  const uint8_t START_BIT = 0x01;
+  const uint8_t SINGLE_ENDED = 0x80;
+  const uint8_t CHANNEL = adcch << 4;
   int res;
   struct spi_ioc_transfer tr;
+  uint8_t tx[COMM_SIZE] = {0, };
+  uint8_t rx[COMM_SIZE] = {0, };
 
-	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-  if(spifd_ch[ch] == 0) return -1;
+	if ( ( spich<0 )||( spich>=HSPSPI_CHMAX ) ) return -1;
+  if(spifd_ch[spich] == 0) return -1;
+
+  tx[0] = START_BIT;
+  tx[1] = SINGLE_ENDED | CHANNEL;
 
   tr.tx_buf = (unsigned long)tx;
   tr.rx_buf = (unsigned long)rx;
-  tr.len = size;
+  tr.len = COMM_SIZE;
   tr.delay_usecs = 0;
   tr.bits_per_word = 8;
   tr.cs_change = 0;
 
-  if(ioctl(spifd_ch[ch], SPI_IOC_MESSAGE(1), &tr) < 1){
+  if(ioctl(spifd_ch[spich], SPI_IOC_MESSAGE(1), &tr) < 1){
     return -2;
   }
 
-  return 0;
+  res = (0x03 & rx[1]) << 8;
+  res |= rx[2];
+
+  return res;
 }
 #endif
 
+
+#ifndef MCP3008TEST
 /*----------------------------------------------------------*/
 //					HSP system support
 /*----------------------------------------------------------*/
@@ -593,9 +612,8 @@ static int devcontrol( char *cmd, int p1, int p2, int p3 )
 		SPI_Close( p1 );
     return 0;
 	}
-	if (( strcmp( cmd, "spifullduplex" )==0 )||( strcmp( cmd, "SPIFULLDUPLEX" )==0 )) {
-    // TODO
-    return 0;
+	if (( strcmp( cmd, "readmcpduplex" )==0 )||( strcmp( cmd, "READMCPDUPLEX" )==0 )) {
+    return MCP3008_FullDuplex(p2, p1);
 	}
 	return -1;
 }
@@ -870,4 +888,4 @@ void hsp3typeinit_cl_extfunc( HSP3TYPEINFO *info )
 	I2C_Init();
 #endif
 }
-
+#endif // MCP3008TEST
