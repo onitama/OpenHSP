@@ -1,3 +1,5 @@
+#include "hsp3dish.as"
+
 ;Kaki Get!
 
 	dim kx,32 :dim ky,32

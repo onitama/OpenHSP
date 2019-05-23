@@ -1,3 +1,5 @@
+#include "hsp3dish.as"
+
 ;Landing Game
 
 	dim map,768
