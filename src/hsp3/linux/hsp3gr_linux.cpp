@@ -159,7 +159,7 @@ static int I2C_WriteByte( int ch, int value, int length )
 #include <linux/spi/spidev.h>
 
 #define HSPSPI_CHMAX 16
-#define HSPSPI_DEVNAME "/dev/spidev.0."
+#define HSPSPI_DEVNAME "/dev/spidev0."
 
 int spifd_ch[HSPSPI_CHMAX];
 
@@ -308,6 +308,7 @@ int MCP3008_FullDuplex(int spich, int adcch){
   tr.delay_usecs = 0;
   tr.bits_per_word = 8;
   tr.cs_change = 0;
+  tr.speed_hz = 5000;
 
   if(ioctl(spifd_ch[spich], SPI_IOC_MESSAGE(1), &tr) < 1){
     return -2;
