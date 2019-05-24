@@ -1116,10 +1116,10 @@ static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
 		return SPI_ReadByte( p1 );
 	}
 	if (( strcmp( cmd, "spiwrite" )==0 )||( strcmp( cmd, "SPIWRITE" )==0 )) {
-		return SPI_WRITEByte( p3, p1, p2 );
+		return SPI_WriteByte( p3, p1, p2 );
 	}
 	if (( strcmp( cmd, "spiopen" )==0 )||( strcmp( cmd, "SPIOPEN" )==0 )) {
-		return SPI_WRITEByte( p2, p1 );
+		return SPI_Open( p2, p1 );
 	}
 	if (( strcmp( cmd, "spiclose" )==0 )||( strcmp( cmd, "SPICLOSE" )==0 )) {
 		SPI_Close( p1 );
