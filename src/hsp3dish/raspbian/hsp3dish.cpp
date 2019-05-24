@@ -756,6 +756,176 @@ static int I2C_WriteByte( int ch, int value, int length )
 #endif
 
 /*----------------------------------------------------------*/
+//					Raspberry Pi SPI support
+/*----------------------------------------------------------*/
+#ifdef HSPRASPBIAN
+#include <sys/ioctl.h>
+#include <stdint.h>
+#include <linux/spi/spidev.h>
+
+#define HSPSPI_CHMAX 16
+#define HSPSPI_DEVNAME "/dev/spidev0."
+
+int spifd_ch[HSPSPI_CHMAX];
+
+void SPI_Init( void )
+{
+	int i;
+	for(i=0;i<HSPSPI_CHMAX;i++) {
+		spifd_ch[i] = 0;
+	}
+}
+
+void SPI_Close( int ch )
+{
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return;
+	if ( spifd_ch[ch] == 0 ) return;
+
+	close( spifd_ch[ch] );
+	spifd_ch[ch] = 0;
+}
+
+void SPI_Term( void )
+{
+	int i;
+	for(i=0;i<HSPSPI_CHMAX;i++) {
+		SPI_Close(i);
+	}
+}
+
+int SPI_Open( int ch, int ss )
+{
+	int fd;
+  char ss_char[2];
+  char devname[128] = HSPSPI_DEVNAME;
+
+  if(ss >= 10) return -2;   // FIXME: you need `itoa()`.
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] ) SPI_Close( ch );
+
+  ss_char[0] = ss + '0';
+  ss_char[1] = '\0';
+
+  strcat(devname, ss_char);
+
+	if((fd = open( devname, O_RDWR )) < 0){
+        return 1;
+    }
+
+  uint8_t spimode = SPI_MODE_0;
+  uint8_t msbfirst = 0;
+  // Set read mode 0
+  if (ioctl(fd, SPI_IOC_RD_MODE, &spimode) < 0) {
+    close( fd );
+    return 2;
+  }
+
+  // Set write mode 0
+  if (ioctl(fd, SPI_IOC_WR_MODE, &spimode) < 0) {
+    close( fd );
+    return 2;
+  }
+
+  // Set MSB first
+  if (ioctl(fd, SPI_IOC_RD_LSB_FIRST, &msbfirst) < 0) {
+    close( fd );
+    return 2;
+  }
+  if (ioctl(fd, SPI_IOC_WR_LSB_FIRST, &msbfirst) < 0) {
+    close( fd );
+    return 2;
+  }
+
+	spifd_ch[ch] = fd;
+	return 0;
+}
+
+int SPI_ReadByte( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -1;
+
+	res = read( spifd_ch[ch], data, 1 );
+	if ( res < 0 ) return -1;
+
+	res = (int)data[0];
+	return res;
+}
+
+int SPI_ReadWord( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -1;
+
+	res = read( spifd_ch[ch], data, 2 );
+	if ( res < 0 ) return -1;
+
+	res = ((int)data[1]) << 8;
+	res += (int)data[0];
+	return res;
+}
+
+int SPI_WriteByte( int ch, int value, int length )
+{
+	int res;
+	int len;
+	unsigned char *data;
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -1;
+	if ( ( length<0 )||( length>4 ) ) return -1;
+
+	len = length;
+	if ( len == 0 ) len = 1;
+	data = (unsigned char *)(&value);
+	res = write( spifd_ch[ch], data, len );
+	if ( res < 0 ) return -1;
+
+	return 0;
+}
+
+int MCP3008_FullDuplex(int spich, int adcch){
+  const int COMM_SIZE = 3;
+  const uint8_t START_BIT = 0x01;
+  const uint8_t SINGLE_ENDED = 0x80;
+  const uint8_t CHANNEL = adcch << 4;
+  int res;
+  struct spi_ioc_transfer tr;
+  uint8_t tx[COMM_SIZE] = {0, };
+  uint8_t rx[COMM_SIZE] = {0, };
+
+	if ( ( spich<0 )||( spich>=HSPSPI_CHMAX ) ) return -1;
+  if(spifd_ch[spich] == 0) return -1;
+
+  tx[0] = START_BIT;
+  tx[1] = SINGLE_ENDED | CHANNEL;
+
+  tr.tx_buf = (unsigned long)tx;
+  tr.rx_buf = (unsigned long)rx;
+  tr.len = COMM_SIZE;
+  tr.delay_usecs = 0;
+  tr.bits_per_word = 8;
+  tr.cs_change = 0;
+  tr.speed_hz = 5000;
+
+  if(ioctl(spifd_ch[spich], SPI_IOC_MESSAGE(1), &tr) < 1){
+    return -2;
+  }
+
+  res = (0x03 & rx[1]) << 8;
+  res |= rx[2];
+
+  return res;
+}
+#endif
+/*----------------------------------------------------------*/
 //		GPIOデバイスコントロール関連
 /*----------------------------------------------------------*/
 
@@ -938,6 +1108,25 @@ static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
 	if (( strcmp( cmd, "i2close" )==0 )||( strcmp( cmd, "I2CCLOSE" )==0 )) {
 		I2C_Close( p1 );
 		return 0;
+	}
+	if (( strcmp( cmd, "spireadw" )==0 )||( strcmp( cmd, "SPIREADW" )==0 )) {
+		return SPI_ReadWord( p1 );
+	}
+	if (( strcmp( cmd, "spiread" )==0 )||( strcmp( cmd, "SPIREAD" )==0 )) {
+		return SPI_ReadByte( p1 );
+	}
+	if (( strcmp( cmd, "spiwrite" )==0 )||( strcmp( cmd, "SPIWRITE" )==0 )) {
+		return SPI_WRITEByte( p3, p1, p2 );
+	}
+	if (( strcmp( cmd, "spiopen" )==0 )||( strcmp( cmd, "SPIOPEN" )==0 )) {
+		return SPI_WRITEByte( p2, p1 );
+	}
+	if (( strcmp( cmd, "spiclose" )==0 )||( strcmp( cmd, "SPICLOSE" )==0 )) {
+		SPI_Close( p1 );
+    return 0;
+	}
+	if (( strcmp( cmd, "readmcpduplex" )==0 )||( strcmp( cmd, "READMCPDUPLEX" )==0 )) {
+    return MCP3008_FullDuplex(p2, p1);
 	}
 	return -1;
 }
