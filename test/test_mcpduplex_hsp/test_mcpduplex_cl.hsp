@@ -1,0 +1,10 @@
+#include "hsp3cl.as"
+	x=0
+*main
+	spiopen 0
+	x = spiget(0,0)
+	y = spiget(1,0)
+	mes x
+	mes y
+	spiclose 0
+	stop

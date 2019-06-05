@@ -45,5 +45,29 @@
 	devcontrol "i2cwrite",_p1,_p2,_p3
 	return
 
+#deffunc spireadw int _p1
+	devcontrol "spireadw",_p1
+	return
+
+#deffunc spiread int _p1
+	devcontrol "spiread",_p1
+	return
+
+#deffunc spiwrite int _p1,int _p2,int _p3
+	devcontrol "spiwrite",_p1,_p2,_p3
+	return
+
+#deffunc spiopen int _p1
+	devcontrol "spiopen",_p1,_p1
+	return
+
+#defcfunc spiget int _p1, int _p2
+	devcontrol "readmcpduplex",_p1,_p2
+	return stat
+
+#deffunc spiclose int _p1
+	devcontrol "spiclose",_p1
+	return
+
 #global
 
