@@ -1,0 +1,33 @@
+;
+; Test for sockgetm
+;
+
+
+#include "hsp3dish.as"
+*init
+  domain = "127.0.0.1"
+  sockopen 0, domain, 12345
+  if stat != 0 {
+    mes "stat: " + stat
+    goto *endp
+  }
+
+sdim buf, 65536
+*main
+  wait 100
+  recv = 0
+  sockgetm buf, 30000, 0, 64;
+  if stat == 11 {
+    mes "no content in buffer"
+  } else : if stat < 0 {
+    mes "ERROR"
+    goto *endp
+  }
+  mes buf
+  if buf == "." {
+    goto *endp
+  }
+  goto *main
+
+*endp
+  sockclose(0)

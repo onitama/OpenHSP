@@ -1,0 +1,14 @@
+#include "hsp3dish.as"
+
+	spiopen 0
+*main
+	
+	x = spiget(0,0)
+	y = spiget(1,0)
+
+	gpmes = "A0 = "+x
+	gpmes = "A1 = "+y
+
+	update 1
+	goto *main
+spiclose 0

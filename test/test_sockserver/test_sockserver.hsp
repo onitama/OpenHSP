@@ -1,0 +1,29 @@
+;
+; Test for sockget
+;
+
+
+#include "hsp3dish.as"
+*init
+  domain = "127.0.0.1"
+  sockmake 0, 12345
+  if stat != 0 {
+    mes "sockmake failed. stat: " + stat
+    goto *endp
+  }
+
+  repeat -1
+    sockwait 0
+    mes stat
+    if stat=0 {
+      break
+    }
+    wait 10
+  loop
+
+  mes "Connected!"
+  message = "Hello"
+  sockput message, 0
+
+*endp
+  sockclose(0)

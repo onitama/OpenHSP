@@ -21,6 +21,7 @@
 #include "../sysreq.h"
 //#include "../hsp3ext.h"
 #include "../../hsp3/strnote.h"
+#include "../../hsp3/linux/hsp3ext_sock.h"
 
 struct engine;
 
@@ -584,10 +585,21 @@ int hsp3dish_init( char *startfile )
 	exinfo = ctx->exinfo2;
 
 #ifdef USE_OBAQ
+	{
 	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 );// TYPE_USERDEF
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_dw_extcmd( tinfo );
+	}
+#endif
+
+#if 1
+	{
+	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF
+	tinfo->hspctx = ctx;
+	tinfo->hspexinfo = exinfo;
+	hsp3typeinit_sock_extcmd( tinfo );
+	}
 #endif
 
 	//		Initalize DEVINFO
