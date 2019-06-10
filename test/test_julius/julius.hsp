@@ -1,0 +1,33 @@
+#include "julius_lib.hsp"
+
+
+init_julius
+
+sockidx = 0
+domain = "127.0.0.1"
+PORT = 10500
+
+
+sockopen sockidx, domain, PORT
+
+if stat != 0 {
+  mes "Error in opening socket"
+  end
+}
+
+sdim words, 4096, 0
+ddim cm, 0
+repeat -1
+  if is_recieved(sockidx) == 0 {
+    get_word_list words, cm
+    mes "L1 " + length(words)
+    repeat length(words)
+      if cm(cnt) > 0.5 {
+          mes "" + cnt + ": " + words(cnt) + " CM = " + cm(cnt)
+      }
+    loop
+    sdim words, 4096, 0
+  }
+  mes "TEST"
+  wait 100
+loop

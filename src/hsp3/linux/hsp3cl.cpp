@@ -16,11 +16,13 @@
 #include "../hsp3gr.h"
 
 #include "hsp3cl.h"
+#include "hsp3ext_sock.h"
 
 /*----------------------------------------------------------*/
 
 static Hsp3 *hsp;
 static HSPCTX *ctx;
+static HSPEXINFO *exinfo;
 
 static char fpas[]={ 'H'-48,'S'-48,'P'-48,'H'-48,
 					 'E'-48,'D'-48,'~'-48,'~'-48 };
@@ -154,7 +156,7 @@ int hsp3cl_init( char *startfile )
 #ifdef HSPDEBUG
 
 	if ( *startfile == 0 ) {
-		printf( "OpenHSP CL ver%s / onion software 1997-2018\n", hspver );
+		printf( "OpenHSP CL ver%s / onion software 1997-2019\n", hspver );
 		usage1();
 		return -1;
 	}
@@ -202,6 +204,13 @@ int hsp3cl_init( char *startfile )
 
 	hsp3typeinit_cl_extcmd( code_gettypeinfo( TYPE_EXTCMD ) );
 	hsp3typeinit_cl_extfunc( code_gettypeinfo( TYPE_EXTSYSVAR ) );
+
+	exinfo = ctx->exinfo2;
+
+	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF
+	tinfo->hspctx = ctx;
+	tinfo->hspexinfo = exinfo;
+	hsp3typeinit_sock_extcmd( tinfo );
 
 	cl_option = 0;
 

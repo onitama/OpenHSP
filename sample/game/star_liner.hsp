@@ -1,3 +1,5 @@
+#include "hsp3dish.as"
+
 ; Star Liner
 
 	m=50
