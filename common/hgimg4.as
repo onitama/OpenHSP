@@ -47,6 +47,9 @@
 #const global GPOBJ_MATOPT_BLENDADD (32)
 #const global GPOBJ_MATOPT_SPECULAR (64)
 #const global GPOBJ_MATOPT_USERSHADER (128)
+#const global GPOBJ_MATOPT_USERBUFFER (256)
+#const global GPOBJ_MATOPT_MIRROR (512)
+#const global GPOBJ_MATOPT_CUBEMAP (1024)
 
 #enum global PRMSET_FLAG = 2
 #enum global PRMSET_MODE
@@ -111,6 +114,11 @@
 
 #const global GPGETMAT_OPT_OBJMAT (0)
 #const global GPGETMAT_OPT_SCRMAT (1)
+
+#const global GPCNVAXIS_PROJECTION (0)
+#const global GPCNVAXIS_PROJECTIONNORMAL (1)
+#const global GPCNVAXIS_WORLDVIEW (2)
+#const global GPCNVAXIS_WORLD (3)
 
 
 ;
@@ -332,6 +340,7 @@
 #cmd gpmatprmt $fc
 #cmd gpusershader $fd
 #cmd gpgetmat $fe
+#cmd gpreport $ff
 
 #cmd setevent $100
 #cmd delevent $101
@@ -346,6 +355,8 @@
 #cmd event_suicide $10a
 #cmd event_aim $10b
 #cmd objaim $10c
+#cmd gpscrmat $10d
+#cmd setobjrender $10e
 
 #cmd event_pos $110
 #cmd event_quat $111
@@ -356,7 +367,7 @@
 #cmd event_work $116
 #cmd event_work2 $117
 #cmd event_axang $118
-#cmd event_ang $119
+#cmd event_angx $119
 #cmd event_angy $11a
 #cmd event_angz $11b
 #cmd event_angr $11c
@@ -370,7 +381,7 @@
 #cmd event_addwork $126
 #cmd event_addwork2 $127
 #cmd event_addaxang $128
-#cmd event_addang $129
+#cmd event_addangx $129
 #cmd event_addangy $12a
 #cmd event_addangz $12b
 #cmd event_addangr $12c
@@ -384,7 +395,7 @@
 #cmd event_setwork $136
 #cmd event_setwork2 $137
 #cmd event_setaxang $138
-#cmd event_setang $139
+#cmd event_setangx $139
 #cmd event_setangy $13a
 #cmd event_setangz $13b
 #cmd event_setangr $13c
