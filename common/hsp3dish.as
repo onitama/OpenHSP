@@ -205,6 +205,24 @@
 #define global REQ_DEFAULT_FRICTION (SYSREQ_DEFAULT_FRICTION)
 
 ;
+;	Socket Enhance
+;
+#regcmd 19
+#cmd sockopen $60
+#cmd sockclose $61
+#cmd sockreadbyte $62
+#cmd sockget $63
+#cmd sockgetc $64
+#cmd sockgetm $65
+#cmd sockgetb $66
+#cmd sockgetbm $67
+#cmd sockput $68
+#cmd sockputc $69
+#cmd sockputb $6a
+#cmd sockmake $6b
+#cmd sockwait $6c
+
+;
 ;	Raspberry Pi Enhance
 ;
 #module __rpgpio
@@ -241,6 +259,30 @@
 #deffunc i2cwrite int _p1,int _p2,int _p3
 
 	devcontrol "i2cwrite",_p1,_p2,_p3
+	return
+
+#deffunc spireadw int _p1
+	devcontrol "spireadw",_p1
+	return
+
+#deffunc spiread int _p1
+	devcontrol "spiread",_p1
+	return
+
+#deffunc spiwrite int _p1,int _p2,int _p3
+	devcontrol "spiwrite",_p1,_p2,_p3
+	return
+
+#deffunc spiopen int _p1
+	devcontrol "spiopen",_p1,_p1
+	return
+
+#defcfunc spiget int _p1, int _p2
+	devcontrol "readmcpduplex",_p1,_p2
+	return stat
+
+#deffunc spiclose int _p1
+	devcontrol "spiclose",_p1
 	return
 
 #global

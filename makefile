@@ -31,6 +31,7 @@ OBJS = \
 	src/hsp3/stack.do \
 	src/hsp3/strbuf.do \
 	src/hsp3/strnote.do \
+	src/hsp3/linux/hsp3ext_sock.do \
 	src/hsp3dish/sysreq.do \
 	src/hsp3dish/emscripten/hgtex.do \
 	src/hsp3dish/emscripten/hgiox.do \
@@ -82,6 +83,7 @@ OBJS_CL = \
 	src/hsp3/linux/supio_linux.o \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
+	src/hsp3/linux/hsp3ext_sock.o \
 	src/hsp3/linux/hsp3gr_linux.o
 
 OBJS_GP = \
@@ -109,6 +111,7 @@ OBJS_GP = \
 	src/hsp3/stack.gpo \
 	src/hsp3/strbuf.gpo \
 	src/hsp3/strnote.gpo \
+	src/hsp3/linux/hsp3ext_sock.gpo \
 	src/hsp3dish/sysreq.gpo \
 	src/hsp3dish/emscripten/hgtex.gpo \
 	src/hsp3dish/emscripten/mmman.gpo \

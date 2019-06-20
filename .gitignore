@@ -1,0 +1,6 @@
+*.ax
+*.gpo
+*.do
+*.o
+__hsptmp.*
+.hspres

@@ -1,0 +1,26 @@
+buf = "<RECOGOUT>\n<SHYPO RANK=\"1\" SCORE=\"-26965.826172\">\n<WHYPO WORD=\"\" CLASSID=\"<s>\" PHONE=\"silB\" CM=\"0.689\"/>\n<WHYPO WORD=\"あら\" CLASSID=\"あら+感動詞\" PHONE=\"a r a\" CM=\"0.083\"/>\n<WHYPO WORD=\"、\" CLASSID=\"、+補助記号\" PHONE=\"sp\" CM=\"0.864\"/>\n<WHYPO"
+
+idx = 0
+W_PREFIX = "WORD=\""
+W_POSTFIX = "\""
+CM_PREFIX = "CM=\""
+CM_POSTFIX = "\""
+W_PREFIX_LEN = 6
+W_POSTFIX_LEN = 1
+CM_PREFIX_LEN = 4
+CM_POSTFIX_LEN = 1
+
+pidx = 0
+
+repeat -1
+  p1 = instr(buf, pidx, W_PREFIX)
+  if p1 == -1 : end
+  p1 = p1 + pidx
+  p2 = instr(buf, p1+W_PREFIX_LEN, W_POSTFIX)
+  if p2 == -1 : end
+  word = strmid(buf, p1+W_PREFIX_LEN, p2)
+  words(idx) = word
+  idx = idx+1
+  pidx = p1+W_PREFIX_LEN+p2+W_POSTFIX_LEN
+  mes "*WORD = " + word + "."
+loop

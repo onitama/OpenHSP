@@ -45,6 +45,7 @@ OBJS = \
 	src/obaq/physics/vessel.do \
 	src/hsp3dish/raspbian/hsp3dish.do \
 	src/hsp3dish/linux/webtask_linux.do \
+	src/hsp3/linux/hsp3ext_sock.do \
 	src/hsp3dish/linux/supio_linux.do
 
 OBJS_CMP = \
@@ -83,6 +84,7 @@ OBJS_CL = \
 	src/hsp3/linux/supio_linux.o \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
+	src/hsp3/linux/hsp3ext_sock.o \
 	src/hsp3/linux/hsp3gr_linux.o
 
 TARGETS = hsp3dish hsp3cl hspcmp hsed

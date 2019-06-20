@@ -20,6 +20,8 @@
 
 #include "hsp3gr_linux.h"
 
+#ifndef MCP3008TEST
+
 /*------------------------------------------------------------*/
 /*
 		system data
@@ -146,6 +148,260 @@ static int I2C_WriteByte( int ch, int value, int length )
 }
 
 #endif
+
+#endif // MCP3008TEST
+/*----------------------------------------------------------*/
+//					Raspberry Pi SPI support
+/*----------------------------------------------------------*/
+#ifdef HSPRASPBIAN
+#include <sys/ioctl.h>
+#include <stdint.h>
+#include <linux/spi/spidev.h>
+
+#define HSPSPI_CHMAX 16
+#define HSPSPI_DEVNAME "/dev/spidev0."
+
+int spifd_ch[HSPSPI_CHMAX];
+
+void SPI_Init( void )
+{
+	int i;
+	for(i=0;i<HSPSPI_CHMAX;i++) {
+		spifd_ch[i] = 0;
+	}
+}
+
+void SPI_Close( int ch )
+{
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return;
+	if ( spifd_ch[ch] == 0 ) return;
+
+	close( spifd_ch[ch] );
+	spifd_ch[ch] = 0;
+}
+
+void SPI_Term( void )
+{
+	int i;
+	for(i=0;i<HSPSPI_CHMAX;i++) {
+		SPI_Close(i);
+	}
+}
+
+int SPI_Open( int ch, int ss )
+{
+	int fd;
+  char ss_char[2];
+  char devname[128] = HSPSPI_DEVNAME;
+
+  if(ss >= 10) return -2;   // FIXME: you need `itoa()`.
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] ) SPI_Close( ch );
+
+  ss_char[0] = ss + '0';
+  ss_char[1] = '\0';
+
+  strcat(devname, ss_char);
+
+	if((fd = open( devname, O_RDWR )) < 0){
+        return 1;
+    }
+
+  uint8_t spimode = SPI_MODE_0;
+  uint8_t msbfirst = 0;
+  // Set read mode 0
+  if (ioctl(fd, SPI_IOC_RD_MODE, &spimode) < 0) {
+    close( fd );
+    return 2;
+  }
+
+  // Set write mode 0
+  if (ioctl(fd, SPI_IOC_WR_MODE, &spimode) < 0) {
+    close( fd );
+    return 2;
+  }
+
+  // Set MSB first
+  if (ioctl(fd, SPI_IOC_RD_LSB_FIRST, &msbfirst) < 0) {
+    close( fd );
+    return 2;
+  }
+  if (ioctl(fd, SPI_IOC_WR_LSB_FIRST, &msbfirst) < 0) {
+    close( fd );
+    return 2;
+  }
+
+	spifd_ch[ch] = fd;
+	return 0;
+}
+
+int SPI_ReadByte( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -1;
+
+	res = read( spifd_ch[ch], data, 1 );
+	if ( res < 0 ) return -1;
+
+	res = (int)data[0];
+	return res;
+}
+
+int SPI_ReadWord( int ch )
+{
+	int res;
+	unsigned char data[8];
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -1;
+
+	res = read( spifd_ch[ch], data, 2 );
+	if ( res < 0 ) return -1;
+
+	res = ((int)data[1]) << 8;
+	res += (int)data[0];
+	return res;
+}
+
+int SPI_WriteByte( int ch, int value, int length )
+{
+	int res;
+	int len;
+	unsigned char *data;
+
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -1;
+	if ( ( length<0 )||( length>4 ) ) return -1;
+
+	len = length;
+	if ( len == 0 ) len = 1;
+	data = (unsigned char *)(&value);
+	res = write( spifd_ch[ch], data, len );
+	if ( res < 0 ) return -1;
+
+	return 0;
+}
+
+int MCP3008_FullDuplex(int spich, int adcch){
+  const int COMM_SIZE = 3;
+  const uint8_t START_BIT = 0x01;
+  const uint8_t SINGLE_ENDED = 0x80;
+  const uint8_t CHANNEL = adcch << 4;
+  int res;
+  struct spi_ioc_transfer tr;
+  uint8_t tx[COMM_SIZE] = {0, };
+  uint8_t rx[COMM_SIZE] = {0, };
+
+	if ( ( spich<0 )||( spich>=HSPSPI_CHMAX ) ) return -1;
+  if(spifd_ch[spich] == 0) return -1;
+
+  tx[0] = START_BIT;
+  tx[1] = SINGLE_ENDED | CHANNEL;
+
+  tr.tx_buf = (unsigned long)tx;
+  tr.rx_buf = (unsigned long)rx;
+  tr.len = COMM_SIZE;
+  tr.delay_usecs = 0;
+  tr.bits_per_word = 8;
+  tr.cs_change = 0;
+  tr.speed_hz = 5000;
+
+  if(ioctl(spifd_ch[spich], SPI_IOC_MESSAGE(1), &tr) < 1){
+    return -2;
+  }
+
+  res = (0x03 & rx[1]) << 8;
+  res |= rx[2];
+
+  return res;
+}
+
+#endif
+
+#ifndef MCP3008TEST
+
+/*----------------------------------------------------------*/
+//					TCP/IP support
+/*----------------------------------------------------------*/
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+static int sockclose(int);
+static int sockget(char*, int, int);
+static int sockgetm(char*, int, int, int);
+static int sockclose(int);
+static int sockreadbyte();
+
+#define SOCKMAX 32
+static	int sockf=0;
+static	int soc[SOCKMAX];		/* Soket Descriptor */
+// static	SOCKET socsv[SOCKMAX];		/* Soket Descriptor (server) */
+static	int svstat[SOCKMAX];		/* Soket Thread Status (server) */
+// static	HANDLE svth[SOCKMAX];		/* Soket Thread Handle (server) */
+
+static int sockopen( int p1, char *p2, int p3){
+  struct sockaddr_in addr;
+  soc[p1] = socket(AF_INET, SOCK_STREAM, 0);
+  if(soc[p1]<0){ return -2; }
+
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr=inet_addr(p2);
+  addr.sin_port=htons(p3);
+  if(connect(soc[p1], (struct sockaddr*)&addr, sizeof(addr)) < 0){
+    return -4;
+  }
+  return 0;
+}
+
+static int sockclose(int p1){
+  close(soc[p1]);
+  return 0;
+}
+
+static int sockget(char* buf, int size, int socid){
+  return sockgetm(buf, size, socid, 0);
+}
+
+static int sockgetm(char* buf, int size, int socid, int flag){
+  int recv_len;
+  memset(buf, 0, sizeof(buf));
+  recv_len = recv(soc[socid], buf, size, flag);
+  if(recv_len == -1) return errno;
+  return 0;
+}
+
+static int sockgetc(int* buf, int socid){
+	int recv_len;
+	char recv;
+	recv_len = read(soc[socid], &recv, 1);
+  if(recv_len < 0) return errno;
+	buf[0] = (int)recv;
+	return 0;
+}
+
+static int sockreadbyte(){
+  // No arguments
+  // Return read byte
+  int buf_len;
+  char buf[1];
+  memset(buf, 0, sizeof(buf));
+
+  buf_len = read(soc[p2], buf, sizeof(buf));
+  if(buf_len < 0){
+    return -2;
+  }
+  if(buf_len == 0){
+    return -1;
+  }
+  return (int)buf[0];
+}
 
 /*----------------------------------------------------------*/
 //					HSP system support
@@ -421,10 +677,40 @@ static int devcontrol( char *cmd, int p1, int p2, int p3 )
 		I2C_Close( p1 );
 		return 0;
 	}
+	if (( strcmp( cmd, "spireadw" )==0 )||( strcmp( cmd, "SPIREADW" )==0 )) {
+		return SPI_ReadWord( p1 );
+	}
+	if (( strcmp( cmd, "spiread" )==0 )||( strcmp( cmd, "SPIREAD" )==0 )) {
+		return SPI_ReadByte( p1 );
+	}
+	if (( strcmp( cmd, "spiwrite" )==0 )||( strcmp( cmd, "SPIWRITE" )==0 )) {
+		return SPI_WriteByte( p3, p1, p2 );
+	}
+	if (( strcmp( cmd, "spiopen" )==0 )||( strcmp( cmd, "SPIOPEN" )==0 )) {
+		return SPI_Open( p2, p1 );
+	}
+	if (( strcmp( cmd, "spiclose" )==0 )||( strcmp( cmd, "SPICLOSE" )==0 )) {
+		SPI_Close( p1 );
+    return 0;
+	}
+	if (( strcmp( cmd, "readmcpduplex" )==0 )||( strcmp( cmd, "READMCPDUPLEX" )==0 )) {
+    return MCP3008_FullDuplex(p2, p1);
+	}
 	return -1;
 }
 
 #endif
+
+/*------------------------------------------------------------*/
+/*
+		TCP/IP
+*/
+/*------------------------------------------------------------*/
+
+static int printmsggo(int p1){
+  printf("Number: %d\n", p1);
+  return 0;
+}
 
 /*------------------------------------------------------------*/
 /*
@@ -592,7 +878,67 @@ static int cmdfunc_extcmd( int cmd )
 		}
 
 #endif
-
+  case 0x60:              //sockopen
+    {
+    char *address;
+    int p_res;
+    p1 = code_getdi( 0 );
+    address = code_stmpstr( code_gets() );
+    p3 = code_getdi( 0 );
+    p_res = sockopen(p1, address, p3);
+    ctx->stat = p_res;
+    break;
+    }
+  case 0x61:              //sockclose
+    {
+    char *cname;
+    int p_res;
+    p1 = code_geti();
+    p_res = sockclose(p1);
+    ctx->stat = p_res;
+    break;
+    }
+  case 0x62:              //sockreadbyte
+    {
+    char *cname;
+    int p_res;
+    p_res = sockreadbyte();
+    if(p_res > 0){
+      printf("%c\n", p_res);
+    }
+    ctx->stat = p_res;
+    break;
+    }
+	case 0x63:	//sockget
+		{
+			PVal *pval;
+			char *ptr;
+			int size;
+			ptr = code_getvptr( &pval, &size );
+			p2 = code_getdi( 0 );
+			p3 = code_getdi( 0 );
+			int p_res;
+			p_res = sockget(pval->pt, p2, p3);
+			ctx->stat = p_res;
+			break;
+		}
+	case 0x64:	//sockgetc
+		{
+		}
+	case 0x65:	//sockgetm
+		{
+			PVal *pval;
+			char *ptr;
+			int size;
+			ptr = code_getvptr( &pval, &size );
+			p2 = code_getdi( 0 );
+			p3 = code_getdi( 0 );
+			p4 = code_getdi( 0 );
+			int p_res;
+			p_res = sockgetm(pval->pt, p2, p3, p4);
+			ctx->stat = p_res;
+			break;
+		}
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
 	}
@@ -694,4 +1040,4 @@ void hsp3typeinit_cl_extfunc( HSP3TYPEINFO *info )
 	I2C_Init();
 #endif
 }
-
+#endif // MCP3008TEST
