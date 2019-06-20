@@ -1,0 +1,55 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, $404040
+
+	setcolor GPOBJ_LIGHT, 1,1,1		; ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.5,0.5,0.5		; アンビエントカラーを設定
+
+	gpload id_model,"res/tamane2"		; モデル読み込み
+	setang id_mode, 0, 3.141592		; モデルの回転を設定
+	setscale id_model, 0.1,0.1,0.1
+
+	setpos GPOBJ_CAMERA, 0,20,30		; カメラ位置を設定
+
+	gpact id_model
+repeat
+	stick key,15
+	if key&128 : end
+
+	redraw 0			; 描画開始
+
+	;	タッチでカメラ位置を動かす
+	if dragmd {	; ドラッグ中
+		getkey a,1
+		if a=1 {
+			dx=0.05*(mousex-dragx)+cx
+			dy=0.05*(mousey-dragy)+cy
+			setpos GPOBJ_CAMERA, dx,dy,cz
+		} else {
+			dragmd=0
+		}
+	} else {	; ドラッグなし
+		getkey a,1
+		if a {
+			dragx=mousex:dragy=mousey
+			getpos GPOBJ_CAMERA, cx,cy,cz
+			dragmd=1
+		}
+	}
+	gplookat GPOBJ_CAMERA, 0,14,0		; カメラから指定した座標を見る
+
+	;addang id_model,0,0.02		; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+

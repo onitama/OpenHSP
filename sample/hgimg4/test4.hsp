@@ -1,0 +1,44 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+	setcls CLSMODE_SOLID, $404040
+
+	sx=ginfo_sx	; 画面のXサイズ
+	sy=ginfo_sy	; 画面のYサイズ
+
+	celload "res/ball64.png",3
+	celdiv 3, 64,64, 32,32
+
+	id=0
+	x = sx / 2
+	y = sy / 2
+	rot = 0.0
+
+	repeat
+
+	stick key
+	if key&$100 {		; マウスクリック判定
+		x=mousex
+		y=mousey
+		id++
+		if id>=64 : id=0
+	}
+
+	redraw 0
+
+	gmode 5,256,256,255
+	pos x,y : celput 3,id,2,2,rot
+	rot+=0.05
+
+	; 文字を表示
+	color 255,255,255
+	pos 16,16
+	mes "celput Sample"
+
+	redraw 1
+	await 1000/60
+
+	loop
+

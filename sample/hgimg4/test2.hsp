@@ -1,0 +1,30 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+	setcls CLSMODE_SOLID, $404040
+
+	x=160:y=160:px=4:py=4
+	m="HGIMG4 grect sample"
+
+repeat
+	redraw 0
+
+	pos 240,300:color 255,255,255:mes m
+
+	color 100,100,100:boxf 150,200,200,450
+
+	hsvcolor cnt/2,255,255
+	gmode 3,200,200,128			; 半透明で描画する
+	grect x,y,double(cnt)*0.07
+
+	x+=px:if (x=0)|(x=ginfo_sx) : px=-px
+	y+=py:if (y=0)|(y=ginfo_sy) : py=-py
+
+
+	redraw 1
+	await 1000/60
+
+loop
+

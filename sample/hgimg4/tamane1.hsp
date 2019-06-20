@@ -1,0 +1,71 @@
+#include "hgimg4.as"
+
+	;	珠音（たまね）3D model sample
+	;	モデリング&アニメーション製作 : オガワコウサク(チームグリグリ)
+	;	HGIM43対応 HSP3用スクリプトサンプル
+	;	※このスクリプト及びサンプルデータは、自作ソフトで自由にお使い頂けます
+	;	※詳しくは、 http://hsp.tv/make/tamane3d.html
+	;
+
+	title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, $404040
+
+	gpload id_model,"res/tamane"		; モデル読み込み
+
+	setscale id_model, 0.01,0.01,0.01
+
+	gpfloor id_floor, 8,8, $00ffff		; 床ノードを追加
+
+	setpos GPOBJ_CAMERA, 0,3.5,5		; カメラ位置を設定
+
+	gpaddanim id_model,"run",0,700		; "run"クリップを設定
+	gpact id_model,"run"			; "run"クリップを再生
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	redraw 0			; 描画開始
+
+	;	タッチでカメラ位置を動かす
+	if dragmd {	; ドラッグ中
+		getkey a,1
+		if a=1 {
+			dx=0.05*(mousex-dragx)+cx
+			dy=0.05*(mousey-dragy)+cy
+			setpos GPOBJ_CAMERA, dx,dy,cz
+		} else {
+			dragmd=0
+		}
+	} else {	; ドラッグなし
+		getkey a,1
+		if a {
+			dragx=mousex:dragy=mousey
+			getpos GPOBJ_CAMERA, cx,cy,cz
+			dragmd=1
+		}
+	}
+	gplookat GPOBJ_CAMERA, 0,14,0		; カメラから指定した座標を見る
+
+;	カーソルキーでカメラ位置を動かす
+	if key&1 : addpos GPOBJ_CAMERA, -0.2, 0
+	if key&4 : addpos GPOBJ_CAMERA, 0.2, 0
+	if key&8 : addpos GPOBJ_CAMERA, 0, 0 , 0.2
+	if key&2 : addpos GPOBJ_CAMERA, 0, 0 , -0.2
+
+	gplookat GPOBJ_CAMERA, 0,1.2,0		; カメラから指定した座標を見る
+
+	;addang id_model,0,0.02		; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+

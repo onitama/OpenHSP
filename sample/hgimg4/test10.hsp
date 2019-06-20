@@ -1,0 +1,60 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, $404040
+
+	setcolor GPOBJ_LIGHT, 1,1,1		; ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.5,0.5,0.5		; アンビエントカラーを設定
+
+	gpload id_model,"res/duck"		; モデル読み込み
+
+	i=-1
+	mdx=10:mdz=6				; X,Z方向の個数
+	px=20.0/mdx:pz=15.0/mdz			; 間隔を計算する
+	z=-3.0					; 配置開始Z座標
+	repeat mdz
+	x=-10.0					; 配置開始X座標
+	repeat mdx
+		if i<0 {
+			i=id_model
+		} else {
+			gpclone i, id_model	; 最初のモデル以降はクローン
+		}
+		setpos i, x,0,z
+		x+=px
+	loop
+	z+=pz
+	loop
+
+	gpfloor id_floor, 40,40, $00ffff	; 床ノードを追加
+
+	setpos GPOBJ_CAMERA, 0,20,20		; カメラ位置を設定
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	redraw 0			; 描画開始
+
+	;	カーソルキーでカメラ位置を動かす
+	if key&1 : addpos GPOBJ_CAMERA, -1, 0
+	if key&4 : addpos GPOBJ_CAMERA, 1, 0
+	if key&8 : addpos GPOBJ_CAMERA, 0, 1
+	if key&2 : addpos GPOBJ_CAMERA, 0, -1
+
+	gplookat GPOBJ_CAMERA, 0,0.3,0		; カメラから指定した座標を見る
+
+	addang id_model,0,0.02		; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+

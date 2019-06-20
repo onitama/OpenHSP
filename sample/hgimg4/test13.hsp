@@ -1,0 +1,57 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	;	物理エンジンテスト
+	;	カーソルキーで箱を動かすことができます
+	;
+	randomize
+	gpreset
+
+	setcls CLSMODE_SOLID, $808080		; 画面クリア設定
+
+	setpos GPOBJ_CAMERA, 0,2,5		; カメラ位置を設定
+
+	gptexmat id_texmat, "res/qbox.png"
+	gpbox id_box, 0.5, -1, id_texmat		; 箱ノードを追加
+	setpos id_box,	0, 3, 0
+	gppbind id_box, 1, 0.5				; 箱の物理設定を行なう
+
+	gpfloor id_floor, 30,30, $404040		; 床ノードを追加
+	gppbind id_floor, 0				; 床の物理設定を行なう
+
+	;	スペースキーまたはクリックで箱を追加
+	dz=2.0
+	repeat 8
+		gpclone i, id_box			; 最初の箱をクローン
+		dx=0.5*rnd(5)-1:z=z-1.0
+		setpos i, dx, 3, dz			; 落とす位置を微調整
+		gppbind i, 1, 0.5			; 箱の物理設定を行なう
+	loop
+
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	;	カーソルキーで箱を動かす
+	if key&1 : gppapply id_box,GPPAPPLY_IMPULSE, -0.1, 0, 0
+	if key&4 : gppapply id_box,GPPAPPLY_IMPULSE, 0.1, 0, 0
+	if key&8 : gppapply id_box,GPPAPPLY_IMPULSE, 0,0, 0.1
+	if key&2 : gppapply id_box,GPPAPPLY_IMPULSE, 0,0, -0.1
+
+	getpos id_box,dx,dy,dz
+	gplookat GPOBJ_CAMERA, dx,dy,dz		; カメラから指定した座標を見る
+
+	redraw 0			; 描画開始
+
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+

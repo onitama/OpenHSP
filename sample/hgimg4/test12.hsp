@@ -1,0 +1,84 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	randomize
+
+	gpreset
+	setcls CLSMODE_SOLID, $404040
+
+	sx=ginfo_sx	; 画面のXサイズ
+	sy=ginfo_sy	; 画面のYサイズ
+
+	celload "res/ball64.png",3
+	celdiv 3, 64,64, 32,32
+
+	max = 100		; ボールの最大数
+	gosub *c_init		; ボールを初期化
+
+	;	自分のキャラ
+	myx=sx/2:myy=sy/2
+	gpspr id_spr, 3,0, 4
+	setpos id_spr, myx, myy
+	setscale id_spr, 2,2,2
+	setcoli id_spr,2,1
+	
+	setborder 0,0,0, 1
+	setborder sx,sy,0, 2
+
+*main
+	stick key,15
+
+	;	カーソルキーで動かす
+	if key&1 : addpos id_spr, -1, 0
+	if key&4 : addpos id_spr, 1, 0
+	if key&8 : addpos id_spr, 0, 1
+	if key&2 : addpos id_spr, 0, -1
+
+	getcoli i,id_spr,64	; 接触したオブジェクトを調べる
+	if i>=0 {
+		delobj i	; 接触したオブジェクトは消す
+	}
+
+	redraw 0		; 描画開始
+
+	gpdraw			; オブジェクトの描画
+
+	; 文字を表示
+	color 255,255,255
+	pos 8,8
+	mes "sprite test"
+
+	redraw 1		; 描画終わり
+	await 1000/60
+
+	goto *main
+
+*c_init
+	;	ボールの初期化サブルーチン
+	;
+	speed=2				; ボールのスピード
+	repeat max
+		mf=cnt&63		; 表示IDを設定
+		mx=rnd(sx-128)+64	; 表示X位置を乱数で設定
+		my=rnd(sy-128)+64	; 表示Y位置を乱数で設定
+		if rnd(2)=0 {		; X方向の移動量を乱数で設定
+			mpx=-speed
+		} else {
+			mpx=speed
+		}
+		if rnd(2)=0 {		; Y方向の移動量を乱数で設定
+			mpy=-speed
+		} else {
+			mpy=speed
+		}
+		gpspr i, 3,mf, 4
+		setpos i, mx, my
+		setdir i, mpx, mpy
+		setangr i, 0,0,rnd(64)
+		setobjmode i,OBJ_MOVE|OBJ_BORDER|OBJ_FLIP
+		;gpsetprm i, PRMSET_ALPHA, 128
+		setcoli i,1
+	loop
+	return
+

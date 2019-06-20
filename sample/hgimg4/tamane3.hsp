@@ -1,0 +1,108 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+
+	;
+	;	珠音ちゃんブラウン管風表示
+	;
+
+	setreq SYSREQ_FIXEDFRAME,24		; アニメーションの更新を固定にする
+	gpreset
+
+	setcls CLSMODE_SOLID, $404040
+
+	setcolor GPOBJ_LIGHT, 1,1,1		; ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.5,0.5,0.5		; アンビエントカラーを設定
+
+	gpload id_model,"res/tamane2"		; モデル読み込み
+	setang id_mode, 0, 3.141592		; モデルの回転を設定
+	setscale id_model, 0.1,0.1,0.1
+	gpact id_model
+
+	setpos GPOBJ_CAMERA, 0,20,30		; カメラ位置を設定
+
+	gosub *setup_post
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	;	タッチでカメラ位置を動かす
+	if dragmd {	; ドラッグ中
+		getkey a,1
+		if a=1 {
+			dx=0.05*(mousex-dragx)+cx
+			dy=0.05*(mousey-dragy)+cy
+			setpos GPOBJ_CAMERA, dx,dy,cz
+		} else {
+			dragmd=0
+		}
+	} else {	; ドラッグなし
+		getkey a,1
+		if a {
+			dragx=mousex:dragy=mousey
+			getpos GPOBJ_CAMERA, cx,cy,cz
+			dragmd=1
+		}
+	}
+
+	gsel 1
+	redraw 0			; 描画開始
+	color 128,0,128:boxf
+
+	gplookat GPOBJ_CAMERA, 0,14,0		; カメラから指定した座標を見る
+
+	;addang id_model,0,0.02		; ノード回転
+	gpdraw				; シーンの描画
+
+	redraw 1			; 描画終了
+
+	gsel 0
+	redraw 0			; 描画開始
+
+	gosub *exec_crt
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1
+	await 1000/60			; 待ち時間
+
+loop
+
+
+*setup_post
+	;	ポストエフェクト初期化
+	sx=ginfo_sx:sy=ginfo_sy
+	gosub *setup_crt
+
+	gsel 0
+	return
+
+*exec_copybuf
+	;	buffer1 -> メイン画面にシェーダー描画
+	pos 0,0:gmode 0
+	celput 1
+	return
+
+*setup_crt
+	;	ブラウン管フィルター
+	celload "res/crtmask.png",4	; オーバーレイ画像
+	gpusershader "res/shaders/sprite.vert", "res/shaders/p_crtmonitor.frag", ""
+	buffer 1,sx,sy,screen_offscreen + screen_usergcopy
+	gpgetmat crt_mat, 1, GPGETMAT_OPT_SCRMAT
+	crt_curvex=0.5		; X方向の湾曲率
+	crt_curvey=0.4		; Y方向の湾曲率
+	gpmatprm1 crt_mat, "u_curvex", crt_curvex
+	gpmatprm1 crt_mat, "u_curvey", crt_curvey
+	return
+
+*exec_crt
+	gosub *exec_copybuf
+	;	オーバーレイを描画
+	pos 0,0:gmode 1
+	gzoom sx,sy,4,0,0,960,640
+	return
+
+

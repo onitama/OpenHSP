@@ -1,0 +1,26 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, 0		; 画面クリア設定
+
+	setpos GPOBJ_CAMERA, 0,0,5	; カメラ位置を設定
+
+	gpbox id_model, 1		; 箱ノードを追加
+
+repeat
+	redraw 0			; 描画開始
+
+	addang id_model,0,0.02,0.01	; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+

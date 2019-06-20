@@ -1,0 +1,70 @@
+material textured
+{
+    u_worldViewProjectionMatrix = WORLD_VIEW_PROJECTION_MATRIX
+    
+    sampler u_diffuseTexture
+    {
+        mipmap = true
+        wrapS = CLAMP
+        wrapT = CLAMP
+        minFilter = LINEAR_MIPMAP_LINEAR
+        magFilter = LINEAR
+    }
+
+    renderState
+    {
+        cullFace = true
+        depthTest = true
+    }
+    
+    technique
+    {
+        pass 
+        {
+            vertexShader = res/shaders/textured.vert
+            fragmentShader = res/shaders/textured.frag
+        }
+    }
+}
+
+material bodyUV : textured
+{
+    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = body.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 16;VERTEX_COLOR
+        }
+    }
+}
+
+material faceUV : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = head.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 16;VERTEX_COLOR
+        }
+    }
+}
+

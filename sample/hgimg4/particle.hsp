@@ -1,0 +1,45 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, 0		; 画面クリア設定
+
+	setpos GPOBJ_CAMERA, 0,0,20	; カメラ位置を設定
+
+	gptexmat id_texmat, "res/qbox.png"		; テクスチャマテリアル作成
+	gpbox id_model, 1, -1, id_texmat		; 箱ノードを追加
+
+	; テクスチャマテリアル作成
+	gptexmat id_ptex, "res/efx.png"	,GPOBJ_MATOPT_BLENDADD|GPOBJ_MATOPT_NOZWRITE
+
+	;	イベントリストを登録
+	;
+	newevent ev1			; 新しいイベントIDを取得
+	event_setdir ev1, -0.2,0.2,-0.5, 0.2,0.7,0.2
+	event_adddir ev1, 0, -0.05, 0
+	event_wait ev1, 40
+	event_suicide ev1
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	gpplate id, 1.8,1.8,-2,id_ptex		; 板ノードを追加
+	setobjmode id, OBJ_MOVE			; 自動移動を設定する
+	setevent id, ev1
+
+	redraw 0			; 描画開始
+
+	addang id_model,0,0.01,0.02	; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+

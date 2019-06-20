@@ -1,0 +1,61 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	;	スプライトの移動&フェード
+	;	カーソルキーでスプライトを動かしてスペースキーでスプライトを発射します
+	;	発射されたスプライトは自動的にフェードアウトして消去されます
+	;
+
+	randomize
+
+	gpreset
+	setcls CLSMODE_SOLID, $404040
+
+	sx=ginfo_sx	; 画面のXサイズ
+	sy=ginfo_sy	; 画面のYサイズ
+
+	celload "res/ball64.png",3
+	celdiv 3, 64,64, 32,32
+
+	;	自分のキャラ
+	myx=sx/2:myy=sy/2
+	gpspr id_spr, 3,0, 4
+	setscale id_spr, 2,2,2
+	spd=4.0	
+
+*main
+	stick key,31
+
+	;	カーソルキーで動かす
+	if key&128 : end
+	if key&16 {
+		;	放射状にスプライトを発射
+		gpspr i,3,1, 4				; スプライトを登録
+		setpos i, myx, myy			; 新しい座標を設定
+		rot=0.01*rnd(6282)			; 角度を乱数で設定する
+		setobjmode i, OBJ_MOVE			; 自動移動を設定する
+		setdir i, sin(rot)*spd,cos(rot)*spd	; 移動方向を設定する
+		gpsetprm i, PRMSET_FADE, -4		; フェードアウトを設定する
+	}
+	if key&1 : myx -= 1
+	if key&4 : myx += 1
+	if key&8 : myy += 1
+	if key&2 : myy -= 1
+
+	setpos id_spr, myx, myy
+
+	redraw 0		; 描画開始
+
+	gpdraw			; オブジェクトの描画
+
+	; 文字を表示
+	color 255,255,255
+	pos 8,8
+	mes "sprite test"
+
+	redraw 1		; 描画終わり
+	await 1000/60
+
+	goto *main
+

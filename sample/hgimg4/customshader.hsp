@@ -1,0 +1,41 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Custom Shader Test"
+
+	;	カスタムシェーダー
+	;
+	randomize
+
+	gpreset
+	setcls CLSMODE_SOLID, $404040
+
+	setpos GPOBJ_CAMERA, 0,0,20	; カメラ位置を設定
+
+	;	カスタムシェーダー(textured_gray.frag)によりテクスチャーを白黒に変換する
+	gpusermat id_mat, "res/shaders/textured.vert","res/shaders/textured_gray.frag","MODULATE_ALPHA;MODULATE_COLOR"
+	gpmatprmt id_mat, "u_diffuseTexture", "hsp3dish.png"
+	gpmatprm4 id_mat,"u_modulateColor", 1,1,1,1
+
+	gpplate id, 8,3,,id_mat		; 板ノードを追加
+
+	gmode 0,640,200
+
+	repeat
+	redraw 0
+
+	stick key
+	if key&128 : end
+	if key&256 {
+		;	クリックしたら赤くなる
+		gpmatprm4 id,"u_modulateColor", 1,0,0,1
+		title ""+stat
+	}
+
+	addang id,0,0.01,0.02		; ノード回転
+	gpdraw
+
+	redraw 1
+	await 1000/60
+	
+	loop
+

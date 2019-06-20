@@ -1,0 +1,56 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Buffer Test"
+
+	;	オフスクリーンバッファを使った描画テスト
+	;	(4x4ドットの大きさで表示します)
+	;
+	gpreset
+
+	setcls CLSMODE_SOLID, 0		; 画面クリア設定
+
+	setpos GPOBJ_CAMERA, 0,0,3	; カメラ位置を設定
+
+	gpbox id_model, 1		; 箱ノードを追加
+
+	sx=ginfo_sx:sy=ginfo_sy
+	dotsize=4
+
+	bx=sx/dotsize:by=sy/dotsize
+	buffer 1,bx,by,screen_offscreen	; オフスクリーンバッファを初期化
+
+
+*main
+	;	サブ画面
+	gsel 1
+	gfilter 0			; 補間なし(nearest)
+	redraw 0			; 描画開始
+
+	addang id_model,0,0.02,0.01	; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 0,0:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+
+	;	メイン画面
+	gsel 0
+	redraw 0
+	pos 0,0:gmode 0
+	celput 1,,dotsize,dotsize	; 拡大して表示
+
+	pos sx-bx,sy-by
+	celput 1			; 右下にオリジナルを表示
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+	;	入力チェック
+	stick key
+	if key&128 : goto *bye
+
+	goto *main
+
+*bye
+	end

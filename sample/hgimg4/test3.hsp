@@ -1,0 +1,45 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+	setcls CLSMODE_SOLID, $404040
+
+	sx=ginfo_sx	; 画面のXサイズ
+	sy=ginfo_sy	; 画面のYサイズ
+
+	; gsquare用の頂点座標と色を配列に代入
+	x(0)=0 : y(0)=0 : col(0)=$0000ff
+	x(1)=sx : y(1)=0 : col(1)=$00ffff
+	x(2)=sx : y(2)=sy : col(2)=$ff0000
+	x(3)=0 : y(3)=sy : col(3)=$ff00ff
+
+	font "",32	; フォントサイズを指定
+
+	gmode 0
+
+	;
+	; gradf命令サンプル
+	;
+	repeat
+
+	py=sin(0.1*cnt)*64+(sy/2)
+
+	redraw 0
+
+	; グラデーションで四角形を描画
+	gsquare gsquare_grad, x,y,col
+
+	; グラデーションで矩形を塗りつぶし
+	gradf 0,py-50,sx,150, 1, $ff00ff, $ffffff
+
+	; 文字を表示
+	color 255,255,255
+	pos 32,py
+	mes "HGIMG4 gradf sample"
+
+	redraw 1
+	await 1000/60
+
+	loop
+

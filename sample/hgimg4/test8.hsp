@@ -1,0 +1,31 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, $404040		; 画面クリア設定
+
+	gpload id_model,"res/sky","sphere"	; モデル読み込み
+
+	setpos GPOBJ_CAMERA, 0,0,5		; カメラ位置を設定
+
+	x=0.0:y=0.0:z=0.0
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	redraw 0			; 描画開始
+
+	addang id_model,0,0.02		; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+
