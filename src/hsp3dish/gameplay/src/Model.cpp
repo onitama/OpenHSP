@@ -326,12 +326,17 @@ static bool drawWireframe(MeshPart* part)
     }
 }
 
-unsigned int Model::draw(bool wireframe)
+unsigned int Model::draw(bool wireframe )
 {
     GP_ASSERT(_mesh);
 
     unsigned int partCount = _mesh->getPartCount();
-    if (partCount == 0)
+	unsigned int meshcount;
+	_drawtotal = 0;
+
+	//GP_WARN( "Draw[%s]",getNode()->getId() );
+
+	if (partCount == 0)
     {
         // No mesh parts (index buffers).
         if (_material)
@@ -345,9 +350,11 @@ unsigned int Model::draw(bool wireframe)
                 GP_ASSERT(pass);
                 pass->bind();
                 GL_ASSERT( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0) );
+				meshcount = _mesh->getVertexCount();
+				_drawtotal += meshcount;
                 if (!wireframe || !drawWireframe(_mesh))
                 {
-                    GL_ASSERT( glDrawArrays(_mesh->getPrimitiveType(), 0, _mesh->getVertexCount()) );
+                    GL_ASSERT( glDrawArrays(_mesh->getPrimitiveType(), 0, meshcount ) );
                 }
                 pass->unbind();
             }
@@ -355,7 +362,9 @@ unsigned int Model::draw(bool wireframe)
     }
     else
     {
-        for (unsigned int i = 0; i < partCount; ++i)
+		meshcount = _mesh->getVertexCount();
+		_drawtotal += meshcount;
+		for (unsigned int i = 0; i < partCount; ++i)
         {
             MeshPart* part = _mesh->getPart(i);
             GP_ASSERT(part);
@@ -373,7 +382,7 @@ unsigned int Model::draw(bool wireframe)
                     GP_ASSERT(pass);
                     pass->bind();
                     GL_ASSERT( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, part->_indexBuffer) );
-                    if (!wireframe || !drawWireframe(part))
+					if (!wireframe || !drawWireframe(part))
                     {
                         GL_ASSERT( glDrawElements(part->getPrimitiveType(), part->getIndexCount(), part->getIndexFormat(), 0) );
                     }
@@ -382,6 +391,7 @@ unsigned int Model::draw(bool wireframe)
             }
         }
     }
+	
     return partCount;
 }
 

@@ -139,7 +139,7 @@ public:
      * rendering states, shader state, and so on, should be set
      * up before calling this method.
      */
-    unsigned int draw(bool wireframe = false);
+    unsigned int draw(bool wireframe = false );
 
 private:
 

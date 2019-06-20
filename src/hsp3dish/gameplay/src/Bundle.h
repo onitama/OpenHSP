@@ -114,9 +114,14 @@ public:
      */
     unsigned int getVersionMinor() const;
 
+
+	void AddSceneToSavedMesh(Scene* sceneContext, Node* nodeContext);
+	std::vector<Node *> _savedNode;
+
 private:
 
-    class Reference
+
+	class Reference
     {
     public:
         std::string id;
@@ -449,6 +454,7 @@ private:
      * @return True if the Node was successfully skipped; false otherwise.
      */
     bool skipNode();
+
 
     unsigned char _version[2];
     std::string _path;

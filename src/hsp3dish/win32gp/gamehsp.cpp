@@ -59,6 +59,8 @@ void gpobj::reset( int id )
 	_colgroup = 0;
 	_transparent = 255;
 	_fade = 0;
+	_rendergroup = 1;
+	_lightgroup = 1;
 
 	_usegpmat = -1;
 	_usegpphy = -1;
@@ -402,7 +404,7 @@ void gamehsp::resetScreen( int opt )
 	//Camera*	camera = Camera::createPerspective(0.25f*3.141592654f, getAspectRatio(), 0.5f, 768.0f );
 	//_cameraDefault = Camera::createPerspective( 45.0f, getAspectRatio(), 0.5f, 768.0f );
 
-	_defcamera = makeNewCam( -1, 45.0f, getAspectRatio(), 0.5f, 768.0f );		// カメラを生成
+	_defcamera = makeNewCam(-1, 45.0f, getAspectRatio(), 0.5f, 768.0f);		// カメラを生成
 	selectCamera( _defcamera );
 
 //	_camera = _scene->addNode("camera");
@@ -614,9 +616,10 @@ void gamehsp::update2DRenderProjectionSystem(Matrix *mat)
 }
 
 
-void gamehsp::selectScene( int sceneid )
+int gamehsp::selectScene( int sceneid )
 {
 	_curscene = sceneid;
+	return 0;
 }
 
 
@@ -1108,19 +1111,99 @@ void gamehsp::drawNode( Node *node )
 }
 
 
+bool gamehsp::drawNodeRecursive(Node *node, bool wireflag)
+{
+	Drawable* drawable = node->getDrawable();
+	if (drawable) {
+		drawable->draw(wireflag);
+		_render_numpoly += drawable->_drawtotal;
+	}
+
+	Node *pnode = node->getFirstChild();
+	while (1) {
+		if (pnode == NULL) break;
+		drawNodeRecursive(pnode, wireflag);
+		pnode = pnode->getNextSibling();
+	}
+
+	return true;
+}
+
+int gamehsp::drawSceneObject(gpobj *camobj)
+{
+	//	すべてのオブジェクトを描画する
+	//	(camobjにコリジョングループ設定がある場合は対象コリジョンのみ描画)
+	//	(camobjがNULLか、対象コリジョンなしの場合はすべてのオブジェクトを描画)
+	//
+	int i,num;
+	gpobj *obj = _gpobj;
+
+	int target_group = 0;
+	if (camobj) target_group = camobj->_rendergroup;
+
+	num = 0;
+	for (i = 0; i < _maxobj; i++) {
+		if (obj->isVisible(_scenedraw_lateflag)) {
+			if (target_group) {
+				if ((target_group & obj->_rendergroup) == 0) continue;
+			}
+			Node *node = obj->_node;
+			if (node) {
+				bool clip = true;
+				bool wireflag = false;
+				int mode = obj->_mode;
+				if (mode & GPOBJ_MODE_XFRONT) {
+					node->setRotation(_qcam_billboard);
+				}
+				if (mode & GPOBJ_MODE_CLIP) {
+					clip = node->getBoundingSphere().intersects(_cameraDefault->getFrustum());
+				}
+				if (mode & GPOBJ_MODE_WIRE) {			// ワイヤーフレーム描画時
+					wireflag = true;
+				}
+
+				if (clip) {
+					//	Alphaのモジュレート設定
+					gameplay::MaterialParameter *prm_modalpha = obj->_prm_modalpha;
+					if (prm_modalpha) { prm_modalpha->setValue(obj->getAlphaRate()); }
+					drawNodeRecursive(obj->_node, wireflag);
+					num++;
+				}
+			}
+		}
+		obj++;
+	}
+
+	return num;
+}
+
+
 void gamehsp::drawAll( int option )
 {
 	// すべてのノードを描画
 	//
+	_render_numobj = 0;
+	_render_numpoly = 0;
 
 	// ビルボード用の向きを作成
 	Matrix m;
 	Camera* camera = _scene->getActiveCamera();
 	m = camera->getNode()->getMatrix();
 	m.getRotation(&_qcam_billboard);
+	gpobj *camobj = (gpobj *)camera->getNode()->getUserObject();
 
 	//	gpobjの3Dシーン描画
 	//
+	if (option & GPDRAW_OPT_DRAWSCENE) {
+		_scenedraw_lateflag = false;
+		_render_numobj += drawSceneObject(camobj);
+	}
+	if (option & GPDRAW_OPT_DRAWSCENE_LATE) {
+		_scenedraw_lateflag = true;
+		_render_numobj += drawSceneObject(camobj);
+	}
+
+#if 0
 	if ( option & GPDRAW_OPT_DRAWSCENE ) {
 		_scenedraw_lateflag = false;
 		_scene->visit(this, &gamehsp::drawScene);
@@ -1129,9 +1212,75 @@ void gamehsp::drawAll( int option )
 		_scenedraw_lateflag = true;
 		_scene->visit(this, &gamehsp::drawScene);
 	}
+#endif
+
+	SetSysReq(SYSREQ_DRAWNUMOBJ, _render_numobj);
+	SetSysReq(SYSREQ_DRAWNUMPOLY, _render_numpoly);
 }
 
 
+bool gamehsp::pickupNode(Node *node, int deep)
+{
+	Drawable* drawable = node->getDrawable();
+	Model* model = dynamic_cast<Model*>(drawable);
+	if (model)
+	{
+		unsigned int partCount = model->getMeshPartCount();
+		GP_WARN( "#model %s (deep:%d)(part:%d)",node->getId(), deep, partCount);
+
+		Material *mat = model->getMaterial(0);
+		if (mat)
+		{
+			Technique* technique = mat->getTechnique();
+			unsigned int passCount = technique->getPassCount();
+			for (unsigned int i = 0; i < passCount; ++i)
+			{
+				Pass* pass = technique->getPassByIndex(i);
+				GP_WARN("#Pass%d ", i);
+			}
+		}
+
+		MeshSkin* skin = model->getSkin();
+		if (skin) {
+			Joint *joint = skin->getRootJoint();
+			Node* jointParent = joint->getParent();
+			GP_WARN("#Skin Root:%s", joint->getId());
+		}
+	}
+
+	if (model) {
+		MeshSkin *skin = model->getSkin();
+		if (skin) {
+			Node *root = skin->getRootNode();
+			if (root) {
+				pickupNode(root, deep + 1);
+			}
+		}
+	}
+
+	Node *pnode = node->getFirstChild();
+	while (1) {
+		if (pnode == NULL) break;
+		pickupNode(pnode, deep+1);
+		pnode = pnode->getNextSibling();
+	}
+
+	return true;
+}
+
+void gamehsp::pickupAll(int option)
+{
+	// すべてのノードを検証
+	//
+	Node *node = _scene->getFirstNode();
+	while (1) {
+		if (node == NULL) break;
+		pickupNode(node, 0);
+		node = node->getNextSibling();
+	}
+}
+
+#if 0
 bool gamehsp::updateNodeMaterial( Node* node, Material *material )
 {
 	//	再帰的にノードのマテリアルを設定
@@ -1154,8 +1303,9 @@ bool gamehsp::updateNodeMaterial( Node* node, Material *material )
     }
 	return true;
 }
+#endif
 
-
+#if 0
 bool gamehsp::drawScene(Node* node)
 {
     // If the node visited contains a model, draw it
@@ -1185,8 +1335,6 @@ bool gamehsp::drawScene(Node* node)
 			}
 
 		}
-
-
 	}
 
     if (model)
@@ -1195,7 +1343,7 @@ bool gamehsp::drawScene(Node* node)
     }
     return true;
 }
-
+#endif
 
 int *gamehsp::getObjectPrmPtr( int objid, int prmid )
 {
@@ -1350,10 +1498,19 @@ int gamehsp::addAnimId(int objid, char *name, int start, int end, int option)
 	obj = getObj(objid);
 	if (obj == NULL) return -1;
 	anim = obj->_animation;
-	if (anim == NULL) return -1;
-	if (*name == 0) return -1;
+	if (anim == NULL) {
+		GP_WARN( "Not Found Animation in OBJ#%d",objid );
+		return -1;
+	}
+	if (*name == 0) {
+		GP_WARN("No Animation name");
+		return -1;
+	}
 	clip = anim->getClip(name);
-	if (clip != NULL) return -1;
+	if (clip != NULL) {
+		GP_WARN("Already exist Animation [%s] in OBJ#%d", name, objid);
+		return -1;
+	}
 
 	p_start = (unsigned long)start;
 	if (end < 0) {
@@ -1450,7 +1607,13 @@ int gamehsp::makeFloorNode( float xsize, float ysize, int color, int matid )
 	}
 	else {
 		material = getMaterial( matid );
-		makeNewModelWithMat(obj, floorMesh, matid);
+		if (material == NULL) {
+			material = makeMaterialColor(-1, GPOBJ_MATOPT_NOLIGHT);
+			makeNewModel(obj, floorMesh, material);
+		}
+		else {
+			makeNewModelWithMat(obj, floorMesh, matid);
+		}
 	}
 
     // メッシュ削除
@@ -1483,7 +1646,9 @@ int gamehsp::makeFloorNode( float xsize, float ysize, int color, int matid )
 int gamehsp::makePlateNode( float xsize, float ysize, int color, int matid )
 {
 	gpobj *obj = addObj();
-	if ( obj == NULL ) return -1;
+	if (obj == NULL) {
+		return -1;
+	}
 
     // 平面作成
 	Mesh* floorMesh = Mesh::createQuad(
@@ -1501,7 +1666,13 @@ int gamehsp::makePlateNode( float xsize, float ysize, int color, int matid )
 	}
 	else {
 		material = getMaterial( matid );
-		makeNewModelWithMat(obj, floorMesh, matid);
+		if (material) {
+			makeNewModelWithMat(obj, floorMesh, matid);
+		}
+		else {
+			material = makeMaterialColor(-1, GPOBJ_MATOPT_NOLIGHT);
+			makeNewModel(obj, floorMesh, material);
+		}
 	}
 
     // メッシュ削除
@@ -1536,7 +1707,13 @@ int gamehsp::makeBoxNode( float size, int color, int matid )
 	}
 	else {
 		material = getMaterial(matid);
-		makeNewModelWithMat(obj, mesh, matid);
+		if (material) {
+			makeNewModelWithMat(obj, mesh, matid);
+		}
+		else {
+			material = makeMaterialColor(-1, GPOBJ_MATOPT_NOLIGHT);
+			makeNewModel(obj, mesh, material);
+		}
 	}
 
 	// 初期化パラメーターを保存
@@ -1630,69 +1807,6 @@ std::string gamehsp::passCallback(Pass* pass, void* cookie)
 }
 
 
-
-int gamehsp::ApplyMaterialToModel(Material *boxMaterial, Model *model)
-{
-	if (boxMaterial == NULL) return -1;
-	model->setMaterial(boxMaterial);
-	return 0;
-
-#if 0
-	unsigned int i;
-	MaterialParameter *mParam;
-	Technique *tec = boxMaterial->getTechniqueByIndex(0);
-	for (i = 0; i < boxMaterial->getParameterCount(); i++)
-	{
-		mParam = boxMaterial->getParameterByIndex(i);
-		GP_WARN("%d:%s",i,mParam->getName());
-
-		if (strcmp(mParam->getName(), "u_directionalLightColor[0]") == 0) {
-			mParam->setValue(Vector3(0, 1, 1));
-			GP_WARN("%d:changed", i);
-		}
-
-	}
-
-	MaterialParameter *ambientColorParam = NULL;
-	//hasParameter(boxMaterial, "u_ambientColor") ?
-	ambientColorParam = boxMaterial->getParameter("u_ambientColor");
-	MaterialParameter *lightDirectionParam = NULL;
-	//hasParameter(boxMaterial, "u_lightDirection") ?
-	lightDirectionParam = boxMaterial->getParameter("u_directionalLightDirection[0]");
-	MaterialParameter *lightColorParam = NULL;
-	//hasParameter(boxMaterial, "u_lightColor") ?
-	lightColorParam = boxMaterial->getParameter("u_directionalLightColor[0]");
-
-	Vector3 directionalLightVector;
-
-	//	カレントライトを反映させる
-	gpobj *lgt;
-	Node *light_node;
-	lgt = getObj(_curlight);
-	light_node = lgt->_node;
-	directionalLightVector = light_node->getForwardVector();
-
-	// ライトの方向設定
-	if (lightDirectionParam) {
-		//lightDirectionParam->bindValue(light_node, &Node::getForwardVectorView);
-		lightDirectionParam->setValue(Vector3(0, 0, -1));
-	}
-	if (ambientColorParam) {
-		Vector3 *vambient;
-		vambient = (Vector3 *)&lgt->_vec[GPOBJ_USERVEC_WORK];
-		ambientColorParam->setValue(vambient);
-	}
-	// ライトの色設定
-	// (リアルタイムに変更を反映させる場合は再設定が必要。現在は未対応)
-	if (lightColorParam) {
-		lightColorParam->setValue(Vector3(0,1,1));
-		//lightColorParam->setValue(light_node->getLight()->getColor());
-	}
-	return 0;
-#endif
-}
-
-
 int gamehsp::makeModelNode(char *fname, char *idname, char *defs)
 {
 	char fn[512];
@@ -1701,7 +1815,6 @@ int gamehsp::makeModelNode(char *fname, char *idname, char *defs)
 	if (obj == NULL) return -1;
 
 	getpath(fname, fn, 1);
-	//strcpy( fn, fname );
 	strcpy(fn2, fn);
 	strcat(fn, ".gpb");
 	strcat(fn2, ".material");
@@ -1722,65 +1835,41 @@ int gamehsp::makeModelNode(char *fname, char *idname, char *defs)
 			Alertf("Node not found.(%s#%s)", fname, idname);
 			return -1;
 		}
-		updateNodeMaterial(rootNode, boxMaterial);
-
 	}
 	else {
-		unsigned int i;
-
 		Scene *scene;
 		char *rootid;
-
-		rootNode = Node::create();
+		rootNode = Node::create("objRoot");
 		rootid = NULL;
-
 		scene = bundle->loadScene();
-		if (scene) {
-			node = scene->getFirstNode();
-			animation = node->getAnimation("animations");
-			if (animation) {
-				rootid = (char *)node->getId();
-				//Alertf( "Found Power Scene Node(%s) Clip count: %d", node->getId(), animation->getClipCount() );
-			}
-		}
-		else {
+		if (scene == NULL) {
 			Alertf("Scene not found.(%s)", fname);
+			return -1;
 		}
 
-		for (i = 0; i<bundle->getObjectCount(); i++) {
-			node = bundle->loadNode(bundle->getObjectId(i));
-			if (node) {
-				Drawable* drawable = node->getDrawable();
-				Model* model = dynamic_cast<Model*>(drawable);
-				if (model) {
-					ApplyMaterialToModel(boxMaterial, model);
-					//Material*m = model->getMaterial();
-					//m->getParameter("u_directionalLightColor[0]")->setValue(Vector3(1, 1, 0));
-					//m->getTechnique()->getParameter("u_directionalLightDirection[0]")->setValue(Vector3(0, 0, -1));
-
-				}
-				//Alertf( "#%d %s",i, bundle->getObjectId(i) );
-
-				animation = node->getAnimation("animations");
-				if (animation) {
-					if (strcmp(node->getId(), rootid) == 0) {
-						//AnimationClip *aclip;
-						//aclip = animation->createClip("idle", 0, animation->getDuration());
-						//aclip->setRepeatCount(AnimationClip::REPEAT_INDEFINITE);
-						//animation->play("idle");
-						//animation->createClips("zombie.animation");
-						//aclip = animation->getClip(0);
-						//Alertf("(%s) Clip count: %d Dur:%ld", aclip->getId(), animation->getClipCount(), aclip->getActiveDuration());
-						//animation->play(aclip->getId());
-						rootNode->addChild(node);
-					}
-				}
-				else {
-					rootNode->addChild(node);
-				}
-
-				SAFE_RELEASE(node);
-			}
+		size_t i, max;
+		std::vector<Node*> nodes;
+		node = scene->getFirstNode();
+		while (1) {
+			if (node == NULL) break;
+			nodes.push_back(node);
+			node = node->getNextSibling();
+		}
+		max = nodes.size();
+		for (i = 0; i < max; i++) {
+			node = nodes[i];
+			rootNode->addChild(node);
+			//GP_WARN("#ADD[%s]", node->getId());
+		}
+		max = bundle->_savedNode.size();
+		for (i = 0; i < max; i++) {
+			node = bundle->_savedNode[i];
+			//GP_WARN("#SAVE[%s]", node->getId());
+			Node *subnode = Node::create("Subobj");
+			subnode->setDrawable(node->getDrawable());
+			subnode->setId(node->getId());
+			subnode->setRefNode(node);
+			rootNode->addChild(subnode);
 		}
 
 		animation = rootNode->getAnimation("animations");
@@ -1791,25 +1880,20 @@ int gamehsp::makeModelNode(char *fname, char *idname, char *defs)
 			//animation->play(aclip->getId());
 		}
 
-		makeModelNodeSub(rootNode, 0);
-
 		SAFE_RELEASE(scene);
-
-
 	}
 
-	obj->updateParameter(boxMaterial);
+	//obj->updateParameter(boxMaterial);
+	//updateNodeMaterial(rootNode, boxMaterial);
+	makeModelNodeSub(rootNode, 0);
 
 	if (_curscene >= 0) {
 		_scene->addNode(rootNode);
 	}
 
-	//model->setMaterial( boxMaterial );
-
 	SAFE_RELEASE(bundle);
 	SAFE_RELEASE(boxMaterial);
 
-	//nodetemp = mCubeNode;
 	rootNode->setUserObject(obj);
 	obj->addRef();
 	obj->_node = rootNode;
@@ -1904,6 +1988,41 @@ gpobj *gamehsp::getObj( int id )
 	if (( id < 0 )||( id >= _maxobj )) return NULL;
 	if ( _gpobj[id]._flag == GPOBJ_FLAG_NONE ) return NULL;
 	return &_gpobj[id];
+}
+
+
+gpobj *gamehsp::getSceneObj(int id)
+{
+	//	システム系も含めたシーンのオブジェクトを取得する
+	//
+	int flag_id;
+	flag_id = id & GPOBJ_ID_FLAGBIT;
+	if (flag_id == 0) {
+		if ((id < 0) || (id >= _maxobj)) return NULL;
+		if (_gpobj[id]._flag == GPOBJ_FLAG_NONE) return NULL;
+		return &_gpobj[id];
+	}
+
+	switch (flag_id) {
+	case GPOBJ_ID_EXFLAG:
+		break;
+	default:
+		return NULL;
+	}
+
+	//	GPOBJ_ID_EXFLAGの場合
+	gpobj *obj = NULL;
+	switch (id) {
+	case GPOBJ_ID_CAMERA:
+		obj = getObj(_defcamera);
+		break;
+	case GPOBJ_ID_LIGHT:
+		obj = getObj(_deflight);
+		break;
+	default:
+		break;
+	}
+	return obj;
 }
 
 
@@ -2049,9 +2168,12 @@ int gamehsp::makeCloneNode( int objid, int mode, int eventID )
 		node->setUserObject(NULL);
 
 		newobj->_node = node->clone();
+		newobj->_animation = newobj->_node->getAnimation("animations");
 
 		newobj->_node->setUserObject(newobj);
 		newobj->addRef();
+
+		makeModelNodeSub(newobj->_node, 0);
 
 		if (_curscene >= 0) {
 			_scene->addNode(newobj->_node);
@@ -2244,7 +2366,7 @@ int gamehsp::updateObjColi( int objid, float size, int addcol )
 	gpspr *spr;
 	Vector3 *pos;
 
-	obj = getObj( objid );
+	obj = getSceneObj( objid );
 	if ( obj == NULL ) return -1;
 
 	if ( addcol == 0 ) {
@@ -2421,6 +2543,10 @@ gpobj *gamehsp::getNextObj( void )
 	while(1) {
 		if ( _find_count >= _maxobj ) { return NULL; }
 		if ( _find_gpobj->_flag ) {
+			if (_find_group == 0) {
+				res = _find_gpobj;
+				break;
+			}
 			if ( _find_gpobj->_mygroup & _find_group ) {
 				if (( _find_gpobj->_mode & _find_exmode ) == 0 ) {
 					res = _find_gpobj;
@@ -2798,6 +2924,13 @@ int gamehsp::convertAxis(Vector3 *res, Vector3 *pos, int mode)
 	{
 		Vector4 v1,v2;
 		Matrix mat = _cameraDefault->getInverseViewMatrix();
+		mat.transformVector(pos->x, pos->y, pos->z, 1.0f, res);
+		break;
+	}
+	case 3:
+	{
+		Vector4 v1, v2;
+		Matrix mat = _cameraDefault->getViewMatrix();
 		mat.transformVector(pos->x, pos->y, pos->z, 1.0f, res);
 		break;
 	}

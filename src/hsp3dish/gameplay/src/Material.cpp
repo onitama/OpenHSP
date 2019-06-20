@@ -40,7 +40,8 @@ Material* Material::create(const char* url, PassCallback callback, void* cookie)
         return NULL;
     }
 
-    Material* material = create((strlen(properties->getNamespace()) > 0) ? properties : properties->getNextNamespace(), callback, cookie);
+	//GP_WARN("file: %s", url);
+	Material* material = create((strlen(properties->getNamespace()) > 0) ? properties : properties->getNextNamespace(), callback, cookie);
     SAFE_DELETE(properties);
 
     return material;
@@ -62,6 +63,7 @@ Material* Material::create(Properties* materialProperties, PassCallback callback
 
     // Create new material from the file passed in.
     Material* material = new Material();
+	//GP_WARN("NewMaterial[%s]", materialProperties->getNamespace());
 
     // Load uniform value parameters for this material.
     loadRenderState(material, materialProperties);

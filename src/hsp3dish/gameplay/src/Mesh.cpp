@@ -128,7 +128,7 @@ Mesh* Mesh::createQuad(const Vector3& p1, const Vector3& p2, const Vector3& p3, 
         p2.x, p2.y, p2.z, n.x, n.y, n.z, 0, 0,
         p3.x, p3.y, p3.z, n.x, n.y, n.z, 1, 1,
         p4.x, p4.y, p4.z, n.x, n.y, n.z, 1, 0
-    };
+	};
 
     VertexFormat::Element elements[] =
     {

@@ -72,14 +72,15 @@ int gamehsp::makeNewLgt( int id, int lgtopt, float range, float inner, float out
 }
 
 
-void gamehsp::selectLight( int lightid )
+int gamehsp::selectLight( int lightid )
 {
 	if ( lightid >= 0 ) {
 		Light *light;
 		light = getLight( lightid );
-		if ( light == NULL ) return;
+		if ( light == NULL ) return -1;
 	}
 	_curlight = lightid;
+	return 0;
 }
 
 void gamehsp::updateLightVector( gpobj *obj, int moc )

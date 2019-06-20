@@ -2,6 +2,8 @@
 #include "TTFFontEncoder.h"
 #include "GPBFile.h"
 #include "StringUtil.h"
+#include <locale>
+#include <codecvt>
 
 namespace gameplay
 {
@@ -155,7 +157,10 @@ int writeFont(const char* inFilePath, const char* outFilePath, std::vector<unsig
         return -1;
     }
 
-    std::vector<FontData*> fonts;
+
+	std::u32string  u32str  = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>().from_bytes("abcdefg");
+	
+	std::vector<FontData*> fonts;
 
     for (size_t fontIndex = 0, count = fontSizes.size(); fontIndex < count; ++fontIndex)
     {
@@ -207,7 +212,7 @@ int writeFont(const char* inFilePath, const char* outFilePath, std::vector<unsig
                 int bitmapRows = slot->bitmap.rows;
                 actualfontHeight = (actualfontHeight < bitmapRows) ? bitmapRows : actualfontHeight;
 
-                if (slot->bitmap.rows > slot->bitmap_top)
+				if ((FT_Int)slot->bitmap.rows > slot->bitmap_top)
                 {
                     bitmapRows += (slot->bitmap.rows - slot->bitmap_top);
                 }

@@ -24,25 +24,56 @@ FBXSceneEncoder::~FBXSceneEncoder()
 {
 }
 
+FbxNode* FBXSceneEncoder::getRootNode(FbxScene* fbxScene)
+{
+    // Load all of the nodes and their contents.
+    FbxNode* rootNode = fbxScene->GetRootNode();
+
+	if ( rootNode->GetChildCount() == 1 ) {
+		rootNode = rootNode->GetChild(0);
+	}
+	return rootNode;
+}
+
 void FBXSceneEncoder::write(const string& filepath, const EncoderArguments& arguments)
 {
     FbxManager* sdkManager = FbxManager::Create();
     FbxIOSettings *ios = FbxIOSettings::Create(sdkManager, IOSROOT);
     sdkManager->SetIOSettings(ios);
-    FbxImporter* importer = FbxImporter::Create(sdkManager,"");
-    
+
+	FbxImporter* importer = FbxImporter::Create(sdkManager,"");
+
     if (!importer->Initialize(filepath.c_str(), -1, sdkManager->GetIOSettings()))
     {
         LOG(1, "Call to FbxImporter::Initialize() failed.\n");
         LOG(1, "Error returned: %s\n\n", importer->GetStatus().GetErrorString());
         exit(-1);
     }
+
+	_OptionFilePath = arguments.getTextureOptionPath();
     
     FbxScene* fbxScene = FbxScene::Create(sdkManager,"__FBX_SCENE__");
+	FbxScene* fbxScene2;
 
     print("Loading FBX file.");
     importer->Import(fbxScene);
     importer->Destroy();
+
+	if (arguments.mergeAnimationEnabled()) {
+		importer = FbxImporter::Create(sdkManager,"");
+    
+		if (!importer->Initialize( arguments.getMergeAnimationFBXName().c_str(), -1, sdkManager->GetIOSettings()))
+		{
+			LOG(1, "Call to FbxImporter::Initialize() failed.\n");
+			LOG(1, "Error returned: %s\n\n", importer->GetStatus().GetErrorString());
+			exit(-1);
+		}
+
+		fbxScene2 = FbxScene::Create(sdkManager,"__FBX_SCENE2__");
+		importer->Import(fbxScene2);
+		importer->Destroy();
+		print("Loading FBX2 file.");
+	}
 
     // Determine if animations should be grouped.
     if (arguments.getGroupAnimationAnimationId().empty() && isGroupAnimationPossible(fbxScene))
@@ -56,15 +87,20 @@ void FBXSceneEncoder::write(const string& filepath, const EncoderArguments& argu
 
     if (arguments.tangentBinormalIdCount() > 0)
     {
-        generateTangentsAndBinormals(fbxScene->GetRootNode(), arguments);
+        generateTangentsAndBinormals(getRootNode(fbxScene), arguments);
     }
 
     print("Loading Scene.");
+	_fbxScene = fbxScene;
     loadScene(fbxScene);
     print("Load materials");
     loadMaterials(fbxScene);
     print("Loading animations.");
-    loadAnimations(fbxScene, arguments);
+	if (arguments.mergeAnimationEnabled()) {
+		loadAnimations(fbxScene2, arguments);
+	} else {
+		loadAnimations(fbxScene, arguments);
+	}
     sdkManager->Destroy();
 
     print("Optimizing GamePlay Binary.");
@@ -155,7 +191,8 @@ void FBXSceneEncoder::loadScene(FbxScene* fbxScene)
     }
 
     // Load all of the nodes and their contents.
-    FbxNode* rootNode = fbxScene->GetRootNode();
+    FbxNode* rootNode = getRootNode(fbxScene);
+
     if (rootNode)
     {
         print("Triangulate.");
@@ -164,18 +201,24 @@ void FBXSceneEncoder::loadScene(FbxScene* fbxScene)
         //triangulateRecursive(rootNode);
         
 
-        print("Load nodes.");
         // Don't include the FBX root node in the GPB.
         const int childCount = rootNode->GetChildCount();
+        printf("Load nodes.(%d)\n",childCount);
         for (int i = 0; i < childCount; ++i)
         {
+			printf("Node:%s\n",rootNode->GetChild(i)->GetName());
             Node* node = loadNode(rootNode->GetChild(i));
             if (node)
             {
                 scene->add(node);
             }
         }
-    }
+
+		//printf("Process Mesh.\n");
+		//scene->processSceneMesh(0);
+	}
+
+	printf("Load Shapes.\n");
 
     // Load the MeshSkin information from the scene's poses.
     loadBindShapes(fbxScene);
@@ -361,6 +404,8 @@ void FBXSceneEncoder::loadAnimationChannels(FbxAnimLayer* animLayer, FbxNode* fb
         channel->setInterpolation(AnimationChannel::LINEAR);
         channel->setTargetAttribute(channelAttribs[i]);
         animation->add(channel);
+		printf( "Anim #%d [%s]\r\n",i,name );
+
     }
 
     // Evaulate animation curve in increments of frameRate and populate channel data.
@@ -459,12 +504,36 @@ void FBXSceneEncoder::loadAnimations(FbxScene* fbxScene, const EncoderArguments&
         for (int l = 0; l < nbAnimLayers; ++l)
         {
             FbxAnimLayer* animLayer = animStack->GetMember<FbxAnimLayer>(l);
-            loadAnimationLayer(animLayer, fbxScene->GetRootNode(), arguments);
+            loadAnimationLayer(animLayer, getRootNode(fbxScene), arguments);
         }
     }
 }
 
-Node* FBXSceneEncoder::loadNode(FbxNode* fbxNode)
+
+	/**
+	 * Get the world matrix of a node.
+	 *
+	 * \param _pnNode The node for which to get the world matrix.
+	 * \param _psScene The scene containing the node.
+	 * \return Returns the world matrix of a node.
+	 */
+FbxAMatrix &FBXSceneEncoder::GetNodeWorldMatrix( FbxNode * _pnNode ) {
+		FbxScene * _psScene = _fbxScene;
+
+		FbxAMatrix & xmTrans = _psScene->GetAnimationEvaluator()->GetNodeGlobalTransform( const_cast<FbxNode *>(_pnNode) );
+		FbxAMatrix xmGeometry;
+		FbxVector4 vTranslation, vRotation, vScaling;
+		vTranslation = _pnNode->GetGeometricTranslation( FbxNode::eSourcePivot );
+		vRotation = _pnNode->GetGeometricRotation( FbxNode::eSourcePivot );
+		vScaling = _pnNode->GetGeometricScaling( FbxNode::eSourcePivot );
+		xmGeometry.SetT( vTranslation );
+		xmGeometry.SetR( vRotation );
+		xmGeometry.SetS( vScaling );
+		FbxAMatrix xmFinal = xmTrans * xmGeometry;
+		return xmFinal;
+}
+
+Node* FBXSceneEncoder::loadNode(FbxNode* fbxNode, FbxNode *baseNode)
 {
     Node* node = NULL;
 
@@ -486,7 +555,27 @@ Node* FBXSceneEncoder::loadNode(FbxNode* fbxNode)
     _gamePlayFile.addNode(node);
 
     transformNode(fbxNode, node);
-    
+
+#if 0
+	if ( baseNode ) {
+		float m[16];
+		FbxAMatrix mat;
+		FbxAMatrix mat2;
+	    //mat = GetNodeWorldMatrix(fbxNode);
+        mat = fbxNode->EvaluateLocalTransform();
+		mat2 = baseNode->EvaluateLocalTransform();
+		mat *= mat2.Inverse();
+        copyMatrix(mat, m);
+        node->setTransformMatrix(m);
+	}
+/*
+		std::string name = node->getId();
+		if ( strcmp( name.c_str(),"PronamaChan" )==0 ) {
+            node->resetTransformMatrix();
+		}
+*/
+#endif
+
     loadCamera(fbxNode, node);
     loadLight(fbxNode, node);
     loadModel(fbxNode, node);
@@ -502,7 +591,7 @@ Node* FBXSceneEncoder::loadNode(FbxNode* fbxNode)
     const int childCount = fbxNode->GetChildCount();
     for (int i = 0; i < childCount; ++i)
     {
-        Node* child = loadNode(fbxNode->GetChild(i));
+        Node* child = loadNode(fbxNode->GetChild(i),baseNode);
         if (child)
         {
             node->addChild(child);
@@ -855,7 +944,7 @@ void FBXSceneEncoder::loadLight(FbxNode* fbxNode, Node* node)
 
 void FBXSceneEncoder::loadModel(FbxNode* fbxNode, Node* node)
 {
-    FbxMesh* fbxMesh = fbxNode->GetMesh();
+	FbxMesh* fbxMesh = fbxNode->GetMesh();
 	if (!fbxMesh || fbxMesh->GetPolygonVertexCount() == 0)
     {
         return;
@@ -865,18 +954,19 @@ void FBXSceneEncoder::loadModel(FbxNode* fbxNode, Node* node)
         Mesh* mesh = loadMesh(fbxMesh);
         Model* model = new Model();
         model->setMesh(mesh);
-        node->setModel(model);
-        loadSkin(fbxMesh, model);
+		node->setModel(model);
+		
+		loadSkin(fbxMesh, model, fbxNode);
         if (model->getSkin())
         {
-            node->resetTransformMatrix();
+              node->resetTransformMatrix();
         }
     }
 }
 
 void FBXSceneEncoder::loadMaterials(FbxScene* fbxScene)
 {
-    FbxNode* rootNode = fbxScene->GetRootNode();
+    FbxNode* rootNode = getRootNode(fbxScene);
     if (rootNode)
     {
         // Don't include the FBX root node
@@ -902,9 +992,24 @@ void FBXSceneEncoder::loadMaterial(FbxNode* fbxNode)
     {
         FbxSurfaceMaterial* fbxMaterial = fbxNode->GetMaterial(index);
         string materialName(fbxMaterial->GetName());
+
+		unsigned int jointcount = 0;
+		if (model) {
+			MeshSkin *skin = model->getSkin();
+			if ( skin ) {
+				jointcount = skin->getJointCount();
+			}
+		}
+
         fixMaterialName(materialName);
+		if (jointcount>0) {                    // FIX : aboid same material name of different joint count (onitama)
+			materialName+="_";
+			materialName+=std::to_string(jointcount);
+		}
+
         Material* material = NULL;
         map<string, Material*>::iterator it = _materials.find(materialName);
+		//printf( "Material(%s)(%d)\n",materialName.c_str(),jointcount );
         if (it != _materials.end())
         {
             // This material was already loaded so don't load it again
@@ -993,6 +1098,24 @@ void FBXSceneEncoder::loadMaterialTextures(FbxSurfaceMaterial* fbxMaterial, Mate
     }
 }
 
+
+std::string FBXSceneEncoder::GetFileNameFromPath(const std::string &path)
+{
+    size_t pos1;
+ 
+    pos1 = path.rfind('\\');
+    if(pos1 != std::string::npos){
+        return path.substr(pos1+1, path.size()-pos1-1);
+    }
+ 
+    pos1 = path.rfind('/');
+    if(pos1 != std::string::npos){
+        return path.substr(pos1+1, path.size()-pos1-1);
+    }
+ 
+    return path;
+}
+
 void FBXSceneEncoder::loadMaterialFileTexture(FbxFileTexture* fileTexture, Material* material)
 {
     FbxTexture::ETextureUse textureUse = fileTexture->GetTextureUse();
@@ -1004,8 +1127,9 @@ void FBXSceneEncoder::loadMaterialFileTexture(FbxFileTexture* fileTexture, Mater
     }
     if (sampler)
     {
+		string fname = _OptionFilePath + GetFileNameFromPath(fileTexture->GetRelativeFileName());
         sampler->set("absolutePath", fileTexture->GetFileName());
-        sampler->set("relativePath", fileTexture->GetRelativeFileName());
+        sampler->set("relativePath", fname );
         sampler->set("wrapS", fileTexture->GetWrapModeU() == FbxTexture::eClamp ? CLAMP : REPEAT);
         sampler->set("wrapT", fileTexture->GetWrapModeV() == FbxTexture::eClamp ? CLAMP : REPEAT);
 
@@ -1100,7 +1224,7 @@ Material* FBXSceneEncoder::createMaterial(const string& name, FbxSurfaceMaterial
         material->setUniform("u_matrixPalette", "MATRIX_PALETTE");
         material->addDefine("SKINNING");
         ostringstream stream;
-        stream << "SKINNING_JOINT_COUNT " << skin->getJointCount();
+		stream << "SKINNING_JOINT_COUNT " << skin->getJointCount();
         material->addDefine(stream.str());
     }
     loadMaterialTextures(fbxMaterial, material);
@@ -1110,12 +1234,13 @@ Material* FBXSceneEncoder::createMaterial(const string& name, FbxSurfaceMaterial
     return material;
 }
 
-void FBXSceneEncoder::loadSkin(FbxMesh* fbxMesh, Model* model)
+void FBXSceneEncoder::loadSkin(FbxMesh* fbxMesh, Model* model, FbxNode *basenode)
 {
     const int deformerCount = fbxMesh->GetDeformerCount();
     for (int i = 0; i < deformerCount; ++i)
     {
         FbxDeformer* deformer = fbxMesh->GetDeformer(i);
+		//printf( "#Load Skin [%s]\n",deformer->GetName() );
         if (deformer->GetDeformerType() == FbxDeformer::eSkin)
         {
             FbxSkin* fbxSkin = FbxCast<FbxSkin>(deformer);
@@ -1137,7 +1262,8 @@ void FBXSceneEncoder::loadSkin(FbxMesh* fbxMesh, Model* model)
                     const char* jointName = linkedNode->GetName();
                     assert(jointName);
                     jointNames.push_back(jointName);
-                    Node* joint = loadNode(linkedNode);
+					//printf( "#     Joint [%s]\n",jointName );
+                    Node* joint = loadNode(linkedNode, basenode);
                     assert(joint);
                     joints.push_back(joint);
 
@@ -1188,6 +1314,9 @@ Mesh* FBXSceneEncoder::loadMesh(FbxMesh* fbxMesh)
     // Find the blend weights and blend indices if this mesh is skinned.
     vector<vector<Vector2> > weights;
     bool hasSkin = loadBlendWeights(fbxMesh, weights);
+
+	printf( "#Load Mesh [%s] skin:%d\n",name,hasSkin );
+
     
     // Get list of uv sets for mesh
     FbxStringList uvSetNameList;

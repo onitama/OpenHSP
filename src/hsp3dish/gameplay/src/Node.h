@@ -274,7 +274,7 @@ public:
      *
      * @return The world matrix of this node.
      */
-    virtual const Matrix& getWorldMatrix() const;
+	virtual const Matrix& getWorldMatrix() const;
 
     /**
      * Gets the world view matrix corresponding to this node.
@@ -607,6 +607,11 @@ public:
      */
     Node* clone() const;
 
+#ifdef HSPDISH
+	Node* getRefNode() const;
+	void setRefNode(Node *node);
+#endif
+
 protected:
 
     /**
@@ -664,6 +669,7 @@ protected:
      * Marks the bounding volume of the node as dirty.
      */
     void setBoundsDirty();
+
 
 private:
 
@@ -723,6 +729,13 @@ protected:
     mutable BoundingSphere _bounds;
     /** The dirty bits used for optimization. */
     mutable int _dirtyBits;
+
+#ifdef HSPDISH
+	/** Reference node for MeshDraw */
+	Node* _refnode;
+	mutable Matrix _worldref;
+#endif
+
 };
 
 /**

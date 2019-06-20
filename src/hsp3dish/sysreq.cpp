@@ -91,6 +91,7 @@ void InitSysReq( void )
 	sysreq[SYSREQ_PLIGHT_MAX] = 0;			// number of Point Light(HGIMG4)
 	sysreq[SYSREQ_SLIGHT_MAX] = 0;			// number of Spot Light(HGIMG4)
 
+	sysreq[SYSREQ_LOGWRITE] = 1;			// HGIMG4 log write
 	sysreq[SYSREQ_FIXEDFRAME] = -1;			// fixed frame rate
 
 

@@ -89,10 +89,11 @@ int gpmat::setParameter(char *name, const Matrix *value, int count)
 
 int gpmat::setParameter(char *name, char *fname, int matopt)
 {
-	bool mipmap;
+	bool mipmap,cubemap;
 	if (_material == NULL) return -1;
 	mipmap = (matopt & GPOBJ_MATOPT_NOMIPMAP) == 0;
-	_material->getParameter(name)->setValue( fname, mipmap);
+	cubemap = (matopt & GPOBJ_MATOPT_CUBEMAP) != 0;
+	_material->getParameter(name)->setValue( fname, mipmap,cubemap);
 
 	return 0;
 }
@@ -283,6 +284,16 @@ void gamehsp::setMaterialDefaultBinding( Material* material, int icolor, int mat
 		material->setParameterAutoBinding("u_worldViewProjectionMatrix", "WORLD_VIEW_PROJECTION_MATRIX");
 	if ( hasParameter( material, "u_inverseTransposeWorldViewMatrix" ) )
 		material->setParameterAutoBinding("u_inverseTransposeWorldViewMatrix", "INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX");
+	if (hasParameter(material, "u_worldViewMatrix"))
+		material->setParameterAutoBinding("u_worldViewMatrix", "WORLD_VIEW_MATRIX");
+	if (hasParameter(material, "u_viewProjectionMatrix"))
+		material->setParameterAutoBinding("u_viewProjectionMatrix", "VIEW_PROJECTION_MATRIX");
+	if (hasParameter(material, "u_projectionMatrix"))
+		material->setParameterAutoBinding("u_projectionMatrix", "PROJECTION_MATRIX");
+	if (hasParameter(material, "u_viewMatrix"))
+		material->setParameterAutoBinding("u_viewMatrix", "VIEW_MATRIX");
+	if (hasParameter(material, "u_worldMatrix"))
+		material->setParameterAutoBinding("u_worldMatrix", "WORLD_MATRIX");
 
 	Vector4 color;
 	Node *light_node;
@@ -578,12 +589,14 @@ Material *gamehsp::makeMaterialColor( int color, int matopt )
 }
 
 
-Material *gamehsp::makeMaterialTexture( char *fname, int matopt )
+Material *gamehsp::makeMaterialTexture( char *fname, int matopt, Texture *opttex )
 {
 	Material *material;
-	bool mipmap;
+	bool mipmap, cubemap;
 	char *defs;
+	char extradefs[256];
 	mipmap = (matopt & GPOBJ_MATOPT_NOMIPMAP) == 0;
+	cubemap = (matopt & GPOBJ_MATOPT_CUBEMAP) != 0;
 
 	if (matopt & GPOBJ_MATOPT_NOLIGHT){
 		defs = this->getNoLightDefines();
@@ -596,12 +609,31 @@ Material *gamehsp::makeMaterialTexture( char *fname, int matopt )
 			defs = this->getLightDefines();
 		}
 	}
+	if (matopt & GPOBJ_MATOPT_MIRROR) {
+		strcpy(extradefs,defs);
+		strcat(extradefs,";MIRRORTEX");
+		defs = extradefs;
+	}
 
-	material = makeMaterialFromShader( "res/shaders/textured.vert", "res/shaders/textured.frag", defs );
+	//material = makeMaterialFromShader("res/shaders/simpletex.vert", "res/shaders/simpletex.frag", defs);
+	material = makeMaterialFromShader("res/shaders/textured.vert", "res/shaders/textured.frag", defs);
 	if ( material == NULL ) return NULL;
 
 	setMaterialDefaultBinding( material, -1, matopt );
-	material->getParameter("u_diffuseTexture")->setValue( fname, mipmap );
+
+	if (matopt & GPOBJ_MATOPT_USERBUFFER) {
+		MaterialParameter *mp = material->getParameter("u_diffuseTexture");
+		if (opttex) {
+			Texture::Sampler* sampler = Texture::Sampler::create(opttex);
+			if (sampler) {
+				mp->setValue(sampler);
+				return material;
+			}
+		}
+		return NULL;
+	}
+
+	material->getParameter("u_diffuseTexture")->setValue( fname, mipmap, cubemap );
 	return material;
 }
 

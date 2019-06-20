@@ -117,7 +117,7 @@ public:
          * @return The new sampler.
          * @script{create}
          */
-        static Sampler* create(const char* path, bool generateMipmaps = false);
+        static Sampler* create(const char* path, bool generateMipmaps = false, bool cubemap = false);
 
         /**
          * Sets the wrap mode for this sampler.
@@ -180,7 +180,7 @@ public:
      * @return The new texture, or NULL if the texture could not be loaded/created.
      * @script{create}
      */
-    static Texture* create(const char* path, bool generateMipmaps = false);
+    static Texture* create(const char* path, bool generateMipmaps = false, bool cubemap = false);
 
     /**
      * Creates a texture from the given image.
@@ -191,7 +191,7 @@ public:
      * @return The new texture, or NULL if the image is not of a supported texture format.
      * @script{create}
      */
-    static Texture* create(Image* image, bool generateMipmaps = false);
+    static Texture* create(Image* image, bool generateMipmaps = false, bool cubemap = false);
 
     /**
      * Creates a texture from the given texture data.

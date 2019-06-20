@@ -75,7 +75,7 @@ Texture::~Texture()
     }
 }
 
-Texture* Texture::create(const char* path, bool generateMipmaps)
+Texture* Texture::create(const char* path, bool generateMipmaps, bool cubemap)
 {
     GP_ASSERT( path );
 
@@ -113,7 +113,7 @@ Texture* Texture::create(const char* path, bool generateMipmaps)
             {
                 Image* image = Image::create(path);
                 if (image)
-                    texture = create(image, generateMipmaps);
+                    texture = create(image, generateMipmaps,cubemap);
                 SAFE_RELEASE(image);
             }
             else if (tolower(ext[1]) == 'p' && tolower(ext[2]) == 'v' && tolower(ext[3]) == 'r')
@@ -145,16 +145,23 @@ Texture* Texture::create(const char* path, bool generateMipmaps)
 	return NULL;
 }
 
-Texture* Texture::create(Image* image, bool generateMipmaps)
+Texture* Texture::create(Image* image, bool generateMipmaps, bool cubemap )
 {
     GP_ASSERT( image );
+	unsigned int sx = image->getWidth();
+	unsigned int sy = image->getHeight();
+	Texture::Type type = Texture::TEXTURE_2D;
+	if (cubemap) {
+		type = Texture::TEXTURE_CUBE;
+		sy /= 6;
+	}
 
     switch (image->getFormat())
     {
     case Image::RGB:
-        return create(Texture::RGB, image->getWidth(), image->getHeight(), image->getData(), generateMipmaps);
-    case Image::RGBA:
-        return create(Texture::RGBA, image->getWidth(), image->getHeight(), image->getData(), generateMipmaps);
+		return create(Texture::RGB, sx, sy, image->getData(), generateMipmaps, type);
+	case Image::RGBA:
+        return create(Texture::RGBA, sx, sy, image->getData(), generateMipmaps, type);
     default:
         GP_ERROR("Unsupported image format (%d).", image->getFormat());
         return NULL;
@@ -272,11 +279,21 @@ Texture* Texture::create(Format format, unsigned int width, unsigned int height,
         }
         textureSize *= bpp;
         // Texture Cube
-        for (unsigned int i = 0; i < 6; i++)
+		unsigned int cubemax = 6;
+		unsigned char *vdata = (unsigned char *)malloc(textureSize);
+		unsigned char *srcptr = (unsigned char *)data + ( cubemax * textureSize );
+        for (unsigned int i = 0; i < cubemax; i++)
         {
-            const unsigned char* texturePtr = (data == NULL) ? NULL : &data[i * textureSize];
+			unsigned char *dstptr = vdata;
+			for (unsigned int j = 0; j < height; j++) {				// V-Flip pixel data
+				srcptr -= width * bpp;
+				memcpy(dstptr, srcptr, width*bpp);
+				dstptr += width * bpp;
+			}
+			const unsigned char* texturePtr = vdata;
             GL_ASSERT( glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, internalFormat, texelType, texturePtr) );
         }
+		free(vdata);
     }
 
     // Set initial minification filter based on whether or not mipmaping was enabled.
@@ -310,6 +327,10 @@ Texture* Texture::create(Format format, unsigned int width, unsigned int height,
     texture->_bpp = bpp;
     if (generateMipmaps)
         texture->generateMipmaps();
+
+//	if (texture->_type == Texture::TEXTURE_CUBE) {
+//		GP_WARN("CubeMap[%d %d]",width,height);
+//	}
 
 
     // Restore the texture id
@@ -1230,9 +1251,9 @@ Texture::Sampler* Texture::Sampler::create(Texture* texture)
     return new Sampler(texture);
 }
 
-Texture::Sampler* Texture::Sampler::create(const char* path, bool generateMipmaps)
+Texture::Sampler* Texture::Sampler::create(const char* path, bool generateMipmaps, bool cubemap)
 {
-    Texture* texture = Texture::create(path, generateMipmaps);
+    Texture* texture = Texture::create(path, generateMipmaps,cubemap);
     return texture ? new Sampler(texture) : NULL;
 }
 
@@ -1256,10 +1277,11 @@ Texture* Texture::Sampler::getTexture() const
 
 void Texture::Sampler::bind()
 {
-    GP_ASSERT( _texture );
+	GP_ASSERT(_texture);
 
-    GLenum target = (GLenum)_texture->_type;
-    if (__currentTextureId != _texture->_handle)
+	GLenum target = (GLenum)_texture->_type;
+
+	if (__currentTextureId != _texture->_handle)
     {
         GL_ASSERT( glBindTexture(target, _texture->_handle) );
         __currentTextureId = _texture->_handle;
@@ -1294,8 +1316,10 @@ void Texture::Sampler::bind()
     if (_texture->_wrapR != _wrapR)
     {
         _texture->_wrapR = _wrapR;
-        if (target == GL_TEXTURE_CUBE_MAP) // We don't want to run this on something that we know will fail
-            GL_ASSERT( glTexParameteri(target, GL_TEXTURE_WRAP_R, (GLenum)_wrapR) );
+		if (target == GL_TEXTURE_CUBE_MAP) // We don't want to run this on something that we know will fail
+		{
+			GL_ASSERT(glTexParameteri(target, GL_TEXTURE_WRAP_R, (GLenum)_wrapR));
+		}
     }
 #endif
 }

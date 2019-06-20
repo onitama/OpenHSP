@@ -1425,11 +1425,13 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 	case 0x66:								// gpuselight
 		p1 = code_getdi( 0 );
-		game->selectLight( p1 );
+		p2 = game->selectLight( p1 );
+		if (p2) throw HSPERR_ILLEGAL_FUNCTION;
 		break;
 	case 0x67:								// gpusecamera
 		p1 = code_getdi( 0 );
-		game->selectCamera( p1 );
+		p2 = game->selectCamera( p1 );
+		if (p2) throw HSPERR_ILLEGAL_FUNCTION;
 		break;
 	case 0x68:								// gpmatprm
 		{
@@ -1574,7 +1576,7 @@ static int cmdfunc_extcmd( int cmd )
 		ps = code_gets();
 		strncpy(fname, ps, HSP_MAX_PATH);
 		p1 = code_getdi(0);
-		mat = game->makeMaterialTexture(fname, p1);
+		mat = game->makeMaterialTexture(fname, p1,NULL);
 		if (mat == NULL) throw HSPERR_ILLEGAL_FUNCTION;
 		p6 = game->makeNewMat(mat, GPMAT_MODE_3D, -1, p1);
 		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p6);
@@ -1705,7 +1707,7 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( 0 );
 		p2 = code_getdi( 0 );
 		p3 = code_getdi( 0 );
-		o = game->getObj( p1 );
+		o = game->getSceneObj( p1 );
 		if ( o == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
 		ctx->stat = o->_mode;
 		switch(p3) {
@@ -1739,7 +1741,8 @@ static int cmdfunc_extcmd( int cmd )
 		fp2 = (float)code_getdd( 1.5 );
 		fp3 = (float)code_getdd( 0.5 );
 		fp4 = (float)code_getdd( 768.0 );
-		p6 = game->makeNewCam( p1, fp1, fp2, fp3, fp4 );
+		p2 = code_getdi(0);
+		p6 = game->makeNewCam( p1, fp1, fp2, fp3, fp4, p2 );
 		if ( p6 < 0 ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
 		break;
 	case 0x7f:								// gpnull
@@ -2006,7 +2009,7 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( 0 );
 		p2 = code_getdi( 0 );
 		p3 = code_getdi( 0 );
-		obj = game->getObj( p1 );
+		obj = game->getSceneObj( p1 );
 		if ( obj == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
 		obj->_mygroup = p2;
 		obj->_colgroup = p3;
@@ -2019,9 +2022,26 @@ static int cmdfunc_extcmd( int cmd )
 		gpobj *obj;
 		p_aptr = code_getva( &p_pval );
 		p1 = code_getdi( 0 );
-		obj = game->getObj( p1 );
+		p2 = code_getdi(0);
+		obj = game->getSceneObj( p1 );
 		if ( obj == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		p1 = obj->_mygroup;
+		switch (p2) {
+		case 0:
+			p1 = obj->_mygroup;
+			break;
+		case 1:
+			p1 = obj->_colgroup;
+			break;
+		case 2:
+			p1 = obj->_rendergroup;
+			break;
+		case 3:
+			p1 = obj->_lightgroup;
+			break;
+		default:
+			code_puterror(HSPERR_ILLEGAL_FUNCTION);
+			break;
+		}
 		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p1 );
 		break;
 		}
@@ -2030,7 +2050,7 @@ static int cmdfunc_extcmd( int cmd )
 		gpobj *obj;
 		p1 = code_getdi( 0 );
 		p2 = 0;
-		obj = game->getObj( p1 );
+		obj = game->getSceneObj( p1 );
 		if ( obj == NULL ) p2 = -1;
 		ctx->stat = p2;
 		break;
@@ -2461,6 +2481,11 @@ static int cmdfunc_extcmd( int cmd )
 		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
 		break;
 	}
+	case 0xff:								// gpreport
+		p1 = code_getdi(0);
+		game->pickupAll(p1);
+		break;
+
 
 	case 0x100:								// setevent
 		p1 = code_getdi( 0 );
@@ -2519,6 +2544,51 @@ static int cmdfunc_extcmd( int cmd )
 		p2 = code_getdi(0);
 		ctx->stat = game->AddSuicideEvent(p1, p2);
 		break;
+
+	case 0x10b:								// event_aim
+		break;
+	case 0x10c:								// objaim
+		break;
+	case 0x10d:								// gpscrmat
+	{
+		gameplay::Material *mat;
+		PVal *p_pval;
+		APTR p_aptr;
+		gameplay::Texture *opttex = NULL;
+		p_aptr = code_getva(&p_pval);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		Bmscr *bm = wnd->GetBmscrSafe(p1);
+		gameplay::FrameBuffer *fb = (gameplay::FrameBuffer *)bm->master_buffer;
+		if (fb) {
+			gameplay::RenderTarget *target = fb->getRenderTarget();
+			if (target) {
+				opttex = target->getTexture();
+			}
+		}
+		if (opttex == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+		p2 |= GPOBJ_MATOPT_USERBUFFER;
+		mat = game->makeMaterialTexture("", p2, opttex);
+		if (mat == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+		p6 = game->makeNewMat(mat, GPMAT_MODE_3D, -1, p2);
+		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p6);
+		break;
+	}
+	case 0x10e:								// setobjrender
+	{
+		p1 = code_getdi(0);
+		p2 = code_getdi(1);
+		p3 = code_getdi(1);
+		gpobj *obj = game->getSceneObj(p1);
+		if (obj == NULL) code_puterror(HSPERR_ILLEGAL_FUNCTION);
+		obj->_rendergroup = p2;
+		obj->_lightgroup = p3;
+		break;
+	}
+	case 0x10f:								// 
+	{
+		break;
+	}
 
 	case 0x110:								// event_pos
 	case 0x111:								// event_quat

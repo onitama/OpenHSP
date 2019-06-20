@@ -140,7 +140,7 @@ public:
      *
      * @return The texture sampler that was set for this material parameter.
      */
-    Texture::Sampler* setValue(const char* texturePath, bool generateMipmaps);
+    Texture::Sampler* setValue(const char* texturePath, bool generateMipmaps, bool cubemap=false);
 
     /**
      * Stores a float value in this parameter.

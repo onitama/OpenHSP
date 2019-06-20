@@ -247,12 +247,12 @@ void MaterialParameter::setValue(const Texture::Sampler** samplers, unsigned int
     _type = MaterialParameter::SAMPLER_ARRAY;
 }
 
-Texture::Sampler* MaterialParameter::setValue(const char* texturePath, bool generateMipmaps)
+Texture::Sampler* MaterialParameter::setValue(const char* texturePath, bool generateMipmaps, bool cubemap)
 {
     GP_ASSERT(texturePath);
     clearValue();
 
-    Texture::Sampler* sampler = Texture::Sampler::create(texturePath, generateMipmaps);
+    Texture::Sampler* sampler = Texture::Sampler::create(texturePath, generateMipmaps, cubemap);
     if (sampler)
     {
         _value.samplerValue = sampler;

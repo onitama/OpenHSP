@@ -10,7 +10,7 @@
 
 // The encoder version number should be incremented when a feature is added to the encoder.
 // The encoder version is not the same as the GPB version.
-#define ENCODER_VERSION "3.0.0"
+#define ENCODER_VERSION "3.1.0 hsp3gp"
 #define HEIGHTMAP_SIZE_MAX 2049
 
 namespace gameplay
@@ -29,9 +29,12 @@ EncoderArguments::EncoderArguments(size_t argc, const char** argv) :
     _optimizeAnimations(false),
     _animationGrouping(ANIMATIONGROUP_PROMPT),
     _outputMaterial(false),
-    _generateTextureGutter(false)
+    _generateTextureGutter(false),
+    _mergeAnimation(false)
 {
     __instance = this;
+	_textureOptionPath = std::string("res/");
+	_shaderOptionPath = std::string("res/shaders/");
 
     memset(_heightmapResolution, 0, sizeof(int) * 2);
 
@@ -80,6 +83,16 @@ EncoderArguments* EncoderArguments::getInstance()
 const std::string& EncoderArguments::getFilePath() const
 {
     return _filePath;
+}
+
+const std::string EncoderArguments::getTextureOptionPath() const
+{
+	return _textureOptionPath;
+}
+
+const std::string EncoderArguments::getMergeAnimationFBXName() const
+{
+	return _mergeAnimationFBXName;
 }
 
 const std::string EncoderArguments::getFileDirPath() const
@@ -269,6 +282,9 @@ void EncoderArguments::printUsage() const
         "\t\tGroup all animation channels targeting the nodes into a \n" \
         "\t\tnew animation.\n" \
     "  -m\t\tOutput material file for scene.\n" \
+    "  -mt <texture path>\t\tTexture reference path.\n" \
+    "  -ms <shader path>\t\tShader reference path.\n" \
+    "  -e <FBX file>\t\tMerge FBX animation.\n" \
     "  -tb <node id>\n" \
         "\t\tGenerates tangents and binormals for the given node.\n" \
     "  -oa\n" \
@@ -312,6 +328,12 @@ void EncoderArguments::printUsage() const
     "  -f\t\tFormat of font. -f:b (BITMAP), -f:d (DISTANCE_FIELD).\n" \
     "\n");
     exit(8);
+}
+
+
+bool EncoderArguments::mergeAnimationEnabled() const
+{
+    return _mergeAnimation;
 }
 
 bool EncoderArguments::fontPreviewEnabled() const
@@ -539,6 +561,14 @@ void EncoderArguments::readOption(const std::vector<std::string>& options, size_
         }
         break;
     case 'm':
+        if (str.compare("-mt") == 0) {
+			(*index)++;
+			_textureOptionPath = options[*index];
+        }
+        if (str.compare("-ms") == 0) {
+			(*index)++;
+			_shaderOptionPath = options[*index];
+        }
         if (str.compare("-m") == 0)
         {
             // generate a material file
@@ -690,6 +720,11 @@ void EncoderArguments::readOption(const std::vector<std::string>& options, size_
             _generateTextureGutter = true;
         }
         break;
+	case 'e':
+		(*index)++;
+		_mergeAnimationFBXName = options[*index];
+		_mergeAnimation = true;
+		break;
     case 'v':
         (*index)++;
         if (*index < options.size())

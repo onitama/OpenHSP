@@ -121,4 +121,63 @@ void Scene::calcAmbientColor(const Node* node, float* values) const
     }
 }
 
+void Scene::processSceneMeshSub( Node *cnode, int nodeid, int pass )
+{
+	for (Node* node = cnode->getFirstChild(); node != NULL; node = node->getNextSibling())
+	{
+		processSceneMeshSub(node,nodeid,pass);
+	}
+
+	if ( cnode->isJoint() ) {
+		_search_joint[0]++;
+	}
+
+	if ( pass == 1 ) {
+		if (_search_joint[nodeid]) {
+			const char *name = cnode->getId().c_str();
+			Model *model = cnode->getModel();
+
+			if ( model ) {
+				printf( "N%d:%s\n",nodeid,name );
+			}
+		}
+	}
+
+}
+
+
+int Scene::processSceneMesh(int pass)
+{
+	//	シーン内のメッシュノードを解析して組み換えを行う
+	//		jointノードとmeshノードに分ける
+	//		jointノードにあるmeshはsceneルートに移動する
+	//		pass:0  jointノードを解析する
+	//		pass:1  jointノード内のmeshを移動する
+	//
+	if (pass==0) {
+		_search_joint.clear();
+		_search_meshNode = NULL;
+		_search_result = 0;
+	}
+	int nodeid = 0;
+    for (std::list<Node*>::const_iterator i = _nodes.begin(); i != _nodes.end(); ++i)
+    {
+        Node *cnode = *i;
+		if (pass==0) {
+			_search_joint.push_back(0);
+		}
+		processSceneMeshSub(cnode,nodeid,pass);
+		if (pass==0) {
+			const char *name = cnode->getId().c_str();
+			printf( "N%d:%d(%s)\n",nodeid,_search_joint[nodeid],name );
+			if (_search_joint[nodeid]==0) {
+				_search_meshNode = cnode;				// jointノードではない=meshノードとする
+			}
+		}
+		nodeid++;
+    }
+	return 0;
+}
+
+
 }

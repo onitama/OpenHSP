@@ -69,6 +69,10 @@ public:
 
 private:
 
+	std::string _OptionFilePath;
+	std::string GetFileNameFromPath(const std::string &path);
+	FbxNode* getRootNode(FbxScene* fbxScene);
+
     /**
      * Loads the scene.
      * 
@@ -166,7 +170,7 @@ private:
      * @param fbxMesh The FBX mesh to load the skin from.
      * @param model The model to add the skin to.
      */
-    void loadSkin(FbxMesh* fbxMesh, Model* model);
+    void loadSkin(FbxMesh* fbxMesh, Model* model, FbxNode *basenode);
     
     /**
      * Loads the FBX Node and creates a GamePlay Node.
@@ -175,7 +179,8 @@ private:
      * 
      * @return The newly created Node or NULL if the node could not be loaded.
      */
-    Node* loadNode(FbxNode* fbxNode);
+	FbxAMatrix &GetNodeWorldMatrix( FbxNode * _pnNode );
+    Node* loadNode(FbxNode* fbxNode, FbxNode *baseNode=NULL);
     
     /**
      * Loads the FbxMesh and returns a GamePlay mesh.
@@ -255,6 +260,8 @@ private:
     static void triangulateRecursive(FbxNode* fbxNode);
 
 private:
+
+	FbxScene *_fbxScene;
 
     /**
      * The GamePlay file that is populated while reading the FBX file.

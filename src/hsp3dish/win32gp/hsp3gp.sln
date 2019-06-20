@@ -1,0 +1,64 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsp3gp", "hsp3gp.vcxproj", "{70071784-3472-4FDA-8F73-8163A29F9D3F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C} = {A4CB663F-1B0F-49E5-A949-5125A5DB100C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gameplay", "..\gameplay\gameplay.vcxproj", "{A4CB663F-1B0F-49E5-A949-5125A5DB100C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		angle_hsprt|Win32 = angle_hsprt|Win32
+		angle_Release|Win32 = angle_Release|Win32
+		AngleRelease|Win32 = AngleRelease|Win32
+		Debug|Win32 = Debug|Win32
+		hsprt|Win32 = hsprt|Win32
+		Release|Win32 = Release|Win32
+		ReleaseAngle|Win32 = ReleaseAngle|Win32
+		ReleaseDll|Win32 = ReleaseDll|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.angle_hsprt|Win32.ActiveCfg = angle_hsprt|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.angle_hsprt|Win32.Build.0 = angle_hsprt|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.angle_Release|Win32.ActiveCfg = angle_Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.angle_Release|Win32.Build.0 = angle_Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.AngleRelease|Win32.ActiveCfg = Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.AngleRelease|Win32.Build.0 = Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.Debug|Win32.Build.0 = Debug|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.hsprt|Win32.ActiveCfg = hsprt|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.hsprt|Win32.Build.0 = hsprt|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.Release|Win32.ActiveCfg = Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.Release|Win32.Build.0 = Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.ReleaseAngle|Win32.ActiveCfg = Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.ReleaseAngle|Win32.Build.0 = Release|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.ReleaseDll|Win32.ActiveCfg = ReleaseDll|Win32
+		{70071784-3472-4FDA-8F73-8163A29F9D3F}.ReleaseDll|Win32.Build.0 = ReleaseDll|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.angle_hsprt|Win32.ActiveCfg = AngleRelease|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.angle_hsprt|Win32.Build.0 = AngleRelease|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.angle_Release|Win32.ActiveCfg = Release|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.angle_Release|Win32.Build.0 = Release|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.AngleRelease|Win32.ActiveCfg = AngleRelease|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.AngleRelease|Win32.Build.0 = AngleRelease|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.Debug|Win32.Build.0 = Debug|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.hsprt|Win32.ActiveCfg = Release|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.hsprt|Win32.Build.0 = Release|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.Release|Win32.ActiveCfg = Release|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.Release|Win32.Build.0 = Release|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.ReleaseAngle|Win32.ActiveCfg = ReleaseAngle|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.ReleaseAngle|Win32.Build.0 = ReleaseAngle|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.ReleaseDll|Win32.ActiveCfg = ReleaseDll|Win32
+		{A4CB663F-1B0F-49E5-A949-5125A5DB100C}.ReleaseDll|Win32.Build.0 = ReleaseDll|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CB2042DE-C356-448B-9A2F-FAB905873857}
+	EndGlobalSection
+EndGlobal

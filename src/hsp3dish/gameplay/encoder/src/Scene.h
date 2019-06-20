@@ -55,6 +55,10 @@ public:
      */
     void setAmbientColor(float red, float green, float blue);
 
+
+	int processSceneMesh(int pass);
+	void processSceneMeshSub( Node *node, int nodeid, int pass );
+
 private:
 
     /**
@@ -71,6 +75,11 @@ private:
     Node* _cameraNode;
     float _ambientColor[Light::COLOR_SIZE];
     Node* _lightNode;
+
+	Node *_search_meshNode;
+	std::vector<int> _search_joint;
+	int _search_result;
+
 };
 
 }

@@ -145,8 +145,14 @@ void MeshSkin::setJoint(Joint* joint, unsigned int index)
         _joints[index]->removeSkin(this);
         SAFE_RELEASE(_joints[index]);
     }
-
-    _joints[index] = joint;
+#if 0
+	if (_model) {
+		Node *node = _model->getNode();
+		if (node) GP_WARN("Node:%s #%d [%s]", node->getId(), index, joint->getId() );
+	}
+#endif
+	
+	_joints[index] = joint;
 
     if (joint)
     {
@@ -158,6 +164,13 @@ void MeshSkin::setJoint(Joint* joint, unsigned int index)
 Vector4* MeshSkin::getMatrixPalette() const
 {
     GP_ASSERT(_matrixPalette);
+
+#if 0
+	if (_model) {
+		Node *node = _model->getNode();
+		if (node) GP_WARN("N=%s J=%d", node->getId(), _joints.size());
+	}
+#endif
 
     for (size_t i = 0, count = _joints.size(); i < count; i++)
     {
@@ -180,6 +193,11 @@ Model* MeshSkin::getModel() const
 Joint* MeshSkin::getRootJoint() const
 {
     return _rootJoint;
+}
+
+Node* MeshSkin::getRootNode() const
+{
+	return _rootNode;
 }
 
 void MeshSkin::setRootJoint(Joint* joint)

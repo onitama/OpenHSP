@@ -198,11 +198,11 @@ unsigned int Scene::findNodes(const char* id, std::vector<Node*>& nodes, bool re
 void Scene::visitNode(Node* node, const char* visitMethod)
 {
 #ifndef HSPDISH
-    ScriptController* sc = Game::getInstance()->getScriptController();
+    //ScriptController* sc = Game::getInstance()->getScriptController();
 
     // Invoke the visit method for this node.
-    if (!sc->executeFunction<bool>(visitMethod, "<Node>", dynamic_cast<void*>(node)))
-        return;
+    //if (!sc->executeFunction<bool>(visitMethod, "<Node>", dynamic_cast<void*>(node)))
+    //    return;
 
     // If this node has a model with a mesh skin, visit the joint hierarchy within it
     // since we don't add joint hierarcies directly to the scene. If joints are never

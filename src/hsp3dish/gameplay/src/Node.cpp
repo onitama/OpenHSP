@@ -28,7 +28,11 @@ Node::Node(const char* id)
     _drawable(NULL), _camera(NULL), _light(NULL), _audioSource(NULL), _collisionObject(NULL), _agent(NULL), _userObject(NULL),
       _dirtyBits(NODE_DIRTY_ALL)
 {
-    GP_REGISTER_SCRIPT_EVENTS();
+#ifdef HSPDISH
+	_refnode = NULL;
+	_worldref.identity();
+#endif
+	GP_REGISTER_SCRIPT_EVENTS();
     if (id)
     {
         _id = id;
@@ -206,6 +210,18 @@ Node* Node::getParent() const
     return _parent;
 }
 
+#ifdef HSPDISH
+Node* Node::getRefNode() const
+{
+	return _refnode;
+}
+
+void Node::setRefNode( Node *node )
+{
+	_refnode = node;
+}
+#endif
+
 unsigned int Node::getChildCount() const
 {
     return _childCount;
@@ -225,7 +241,7 @@ Node* Node::findNode(const char* id, bool recursive, bool exactMatch) const
 {
     GP_ASSERT(id);
 
-    // If the drawable is a model with a mesh skin, search the skin's hierarchy as well.
+	// If the drawable is a model with a mesh skin, search the skin's hierarchy as well.
     Node* rootNode = NULL;
     Model* model = dynamic_cast<Model*>(_drawable);
     if (model)
@@ -245,13 +261,14 @@ Node* Node::findNode(const char* id, bool recursive, bool exactMatch) const
     // Search immediate children first.
     for (Node* child = getFirstChild(); child != NULL; child = child->getNextSibling())
     {
-        // Does this child's ID match?
+
+		// Does this child's ID match?
         if ((exactMatch && child->_id == id) || (!exactMatch && child->_id.find(id) == 0))
         {
             return child;
         }
     }
-    // Recurse.
+	// Recurse.
     if (recursive)
     {
         for (Node* child = getFirstChild(); child != NULL; child = child->getNextSibling())
@@ -442,13 +459,20 @@ const Matrix& Node::getWorldMatrix() const
 
             // Our world matrix was just updated, so call getWorldMatrix() on all child nodes
             // to force their resolved world matrices to be updated.
-            for (Node* child = getFirstChild(); child != NULL; child = child->getNextSibling())
-            {
-                child->getWorldMatrix();
-            }
-        }
+            //for (Node* child = getFirstChild(); child != NULL; child = child->getNextSibling())
+            //{
+            //    child->getWorldMatrix();
+            //}
+		}
     }
-    return _world;
+#ifdef HSPDISH
+	if (_refnode) {
+		// Apply reference node matrix
+		Matrix::multiply(_world, _refnode->getWorldMatrix(), &_worldref);
+		return _worldref;
+	}
+#endif
+	return _world;
 }
 
 const Matrix& Node::getWorldViewMatrix() const

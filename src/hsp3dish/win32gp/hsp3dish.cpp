@@ -57,6 +57,8 @@ static int hsp_wx, hsp_wy, hsp_wd, hsp_ss;
 static int drawflag;
 
 static	HWND m_hWnd;
+static	HWND m_hWndParent;
+static	HINSTANCE m_hInstance;
 
 #ifndef HSPDEBUG
 static int hsp_sscnt, hsp_ssx, hsp_ssy;
@@ -98,7 +100,7 @@ static std::string gplog;
 extern "C" {
 	static void logfunc( gameplay::Logger::Level level, const char *msg )
 	{
-		gplog += msg;
+		if (GetSysReq(SYSREQ_LOGWRITE)) gplog += msg;
 	}
 }
 
@@ -420,15 +422,23 @@ static void hsp3dish_initwindow( HINSTANCE hInstance, int sx, int sy, char *wind
 	DWORD m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
 						WS_MINIMIZEBOX | /*WS_MAXIMIZEBOX |*/ WS_VISIBLE | WS_CLIPCHILDREN;
 
-	// Set the window's initial width
 	RECT rc;
-	SetRect( &rc, 0, 0, sx, sy );
-	AdjustWindowRect( &rc, m_dwWindowStyle, false );
+	SetRect(&rc, 0, 0, sx, sy);
+
+	if (m_hWndParent) {
+		m_dwWindowStyle = WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE;
+
+	}
+	else {
+		// Set the window's initial width
+		AdjustWindowRect(&rc, m_dwWindowStyle, false);
+	}
+
 
 	// Create the render window
 	m_hWnd = CreateWindow( "HSP3DishWindow", windowtitle, m_dwWindowStyle,
 								CW_USEDEFAULT, CW_USEDEFAULT,
-								(rc.right-rc.left), (rc.bottom-rc.top), 0,
+								(rc.right-rc.left), (rc.bottom-rc.top), m_hWndParent,
 								NULL, hInstance, 0 );
 
 	// 描画APIに渡す
@@ -615,7 +625,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 #endif
 			return;
 		}
-		
+
 		if ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
 			if (msg.message == WM_QUIT ) throw HSPERR_NONE;
 			hsp3dish_dispatch( &msg );
@@ -666,6 +676,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 					}
 					hspctx->lasttick = tick;
 					hspctx->runmode = RUNMODE_RUN;
+
 #ifndef HSPDEBUG
 					if ( ctx->hspstat & HSPSTAT_SSAVER ) {
 						if ( hsp_sscnt ) hsp_sscnt--;
@@ -766,29 +777,44 @@ static void hsp3dish_savelog( void )
 	}
 }
 
-int hsp3dish_init( HINSTANCE hInstance, char *startfile )
+
+int app_init(void)
 {
-	//		システム関連の初期化
-	//		( mode:0=debug/1=release )
+	//		Windowsシステム関連の初期化(最初に実行)
 	//
-	int a,orgexe, mode;
-	int hsp_sum, hsp_dec;
-	char a1;
-	char fname[_MAX_PATH+1];
+	if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
+		return 1;
+	}
+	OleInitialize(NULL);
+
+	InitCommonControls();
+	return 0;
+}
+
+int hsp3dish_setwindow(int bootprm, int wx, int wy)
+{
+	//		ウインドウサイズを指定する
+	//		(wxがマイナスの場合は.iniファイルから取得する)
+	//
+	hsp_wx = wx;
+	hsp_wy = wy;
+	hsp_wd = bootprm;
+	return 0;
+}
+
+int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
+{
+	//		HSP3Dishシステム関連の初期化
+	//
+	int orgexe, mode;
+	char fname[_MAX_PATH + 1];
 	char *ss;
 #ifdef HSPDEBUG
 	int i;
 #endif
 
-	if ( FAILED( CoInitializeEx( NULL, COINIT_APARTMENTTHREADED) ) ) {
-		return 1;
-	}
-	OleInitialize( NULL );
-
-	InitCommonControls();
 	InitSysReq();
-	
-	SetSysReq( SYSREQ_MAXMATERIAL, 64 );		// マテリアルのデフォルト値
+	SetSysReq(SYSREQ_MAXMATERIAL, 128);		// マテリアルのデフォルト値
 
 	game = NULL;
 	platform = NULL;
@@ -797,27 +823,31 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	//
 	hsp = new Hsp3();
 	hsp->hspctx.instance = (void *)hInstance;
+	m_hInstance = hInstance;
+
+	m_hWnd = NULL;
+	exinfo = NULL;
+	m_hWndParent = (HWND)hParent;
+
 #ifdef HSPDEBUG
 	h_dbgwin = NULL;
 	dbgwnd = NULL;
-	m_hWnd = NULL;
-	exinfo = NULL;
 
-	ss = strsp_cmds( startfile );
-	i = (int)( ss - startfile );
+	ss = strsp_cmds(startfile);
+	i = (int)(ss - startfile);
 	ss = startfile;
-	if ( ss[i-1] == 32 ) i--;
-	if ( *ss == 0x22 ) {
-		ss++;i-=2;
+	if (ss[i - 1] == 32) i--;
+	if (*ss == 0x22) {
+		ss++; i -= 2;
 	}
-	if ( i > 0 ) {
-		strncpy( fname, ss, i );
+	if (i > 0) {
+		strncpy(fname, ss, i);
 		fname[i] = 0;
-		hsp->SetFileName( fname );
+		hsp->SetFileName(fname);
 	}
 #else
-	if ( startfile != NULL ) {
-		hsp->SetFileName( startfile );
+	if (startfile != NULL) {
+		hsp->SetFileName(startfile);
 	}
 #endif
 
@@ -825,54 +855,68 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	//		実行ファイルかデバッグ中かを調べる
 	//
 	mode = 0;
-	orgexe=0;
-	hsp_wx = 960;
-	hsp_wy = 640;
-//	hsp_wx = 320;
-//	hsp_wy = 480;
-	hsp_wd = 0;
+	orgexe = 0;
 	hsp_ss = 0;
 
-	for( a=0 ; a<8; a++) {
-		a1=optmes[a]-48;if (a1==fpas[a]) orgexe++;
+#ifndef HSP3DLL
+	int a;
+	char a1;
+	hsp3dish_setwindow(0, -1, -1);
+	for (a = 0; a < 8; a++) {
+		a1 = optmes[a] - 48; if (a1 == fpas[a]) orgexe++;
 	}
-	if ( orgexe == 0 ) {
-		mode = atoi(optmes+9) + 0x10000;
-		a1=*(optmes+17);
-		if ( a1 == 's' ) hsp_ss = HSPSTAT_SSAVER;
-		hsp_wx=*(short *)(optmes+20);
-		hsp_wy=*(short *)(optmes+23);
-		hsp_wd=( *(short *)(optmes+26) );
-		hsp_sum=*(unsigned short *)(optmes+29);
-		hsp_dec=*(int *)(optmes+32);
-		hsp->SetPackValue( hsp_sum, hsp_dec );
+	if (orgexe == 0) {
+		int hsp_sum, hsp_dec;
+		mode = atoi(optmes + 9) + 0x10000;
+		a1 = *(optmes + 17);
+		if (a1 == 's') hsp_ss = HSPSTAT_SSAVER;
+		hsp_wx = *(short *)(optmes + 20);
+		hsp_wy = *(short *)(optmes + 23);
+		hsp_wd = (*(short *)(optmes + 26));
+		hsp_sum = *(unsigned short *)(optmes + 29);
+		hsp_dec = *(int *)(optmes + 32);
+		hsp->SetPackValue(hsp_sum, hsp_dec);
 	}
+#endif
 
 	//		起動ファイルのディレクトリをカレントにする
 	//
 #ifndef HSPDEBUG
-	if (( hsp_wd & 2 ) == 0 ) {
-		GetModuleFileName( NULL, fname, _MAX_PATH );
-		getpath( fname, fname, 32 );
-		changedir( fname );
+	if ((hsp_wd & 2) == 0) {
+		GetModuleFileName(NULL, fname, _MAX_PATH);
+		getpath(fname, fname, 32);
+		changedir(fname);
 	}
 #endif
 
-	if ( hsp->Reset( mode ) ) {
-		hsp3dish_dialog( "Startup failed." );
+	//	ウインドウサイズを設定する
+	//
+	if ((hsp_wx <= 0) || (hsp_wy <= 0)) {
+		if (OpenIniFile("hsp3dish.ini") == 0) {
+			hsp_wx = GetIniFileInt("wx");
+			hsp_wy = GetIniFileInt("wy");
+			CloseIniFile();
+		}
+	}
+	if (hsp_wx <= 0) hsp_wx = 960;
+	if (hsp_wy <= 0) hsp_wy = 640;
+
+	//	axファイルの読み込み
+	//
+	if (hsp->Reset(mode)) {
+		hsp3dish_dialog("Startup failed.");
 		return 1;
 	}
 
-#ifdef HSPDEBUG
-	if ( OpenIniFile( "hsp3dish.ini" ) == 0 ) {
-		hsp_wx = GetIniFileInt( "wx" );
-		hsp_wy = GetIniFileInt( "wy" );
-		CloseIniFile();
-	}
-#endif
-
 	ctx = &hsp->hspctx;
+	return 0;
+}
 
+int hsp3dish_reset(void)
+{
+	char *ss;
+
+#ifndef HSP3DLL
 	{
 	//		コマンドライン関連
 	ss = GetCommandLine();
@@ -880,8 +924,11 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 #ifdef HSPDEBUG
 	ss = strsp_cmds( ss );
 #endif
-	sbStrCopy( &ctx->cmdline, ss );					// コマンドラインパラメーターを保存
 	}
+#else
+	ss = "";
+#endif
+	sbStrCopy(&ctx->cmdline, ss);					// コマンドラインパラメーターを保存
 
 	//		SSaver proc
 	//
@@ -926,7 +973,7 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	char * pc = NULL;
 #endif
 
-	hsp3dish_initwindow( hInstance, hsp_wx, hsp_wy, pc );
+	hsp3dish_initwindow( m_hInstance, hsp_wx, hsp_wy, pc );
 
 
 #ifndef HSP_COM_UNSUPPORTED
@@ -987,7 +1034,7 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	HSP3DEVINFO *devinfo;
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo( devinfo );
-	hsp3extcmd_sysvars((int)hInstance, (int)m_hWnd, 0);
+	hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
 
 	gameplay::Logger::log(gameplay::Logger::LEVEL_INFO, "HGIMG4 %s initalized : %s\n", hspver, devinfo->devname);
 
@@ -998,7 +1045,7 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 }
 
 
-static void hsp3dish_bye(void)
+void hsp3dish_bye(void)
 {
 	//		Window関連の解放
 	//
@@ -1010,6 +1057,14 @@ static void hsp3dish_bye(void)
 		timeEndPeriod(timer_period);
 		timer_period = -1;
 	}
+
+#ifdef HSPDEBUG
+	//		デバッグウインドゥの解放
+	//
+	if (h_dbgwin != NULL) { FreeLibrary(h_dbgwin); h_dbgwin = NULL; }
+#endif
+
+	DllManager().free_all_library();
 
 	//		HSP関連の解放
 	//
@@ -1037,22 +1092,17 @@ static void hsp3dish_bye(void)
 	    delete game;
 	}
 
-#ifdef HSPDEBUG
-	//		デバッグウインドゥの解放
-	//
-	if ( h_dbgwin != NULL ) { FreeLibrary( h_dbgwin ); h_dbgwin = NULL; }
-#endif
+}
 
-	DllManager().free_all_library();
 
+void app_bye(void)
+{
 	//		システム関連の解放
 	//
 #ifndef HSP_COM_UNSUPPORTED
 	OleUninitialize();
 	CoUninitialize();
 #endif
-
-
 }
 
 
@@ -1080,15 +1130,9 @@ void hsp3dish_error( void )
 	} else {
 		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
 	}
+	hsp3dish_savelog();
 	hsp3dish_debugopen();
 	hsp3dish_dialog( errmsg );
-
-	{
-		// エラーログを記録
-		char *p = (char *)gplog.c_str();
-		mem_save("hsp3gp_error.log", p, strlen(p), -1);
-		//hsp3dish_dialog((char *)gplog.c_str());
-	}
 }
 
 
@@ -1118,7 +1162,6 @@ int hsp3dish_exec( void )
 		}
 		catch( ... ) {
 		}
-		hsp3dish_bye();
 		return -1;
 	}
 
@@ -1141,8 +1184,8 @@ int hsp3dish_exec( void )
 	}
 #endif
 	endcode = ctx->endcode;
-	hsp3dish_bye();
 	return endcode;
 }
+
 
 

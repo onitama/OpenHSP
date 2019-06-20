@@ -273,6 +273,7 @@ const Matrix& Camera::getProjectionMatrix() const
         if (_type == PERSPECTIVE)
         {
             Matrix::createPerspective(_fieldOfView, _aspectRatio, _nearPlane, _farPlane, &_projection);
+
         }
         else
         {

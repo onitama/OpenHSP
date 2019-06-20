@@ -91,7 +91,10 @@ public:
      */
     const std::string getFileName() const;
 
-    /**
+
+	const std::string getTextureOptionPath() const;
+
+	/**
      * Returns the output path/folder.
      * Example: "C:/dir"
      */
@@ -182,6 +185,9 @@ public:
 
     static std::string getRealPath(const std::string& filepath);
 
+    bool mergeAnimationEnabled() const;
+	const std::string getMergeAnimationFBXName() const;
+
 private:
 
     /**
@@ -211,6 +217,8 @@ private:
     std::string _filePath;
     std::string _fileOutputPath;
     std::string _nodeId;
+    std::string _textureOptionPath;
+    std::string _shaderOptionPath;
 
     bool _normalMap;
     Vector3 _heightmapWorldSize;
@@ -225,6 +233,9 @@ private:
     AnimationGroupOption _animationGrouping;
     bool _outputMaterial;
     bool _generateTextureGutter;
+
+    bool _mergeAnimation;
+    std::string _mergeAnimationFBXName;
 
     std::vector<std::string> _groupAnimationNodeId;
     std::vector<std::string> _groupAnimationAnimationId;

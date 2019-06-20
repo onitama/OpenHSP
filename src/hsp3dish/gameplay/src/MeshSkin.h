@@ -73,6 +73,7 @@ public:
      * @return The root joint.
      */
     Joint* getRootJoint() const;
+	Node* getRootNode() const;
 
     /**
      * Sets the root joint for this MeshSkin.

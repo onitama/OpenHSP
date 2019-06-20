@@ -278,6 +278,7 @@ void Bundle::clearLoadSession()
         SAFE_DELETE(_meshSkins[i]);
     }
     _meshSkins.clear();
+	_savedNode.clear();
 }
 
 const char* Bundle::getIdFromOffset() const
@@ -431,6 +432,7 @@ Scene* Bundle::loadScene(const char* id)
             Node* node = readNode(scene, NULL);
             if (node)
             {
+				GP_WARN( "AddScene %s",node->getId() );
                 scene->addNode(node);
                 node->release(); // scene now owns node
             }
@@ -469,6 +471,7 @@ Scene* Bundle::loadScene(const char* id)
     }
     scene->setAmbientColor(red, green, blue);
 
+#if 1
     // Parse animations.
     GP_ASSERT(_references);
     GP_ASSERT(_stream);
@@ -486,10 +489,13 @@ Scene* Bundle::loadScene(const char* id)
             readAnimations(scene);
         }
     }
+#endif
 
+	//testNode = scene->findNode("Character1_Head");
+	
     resolveJointReferences(scene, NULL);
 
-    return scene;
+	return scene;
 }
 
 Node* Bundle::loadNode(const char* id)
@@ -499,17 +505,21 @@ Node* Bundle::loadNode(const char* id)
 
 Node* Bundle::loadNode(const char* id, Scene* sceneContext)
 {
-    GP_ASSERT(id);
-    GP_ASSERT(_references);
-    GP_ASSERT(_stream);
+	GP_ASSERT(id);
+	GP_ASSERT(_references);
+	GP_ASSERT(_stream);
 
-    clearLoadSession();
+	clearLoadSession();
 
-    // Load the node and any referenced joints with node tracking enabled.
-    _trackedNodes = new std::map<std::string, Node*>();
-    Node* node = loadNode(id, sceneContext, NULL);
-    if (node)
-        resolveJointReferences(sceneContext, node);
+	// Load the node and any referenced joints with node tracking enabled.
+	_trackedNodes = new std::map<std::string, Node*>();
+	GP_WARN("Load Node[%s]", id);
+
+	Node* node = loadNode(id, sceneContext, NULL);
+	if (node) {
+		resolveJointReferences(sceneContext, node);
+	}
+	GP_WARN("Load Node End[%s]", id);
 
     // Load all animations targeting any nodes or mesh skins under this node's hierarchy.
     for (unsigned int i = 0; i < _referenceCount; i++)
@@ -975,11 +985,12 @@ Model* Bundle::readModel(const char* nodeId)
     std::string xref = readString(_stream);
     if (xref.length() > 1 && xref[0] == '#') // TODO: Handle full xrefs
     {
+		//GP_WARN( "ReadModel[%s]", xref.c_str());
         Mesh* mesh = loadMesh(xref.c_str() + 1, nodeId);
         if (mesh)
         {
-            Model* model = Model::create(mesh);
-            SAFE_RELEASE(mesh);
+			Model* model = Model::create(mesh);
+			SAFE_RELEASE(mesh);
 
             // Read skin.
             unsigned char hasSkin;
@@ -995,7 +1006,7 @@ Model* Bundle::readModel(const char* nodeId)
                 {
                     model->setSkin(skin);
                 }
-            }
+			}
             // Read material.
             unsigned int materialCount;
             if (!read(&materialCount))
@@ -1068,8 +1079,10 @@ MeshSkin* Bundle::readMeshSkin()
     // Read joint xref strings for all joints in the list.
     for (unsigned int i = 0; i < jointCount; i++)
     {
-        skinData->joints.push_back(readString(_stream));
-    }
+		std::string name = readString(_stream);
+        skinData->joints.push_back(name);
+		//GP_WARN("xfer[%s]",name.c_str());
+	}
 
     // Read bind poses.
     unsigned int jointsBindPosesCount;
@@ -1103,6 +1116,30 @@ MeshSkin* Bundle::readMeshSkin()
     return meshSkin;
 }
 
+
+void Bundle::AddSceneToSavedMesh(Scene* sceneContext, Node* nodeContext)
+{
+	Drawable* drawable = nodeContext->getDrawable();
+	Model* model = dynamic_cast<Model*>(drawable);
+	if (model) {
+		bool newentry = true;
+		for (size_t i = 0, count = _savedNode.size(); i < count; ++i)
+		{
+			if (_savedNode[i] == nodeContext) newentry=false;
+		}
+		if (newentry) {
+			//GP_WARN("#SavedMesh[%s]",nodeContext->getId());
+			_savedNode.push_back(nodeContext);
+		}
+	}
+
+	// child nodes
+	for (Node* child = nodeContext->getFirstChild(); child != NULL; child = child->getNextSibling())
+	{
+		AddSceneToSavedMesh(sceneContext,child);
+	}
+}
+
 void Bundle::resolveJointReferences(Scene* sceneContext, Node* nodeContext)
 {
     GP_ASSERT(_stream);
@@ -1112,6 +1149,7 @@ void Bundle::resolveJointReferences(Scene* sceneContext, Node* nodeContext)
         MeshSkinData* skinData = _meshSkins[i];
         GP_ASSERT(skinData);
         GP_ASSERT(skinData->skin);
+		//GP_WARN("skin%d (%s)", i, nodeContext->getId() );
 
         // Resolve all joints in skin joint list.
         size_t jointCount = skinData->joints.size();
@@ -1121,6 +1159,7 @@ void Bundle::resolveJointReferences(Scene* sceneContext, Node* nodeContext)
             std::string jointId = skinData->joints[j];
             if (jointId.length() > 1 && jointId[0] == '#')
             {
+				//GP_WARN( "load[%s]",jointId.c_str() );
                 jointId = jointId.substr(1, jointId.length() - 1);
 
                 Node* n = loadNode(jointId.c_str(), sceneContext, nodeContext);
@@ -1129,7 +1168,7 @@ void Bundle::resolveJointReferences(Scene* sceneContext, Node* nodeContext)
                     Joint* joint = static_cast<Joint*>(n);
                     joint->setInverseBindPose(skinData->inverseBindPoseMatrices[j]);
                     skinData->skin->setJoint(joint, (unsigned int)j);
-                    SAFE_RELEASE(joint);
+					SAFE_RELEASE(joint);
                 }
             }
         }
@@ -1207,8 +1246,14 @@ void Bundle::resolveJointReferences(Scene* sceneContext, Node* nodeContext)
         }
 
         // Remove the joint hierarchy from the scene since it is owned by the mesh skin.
-        if (sceneContext)
-            sceneContext->removeNode(skinData->skin->_rootNode);
+		if (sceneContext) {
+			Node *byenode = skinData->skin->_rootNode;
+			//GP_WARN("#remove[%s]", byenode->getId());
+			if (byenode->getScene() == sceneContext) {
+				AddSceneToSavedMesh(sceneContext, byenode);
+			}
+			sceneContext->removeNode(byenode);
+		}
 
         // Done with this MeshSkinData entry.
         SAFE_DELETE(_meshSkins[i]);
@@ -1276,10 +1321,12 @@ Animation* Bundle::readAnimationChannel(Scene* scene, Animation* animation, cons
     // Search for a node that matches the target.
     if (!target)
     {
+		//GP_WARN( "Anim[%s]", targetId.c_str());
         target = scene->findNode(targetId.c_str());
         if (!target)
         {
-            GP_ERROR("Failed to find the animation target (with id '%s') for animation '%s'.", targetId.c_str(), animationId);
+			readAnimationChannelData(animation, animationId, target, 0);
+			GP_WARN("Failed to find the animation target (with id '%s') for animation '%s'.", targetId.c_str(), animationId);
             return NULL;
         }
     }
@@ -1404,6 +1451,7 @@ Mesh* Bundle::loadMesh(const char* id, const char* nodeId)
     mesh->_url += "#";
     mesh->_url += id;
 
+
     mesh->setVertexData((float*)meshData->vertexData, 0, meshData->vertexCount);
 
     mesh->_boundingBox.set(meshData->boundingBox);
@@ -1434,7 +1482,8 @@ Mesh* Bundle::loadMesh(const char* id, const char* nodeId)
         return NULL;
     }
 
-    return mesh;
+	//GP_WARN("#LoadMesh[%s]", id);
+	return mesh;
 }
 
 Bundle::MeshData* Bundle::readMeshData()

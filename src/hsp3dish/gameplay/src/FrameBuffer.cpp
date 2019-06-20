@@ -200,15 +200,12 @@ void FrameBuffer::setRenderTarget(RenderTarget* target, unsigned int index, GLen
         {
             attachment = GL_DEPTH_ATTACHMENT;
             GL_ASSERT( glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, textureTarget, _renderTargets[index]->getTexture()->getHandle(), 0));
-/*
 #ifndef OPENGL_ES            
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
 #elif defined(GL_ES_VERSION_3_0) && GL_ES_VERSION_3_0
             glDrawBuffers(0, NULL);
 #endif
-*/
-            glDrawBuffers(0, NULL);
         }
         else
         {

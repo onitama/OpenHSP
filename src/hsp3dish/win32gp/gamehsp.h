@@ -104,6 +104,9 @@ GPPSET_MAX
 #define GPOBJ_MATOPT_BLENDADD (32)
 #define GPOBJ_MATOPT_SPECULAR (64)
 #define GPOBJ_MATOPT_USERSHADER (128)
+#define GPOBJ_MATOPT_USERBUFFER (256)
+#define GPOBJ_MATOPT_MIRROR (512)
+#define GPOBJ_MATOPT_CUBEMAP (1024)
 
 #define GPDRAW_OPT_OBJUPDATE (1)
 #define GPDRAW_OPT_DRAWSCENE (2)
@@ -178,6 +181,9 @@ public:
 	int _colilog;						// 衝突ログID
 	int	_transparent;					// 透明度(0=透明/255=不透明)
 	int _fade;							// フェード設定(0=なし/+-で増減)
+	int _rendergroup;					// レンダリンググループ
+	int _lightgroup;					// ライティンググループ
+
 	gpspr *_spr;						// 生成された2Dスプライト情報
 	gpphy *_phy;						// 生成されたコリジョン情報
 	Node *_node;						// 生成されたNode
@@ -241,6 +247,7 @@ public:
 	void updateViewport( int x, int y, int w, int h );
 
 	gpobj *getObj( int id );
+	gpobj *getSceneObj(int id);
 	int deleteObj( int id );
 	gpobj *addObj( void );
 	Node *getNode( int objid );
@@ -293,10 +300,14 @@ public:
 	int updateObjColi( int objid, float size, int addcol );
 	void findeObj( int exmode, int group );
 	gpobj *getNextObj( void );
+	void pickupAll(int option);
+	bool pickupNode(Node* node, int deep);
+	bool drawNodeRecursive(Node *node,bool wire=false);
+	int drawSceneObject(gpobj *camobj);
 
-	void selectScene( int sceneid );
-	void selectLight( int lightid );
-	void selectCamera( int camid );
+	int selectScene( int sceneid );
+	int selectLight( int lightid );
+	int selectCamera( int camid );
 
 	void makeNewModel( gpobj *obj, Mesh *mesh, Material *material );
 	int makeNewModelWithMat( gpobj *obj, Mesh *mesh, int matid );
@@ -318,14 +329,15 @@ public:
 	int makeNewMatFromObj(int objid, int part);
 
 	int makeNewLgt( int id, int lgtopt, float range=1.0f, float inner=0.5f, float outer=1.0f );
-	int makeNewCam( int id, float fov, float aspect, float near, float far );
+	int makeNewCam( int id, float fov, float aspect, float near, float far, int mode=0 );
+
 	void setUserShader2D( char *vsh, char *fsh, char *defines );
 	char *getUserVSH(void) { return (char *)user_vsh.c_str(); };
 	char *getUserFSH(void) { return (char *)user_fsh.c_str(); };
 	char *getUserDefines(void) { return (char *)user_defines.c_str(); };
 
 	Material *makeMaterialColor( int color, int lighting );
-	Material *makeMaterialTexture( char *fname, int matopt );
+	Material *makeMaterialTexture( char *fname, int matopt, Texture *opttex = NULL);
 	Material *makeMaterialFromShader( char *vshd, char *fshd, char *defs );
 	void setMaterialDefaultBinding( Material* material, int icolor, int matopt );
 	float setMaterialBlend( Material* material, int gmode, int gfrate );
@@ -454,7 +466,6 @@ private:
      * Draws the scene each frame.
      */
     bool updateNodeMaterial( Node* node, Material *material );
-	int ApplyMaterialToModel(Material *boxMaterial, Model *model);
 	bool drawScene(Node* node);
 	bool init2DRender( void );
 
@@ -495,6 +506,10 @@ private:
 	Quaternion _qcam_billboard;
 	int _viewx1, _viewy1, _viewx2, _viewy2;
 	FrameBuffer* _previousFrameBuffer;
+	int _render_numobj;
+	int _render_numpoly;
+
+	Node *testNode;
 
 	// Multi Light
 	int _max_dlight;
