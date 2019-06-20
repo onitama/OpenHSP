@@ -19,7 +19,7 @@
 	setreq SYSREQ_LOGWRITE,1		; 終了時にログを出力
 	setcls CLSMODE_SOLID, $404040
 
-	gpload id_model,"res/pronamachan.gpb"		; モデル読み込み
+	gpload id_model,"res/pronamachan"		; モデル読み込み
 
 	setscale id_model, 0.025,0.025,0.025
 

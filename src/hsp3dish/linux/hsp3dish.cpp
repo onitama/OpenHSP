@@ -459,7 +459,6 @@ static void hsp3dish_savelog( void )
 	//		ログをファイルに出力する
 	//
 	if (game != NULL) {
-		char fname[_MAX_PATH + 1];
 		const char *logs;
 #ifdef GP_USE_MEM_LEAK_DETECTION
 		printMemoryLeaks();
