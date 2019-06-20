@@ -1,0 +1,92 @@
+#include "hgimg4.as"
+#packopt name pronama4
+#packopt xsize 960
+#packopt ysize 640
+
+	;	暮井 慧（プロ生ちゃん） 3D model (C) Pronama LLC
+	;
+	;	HGIMG4対応 HSP3用スクリプトサンプル
+	;	※このスクリプト及びサンプルデータは、ライセンス規約のもと
+	;	　自作ソフトで自由にお使い頂けます
+	;	※詳しくは、 https://kei.pronama.jp/
+	;
+
+	title "HGIMG4 Test"
+
+#define GRP_SKY $8000
+
+	gpreset
+	setreq SYSREQ_LOGWRITE,1		; 終了時にログを出力
+	setcls CLSMODE_SOLID, $404040
+
+	gpload id_model,"res/pronamachan.gpb"		; モデル読み込み
+
+	setscale id_model, 0.025,0.025,0.025
+
+	gpaddanim id_model,"WALK00_F"			; アニメーションクリップを設定
+	gpact id_model,"WALK00_F"			; アニメーションクリップを再生
+
+	gpfloor id_floor, 16,16, $004000			; 床ノードを追加
+
+	camx=0.0:camy=3.0:camz=8.0
+
+	gsel 0
+*main
+	gosub *render
+
+	;	スペースキーまたはクリックでキャラクターを追加
+	if key&$110 {
+		gpclone i, id_model			; オブジェクトをクローン
+		x=rnd(16)-8:z=rnd(16)-8
+		setpos i, x, 0, z
+		gpact i,"WALK00_F"			; アニメーションクリップを再生
+	}
+
+	;	タッチでカメラ位置を動かす
+	if dragmd {	; ドラッグ中
+		getkey a,1
+		if a=1 {
+			camx=0.05*(mousex-dragx)+cx
+			camy=0.05*(mousey-dragy)+cz
+		} else {
+			dragmd=0
+		}
+	} else {	; ドラッグなし
+		getkey a,1
+		if a {
+			cx=camx:cz=camz
+			dragx=mousex:dragy=mousey
+			dragmd=1
+		}
+	}
+
+	;	カーソルキーでカメラ位置を動かす
+	if key&1 : camx -=0.2
+	if key&4 : camx +=0.2
+	if key&8 : camz +=0.2
+	if key&2 : camz -=0.2
+
+	;addang id_model,0,0.02		; ノード回転
+
+
+	await 1000/60			; 待ち時間
+
+	goto *main
+
+*render
+	stick key,15+64
+	if key&128 : end
+
+	setpos GPOBJ_CAMERA, camx,camy,camz		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, 0,1.8,0		; カメラから指定した座標を見る
+
+	redraw 0			; 描画開始
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	return
+
+

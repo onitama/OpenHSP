@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project（http://dev.onionsoft.net/trac/wiki）">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSPTV,プログラミング生放送,プロ生ちゃん,暮井慧">
+	<meta name="description" content="HSPTVに関する情報を掲載">
+	<link href="tamane.css" rel="stylesheet" type="text/css" media="all">
+	<title>HGIMG4 3.6β1 PronamaChan Preview</title>
+</head>
+<body>
+	<div id="CONTAINER">
+		<!-- ヘッダー -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2019(c)</p>
+		<h1>HGIMG4 3.6β1プロ生ちゃんデモ版</h1>
+
+		<h2 id="ABOUT">はじめに</h2>
+		<p><font size="-1">
+		「HGIMG4 3.6β1プロ生ちゃんデモ版」は、HSP3の3D機能をサポートするプラグインHGIMG4が、将来のバージョンに同梱される予定のものをテストすることが可能なβ版となります。<br>
+		プログラミング生放送のキャラクター<a href="https://kei.pronama.jp/" target="_blank">「プロ生ちゃん」</a>素材を使用したサンプルデモを含む特別なバージョンが収録されています。
+		</p>
+		<p>
+		<img src="image/hgimg4_sample.jpg">
+		</p>
+
+		<h2 id="USAGE">パッケージ概要</h2>
+		<p>
+		HGIMG4 3.6β1プレビュー版は、HSPスクリプトエディタ、HSP3標準ランタイム、HGIMG4標準ランタイムを同梱しています。(フルセット版のHSP3.5からの差分として上書きして使用することも可能です)。
+		HSP3.5から大幅な仕様の変更はなく、HSPスクリプトエディタ(hsed3.exe)を起動して従来と同様にご利用頂けます。
+		</p>
+
+		<h2 id="DEMO">プロ生ちゃんサンプルデモ</h2>
+
+		<li>pronama3.hsp</li>
+		<p>
+		マルチパスによる鏡面反射レンダリングを行うサンプルです。背景はキューブマップのスカイボックスを使用しています。
+		</p>
+
+		<p>
+		<a href="image/pn2.png" target="_blank"><img src="image/pn2.png" width="512"></a>
+		</p>
+
+		<li>pronama4.hsp</li>
+		<p>
+		クリックかスペースキーを押すごとにプロ生ちゃんが増えていきます。大量のキャラクターアニメーションを表示するサンプルです。
+		</p>
+
+		<p>
+		<a href="image/pn3.png" target="_blank"><img src="image/pn3.png" width="512"></a>
+		</p>
+
+		<li>pronama5.hsp</li>
+		<p>
+		ポストプロセスを加えたブラウン管テレビ風の表示など、様々なエフェクトを切り替えることができます。
+		</p>
+
+		<p>
+		<a href="image/pn1.png" target="_blank"><img src="image/pn1.png" width="512"></a>
+		</p>
+
+		<li>pronama_box.hsp</li>
+		<p>
+		物理エンジンを使って箱を落下させているサンプルです。クリックかスペースキーを押すごとに箱が発生します。
+		</p>
+
+		<p>
+		<a href="image/pn5.png" target="_blank"><img src="image/pn5.png" width="512"></a>
+		</p>
+
+		<h2 id="NEWHGIMG">より使いやすく</h2>
+		<p>
+		新しいHGIMG4では、より使いやすく、シンプルに3D表示を活用できるよう開発が進められています。<br>
+		少ないデータ、スクリプトでモデルデータ・アニメーションといった高度な技術を活用するために、HGIMG4は独自の拡張を続けています。
+		OpenGL/DirectXによる描画、GLSLシェーダーの活用、物理エンジン(Bullet)、イベントシステムなどを搭載し、
+		キャラクターアニメーション、マルチパスレンダリング、ポストプロセッシングスタックなど強力なシステムを搭載します。<br>
+		新しいHSP3.6に向けて進化を続けるHGIMG4に、これからもご期待ください。
+		</p>
+		<p>
+		<img src="image/hgimg4_sample.jpg">
+		</p>
+
+
+		<h2 id="UNITYHSP">Unityとの連携</h2>
+		<p>
+		3Dゲームエンジン、ツールとして幅広く使用されているUnityをハブとすることで、各種モデルを利用しやすくなりました。<br>
+		Unity上に読み込まれている3Dモデル・アニメーションデータをUnity FBX Exporterにより、HGIMG4から使用可能なFBXファイルとして出力することで、Unity上のアセット、VRMなどのモデルデータ、アニメーションを活用することができます。
+		</p>
+		<p>
+		<img src="image/hgimg4_unity.jpg">
+		</p>
+		<p>
+		また、マテリアルやモデル・アニメーションのデータを管理するためのGUIツール「HSP3d」を開発中です。<br>
+		多岐に渡る3Dデータを統合的に管理・設定することにより、複雑なデータをHSP3からシンプルな形で使用することが可能になります。<br>
+		</p>
+
+
+		<h2 id="FBXEXPORTER">Unity FBX Exporterによる出力の流れ</h2>
+		<p>
+		Unity(Unity 2017.3以降)で新しいプロジェクトを作成して、使用する素材をAssetフォルダ以下に準備(コピー)してください。
+		素材に含まれているFBXファイルを選択すると、Inspectorにモデルのプレビューが表示されます。
+		ここでは、プロ生ちゃんノーマル版を使用します。アニメーションを出力する場合は、アバターのアニメーションタイプをGenericにする必要があります。
+		アニメーションタイプがHumanoidになっている場合は、FBXを複製してからGenericのモデルを設定すると良いでしょう。<br>
+		設定ができたら、シーン上にモデルを配置してください。FBXをHierarchyウィンドウにドロップすると、モデルがシーン内に配置されます。
+		</p>
+		<p>
+		<a href="image/p3.png" target="_blank"><img src="image/p3.png" width="512"></a>
+		</p>
+		<p>
+		
+		</p>
+		<p>
+		Asset Storeから、<a href="https://assetstore.unity.com/packages/essentials/fbx-exporter-101408" target="_blank">FBX Exporter</a>をダウンロードして現在のプロジェクトにインポートします。FBX Exporterは、Unityが公式に配布している無料のアセットになります。
+		</p>
+		<p>
+		<a href="image/p4.png" target="_blank"><img src="image/p4.png" width="512"></a>
+		</p>
+		<p>
+		※この記事は、Unity FBX Exporter ver.1.3.0f1を元に作成しています。FBX Exporterは、Unity 2017.3以降で動作しますが、すべてのバージョンでの動作を保証するものではありません
+		</p>
+		<p>
+		アセットをインポートすることで、シーン上に配置したモデルの右クリックメニューから「Export to FBX...」を選択することができるようになります。
+		</p>
+
+		<p>
+		<a href="image/p5.jpg" target="_blank"><img src="image/p5.jpg" width="512"></a>
+		</p>
+		<p>
+		基本的には、ここからFBX Exporterのウインドウを出して、FBXファイルを出力することになります。<br>
+		FBX Exporterのウインドウオプションでは、「Export Format」をBinaryに設定しておいてください。
+		後は、「Export」ボタンを押すことで指定されたフォルダにFBXファイルが出力されます。
+		</p>
+
+		<p>
+		出力されたFBXファイルをHSP3(HGIMG4)から使用するためには、モデルデータを.gpbファイルに変換する必要があります。
+		.gpbファイルへの変換は、同梱されているGPB converter(gpbconv.exe)を使用します。ツールから、FBXファイルを選択して「変換」ボタンを押すことで、FBXファイルと同名の.gpbファイルと、.materialファイルが生成されます。
+		</p>
+		<p>
+		<img src="image/gpbconvert.png">
+		</p>
+
+		<p>
+		.gpbファイルは、モデルデータのみになるため、テクスチャ(画像)ファイルを使用している場合は、別途用意する必要があります。(HGIMG4では、モデルが使用するテクスチャ画像は、.png形式を推奨しています。)<br>
+		GPB converterから出力された.gpbファイル、.materialファイル、テクスチャ画像(.png)ファイルをすべて実行するスクリプト以下のresフォルダにコピーして使用してください。
+		</p>
+
+		<p>
+		アニメーションを含むモデルを出力する場合は、シーン上のモデルにアニメーションコントローラーを設定して、Unity実行時にアニメーションが再生される状態にしておいてください。<br>
+		ボーン構造があるモデルを出力する際に、FBX Exporterがエラーを出す場合があります。
+		多くの場合、これはモデルのスキンメッシュ(Skinned Mesh Renderer)設定のRootBoneが正しく設定されていないことが原因となります。
+		RootBoneをボーン構造の根本に近い階層に設定することで、正しく出力できるようになるはずです。
+		</p>
+		<p>
+		※現在のバージョンでは、HGIMG4のモデル変換時の制約により、モデルのスキンメッシュ(Skinned Mesh Renderer)のある階層に回転やスケーリングがある場合、正しくHGIMG4上で表示されないことがあります。プロ生ちゃんモデルなど、一部のモデルデータを出力する際に、メッシュ階層の回転は0にやスケールは1にしておくようにしてください。それ以外の階層における回転やスケーリングは特に制限はありません。
+		</p>
+		<p>
+		※プロ生ちゃんモデルを出力する際に、スパッツや靴下など一部のパーツがちらついて表示されることがあります。<br>
+		これは、差し替え用のマテリアルが重なって表示されているためで、正しく表示させるためには、FBXのマテリアルインポートを以下のように設定する必要があります。
+		PronamaChan.fbxファイルのインスペクタで、モデルを取り込む際のマテリアル設定を行うことが可能です。
+		</p>
+
+		<p>
+		<a href="image/pn_material.png" target="_blank"><img src="image/pn_material.png" width="720"></a>
+		</p>
+
+		<p>
+		それぞれのマテリアルに対して、Materials/Unlitフォルダ下にあるマテリアルファイル(.mat)を割り当てます。
+		たとえば、「BODY_skin」に対しては、「skin」のマテリアルを割り当てます。
+		「BODY_skin.002」「BODY_skin.003」「BODY_skin.004」は、差し替えるためのマテリアルでもともと表示する必要がないため、「transparent(透明)」のマテリアルを指定しておいてください。<br>
+		Unity上ではtransparentマテリアルは表示されませんが、HGIMG4上で表示した際にはtransparentマテリアルは白色として表示されてしまいます。
+		そのため、HGIMG4での表示マテリアル設定を行う.materialファイルを編集します。
+		GPB converterにより、PronamaChan.fbxファイルを変換した際に、マテリアル設定が、PronamaChan.materialとして保存されます。このファイルをテキストエディタで開いて、「material transparent_187 : colored」の項目を編集します。
+		</p>
+
+		<pre>
+		material transparent_187 : colored
+		{
+		    u_diffuseColor = 1, 1, 1, 1
+		    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+		    u_matrixPalette = MATRIX_PALETTE
+		    
+		    renderState
+		    {
+			depthFunc = NEVER
+		    }
+		
+		    technique
+		    {
+		        pass 
+		        {
+		            defines = SKINNING;SKINNING_JOINT_COUNT 187
+		        }
+		    }
+		}
+		</pre>
+
+		<p>
+		renderState項目の設定により、transparent_187のマテリアル描画を行わないように指定しています。
+		これで、正しく表示されるはずです。スパッツや靴下を使わない(表示しない)場合は、スパッツや靴下のマテリアルもtransparentに指定する必要があります。
+		</p>
+
+		<h2 id="ANIMATION">Unity上でのアニメーション適用</h2>
+
+		<p>
+		<a href="image/p7.png" target="_blank"><img src="image/p7.png" width="512"></a>
+		</p>
+
+		<p>
+		アニメーションをモデルに適用する方法はいくつかありますが、手軽にアニメションデータを入手できるサイトとして、<a href="https://www.mixamo.com/" target="_blank">mixamo</a>があります。
+		<a href="https://www.mixamo.com/" target="_blank">mixamo</a>は、様々なモデルに対してアニメーションを適用したものを無料でFBXファイルとしてダウンロードでき、自由度の高いライセンスとなっています。
+		</p>
+
+		<p>
+		<img src="image/mixamo.jpg">
+		</p>
+		<p>
+		Unity上のアセットでも、様々なモーションデータや、作成するためのツールなどが揃えられていますので、かなりの部分を無料で行うことが可能です。<br>
+		mixamoを含めて、多くのアニメーションデータは、アニメーションタイプがHumanoidリグのものを対象としています。
+		FBX Exporterでアニメションを出力するためには、Genericリグにする必要があり、標準のUnity機能ではHumanoidとGenericを変換することができません。<br>
+		ただし、有料アセットではこの変換をサポートするものがあり、<a href="https://assetstore.unity.com/packages/tools/animation/umotion-pro-animation-editor-95991" target="_blank">「UMotion Pro」</a>はその1つとして活用することができます。
+		</p>
+
+		<p>
+		<a href="image/p8.png" target="_blank"><img src="image/p8.png" width="512"></a>
+		</p>
+
+		<p>
+		今回のプロ生ちゃんサンプルデモでは、UMotion Proを使用してmixamoのアニメーションデータを変換したものが使われています。
+		<a href="https://assetstore.unity.com/packages/tools/animation/umotion-pro-animation-editor-95991" target="_blank">「UMotion Pro」</a>自体で、アニメーションデータの作成を行うこともできるので、活用の幅は広がるはずです。
+		</p>
+		<p>
+		3Dアバターファイルフォーマットである、<a href="https://dwango.github.io/vrm/" target="_blank">「VRM」</a>形式を、<a href="https://github.com/dwango/UniVRM" target="_blank">UniVRM</a>を使用してUnityに読み込み、FBX Exporterで出力することも可能です。
+		</p>
+
+		<p>
+		<img src="image/hgimg4_vrm.jpg">
+		</p>
+
+		<p>
+		Unityをハブとすることで、幅広く3Dモデルやアニメーションを活用することができます。
+		HSP3のスクリプトから3Dをコントロールすることで、手軽なゲーム作成、テスト的なアプリケーションなど、あなたのアイデアで応用範囲を広げてみてください。
+		</p>
+
+
+		<h2 id="LICENCE">著作権とライセンス</h2>
+		<p>
+		アーカイブに含まれるランタイム及びスクリプトファイルは、HSP本体と同様のライセンスのもと添付、複製、改編、再配布することができます。<br>
+		ユーザーがツールを使って作成したデータ、及び生成されたスクリプトの権利は、それを作成したユーザーに属します。<br>		サンプルで使用されている3Dモデル（プロ生ちゃん）のライセンスは、以下を参照してください。
+		<pre>
+		暮井 慧（プロ生ちゃん） 3D model
+		© Pronama LLC
+		※詳しくは、 <a href="https://kei.pronama.jp/" target="_blank">https://kei.pronama.jp/</a>
+		</pre>
+		素材を使用する際には、必ず「プロ生ちゃん」の利用ガイドラインをお読みください。
+		</p>
+		<pre>
+		プロ生ちゃん（暮井 慧）利用ガイドライン
+		<a href="https://kei.pronama.jp/guideline/" target="_blank">https://kei.pronama.jp/guideline/</a>
+		</pre>
+
+
+		<!-- フッター -->
+		<ul id="FOOTER">
+			<a href="http://www.onionsoft.net/" target="_blank" align="right"><img src="image/onimark64.png"></a><br>
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="http://hsp.tv/" target="_blank">Go to HSPTV page</a></li>
+		</ul>
+	</div><!-- container -->
+</body>
+
+</html>

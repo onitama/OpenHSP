@@ -1,0 +1,305 @@
+material colored
+{
+    u_worldViewProjectionMatrix = WORLD_VIEW_PROJECTION_MATRIX
+    
+    renderState
+    {
+        cullFace = true
+        depthTest = true
+    }
+    
+    technique
+    {
+        pass 
+        {
+            vertexShader = res/shaders/colored.vert
+            fragmentShader = res/shaders/colored.frag
+        }
+    }
+}
+
+material textured
+{
+    u_worldViewProjectionMatrix = WORLD_VIEW_PROJECTION_MATRIX
+    
+    sampler u_diffuseTexture
+    {
+        mipmap = true
+        wrapS = CLAMP
+        wrapT = CLAMP
+        minFilter = LINEAR_MIPMAP_LINEAR
+        magFilter = LINEAR
+    }
+
+    renderState
+    {
+        cullFace = true
+        depthTest = true
+    }
+    
+    technique
+    {
+        pass 
+        {
+            vertexShader = res/shaders/textured.vert
+            fragmentShader = res/shaders/textured.frag
+        }
+    }
+}
+
+material b_187 : colored
+{
+    u_diffuseColor = 1, 1, 1, 1
+    u_matrixPalette = MATRIX_PALETTE
+    
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material dress_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/dress.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material eyeLight_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/eyeLight.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    renderState
+    {
+	blend = true
+	blendSrc = SRC_ALPHA
+	blendDst = ONE_MINUS_SRC_ALPHA
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material eyeWhite_187 : colored
+{
+    u_diffuseColor = 1, 1, 1, 1
+    u_matrixPalette = MATRIX_PALETTE
+    
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material eyes_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/eyes.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material face_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/face2.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material hair_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/hair.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material skin_187 : textured
+{
+    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/skin.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material skirt_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/skirt.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material socks_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/socks.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material spats_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/spats.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material transparent_187 : colored
+{
+    u_diffuseColor = 1, 1, 1, 1
+    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+    u_matrixPalette = MATRIX_PALETTE
+    
+    renderState
+    {
+	depthFunc = NEVER
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
+material watch_187 : textured
+{
+    u_matrixPalette = MATRIX_PALETTE
+    
+    sampler u_diffuseTexture
+    {
+        path = res/watch.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SKINNING;SKINNING_JOINT_COUNT 187
+        }
+    }
+}
+
