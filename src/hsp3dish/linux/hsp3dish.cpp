@@ -86,7 +86,7 @@ static std::string gplog;
 extern "C" {
 	static void logfunc( gameplay::Logger::Level level, const char *msg )
 	{
-		gplog += msg;
+		if (GetSysReq(SYSREQ_LOGWRITE)) gplog += msg;
 	}
 }
 
@@ -468,7 +468,7 @@ int hsp3dish_init( char *startfile )
 	InitSysReq();
 
 #ifdef HSPDISHGP
-	SetSysReq( SYSREQ_MAXMATERIAL, 64 );            // マテリアルのデフォルト値
+	SetSysReq( SYSREQ_MAXMATERIAL, 128 );            // マテリアルのデフォルト値
 
 	game = NULL;
 	platform = NULL;
@@ -569,8 +569,9 @@ int hsp3dish_init( char *startfile )
 	//	platform = gameplay::Platform::create( game, NULL, hsp_wx, hsp_wy, false );
 	platform = gameplay::Platform::create( game, NULL, hsp_wx, hsp_wy, false );
 	if ( platform == NULL ) {
-		hsp3dish_dialog( (char *)gplog.c_str() );
+		//hsp3dish_dialog( (char *)gplog.c_str() );
 		hsp3dish_dialog( "OpenGL initalize failed." );
+		hsp3dish_savelog();
 		return 1;
 	}
 	platform->enterMessagePump();
@@ -607,6 +608,10 @@ int hsp3dish_init( char *startfile )
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo( devinfo );
 
+#ifdef HSPDISHGP
+	gameplay::Logger::log(gameplay::Logger::LEVEL_INFO, "HGIMG4 %s initalized : %s\n", hspver, devinfo->devname);
+#endif
+
 	return 0;
 }
 
@@ -620,12 +625,18 @@ static void hsp3dish_bye( void )
 #ifdef HSPDISHGP
 	//		gameplay関連の解放
 	//
-	if ( platform != NULL ) {
+	if (platform != NULL) {
 		platform->shutdownInternal();
 		delete platform;
 	}
-	if ( game != NULL ) {
-		delete game;
+
+	if (GetSysReq(SYSREQ_LOGWRITE)) {
+		hsp3dish_savelog();
+	}
+
+	if (game != NULL) {
+		//game->exit();
+	    delete game;
 	}
 #endif
 
