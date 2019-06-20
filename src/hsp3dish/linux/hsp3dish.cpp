@@ -453,6 +453,23 @@ static void hsp3dish_setdevinfo( HSP3DEVINFO *devinfo )
 
 /*----------------------------------------------------------*/
 
+#ifdef HSPDISHGP
+static void hsp3dish_savelog( void )
+{
+	//		ログをファイルに出力する
+	//
+	if (game != NULL) {
+		char fname[_MAX_PATH + 1];
+		const char *logs;
+#ifdef GP_USE_MEM_LEAK_DETECTION
+		printMemoryLeaks();
+#endif
+		logs = gplog.c_str();
+		mem_save("hsp3gp.log", (void *)logs, (int)strlen(logs), -1);
+	}
+}
+#endif
+
 int hsp3dish_init( char *startfile )
 {
 	//		システム関連の初期化
