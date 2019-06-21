@@ -1392,17 +1392,6 @@ int hgio_gettick( void )
 	return i - initTime;
 #endif
 
-#ifdef HSPNDK
-	int i;
-	timespec ts;
-	double nsec;
-    clock_gettime(CLOCK_REALTIME,&ts);
-    nsec = (double)(ts.tv_nsec) * 0.001 * 0.001;
-    i = (int)ts.tv_sec * 1000 + (int)nsec;
-    //return ((double)(ts.tv_sec) + (double)(ts.tv_nsec) * 0.001 * 0.001 * 0.001);
-	return i;
-#endif
-
 #ifdef HSPIOS
     CFAbsoluteTime now;
     now = CFAbsoluteTimeGetCurrent();

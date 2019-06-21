@@ -76,7 +76,7 @@ static bool androidFileExists(const char* filePath)
     AAsset* asset = AAssetManager_open(__assetManager, filePath, AASSET_MODE_RANDOM);
     if (asset)
     {
-        int lenght = AAsset_getLength(asset);
+        int length = AAsset_getLength(asset);
         AAsset_close(asset);
         return length > 0;
     }
