@@ -33,7 +33,7 @@ static char langstr[8];
 static GdkColor colorBg;
 static GdkColor colorText;
 
-#define HSED_VER "ver.0.8"
+#define HSED_VER "ver.0.81"
 #define TEMP_HSP "__hsptmp.hsp"
 #define TEMP_AX "__hsptmp.ax"
 #define TEMP_HSPRES ".hspres"
@@ -237,7 +237,7 @@ static int status;
 static void hsed_about(GtkWidget *w,int d)
 {
 	int res;
-	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2018(C) onion software" );
+	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2019(C) onion software" );
 }
 
 void file_dlg_cancel(GtkWidget *widget,GtkWidget *dlg){
@@ -726,8 +726,8 @@ static void HSP_run(GtkWidget *w,int flag)
 	printf(complog);
 	if(pclose(fp)){
 		printf("hsed: Compile error.\n");
-		HSP_view_log();
 		chdir(mydir);
+		HSP_view_log();
 		return;
 	}
 
