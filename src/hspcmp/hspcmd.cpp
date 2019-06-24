@@ -207,6 +207,9 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$05e 9 setcls",				// (ver3.5)
 	"$05f 9 celputm",				// (ver3.5)
 
+	"$04d 9 objcolor",				// (ver3.6)
+	"$04e 9 rgbcolor",				// (ver3.6)
+
 	//	enhanced command (ver3.0)
 
 	"$000 17 newcom",

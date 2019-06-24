@@ -230,33 +230,22 @@ int CLabel::Search( char *oname )
 }
 
 
-int CLabel::SearchLocal( char *oname, char *loname )
+int CLabel::SearchLocal(char *global_name, char *local_name)
 {
-	//		object name search ( for local )
-	//
-	int hash, hash2;
-	if (cur == 0) return -1;
 
-	hash = StrCase(oname);
-	hash2 = GetHash(loname);
-	if (*oname != 0) {
-		std::pair<LabelMap::iterator, LabelMap::iterator> r = labels.equal_range( oname );
-		for(LabelMap::iterator it = r.first; it != r.second; ++it) {
-			LABOBJ *lab = mem_lab + it->second;
-			if (lab->flag >= 0 && lab->eternal) {
-				return it->second;
-			}
-		}
+	//		Retrieves the object name specified by 'global_name' and by 'local_name', first from the local scope and then from the global scope, and returns its ID on success or -1 if not found. 
+	//		'global_name' has to points to the global name, and 'local_name' has to points to the local name; the module name should suffix the string of 'local_name'.
 
-		std::pair<LabelMap::iterator, LabelMap::iterator> r2 = labels.equal_range( loname );
-		for(LabelMap::iterator it = r2.first; it != r2.second; ++it) {
-			LABOBJ *lab = mem_lab + it->second;
-			if (lab->flag >= 0 && !lab->eternal) {
-				return it->second;
-			}
-		}
-	}
+	int i = Search(local_name);
+
+	if (i >= 0 && !mem_lab[i].eternal) return i;
+
+	i = Search(global_name);	
+
+	if (i >= 0 && mem_lab[i].eternal) return i;
+
 	return -1;
+
 }
 
 
