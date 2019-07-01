@@ -37,6 +37,9 @@
 	score = 0
 	gameflag = 0
 *main
+	stick key
+	if key&512 : end
+
 	redraw 0
 	color 0,0,128:boxf
 	color 0,255,255:pos 8,8:mes "SCORE:"+score
@@ -50,7 +53,6 @@
 
 	if gameflag {
 		gosub *gameover
-		stick key
 		if key&256 {
 			if mousey<300 : goto *gstart
 		}

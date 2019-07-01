@@ -175,12 +175,60 @@ static int key_map[KEY_MAX];
 
 struct input_event ev[64];
 
+static void initMouse( void )
+{
+	DIR *dirp;
+	struct dirent *dp;
+	regex_t mouse;
+	char fullPath[1024];
+	static char *dirName = "/dev/input/by-id";
+
+	if(regcomp(&mouse,"event-mouse",0)!=0)
+	{
+	    printf("regcomp for mouse failed\n");
+	    return;
+	}
+
+	if ((dirp = opendir(dirName)) == NULL) {
+	    perror("couldn't open '/dev/input/by-id'");
+	    return;
+	}
+
+	// Find any files that match the regex for keyboard or mouse
+
+	do {
+	    errno = 0;
+	    if ((dp = readdir(dirp)) != NULL) 
+	    {
+		//printf("readdir (%s)\n",dp->d_name);
+		if(regexec (&mouse, dp->d_name, 0, NULL, 0) == 0)
+		{
+		    //printf("match for the mouse = %s\n",dp->d_name);
+		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
+		    mouseFd = open(fullPath,O_RDONLY | O_NONBLOCK);
+		    //printf("%s Fd = %d\n",fullPath,mouseFd);
+		    //printf("Getting exclusive access: ");
+		    ioctl(mouseFd, EVIOCGRAB, 1);
+		    //printf("%s\n", (result == 0) ? "SUCCESS" : "FAILURE");
+		}
+
+	    }
+	} while (dp != NULL);
+
+	closedir(dirp);
+	regfree(&mouse);
+
+	mouse_x = (int)mem_engine.width / 2;
+	mouse_y = (int)mem_engine.height / 2;
+	mouse_btn1 = 0;
+	mouse_btn2 = 0;
+}
+
 static void initKeyboard( void )
 {
 	DIR *dirp;
 	struct dirent *dp;
-	regex_t kbd,mouse;
-
+	regex_t kbd;
 	char fullPath[1024];
 	static char *dirName = "/dev/input/by-id";
 	int i;
@@ -189,13 +237,6 @@ static void initKeyboard( void )
 	{
 	    printf("regcomp for kbd failed\n");
 	    return;
-
-	}
-	if(regcomp(&mouse,"event-mouse",0)!=0)
-	{
-	    printf("regcomp for mouse failed\n");
-	    return;
-
 	}
 
 	if ((dirp = opendir(dirName)) == NULL) {
@@ -216,49 +257,98 @@ static void initKeyboard( void )
 		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
 		    keyboardFd = open(fullPath,O_RDONLY | O_NONBLOCK);
 		    //printf("%s Fd = %d\n",fullPath,keyboardFd);
-
-		}
-		if(regexec (&mouse, dp->d_name, 0, NULL, 0) == 0)
-		{
-		    //printf("match for the kbd = %s\n",dp->d_name);
-		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
-		    mouseFd = open(fullPath,O_RDONLY | O_NONBLOCK);
-		    //printf("%s Fd = %d\n",fullPath,mouseFd);
-		    //printf("Getting exclusive access: ");
-		    ioctl(mouseFd, EVIOCGRAB, 1);
-		    //printf("%s\n", (result == 0) ? "SUCCESS" : "FAILURE");
 		}
 
 	    }
 	} while (dp != NULL);
 
 	closedir(dirp);
-
 	regfree(&kbd);
-	regfree(&mouse);
 
-	mouse_x = (int)mem_engine.width / 2;
-	mouse_y = (int)mem_engine.height / 2;
-	mouse_btn1 = 0;
-	mouse_btn2 = 0;
 	for(i=0;i<KEY_MAX;i++) {
 		key_map[i] = 0;
 	}
 
 }
 
+static void doneMouse( void )
+{
+	if (mouseFd!=-1) {
+	    ioctl(mouseFd, EVIOCGRAB, 0);
+		close(mouseFd);
+		mouseFd=-1;
+	}
+}
+
+static void doneKeyboard( void )
+{
+	if (keyboardFd!=-1) {
+		close(keyboardFd);
+		keyboardFd=-1;
+	}
+}
+
 static void updateKeyboard( void )
 {
     int rd;
+    // Read events from keyboard
+    rd = 0;
+    if (keyboardFd<0) {
+		initKeyboard();
+    }
+    if (keyboardFd>=0) {
+	    rd = read(keyboardFd,ev,sizeof(ev));
+    }
+    if(rd < 0) {
+	  if(errno!=EAGAIN) {
+		//printf("keyboard read failed %d\n",errno);
+		doneKeyboard();
+		keyboardFd=-1;
+	  }
+    }
+    if(rd > 0) {
+		int count,n;
+		struct input_event *evp;
+		count = rd / sizeof(struct input_event);
+		n = 0;
+		while(count--) {
+		    evp = &ev[n++];
+		    if(evp->type == 1) {
+				if (( evp->code >= 0 )&&( evp->code < KEY_MAX )) {
+					key_map[evp->code] = evp->value;
+				}
+				if((evp->code == KEY_ESC) && (evp->value == 1)) {
+				    quit_flag = 1;
+				}
+			}
+		}
+    }
+}
+
+static void updateMouse( void )
+{
+    int rd;
     int sx,sy;
-	if((keyboardFd == -1) || (mouseFd == -1)) return;
 
 	sx = (int)mem_engine.width;
 	sy = (int)mem_engine.height;
 
     // Read events from mouse
 
-    rd = read(mouseFd,ev,sizeof(ev));
+    rd = 0;
+    if (mouseFd<0) {
+		initMouse();
+    }
+    if (mouseFd>=0) {
+	    rd = read(mouseFd,ev,sizeof(ev));
+    }
+    if(rd < 0) {
+	  if(errno!=EAGAIN) {
+		//printf("mouse read failed %d\n",errno);
+		doneMouse();
+		mouseFd=-1;
+	  }
+    }
     if(rd > 0) {
 		int count,n;
 		struct input_event *evp;
@@ -295,40 +385,25 @@ static void updateKeyboard( void )
 			}
 	    }
 	}
-
-    // Read events from keyboard
-
-    rd = read(keyboardFd,ev,sizeof(ev));
-    if(rd > 0) {
-		int count,n;
-		struct input_event *evp;
-		count = rd / sizeof(struct input_event);
-		n = 0;
-		while(count--) {
-		    evp = &ev[n++];
-		    if(evp->type == 1) {
-				if (( evp->code >= 0 )&&( evp->code < KEY_MAX )) {
-					key_map[evp->code] = evp->value;
-				}
-				if((evp->code == KEY_ESC) && (evp->value == 1)) {
-				    quit_flag = 1;
-				}
-			}
-		}
-    }
-
 }
 
-
-static void doneKeyboard( void )
+static void initInput( void )
 {
-	if (keyboardFd!=-1) close(keyboardFd);
-	if (mouseFd!=-1) {
-	    ioctl(mouseFd, EVIOCGRAB, 0);
-		close(mouseFd);
-	}
+	initMouse();
+	initKeyboard();
 }
 
+static void updateInput( void )
+{
+	updateMouse();
+	updateKeyboard();
+}
+
+static void doneInput( void )
+{
+	doneMouse();
+	doneKeyboard();
+}
 
 /*----------------------------------------------------------*/
 
@@ -575,7 +650,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 	int tick;
 	useconds_t usec;
 
-	updateKeyboard();
+	updateInput();
 	hgio_touch( mouse_x, mouse_y, mouse_btn1 );
 
 	//int x, y, btn;
@@ -1240,7 +1315,7 @@ int hsp3dish_init( char *startfile )
 	sy = (int)mem_engine.height;
 	autoscale = 0;
 
-	initKeyboard();
+	initInput();
 	gpio_init();
 	I2C_Init();
 
@@ -1376,7 +1451,7 @@ static void hsp3dish_bye( void )
    eglDestroyContext( p_engine->display, p_engine->context );
    eglTerminate( p_engine->display );
 
-	doneKeyboard();
+	doneInput();
 	I2C_Term();
 	gpio_bye();
 
