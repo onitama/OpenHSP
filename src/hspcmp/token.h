@@ -105,6 +105,7 @@ typedef struct MACDEF {
 #define HEDINFO_UTF8 0x20000		// UTF8ランタイムを使用する(コード識別用)
 #define HEDINFO_HSP64 0x40000		// 64bitランタイムを使用する(コード識別用)
 #define HEDINFO_IORESUME 0x80000	// ファイルI/Oエラーを無視して処理を続行する
+#define HEDINFO_AUTOTIMER 0x100000	// マルチメディアタイマーを強制的に設定にする
 
 enum ppresult_t {
 	PPRESULT_SUCCESS,				// 成功
