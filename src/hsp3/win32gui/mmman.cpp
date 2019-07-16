@@ -218,6 +218,8 @@ int MMMan::Load( char *fname, int num, int opt )
 	char *pt;
 	int flag;
 	MMM *mmm;
+	HSPAPICHAR *hactmp1 = 0;
+	HSPAPICHAR wfext[9];
 
 	flag = MMDATA_MCIVOICE;
 	pt = NULL;
@@ -230,29 +232,33 @@ int MMMan::Load( char *fname, int num, int opt )
 		a = atoi( fname+3 );if ( a<1 ) a=1;
 	}
 
-	getpath(fname,fext,16+2);				// 拡張子を小文字で取り出す
+	getpathW(chartoapichar(fname,&hactmp1),wfext,16+2);				// 拡張子を小文字で取り出す
 
-	if (!strcmp(fext,".avi")) {				// when "AVI"
+	if (!_tcscmp(wfext,TEXT(".avi"))) {				// when "AVI"
 		flag = MMDATA_MCIVIDEO;
 	}
 
-	if (!strcmp(fext,".wmv")) {				// when "WMV"
+	if (!_tcscmp(wfext,TEXT(".wmv"))) {				// when "WMV"
 		flag = MMDATA_MCIVIDEO;
 	}
 
-	if (!strcmp(fext,".mpg")) {				// when "MPG"
+	if (!_tcscmp(wfext,TEXT(".mpg"))) {				// when "MPG"
 		flag = MMDATA_MPEGVIDEO;
 	}
 
-	if (!strcmp(fext,".wav")) {				// when "WAV"
+	if (!_tcscmp(wfext,TEXT(".wav"))) {				// when "WAV"
 		getlen = dpm_exist( fname );
-		if ( getlen==-1 ) return 1;
+		if (getlen == -1) {
+			freehac(&hactmp1);
+			return 1;
+		}
 		if ( getlen < 2000000 ) {			// 2MB以上はMCIから再生
 			pt = (char *)malloc( getlen+16 );
 			dpm_read( fname, pt, getlen, 0 );
 			flag = MMDATA_INTWAVE;
 		}
 	}
+	freehac(&hactmp1);
 
 	mmm = SetBank( num, flag, opt, pt, fname );
 
@@ -292,8 +298,7 @@ int MMMan::Play( int num )
 			if (a==1) prm|=SND_LOOP | SND_ASYNC;
 			if (a==2) prm|=SND_SYNC;
 #ifdef HSPUTF8
-			sndPlaySound( chartoapichar((char*)mmm->mempt,&hactmp1),prm );
-			freehac(&hactmp1);
+			sndPlaySound( (LPCTSTR)mmm->mempt,prm );
 #else
 			sndPlaySound( (LPCSTR)mmm->mempt,prm);
 #endif

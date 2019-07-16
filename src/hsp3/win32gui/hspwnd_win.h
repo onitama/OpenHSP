@@ -23,6 +23,8 @@
 #define HSPOBJ_INPUT_MULTILINE 0x100
 #define HSPOBJ_INPUT_READONLY 0x200
 #define HSPOBJ_INPUT_HSCROLL 0x400
+#define HSPOBJ_INPUT_NOWRAP 0x800
+#define HSPOBJ_INPUT_BACKCOLOR 0x1000
 
 #define HSPOBJ_NONE 0
 #define HSPOBJ_TAB_ENABLE 1
@@ -68,6 +70,13 @@ typedef struct HSPOBJINFO
 	void	(*func_notice)( struct HSPOBJINFO *, int );
 	void	(*func_objprm)( struct HSPOBJINFO *, int, void * );
 	void	(*func_delete)( struct HSPOBJINFO * );
+
+	//		Extra Object Info (3.6)
+	//
+	HBRUSH	br_back;
+	COLORREF color_back;
+	COLORREF color_text;
+	int		exinfo1,exinfo2;
 
 } HSPOBJINFO;
 
@@ -116,6 +125,7 @@ public:
 	void Sysfont( int p1 );
 	void Setcolor( int a1, int a2, int a3 );
 	void Setcolor( COLORREF rgbcolor );
+	void Setcolor2(  COLORREF rgbcolor );
 	void SetHSVColor( int hval, int sval, int vval );
 	void SetSystemcolor( int id );
 	void SetPalette( int palno, int rv, int gv, int bv );
@@ -144,6 +154,7 @@ public:
 	HSPOBJINFO *AddHSPVarEventObject( int id, HWND handle, int mode, PVal *pval, APTR aptr, int type, void *ptr );
 	HSPOBJINFO *GetHSPObject( int id );
 	HSPOBJINFO *GetHSPObjectSafe( int id );
+	HSPOBJINFO *TrackHSPObject( HWND hwnd );
 
 	void DeleteHSPObject( int id );
 	void SetHSPObjectFont( int id );
@@ -156,6 +167,7 @@ public:
 	int AddHSPObjectMultiBox( PVal *pval, APTR aptr, int psize, char *defval, int mode );
 	void SetButtonImage( int id, int bufid, int x1, int y1, int x2, int y2, int x3, int y3 );
 	void DrawHSPCustomButton( HSPOBJINFO *obj, HDC drawhdc, int flag );
+	void SetHSPObjectColor( HSPOBJINFO *obj );
 	void SendHSPObjectDraw( int wparam, LPDRAWITEMSTRUCT lparam );
 
 	void EnableObject( int id, int sw );
@@ -240,6 +252,9 @@ public:
 	short	divx, divy;					// Divide value for CEL
 	short	divsx, divsy;				// CEL size
 	short	celofsx, celofsy;			// CEL center offset
+
+	COLORREF objcolor;					// object color code
+
 private:
 	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
 	void CnvRGB16( PTRIVERTEX target, DWORD src );

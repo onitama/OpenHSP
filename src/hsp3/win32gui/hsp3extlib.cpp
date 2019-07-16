@@ -193,16 +193,7 @@ static int BindFUNC( STRUCTDAT *st, char *name )
 	}
 	hd = (HINSTANCE)(lib->hlib);
 	if ( hd == NULL ) return 1;
-#ifdef HSPUTF8
-	HSPAPICHAR *hactmp1 = 0;
-	char tmp1[512];
-	chartoapichar(n,&hactmp1);
-	cnvsjis(tmp1,(char*)hactmp1,512);
-	st->proc = (void *)GetProcAddress( hd, tmp1 );
-	freehac(&hactmp1);
-#else
 	st->proc = (void *)GetProcAddress( hd, n );
-#endif
 	if ( st->proc == NULL ) return 1;
 	st->subid--;
 	return 0;

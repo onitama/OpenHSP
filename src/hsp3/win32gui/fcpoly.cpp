@@ -270,7 +270,7 @@ void DrawPolygonF4( POLY4 *lpPolyData )
 	short color1;
 	unsigned char color2;
 
-	DWORD dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
+	DWORD_PTR dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
 //	int x0,x1,x2,y0,y1,y2;
 
 	short alpha,alphaop,ialpha;
@@ -303,8 +303,8 @@ void DrawPolygonF4( POLY4 *lpPolyData )
 	// 転送先バッファとスキャンデータのベースアドレスセット
 	// 転送先バッファ(DIB)は上下が反転しているのに注意((nDestHeight-1-nStartY)の所)
 
-	dwDest = (DWORD)lpDest + (DWORD)((nDestHeight-1-nStartY)*nDestWByte);
-	dwScanData = (DWORD)scanData + (DWORD)(nStartY*sizeof(SCANDATA));
+	dwDest = (DWORD_PTR)lpDest + (DWORD_PTR)((nDestHeight-1-nStartY)*nDestWByte);
+	dwScanData = (DWORD_PTR)scanData + (DWORD_PTR)(nStartY*sizeof(SCANDATA));
 	
 	//	透明設定を判定
 	//
@@ -429,14 +429,14 @@ void DrawPolygonTex( POLY4 *lpPolyData )
 	char *p;
 	char *srcp;
 	char d1,d2,d3;
-	DWORD tx,ty,tdx,tdy; 
+	DWORD_PTR tx,ty,tdx,tdy; 
 
 	short alpha,alphaop,ialpha,a1,a2,a3;
 	unsigned char *up;
 	unsigned char *usrcp;
 
-	DWORD dwTexSize; // テクスチャのサイズ
-	DWORD dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
+	DWORD_PTR dwTexSize; // テクスチャのサイズ
+	DWORD_PTR dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
 
 	//		Texture select
 	//if ( lpPolyData->tex != curtex ) ChangeTex( lpPolyData->tex );
@@ -452,7 +452,7 @@ void DrawPolygonTex( POLY4 *lpPolyData )
 	if ( (x0 - x1) * (y1 - y2) - (x1 - x2) * (y0 - y1) >= 0 ) return;
 */
 	// エッジの座標のスキャン
-	dwTexSize = (DWORD)(nTexHeight*nTexWByte);
+	dwTexSize = (DWORD_PTR)(nTexHeight*nTexWByte);
 	ScanLine( lpPolyData, nDestWidth, nDestHeight, &nStartY, &nEndY );
 	
 	// 範囲外なら描画しない
@@ -464,8 +464,8 @@ void DrawPolygonTex( POLY4 *lpPolyData )
 	// 転送先バッファとスキャンデータのベースアドレスセット
 	// 転送先バッファ(DIB)は上下が反転しているのに注意((nDestHeight-1-nStartY)の所)
 	p = (char *)lpDest + ((nDestHeight-1-nStartY)*nDestWByte);
-	dwDest = (DWORD)p;
-	dwScanData = (DWORD)scanData + (DWORD)(nStartY*sizeof(SCANDATA));
+	dwDest = (DWORD_PTR)p;
+	dwScanData = (DWORD_PTR)scanData + (DWORD_PTR)(nStartY*sizeof(SCANDATA));
 
 	//	透明設定を判定
 	//
@@ -502,7 +502,7 @@ void DrawPolygonTex( POLY4 *lpPolyData )
 	// x と y の変位を計算
 	if(maxX != minX){ 
 	
-	i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+	i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 	tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 	tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 
@@ -577,7 +577,7 @@ p4trans:
 		// x と y の変位を計算
 		if(maxX != minX){ 
 	
-			i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+			i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 			tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 			tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 
@@ -646,7 +646,7 @@ p4_blend:
 		tx <<= 16; 
 		ty <<= 16;
 		if(maxX != minX){ 
-			i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+			i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 			tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 			tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 		}
@@ -694,7 +694,7 @@ p4_tblend:
 		tx <<= 16; 
 		ty <<= 16;
 		if(maxX != minX){ 
-			i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+			i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 			tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 			tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 		}
@@ -745,7 +745,7 @@ p4_modulate:
 		tx <<= 16; 
 		ty <<= 16;
 		if(maxX != minX){ 
-			i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+			i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 			tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 			tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 		}
@@ -795,7 +795,7 @@ p4_substract:
 		tx <<= 16; 
 		ty <<= 16;
 		if(maxX != minX){ 
-			i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+			i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 			tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 			tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 		}
@@ -847,7 +847,7 @@ void DrawPolygonF4P( POLY4 *lpPolyData )
 //	char *p;
 	unsigned char color1;
 
-	DWORD dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
+	DWORD_PTR dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
 //	int x0,x1,x2,y0,y1,y2;
 
 //	short alpha,alphaop,ialpha;
@@ -869,8 +869,8 @@ void DrawPolygonF4P( POLY4 *lpPolyData )
 	// 転送先バッファとスキャンデータのベースアドレスセット
 	// 転送先バッファ(DIB)は上下が反転しているのに注意((nDestHeight-1-nStartY)の所)
 
-	dwDest = (DWORD)lpDest + (DWORD)((nDestHeight-1-nStartY)*nDestWidth2);
-	dwScanData = (DWORD)scanData + (DWORD)(nStartY*sizeof(SCANDATA));
+	dwDest = (DWORD_PTR)lpDest + (DWORD_PTR)((nDestHeight-1-nStartY)*nDestWidth2);
+	dwScanData = (DWORD_PTR)scanData + (DWORD_PTR)(nStartY*sizeof(SCANDATA));
 
 	// nStartY から nEndY まで上から順に描画
 	for(y = nStartY; y < nEndY; y++){
@@ -906,13 +906,13 @@ void DrawPolygonTexP( POLY4 *lpPolyData )
 	int maxX,minX;  // エッジ座標の最大最小値
 	char *p;
 	char d1;
-	DWORD tx,ty,tdx,tdy; 
+	DWORD_PTR tx,ty,tdx,tdy; 
 
-	DWORD dwTexSize; // テクスチャのサイズ
-	DWORD dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
+	DWORD_PTR dwTexSize; // テクスチャのサイズ
+	DWORD_PTR dwScanData,dwDest; // エッジの座標データと転送先のベースアドレス
 
 	// エッジの座標のスキャン
-	dwTexSize = (DWORD)(nTexHeight*nTexWidth);
+	dwTexSize = (DWORD_PTR)(nTexHeight*nTexWidth);
 	ScanLine( lpPolyData, nDestWidth, nDestHeight, &nStartY, &nEndY );
 	
 	// 範囲外なら描画しない
@@ -924,8 +924,8 @@ void DrawPolygonTexP( POLY4 *lpPolyData )
 	// 転送先バッファとスキャンデータのベースアドレスセット
 	// 転送先バッファ(DIB)は上下が反転しているのに注意((nDestHeight-1-nStartY)の所)
 	p = (char *)lpDest + ((nDestHeight-1-nStartY)*nDestWidth2);
-	dwDest = (DWORD)p;
-	dwScanData = (DWORD)scanData + (DWORD)(nStartY*sizeof(SCANDATA));
+	dwDest = (DWORD_PTR)p;
+	dwScanData = (DWORD_PTR)scanData + (DWORD_PTR)(nStartY*sizeof(SCANDATA));
 
 	//	透明設定を判定
 	//
@@ -955,7 +955,7 @@ void DrawPolygonTexP( POLY4 *lpPolyData )
 	// x と y の変位を計算
 	if(maxX != minX){ 
 	
-	i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+	i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 	tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 	tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 
@@ -1024,7 +1024,7 @@ p4transp:
 		// x と y の変位を計算
 		if(maxX != minX){ 
 	
-			i2 = 0x10000 / (maxX-minX); // DWORD -> WORD 変換
+			i2 = 0x10000 / (maxX-minX); // DWORD_PTR -> WORD 変換
 			tdx = ((*(LPLONG)(dwScanData+16)-*(LPLONG)(dwScanData+8)))*i2;
 			tdy = ((*(LPLONG)(dwScanData+20)-*(LPLONG)(dwScanData+12)))*i2;
 

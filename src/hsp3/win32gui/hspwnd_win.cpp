@@ -248,6 +248,24 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		}
 		break;
 
+	case WM_CTLCOLOREDIT:
+		bm = TrackBmscr( hwnd );
+		if ( bm != NULL ) {
+			HDC hDC = (HDC)wParam;
+			HWND hCtrl = (HWND)lParam;
+			HSPOBJINFO *hspobj = bm->TrackHSPObject(hCtrl);
+			if ( hspobj != NULL ) {
+				HBRUSH brush_bg = hspobj->br_back;
+				if ( brush_bg != NULL ) {
+					SetBkMode(hDC, OPAQUE);
+					SetTextColor(hDC, hspobj->color_text);
+					SetBkColor(hDC,hspobj->color_back);
+					return (LRESULT)brush_bg;
+				}
+			}
+		}
+		break;
+
 	}
 
 	return DefWindowProc (hwnd, uMessage, wParam, lParam) ;
@@ -582,6 +600,8 @@ int HspWnd::Picload( int id, char *fname, int mode )
     LPSTREAM pstm = NULL;							// IStreamを取得する
 	char fext[8];
 	int stbmode;
+	HSPAPICHAR *hactmp1 = 0;
+	HSPAPICHAR wfext[8];
 
 	bm = GetBmscr( id );
 	if ( bm == NULL ) return 1;
@@ -601,11 +621,12 @@ int HspWnd::Picload( int id, char *fname, int mode )
 
 #ifdef USE_STBIMAGE
 	stbmode = 0;
-	getpath(fname,fext,16+2);				// 拡張子を小文字で取り出す
+	getpathW(chartoapichar(fname,&hactmp1),wfext,16+2);				// 拡張子を小文字で取り出す
 
-	if (!strcmp(fext,".png")) stbmode++;	// ".png"の時
-	if (!strcmp(fext,".psd")) stbmode++;	// ".psd"の時
-	if (!strcmp(fext,".tga")) stbmode++;	// ".tga"の時
+	if (!_tcscmp(wfext,TEXT(".png"))) stbmode++;	// ".png"の時
+	if (!_tcscmp(wfext,TEXT(".psd"))) stbmode++;	// ".psd"の時
+	if (!_tcscmp(wfext,TEXT(".tga"))) stbmode++;	// ".tga"の時
+	freehac(&hactmp1);
 
 	if ( stbmode ) {						// stb_imageを使用して読み込む
 		int components;
@@ -843,7 +864,8 @@ void Bmscr::Cls( int mode )
 	//		text setting initalize
 	//
 	cx=0;cy=0;
-	Setcolor(0,0,0);
+	Setcolor((COLORREF)0);
+	Setcolor2((COLORREF)0);
 
 	//		palette initalize
 	//
@@ -1115,7 +1137,20 @@ void Bmscr::Setcolor( int a1, int a2, int a3 )
 
 void Bmscr::Setcolor( COLORREF rgbcolor )
 {
-	Setcolor( GetRValue(rgbcolor), GetGValue(rgbcolor), GetBValue(rgbcolor) );
+	color = rgbcolor;
+	SetBkMode( hdc,TRANSPARENT );
+	SetTextColor( hdc, color );
+	if ( hbr != NULL ) DeleteObject( hbr );
+	hbr = CreateSolidBrush( color );
+	if ( hpn != NULL ) DeleteObject( hpn );
+	hpn = CreatePen( PS_SOLID,0,color );
+	//Setcolor( GetRValue(rgbcolor), GetGValue(rgbcolor), GetBValue(rgbcolor) );
+}
+
+
+void Bmscr::Setcolor2( COLORREF rgbcolor )
+{
+	objcolor = rgbcolor;
 }
 
 
@@ -1239,6 +1274,7 @@ void Bmscr::Print( char *mes )
 		Send( cx, cy, size->cx, size->cy );
 	} else {
 		GetTextExtentPoint32( hdc, TEXT(" "), 1, size );
+		size->cx = 0;
 	}
 	Posinc( size->cy );
 }

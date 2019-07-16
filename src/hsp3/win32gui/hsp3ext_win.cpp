@@ -641,9 +641,9 @@ static int cmdfunc_ctrlcmd( int cmd )
         ps = code_gets();
         chartoapichar(ps, &hactmp1);
         sizew = wcslen(hactmp1) + 1;
-        if (size <= sizew*(int)sizeof(HSPAPICHAR)){
+        if (size < sizew*(int)sizeof(HSPAPICHAR)){
             memcpy(ptr, hactmp1, size);
-			((HSPAPICHAR*)ptr)[size - 1] = TEXT('\0');
+			*(HSPAPICHAR*)(ptr + (size - 1) / sizeof(HSPAPICHAR)) = TEXT('\0');
             hspctx->stat = -sizew*sizeof(HSPAPICHAR);
 		}
         else{
@@ -814,7 +814,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 
 		vptr = code_getsptr( &fl );
 		if ( fl == TYPE_STRING ) {
-			p2 = (WPARAM)chartoapichar(vptr,&hactmp2);
+			p2 = (WPARAM)chartoapichar(vptr,&hactmp1);
 		} else {
 			p2 = *(WPARAM *)vptr;
 		}

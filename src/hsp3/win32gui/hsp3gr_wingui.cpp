@@ -53,6 +53,37 @@ extern int resY0, resY1;				// "fcpoly.h"のパラメーター
 #define GSQUARE_MODE_COLORFILL 1
 #define GSQUARE_MODE_GRADFILL 2
 
+
+#ifdef UNICODE
+UINT WinExec(LPCTSTR lpCmdLine, UINT uCmdShow)
+{
+	STARTUPINFO sui = {
+		sizeof(STARTUPINFO),
+		NULL,
+		NULL,
+		NULL,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		STARTF_USESHOWWINDOW,
+		uCmdShow,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	};
+	PROCESS_INFORMATION pi = {
+		NULL, NULL, 0, 0
+	};
+	CreateProcess(NULL, (LPTSTR)lpCmdLine, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
+	return 32;
+}
+#endif
 /*----------------------------------------------------------*/
 //					HSP system support
 /*----------------------------------------------------------*/
@@ -62,7 +93,6 @@ void ExecFile( char *stmp, char *ps, int mode )
 	int i,j;
 	HSPAPICHAR *hactmp1 = 0;
 	HSPAPICHAR *hactmp2 = 0;
-	char *p;
 	j=SW_SHOWDEFAULT;if (mode&2) j=SW_SHOWMINIMIZED;
 
 	if ( *ps != 0 ) {
@@ -93,11 +123,8 @@ void ExecFile( char *stmp, char *ps, int mode )
 		freehac(&hactmp1);
 	}
 	else {
-		apichartohspchar(chartoapichar(stmp,&hactmp1),&p);
-		freehac(&hactmp1);
-		i=WinExec( p,j );
-		freehc(&p);
-		
+		i = WinExec(chartoapichar(stmp, &hactmp1), j);
+		freehac(&hactmp1);		
 	}
 	if (i<32) throw HSPERR_EXTERNAL_EXECUTE;
 }
@@ -147,6 +174,7 @@ static char *getdir( int id )
 	TCHAR fname[_MAX_PATH+1];
 	char *resp8;
 	p = ctx->stmp;
+	HSPCHAR *hctmp1 = 0;
 
 	switch( id ) {
 	case 0:				//    カレント(現在の)ディレクトリ
@@ -170,9 +198,10 @@ static char *getdir( int id )
 	case 5:				//    HSPTV素材があるディレクトリ
 #if defined(HSPDEBUG)||defined(HSP3IMP)
 		GetModuleFileName( NULL,fname,_MAX_PATH );
-		apichartohspchar(fname,&resp8);
-		getpath( resp8, p, 32 );
-		freehc(&resp8);
+		getpathW( fname, pw, 32 );
+		apichartohspchar(pw, &hctmp1);
+		strcpy(p, hctmp1);
+		freehc(&hctmp1);
 		CutLastChr( p, '\\' );
 		strcat( p, "\\hsptv\\" );
 		return p;
@@ -854,7 +883,7 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( 0 );
 		p2 = code_getdi( 0 );
 		p3 = code_getdi( 0 );
-		bmscr->Setcolor(p1,p2,p3);
+		bmscr->Setcolor( RGB(p1,p2,p3) );
 		break;
 	case 0x19:								// palcolor
 		p1 = code_getdi( 0 );
@@ -1055,6 +1084,7 @@ static int cmdfunc_extcmd( int cmd )
 		i = HSPOBJ_INPUT_MULTILINE;
 		if ((p3&1)==0) i |= HSPOBJ_INPUT_READONLY;
 		if (p3&4) i |= HSPOBJ_INPUT_HSCROLL;
+		if (p3&8) i |= HSPOBJ_INPUT_NOWRAP;
 		if ( p4 < 0 ) p4 = size-1;
 		ctx->stat = bmscr->AddHSPObjectInput( pval, aptr, p1, p2, ptr, p4, (pval->flag)|i );
 		break;
@@ -1462,10 +1492,26 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x48:								// devinfoi
 	case 0x49:								// devprm
 	case 0x4a:								// devcontrol
+	case 0x4b:								// httpload
+	case 0x4c:								// httpinfo
+	case 0x5d:								// gmulcolor
+	case 0x5e:								// setcls
+	case 0x5f:								// celputm
 		// HSP3Dish用の機能
 		throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 
+	case 0x4d:								// objcolor
+		p1 = code_getdi( 255 );
+		p2 = code_getdi( 255 );
+		p3 = code_getdi( 255 );
+		bmscr->Setcolor2( RGB(p1,p2,p3) );
+		break;
+	case 0x4e:								// rgbcolor
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		bmscr->Setcolor((p1 >> 16) & 0xff, (p1>>8) & 0xff, p1 & 0xff );
+		break;
 
 
 	default:

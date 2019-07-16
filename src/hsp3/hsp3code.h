@@ -2,7 +2,7 @@
 //
 //	hsp3code.cpp header
 //
-#ifndef HSP3OCDE_H
+#ifndef HSP3CODE_H
 #define HSP3CODE_H
 
 #include "hsp3debug.h"

@@ -34,6 +34,10 @@ HSPAPICHAR *chartoapichar( const char *orig,HSPAPICHAR **pphac)
 	
 	int reslen;
 	wchar_t *resw;
+	if (orig == 0) {
+		*pphac = 0;
+		return 0;
+	}
 	reslen = MultiByteToWideChar(CP_UTF8,0,orig,-1,(LPWSTR)NULL,0);
 	resw = (wchar_t*)calloc(reslen+1,sizeof(wchar_t));
 	MultiByteToWideChar(CP_UTF8,0,orig,-1,resw,reslen);
@@ -51,6 +55,10 @@ HSPCHAR *apichartohspchar( const HSPAPICHAR *orig,HSPCHAR **pphc)
 {
 	int plen;
 	HSPCHAR *p = 0;
+	if (orig == 0) {
+		*pphc = 0;
+		return 0;
+	}
 	plen=WideCharToMultiByte(CP_UTF8,NULL,orig,-1,NULL,0,NULL,NULL);
 	p = (HSPCHAR *)calloc(plen+1,sizeof(HSPCHAR*));
 	WideCharToMultiByte(CP_UTF8,NULL,orig,-1,p,plen,NULL,NULL);
@@ -69,6 +77,10 @@ HSPAPICHAR *ansichartoapichar(const char *orig, HSPAPICHAR **pphac)
 
 	int reslen;
 	wchar_t *resw;
+	if (orig == 0) {
+		*pphac = 0;
+		return 0;
+	}
 	reslen = MultiByteToWideChar(CP_ACP, 0, orig, -1, (LPWSTR)NULL, 0);
 	resw = (wchar_t*)calloc(reslen + 1, sizeof(wchar_t));
 	MultiByteToWideChar(CP_ACP, 0, orig, -1, resw, reslen);
@@ -80,6 +92,10 @@ char *apichartoansichar(const HSPAPICHAR *orig, char **ppac)
 {
 	int plen;
 	HSPCHAR *p = 0;
+	if (orig == 0) {
+		*ppac = 0;
+		return 0;
+	}
 	plen = WideCharToMultiByte(CP_ACP, NULL, orig, -1, NULL, 0, NULL, NULL);
 	p = (char *)calloc(plen + 1, sizeof(char*));
 	WideCharToMultiByte(CP_ACP,NULL, orig, -1, p, plen, NULL, NULL);
@@ -513,11 +529,11 @@ int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
 		if (a1==0) break;
 		splc++;
 		if (a1>=128) {					// 多バイト文字チェック
-			if (a1>=192) utf8cnt++;
-			if (a1>=224) utf8cnt++;
-			if (a1>=240) utf8cnt++;
-			if (a1>=248) utf8cnt++;
-			if (a1>=252) utf8cnt++;
+			if ((a1 >= 192) && (srcstr[splc + utf8cnt] != 0)) utf8cnt++;
+			if ((a1 >= 224) && (srcstr[splc + utf8cnt] != 0)) utf8cnt++;
+			if ((a1 >= 240) && (srcstr[splc + utf8cnt] != 0)) utf8cnt++;
+			if ((a1 >= 248) && (srcstr[splc + utf8cnt] != 0)) utf8cnt++;
+			if ((a1 >= 252) && (srcstr[splc + utf8cnt] != 0)) utf8cnt++;
 		}
 
 		if (a1==splitchr) break;
@@ -539,9 +555,11 @@ int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
 				utf8cnt--;
 			}
 		}
-		if ( a>=len ) break;
+		if ( a>=len-5 ) break;
 	}
-	dststr[a]=0;
+	for (int i = a; i < a+6; i++){
+		dststr[i] = 0;
+	}
 	return (int)a1;
 }
 

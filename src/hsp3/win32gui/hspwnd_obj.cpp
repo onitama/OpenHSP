@@ -42,6 +42,7 @@ static WNDPROC DefButtonProc;
 
 extern HspWnd *curwnd;
 
+//		1行エディットボックス用
 LRESULT CALLBACK MyEditProc( HWND hwnd , UINT msg , WPARAM wp , LPARAM lp ) {
 	if ( msg==WM_CHAR ) {
 		if (( wp==13 )||( wp==9 )) {
@@ -49,6 +50,32 @@ LRESULT CALLBACK MyEditProc( HWND hwnd , UINT msg , WPARAM wp , LPARAM lp ) {
 		}
 	}
 	return CallWindowProc( DefEditProc , hwnd , msg , wp , lp);
+}
+
+//		複数行エディットボックス用
+LRESULT CALLBACK MyEditProc2( HWND hwnd , UINT msg , WPARAM wp , LPARAM lp ) {
+
+	switch(msg) {
+	case WM_CHAR:
+		if (wp==0x01) {
+			SendMessage (hwnd, EM_SETSEL, 0, -1) ;
+			return 0;
+		}
+	case WM_KEYUP:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
+		 //PutLineNumber();
+		 break;
+	default:
+		 break;
+	}
+	return CallWindowProc( DefEditProc , hwnd , msg , wp , lp);
+}
+
+//		ワードラップ抑制用
+int CALLBACK EditWordBreakProc(LPTSTR lpch, int ichCurrent, int cch, int code)
+{
+    return (WB_ISDELIMITER == code) ? 0 : ichCurrent;
 }
 
 static void UpdateCustomButton( HWND hwnd, int flag )
@@ -203,8 +230,8 @@ static void Object_StrInput( HSPOBJINFO *info, int wparam )
 	size = (int)SendMessage( info->hCld, WM_GETTEXTLENGTH,0,0L );
 	cid = GetDlgCtrlID( info->hCld );
 	
-	if ( size < 0x8000 ) {
-		bigbuf = minp;
+	if (size < 0x8000) {
+			bigbuf = minp;
 		val = GetDlgItemText( hwnd, cid, minp, 0x7fff );
 	} else {
 		bigbuf = (HSPAPICHAR*)sbAlloc( size+1 );
@@ -215,6 +242,7 @@ static void Object_StrInput( HSPOBJINFO *info, int wparam )
 		bmscr_obj_ival = 0;
 		info->varset.ptr = (void *)&bmscr_obj_ival;
 	} else {
+		bigbuf[size] = 0;
 		apichartohspchar(bigbuf,&hctmp1);
 		info->varset.ptr = hctmp1;
 	}
@@ -222,6 +250,26 @@ static void Object_StrInput( HSPOBJINFO *info, int wparam )
 
 	if ( size >= 0x8000 ) sbFree( bigbuf );
 	freehc(&hctmp1);
+}
+
+static void Object_MesboxInput( HSPOBJINFO *info, int wparam )
+{
+	HWND hwnd;
+	BMSCR *bm;
+	int notify;
+	int ln,ln_s,ln_e;
+
+	bm = (BMSCR *)info->bm;
+	hwnd = bm->hwnd;
+	notify = wparam>>16;
+	if ( notify != EN_UPDATE ) return;
+
+	SendMessage ( hwnd, EM_GETSEL, (WPARAM)&ln_s, (LPARAM)&ln_e );
+	ln=SendMessage ( hwnd, EM_LINEFROMCHAR, (WPARAM)ln_s, 0 );
+	info->exinfo1++;// = ln+1;
+	info->exinfo2 = ln_s;
+
+	Object_StrInput(info,wparam);
 }
 
 static void Object_ComboBox( HSPOBJINFO *info, int wparam )
@@ -461,6 +509,22 @@ int Bmscr::NewHSPObject( void )
 }
 
 
+HSPOBJINFO *Bmscr::TrackHSPObject( HWND hwnd )
+{
+	//		オブジェクトのハンドルから本体を探す
+	//
+	int i;
+	if ( mem_obj != NULL ) {
+		HSPOBJINFO *p = mem_obj;
+		for( i=0;i<objmax;i++ ) {
+			if ( p->hCld == hwnd ) return p;
+			p++;
+		}
+	}
+	return NULL;
+}
+
+
 HSPOBJINFO *Bmscr::AddHSPObject( int id, HWND handle, int mode )
 {
 	HSPOBJINFO *obj;
@@ -475,7 +539,21 @@ HSPOBJINFO *Bmscr::AddHSPObject( int id, HWND handle, int mode )
 	obj->owid = 0;
 	obj->owsize = 0;
 	SetHSPObjectFont( id );
+	obj->color_back = RGB(255,255,255);
+	obj->color_text = RGB(0,0,0);
+	obj->br_back = NULL;
+	obj->exinfo1 = 0;
+	obj->exinfo2 = 0;
+
 	return obj;
+}
+
+
+void Bmscr::SetHSPObjectColor( HSPOBJINFO *obj )
+{
+	obj->color_back = this->color;
+	obj->color_text = this->objcolor;
+	obj->br_back = CreateSolidBrush( this->color );
 }
 
 
@@ -566,6 +644,7 @@ void Bmscr::DeleteHSPObject( int id )
 		if ( obj->func_delete != NULL ) obj->func_delete( obj );
 	}
 	obj->owmode = HSPOBJ_NONE;
+	obj->hCld = NULL;
 }
 
 
@@ -595,7 +674,7 @@ void Bmscr::SetHSPObjectFont( int id )
 	if ( obj->owmode == HSPOBJ_NONE ) return;
 	if (( obj->owmode & HSPOBJ_OPTION_SETFONT ) == 0 ) return;
 
-	a = objmode;
+	a = objmode & 3;
 	if (a) {
 		hw = obj->hCld;
 		if ( hw == NULL ) return;
@@ -795,8 +874,8 @@ int Bmscr::AddHSPObjectInput( PVal *pval, APTR aptr, int sizex, int sizey, char 
 	if ( mode & HSPOBJ_INPUT_HSCROLL ) ws|=WS_HSCROLL;
 	if ( mode & HSPOBJ_INPUT_MULTILINE ) {
 		ws|=ES_LEFT|ES_MULTILINE|ES_WANTRETURN|WS_VSCROLL|ES_AUTOVSCROLL;
-		//tabstop = HSPOBJ_TAB_DISABLE;
-		tabstop = HSPOBJ_TAB_SKIP;
+		tabstop = HSPOBJ_TAB_DISABLE;
+		//tabstop |= HSPOBJ_TAB_SKIP;
 		max = 0;
 	}
 	else {
@@ -821,12 +900,23 @@ int Bmscr::AddHSPObjectInput( PVal *pval, APTR aptr, int sizex, int sizey, char 
 	if ( subcl ) {
 		DefEditProc = (WNDPROC)GetWindowLongPtr( hwedit , GWLP_WNDPROC );
 		SetWindowLongPtr(hwedit, GWLP_WNDPROC, (LONG_PTR)MyEditProc);
+	} else {
+		DefEditProc = (WNDPROC)GetWindowLongPtr( hwedit , GWLP_WNDPROC );
+		SetWindowLongPtr(hwedit, GWLP_WNDPROC, (LONG_PTR)MyEditProc2);
+		if ( mode & HSPOBJ_INPUT_NOWRAP ) SendMessage(hwedit, EM_SETWORDBREAKPROC, 0, (LPARAM)EditWordBreakProc);
 	}
 
 	obj = AddHSPVarEventObject( id, hwedit, tabstop|HSPOBJ_OPTION_SETFONT, pval, aptr, type, (void *)&bmscr_obj_ival );
+	if ( objmode & 4 ) {
+		SetHSPObjectColor(obj);
+	}
 	switch( type ) {
 	case HSPOBJ_INPUT_STR:
-		obj->func_notice = Object_StrInput;
+		if ( subcl ) {
+			obj->func_notice = Object_StrInput;
+		}else {
+			obj->func_notice = Object_MesboxInput;
+		}
 		break;
 	case HSPOBJ_INPUT_DOUBLE:
 		obj->func_notice = Object_DoubleInput;
@@ -887,6 +977,9 @@ int Bmscr::AddHSPObjectMultiBox( PVal *pval, APTR aptr, int psize, char *defval,
 
 	obj = AddHSPVarEventObject( id, hw, HSPOBJ_TAB_ENABLE|HSPOBJ_OPTION_SETFONT, pval, aptr, TYPE_INUM, (void *)&bmscr_obj_ival );
 	obj->owid = mode;
+	if ( objmode & 4 ) {
+		SetHSPObjectColor(obj);
+	}
 
 	if ( mode ) {
 		obj->func_notice = Object_ComboBox;
