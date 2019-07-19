@@ -1,38 +1,51 @@
-material duck
+material textured
 {
+    u_worldViewProjectionMatrix = WORLD_VIEW_PROJECTION_MATRIX
+    
+    sampler u_diffuseTexture
+    {
+        mipmap = true
+        wrapS = CLAMP
+        wrapT = CLAMP
+        minFilter = LINEAR_MIPMAP_LINEAR
+        magFilter = LINEAR
+    }
+
+    renderState
+    {
+        cullFace = true
+        depthTest = true
+    }
+    
     technique
     {
-        pass 0
+        pass 
         {
-            // shaders
             vertexShader = res/shaders/textured.vert
             fragmentShader = res/shaders/textured.frag
-            defines = SPECULAR;DIRECTIONAL_LIGHT_COUNT 1
-            
-            // uniforms
-            u_worldViewProjectionMatrix = WORLD_VIEW_PROJECTION_MATRIX
-            u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
-            u_cameraPosition = CAMERA_WORLD_POSITION
-            u_ambientColor = SCENE_AMBIENT_COLOR
-            u_specularExponent = 50
-            
-            // samplers
-            sampler u_diffuseTexture
-            {
-                path = res/duck-diffuse.png
-                mipmap = true
-                wrapS = CLAMP
-                wrapT = CLAMP
-                minFilter = NEAREST_MIPMAP_LINEAR
-                magFilter = LINEAR
-            }
-
-            // render state
-            renderState
-            {
-                cullFace = true
-                depthTest = true
-            }
         }
     }
 }
+
+material blinn1 : textured
+{
+    u_cameraPosition = CAMERA_WORLD_POSITION
+    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+    u_specularExponent = 8.31179
+    
+    sampler u_diffuseTexture
+    {
+        path = res/duck.png
+        wrapS = REPEAT
+        wrapT = REPEAT
+    }
+
+    technique
+    {
+        pass 
+        {
+            defines = SPECULAR;DIRECTIONAL_LIGHT_COUNT 1
+        }
+    }
+}
+

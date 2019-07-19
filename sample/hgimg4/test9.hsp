@@ -10,7 +10,7 @@ title "HGIMG4 Test"
 	setcolor GPOBJ_LIGHT, 1,1,1		; ライトカラーを設定
 	setdir GPOBJ_LIGHT, 0.5,0.5,0.5		; アンビエントカラーを設定
 
-	gpload id_model,"res/duck.gpb"		; モデル読み込み
+	gpload id_model,"res/duck"		; モデル読み込み
 	setang id_mode, 0, 3.141592		; モデルの回転を設定
 
 	gpfloor id_floor, 8,8, $00ffff		; 床ノードを追加

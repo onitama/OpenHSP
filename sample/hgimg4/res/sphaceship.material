@@ -1,0 +1,66 @@
+material colored
+{
+    u_worldViewProjectionMatrix = WORLD_VIEW_PROJECTION_MATRIX
+    
+    renderState
+    {
+        cullFace = true
+        depthTest = true
+    }
+    
+    technique
+    {
+        pass 
+        {
+            vertexShader = res/shaders/colored.vert
+            fragmentShader = res/shaders/colored.frag
+        }
+    }
+}
+
+material sBlue : colored
+{
+    u_ambientColor = 0.16536, 0.16536, 0.16536
+    u_diffuseColor = 0.35073, 0.698108, 0.866, 1
+    u_specularExponent = 6.31179
+    
+    technique
+    {
+        pass 
+        {
+            defines = SPECULAR;DIRECTIONAL_LIGHT_COUNT 1
+        }
+    }
+}
+
+material sMetal : colored
+{
+    u_diffuseColor = 0.6693, 0.6693, 0.6693, 1
+    u_specularExponent = 37.6868
+    
+    technique
+    {
+        pass 
+        {
+            defines = SPECULAR;DIRECTIONAL_LIGHT_COUNT 1
+        }
+    }
+}
+
+material sWhite : colored
+{
+    u_ambientColor = 0.3622, 0.3622, 0.3622
+    u_cameraPosition = CAMERA_WORLD_POSITION
+    u_diffuseColor = 1, 1, 1, 1
+    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+    u_specularExponent = 6.31179
+    
+    technique
+    {
+        pass 
+        {
+            defines = SPECULAR;DIRECTIONAL_LIGHT_COUNT 1
+        }
+    }
+}
+
