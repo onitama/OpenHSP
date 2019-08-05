@@ -974,6 +974,7 @@ int MCP3008_FullDuplex(int spich, int adcch){
   const uint8_t CHANNEL = adcch << 4;
   int res;
   struct spi_ioc_transfer tr;
+  memset(&tr, 0, sizeof(struct spi_ioc_transfer));
   uint8_t tx[COMM_SIZE] = {0, };
   uint8_t rx[COMM_SIZE] = {0, };
 
