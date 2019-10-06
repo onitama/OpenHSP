@@ -28,11 +28,6 @@ CFLAGS_EXTLIB = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
 OBJS = \
 	../hsp3/dpmread.bc \
 	geometry.bc \
-	hgdx.bc \
-	hgemitter.bc \
-	hgevent.bc \
-	hgmodel.bc \
-	hgobj.bc \
 	../hsp3/hsp3.bc \
 	../hsp3/hsp3code.bc \
 	../hsp3/hsp3debug.bc \
@@ -68,11 +63,6 @@ OBJS = \
 OBJS_GP = \
 	../hsp3/dpmread.gp.bc \
 	geometry.gp.bc \
-	hgdx.gp.bc \
-	hgemitter.gp.bc \
-	hgevent.gp.bc \
-	hgmodel.gp.bc \
-	hgobj.gp.bc \
 	../hsp3/hsp3.gp.bc \
 	../hsp3/hsp3code.gp.bc \
 	../hsp3/hsp3debug.gp.bc \

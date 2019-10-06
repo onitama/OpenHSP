@@ -100,10 +100,10 @@ typedef struct HSPHED
 
 	//		HSP3.5 extra header structure
 	//
-	int		pt_sr;				// ptr to Option Segment
-	int		max_sr;				// size of Option Segment
-	int		opt1;				// option (reserved)
-	int		opt2;				// option (reserved)
+	int		pt_sr;				// ptr to Runtime Option Segment
+	int		max_sr;				// size of Runtime Option Segment
+	int		pt_exopt;			// Extra Option Segment (3.6)
+	int		max_exopt;			// size of Extra Option Segment (3.6)
 
 } HSPHED;
 
@@ -126,6 +126,13 @@ typedef struct HSPHED
 #define HPIDAT_FLAG_SELFFUNC -1
 #define HPIDAT_FLAG_VARFUNC 1
 #define HPIDAT_FLAG_DLLFUNC 2
+
+#define HSPHED_EXOPTION_TAG_NONE 0
+#define HSPHED_EXOPTION_TAG_DSINDEX 1
+#define HSPHED_EXOPTION_TAG_SIZEX 2
+#define HSPHED_EXOPTION_TAG_SIZEY 3
+#define HSPHED_EXOPTION_TAG_SYSREQ 4
+
 
 typedef struct MEM_HPIDAT {		// native HPIDAT
 
@@ -556,6 +563,8 @@ struct HSPCTX
 	HSPEXINFO *exinfo2;					// HSP function data(3.1)
 
 	int	prmstack_max;					// Parameter Stack Max(hsp3cnv) (3.3)
+	int *dsindex;						// DSBuffer index (3.6)
+	int dsindex_size;					// DSBuffer index size (3.6)
 };
 
 #define HSPCTX_REFSTR_MAX 4096

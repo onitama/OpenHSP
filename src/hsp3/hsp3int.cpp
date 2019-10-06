@@ -1284,9 +1284,10 @@ static int cmdfunc_intcmd( int cmd )
 		APTR ap;
 
 		ap = code_getva( &pv );		// パラメータ1:変数
+		p = (char*)HspVarCorePtrAPTR(pv, ap);
+
 		sflag = code_getdi( 0 );	// パラメータ2:数値
 
-		p = (char *)HspVarCorePtrAPTR( pv, ap );
 		i = GetNoteLines(p);
 		if ( i <= 0 ) throw HSPERR_ILLEGAL_FUNCTION;
 
@@ -1357,9 +1358,9 @@ static void *reffunc_intfunc( int *type_res, int arg )
 	code_next();
 
 	//		返値のタイプをargをもとに設定する
-	//		0～255   : int
-	//		256～383 : string
-	//		384～511 : double(HSPREAL)
+	//		0〜255   : int
+	//		256〜383 : string
+	//		384〜511 : double(HSPREAL)
 	//
 	switch( arg>>7 ) {
 		case 2:										// 返値がstr

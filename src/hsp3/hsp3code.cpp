@@ -8,17 +8,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <map>
+using namespace std;
+
 #include "hspwnd.h"
 #include "supio.h"
 #include "dpmread.h"
 #include "stack.h"
 #include "strbuf.h"
+#include "strnote.h"
 #include "hsp3code.h"
 #include "hsp3debug.h"
 #include "hsp3config.h"
 #include "hsp3int.h"
-
-#define strp(dsptr) &hspctx->mem_mds[dsptr]
 
 /*------------------------------------------------------------*/
 /*
@@ -55,6 +57,197 @@ static PVal prmvar;								// パラメーターテンポラリ変数の実態
 static	unsigned char *mem_di_val;				// Debug VALS info ptr
 static	int srcname;
 static	int funcres;							// 関数の戻り値型
+
+/*------------------------------------------------------------*/
+/*
+		strmap data
+*/
+/*------------------------------------------------------------*/
+
+#define strp(dsptr) &hspctx->mem_mds[dsptr]
+#define STRMAP_HEADER "&&&&dsmap:"
+#define STRMAP_OPTION_PARTIAL 0
+#define STRMAP_OPTION_ALLMATCH 1
+
+static	int strmap_enable;						// 1=ON/0=OFF
+static	int strmap_option;						// option値
+static	int strmap_max;							// 文字列マップのサイズ
+static	int strmap_allover;						// すべての文字列を置き換えたか?(0=NG/1=OK)
+static	char** strmap_endptr;					// 文字列マップ(エンドポイント)
+static	unsigned char *strmap_cnv;				// 文字列マップ変換用データ(.strmapファイル)
+
+static map<int, char *> strmap_entry;			// 文字列マップ
+
+static int get_strmaphash(char* startptr, char* endptr, int *out_length)
+{
+	//	文字列のハッシュコード(checksum)を求める
+	//
+	int chksum, ofs;
+	unsigned char a1;
+	unsigned char* p = (unsigned char *)startptr;
+	unsigned char* endp = (unsigned char*)endptr;
+	if (endp == NULL) {
+		endp = p + strlen(startptr);
+	}
+	ofs = 0;
+	chksum = 0;
+	while (1) {
+		ofs++;
+		if ( p>=endp ) break;
+		a1 = *p++;
+		if (a1 == 0) break;
+		chksum += ofs + ((int)a1) * 7;
+	}
+	*out_length = ofs;
+	return chksum;
+}
+
+static int search_strmap(char* startptr, char *endptr, int length, int ptr, int chksum, int option)
+{
+	//	axファイルのデータとstrmap記録を照合する
+	//
+	int i,hash,size;
+	int* dsindex = hspctx->dsindex;
+
+	for (i = 0; i < hspctx->dsindex_size; i++) {
+		char* p = strp( dsindex[i] );
+		hash = get_strmaphash(p,NULL,&size);
+		if (hash == chksum) {
+			if ( size==length ) {
+				//Alertf("Find! [%s]%d", p, hash);
+				return (dsindex[i]);
+			}
+		}
+	}
+	return -1;
+}
+
+static int parse_strmap(char* strmap, int mode)
+{
+	//	strmapフォーマット文字列をパースする
+	//	(mode=0の場合はindex最大値のみ取得する)
+	//
+	int idmax = -1;
+	int curline;
+	int maxline, header_size;
+	CStrNote note;
+	char* p;
+	char* pres;
+	int id, ptr, chksum, length;
+
+	header_size = strlen(STRMAP_HEADER);
+	note.Select(strmap);
+	maxline = note.GetMaxLine();
+	curline = 0;
+	id = 0;
+	while(1) {
+		if (curline >= maxline) break;
+		p = note.GetLineDirect(curline);
+		pres = strstr2(p, STRMAP_HEADER);
+		if (pres != NULL) {
+			char s1[16];
+			char s2[16];
+			char s3[16];
+			pres += header_size;
+			strsp_ini();
+			strsp_get(pres, s1, ',', 10);
+			strsp_get(pres, s2, ',', 10);
+			strsp_get(pres, s3, ',', 10);
+			length = atoi(s1);
+			ptr = atoi(s2);
+			chksum = atoi(s3);
+			pres += strsp_getptr();
+			if (id > idmax) idmax = id;
+			id++;
+		}
+		curline++;
+		note.ResumeLineDirect();
+		if ((mode) && (pres)) {
+			if (*pres == 13) pres++;		// CR/LFを読み飛ばす
+			if (*pres == 10) pres++;
+
+			char *pbuf =strstr2(pres, STRMAP_HEADER);
+			if (pbuf == NULL) pbuf = pres + strlen(pres);
+			pbuf--;			// CR/LFを戻す
+			if (*pbuf == 10) pbuf--;
+			strmap_endptr[id-1] = pbuf;
+
+			ptr = search_strmap( pres, pbuf, length, ptr, chksum, strmap_option);
+			if (ptr >= 0) {
+				strmap_entry.insert(make_pair(ptr, pres));
+				//Alertf("PRM[%d][%d][%d][%s]", id, ptr, chksum, pres);
+			}
+			else {
+				strmap_allover = 0;
+			}
+		}
+	}
+
+	return idmax;
+}
+
+char *code_strp(int dsptr)
+{
+	if (strmap_enable) {
+		if (strmap_entry.count(dsptr)) {
+			char* p = strmap_entry.at(dsptr);
+			return p;
+		}
+	}
+	return &hspctx->mem_mds[dsptr];
+}
+
+int code_strexchange(char* fname, int option)
+{
+	//	文字列プールを置き換える
+	//
+	if ( hspctx->dsindex == NULL ) return -1;	// 文字列インデックスが存在しない
+
+	if (strmap_enable) {
+		mem_bye(strmap_cnv);
+		strmap_enable = 0;
+	}
+
+	if (*fname == 0) {
+		return 0;
+	}
+	char* strmap = dpm_readalloc(fname);
+	if (strmap == NULL) {
+		return -1;
+	}
+	strmap_entry.clear();
+	strmap_cnv = (unsigned char*)strmap;
+	strmap_max = parse_strmap( strmap, 0 );
+	if (strmap_max < 0) return -1;
+	strmap_max++;
+
+	strmap_enable = 1;
+	strmap_allover = 1;
+	strmap_option = option;
+
+	strmap_endptr = (char**)mem_ini(strmap_max * sizeof(char*));
+	parse_strmap(strmap, 1);
+
+	int i;
+	for (i = 0; i < strmap_max; i++) {
+		if (strmap_endptr[i]) {
+			if (*strmap_endptr[i] == 13) {
+				*strmap_endptr[i] = 0;			// エンドポイントをnullにする
+			}
+			//Alertf("ID[%d][%s]", i, strmap_endptr[i]);
+		}
+	}
+	mem_bye(strmap_endptr);
+
+	if (option & STRMAP_OPTION_ALLMATCH) {
+		if (strmap_allover == 0) {
+			mem_bye(strmap_cnv);
+			strmap_enable = 0;
+			return -1;
+		}
+	}
+	return 0;
+}
 
 /*------------------------------------------------------------*/
 /*
@@ -587,7 +780,7 @@ int code_get( void )
 				}
 				HspVarCoreClearTemp( mpval, type );						// 最小サイズのメモリを確保
 			}
-			varproc->Set( mpval, (PDAT *)(mpval->pt), strp(val) );		// テンポラリ変数に初期値を設定
+			varproc->Set( mpval, (PDAT *)(mpval->pt), code_strp(val) );		// テンポラリ変数に初期値を設定
 			break;
 		default:
 			throw HSPERR_UNKNOWN_CODE;
@@ -635,7 +828,7 @@ int code_get( void )
 			code_next();
 			break;
 		case TYPE_STRING:
-			StackPush( type, strp(val) );
+			StackPush( type, code_strp(val) );
 			code_next();
 			break;
 		case TYPE_DNUM:
@@ -2104,9 +2297,9 @@ static int cmdfunc_prog( int cmd )
 			label = code_getlb2();
 			if ( p1 == p2 ) {
 				if ( p3 ) {
-					otbak = label;			// on～gosub
+					otbak = label;			// on〜gosub
 				} else {
-					code_setpc( label);		// on～goto
+					code_setpc( label);		// on〜goto
 					break;
 				}
 			}
@@ -2162,6 +2355,16 @@ static int cmdfunc_prog( int cmd )
 
 	case 0x1f:								// yield
 		break;
+
+	case 0x20:								// strexchange
+		{
+		int ep1;
+		char pathname[HSP_MAX_PATH];
+		strncpy(pathname, code_gets(), HSP_MAX_PATH - 1);
+		ep1 = code_getdi(0);
+		hspctx->stat = code_strexchange(pathname, ep1);
+		break;
+		}
 
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
@@ -2614,6 +2817,7 @@ void code_init( void )
 	HspVarCoreInit();			// ストレージコア初期化
 	mpval = HspVarCoreGetPVal(0);
 	hspevent_opt = 0;			// イベントオプションを初期化
+	strmap_enable = 0;			// strmapを初期化
 
 	//		exinfoの初期化
 	//
@@ -2861,10 +3065,8 @@ rerun:
 				} else {
 					hspctx->msgfunc( hspctx );
 				}
-				if ( hspctx->runmode == RUNMODE_END ) {
-					return RUNMODE_END;
-//					i = hspctx->runmode;
-//					break;
+				if (( hspctx->runmode == RUNMODE_END )||(hspctx->runmode == RUNMODE_ERROR)) {
+					return hspctx->runmode;
 				}
 			}
 #ifdef HSPEMSCRIPTEN
@@ -2883,14 +3085,10 @@ rerun:
 		} else if ( code == HSPERR_EXITRUN ) {
 			i = RUNMODE_EXITRUN;
 		} else {
+			code_catcherror(code);
 			i = RUNMODE_ERROR;
-			hspctx->err = code;
-			hspctx->runmode = i;
-			if ( code_isirq( HSPIRQ_ONERROR ) ) {
-				code_sendirq( HSPIRQ_ONERROR, 0, (int)code, code_getdebug_line() );
-				if ( hspctx->runmode != i ) goto rerun;
-				return i;
-			}
+			if ( hspctx->runmode != i ) goto rerun;
+			return i;
 		}
 	}
 #endif
@@ -2942,10 +3140,8 @@ rerun:
 				} else {
 					hspctx->msgfunc( hspctx );
 				}
-				if ( hspctx->runmode == RUNMODE_END ) {
-					return RUNMODE_END;
-//					i = hspctx->runmode;
-//					break;
+				if ((hspctx->runmode == RUNMODE_END) || (hspctx->runmode == RUNMODE_ERROR)) {
+					return hspctx->runmode;
 				}
 			}
 			return RUNMODE_RUN;
@@ -2962,17 +3158,10 @@ rerun:
 		} else if ( code == HSPERR_EXITRUN ) {
 			i = RUNMODE_EXITRUN;
 		} else {
+			code_catcherror(code);
 			i = RUNMODE_ERROR;
-			hspctx->err = code;
-			hspctx->runmode = i;
-			if ( code_isirq( HSPIRQ_ONERROR ) ) {
-				code_sendirq( HSPIRQ_ONERROR, 0, (int)code, code_getdebug_line() );
-				if ( hspctx->runmode != i ) {
-					prev = 0;
-					return RUNMODE_RUN;
-				}
-				return i;
-			}
+			if (hspctx->runmode != i) goto rerun;
+			return i;
 		}
 	}
 #endif
@@ -3337,6 +3526,28 @@ void code_execirq( IRQDAT *irq, int wparam, int lparam )
 #endif
 	}
 	//Alertf("sublev%d", hspctx->sublev );
+}
+
+
+int code_catcherror(HSPERROR code)
+{
+	//		エラーのIRQイベントを処理する
+	//
+	if (code == HSPERR_NONE) {
+		hspctx->runmode = RUNMODE_END;
+	}
+	else if (code == HSPERR_EXITRUN) {
+		return hspctx->runmode;
+		hspctx->runmode = RUNMODE_EXITRUN;
+	}
+	else {
+		hspctx->err = code;
+		hspctx->runmode = RUNMODE_ERROR;
+		if (code_isirq(HSPIRQ_ONERROR)) {
+			code_sendirq(HSPIRQ_ONERROR, 0, (int)code, code_getdebug_line());
+		}
+	}
+	return hspctx->runmode;
 }
 
 

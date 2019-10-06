@@ -1,0 +1,38 @@
+#include "hsp3dish.as"
+
+	;
+	;
+	wx=640:wy=480 
+	screen 0,wx,wy
+	cx=wx/2:cy=wy/2
+	dist=int(sqrt( cx*cx + cy*cy ))+8
+	dim x,4
+	dim y,4
+	kai=16 ; 
+	tt=0
+	plus=3.141592/kai*2
+
+	x(0)=cx:y(0)=cy
+	x(3)=cx:y(3)=cy
+
+	r1=255:g1=0:b1=0 ; 1
+	r2=255:g2=255:b2=0 ; 2
+
+	repeat
+	rot=0.01 * tt
+	redraw 0
+
+		repeat kai
+		x(1)=int(sin(rot)*dist)+cx
+		y(1)=int(cos(rot)*dist)+cy
+		rot+=plus
+		x(2)=int(sin(rot)*dist)+cx
+		y(2)=int(cos(rot)*dist)+cy
+		if cnt&1 : color r1,g1,b1 : else : color r2,g2,b2
+		gsquare  -1,x,y
+		loop
+		tt++
+
+	redraw 1
+	await 30
+	loop

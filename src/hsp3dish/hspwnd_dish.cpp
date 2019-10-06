@@ -812,6 +812,13 @@ void Bmscr::SquareTex( int *dst_x, int *dst_y, Bmscr *src, int *src_x, int *src_
 	hgio_square_tex( (BMSCR *)this, dst_x, dst_y, (BMSCR *)src, src_x, src_y );
 }
 
+int Bmscr::BufferOp(int mode, char *ptr)
+{
+	//		テクスチャバッファの操作
+	//
+	return hgio_bufferop((BMSCR*)this, mode, ptr);
+}
+
 /*----------------------------------------------------------------*/
 
 void Bmscr::setMTouch( HSP3MTOUCH *mt, int x, int y, bool touch )

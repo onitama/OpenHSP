@@ -90,6 +90,7 @@ void code_execirq( IRQDAT *irq, int wparam, int lparam );
 void code_setirq( int id, int opt, int custom, unsigned short *ptr );
 int code_irqresult( int *value );
 void code_enableirq( int id, int sw );
+int code_catcherror(HSPERROR code);
 
 HSP3TYPEINFO *code_gettypeinfo( int type );
 void code_enable_typeinfo( HSP3TYPEINFO *info );
@@ -113,5 +114,8 @@ void code_delstruct( PVal *in_pval, APTR in_aptr );
 void code_delstruct_all( PVal *pval );
 
 #define fpconv( fp )  ( reinterpret_cast< void * >(fp) )
+
+char* code_strp(int dsptr);
+int code_strexchange(char *fname, int option);
 
 #endif

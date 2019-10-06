@@ -1,0 +1,15 @@
+#include "hsp3dish.as"
+
+	randomize
+*main
+	pos 320,240
+	redraw 0
+	repeat 400
+	c1=rnd(256):c2=rnd(256):c3=rnd(256):color c1,c2,c3
+	x=rnd(640):y=rnd(480)
+	line x,y
+	loop
+	redraw 1
+	await 1000
+	goto *main
+

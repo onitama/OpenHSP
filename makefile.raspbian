@@ -10,11 +10,6 @@ CFLAGS_CMP =  -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHS
 OBJS = \
 	src/hsp3/dpmread.do \
 	src/hsp3dish/geometry.do \
-	src/hsp3dish/hgdx.do \
-	src/hsp3dish/hgemitter.do \
-	src/hsp3dish/hgevent.do \
-	src/hsp3dish/hgmodel.do \
-	src/hsp3dish/hgobj.do \
 	src/hsp3/hsp3.do \
 	src/hsp3/hsp3code.do \
 	src/hsp3/hsp3debug.do \

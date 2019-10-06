@@ -9,11 +9,6 @@ CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSP
 OBJS = \
 	src/hsp3/dpmread.do \
 	src/hsp3dish/geometry.do \
-	src/hsp3dish/hgdx.do \
-	src/hsp3dish/hgemitter.do \
-	src/hsp3dish/hgevent.do \
-	src/hsp3dish/hgmodel.do \
-	src/hsp3dish/hgobj.do \
 	src/hsp3/hsp3.do \
 	src/hsp3/hsp3code.do \
 	src/hsp3/hsp3debug.do \
@@ -89,11 +84,6 @@ OBJS_CL = \
 OBJS_GP = \
 	src/hsp3/dpmread.gpo \
 	src/hsp3dish/geometry.gpo \
-	src/hsp3dish/hgdx.gpo \
-	src/hsp3dish/hgemitter.gpo \
-	src/hsp3dish/hgevent.gpo \
-	src/hsp3dish/hgmodel.gpo \
-	src/hsp3dish/hgobj.gpo \
 	src/hsp3/hsp3.gpo \
 	src/hsp3/hsp3code.gpo \
 	src/hsp3/hsp3debug.gpo \

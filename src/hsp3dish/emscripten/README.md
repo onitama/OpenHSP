@@ -1,6 +1,10 @@
 HSP3Dish emscripten
 ===================
 
+Modify
+-----
+modify_emscriptenフォルダ内にemscriptenライブラリの修正を含んでいます
+
 Build
 -----
 

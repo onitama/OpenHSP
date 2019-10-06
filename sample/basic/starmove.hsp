@@ -1,0 +1,27 @@
+#include "hsp3dish.as"
+
+cls 1
+font "",40,1
+
+cvalue=0.0
+
+*main
+	redraw 0
+	gmode 6,320,240,256
+	dir=cvalue
+	size=170+sin(cvalue)*60
+	repeat 16
+		x=320+sin(dir+cvalue)*size
+		y=240+cos(dir-cvalue)*size
+		cc=sin(cvalue*0.5)*192
+		color abs(cc),160,255
+		pos x,y:mes "*"
+		dir+=0.2
+	loop
+	redraw 1
+	await 16
+	cvalue+=0.1
+	goto *main
+
+stop
+

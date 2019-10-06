@@ -208,6 +208,7 @@ void CToken::ResetCompiler( void )
 	hed_option = 0;
 	hed_runtime[0] = 0;
 	hed_autoopt_timer = 0;
+	hed_autoopt_strexchange = 0;
 	pp_utf8 = 0;
 }
 
@@ -314,7 +315,7 @@ pickag:
 
 char *CToken::Pickstr2( char *str )
 {
-	//		Strings pick sub '～'
+	//		Strings pick sub '〜'
 	//
 	unsigned char *vs;
 	unsigned char *pp;
@@ -928,7 +929,7 @@ char *CToken::ExpandAhtStr( char *str )
 char *CToken::ExpandStrEx( char *str )
 {
 	//		指定文字列をmembufへ展開する
-	//		( 複数行対応 {"～"} )
+	//		( 複数行対応 {"〜"} )
 	//
 	int a;
 	unsigned char *vs;
@@ -989,7 +990,7 @@ char *CToken::ExpandStrEx( char *str )
 
 char *CToken::ExpandStrComment( char *str, int opt )
 {
-	//		/*～*/ コメントを展開する
+	//		/*〜*/ コメントを展開する
 	//
 	int a;
 	unsigned char *vs;
@@ -1132,15 +1133,15 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 			return ExpandStrComment( (char *)vs+2, 0 );
 		}
 	}
-	if (a1==0x22) {							// "～"
+	if (a1==0x22) {							// "〜"
 		*type = TK_STRING;
 		return ExpandStr( (char *)vs+1, 1 );
 	}
-	if (a1==0x27) {							// '～'
+	if (a1==0x27) {							// '〜'
 		*type = TK_STRING;
 		return ExpandStr( (char *)vs+1, 2 );
 	}
-	if (a1=='{') {							// {"～"}
+	if (a1=='{') {							// {"〜"}
 		if (vs[1]==0x22) {
 			if (wrtbuf!=NULL) wrtbuf->PutStr( "{\"" );
 			mulstr = LMODE_STR;
@@ -2671,7 +2672,7 @@ ppresult_t CToken::PP_Module( void )
 	int res,i,id,fl;
 	char *word;
 	char tagname[MODNAME_MAX+1];
-	char tmp[0x4000];
+	//char tmp[0x4000];
 
 	word = (char *)s3; fl = 0;
 	i = GetToken();
@@ -3303,7 +3304,7 @@ int CToken::ExpandTokens( char *vp, CMemBuf *buf, int *lineext, int is_preproces
 			break;
 		}
 
-		// {"～"}の処理
+		// {"〜"}の処理
 		//
 		if ( mulstr == LMODE_STR ) {
 			wrtbuf = buf;
@@ -3311,7 +3312,7 @@ int CToken::ExpandTokens( char *vp, CMemBuf *buf, int *lineext, int is_preproces
 			if ( *vp!=0 ) continue;
 		}
 
-		// /*～*/の処理
+		// /*〜*/の処理
 		//
 		if ( mulstr == LMODE_COMMENT ) {
 			vp = ExpandStrComment( vp, 0 );

@@ -26,8 +26,8 @@
 typedef struct
 {
 short flag;			// enable flag
-short volume;		// volume(0～-10000)
-short pan;			// pan(-10000～10000)
+short volume;		// volume(0〜-10000)
+short pan;			// pan(-10000〜10000)
 short speed;		// speed
 int loopptr;		// loop pointer
 LPDIRECTSOUNDBUFFER lpSoundBuffer;	// DxBuffer
@@ -166,7 +166,7 @@ static unsigned long GetWaveData( unsigned char *pData, unsigned char **ppMaster
 	while ( TRUE )
 	{
 		unsigned long size = 0;
-		// なんのチャンクかな～
+		// なんのチャンクかな〜
 		memcpy( Chunk, pData, 4 );
 		pData += 4;
 

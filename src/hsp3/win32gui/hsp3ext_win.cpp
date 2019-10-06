@@ -81,14 +81,28 @@ static void InitAtxDll( void )
 {
 	if ( hinst_atxdll != NULL ) return;
 
-	hinst_atxdll = LoadLibrary( TEXT("Atl71.dll") );
-	if ( hinst_atxdll ) {
-		atxwndclass = TEXT("AtlAxWin71");
-	} else {
-		hinst_atxdll = LoadLibrary( TEXT("Atl.dll") );
-		if ( hinst_atxdll == NULL ) return;
-		atxwndclass = TEXT("AtlAxWin");
+	struct {
+		TCHAR *pszDllName;			// DLLの名前
+		TCHAR *pszWindowClassName;	// ウインドウクラスの名前
+
+	} dllInfo[] = {
+	  { TEXT("atl110.dll"), TEXT("AtlAxWin110") }
+	, { TEXT("atl100.dll"), TEXT("AtlAxWin100") }
+	, { TEXT("atl90.dll") , TEXT("AtlAxWin90")  }
+	, { TEXT("atl80.dll") , TEXT("AtlAxWin80")  }
+	, { TEXT("atl71.dll") , TEXT("AtlAxWin71")  }
+	, { TEXT("atl.dll")   , TEXT("AtlAxWin")    }
+	};
+
+	for (int i = 0; i < _countof(dllInfo); i++) {
+		hinst_atxdll = LoadLibrary(dllInfo[i].pszDllName);
+		if (hinst_atxdll) {
+			atxwndclass = dllInfo[i].pszWindowClassName;
+			break;
+		}
 	}
+
+	if (hinst_atxdll == NULL) return;
 
 	fn_atxinit = (_ATXDLL_INIT)GetProcAddress( hinst_atxdll, "AtlAxWinInit" );
 	fn_atxgetctrl = (_ATXDLL_GETCTRL)GetProcAddress( hinst_atxdll, "AtlAxGetControl" );

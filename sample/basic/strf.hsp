@@ -1,0 +1,16 @@
+#include "hsp3dish.as"
+
+	;	(strf)
+	redraw 0
+	a=123
+	mes strf("10[%d]",a)
+	mes strf("16[%x]",a)
+	mes strf("10[%05d]",a)
+	mes strf("16[%05x]",a)
+	a=sqrt(2)
+	mes strf("10[%f]",a)
+	mes strf("10[%3.10f]",a)
+	redraw 1
+
+	stop
+

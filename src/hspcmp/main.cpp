@@ -33,6 +33,7 @@ static 	char *p[] = {
 	"       -w    force debug window on",
 	"       -e?   execute/view .ax runtime",
 	"       -r    execute runtime with result",
+	"       -s    output string map",
 	"       --syspath=??? set system folder for execute",
 	"       --compath=??? set common path to ???",
 	NULL };
@@ -47,8 +48,7 @@ int main( int argc, char *argv[] )
 {
 	char a1,a2,a3;
 	int b,st;
-	int cmpopt,ppopt,utfopt,pponly,execobj;
-	int result;
+	int cmpopt,ppopt,utfopt,pponly,execobj,strmap;
 	char fname[HSP_MAX_PATH];
 	char fname2[HSP_MAX_PATH];
 	char oname[HSP_MAX_PATH];
@@ -60,7 +60,7 @@ int main( int argc, char *argv[] )
 
 	if (argc<2) { usage1();return -1; }
 
-	st = 0; ppopt = 0; cmpopt = 0; utfopt = 0; pponly = 0;
+	st = 0; ppopt = 0; cmpopt = 0; utfopt = 0; pponly = 0; strmap = 0;
 	execobj = 0;
 	fname[0]=0;
 	fname2[0]=0;
@@ -104,6 +104,8 @@ int main( int argc, char *argv[] )
 				utfopt=1; cmpopt|=HSC3_MODE_UTF8; break;
 			case 'w':
 				cmpopt|=HSC3_MODE_DEBUGWIN; break;
+			case 's':
+				strmap = 1; cmpopt |= HSC3_MODE_STRMAP; break;
 			case 'o':
 				strcpy( oname,argv[b]+2 );
 				break;
@@ -126,7 +128,13 @@ int main( int argc, char *argv[] )
 
 
 	if (oname[0]==0) {
-		strcpy( oname,fname ); cutext( oname ); addext( oname,"ax" );
+		strcpy( oname,fname ); cutext( oname );
+		if (strmap) {
+			addext(oname, "strmap");
+		}
+		else {
+			addext(oname, "ax");
+		}
 	}
 	strcpy( fname2, fname ); cutext( fname2 ); addext( fname2,"i" );
 	addext( fname,"hsp" );			// 拡張子がなければ追加する
@@ -146,6 +154,7 @@ int main( int argc, char *argv[] )
 		}
 
 #ifdef HSPLINUX
+		int result;
 		cutext( oname );
 		if ( execobj & 8 ) {
 			printf("Runtime[%s].\n",oname);

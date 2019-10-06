@@ -381,7 +381,27 @@ int dpm_read( char *fname, void *readmem, int rlen, int seekofs )
 #else
 	ff = fopen( fname, "rb" );
 #endif
-	if ( ff == NULL ) return -1;
+	if ( ff == NULL ) {
+#if (defined HSPDISH && defined HSPWIN && defined HSPDEBUG)
+		//	hsptvフォルダを検索する
+		char fn[_MAX_PATH];
+		char fporg[_MAX_PATH];
+		char fname_tmp[_MAX_PATH];
+		strcpy(fname_tmp,fname);
+		GetModuleFileName(NULL, fporg, _MAX_PATH);
+		getpath(fporg,fn,32);
+		getpath(fname_tmp,fporg,8);
+		CutLastChr(fn, '\\');
+		strcat( fn,"\\hsptv\\" );
+		strcat( fn, fporg );
+		ff = fopen(fn, "rb");
+		if (ff == NULL) {
+			return -1;
+		}
+#else
+		return -1;
+#endif
+	}
 	if ( seekofs>=0 ) fseek( ff, seeksize, SEEK_SET );
 	a1 = (int)fread( lpRd, 1, rlen, ff );
 	fclose( ff );
@@ -408,13 +428,35 @@ int dpm_exist( char *fname )
 			return fs;					// dpm file size
 		}
 	}
+
+	//	Read normal file
 #if (defined HSPUTF8 && defined HSPWIN)
 	ff=_wfopen( chartoapichar(fname,&hactmp1),L"rb" );
 	freehac(&hactmp1);
 #else
 	ff=fopen( fname,"rb" );
 #endif
-	if (ff==NULL) return -1;
+	if (ff==NULL) {
+#if (defined HSPDISH && defined HSPWIN && defined HSPDEBUG)
+		//	hsptvフォルダを検索する
+		char fn[_MAX_PATH];
+		char fporg[_MAX_PATH];
+		char fname_tmp[_MAX_PATH];
+		strcpy(fname_tmp,fname);
+		GetModuleFileName(NULL, fporg, _MAX_PATH);
+		getpath(fporg,fn,32);
+		getpath(fname_tmp,fporg,8);
+		CutLastChr(fn, '\\');
+		strcat( fn,"\\hsptv\\" );
+		strcat( fn, fporg );
+		ff = fopen(fn, "rb");
+		if (ff == NULL) {
+			return -1;
+		}
+#else
+		return -1;
+#endif
+	}
 	fseek( ff,0,SEEK_END );
 	length=(int)ftell( ff );			// normal file size
 	fclose(ff);

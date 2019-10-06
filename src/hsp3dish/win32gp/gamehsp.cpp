@@ -24,6 +24,27 @@ static std::string model_defines;
 
 extern bool hasParameter( Material* material, const char* name );
 
+
+static void QuaternionToEulerAngles(Quaternion q, double& roll, double& pitch, double& yaw)
+{
+	// roll (x-axis rotation)
+	double sinr_cosp = +2.0 * (q.w * q.x + q.y * q.z);
+	double cosr_cosp = +1.0 - 2.0 * (q.x * q.x + q.y * q.y);
+	roll = atan2(sinr_cosp, cosr_cosp);
+
+	// pitch (y-axis rotation)
+	double sinp = +2.0 * (q.w * q.y - q.z * q.x);
+	if (fabs(sinp) >= 1)
+		pitch = copysign(MATH_PI / 2, sinp); // use 90 degrees if out of range
+	else
+		pitch = asin(sinp);
+
+	// yaw (z-axis rotation)
+	double siny_cosp = +2.0 * (q.w * q.z + q.x * q.y);
+	double cosy_cosp = +1.0 - 2.0 * (q.y * q.y + q.z * q.z);
+	yaw = atan2(siny_cosp, cosy_cosp);
+}
+
 /*------------------------------------------------------------*/
 /*
 		gameplay Node Obj
@@ -125,7 +146,7 @@ bool gpobj::isVisible( bool lateflag )
 float gpobj::getAlphaRate( void )
 {
 	// Alpha値を取得する
-	// ( _transparent値を0.0～1.0に変換する)
+	// ( _transparent値を0.0〜1.0に変換する)
 	if ( _transparent >= 255 ) return 1.0f;
 	if ( _transparent <= 0 ) return 0.0f;
 	return ( 1.0f / 255.0f ) * (float)_transparent;
@@ -1027,6 +1048,21 @@ void gamehsp::getNodeVector( gpobj *obj, Node *node, int moc, Vector4 *prm )
 		break;
 	case MOC_EFX:
 		break;
+
+
+	case MOC_ANGX:
+		if (node) {
+			Quaternion quat;
+			double roll, pitch, yaw;
+			quat = node->getRotation();
+			QuaternionToEulerAngles(quat, roll, pitch, yaw );
+			prm->x = roll;
+			prm->y = pitch;
+			prm->z = yaw;
+			prm->w = 0.0f;
+		}
+		break;
+
 
 	case MOC_COLOR:
 		if ( obj ) {
@@ -2805,7 +2841,7 @@ void gamehsp::setPolyDiffuseTex2D( float r, float g, float b, float a )
 float gamehsp::setPolyColorBlend( int gmode, int gfrate )
 {
 	//	2Dカラー描画設定
-	//	(戻り値=alpha値(0.0～1.0))
+	//	(戻り値=alpha値(0.0〜1.0))
 	//
 	Material *material;
 	material = _meshBatch->getMaterial();

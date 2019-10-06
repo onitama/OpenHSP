@@ -53,6 +53,7 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$01d 15 newlab",				// (ver3.2)
 	"$01e 15 resume",				// (ver3.2)
 	"$01f 15 yield",				// (ver3.2)
+	"$020 15 strexchange",			// (ver3.6)
 
 //	"$015 15 logmode",				// (ver2.55)
 //	"$016 15 logmes",				// (ver2.55)
@@ -207,8 +208,10 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$05e 9 setcls",				// (ver3.5)
 	"$05f 9 celputm",				// (ver3.5)
 
+	"$05c 9 celbitmap",				// (ver3.6)
 	"$04d 9 objcolor",				// (ver3.6)
 	"$04e 9 rgbcolor",				// (ver3.6)
+	"$04f 9 viewport",				// (ver3.6)
 
 	//	enhanced command (ver3.0)
 

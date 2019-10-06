@@ -1,0 +1,27 @@
+#include "hsp3dish.as"
+
+	redraw 0
+
+	i="-------------------------------"
+	mes i
+	a="ABCDEFG"
+	mes "="+a
+	b=strmid(a,0,3)
+	mes "="+b
+	b=strmid(a,-1,3)
+	mes "="+b
+	b=strmid(a,2,3)
+	mes "="+b
+
+	mes i
+	c=instr(a,0,"FG")
+	mes "FG="+c
+	c=instr(a,0,"AB")
+	mes "AB="+c
+	c=instr(a,0,"GH")
+	mes "GH="+c
+
+	mes i
+	redraw 1
+	stop
+

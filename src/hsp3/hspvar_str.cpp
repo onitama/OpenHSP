@@ -212,6 +212,8 @@ static void HspVarStr_NeI( PDAT *pdat, const void *val )
 {
 	int i;
 	i = strcmp( (char *)pdat, (char *)val );
+	if (i<0) i=-1;
+	if (i>0) i=1;
 	*(int *)pdat = i;
 	myproc->aftertype = HSPVAR_FLAG_INT;
 }

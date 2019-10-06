@@ -1135,15 +1135,32 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x2c:								// mouse
 		{
 		POINT pt;
+		int setdef = 0;			// 既にマイナスの値か?
 		GetCursorPos(&pt);
+		if ((pt.x < 0) || (pt.x < 0)) {
+			if (msact >= 0) setdef = 1;
+		}
 		p1 = code_getdi( pt.x );
 		p2 = code_getdi( pt.y );
-		if ((p1<0)||(p2<0)) {
+		p3 = code_getdi( setdef );
+		if (p3 == 0) {
+			if (msact >= 0) {
+				if ((p1 < 0) || (p2 < 0)) {
+					msact = ShowCursor(0);
+					break;
+				}
+			}
+		}
+
+		SetCursorPos(p1, p2);
+
+		if (p3 < 0) {
 			msact = ShowCursor(0);
 			break;
 		}
-		SetCursorPos( p1, p2 );
-		if ( msact < 0 ) { msact = ShowCursor(1); }
+		if (p3 > 0) {
+			if (msact < 0) { msact = ShowCursor(1); }
+		}
 		break;
 		}
 
@@ -1854,7 +1871,7 @@ void hsp3typeinit_extcmd( HSP3TYPEINFO *info, int sx, int sy, int wd, int xx, in
 	wnd->SetNotifyFunc( fpconv( mmnfunc ) );
 	wnd->SetEventNoticePtr( &ctx->stat );
 	cur_window = 0;
-	msact = 1;
+	msact = 0;
 	dispflg = 0;
 	bmscr = wnd->GetBmscr( 0 );
 	mmman->Reset( bmscr->hwnd );

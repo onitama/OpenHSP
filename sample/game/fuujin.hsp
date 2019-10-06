@@ -1,0 +1,154 @@
+;	風神 ver1.0 HSP Script / onitama
+;
+;	風を操る風神となって魂のカケラを集めてください。操作はすべてマウスで行ないます。
+;	魂のカケラ(赤い点のある物体)を出口(緑色の点がある四角形)に送り出せばポイントとなります。
+;	プレイヤーは、画面上の好きな場所でボタンを押すことで、そこから強い風を発生させることができます。
+;	ボタンを押し続けることで、より強い力となります。うまく風を使って、魂のカケラを導きましょう。
+;	風を発生させると画面上Powerで示されている力が減っていきます。Powerが0になるとゲームオーバーです。
+;	限られた風の力でどこまでポイントを稼ぐことができるかを競うゲームです。
+;	ゲームのステージは、ランダムに生成されます。遊ぶたびに異なるテクニックと判断が要求されます。
+;
+;
+;
+#include "hsp3dish.as"
+#packopt name "fuujin"
+#define gametitle "風神"
+#const gr_ball 1
+#const gr_goal 2
+#const gr_drain 4
+#const gr_wall 8
+
+	randomize		; 乱数の初期化
+	screen 0,640,480	; ウィンドウ初期化
+	title gametitle		; タイトル
+	high=0			; ハイスコア
+	celload "fuujin.png",1	; タイトル画面
+
+*maintitle
+	;	タイトル画面
+	cls			; 画面の初期化
+	objsize 120,24:pos 260,320
+	button "START",*gamestart
+	button "END",*gameend
+
+*main1
+	redraw 0
+	color 0,0,0:boxf	; 画面クリア
+	gmode 0,640,480
+	pos 0,0:gcopy 1		; タイトル表示
+	x=mousex:y=mousey
+	color 255,255,255
+	pos x-10,y-10:mes "+"
+	redraw 1
+	await 1000/30
+	goto *main1
+
+*gamestart
+	;	ゲームスタート
+	cls			; 画面の初期化
+	qreset			; OBAQの初期化
+
+	;	背景(坂道)を作成
+	bgdiv=10:dim mdl_bg,10
+	wx=120:wy=60:px=wx/bgdiv/2
+	x=wx/2:y=-wy:bgx=146:bgy=114
+	repeat bgdiv
+		i=0:x2=px:y2=y
+		y+=rnd(8)+1:if y>0 : y=0
+		x1=-px:y1=y
+		mdl_bg(i)=x2:mdl_bg(i+1)=y2:i+=2
+		mdl_bg(i)=x1:mdl_bg(i+1)=y1:i+=2
+		mdl_bg(i)=x1:mdl_bg(i+1)=0:i+=2
+		mdl_bg(i)=x2:mdl_bg(i+1)=0:i+=2
+		mdl_bg(i)=x2:mdl_bg(i+1)=y2:i+=2
+		qaddmodel bg, mdl_bg, -1, bgx,bgy,0, 1,1,colsw_none	; モデルを追加
+		qtype bg, type_bind
+		qgroup bg, gr_wall
+		bgx-=px*2
+	loop
+
+	;	排出口を作成
+	qaddpoly drain, 4, 20,114,0, 16,2, colsw_none
+	qtype drain, type_bind
+	qgroup drain, gr_drain,gr_ball,gr_ball
+
+	;	ゴールを作成
+	qaddpoly goal, 4, 100,20,0, 8,8
+	qtype goal, type_bind
+	qgroup goal, gr_goal,gr_ball,gr_ball
+
+	;	ゲームスタート
+	score=0			; スコア
+	frame=0			; フレームカウント用
+	wind=1500		; 風圧のこり
+	blflag=0		; 風圧カウント
+	gameover=0		; ゲームオーバーカウント
+
+*main
+	;	メインループ
+	;
+	redraw 0		; 画面の更新を開始
+	gradf ,,,,1,0,128	; 画面クリア
+	qexec			; OBAQによるオブジェクトの更新
+
+	stick key,$10f		; キーの取得
+	if key&128 : end	; [ESC]キーで終了
+
+	if (frame\16)=0 {	; ボールを追加
+		qaddpoly i, 12, 15+rnd(4),12,0, 4,4
+		qweight i,6.0,3000.0
+		qgroup i, gr_ball
+	}
+
+	if wind<=0 {		; ゲームオーバー処理
+		color 0,255,255
+		pos 284,220:mes "GAME OVER"
+		gameover++
+		if gameover>500 : goto *maintitle
+		key=0
+	}
+	if key&$100 {		; 風を発生
+		blx=mousex:bly=mousey
+		blflag=(blflag+1)&15
+		qblast blx/4,bly/4,1
+		color 255,255,0:i=blflag*4
+		circle blx-i,bly-i,blx+i,bly+i,0
+		wind--
+	} else {
+		blflag=0
+	}
+
+	qdraw			; オブジェクトの描画
+
+	x=mousex:y=mousey
+	pos x-10,y-10:mes "+"
+
+	;	表示関係
+	if score>high : high=score
+	color 255,255,255
+	pos 0,0:mes "Power:"+wind+" High:"+high
+	pos 480,0:mes "Score:"+score	; スコア表示
+
+	redraw 1		; 画面の更新を終了
+	await 1000/60		; 一定時間待つ
+
+	;	排出口との接触判定
+	qcollision drain
+	qgetcol i,colx,coly
+	if i>=0 {
+		qdel i	; GOALに触れた玉は消す
+	}
+
+	;	ゴールとの接触判定
+	qcollision goal
+	qgetcol i,colx,coly
+	if i>=0 {
+		score+=5
+		qdel i	; GOALに触れた玉は消す
+	}
+
+	frame++			; フレームカウントを更新
+	goto *main
+
+*gameend
+	end

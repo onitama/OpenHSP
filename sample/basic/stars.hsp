@@ -1,0 +1,14 @@
+#include "hsp3dish.as"
+
+font "",60
+
+redraw 0
+repeat 100
+x=rnd(640)
+y=rnd(480)
+pos x,y
+mes "☆"
+loop
+redraw 1
+
+

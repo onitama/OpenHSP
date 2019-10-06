@@ -1,7 +1,7 @@
 
 //
 //		HSP compile/package functions for HSP3
-//				onion software/onitama 2002
+//				onion software/onitama 2002-2017
 //
 
 #include <stdio.h>
@@ -21,6 +21,8 @@
 
 #define DPM_SUPPORT		// DPMファイルマネージャをサポート
 #include "dpm.h"
+
+#define ICONINS_SUPPORT	// ICONINSツールをサポート
 
 //	VC++の場合
 #ifdef __cplusplus
@@ -74,7 +76,7 @@ static int GetFilePath( char *bname )
 	int a,b,len;
 	char a1;
 	b=-1;
-	len=strlen(bname);
+	len=(int)strlen(bname);
 	for(a=0;a<len;a++) {
 		a1=bname[a];
 		if (a1=='\\') b=a;
@@ -233,6 +235,7 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	//			( mode: 1=debug/0=no debug )
 	//			(       2=preprocessor only )
 	//			(       4=UTF8 output mode )
+	//			(       8=strmap output mode )
 	//			( ppopt = preprocessor option )
 	//			(       0=default/1=ver2.6 mode )
 	//			(       32=UTF8 input mode )
@@ -277,10 +280,16 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	}
 
 	cmpmode = p1 & HSC3_MODE_DEBUG;
-	if ( p1 & 4 ) cmpmode |= HSC3_MODE_UTF8;
+	if (p1 & 4) cmpmode |= HSC3_MODE_UTF8;
+	if (p1 & 8) cmpmode |= HSC3_MODE_STRMAP;
 	if ( p3 ) cmpmode |= HSC3_MODE_DEBUGWIN;
 
-	st = hsc3->Compile( fname2, oname, cmpmode );
+	if (p1 & 8) {
+		st = hsc3->CompileStrMap(fname2, oname, cmpmode);
+	}
+	else {
+		st = hsc3->Compile(fname2, oname, cmpmode);
+	}
 	hsc3->PreProcessEnd();
 	if ( st != 0 ) return st;
 	return 0;
@@ -426,18 +435,42 @@ EXPORT BOOL WINAPI hsc3_messize ( int *p1, int p2, int p3, int p4 )
 EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 {
 	//
-	//		hsc3_make "myname"  (type6)
+	//		hsc3_make "myname",sw,0  (type6)
+	//		(sw=1の場合はiconinsを呼び出す)
 	//
 	char libpath[_MAX_PATH];
 	int i,type;
 	int opt3a,opt3b;
 	int st;
+#ifdef ICONINS_SUPPORT
+	char ici_opt[4096];
+	char ici_current[_MAX_PATH];
+	char ici_target[_MAX_PATH];
+	char ici_icon[_MAX_PATH];
+	char ici_version[_MAX_PATH];
+	char ici_manifest[_MAX_PATH];
+	char ici_lang[_MAX_PATH];
+	char ici_upx[_MAX_PATH];
+	int ici_use_icon = 0;
+	int ici_use_version = 0;
+	int ici_use_manifest = 0;
+	int ici_use_lang = 0;
+	int ici_use_upx = 0;
+#endif
 
 	if ( hsc3==NULL ) Alert( "#No way." );
 	hsc3->ResetError();
 
 	strcpy( libpath, p1 );
 	GetFilePath( libpath );
+
+#ifdef ICONINS_SUPPORT
+	GetModuleFileName( NULL,ici_opt,_MAX_PATH );
+	GetFilePath( ici_opt );
+	strcat( ici_opt, "iconins.exe" );
+	GetCurrentDirectory( _MAX_PATH, ici_current );
+	strcat( ici_current, "\\" );
+#endif
 
 	i = hsc3->OpenPackfile();
 	if (i) { Alert( "packfileが見つかりません" ); return -1; }
@@ -455,6 +488,24 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	if ( opt3a ) opt3 |= 1;
 	if ( opt3b ) opt3 |= 2;
 
+#ifdef ICONINS_SUPPORT
+	hsc3->GetPackfileOption( ici_icon, "icon", "" );
+	if ( ici_icon[0] != 0 ) { ici_use_icon = 1; }
+	hsc3->GetPackfileOption( ici_version, "version", "" );
+	if ( ici_version[0] != 0 ) { ici_use_version = 1; }
+	hsc3->GetPackfileOption( ici_manifest, "manifest", "" );
+	if ( ici_manifest[0] != 0 ) { ici_use_manifest = 1; }
+	hsc3->GetPackfileOption( ici_lang, "lang", "" );
+	if ( ici_lang[0] != 0 ) { ici_use_lang = 1; }
+	hsc3->GetPackfileOption( ici_upx, "upx", "" );
+	if ( ici_upx[0] != 0 ) { ici_use_upx = 1; }
+
+	strcpy( ici_target, ici_current );
+	strcat( ici_target, fname );
+	if (type==2) strcat(ici_target,".scr");
+			else strcat(ici_target,".exe");
+#endif
+
 	hsc3->ClosePackfile();
 
 	//		exeを作成
@@ -468,6 +519,50 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 #else
 	st = 0;
 #endif
+
+	//		iconins process
+#ifdef ICONINS_SUPPORT
+	if ((ici_use_icon+ici_use_version+ici_use_manifest+ici_use_lang+ici_use_upx)>0) {
+
+		strcat( ici_opt, " -e\"" );
+		strcat( ici_opt, ici_target );
+		strcat( ici_opt, "\"" );
+
+		if ( ici_use_icon ) {
+			strcat( ici_opt," -i\"" );
+			strcat( ici_opt, ici_current );
+			strcat( ici_opt, ici_icon );
+			strcat( ici_opt, "\"" );
+		}
+		if ( ici_use_version ) {
+			strcat( ici_opt," -v\"" );
+			strcat( ici_opt, ici_current );
+			strcat( ici_opt, ici_version );
+			strcat( ici_opt, "\"" );
+		}
+		if ( ici_use_manifest ) {
+			strcat( ici_opt," -m\"" );
+			strcat( ici_opt, ici_current );
+			strcat( ici_opt, ici_manifest );
+			strcat( ici_opt, "\"" );
+		}
+		if ( ici_use_lang ) {
+			strcat( ici_opt," -l\"" );
+			strcat( ici_opt, ici_lang );
+			strcat( ici_opt, "\"" );
+		}
+		if ( ici_use_upx ) {
+			strcat( ici_opt," -u\"" );
+			strcat( ici_opt, ici_upx );
+			strcat( ici_opt, "\"" );
+		}
+		if ( p2 ) {
+			i = WinExec( ici_opt, SW_SHOW );
+			if ( i < 32 ) return -1;
+		}
+	}
+#endif
+
 	return -st;
 }
 
@@ -597,7 +692,7 @@ EXPORT BOOL WINAPI aht_stdsize ( int *p1, int p2, int p3, int p4 )
 	//		aht_stdbuf var  (type1)
 	//
 	if ( aht == NULL ) return -1;
-	*p1 = strlen( aht->GetStdBuffer() ) + 1;
+	*p1 = (int)strlen( aht->GetStdBuffer() ) + 1;
 	return 0;
 }
 
@@ -1201,7 +1296,7 @@ EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 	if ( res >= 0 ) {
 		m = aht->GetModel( res );
 		p = m->GetClass();
-		len = strlen( p ) - 5; if ( len < 0 ) len = 0;
+		len = (int)strlen( p ) - 5; if ( len < 0 ) len = 0;
 		if ( tstrcmp( p+len, ".home" ) ) {			// homeクラスかどうか確認する
 			if ( homeid != -1 ) ahtbuild_error = 2;
 			homeid = res;
@@ -1213,7 +1308,7 @@ EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 	if ( i >= 0 ) {
 		m = aht->GetModel( i );
 		p = m->GetClass();
-		len = strlen( p ) - 8; if ( len < 0 ) len = 0;
+		len = (int)strlen( p ) - 8; if ( len < 0 ) len = 0;
 		if ( tstrcmp( p+len, ".routine" ) ) {			// routineクラスかどうか確認する
 			statval = -1;
 		}

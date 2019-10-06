@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\win">
+      <UniqueIdentifier>{e86adf04-53e0-48a8-a50f-0c03c6a5ae06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\core">
+      <UniqueIdentifier>{e2a37d5c-4cdb-4066-99d2-ea34bb1ada45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\win">
+      <UniqueIdentifier>{d4be62f3-4557-4f93-ac13-2295d7e9520b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\core">
+      <UniqueIdentifier>{7e769122-0e2c-44a4-bda0-df2ebdda9b0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\win32gui\comobj.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32gui\comobj_event.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32gui\filedlg.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="hsp3cl.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32gui\hsp3ext_win.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32gui\hsp3extlib.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="hsp3gr_win.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32gui\hspvar_comobj.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32gui\hspvar_variant.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32gui\supio_win.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dpmread.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsp3.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsp3code.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsp3debug.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsp3int.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspvar_core.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspvar_double.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspvar_int.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspvar_label.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspvar_str.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hspvar_struct.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stack.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\strbuf.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\strnote.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\win32gui\comobj.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\comobj_event.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\filedlg.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="hsp3cl.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\hsp3ext_win.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\hsp3extlib.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="hsp3gr_win.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\hspvar_comobj.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\hspvar_variant.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\hspwnd_win.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32gui\supio_win.h">
+      <Filter>ヘッダー ファイル\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dpmread.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3code.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3config.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3debug.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3ext.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3gr.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3int.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsp3struct.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hspvar_core.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hspvar_label.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stack.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\strbuf.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\strnote.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Supio.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -178,6 +178,7 @@ public:
 	void FillRotTex( int dst_sx, int dst_sy, float ang, Bmscr *src, int tx, int ty, int srcx, int scry );
 	void SquareTex( int *dst_x, int *dst_y, Bmscr *src, int *src_x, int *src_y, int mode );
 	void GradFill( int x, int y, int sx, int sy, int mode, int col1, int col2 );
+	int BufferOp(int mode, char* ptr);
 
 	void SetFilter( int type );
 
@@ -291,14 +292,14 @@ public:
 	int		mtouch_num;					// Active Multi-Touch points
 	HSP3MTOUCH mtouch[BMSCR_MAX_MTOUCH];	// Multi-Touch Info
 
-	float	colorvalue[4];				// ColorRGB value each 0.0～1.0
+	float	colorvalue[4];				// ColorRGB value each 0.0〜1.0
 
 	char	font_curname[RESNAME_MAX];	// Current Font Name
 	int		font_cursize;				// Current Font Size
 	int		font_curstyle;				// Current Font Style
 
 	int		mulcolor;					// Multiplyer Color (RGB)
-	float	mulcolorvalue[4];			// Multiplyer Color value each 0.0～1.0
+	float	mulcolorvalue[4];			// Multiplyer Color value each 0.0〜1.0
 
 	int		buffer_option;				// buffer options for off-screen
 	void	*master_buffer;				// buffer pointer to off-screen
@@ -447,14 +448,14 @@ typedef struct BMSCR
 	int		mtouch_num;					// Active Multi-Touch points
 	HSP3MTOUCH mtouch[BMSCR_MAX_MTOUCH];	// Multi-Touch Info
 
-	float	colorvalue[4];				// ColorRGB value each 0.0～1.0
+	float	colorvalue[4];				// ColorRGB value each 0.0〜1.0
 
 	char	font_curname[RESNAME_MAX];	// Current Font Name
 	int		font_cursize;				// Current Font Size
 	int		font_curstyle;				// Current Font Style
 
 	int		mulcolor;					// Multiplyer Color (RGB)
-	float	mulcolorvalue[4];			// Multiplyer Color value each 0.0～1.0
+	float	mulcolorvalue[4];			// Multiplyer Color value each 0.0〜1.0
 
 	int		buffer_option;				// buffer options for off-screen
 	void	*master_buffer;				// buffer pointer to off-screen

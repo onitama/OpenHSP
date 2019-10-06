@@ -103,7 +103,7 @@ int hsp3win_debugopen( void )
 #ifdef HSPDEBUG
 	if ( h_dbgwin != NULL ) return 0;
 #ifdef HSP64
-	h_dbgwin = LoadLibrary( HSP3DEBUG_MODULE "_64.dll" );
+	h_dbgwin = LoadLibrary( TEXT( HSP3DEBUG_MODULE "_64.dll" ) );
 #else
 #ifndef HSPUTF8
 	h_dbgwin = LoadLibrary(TEXT( HSP3DEBUG_MODULE ".dll" ));
@@ -159,14 +159,24 @@ static void hsp3win_dispatch( MSG *msg )
 	}
 #endif
 
-	if ( msg->message==WM_KEYDOWN ) {	// ocheck onkey
-		if ( msg->wParam == 9 ) {
+	if (msg->message == WM_KEYDOWN) {	// ocheck onkey
+		if (msg->wParam == 9) {
 			hsp3gr_nextobj();
 		}
-		if ( code_isirq( HSPIRQ_ONKEY ) ) {
-			code_sendirq( HSPIRQ_ONKEY, (int)MapVirtualKey( msg->wParam, 2 ), (int)msg->wParam, (int)msg->lParam );
+		if (code_isirq(HSPIRQ_ONKEY)) {
+#ifdef HSPERR_HANDLE
+			try {
+#endif
+				code_sendirq(HSPIRQ_ONKEY, (int)MapVirtualKey(msg->wParam, 2), (int)msg->wParam, (int)msg->lParam);
+#ifdef HSPERR_HANDLE
+			}
+			catch (HSPERROR code) {						// HSPエラー例外処理
+				code_catcherror(code);
+			}
+#endif
 		}
 	}
+
 }
 
 

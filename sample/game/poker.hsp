@@ -1,0 +1,286 @@
+#include "hsp3dish.as"
+
+	mmload "sel.wav",0
+	randomize
+	ui=2
+	celload "uiparts.png",ui
+	celdiv ui,90,24
+	celload "trump.png",3
+	csx=96:csy=128
+	screen 0,640,480
+	gosub *creset
+	sdim ylist,1024
+	dim ybai,16
+	dim hand,16
+	dim hand2,16
+	dim handbak,16
+	ylist={"0 なし
+1 ツーペア
+2 スリーカード
+3 ストレート
+4 フラッシュ
+5 フルハウス
+6 フォーカード
+7 ストレートフラッシュ
+8 ロイヤルストレートフラッシュ
+"}
+	ybai=0,2,5,10,20,30,50,100,500
+	credit=30
+	bet=1
+*main
+	gosub *uib_reset
+
+	if credit=0 {
+	  dialog "コインがありません" : end
+	}
+	sdim s1,256
+	dim cbox,5
+
+	yaku=0
+	plus=0
+
+	ibet=bet
+	credit=credit-bet
+	objsize 90,24
+	repeat 5
+	gosub *cdraw:hand.cnt=a
+	cbox(cnt)=0
+	x=cnt*100+20:y=430:a=cbox(cnt)
+	gosub *uib_add
+	loop
+
+	x=530:y=430:a=3:gosub *uib_add
+	btn_draw=myid
+
+	mmplay 0
+	gosub *csort
+
+*gm_loop2
+	gosub *update
+	if uib_push=btn_draw : goto *change
+	if uib_push>=0 : a = uib_push : goto *gm_hold_click2
+	if key&$100 : goto *gm_hold_click
+	goto *gm_loop2
+
+*gm_hold_click
+	;	HOLDクリック
+	if uib_push>=5 : goto *gm_loop2
+	a=-1
+	repeat 5
+	x=cnt*100+20:y=300
+		if myy<y | myx<x : continue
+		if myy>y+csy | myx>x+csx : continue
+		a=cnt
+	loop
+
+*gm_hold_click2
+	if a>=0 {
+		cbox(a)^=1
+		uibid(a)=cbox(a)
+	}
+	goto *gm_loop2
+
+*change
+	mmplay 0
+	repeat 5
+	if cbox(cnt)=0 {
+	  x=cnt*100+20:y=300
+	  gosub *cdraw
+	  hand(cnt)=a
+	}
+	loop
+
+	plus=0
+	gosub *csave
+	gosub *csort
+	plus=ybai(yaku) * ibet
+	credit+=plus
+	gosub *cload
+
+	uibid(btn_draw)=5
+*gm_loop3
+	gosub *update
+	if uib_push=btn_draw : goto *main
+	goto *gm_loop3
+
+*putlist
+	notesel ylist
+	repeat 9:y=cnt*30+24
+	noteget s1,cnt:a=ybai(cnt)
+	color 0,0,0
+	if cnt=yaku : color 255,0,0
+	pos 24,y:mes s1
+	pos 320,y:mes "x"+a
+	loop
+	return
+
+*csort
+	; 手札をソート
+	dim count,14
+
+	mark=hand.0&3:markc=0
+	yaku=0:pair=0:lastnum=-10:st=0
+	repeat 5:hand2.cnt=hand.cnt:loop
+	i=0:repeat 52:chk=cnt
+	repeat 5
+	if hand2.cnt=chk {
+	  a=chk/4:count.a++
+	  if lastnum+1=a : st++
+	  lastnum=a
+	  a=chk&3:if a=mark : markc++
+	  hand2.cnt=-1
+	  hand.i=chk:i++
+	}
+	loop
+	if i>=5 : break
+	loop
+	repeat 14:a=count.cnt
+	if a=2 : pair++
+	if a=3 : yaku=2
+	if a=4 : yaku=6
+	loop
+	if (yaku=2)&(pair=1) : yaku=5
+	if pair=2 {
+	  if yaku=0 : yaku=1
+	}
+	if markc=5 : yaku=4
+	if (st=3)&(yaku=4) {
+	  if lastnum=12 {
+	    if hand.0/4=0 : yaku=8 : return
+	  }
+	}
+	if st=4 {
+	  if yaku=0 : yaku=3
+	  if yaku=4 : yaku=7
+	}
+	return
+*creset
+	; カードをシャッフル
+	dim card,52:cnum=0
+	repeat 52:card.cnt=cnt:loop
+	repeat 52
+	a=rnd(52):b=card.cnt
+	card.cnt=card.a:card.a=b
+	loop
+	return
+*cdraw
+	; カード１枚を引く
+	if cnum>=52 : gosub *creset
+	a=card.cnum:cnum=cnum+1
+	return
+*cput
+	; カード１枚を表示するサブルーチン
+	px=a/4*96:py=(a&3)*128
+	if a>=52: px=13*96:py=(a-52)*128
+	gmode 2,96,128
+	pos x,y:gcopy 3,px,py
+	return
+
+*csave
+	; 手カードを退避
+	repeat 5
+	handbak(cnt) = hand(cnt)
+	loop
+	return
+
+*cload
+	; 手カードを復帰
+	repeat 5
+	hand(cnt) = handbak(cnt)
+	loop
+	return
+
+*uib_reset
+	;	UIボタンリセット
+	uimax=16
+	dim uibid,uimax
+	dim uibx,uimax
+	dim uiby,uimax
+	repeat uimax
+	uibid(cnt)=-1
+	loop
+	return
+
+*uib_add
+	;	UIボタン設置
+	myid=-1
+	repeat uimax
+	if uibid(cnt)<0 {
+		myid=cnt
+		uibx(myid)=x:uiby(myid)=y:uibid(myid)=a
+		break
+	}
+	loop
+	return
+
+*uib_del
+	;	UIボタン削除
+	uibid(a)=-1
+	return
+
+*uib_put
+	;	UIボタン表示
+	gmode 0
+	repeat uimax
+	if uibid(cnt)>=0 {
+		pos uibx(cnt),uiby(cnt):celput ui,uibid(cnt)
+	}
+	loop
+	return
+
+*uib_check
+	;	UIボタンチェック
+	;	myx,myy = カーソル位置
+	;	a=ボタンID/ -1=none
+	a=-1
+	repeat uimax
+	if uibid(cnt)<0 : continue
+	x=uibx(cnt):y=uiby(cnt)
+	if myy<y | myx<x : continue
+	if myy>y+40 : continue
+	if myx>x+150 : continue
+		a=cnt
+	loop
+	return
+
+*update
+	; キー更新
+	stick key
+	myx = mousex
+	myy = mousey
+	uib_push=-1
+
+	if key&$100 {
+		gosub *uib_check
+		uib_push=a
+	}
+
+	; 画面のアップデート
+	redraw 0
+
+	gmulcolor
+	color 0,120,0:boxf
+
+	gosub *putlist
+
+	repeat 5
+	x=cnt*100+20:y=300
+	a=hand(cnt):gosub *cput
+	loop
+
+	pos 480,24
+	color 0,255,255
+	font msgothic,18,1
+	mes "コイン="+credit
+	pos 538,48
+	if plus>0 : mes "+"+plus
+
+	gosub *uib_put
+
+	pos myx,myy:gmode 2:celput ui,18
+
+	redraw 1
+	await 1000/30
+	return
+
+

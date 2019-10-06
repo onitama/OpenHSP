@@ -94,6 +94,7 @@ typedef struct MACDEF {
 #define COMP_MODE_DEBUG 1
 #define COMP_MODE_DEBUGWIN 2
 #define COMP_MODE_UTF8 4
+#define COMP_MODE_STRMAP 8
 
 #define SWSTACK_MAX 32
 
@@ -358,6 +359,8 @@ private:
 	bool CG_optInfo() const { return (hed_cmpmode & CMPMODE_OPTINFO) != 0; }
 	void CG_MesLabelDefinition(int label_id);
 
+	int	SaveStringMap(char* fname);
+
 	//		Data
 	//
 	CLabel *lb;						// label object
@@ -426,6 +429,7 @@ private:
 	int cg_putvars;
 	int cg_defvarfix;
 	int cg_utf8out;
+	int cg_strmap;
 	char *cg_ptr;
 	char *cg_ptr_bak;
 	char *cg_str;
@@ -457,16 +461,12 @@ private:
 	CMemBuf *fi2_buf;
 	CMemBuf *hpi_buf;
 
-#ifdef HSP_DS_POOL
-	std::map<double, int> double_literal_table; // 定数プール用
-	std::map<std::string, int> string_literal_table;
-#endif
-
 	//		for Header info
 	int hed_option;
 	char hed_runtime[64];
 	int hed_cmpmode;
 	int hed_autoopt_timer;
+	int hed_autoopt_strexchange;
 
 	//		for Struct
 	int	cg_stnum;

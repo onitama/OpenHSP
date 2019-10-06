@@ -1,93 +1,115 @@
 ; 64-bit 'CallFunc'
 ;
-; Kurogoma 08/26/2016
-;
-; This MASM script is in the pulbic domain.
+; LICENCE: Public domain
 
 OPTION CASEMAP: NONE
-
-INT_PTR     TYPEDEF PTR
-FARPROC     TYPEDEF PTR
 
 PUBLIC CallFunc64
 
 .CODE
 
-; CallFunc64(INT_PTR * arguments , FARPROC externalFunction, int numbrofArguments)
-; This function calls a external function.
-; argumtnts:            Argument or arguments to pass to the funciton of 'externalFunction'
-; externalFunciton:     Function to call
-; numberOgArguments:    Number of the argument or arguments of 'arguments'
-CallFunc64 PROC FRAME   arguments: PTR INT_PTR, externalFunction: FARPROC, numberOfArguments:SDWORD
+; [CallFunc64]
+;
+; The 'CallFunc64' function calls the sppecified function with the specified array as arguments.
+;
+; [Syntax]
+;
+; INT_PTR CallFunc64(INT_PTR const *arguments, FARPROC external_function, int number_Of_arguments);
+; INT32 CallFunc64(INT_PTR const *arguments, FARPROC external_function, int number_Of_arguments);
+; double CallFunc64(INT_PTR const *arguments, FARPROC external_function, int number_of_arguments);
+;
+; [Parameters]
+;
+; INT_PTR const *arguments [in, optional]
+;     Points to the array used as arguments to the function of 'externalFunction'. If 'numberOfArguments' is set to a negative value or zero, the function makes no use of the parameter.
+;
+; FARPROC external_function [in]
+;     Points to the function to call with the array of 'arguments' as arguments.
+;
+; int number_of_arguments [in]
+;     Represents the number of elements in the array of 'arguments'.
+;
+; [Return value]
+;
+; The return value is directly from the function of 'externalFunction'.
+;
+; [Remarks]
+;
+; If 'numberOfParameters' is set to a negative value, the behavior is the same as when the parameter is set to zero; the function of 'externalFunction' is then assumed not to receive any parameter.
+; The behavior is undefined if the array of 'arguments' is not proper as arguments for the function of 'externalFunction'.
+
+CallFunc64 PROC FRAME
+
+    mov rax, rdx ; Save the value of 'external_function' to rax
+
+    ; Directly go to the function of 'external_function' if it does not receive any parameter
+
+    mov edx, r8d
+    test edx, edx
+    jg short @has_args
+
+        jmp rax
+
+    @has_args:
 
     push rbp
     .PUSHREG rbp
+
     mov rbp, rsp
     .SETFRAME rbp, 0
 
     .ENDPROLOG
 
-    mov r10, rdx
+    sal edx, 3 ; edx = number_of_arguments * sizeof(INT_PTR)
 
-    ; Put the 'arguments' on the stack
+    ; Align the stack to 16 bytes and allocate at least 32 bytes
 
-    mov eax, r8d
-    sal eax, 3
-    @IfLabel00:
-    jge @EndIfLabel00
-        xor eax, eax
-    @EndIfLabel00:
+    sub edx, 8 * 4
+    @if00:
+    jge short @else00
 
-    sub rax, 8*4
-    @IfLabel10:
-    jge @IfLabel10_Else
+        neg edx
+        jmp short @end_if00
 
-        add rsp, rax
-        jmp @EndIfLabel10
+    @else00:
 
-    @IfLabel10_Else:
+        and edx, 8
 
-        and eax, 8
-        sub rsp, rax
+    @end_if00:
 
-    @EndIfLabel10:
+    sub rsp, rdx
 
-    jmp @F
-    @DoLabel_00:
+    ; Prepare arguments
 
-        push QWORD PTR [rcx + r8*8]
+    @do00:
 
-        @@:
-        dec r8d
-        jge @DoLabel_00
+       dec r8d
+       push qword ptr [rcx + r8 * 8]
 
-    @UntilLabel_00:
+       jg @do00
 
-    ; Put the first 4 arguments into registers
-
-;    mov rax, rsp
+    @until00:
 
     pop rcx
     pop rdx
     pop r8
     pop r9
 
-    sub rsp, 8*4
+    movd xmm0, rcx
+    movd xmm1, rdx
+    movd xmm2, r8
+    movd xmm3, r9
 
-    ; Note: Why can't MASM assenble these codes?
-    db 66h, 48h, 0fh, 6eh, 0c1h ; movq xmm0, rcx
-    db 66h, 48h, 0fh, 6eh, 0cah ; movq xmm1, rdx
-    db 66h, 48h, 0fh, 6eh, 0d0h ; movq xmm2, r8
-    db 66h, 48h, 0fh, 6eh, 0d9h ; movq xmm3, r9
+    ; cmp rsp, rbp
 
-;    mov rsp, rax
+    ; Call the function of 'external_function'
 
-    call r10
+    sub rsp, 8 * 4
+    call rax
 
     leave
-    ret 0
+    ret
 
 CallFunc64 ENDP
-
 
 END

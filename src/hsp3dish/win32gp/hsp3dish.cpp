@@ -100,7 +100,10 @@ static std::string gplog;
 extern "C" {
 	static void logfunc( gameplay::Logger::Level level, const char *msg )
 	{
-		if (GetSysReq(SYSREQ_LOGWRITE)) gplog += msg;
+		if (GetSysReq(SYSREQ_LOGWRITE)) {
+			gplog += msg;
+			//MessageBox(NULL, msg, "!", 0);
+		}
 	}
 }
 
@@ -228,34 +231,38 @@ static int	GetIniFileInt( char *keyword )
 
 LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam )
 {
+	if (code_isuserirq()) {
+#ifdef HSPERR_HANDLE
+		try {
+#endif
+			int retval;
+			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (int)uMessage, (int)wParam, (int)lParam)) {
+				if (code_irqresult(&retval)) return retval;
+			}
+#ifdef HSPERR_HANDLE
+		}
+		catch (HSPERROR code) {						// HSPエラー例外処理
+			code_catcherror(code);
+		}
+#endif
+	}
+
 	switch (uMessage)
 	{
 	case WM_PAINT:
 		//		Display 全描画
 		//
 		break;
-/*
-	case WM_GETMINMAXINFO:
-		{
-		LPMINMAXINFO lpmm;
-		bm = TrackBmscr( hwnd );
-		if ( bm != NULL ) {
-			lpmm = (LPMINMAXINFO)lParam;
-			lpmm->ptMaxTrackSize.x = bm->sx + bm->framesx;
-			lpmm->ptMaxTrackSize.y = bm->sy + bm->framesy;
-		}
-		break;
-		}
 
-	case WM_SIZE:
-		bm = TrackBmscr( hwnd );
-		if ( bm != NULL ) {
-			bm->wx = lParam & 0xFFFF;				// xサイズ
-			bm->wy = (lParam >> 16) & 0xFFFF;		// yサイズ
-			bm->SetScroll( bm->viewx, bm->viewy );
+	case WM_MOUSEWHEEL:
+		if (exinfo != NULL) {
+			Bmscr* bm;
+			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+			bm->savepos[BMSCR_SAVEPOS_MOSUEZ] = LOWORD(wParam);
+			bm->savepos[BMSCR_SAVEPOS_MOSUEW] = HIWORD(wParam);
 		}
-		break;
-*/
+		return 0;
+
 	case WM_MOUSEMOVE:
 		{
 		Bmscr *bm;
@@ -337,6 +344,18 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 			tme.dwHoverTime = HOVER_DEFAULT;
 			_TrackMouseEvent( &tme );
 		}
+		if (code_isirq(HSPIRQ_ONCLICK)) {
+#ifdef HSPERR_HANDLE
+			try {
+#endif
+				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam);
+#ifdef HSPERR_HANDLE
+			}
+			catch (HSPERROR code) {						// HSPエラー例外処理
+				code_catcherror(code);
+			}
+#endif
+		}
 		break;
 		}
 
@@ -386,20 +405,27 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	case WM_QUERYENDSESSION:
 	case WM_CLOSE:
 		{
-		int id,retval;
-		id = GetWindowLong( hwnd, GWL_USERDATA );
-		if ( code_isirq( HSPIRQ_ONEXIT ) ) {
-			int iparam = 0;
-			if ( uMessage == WM_QUERYENDSESSION ) iparam++;
-			retval = code_sendirq( HSPIRQ_ONEXIT, iparam, id, 0 );
-			if ( retval == RUNMODE_INTJUMP ) retval = code_execcmd2();	// onexit goto時は実行してみる
-			if ( retval != RUNMODE_END ) return 0;
-			//break;
+		int id, retval;
+		id = (int)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (code_isirq(HSPIRQ_ONEXIT)) {
+#ifdef HSPERR_HANDLE
+			try {
+#endif
+				int iparam = 0;
+				if (uMessage == WM_QUERYENDSESSION) iparam++;
+				retval = code_sendirq(HSPIRQ_ONEXIT, iparam, id, 0);
+				if (retval == RUNMODE_INTJUMP) retval = code_execcmd2();	// onexit goto時は実行してみる
+#ifdef HSPERR_HANDLE
+			}
+			catch (HSPERROR code) {						// HSPエラー例外処理
+				code_catcherror(code);
+			}
+#endif
+			if (retval != RUNMODE_END) return 0;
 		}
-		code_puterror( HSPERR_NONE );
+		code_puterror(HSPERR_NONE);
 		PostQuitMessage(0);
-		return 0;
-		//break;
+		return (uMessage == WM_QUERYENDSESSION) ? true : false;
 		}
 
 	}
@@ -567,16 +593,21 @@ static void hsp3dish_dispatch( MSG *msg )
 	}
 #endif
 
-#if 0
-	if ( msg->message==WM_KEYDOWN ) {	// ocheck onkey
-		if ( msg->wParam == 9 ) {
-//			hsp3gr_nextobj();
-		}
-		if ( code_isirq( HSPIRQ_ONKEY ) ) {
-			code_sendirq( HSPIRQ_ONKEY, (int)MapVirtualKey( msg->wParam, 2 ), (int)msg->wParam, (int)msg->lParam );
+	if (msg->message == WM_KEYDOWN) {	// ocheck onkey
+		if (code_isirq(HSPIRQ_ONKEY)) {
+#ifdef HSPERR_HANDLE
+			try {
+#endif
+				code_sendirq(HSPIRQ_ONKEY, (int)MapVirtualKey(msg->wParam, 2), (int)msg->wParam, (int)msg->lParam);
+#ifdef HSPERR_HANDLE
+			}
+			catch (HSPERROR code) {						// HSPエラー例外処理
+				code_catcherror(code);
+			}
+#endif
 		}
 	}
-#endif
+
 }
 
 

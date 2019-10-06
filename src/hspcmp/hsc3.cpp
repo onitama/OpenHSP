@@ -242,8 +242,6 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 {
 	//		Compile
 	//
-	//int res;
-	//res = tcomp_main( fname, outname, errbuf, mode, "" );
 
 	int res;
 	int genmode;
@@ -267,17 +265,26 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 
 	sprintf( mm,"#%s ver%s / onion software 1997-2019(c)", HSC3TITLE2, hspver );
 	tk.Mes( mm );
-	if ( genmode & HSC3_MODE_UTF8 ) {
-		tk.Mes( "#use UTF-8 strings." );
+	if (genmode & HSC3_MODE_UTF8) {
+		tk.Mes("#use UTF-8 strings.");
+	}
+	if (genmode & HSC3_MODE_STRMAP) {
+		tk.Mes("#output string map.");
 	}
 
 	if ( outbuf != NULL ) {
 		res = tk.GenerateCode( outbuf, outname, genmode );
 	} else {
-		res = tk.GenerateCode( fname, outname, genmode );
+		res = tk.GenerateCode( fname, outname, genmode| HSC3_MODE_STRMAP);
 	}
 
 	return res;
+}
+
+
+int CHsc3::CompileStrMap(char* fname, char* outname, int mode)
+{
+	return Compile(fname, outname, mode| HSC3_MODE_STRMAP);
 }
 
 

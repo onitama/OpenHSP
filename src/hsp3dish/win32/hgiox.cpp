@@ -45,7 +45,9 @@ int OpenMemFilePtr( char *fname )
 {
 	int fsize;
 	fsize = dpm_exist( fname );		// ファイルのサイズを取得
-	if ( fsize <= 0 ) return -1;
+	if ( fsize <= 0 ) {
+		return -1;
+	}
 	mfptr_depth++;
 	if ( mfptr_depth >= MFPTR_MAX ) return -1;
 	mfptr[mfptr_depth] = (char *)malloc( fsize );
@@ -802,7 +804,7 @@ int hgio_stick( int actsw )
 int hgio_redraw( BMSCR *bm, int flag )
 {
 	//		redrawモード設定
-	//		(必ずredraw 0～redraw 1をペアにすること)
+	//		(必ずredraw 0〜redraw 1をペアにすること)
 	//
 	if ( bm == NULL ) return -1;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
@@ -909,10 +911,35 @@ int hgio_gsel( BMSCR *bm )
 }
 
 
-int hgio_buffer(BMSCR *bm)
+int hgio_buffer(BMSCR* bm)
 {
-	//		buffer(描画用画面作成) 未実装
+	//		buffer(描画用画面作成)
 	//
+	int texid = RegistTexEmpty(bm->sx, bm->sy, 1);
+	if (texid >= 0) {
+		bm->texid = texid;
+	}
+	return 0;
+}
+
+
+int hgio_bufferop(BMSCR* bm, int mode, char *ptr)
+{
+	//		オフスクリーンバッファを操作
+	//
+	int texid = bm->texid;
+	if (texid < 0) return -1;
+
+	if (mode & 0x1000) {
+		return UpdateTexStar(texid, mode & 0xfff);
+	}
+
+	switch (mode) {
+	case 0:
+		return UpdateTex32(texid, ptr, 0);
+	default:
+		return -2;
+	}
 	return 0;
 }
 
@@ -1113,7 +1140,7 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 	if (drawflag == 0) hgio_render_start();
 
 	rate = D3DX_PI * 2.0f / (float)CIRCLE_DIV;
-	sx = abs(x2-x1); sy = abs(y2-y1);
+	sx = (float)fabs(x2-x1); sy = (float)fabs(y2-y1);
 	rx = sx * 0.5f;
 	ry = sy * 0.5f;
 	x = x1 + rx;
@@ -1125,8 +1152,8 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 
 	v = arScreen;
 	for(int i = 1; i<=CIRCLE_DIV + 1; i ++) {
-		v->x = x + cos((float)i * rate)*rx;
-		v->y = y + sin((float)i * rate)*ry;
+		v->x = x + (float)cos((float)i * rate)*rx;
+		v->y = y + (float)sin((float)i * rate)*ry;
 		v->z = 0.0f;
 		v->rhw = 1.0f;
 		v->color = col;
@@ -1398,15 +1425,13 @@ void hgio_setfilter( int type, int opt )
 }
 
 
-#if 1
-
-
-
+#if 0
 void hgio_setcenter( float x, float y )
 {
 	center_x = x;
 	center_y = y;
 }
+
 
 void hgio_drawsprite( hgmodel *mdl, HGMODEL_DRAWPRM *prm )
 {
@@ -1515,7 +1540,7 @@ void hgio_drawsprite( hgmodel *mdl, HGMODEL_DRAWPRM *prm )
 	// とりあえず直接描画(四角形)
 	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2D,sizeof(D3DTLVERTEX));
 }
-
+#endif
 
 void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, int *uvy )
 {
@@ -1727,8 +1752,6 @@ HWND hgio_gethwnd( void )
 {
 	return master_wnd;
 }
-
-#endif
 
 
 int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSCR *bmsrc )

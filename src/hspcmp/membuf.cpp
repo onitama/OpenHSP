@@ -91,9 +91,17 @@ void CMemBuf::RegistIndex( int val )
 }
 
 
-void CMemBuf::Index( void )
+void CMemBuf::Index(void)
 {
-	RegistIndex( cur );
+	RegistIndex(cur);
+}
+
+
+void CMemBuf::IndexExclusive(void)
+{
+	if (SearchIndexValue(cur) < 0) {
+		RegistIndex(cur);
+	}
 }
 
 
@@ -356,7 +364,8 @@ void CMemBuf::SetIndex( int idx, int val )
 
 int CMemBuf::GetIndex( int idx )
 {
-	if ( idxflag==0 ) return -1;
+	if ( idxflag==0 ) return 0;
+	if ((idx < 0) || ( idx>=curidx)) return 0;
 	return idxbuf[idx];
 }
 
@@ -371,11 +380,27 @@ int CMemBuf::GetIndexBufferSize( void )
 int CMemBuf::SearchIndexValue( int val )
 {
 	int i;
-	int j;
 	if ( idxflag==0 ) return -1;
+	for(i=0;i< curidx;i++) {
+		if ( idxbuf[i] == val ) return i;
+	}
+	return -1;
+}
+
+
+int CMemBuf::SearchIndexedData(char* data, int size)
+{
+	int i;
+	int j;
+	int sz = size;
+	if (idxflag == 0) return -1;
+	if (sz < 0) sz = (int)strlen(data)+1;
+	if (sz == 0) return -1;
+
 	j = -1;
-	for(i=0;i<cur;i++) {
-		if ( idxbuf[i] == val ) j=i;
+	for (i = 0; i < curidx; i++) {
+		char* p = mem_buf + idxbuf[i];
+		if (memcmp( p, data, sz )==0) j = idxbuf[i];
 	}
 	return j;
 }

@@ -1,7 +1,7 @@
 /**
  * @license
- * Copyright (C) 1997-2014, Onion Software/onitama.
- * Copyright (C) 2014, zakki.
+ * Copyright (C) 1997-, Onion Software/onitama.
+ * Copyright (C) 2014-, zakki, K-s.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

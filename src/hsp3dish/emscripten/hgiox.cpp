@@ -507,6 +507,27 @@ int hgio_buffer(BMSCR *bm)
 {
 	//		buffer(描画用画面作成) 未実装
 	//
+	int texid = MakeEmptyTex( bm->sx, bm->sy );
+	if (texid >= 0) {
+		bm->texid = texid;
+	}
+	return 0;
+}
+
+
+int hgio_bufferop(BMSCR* bm, int mode, char *ptr)
+{
+	//		オフスクリーンバッファを操作
+	//
+	int texid = bm->texid;
+	if (texid < 0) return -1;
+
+	switch (mode) {
+	case 0:
+		return 0;
+	default:
+		return -2;
+	}
 	return 0;
 }
 
@@ -2058,114 +2079,6 @@ void hgio_SetAlphaModeDG( int efxprm )
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,_filter); 
 }
 
-
-void hgio_drawsprite( hgmodel *mdl, HGMODEL_DRAWPRM *prm )
-{
-	//		画像コピー(DG用)
-	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
-	//		カレントポジション、描画モードはBMSCRから取得
-	//
-	TEXINF *tex = GetTex( prm->tex );
-	if ( tex->mode == TEXMODE_NONE ) return;
-
-    GLfloat *flp;
-    float ratex,ratey;
-	float ang;
-	short ua_ofsx, ua_ofsy;
-
-	int texpx,texpy,texid;
-	GLfloat x,y,x0,y0,x1,y1,ofsx,ofsy,mx0,mx1,my0,my1;
-	GLfloat tx0,ty0,tx1,ty1,sx,sy;
-
-    //Alertf( "(%d,%d)(%d,%d)(%f,%f)",xx,yy,srcsx,srcsy,psx,psy );
-    
-	ang = prm->rot.z;
-	mx0=-(float)sin( ang );
-	my0=(float)cos( ang );
-	mx1 = -my0;
-	my1 = mx0;
-    
-	ofsx = mdl->center_x * prm->scale.x;
-	ofsy = mdl->center_y * prm->scale.y;
-	x0 = mx0 * ofsy;
-	y0 = my0 * ofsy;
-	x1 = mx1 * ofsx;
-	y1 = my1 * ofsx;
-    
-	//		基点の算出
-	x = ( prm->pos.x - (-x0+x1) ) + center_x;
-	y = ( prm->pos.y - (-y0+y1) ) + center_y;
-    
-	/*-------------------------------*/
-    
-	//		回転座標の算出
-	ofsx = -( mdl->sizex * prm->scale.x );
-	ofsy = -( mdl->sizey * prm->scale.y );
-	x0 = mx0 * ofsy;
-	y0 = my0 * ofsy;
-	x1 = mx1 * ofsx;
-	y1 = my1 * ofsx;
-    
-	/*-------------------------------*/
-    
-	sx = tex->ratex;
-	sy = tex->ratey;
-    //sx = 1.0f / image.width;
-    //sy = 1.0f / image.height;
-
-	ua_ofsx = prm->ua_ofsx;
-	ua_ofsy = prm->ua_ofsy;
-	tx0 = ((float)(mdl->uv[0]+ua_ofsx) ) * sx;
-	ty0 = ((float)(mdl->uv[1]+ua_ofsy) ) * sy;
-	tx1 = ((float)(mdl->uv[2]+ua_ofsx) ) * sx;
-	ty1 = ((float)(mdl->uv[3]+ua_ofsy) ) * sy;
-
-
-    flp = uvf2D;
-    *flp++ = tx0;
-    *flp++ = ty0;
-    *flp++ = tx0;
-    *flp++ = ty1;
-    *flp++ = tx1;
-    *flp++ = ty0;
-    *flp++ = tx1;
-    *flp++ = ty1;
-
-	/*-------------------------------*/
-
-    flp = vertf2D;
-    
-	*flp++ = (x);
-	*flp++ = -(y);
-    
-	/*-------------------------------*/
-
-	*flp++ = ((-x0) + x);
-	*flp++ = -((-y0) + y);
-    
-	/*-------------------------------*/
-    
-	*flp++ = ((x1) + x);
-	*flp++ = -((y1) + y);
-    
-	/*-------------------------------*/
-
-	*flp++ = ((-x0+x1) + x);
-	*flp++ = -((-y0+y1) + y);
-    
-	/*-------------------------------*/
-    
-	ChangeTex( tex->texid );
-    //glBindTexture(GL_TEXTURE_2D,image.name);
-
-    glVertexPointer(2,GL_FLOAT,0,vertf2D);
-    glTexCoordPointer(2,GL_FLOAT,0,uvf2D);
-
-	hgio_SetAlphaModeDG( (int)prm->efx.x );
-	//hgio_setTexBlendMode( bm->gmode, bm->gfrate );
-    //glDisableClientState(GL_COLOR_ARRAY);
-    glDrawArrays(GL_TRIANGLE_STRIP,0,4);
-}
 
 HSPREAL hgio_getinfo( int type )
 {

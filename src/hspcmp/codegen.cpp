@@ -314,7 +314,7 @@ void CToken::CalcCG( int ex )
 char *CToken::PickLongStringCG( char *str )
 {
 	//		指定文字列をmembufへ展開する
-	//		( 複数行対応 {"～"} )
+	//		( 複数行対応 {"〜"} )
 	//
 	char *p;
 	char *psrc;
@@ -515,13 +515,13 @@ char *CToken::GetTokenCG( char *str, int option )
 		throw CGERROR_UNKNOWN;
 	}
 
-	if (a1==0x22) {								// "～"
+	if (a1==0x22) {								// "〜"
 		vs++;
 		ttype = TK_STRING; cg_str = (char *)vs;
 		return PickStringCG( (char *)vs, 0x22 );
 	}
 
-	if (a1=='{') {							// {"～"}
+	if (a1=='{') {							// {"〜"}
 		if (vs[1]==0x22) {
 			vs+=2;
 			if ( *vs == 0 ) {
@@ -533,7 +533,7 @@ char *CToken::GetTokenCG( char *str, int option )
 		}
 	}
 
-	if (a1==0x27) {								// '～'
+	if (a1==0x27) {								// '〜'
 		char *p;
 		vs++; cg_str = (char *)vs;
 		p = PickStringCG( (char *)vs, 0x27 );
@@ -1370,6 +1370,12 @@ void CToken::CheckInternalProgCMD( int opt, int orgcs )
 			//Mesf( "#initflag set [%s]", cg_str );
 		}
 		break;
+
+	case 0x20:					// strexchange
+		//	strexchange命令の出現をカウントする(ヘッダ自動設定のため)
+		if (hed_autoopt_strexchange >= 0) hed_autoopt_strexchange++;
+		break;
+
 	}
 }
 
@@ -2544,18 +2550,6 @@ int CToken::PutDS(double value)
 	//
 	int i = ds_buf->GetSize();
 
-#ifdef HSP_DS_POOL
-	if ( CG_optCode() ) {
-		int i_cache =
-			double_literal_table.insert(std::make_pair(value, i))
-			.first->second;
-		if ( i != i_cache ) {
-			if ( CG_optInfo() ) { Mesf("#実数リテラルプール %f", value); }
-			return i_cache;
-		}
-	}
-#endif
-
 	ds_buf->Put(value);
 	return i;
 }
@@ -2592,21 +2586,19 @@ int CToken::PutDSStr(char *str, bool converts_to_utf8)
 
 	int i = ds_buf->GetSize();
 
-#ifdef HSP_DS_POOL
 	if ( CG_optCode() ) {
-		int i_cache =
-			string_literal_table.insert(std::make_pair(std::string(p), i))
-			.first->second;
-		if ( i != i_cache ) {
-			if ( CG_optInfo() ) {
-				char *literal_str = to_hsp_string_literal(str);
-				Mesf("#文字列プール %s", literal_str);
-				free(literal_str);
+		if (*p != 0) {
+			int i_cache = ds_buf->SearchIndexedData(p, -1);
+			if (i_cache >= 0) {
+				if (CG_optInfo()) {
+					Mesf("#String pool:%s", p);
+				}
+				return i_cache;
 			}
-			return i_cache;
 		}
 	}
-#endif
+
+	ds_buf->IndexExclusive();				// 文字列はindexを登録する
 
 	if ( converts_to_utf8 ) {
 		ds_buf->PutData(p, (int)(strlen(p) + 1));
@@ -2996,7 +2988,11 @@ void CToken::PutHPI( short flag, short option, char *libname, char *funcname )
 	hpi.option = option;
 	hpi.libname = PutDSBuf( libname );
 	hpi.funcname = PutDSBuf( funcname );
+#ifndef HSP64
 	hpi.libptr = NULL;
+#else
+	hpi.p_libptr = 0;
+#endif
 	hpi_buf->PutData( &hpi, sizeof(HPIDAT) );
 }
 
@@ -3021,6 +3017,7 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 	int i,orgcs,res;
 	int adjsize;
 	CMemBuf optbuf;				// オプション文字列用バッファ
+	CMemBuf exoptbuf;			// 拡張オプション用バッファ
 	CMemBuf bakbuf;				// プリプロセッサソース保存用バッファ
 
 	cs_buf = new CMemBuf;
@@ -3037,7 +3034,10 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 
 	cg_debug = mode & COMP_MODE_DEBUG;
 	cg_utf8out = mode & COMP_MODE_UTF8;
+	cg_strmap = mode & COMP_MODE_STRMAP;
 	if ( pp_utf8 ) cg_utf8out = 0;						// ソースコードがUTF-8の場合は変換は必要ない
+
+	ds_buf->AddIndexBuffer();
 
 	cg_putvars = hed_cmpmode & CMPMODE_PUTVARS;
 	res = GenerateCodeMain( srcbuf );
@@ -3058,6 +3058,7 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		HSPHED hsphed;
 		int sz_hed, sz_opt, cs_size, ds_size, ot_size, di_size;
 		int li_size, fi_size, mi_size, fi2_size, hpi_size;
+		int sz_exopt;
 
 		orgcs = GetCS();
 		PutCS( TYPE_PROGCMD, 0x11, EXFLG_1 );			// 終了コードを最後に入れる
@@ -3116,6 +3117,21 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		if (hed_option & HEDINFO_ORGRND) hsphed.bootoption |= HSPHED_BOOTOPT_ORGRND;		// 標準の乱数発生を使用する
 		if (hed_option & HEDINFO_IORESUME) hsphed.bootoption |= HSPHED_BOOTOPT_IORESUME;	// ファイルI/Oエラーを無視して処理を続行する
 
+		//		文字列テーブルの作成
+		if (hed_autoopt_strexchange > 0) {
+			int dspool_size = ds_buf->GetIndexBufferSize();
+			if (dspool_size) {
+				exoptbuf.Put((int)(HSPHED_EXOPTION_TAG_DSINDEX)+(dspool_size << 16));
+				exoptbuf.PutData(ds_buf->GetIndexBuffer(), dspool_size * sizeof(int));
+			}
+		}
+		if (exoptbuf.GetSize()) {
+			//	exoptの終端
+			exoptbuf.Put((int)HSPHED_EXOPTION_TAG_NONE);
+		}
+
+		sz_exopt = exoptbuf.GetSize();
+
 		cs_size = cs_buf->GetSize();
 		ds_size = ds_buf->GetSize();
 		ot_size = ot_buf->GetSize();
@@ -3131,10 +3147,10 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		hsphed.h2='S';
 		hsphed.h3='P';
 		hsphed.h4='3';
-		hsphed.version = 0x0350;						// version3.5
+		hsphed.version = 0x0360;						// version3.5
 		hsphed.max_val = cg_valcnt;						// max count of VAL Object
 		hsphed.allsize  = sz_hed + cs_size + ds_size + ot_size + di_size;
-		hsphed.allsize += li_size + fi_size + mi_size + fi2_size + hpi_size;
+		hsphed.allsize += li_size + fi_size + mi_size + fi2_size + hpi_size + sz_exopt;
 
 		hsphed.pt_cs = sz_hed;							// ptr to Code Segment
 		hsphed.max_cs = cs_size;						// size of CS
@@ -3163,8 +3179,8 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 
 		hsphed.pt_sr = sizeof(HSPHED);					// ptr to Option Segment
 		hsphed.max_sr = sz_opt;							// size of Option Segment
-		hsphed.opt1 = 0;
-		hsphed.opt2 = 0;
+		hsphed.pt_exopt = hsphed.pt_hpidat + hpi_size;
+		hsphed.max_exopt = sz_exopt;
 
 
 		axbuf.PutData( &hsphed, sizeof(HSPHED) );
@@ -3179,9 +3195,15 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		if ( fi_size ) axbuf.PutData( fi_buf->GetBuffer(), fi_size );
 		if ( mi_size ) axbuf.PutData( mi_buf->GetBuffer(), mi_size );
 		if ( fi2_size ) axbuf.PutData( fi2_buf->GetBuffer(), fi2_size );
-		if ( hpi_size ) axbuf.PutData( hpi_buf->GetBuffer(), hpi_size );
+		if (hpi_size) axbuf.PutData( hpi_buf->GetBuffer(), hpi_size );
+		if (sz_exopt) axbuf.PutData( exoptbuf.GetBuffer(), sz_exopt );
 
-		res = axbuf.SaveFile( oname );
+		if (cg_strmap) {
+			res = SaveStringMap(oname);
+		}
+		else {
+			res = axbuf.SaveFile(oname);
+		}
 		if ( res<0 ) {
 #ifdef JPNMSG
 			Mes( "#出力ファイルを書き込めません" );
@@ -3194,6 +3216,9 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 			n_mod = fi_buf->GetSize() / sizeof(STRUCTDAT);
 			Mesf( "#Code size (%d) String data size (%d) param size (%d)",cs_size,ds_size,mi_buf->GetSize() );
 			Mesf( "#Vars (%d) Labels (%d) Modules (%d) Libs (%d) Plugins (%d)",cg_valcnt,ot_size>>2,n_mod,li_size,n_hpi );
+			if (sz_exopt) {
+				Mesf("#Output extra data field (%d).", sz_exopt);
+			}
 			Mesf( "#No error detected. (total %d bytes)",hsphed.allsize );
 			res = 0;
 		}
@@ -3227,3 +3252,39 @@ void CToken::CG_MesLabelDefinition(int label_id)
 #endif
 	}
 }
+
+
+int	CToken::SaveStringMap(char* fname)
+{
+	//	Output String Map
+	//
+	int max, i, ofs, ptr, chksum;
+	unsigned char* p;
+	unsigned char* mem;
+	unsigned char a1;
+	CMemBuf outbuf;
+
+	outbuf.PutStrf(";	strmap v0.5 %s", fname);
+	outbuf.PutCR();
+
+	max = ds_buf->GetIndexBufferSize();
+	mem = (unsigned char *)ds_buf->GetBuffer();
+	for (i = 0; i < max; i++) {
+		ptr = ds_buf->GetIndex(i);
+		p = mem + ptr;
+		chksum = 0; ofs = 0;
+		while (1) {
+			a1 = p[ofs++];
+			if (a1 == 0) break;
+			chksum += ofs + ((int)a1)*7;
+		}
+		outbuf.PutStrf("&&&&dsmap:%d,%d,%d", ofs, ptr, chksum);
+		outbuf.PutCR();
+		outbuf.PutStr((char *)p);
+		outbuf.PutCR();
+	}
+
+	return outbuf.SaveFile(fname);
+}
+
+

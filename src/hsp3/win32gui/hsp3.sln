@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsp3", "hsp3.vcxproj", "{05713FB6-5219-4BB5-B965-F30E5040BA7C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Debug-unicode|x86 = Debug-unicode|x86
+		hsprt|x86 = hsprt|x86
+		hsprt-unicode|x86 = hsprt-unicode|x86
+		Release|x86 = Release|x86
+		Release-unicode|x86 = Release-unicode|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Debug|x86.ActiveCfg = Debug|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Debug|x86.Build.0 = Debug|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Debug-unicode|x86.ActiveCfg = Debug-unicode|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Debug-unicode|x86.Build.0 = Debug-unicode|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.hsprt|x86.ActiveCfg = hsprt|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.hsprt|x86.Build.0 = hsprt|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.hsprt-unicode|x86.ActiveCfg = hsprt-unicode|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.hsprt-unicode|x86.Build.0 = hsprt-unicode|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Release|x86.ActiveCfg = Release|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Release|x86.Build.0 = Release|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Release-unicode|x86.ActiveCfg = Release-unicode|Win32
+		{05713FB6-5219-4BB5-B965-F30E5040BA7C}.Release-unicode|x86.Build.0 = Release-unicode|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F26A0EC-DF40-4C57-BB0F-68C9B767DB0D}
+	EndGlobalSection
+EndGlobal

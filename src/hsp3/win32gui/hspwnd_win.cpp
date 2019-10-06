@@ -123,9 +123,18 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	Bmscr *bm;
 
 	if ( code_isuserirq() ) {
+#ifdef HSPERR_HANDLE
+		try {
+#endif
 		if ( code_checkirq( (int)GetWindowLongPtr( hwnd, GWLP_USERDATA ), (int)uMessage, (int)wParam, (int)lParam ) ) {
 			if ( code_irqresult( &retval ) ) return retval;
 		}
+#ifdef HSPERR_HANDLE
+		}
+		catch (HSPERROR code) {						// HSPエラー例外処理
+			code_catcherror(code);
+		}
+#endif
 	}
 
 	switch (uMessage)
@@ -201,7 +210,16 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	case WM_RBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 		if ( code_isirq( HSPIRQ_ONCLICK ) ) {
-			code_sendirq( HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam );
+#ifdef HSPERR_HANDLE
+			try {
+#endif
+				code_sendirq( HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam );
+#ifdef HSPERR_HANDLE
+			}
+			catch (HSPERROR code) {						// HSPエラー例外処理
+				code_catcherror(code);
+			}
+#endif
 		}
 		break;
 	case WM_COMMAND:
@@ -229,10 +247,19 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	case WM_CLOSE:
 		id = (int)GetWindowLongPtr( hwnd, GWLP_USERDATA );
 		if ( code_isirq( HSPIRQ_ONEXIT ) ) {
-			int iparam = 0;
-			if ( uMessage == WM_QUERYENDSESSION ) iparam++;
-			retval = code_sendirq( HSPIRQ_ONEXIT, iparam, id, 0 );
-			if ( retval == RUNMODE_INTJUMP ) retval = code_execcmd2();	// onexit goto時は実行してみる
+#ifdef HSPERR_HANDLE
+			try {
+#endif
+				int iparam = 0;
+				if ( uMessage == WM_QUERYENDSESSION ) iparam++;
+				retval = code_sendirq( HSPIRQ_ONEXIT, iparam, id, 0 );
+				if ( retval == RUNMODE_INTJUMP ) retval = code_execcmd2();	// onexit goto時は実行してみる
+#ifdef HSPERR_HANDLE
+			}
+			catch (HSPERROR code) {						// HSPエラー例外処理
+				code_catcherror(code);
+			}
+#endif
 			if ( retval != RUNMODE_END ) return 0;
 		}
 		code_puterror( HSPERR_NONE );
@@ -546,8 +573,8 @@ void HspWnd::MakeBmscrWnd( int id, int type, int xx, int yy, int wx, int wy, int
 	rc.right = wx;
 	rc.bottom = wy;
 	if ( AdjustWindowRectEx( &rc, style, FALSE, exstyle ) ) {
-		bm->framesx = rc.right - rc.left - wx;
-		bm->framesy = rc.bottom - rc.top - wy;
+		bm->framesx = (short)(rc.right - rc.left - wx);
+		bm->framesy = (short)(rc.bottom - rc.top - wy);
 	} else {
 		bm->framesx = wfx;
 		bm->framesy = wfy;
@@ -598,7 +625,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
 	long hmWidth, hmHeight;
 	LPPICTURE gpPicture;							// IPicture
     LPSTREAM pstm = NULL;							// IStreamを取得する
-	char fext[8];
+	//char fext[8];
 	int stbmode;
 	HSPAPICHAR *hactmp1 = 0;
 	HSPAPICHAR wfext[8];

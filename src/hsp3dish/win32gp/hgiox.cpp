@@ -221,7 +221,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	nDestWidth = sx;
 	nDestHeight = sy;
 
-#if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+#if defined(HSPNDK) || defined(HSPIOS) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 	_originX = 0;
 	_originY = 0;
 	_scaleX = 1.0f;
@@ -554,7 +554,7 @@ bool hgio_getkey( int kcode )
 int hgio_redraw( BMSCR *bm, int flag )
 {
 	//		redrawモード設定
-	//		(必ずredraw 0～redraw 1をペアにすること)
+	//		(必ずredraw 0〜redraw 1をペアにすること)
 	//
 	if ( bm == NULL ) return -1;
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return -1;
@@ -794,45 +794,6 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 	}
 
 	game->finishPolyColor2D();
-
-
-	/*
-	D3DTLVERTEXC *v;
-	D3DTLVERTEXC arScreen[CIRCLE_DIV + 2];
-	int col;
-	float x,y,rx,ry,sx,sy,rate;
-
-	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
-
-	rate = D3DX_PI * 2.0f / (float)CIRCLE_DIV;
-	sx = abs(x2-x1); sy = abs(y2-y1);
-	rx = sx * 0.5f;
-	ry = sy * 0.5f;
-	x = x1 + rx;
-	y = y1 + ry;
-
-	ChangeTex( -1 );
-	SetAlphaMode( 0 );
-	col = bm->color;
-
-	v = arScreen;
-	for(int i = 1; i<=CIRCLE_DIV + 1; i ++) {
-		v->x = x + cos((float)i * rate)*rx;
-		v->y = y + sin((float)i * rate)*ry;
-		v->z = 0.0f;
-		v->rhw = 1.0f;
-		v->color = col;
-		v++;
-	}
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEXC);
-	// とりあえず直接描画(四角形)
-	d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,CIRCLE_DIV,arScreen,sizeof(D3DTLVERTEXC));
-	d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
-	*/
 }
 
 
@@ -1176,103 +1137,6 @@ void hgio_setfilter( int type, int opt )
 		mat->setFilter(Texture::Filter::NEAREST);
 		break;
 	}
-}
-
-
-#if 1
-
-void hgio_setcenter( float x, float y )
-{
-	center_x = x;
-	center_y = y;
-}
-
-void hgio_drawsprite( hgmodel *mdl, HGMODEL_DRAWPRM *prm )
-{
-	//		画像コピー(DG用)
-	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
-	//		カレントポジション、描画モードはBMSCRから取得
-	//
-	/*
-	D3DTLVERTEX *v;
-	TEXINF *tex;
-	int texid;
-	short ua_ofsx, ua_ofsy;
-	float ang,x,y,x0,y0,x1,y1,ofsx,ofsy,mx0,mx1,my0,my1;
-	float tx0,ty0,tx1,ty1,sx,sy;
-
-	ang = prm->rot.z;
-	mx0=-(float)sin( ang );
-	my0=(float)cos( ang );
-	mx1 = -my0;
-	my1 = mx0;
-
-	ofsx = mdl->center_x * (prm->scale.x);
-	ofsy = mdl->center_y * (prm->scale.y);
-	x0 = mx0 * ofsy;
-	y0 = my0 * ofsy;
-	x1 = mx1 * ofsx;
-	y1 = my1 * ofsx;
-
-	//		基点の算出
-	x = ( prm->pos.x - (-x0+x1) ) + center_x;
-	y = ( prm->pos.y - (-y0+y1) ) + center_y;
-
-	//		回転座標の算出
-	ofsx = -( mdl->sizex * (prm->scale.x) );
-	ofsy = -( mdl->sizey * (prm->scale.y) );
-	x0 = mx0 * ofsy;
-	y0 = my0 * ofsy;
-	x1 = mx1 * ofsx;
-	y1 = my1 * ofsx;
-
-	texid = prm->tex;
-	ChangeTex( texid );
-	tex = GetTex( texid );
-	sx = tex->ratex;
-	sy = tex->ratey;
-
-	//Alertf( "%d (%f,%f)",texid, x,y );
-
-	ua_ofsx = prm->ua_ofsx;
-	ua_ofsy = prm->ua_ofsy;
-	tx0 = ((float)(mdl->uv[0]+ua_ofsx) ) * sx;
-	ty0 = ((float)(mdl->uv[1]+ua_ofsy) ) * sy;
-	tx1 = ((float)(mdl->uv[2]+ua_ofsx) ) * sx;
-	ty1 = ((float)(mdl->uv[3]+ua_ofsy) ) * sy;
-
-	v = vertex2D;
-	v[0].color = v[1].color = v[2].color = v[3].color = SetAlphaModeDG( (int)prm->efx.x ) | 0xffffff;
-
-	v->x = ((-x0+x1) + x);
-	v->y = ((-y0+y1) + y);
-	v->tu0 = tx1;
-	v->tv0 = ty1;
-	v++;
-
-	v->x = ((x1) + x);
-	v->y = ((y1) + y);
-	v->tu0 = tx1;
-	v->tv0 = ty0;
-	v++;
-
-	v->x = (x);
-	v->y = (y);
-	v->tu0 = tx0;
-	v->tv0 = ty0;
-	v++;
-
-	v->x = ((-x0) + x);
-	v->y = ((-y0) + y);
-	v->tu0 = tx0;
-	v->tv0 = ty1;
-	v++;
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEX);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2D,sizeof(D3DTLVERTEX));
-	*/
 }
 
 
@@ -1630,7 +1494,7 @@ void hgio_text_render( void )
 {
 }
 
-#endif
+
 
 
 
@@ -1869,4 +1733,23 @@ char *hgio_getdir( int id )
 #endif
 
 /*-------------------------------------------------------------------------------*/
+
+int hgio_bufferop(BMSCR* bm, int mode, char* ptr)
+{
+	//		オフスクリーンバッファを操作
+	//
+	gpmat* mat;
+	int texid = bm->texid;
+	if (texid < 0) return -1;
+
+	switch (mode) {
+	case 0:
+		mat = game->getMat(texid);
+		return mat->updateTex32(ptr, 0);
+	default:
+		return -2;
+	}
+	return 0;
+}
+
 

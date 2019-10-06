@@ -14,14 +14,6 @@
 #include "hspwnd_dish.h"
 #include "geometry.h"
 
-#include "hgmodel.h"
-#include "hgevent.h"
-#include "hgemitter.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //		universal draw command function
 //
 void hgio_init( int mode, int sx, int sy, void *hwnd );
@@ -29,6 +21,7 @@ void hgio_term( void );
 void hgio_resume( void );
 int hgio_gsel( BMSCR *bm );
 int hgio_buffer(BMSCR *bm);
+int hgio_bufferop(BMSCR* bm, int mode, char *ptr);
 
 void hgio_size( int sx, int sy );
 void hgio_view( int sx, int sy );
@@ -62,7 +55,6 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang );
 int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSCR *bmsrc );
 
 void hgio_setcenter( float x, float y );
-void hgio_drawsprite( hgmodel *mdl, HGMODEL_DRAWPRM *prm );
 
 void hgio_clsmode( int mode, int color, int tex );
 int hgio_getWidth( void );
@@ -87,10 +79,6 @@ void hgio_setmainarg( char *hsp_mainpath, char *cmdprm );
 void hgio_draw_gpsprite( Bmscr *bmscr, bool lateflag );
 void hgio_draw_all(Bmscr *bmscr, int option);
 
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 
 enum {

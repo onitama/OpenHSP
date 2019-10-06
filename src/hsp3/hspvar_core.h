@@ -188,7 +188,7 @@ typedef struct
 /*
 	typefunc
 
-	基本タイプ HSPVAR_FLAG_STR ～ HSPVAR_FLAG_DOUBLE
+	基本タイプ HSPVAR_FLAG_STR 〜 HSPVAR_FLAG_DOUBLE
 	拡張タイプ HSPVAR_FLAG_USERDEF 以降
 
 	式の評価でpval->ptを参照するため、常に配列0のポイントはpval->ptが指し示す必要がある。

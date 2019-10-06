@@ -28,9 +28,11 @@ public:
 	int GetIndex( int idx );
 	int GetIndexBufferSize( void );
 	int SearchIndexValue( int val );
+	int SearchIndexedData(char *data, int size);
 
 	void RegistIndex( int val );
 	void Index( void );
+	void IndexExclusive( void );
 	void Put( int data );
 	void Put( short data );
 	void Put( char data );

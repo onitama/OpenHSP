@@ -1,0 +1,200 @@
+#include "hsp3dish.as"
+#const gr_ball 1
+#const gr_wall 2
+
+	;
+	;	drop game
+	;
+	name="ドロップパズル"
+	randomize
+	cls 4
+	title name
+	celload "koma.png",3
+	celdiv 3,75,80
+
+	mmload "se_puyo.wav",0
+	mmload "se_break3.wav",1
+	mmload "se_block2.wav",2
+
+	high=0
+*demo
+	if score>high : high=score	; 最高得点を更新する
+	objsize 260,60
+	pos 180,300
+	button "スタート",*start
+	mmplay 2
+*demo_loop
+	redraw 0
+	color 0,0,0
+	boxf
+	color 255,255,255
+	font "",50
+	pos 150,60
+	mes name
+	font "",24
+	pos 120,200
+	mes "さいこうスコアは["+score+"]です"
+
+	x=mousex:y=mousey
+	pos x-10,y-10:mes "+"
+
+	redraw 1
+	await 1000/30
+	goto *demo_loop
+
+*start
+	cls 4
+	font "",20
+	zm=3
+
+	qreset			; OBAQの初期化
+	qview zm,zm,0,0
+	qborder -200,-200,200,200
+
+	qaddpoly bg, 24, 100,75-20,0,90,90	; 壁を追加
+	qtype bg, type_bind|type_inner
+	qgroup bg, gr_wall
+	qmat bg,mat_wire, -1
+
+	score=0
+	max=40
+	dim combo,max			; コンボ用IDリスト
+	size=12
+	farsize=size*size
+	fr=0
+	tmode=0
+	cmax=0
+	climit=2
+	timer=3000
+
+*main
+	;	メインループ
+	;
+	stick key,$11f		; キーの取得
+	;if key&128 : end	; [ESC]キーで終了
+
+	redraw 0		; 画面の更新を開始
+	gradf ,,,,1,0,128	; 画面クリア
+
+	gosub *go_drop
+	gosub *go_touch
+
+	qexec			; OBAQによるオブジェクトの更新
+	qdraw 1			; オブジェクトの描画
+	color 255,255,255
+	pos 20,440
+	mes "SCORE:"+score
+	pos 520,440
+	mes "TIMER:"+timer/62
+
+	x=mousex:y=mousey
+	pos x-10,y-10:mes "+"
+
+	redraw 1		; 画面の更新を終了
+	await 16		; 一定時間待つ
+
+	timer--
+	if timer<=0 : goto *demo
+	goto *main
+
+*go_drop
+	;	コマを落とす
+	left=0
+	qfind gr_ball
+	repeat
+		qnext id:if id<0 : break
+		left++		; コマの残り数を数える
+	loop
+
+	if left<max {
+		fr++
+		if fr>4 {
+			; 新しいコマを落とす
+			fr=0
+			x=rnd(90)-45:k=rnd(5)
+			qaddpoly my, 5, x+100,-10,0,size,size	; 追加
+			quser my,k
+			qmat my,mat_spr, 3,k
+			qmat3 my,2
+			qgroup my, gr_ball
+		}
+	}
+	return
+
+*go_touch
+	;	タッチする
+	qcnvaxis ax,ay,mousex,mousey,1	; 画面座標から内部座標に変換
+	qinner res,ax,ay		; 座標を含むオブジェクトを調べる
+	;
+	if tmode=1 : goto *go_thold
+	if tmode=2 : goto *go_tover
+
+	if key&16 {		; 風を発生
+		qblast 100,140,1
+	}
+
+	;	タッチを受け付け
+	if res<0 : return			; タッチできない
+	if key&256 {				; ボタンを押している
+		tmode=1
+		gosub *sub_select
+	}
+	return
+
+*go_thold
+	;	タッチ中
+	if (key&256)=0 {
+		; ボタンを離した
+		tmode=2
+		return
+	}
+	if res<0 : return			; タッチできない
+
+	qgetuser res, u1,u2,u3
+	if tcol!=u1 : return			; 同じ色ではない
+
+	dx=abs(ax-tx):dy=abs(ay-ty)
+	if dx*dx+dy*dy < farsize {		; 距離が近いか?
+		gosub *sub_select
+	}
+	return
+
+*sub_select
+	;	コマをマークする
+	tobj=res
+	tx=ax:ty=ay
+	qgetuser res, u1,u2,u3
+	tcol=u1
+
+	qgetmat3 res, var_gm, var_rate
+	if var_rate=128 : return
+	qmat3 res, 3, 128
+	mmplay 0
+	return
+
+
+*go_tover
+	;	タッチ終了
+	tmode=0
+	cmax=0
+	qfind gr_ball
+	repeat
+		qnext id:if id<0 : break
+		qgetmat3 id, v_gmode, v_rate
+		if v_gmode=3 {
+			qmat3 id,2
+			combo(cmax)=id
+			cmax++
+		}
+	loop
+	if cmax<climit : return			; 規定コンボに達していない
+
+	bonus=0
+	repeat cmax
+		qdel combo(cnt)
+		bonus=bonus+3
+		score=score+bonus
+	loop
+	mmplay 1
+	return
+

@@ -1,0 +1,20 @@
+#include "hsp3dish.as"
+
+	;	HSV sample
+	;
+	y=0
+*main
+	redraw 0
+	x=0:px=2
+	repeat 256
+	hsvcolor y,cnt,255
+	boxf x,0,x+px,px*256
+	x+=px
+	loop
+	y=y+1
+	redraw 1
+	await 20
+	goto *main
+
+
+

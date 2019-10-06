@@ -238,7 +238,7 @@ AHTPROP *AHTMODEL::SetPropertyType( char *propname, int type )
 AHTPROP *AHTMODEL::SetPropertyDefault( char *propname, char *value )
 {
 	//		プロパティのデフォルト値を設定
-	//		("～"を判別する)
+	//		("〜"を判別する)
 	//
 	unsigned char *vp;
 	unsigned char a1;

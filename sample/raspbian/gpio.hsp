@@ -1,0 +1,14 @@
+#include "hsp3dish.as"
+
+	;	RaspberryPiのGPIOを使う
+	;	GPIO#17にLEDが接続されている場合、点滅します
+	;
+	redraw 0
+	mes "GPIO Test"
+	redraw 1
+*hata
+	gpio 17,1	; GPIO #17 ON
+	wait 150
+	gpio 17,0	; GPIO #17 OFF
+	wait 150
+	goto *hata

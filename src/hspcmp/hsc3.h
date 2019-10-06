@@ -19,6 +19,7 @@
 #define HSC3_MODE_DEBUG 1
 #define HSC3_MODE_DEBUGWIN 2
 #define HSC3_MODE_UTF8 4		// UTF8コードを出力
+#define HSC3_MODE_STRMAP 8		// strmapを出力
 
 class CMemBuf;
 class CToken;
@@ -45,7 +46,8 @@ public:
 	int PreProcess( char *fname, char *outname, int option, char *rname, void *ahtoption=NULL );
 	int PreProcessAht( char *fname, void *ahtoption, int mode=0 );
 	void PreProcessEnd( void );
-	int Compile( char *fname, char *outname, int mode );
+	int Compile(char* fname, char* outname, int mode);
+	int CompileStrMap(char* fname, char* outname, int mode);
 	void SetCommonPath( char *path );
 
 	//		Service

@@ -1,0 +1,200 @@
+#include "hsp3dish.as"
+
+	;	ゲームサンプル
+	;	カーソルキーでプレイヤー（大きい丸）を操作し、引っ張られるハンマー（小さい丸）を多角形にぶつけると得点
+	;	プレイヤーと多角形がぶつかるとゲームオーバー
+	;	ゲームオーバー後にスペースかリターンで再スタート
+
+	title "tof2"
+
+	randomize			; 乱数の初期化
+	screen 0, 640, 480	; ウィンドウ初期化
+
+*init
+	; 初期化
+
+	qreset								; OBAQの初期化
+	qborder -120.0, -60.0, 120.0, 60.0	; 壁の設定
+	qgravity 0.0, 0.0					; 重力は無し
+
+	; プレイヤーの移動範囲を設定
+	wallmodel = -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0
+	qaddmodel wall, wallmodel, -1, 80.0, 60.0, 0.0, 72.0, 54.0, colsw_none, 0x04
+	qtype wall, type_bind | type_inner
+	qmat wall, mat_wire, 0xffffff
+
+	; プレイヤーを定義
+	qaddpoly player, 16, 80.0, 60.0, 0.0, 6.0, 6.0
+	qweight player, 36.0 / 8.0, 36.0 * 36.0
+	qdamper player, 0.7, 0.0
+	qinertia player, 0.995
+	qmat player, mat_wire, 0xffffff
+
+	; ハンマーを定義
+	qaddpoly hammer, 16, 80.0, 30.0, 0.0, 3.0, 3.0
+	qweight hammer, 9.0 / 8.0, 9.0 * 9.0
+	qdamper hammer, 0.7, 0.0
+	qinertia hammer, 0.995
+	qmat hammer, mat_wire, 0xffffff
+
+	; ゲーム進行用の情報を定義
+	score = 0
+	gameover = 0
+	rockCount = 0
+
+*main
+	; メインループ
+
+	redraw 0					; 画面の更新を開始
+
+	; 背景描画
+	color 0, 0, 0
+	boxf
+
+	qexec						; OBAQによるオブジェクトの更新
+
+	stick key, 15				; キーの取得
+
+	; ESCキーで終了
+	if key & 128 {
+		end
+	}
+
+	qgetpos player, px, py, pr	; プレイヤー位置を取得
+
+	; ハンマーが衝突した多角形を、一定時間後に消滅させる
+	qfind 2, stat_active
+	qnext tmprock
+	while tmprock >= 0
+		qgetuser tmprock, damage, dummy1, dummy2
+		if damage > 0 {
+			qmat tmprock, mat_wire, 0xffffff - 0x111111 * damage	; 消えかけている色に
+			damage ++
+		}
+		quser tmprock, damage
+		if damage >= 16 {
+			qdel tmprock	; 消滅
+		}
+		qnext tmprock
+	wend
+
+	; ゲーム続行中の処理
+	if gameover = 0 {
+		qblast px, py, -0.01	; プレイヤーの位置へ、物体は緩やかに引き寄せられる
+
+		; カーソルキーでプレイヤーを操作
+		pax = 0.0
+		pay = 0.0
+		par = 0.0
+		qgetspeed player, psx, psy, psr
+		if key & 1 {
+			if psx < 0.0 {
+				pax = -(0.5 + psx) * 0.05	; 限界速度に近づくほど、加速は小さくなる
+			} else {
+				pax = -0.5 * 0.05			; ブレーキの効きは一定
+			}
+		}
+		if key & 4 {
+			if psx > 0.0 {
+				pax = (0.5 - psx) * 0.05
+			} else {
+				pax = 0.5 * 0.05
+			}
+		}
+		if key & 2 {
+			if psy < 0.0 {
+				pay = -(0.5 + psy) * 0.05
+			} else {
+				pay = -0.5 * 0.05
+			}
+		}
+		if key & 8 {
+			if psy > 0.0 {
+				pay = (0.5 - psy) * 0.05
+			} else {
+				pay = 0.5 * 0.05
+			}
+		}
+		qspeed player, pax, pay, par
+
+		; ハンマーをプレイヤーに近づけるゴム状のワイヤー
+		qgetpos hammer, hx, hy, hr
+		qspeed hammer, (px - hx) / 4096.0, (py - hy) / 4096.0, 0.0
+
+		; プレイヤーと多角形が衝突したらゲームオーバー
+		qcollision player
+		qgetcol tmprock, dummyX, dummyY
+		while tmprock >= 0
+			qgetuser tmprock, damage, dummy1, dummy2
+			if damage = 0 {
+				gameover = 1
+			}
+			qgetcol tmprock, dummyX, dummyY
+		wend
+
+		; ハンマーと多角形が衝突したら、多角形の消滅カウントを開始する
+		qcollision hammer
+		qgetcol tmprock, dummyX, dummyY
+		while tmprock >= 0
+			qgetuser tmprock, damage, dummy1, dummy2
+			if damage = 0 {
+				quser tmprock, 1
+				score ++
+			}
+			qgetcol tmprock, dummyX, dummyY
+		wend
+
+		; 時間経過で多角形が出現
+		if rockCount <= 0 {
+			size = 8.0 + rnd(8)
+			qaddpoly tmprock, 3 + rnd(4), -size + rnd(2) * (160.0 + size * 2.0), size + 2.0 + rnd(116.0 - size * 2.0), rnd(256) * M_PI / 256.0, size, size, colsw_active, 0x02, 0x04, 0x05
+
+			if tmprock >= 0 {
+				weight = size * size / 16.0
+				qweight tmprock, weight, weight * size * size / 2.0
+				qdamper tmprock, 0.5, 1.0
+				qinertia tmprock, 1.0
+				quser tmprock, 0
+				qmat tmprock, mat_wire, 0xffffff
+	
+				; 次の多角形出現までの間隔を設定（20点以降は変わらず）
+				rockCount = 180 - score * 6
+				if rockCount < 60 {
+					rockCount = 60
+				}
+			}
+		}
+		rockCount --
+	} else {
+		; ゲームオーバー後はスペースかリターンで再スタート
+		if key & 48 {
+			goto *init
+		}
+	}
+
+	qdraw 1					; オブジェクトの描画
+
+	color 255, 255, 255		; 文字色を設定
+	font msgothic, 16		; 文字フォントを設定
+
+	; スコアを表示
+	pos 8, 4
+	mes "score : " + score
+
+	if gameover {
+		; ゲームオーバーの文字を表示
+		pos 320 - 9 * 4, 240 - 8
+		mes "game over"
+	} else {
+		; プレイヤーとハンマーを結ぶワイヤーを描画
+		qgetpos hammer, hx, hy, hr
+		qcnvaxis hx, hy, hx, hy
+		qcnvaxis px, py, px, py
+		line hx, hy, px, py
+	}
+
+	redraw 1		; 画面の更新を終了
+	await 12		; 一定時間待つ
+
+	goto *main
+

@@ -32,6 +32,7 @@ public:
 	int setParameter(char *name, char *fname, int matopt);
 	int setState(char *name, char *value);
 	void setFilter( Texture::Filter value );
+	int updateTex32(char* ptr, int mode);
 
 	short _flag;						// 存在フラグ
 	short _mark;						// マーク処理用

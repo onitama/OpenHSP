@@ -52,7 +52,6 @@ char *hsp3dish_getlog(void);		// for gameplay3d log
 
 #define USE_WEBTASK
 #define USE_MMAN
-//#define USE_DGOBJ
 
 
 /*------------------------------------------------------------*/
@@ -99,31 +98,6 @@ static int dxsnd_flag;
 
 #ifdef USE_WEBTASK
 static WebTask *webtask;
-#endif
-
-
-/*----------------------------------------------------------*/
-//					HSPDG system support
-/*----------------------------------------------------------*/
-
-#ifdef USE_DGOBJ
-#include "hgdx.h"
-static hgdx *hg;
-static VECTOR *sel_vector;
-static double dp1,dp2,dp3;
-static int movemode[MOC_MAX];
-static double *p_vec;
-static VECTOR p_vec1;
-static VECTOR p_vec2;
-
-#define CnvIntRot(val) ((float)val)*(PI2/256.0f)
-#define CnvRotInt(val) ((int)(val*(256.0f/PI2)))
-
-#define MOVEMODE_LINEAR 0
-#define MOVEMODE_SPLINE 1
-#define MOVEMODE_LINEAR_REL 2
-#define MOVEMODE_SPLINE_REL 3
-
 #endif
 
 
@@ -390,79 +364,25 @@ static int *code_getivec( void )
 
 #endif
 
-#ifdef USE_DGOBJ
-static void code_getvec( VECTOR *vec )
-{
-	vec->x = (float)code_getdd( 0.0 );
-	vec->y = (float)code_getdd( 0.0 );
-	vec->z = (float)code_getdd( 0.0 );
-	vec->w = 1.0f;
-}
-
-static void code_setvec( double *ptr, VECTOR *vec )
-{
-	ptr[0] = (double)vec->x;
-	ptr[1] = (double)vec->y;
-	ptr[2] = (double)vec->z;
-	ptr[3] = (double)vec->w;
-}
-
-static void code_setivec( int *ptr, VECTOR *vec )
-{
-	ptr[0] = (int)vec->x;
-	ptr[1] = (int)vec->y;
-	ptr[2] = (int)vec->z;
-	ptr[3] = (int)vec->w;
-}
-
-static double *code_getvvec( void )
-{
-	PVal *pval;
-	int size;
-	double dummy;
-	double *v;
-
-	v = (double *)code_getvptr( &pval, &size );
-	if ( pval->flag != HSPVAR_FLAG_DOUBLE ) {
-		dummy = 0.0f;
-		code_setva( pval, 0, HSPVAR_FLAG_DOUBLE, &dummy );
-		pval->len[1] = 4;						// ちょっと強引に配列を拡張
-		pval->size = 4 * sizeof(double);
-		code_setva( pval, 1, HSPVAR_FLAG_DOUBLE, &dummy );
-		code_setva( pval, 2, HSPVAR_FLAG_DOUBLE, &dummy );
-		v = (double *)HspVarCorePtrAPTR( pval, 0 );
-	}
-	return v;
-}
-
-static int *code_getivec( void )
-{
-	PVal *pval;
-	int dummy;
-	int size;
-	int *v;
-
-	v = (int *)code_getvptr( &pval, &size );
-	if ( pval->flag != HSPVAR_FLAG_INT ) {
-		dummy = 0;
-		code_setva( pval, 0, HSPVAR_FLAG_INT, &dummy );
-		pval->len[1] = 4;						// ちょっと強引に配列を拡張
-		pval->size = 4 * sizeof(int);
-		v = (int *)HspVarCorePtrAPTR( pval, 0 );
-	}
-	return v;
-}
-#endif
-
-
 static int *code_getiv( void )
 {
-	//		変数パラメーターを取得(PDATポインタ)
+	//		変数パラメーターを取得(int,PDATポインタ)
 	//
 	PVal *pval;
 	pval = code_getpval();
 	if ( pval->flag != HSPVAR_FLAG_INT ) throw HSPERR_TYPE_MISMATCH;
 	return (int *)HspVarCorePtrAPTR( pval, 0 );
+}
+
+static int* code_getiv_sizecheck(int minsize)
+{
+	//		変数パラメーターを取得(int,PDATポインタ)(最低サイズを確認)
+	//
+	PVal* pval;
+	pval = code_getpval();
+	if (pval->flag != HSPVAR_FLAG_INT) throw HSPERR_TYPE_MISMATCH;
+	if ( pval->len[1] < minsize ) throw HSPERR_TYPE_MISMATCH;
+	return (int*)HspVarCorePtrAPTR(pval, 0);
 }
 
 static int *code_getiv2( PVal **out_pval )
@@ -956,6 +876,44 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 		}
 
+	case 0x2c:								// mouse
+	{
+#ifdef HSPWIN
+		POINT pt;
+		int setdef = 0;			// 既にマイナスの値か?
+		GetCursorPos(&pt);
+		if ((pt.x < 0) || (pt.x < 0)) {
+			if (msact >= 0) setdef = 1;
+		}
+		p1 = code_getdi(pt.x);
+		p2 = code_getdi(pt.y);
+		p3 = code_getdi(setdef);
+		if (p3 == 0) {
+			if (msact >= 0) {
+				if ((p1 < 0) || (p2 < 0)) {
+					msact = ShowCursor(0);
+					break;
+				}
+			}
+		}
+
+		SetCursorPos(p1, p2);
+
+		if (p3 < 0) {
+			msact = ShowCursor(0);
+			break;
+		}
+		if (p3 > 0) {
+			if (msact < 0) { msact = ShowCursor(1); }
+		}
+#else
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+#endif
+		break;
+	}
+
 	case 0x2f:								// line
 		p1=code_getdi(0);
 		p2=code_getdi(0);
@@ -1360,6 +1318,20 @@ static int cmdfunc_extcmd( int cmd )
 		bmscr->Setcolor((p1 >> 16) & 0xff, (p1>>8) & 0xff, p1 & 0xff );
 		break;
 
+	case 0x5c:								// celbitmap
+		{
+		Bmscr* bm2;
+		char *vptr;
+		int needsize;
+		p1 = code_getdi(0);
+		bm2 = wnd->GetBmscrSafe(p1);	// 転送元のBMSCRを取得
+		needsize = bm2->sx * bm2->sy;
+		vptr = (char*)code_getiv_sizecheck(needsize);
+		p2 = code_getdi(0);
+		ctx->stat = bm2->BufferOp(p2, vptr);
+		break;
+		}
+
 	case 0x5d:								// gmulcolor
 		p1 = code_getdi( 255 );
 		p2 = code_getdi( 255 );
@@ -1514,7 +1486,7 @@ static int cmdfunc_extcmd( int cmd )
 		node = game->getNode( p1 );
 		if ( node == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
 		str = (char *)node->getId();
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_STR, &str );
+		code_setva( p_pval, p_aptr, HSPVAR_FLAG_STR, str );
 		break;
 		}
 	case 0x6d:								// setborder
@@ -1613,9 +1585,14 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( -1 );
 		p2 = code_getdi( 0 );
 		mat = game->makeMaterialFromShader( vshname, fshname, defname );
-		if ( mat == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		game->setMaterialDefaultBinding( mat, p1, p2 );
-		p6 = game->makeNewMat(mat, GPMAT_MODE_3D, p1, p2);
+		if (mat == NULL) {
+			//throw HSPERR_ILLEGAL_FUNCTION;
+			p6 = -1;
+		}
+		else {
+			game->setMaterialDefaultBinding(mat, p1, p2);
+			p6 = game->makeNewMat(mat, GPMAT_MODE_3D, p1, p2);
+		}
 		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p6 );
 		break;
 		}
@@ -1775,7 +1752,8 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x85:								// getcolor
 	case 0x86:								// getwork
 	case 0x87:								// getwork2
-		{
+	case 0x89:								// getang
+	{
 		PVal *pv1;
 		PVal *pv2;
 		PVal *pv3;
@@ -2597,8 +2575,28 @@ static int cmdfunc_extcmd( int cmd )
 		obj->_lightgroup = p3;
 		break;
 	}
-	case 0x10f:								// 
+	case 0x10f:								// getangr
 	{
+		PVal* pv1;
+		PVal* pv2;
+		PVal* pv3;
+		APTR aptr1;
+		APTR aptr2;
+		APTR aptr3;
+		gameplay::Vector4 v;
+		int ip1, ip2, ip3;
+		p1 = code_getdi(0);
+		aptr1 = code_getva(&pv1);
+		aptr2 = code_getva(&pv2);
+		aptr3 = code_getva(&pv3);
+		p6 = game->getObjectVector(p1, MOC_ANGX, &v);
+		if (p6 < 0) code_puterror(HSPERR_ILLEGAL_FUNCTION);
+		ip1 = CnvRotInt(v.x);
+		ip2 = CnvRotInt(v.y);
+		ip3 = CnvRotInt(v.z);
+		code_setva(pv1, aptr1, HSPVAR_FLAG_INT, &ip1);
+		code_setva(pv2, aptr2, HSPVAR_FLAG_INT, &ip2);
+		code_setva(pv3, aptr3, HSPVAR_FLAG_INT, &ip3);
 		break;
 	}
 
@@ -2619,12 +2617,17 @@ static int cmdfunc_extcmd( int cmd )
 		p2 = code_getdi( 10 );
 		dp1 = code_getdd( 0.0 );
 		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd(0.0);
+		dp3 = code_getdd( 0.0 );
 		//dp4 = code_getdd(0.0);
 		dp4 = 1.0f;
 
 		p6 = cmd - 0x110;
-		if (cmd == 0x11c) {	p6 = MOC_ANGX; }
+		if (cmd == 0x11c) {
+			dp1 = CnvIntRot((int)dp1);
+			dp2 = CnvIntRot((int)dp2);
+			dp3 = CnvIntRot((int)dp3);
+			p6 = MOC_ANGX;
+		}
 		p3 = code_getdi(MOVEMODE_LINEAR);
 		if ( p3 & 16 ) p6|=HGEVENT_MOCOPT_SRCWORK;
 		switch( p3 & 15 ) {
@@ -2698,1239 +2701,6 @@ static int cmdfunc_extcmd( int cmd )
 		ctx->stat = game->AddChangeEvent(p1, MOC_ANGX, (float)dp1, (float)dp2, (float)dp3, (float)dp4, (float)dp5, (float)dp6);
 		break;
 	}
-
-
-#endif
-
-
-#ifdef USE_DGOBJ
-	/* DG Graphics Support */
-	case 0x50:								// dgreset
-		{
-		int i;
-		if ( hg == NULL ) {
-			hg = new hgdx;
-		}
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		hg->SetDest( NULL, 0,0, bmscr->sx, bmscr->sy, p1, p2 );
-		hg->Reset();
-		sel_vector = NULL;
-		for(i=0;i<MOC_MAX;i++) { movemode[i] = MOVEMODE_LINEAR; }
-		movemode[MOC_POS] = MOVEMODE_SPLINE;
-		break;
-		}
-	case 0x51:								// dgdraw
-		p1 = code_getdi( 0 );
-		if ( hg == NULL ) throw HSPERR_UNSUPPORTED_FUNCTION;
-		ctx->stat = hg->DrawObjAll();
-#ifdef HSPWIN
-		SetSysReq( SYSREQ_RESULT, GetTickCount()  );
-#endif
-		break;
-
-	case 0x52:								// dgspruv
-		{
-		int tex;
-		PVal *p_pval;
-		APTR p_aptr;
-		Bmscr *bm2;
-		p_aptr = code_getva( &p_pval );
-		tex = code_getdi( 0 );
-		bm2 = wnd->GetBmscrSafe( tex );
-		if ( bm2->flag != HSPWND_TYPE_BUFFER ) throw HSPERR_ILLEGAL_FUNCTION;
-
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		p4 = code_getdi( bm2->sx - 1 );
-		p5 = code_getdi( bm2->sy - 1 );
-		if ( hg == NULL ) throw HSPERR_UNSUPPORTED_FUNCTION;
-		p6 = hg->AddSpriteModel( bm2->texid, 0, p2, p3, p4+1, p5+1 );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p6 );
-		break;
-		}
-	case 0x53:								// regobj
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( -1 );
-		if ( hg == NULL ) throw HSPERR_UNSUPPORTED_FUNCTION;
-		p6 = hg->AddObjWithModel( p1 );
-		hg->ObjModeOn( p6, p2 );
-		if ( p3 >= 0 ) { hg->AttachEvent( p6, p3, -1 ); }
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p6 );
-		break;
-		}
-	case 0x54:								// delobj
-		p1 = code_getdi( 0 );
-		if ( hg == NULL ) throw HSPERR_UNSUPPORTED_FUNCTION;
-		hg->DeleteObj( p1 );
-		break;
-	case 0x55:								// dgspr
-		{
-		//			dgspr var,id,subid
-		int tex;
-		int xx,yy,psx,psy;
-		PVal *p_pval;
-		APTR p_aptr;
-		Bmscr *bm2;
-		p_aptr = code_getva( &p_pval );
-		tex = code_getdi( 0 );
-		p1 = code_getdi( 0 );
-		bm2 = wnd->GetBmscrSafe( tex );
-		if ( bm2->flag != HSPWND_TYPE_BUFFER ) throw HSPERR_ILLEGAL_FUNCTION;
-		if ( hg == NULL ) throw HSPERR_UNSUPPORTED_FUNCTION;
-		psx = bm2->divsx;
-		psy = bm2->divsy;
-		xx = ( p1 % bm2->divx ) * psx;
-		yy = ( p1 / bm2->divx ) * psy;
-		p6 = hg->AddSpriteModel( bm2->texid, 0, xx, yy, xx+psx, yy+psy );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p6 );
-		break;
-		}
-	case 0x60:								// setpos
-	case 0x61:								// setang
-	case 0x62:								// setscale
-	case 0x63:								// setdir
-	case 0x64:								// setefx
-	case 0x65:								// setwork
-		{
-		VECTOR *v;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		v = hg->GetObjVectorPrm( p1, cmd - 0x60 );
-		if ( v == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		SetVector3( v, (float)dp1, (float)dp2, (float)dp3 );
-		break;
-		}
-	case 0x68:								// addpos
-	case 0x69:								// addang
-	case 0x6a:								// addscale
-	case 0x6b:								// adddir
-	case 0x6c:								// addefx
-	case 0x6d:								// addwork
-		{
-		VECTOR *v;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		v = hg->GetObjVectorPrm( p1, cmd - 0x68 );
-		if ( v == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		v->x += (float)dp1;
-		v->y += (float)dp2;
-		v->z += (float)dp3;
-		break;
-		}
-	case 0x70:								// getpos
-	case 0x71:								// getang
-	case 0x72:								// getscale
-	case 0x73:								// getdir
-	case 0x74:								// getefx
-	case 0x75:								// getwork
-		{
-		PVal *pv1;
-		PVal *pv2;
-		PVal *pv3;
-		APTR aptr1;
-		APTR aptr2;
-		APTR aptr3;
-		VECTOR *v;
-		p1 = code_getdi( 0 );
-		aptr1 = code_getva( &pv1 );
-		aptr2 = code_getva( &pv2 );
-		aptr3 = code_getva( &pv3 );
-		v = hg->GetObjVectorPrm( p1, cmd - 0x70 );
-		if ( v == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		dp1 = (double)v->x;
-		dp2 = (double)v->y;
-		dp3 = (double)v->z;
-		code_setva( pv1, aptr1, HSPVAR_FLAG_DOUBLE, &dp1 );
-		code_setva( pv2, aptr2, HSPVAR_FLAG_DOUBLE, &dp2 );
-		code_setva( pv3, aptr3, HSPVAR_FLAG_DOUBLE, &dp3 );
-		break;
-		}
-	case 0x78:								// getposi
-	case 0x79:								// getangi
-	case 0x7a:								// getscalei
-	case 0x7b:								// getdiri
-	case 0x7c:								// getefxi
-	case 0x7d:								// getworki
-		{
-		PVal *pv1;
-		PVal *pv2;
-		PVal *pv3;
-		APTR aptr1;
-		APTR aptr2;
-		APTR aptr3;
-		VECTOR *v;
-		p1 = code_getdi( 0 );
-		aptr1 = code_getva( &pv1 );
-		aptr2 = code_getva( &pv2 );
-		aptr3 = code_getva( &pv3 );
-		v = hg->GetObjVectorPrm( p1, cmd - 0x78 );
-		if ( v == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		p1 = (int)v->x;
-		p2 = (int)v->y;
-		p3 = (int)v->z;
-		code_setva( pv1, aptr1, HSPVAR_FLAG_INT, &p1 );
-		code_setva( pv2, aptr2, HSPVAR_FLAG_INT, &p2 );
-		code_setva( pv3, aptr3, HSPVAR_FLAG_INT, &p3 );
-		break;
-		}
-
-	case 0x80:								// selpos
-	case 0x81:								// selang
-	case 0x82:								// selscale
-	case 0x83:								// seldir
-	case 0x84:								// selefx
-	case 0x85:								// selwork
-		p1 = code_getdi( 0 );
-		sel_vector = hg->GetObjVectorPrm( p1, cmd - 0x80 );
-		if ( sel_vector == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		break;
-
-	case 0x88:								// objset1
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		if (( p1 < 0 )||( p1 >= 4 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] = (float)dp1;
-		break;
-		}
-	case 0x89:								// objset1r
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		if (( p1 < 0 )||( p1 >= 4 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] = CnvIntRot(p2);
-		break;
-		}
-	case 0x8a:								// objset2
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		if (( p1 < 0 )||( p1 >= 3 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] = (float)dp1;
-		vp[p1+1] = (float)dp2;
-		break;
-		}
-	case 0x8b:								// objset2r
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		if (( p1 < 0 )||( p1 >= 3 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] = CnvIntRot(p2);
-		vp[p1+1] = CnvIntRot(p3);
-		break;
-		}
-	case 0x8c:								// objset3
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		SetVector3( sel_vector, (float)dp1, (float)dp2, (float)dp3 );
-		break;
-	case 0x8d:								// objset3r
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		SetVector3( sel_vector, CnvIntRot(p1), CnvIntRot(p2), CnvIntRot(p3) );
-		break;
-
-		
-	case 0x8e:								// objadd1
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		if (( p1 < 0 )||( p1 >= 4 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] += (float)dp1;
-		break;
-		}
-	case 0x8f:								// objadd1r
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		if (( p1 < 0 )||( p1 >= 4 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] += CnvIntRot(p2);
-		break;
-		}
-	case 0x90:								// objadd2
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		if (( p1 < 0 )||( p1 >= 3 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] += (float)dp1;
-		vp[p1+1] += (float)dp2;
-		break;
-		}
-	case 0x91:								// objadd2r
-		{
-		float *vp = (float *)sel_vector;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		if (( p1 < 0 )||( p1 >= 3 )) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		vp[p1] += CnvIntRot(p2);
-		vp[p1+1] += CnvIntRot(p3);
-		break;
-		}
-	case 0x92:								// objadd3
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		sel_vector->x += (float)dp1;
-		sel_vector->y += (float)dp2;
-		sel_vector->z += (float)dp3;
-		break;
-	case 0x93:								// objadd3r
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		sel_vector->x += CnvIntRot(p1);
-		sel_vector->y += CnvIntRot(p2);
-		sel_vector->z += CnvIntRot(p3);
-		break;
-
-	case 0x94:								// event_jump
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		ctx->stat = hg->AddJumpEvent( p1, p2, p3 );
-		break;
-	case 0x95:								// event_prmset
-	case 0x96:								// event_prmon
-	case 0x97:								// event_prmoff
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		ctx->stat = hg->AddParamEvent( p1, cmd-0x95, p2, p3 );
-		break;
-	case 0x98:								// event_pos
-	case 0x99:								// event_ang
-	case 0x9a:								// event_scale
-	case 0x9b:								// event_dir
-	case 0x9c:								// event_efx
-	case 0x9d:								// event_work
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 10 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		p6 = cmd-0x98;
-		p3 = code_getdi( movemode[p6] );
-		if ( p3 & 16 ) p6|=HGEVENT_MOCOPT_SRCWORK;
-		switch( p3 & 15 ) {
-		case MOVEMODE_LINEAR:
-			ctx->stat = hg->AddMoveEvent( p1, p6, (float)dp1, (float)dp2, (float)dp3, p2, 0 );
-			break;
-		case MOVEMODE_SPLINE:
-			ctx->stat = hg->AddSplineMoveEvent( p1, p6, (float)dp1, (float)dp2, (float)dp3, p2, 0 );
-			break;
-		case MOVEMODE_LINEAR_REL:
-			ctx->stat = hg->AddMoveEvent( p1, p6, (float)dp1, (float)dp2, (float)dp3, p2, 1 );
-			break;
-		case MOVEMODE_SPLINE_REL:
-			ctx->stat = hg->AddSplineMoveEvent( p1, p6, (float)dp1, (float)dp2, (float)dp3, p2, 1 );
-			break;
-		}
-		break;
-
-	case 0x9f:								// event_angr
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 10 );
-		dp1 = CnvIntRot( code_getdi( 0 ) );
-		dp2 = CnvIntRot( code_getdi( 0 ) );
-		dp3 = CnvIntRot( code_getdi( 0 ) );
-		ctx->stat = hg->AddMoveEvent( p1, MOC_ANG, (float)dp1, (float)dp2, (float)dp3, p2, 0 );
-		break;
-
-	case 0xa0:								// event_addpos
-	case 0xa1:								// event_addang
-	case 0xa2:								// event_addscale
-	case 0xa3:								// event_adddir
-	case 0xa4:								// event_addefx
-	case 0xa5:								// event_addwork
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		ctx->stat = hg->AddPlusEvent( p1, cmd-0xa0, (float)dp1, (float)dp2, (float)dp3 );
-		break;
-	case 0xa6:								// event_addtarget
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		ctx->stat = hg->AddPlusEvent( p1, p2|HGEVENT_MOCOPT_SRCWORK, 0.0f, 0.0f, 0.0f );
-		break;
-	case 0xa7:								// event_addangr
-		p1 = code_getdi( 0 );
-		dp1 = CnvIntRot( code_getdi( 0 ) );
-		dp2 = CnvIntRot( code_getdi( 0 ) );
-		dp3 = CnvIntRot( code_getdi( 0 ) );
-		ctx->stat = hg->AddPlusEvent( p1, MOC_ANG, (float)dp1, (float)dp2, (float)dp3 );
-		break;
-
-	case 0xa8:								// event_setpos
-	case 0xa9:								// event_setang
-	case 0xaa:								// event_setscale
-	case 0xab:								// event_setdir
-	case 0xac:								// event_setefx
-	case 0xad:								// event_setwork
-		{
-		double dp4,dp5,dp6;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		dp4 = code_getdd( dp1 );
-		dp5 = code_getdd( dp2 );
-		dp6 = code_getdd( dp3 );
-		ctx->stat = hg->AddChangeEvent( p1, cmd-0xa8, (float)dp1, (float)dp2, (float)dp3, (float)dp4, (float)dp5, (float)dp6 );
-		break;
-		}
-	case 0xaf:								// event_setangr
-		{
-		double dp4,dp5,dp6;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		p4 = code_getdi( 0 );
-		dp1 = CnvIntRot( p2 );
-		dp2 = CnvIntRot( p3 );
-		dp3 = CnvIntRot( p4 );
-		dp4 = CnvIntRot( code_getdi( p2 ) );
-		dp5 = CnvIntRot( code_getdi( p3 ) );
-		dp6 = CnvIntRot( code_getdi( p4 ) );
-		ctx->stat = hg->AddChangeEvent( p1, MOC_ANG, (float)dp1, (float)dp2, (float)dp3, (float)dp4, (float)dp5, (float)dp6 );
-		break;
-		}
-	case 0xb0:								// setevent
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( -1 );
-		ctx->stat = hg->AttachEvent( p1, p2, p3 );
-		break;
-	case 0xb1:								// delevent
-		p1 = code_getdi( 0 );
-		hg->DeleteEvent( p1 );
-		break;
-	case 0xb2:								// event_wait
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		ctx->stat = hg->AddWaitEvent( p1, p2 );
-		break;
-
-	case 0xb3:								// event_uv
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		ctx->stat = hg->AddUVEvent( p1, p2, p3 );
-		break;
-
-	case 0xb4:								// newevent
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = hg->GetEmptyEventId();
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p1 );
-		break;
-		}
-	case 0xb5:								// setangr
-	case 0xb6:								// addangr
-		{
-		VECTOR *v;
-		p1 = code_getdi( 0 );
-		dp1 = CnvIntRot( code_getdi( 0 ) );
-		dp2 = CnvIntRot( code_getdi( 0 ) );
-		dp3 = CnvIntRot( code_getdi( 0 ) );
-		v = hg->GetObjVectorPrm( p1, MOC_ANG );
-		if ( v == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		if ( cmd == 0xb5 ) {
-			SetVector3( v, (float)dp1, (float)dp2, (float)dp3 );
-		} else {
-			v->x += (float)dp1;
-			v->y += (float)dp2;
-			v->z += (float)dp3;
-		}
-		break;
-		}
-	case 0xb7:								// getangr
-		{
-		PVal *pv1;
-		PVal *pv2;
-		PVal *pv3;
-		APTR aptr1;
-		APTR aptr2;
-		APTR aptr3;
-		VECTOR *v;
-		p1 = code_getdi( 0 );
-		aptr1 = code_getva( &pv1 );
-		aptr2 = code_getva( &pv2 );
-		aptr3 = code_getva( &pv3 );
-		v = hg->GetObjVectorPrm( p1, MOC_ANG );
-		if ( v == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		p2 = CnvRotInt(v->x);
-		p3 = CnvRotInt(v->y);
-		p4 = CnvRotInt(v->z);
-		code_setva( pv1, aptr1, HSPVAR_FLAG_INT, &p2 );
-		code_setva( pv2, aptr2, HSPVAR_FLAG_INT, &p3 );
-		code_setva( pv3, aptr3, HSPVAR_FLAG_INT, &p4 );
-		break;
-		}
-
-	case 0xb8:								// setobjmode
-		{
-		hgobj *o;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		o = hg->GetObj( p1 );
-		if ( o == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		ctx->stat = o->mode;
-		switch(p3) {
-		case 0:
-			o->mode |= p2;
-			break;
-		case 1:
-			o->mode &= ~p2;
-			break;
-		default:
-			o->mode = p2;
-			break;
-		}
-		break;
-		}
-	case 0xb9:								// setobjmodel
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		ctx->stat = hg->AttachObjWithModel( p1, p2 );
-		break;
-	case 0xba:								// setcoli
-		{
-		hgobj *o;
-		p1 = code_getdi( 0 );
-		o = hg->GetObj( p1 );
-		if ( o == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		o->SetColiGroup( p2, p3 );
-		break;
-		}
-	case 0xbb:								// enumobj
-		p1 = code_getdi( 0 );
-		hg->EnumObj( p1 );
-		break;
-	case 0xbc:								// getenum
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = hg->GetEnumObj();
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p1 );
-		break;
-		}
-
-	case 0xbd:								// event_wpos
-	case 0xbe:								// event_wang
-	case 0xbf:								// event_wscale
-	case 0xc0:								// event_wdir
-	case 0xc1:								// event_wefx
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 10 );
-		p6 = cmd-0xbd;
-		p3 = code_getdi( movemode[p6] );
-		switch( p3 ) {
-		case MOVEMODE_LINEAR:
-			ctx->stat = hg->AddMoveEvent( p1, p6|HGEVENT_MOCOPT_SRCWORK, 0.0f, 0.0f, 0.0f, p2, 0 );
-			break;
-		case MOVEMODE_SPLINE:
-			ctx->stat = hg->AddSplineMoveEvent( p1, p6|HGEVENT_MOCOPT_SRCWORK, 0.0f, 0.0f, 0.0f, p2, 0 );
-			break;
-		case MOVEMODE_LINEAR_REL:
-			ctx->stat = hg->AddMoveEvent( p1, p6|HGEVENT_MOCOPT_SRCWORK, 0.0f, 0.0f, 0.0f, p2, 1 );
-			break;
-		case MOVEMODE_SPLINE_REL:
-			ctx->stat = hg->AddSplineMoveEvent( p1, p6|HGEVENT_MOCOPT_SRCWORK, 0.0f, 0.0f, 0.0f, p2, 1 );
-			break;
-		}
-		break;
-	case 0xc2:								// event_wwait
-		p1 = code_getdi( 0 );
-		ctx->stat = hg->AddWaitEvent( p1, -1 );
-		break;
-
-	case 0xc3:								// fvset
-		p_vec = code_getvvec();
-		code_getvec( &p_vec1 );
-		code_setvec( p_vec, &p_vec1 );
-		break;
-	case 0xc4:								// fvadd
-		p_vec = code_getvvec();
-		code_getvec( &p_vec1 );
-		p_vec2.x = (float)p_vec[0] + p_vec1.x;
-		p_vec2.y = (float)p_vec[1] + p_vec1.y;
-		p_vec2.z = (float)p_vec[2] + p_vec1.z;
-		code_setvec( p_vec, &p_vec2 );
-		break;
-	case 0xc5:								// fvsub
-		p_vec = code_getvvec();
-		code_getvec( &p_vec1 );
-		p_vec2.x = (float)p_vec[0] - p_vec1.x;
-		p_vec2.y = (float)p_vec[1] - p_vec1.y;
-		p_vec2.z = (float)p_vec[2] - p_vec1.z;
-		code_setvec( p_vec, &p_vec2 );
-		break;
-	case 0xc6:								// fvmul
-		p_vec = code_getvvec();
-		code_getvec( &p_vec1 );
-		p_vec2.x = (float)p_vec[0] * p_vec1.x;
-		p_vec2.y = (float)p_vec[1] * p_vec1.y;
-		p_vec2.z = (float)p_vec[2] * p_vec1.z;
-		code_setvec( p_vec, &p_vec2 );
-		break;
-	case 0xc7:								// fvdiv
-		p_vec = code_getvvec();
-		code_getvec( &p_vec1 );
-		p_vec2.x = (float)p_vec[0] / p_vec1.x;
-		p_vec2.y = (float)p_vec[1] / p_vec1.y;
-		p_vec2.z = (float)p_vec[2] / p_vec1.z;
-		code_setvec( p_vec, &p_vec2 );
-		break;
-	case 0xc8:								// fvdir
-		{
-		VECTOR v;
-		VECTOR ang;
-		p_vec = code_getvvec();
-		code_getvec( &v );
-		p1 = code_getdi( 0 );
-		SetVector( &ang, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f );
-		InitMatrix();
-		switch( p1 ) {
-		case HGMODEL_ROTORDER_ZYX:
-			RotZ( ang.z );
-			RotY( ang.y );
-			RotX( ang.x );
-			break;
-		case HGMODEL_ROTORDER_XYZ:
-			RotX( ang.x );
-			RotY( ang.y );
-			RotZ( ang.z );
-			break;
-		case HGMODEL_ROTORDER_YXZ:
-			RotY( ang.y );
-			RotX( ang.x );
-			RotZ( ang.z );
-			break;
-		}
-		ApplyMatrix( &ang, &v );
-		code_setvec( p_vec, &ang );
-		break;
-		}
-	case 0xc9:								// fvmin
-		p_vec = code_getvvec();
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		if ( p_vec[0] < dp1 ) p_vec[0] = dp1;
-		if ( p_vec[1] < dp2 ) p_vec[1] = dp2;
-		if ( p_vec[2] < dp3 ) p_vec[2] = dp3;
-		break;
-	case 0xca:								// fvmax
-		p_vec = code_getvvec();
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		if ( p_vec[0] > dp1 ) p_vec[0] = dp1;
-		if ( p_vec[1] > dp2 ) p_vec[1] = dp2;
-		if ( p_vec[2] > dp3 ) p_vec[2] = dp3;
-		break;
-	case 0xcb:								// fvunit
-		{
-		VECTOR v;
-		p_vec = code_getvvec();
-		SetVector( &v, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f );
-		UnitVector( &v );
-		code_setvec( p_vec, &v );
-		break;
-		}
-	case 0xcc:								// fvouter
-		{
-		VECTOR v;
-		VECTOR v1;
-		VECTOR v2;
-		p_vec = code_getvvec();
-		code_getvec( &v2 );
-		SetVector( &v1, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f );
-		OuterProduct( &v, &v1, &v2 );
-		code_setvec( p_vec, &v );
-		break;
-		}
-	case 0xcd:								// fvinner
-		{
-		VECTOR v;
-		VECTOR v2;
-		p_vec = code_getvvec();
-		code_getvec( &v2 );
-		SetVector( &v, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f );
-		p_vec[0] = (double)InnerProduct( &v, &v2 );
-		break;
-		}
-	case 0xce:								// fvface
-		{
-		VECTOR v;
-		VECTOR v2;
-		p_vec = code_getvvec();
-		code_getvec( &v2 );
-		SetVector( &v, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f );
-		GetTargetAngle( &v, &v, &v2 );
-		code_setvec( p_vec, &v );
-		break;
-		}
-	case 0xcf:								// fv2str
-		p_vec = code_getvvec();
-		sprintf( ctx->refstr, "%f,%f,%f",p_vec[0],p_vec[1],p_vec[2] );
-		break;
-	case 0xd0:								// f2str
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		char str[64];
-		p_aptr = code_getva( &p_pval );
-		dp1 = code_getdd( 0.0 );
-		sprintf( str, "%f", dp1 );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_STR, &str );
-		break;
-		}
-	case 0xd1:								// str2fv
-		{
-		VECTOR v;
-		char *ps;
-		p_vec = code_getvvec();
-		ps = code_gets();
-		sscanf( ps,"%f,%f,%f",&v.x,&v.y,&v.z );
-		code_setvec( p_vec, &v );
-		break;
-		}
-	case 0xd2:								// str2f
-		{
-		float fp;
-		char *ps;
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		ps = code_gets();
-		sscanf( ps, "%f", &fp );
-		dp1 = (double)fp;
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_DOUBLE, &dp1 );
-		break;
-		}
-
-	case 0xd3:								// objgetstr
-		{
-		VECTOR *v;
-		PVal *p_pval;
-		APTR p_aptr;
-		char str[64];
-		p_aptr = code_getva( &p_pval );
-		v = (VECTOR *)sel_vector;
-		sprintf( str,"%f,%f,%f",v->x,v->y,v->z );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_STR, &str );
-		break;
-		}
-	case 0xd4:								// objgetfv
-		{
-		VECTOR *v;
-		v = (VECTOR *)sel_vector;
-		p_vec = code_getvvec();
-		code_setvec( p_vec, v );
-		break;
-		}
-	case 0xd5:								// objgetv
-		{
-		VECTOR *v;
-		int *i_vec;
-		v = (VECTOR *)sel_vector;
-		i_vec = code_getivec();
-		code_setivec( i_vec, v );
-		break;
-		}
-	case 0xd6:								// objsetfv
-		{
-		VECTOR *v;
-		v = (VECTOR *)sel_vector;
-		p_vec = code_getvvec();
-		v->x = (float)p_vec[0];
-		v->y = (float)p_vec[1];
-		v->z = (float)p_vec[2];
-		break;
-		}
-	case 0xd7:								// objsetv
-		{
-		VECTOR *v;
-		int *i_vec;
-		v = (VECTOR *)sel_vector;
-		i_vec = code_getivec();
-		v->x = (float)i_vec[0];
-		v->y = (float)i_vec[1];
-		v->z = (float)i_vec[2];
-		break;
-		}
-	case 0xd8:								// objaddfv
-		{
-		VECTOR *v;
-		v = (VECTOR *)sel_vector;
-		p_vec = code_getvvec();
-		v->x += (float)p_vec[0];
-		v->y += (float)p_vec[1];
-		v->z += (float)p_vec[2];
-		break;
-		}
-
-	case 0xd9:								// selmoc
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		sel_vector = hg->GetObjVectorPrm( p1, p2 );
-		if ( sel_vector == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		break;
-	case 0xda:								// setborder
-		{
-		float x,y,z;
-		VECTOR v1;
-		VECTOR v2;
-		code_getvec( &p_vec1 );
-		p1 = code_getdi( 0 );
-		switch( p1 ) {
-		case 0:
-			x = p_vec1.x * 0.5f;
-			y = p_vec1.y * 0.5f;
-			z = p_vec1.z * 0.5f;
-			hg->SetBorder( -x, x, -y, y, -z, z );
-			break;
-		case 1:
-			hg->GetBorder( &v1, &v2 );
-			hg->SetBorder( p_vec1.x, v2.x, p_vec1.y, v2.y, p_vec1.z, v2.z );
-			break;
-		case 2:
-			hg->GetBorder( &v1, &v2 );
-			hg->SetBorder( v1.x, p_vec1.x, v1.y, p_vec1.y, v1.z, p_vec1.z );
-			break;
-		}
-		break;
-		}
-	case 0xdb:								// findobj
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		hg->StartObjFind( p1, p2 );
-		break;
-	case 0xdc:								// nextobj
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = hg->FindObj();
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p1 );
-		break;
-		}
-	case 0xdd:								// getcoli
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p2 = code_getdi( 0 );
-		dp1 = code_getdd( 1.0 );
-		p3 = code_getdi( 0 );
-		p1 = hg->UpdateObjColi( p2, (float)dp1, p3 );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p1 );
-		break;
-		}
-	case 0xde:								// getobjcoli
-		{
-		hgobj *o;
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = code_getdi( 0 );
-		o = hg->GetObj( p1 );
-		if ( o == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		p1 = o->GetColiGroup();
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p1 );
-		break;
-		}
-	case 0xdf:								// getobjmodel
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = code_getdi( 0 );
-		p2 = hg->GetObjModelId( p1 );
-		if ( p2 < 0 ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p2 );
-		break;
-		}
-	case 0xe0:								// objexist
-		{
-		hgobj *o;
-		p1 = code_getdi( 0 );
-		p2 = 0;
-		o = hg->GetObj( p1 );
-		if ( o == NULL ) p2 = -1;
-		ctx->stat = p2;
-		break;
-		}
-	case 0xe1:								// event_regobj
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		ctx->stat = hg->AddRegobjEvent( p1, p2, p3 );
-		break;
-	case 0xe2:								// objchild
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		if ( p2 >= 0 ) {
-			hg->SetObjChild( p1, p2 );
-		} else {
-			hg->CutObjChild( p1 );
-		}
-		break;
-	case 0xe3:								// event_aim
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		dp1 = code_getdd( 1.0 );
-		dp2 = code_getdd( 1.0 );
-		dp3 = code_getdd( 1.0 );
-		ctx->stat = hg->AddAimEvent( p1, p2, p3, (float)dp1, (float)dp2, (float)dp3 );
-		break;
-	case 0xe4:								// objaim
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		dp1 = code_getdd( 1.0 );
-		dp2 = code_getdd( 1.0 );
-		dp3 = code_getdd( 1.0 );
-		ctx->refdval = (double)hg->ObjAim( p1, p2, p3, (float)dp1, (float)dp2, (float)dp3 );
-		break;
-	case 0xe5:								// getnearobj
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		dp1 = code_getdd( 10.0 );
-		p3 = hg->GetNearestObj( p1, (float)dp1, p2 );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p3 );
-		break;
-		}
-	case 0xe6:								// delmodel
-		p1 = code_getdi( 0 );
-		hg->DeleteModel( p1 );
-		break;
-
-	case 0xe7:								// newemit
-		{		// var, mode, num, id
-		int id;
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 8 );
-		p1 = code_getdi( -1 );
-		id = hg->AddEmitter( p1, p2, p3 );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &id );
-		break;
-		}
-	case 0xe8:								// delemit
-		p1 = code_getdi( 0 );
-		hg->DeleteEmitter( p1 );
-		break;
-	case 0xe9:								// emit_size
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetSize( (float)dp1, (float)dp2, (float)dp3 );
-		break;
-		}
-	case 0xea:								// emit_speed
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 1.0 );
-		dp2 = code_getdd( 0.0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetSpeed( (float)dp1, (float)dp2 );
-		break;
-		}
-	case 0xeb:								// emit_angmul
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetAngleMul( (float)dp1, (float)dp2, (float)dp3 );
-		break;
-		}
-	case 0xec:								// emit_angopt
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetAngleOpt( (float)dp1, (float)dp2, (float)dp3 );
-		break;
-		}
-	case 0xed:								// emit_model
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		p4 = code_getdi( 0 );
-		p5 = code_getdi( 0x100 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetModel( p2, p3, p4, p5 );
-		break;
-		}
-	case 0xee:								// emit_event
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetEvent( p2, p3 );
-		break;
-		}
-	case 0xef:								// emit_num
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetNum( p2, p3 );
-		break;
-		}
-	case 0xf0:								// emit_group
-		{
-		hgemitter *emi;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		p3 = code_getdi( 0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		emi->SetGroup( p2, p3 );
-		break;
-		}
-	case 0xf1:								// dgemit
-		{
-		hgemitter *emi;
-		VECTOR pos;
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		emi = hg->GetEmitter( p1 );
-		if ( emi == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
-		SetVector( &pos, (float)dp1, (float)dp2, (float)dp3, 0.0f );
-		ctx->stat = emi->Emit( hg, &pos );
-		break;
-		}
-	case 0xf2:								// setobjemit
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		hg->SetObjEmitter( p1, p2 );
-		break;
-	case 0xf3:								// groupmod
-		{
-		VECTOR pos;
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		dp1 = code_getdd( 0.0 );
-		dp2 = code_getdd( 0.0 );
-		dp3 = code_getdd( 0.0 );
-		p3 = code_getdi( 0 );
-		SetVector( &pos, (float)dp1, (float)dp2, (float)dp3, 0.0f );
-		hg->GroupModify( p1, p2, p3, &pos );
-		break;
-		}
-	case 0xf4:								// setcolscale
-		{
-		hgobj *o;
-		p1 = code_getdi( 0 );
-		o = hg->GetObj( p1 );
-		if ( o == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
-		dp1 = code_getdd( 1.0 );
-		dp2 = code_getdd( dp1 );
-		dp3 = code_getdd( dp1 );
-		p2 = code_getdi( 0 );
-		switch( p2 ) {
-		case 0:
-			o->SetColScale( (float)dp1, (float)dp2, (float)dp3 );
-			break;
-		case 1:
-			o->SetColParam( (float)dp1, (float)dp2, (float)dp3 );
-			break;
-		case 2:
-			o->SetOptInfo( (int)dp1, (int)dp2, (int)dp3 );
-			break;
-		default:
-			break;
-		}
-		break;
-		}
-	case 0xf5:								// modelcols
-		p1 = code_getdi( 0 );
-		dp1 = code_getdd( 1.0 );
-		dp2 = code_getdd( dp1 );
-		dp3 = code_getdd( dp1 );
-		p2 = code_getdi( 0 );
-		switch( p2 ) {
-		case 0:
-			hg->SetModelColScale( p1, (float)dp1, (float)dp2, (float)dp3 );
-			break;
-		case 1:
-			hg->SetModelColParam( p1, (float)dp1, (float)dp2, (float)dp3 );
-			break;
-		default:
-			break;
-		}
-		break;
-
-	//	sound part
-	//
-	case 0x100:								// dmmini
-		{
-        if ( dxsnd_flag == 0 ) {
-#ifdef HSPWIN
-            SndInit( (HWND)ctx->wnd_parent );
-#else
-            SndInit( NULL );
-#endif
-        }
-		dxsnd_flag = 1;
-		break;
-		}
-	case 0x101:								// dmmbye
-		SndTerm();
-		dxsnd_flag = 0;
-		break;
-	case 0x102:								// dmmreset
-		SndReset();
-		break;
-	case 0x103:								// dmmdel
-		p1 = code_getdi( 0 );
-		SndDelete( p1 );
-		break;
-	case 0x104:								// dmmvol
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		SndSetVolume( p1, p2 );
-		break;
-	case 0x105:								// dmmpan
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		SndSetPan( p1, p2 );
-		break;
-	case 0x106:								// dmmloop
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		SndSetLoop( p1, p2 );
-		break;
-	case 0x107:								// dmmload
-		{
-		char *ps;
-		char fname[HSP_MAX_PATH];
-		char fext[8];
-		char *mp;
-		ps = code_gets();
-		strcpy( fname, ps );
-		p1 = code_getdi( -1 );
-		p2 = code_getdi( 0 );
-
-		getpath(fname,fext,16+2);				// 拡張子を小文字で取り出す
-		if (!strcmp(fext,".wav")) {				// when "wav"
-			mp = dpm_readalloc( fname );		// HSPリソースを含めて検索する
-			if ( mp == NULL ) { ctx->stat = -1; break; }
-			ctx->stat = SndRegistWav( p1, mp, 0);
-			if ( p2 & 1 ) { SndSetLoop( ctx->stat, 0 ); }
-			mem_bye( mp );
-		}
-/*
-		if (!strcmp(fext,".ogg")) {				// when "ogg"
-			hspctx->stat = SndRegistOgg( p1, fname, p2 );
-		}
-		if (!strcmp(fext,".s")) {				// when "s" (oggと同様)
-			hspctx->stat = SndRegistOgg( p1, fname, p2 );
-		}
-*/
-		break;
-		}
-	case 0x108:								// dmmplay
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		if ( p2 == 0 ) {
-			SndPlay( p1 );
-		} else {
-			SndPlayPos( p1, p2 );
-		}
-		break;
-	case 0x109:								// dmmstop
-		p1 = code_getdi( 0 );
-		if ( p1 < 0 ) {
-			SndStopAll();
-		} else {
-			SndStop( p1 );
-		}
-		break;
-	case 0x10a:								// dmmstat
-		{
-		PVal *p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva( &p_pval );
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
-		if ( p2 & 0x100 ) {
-			dp1 = SndGetTime( p1, p2&0xff );
-			code_setva( p_pval, p_aptr, HSPVAR_FLAG_DOUBLE, &dp1 );
-			break;
-		}
-		p3 = SndGetStatus( p1, p2 );
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p3 );
-		break;
-		}
-
-
 
 
 #endif
@@ -4173,9 +2943,6 @@ static int termfunc_extcmd( int option )
 #ifdef USE_WEBTASK
 	delete webtask;
 #endif
-#ifdef USE_DGOBJ
-	if ( hg != NULL ) delete hg;
-#endif
 	delete wnd;
 	return 0;
 }
@@ -4195,6 +2962,7 @@ void hsp3typeinit_extcmd( HSP3TYPEINFO *info )
 	sys_inst = 0;
 	sys_hwnd = 0;
 	sys_hdc = 0;
+	msact = 0;
 
 #ifdef USE_MMAN
 	mmman = new MMMan;
@@ -4202,10 +2970,6 @@ void hsp3typeinit_extcmd( HSP3TYPEINFO *info )
 #endif
 #ifdef USE_WEBTASK
 	webtask = new WebTask;
-#endif
-
-#ifdef USE_DGOBJ
-	hg = NULL;
 #endif
 
 	//		function register

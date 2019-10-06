@@ -21,7 +21,6 @@ static char startax[]={ 'S'-40,'T'-40,'A'-40,'R'-40,'T'-40,
 
 
 #define GetPRM(id) (&hspctx.mem_finfo[id])
-#define strp(dsptr) &hspctx.mem_mds[dsptr]
 
 
 /*------------------------------------------------------------*/
@@ -176,7 +175,33 @@ int Hsp3::Reset( int mode )
 	hspctx.mem_minfo = (STRUCTPRM *)copy_DAT(ptr + hsphed->pt_minfo, hsphed->max_minfo);
 	hspctx.mem_finfo = (STRUCTDAT *)copy_STRUCTDAT(hsphed, ptr + hsphed->pt_finfo, hsphed->max_finfo);
 
+	//		init strmap
+	int *exopt_pt = (int *)(ptr + hsphed->pt_exopt);
+	int* dsindex = NULL;
+	int dsindex_size = 0;
+	if (hsphed->max_exopt) {
+		while (1) {
+			int tag,bodysize;
+			tag = *exopt_pt++;
+			bodysize = tag >> 16;
+			tag = tag & 0xffff;
+			if (tag == HSPHED_EXOPTION_TAG_NONE) {
+				break;
+			}
+			if (tag == HSPHED_EXOPTION_TAG_DSINDEX) {
+				dsindex = exopt_pt;
+				exopt_pt+= bodysize;
+				dsindex_size = bodysize;
+				continue;
+			}
+			break;
+		}
+	}
+	hspctx.dsindex = dsindex;
+	hspctx.dsindex_size = dsindex_size;
+
 	HspVarCoreResetVartype( hsphed->max_varhpi );		// 型の初期化
+
 	code_resetctx( &hspctx );		// hsp3code setup
 
 	//		hspstat check

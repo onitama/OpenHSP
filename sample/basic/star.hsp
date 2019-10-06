@@ -1,0 +1,17 @@
+#include "hsp3dish.as"
+
+	randomize
+	font "",40,1
+*main
+	redraw 0
+	x=rnd(320)-20: y=rnd(240)-20
+	color rnd(256),rnd(256),rnd(256):pos x,y:mes "*"
+
+	redraw 1
+	await 20
+	goto *main
+
+	stop
+
+
+

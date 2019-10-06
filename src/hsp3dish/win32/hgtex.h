@@ -57,6 +57,9 @@ int RegistTex( char *data, int sx, int sy, int width, int height, int sw );
 int RegistTexIndex( char *data, char *palette, int sx, int sy, int width, int height, int sw, int pals );
 int RegistTexEmpty( int w, int h, int tmode );
 int UpdateTex( int texid, char *data, int sw );
+int UpdateTexStar(int texid, int mode);
+int UpdateTex32(int texid, char* srcptr, int mode);
+
 int GetNextTexID( void );
 void DeleteTex( int id );
 void ChangeTex( int id );
