@@ -2629,7 +2629,6 @@ static int cmdfunc_extcmd( int cmd )
 			p6 = MOC_ANGX;
 		}
 		p3 = code_getdi(MOVEMODE_LINEAR);
-		if ( p3 & 16 ) p6|=HGEVENT_MOCOPT_SRCWORK;
 		switch( p3 & 15 ) {
 		case MOVEMODE_LINEAR:
 			ctx->stat = game->AddMoveEvent( p1, p6, (float)dp1, (float)dp2, (float)dp3, p2, 0 );
