@@ -3,7 +3,7 @@ CFLAGS = -Wall --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX -DHSPDEBUG
 OBJS = linux/main.o hsp3.o hsp3code.o hsp3debug.o \
     hsp3int.o hspvar_core.o hspvar_double.o hspvar_int.o \
     hspvar_label.o hspvar_str.o hspvar_struct.o stack.o strbuf.o strnote.o \
-    dpmread.o linux/supio_linux.o linux/hsp3cl.o linux/hsp3ext_linux.o linux/hsp3gr_linux.o
+    dpmread.o linux/supio_linux.o linux/hsp3cl.o linux/hsp3ext_linux.o linux/hsp3gr_linux.o linux/hsp3ext_sock.o
 TARGET = hsp3
 LIBS = 
 .SUFFIXES: .cpp
