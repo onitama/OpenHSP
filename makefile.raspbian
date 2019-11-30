@@ -114,7 +114,7 @@ hsp3cl: $(OBJS_CL)
 	$(CXX) $(CFLAGS_CL) -c $< -o $*.o
 
 hsed: src/tools/hsed_gtk2.cpp src/tools/supio.cpp
-	$(CXX) -O2 -Wno-write-strings -DHSPRASPBIAN -I /usr/include/gtk-2.0 -I /usr/include/glib-2.0 -I /usr/include/pango-1.0 -I /usr/include/atk-1.0 -o hsed src/tools/hsed_gtk2.cpp src/tools/supio.cpp
+	$(CXX) -O2 -Wno-write-strings -DHSPRASPBIAN -I /usr/include/gtk-2.0 -I /usr/include/glib-2.0 -I /usr/include/pango-1.0 -I /usr/include/atk-1.0 -I /usr/lib/arm-linux-gnueabihf/glib-2.0/include -o hsed src/tools/hsed_gtk2.cpp src/tools/supio.cpp
 
 clean:
 	rm -f $(OBJS) $(OBJS_CMP) $(OBJS_CL) $(TARGETS)
