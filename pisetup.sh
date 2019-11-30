@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -eux
 echo "Setup HSP3 for Raspberry Pi"
 sudo apt-get update
 sudo apt-get install --yes libgtk2.0-dev
