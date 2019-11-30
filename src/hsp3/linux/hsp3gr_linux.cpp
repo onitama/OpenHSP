@@ -536,8 +536,8 @@ static int gpio_delport( int port )
 	if ((port<0)||(port>=GPIO_MAX)) return -1;
 
 	if ( gpio_type[port]==GPIO_TYPE_NONE ) return 0;
-	echo_file2( GPIO_CLASS "unexport", port );
-	usleep(100000);		//0.1秒待つ(念のため)
+	//echo_file2( GPIO_CLASS "unexport", port );
+	//usleep(100000);		//0.1秒待つ(念のため)
 	gpio_type[port]=GPIO_TYPE_NONE;
 	return 0;
 }
