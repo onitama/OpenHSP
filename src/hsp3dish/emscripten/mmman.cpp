@@ -56,7 +56,7 @@ MMMan::MMMan()
 	mem_snd = NULL;
 	engine_flag = false;
 
-	Mix_Init(MIX_INIT_OGG);
+	Mix_Init(MIX_INIT_OGG|MIX_INIT_MP3);
 	// Mix_ReserveChannels(16);
 
 	int ret = Mix_OpenAudio(0, 0, 0, 0);
