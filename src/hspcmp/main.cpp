@@ -154,11 +154,11 @@ int main( int argc, char *argv[] )
 		}
 
 #ifdef HSPLINUX
-		int result;
 		cutext( oname );
 		if ( execobj & 8 ) {
 			printf("Runtime[%s].\n",oname);
 		} else {
+			int result;
 			printf("Execute from %s runtime[%s](%d).\n",fname,oname,execobj);
 			sprintf(execmd,"%s./%s %s",syspath,oname,fname);
 			//sprintf(execmd,"%s./%s %s >%s.hspres",syspath,oname,fname,syspath);

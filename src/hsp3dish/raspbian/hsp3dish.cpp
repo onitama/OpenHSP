@@ -35,7 +35,6 @@
 #include "../sysreq.h"
 //#include "../hsp3ext.h"
 #include "../../hsp3/strnote.h"
-#include "../../hsp3/linux/hsp3ext_sock.h"
 
 #include "../emscripten/appengine.h"
 
@@ -175,60 +174,12 @@ static int key_map[KEY_MAX];
 
 struct input_event ev[64];
 
-static void initMouse( void )
-{
-	DIR *dirp;
-	struct dirent *dp;
-	regex_t mouse;
-	char fullPath[1024];
-	static char *dirName = "/dev/input/by-id";
-
-	if(regcomp(&mouse,"event-mouse",0)!=0)
-	{
-	    printf("regcomp for mouse failed\n");
-	    return;
-	}
-
-	if ((dirp = opendir(dirName)) == NULL) {
-	    perror("couldn't open '/dev/input/by-id'");
-	    return;
-	}
-
-	// Find any files that match the regex for keyboard or mouse
-
-	do {
-	    errno = 0;
-	    if ((dp = readdir(dirp)) != NULL) 
-	    {
-		//printf("readdir (%s)\n",dp->d_name);
-		if(regexec (&mouse, dp->d_name, 0, NULL, 0) == 0)
-		{
-		    //printf("match for the mouse = %s\n",dp->d_name);
-		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
-		    mouseFd = open(fullPath,O_RDONLY | O_NONBLOCK);
-		    //printf("%s Fd = %d\n",fullPath,mouseFd);
-		    //printf("Getting exclusive access: ");
-		    ioctl(mouseFd, EVIOCGRAB, 1);
-		    //printf("%s\n", (result == 0) ? "SUCCESS" : "FAILURE");
-		}
-
-	    }
-	} while (dp != NULL);
-
-	closedir(dirp);
-	regfree(&mouse);
-
-	mouse_x = (int)mem_engine.width / 2;
-	mouse_y = (int)mem_engine.height / 2;
-	mouse_btn1 = 0;
-	mouse_btn2 = 0;
-}
-
 static void initKeyboard( void )
 {
 	DIR *dirp;
 	struct dirent *dp;
-	regex_t kbd;
+	regex_t kbd,mouse;
+
 	char fullPath[1024];
 	static char *dirName = "/dev/input/by-id";
 	int i;
@@ -237,6 +188,13 @@ static void initKeyboard( void )
 	{
 	    printf("regcomp for kbd failed\n");
 	    return;
+
+	}
+	if(regcomp(&mouse,"event-mouse",0)!=0)
+	{
+	    printf("regcomp for mouse failed\n");
+	    return;
+
 	}
 
 	if ((dirp = opendir(dirName)) == NULL) {
@@ -257,98 +215,49 @@ static void initKeyboard( void )
 		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
 		    keyboardFd = open(fullPath,O_RDONLY | O_NONBLOCK);
 		    //printf("%s Fd = %d\n",fullPath,keyboardFd);
+
+		}
+		if(regexec (&mouse, dp->d_name, 0, NULL, 0) == 0)
+		{
+		    //printf("match for the kbd = %s\n",dp->d_name);
+		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
+		    mouseFd = open(fullPath,O_RDONLY | O_NONBLOCK);
+		    //printf("%s Fd = %d\n",fullPath,mouseFd);
+		    //printf("Getting exclusive access: ");
+		    ioctl(mouseFd, EVIOCGRAB, 1);
+		    //printf("%s\n", (result == 0) ? "SUCCESS" : "FAILURE");
 		}
 
 	    }
 	} while (dp != NULL);
 
 	closedir(dirp);
-	regfree(&kbd);
 
+	regfree(&kbd);
+	regfree(&mouse);
+
+	mouse_x = (int)mem_engine.width / 2;
+	mouse_y = (int)mem_engine.height / 2;
+	mouse_btn1 = 0;
+	mouse_btn2 = 0;
 	for(i=0;i<KEY_MAX;i++) {
 		key_map[i] = 0;
 	}
 
 }
 
-static void doneMouse( void )
-{
-	if (mouseFd!=-1) {
-	    ioctl(mouseFd, EVIOCGRAB, 0);
-		close(mouseFd);
-		mouseFd=-1;
-	}
-}
-
-static void doneKeyboard( void )
-{
-	if (keyboardFd!=-1) {
-		close(keyboardFd);
-		keyboardFd=-1;
-	}
-}
-
 static void updateKeyboard( void )
 {
     int rd;
-    // Read events from keyboard
-    rd = 0;
-    if (keyboardFd<0) {
-		initKeyboard();
-    }
-    if (keyboardFd>=0) {
-	    rd = read(keyboardFd,ev,sizeof(ev));
-    }
-    if(rd < 0) {
-	  if(errno!=EAGAIN) {
-		//printf("keyboard read failed %d\n",errno);
-		doneKeyboard();
-		keyboardFd=-1;
-	  }
-    }
-    if(rd > 0) {
-		int count,n;
-		struct input_event *evp;
-		count = rd / sizeof(struct input_event);
-		n = 0;
-		while(count--) {
-		    evp = &ev[n++];
-		    if(evp->type == 1) {
-				if (( evp->code >= 0 )&&( evp->code < KEY_MAX )) {
-					key_map[evp->code] = evp->value;
-				}
-				if((evp->code == KEY_ESC) && (evp->value == 1)) {
-				    quit_flag = 1;
-				}
-			}
-		}
-    }
-}
-
-static void updateMouse( void )
-{
-    int rd;
     int sx,sy;
+	if((keyboardFd == -1) || (mouseFd == -1)) return;
 
 	sx = (int)mem_engine.width;
 	sy = (int)mem_engine.height;
 
     // Read events from mouse
 
-    rd = 0;
-    if (mouseFd<0) {
-		initMouse();
-    }
-    if (mouseFd>=0) {
-	    rd = read(mouseFd,ev,sizeof(ev));
-    }
-    if(rd < 0) {
-	  if(errno!=EAGAIN) {
-		//printf("mouse read failed %d\n",errno);
-		doneMouse();
-		mouseFd=-1;
-	  }
-    }
+    rd = read(mouseFd,ev,sizeof(ev));
     if(rd > 0) {
 		int count,n;
 		struct input_event *evp;
@@ -385,25 +294,40 @@ static void updateMouse( void )
 			}
 	    }
 	}
+
+    // Read events from keyboard
+
+    rd = read(keyboardFd,ev,sizeof(ev));
+    if(rd > 0) {
+		int count,n;
+		struct input_event *evp;
+		count = rd / sizeof(struct input_event);
+		n = 0;
+		while(count--) {
+		    evp = &ev[n++];
+		    if(evp->type == 1) {
+				if (( evp->code >= 0 )&&( evp->code < KEY_MAX )) {
+					key_map[evp->code] = evp->value;
+				}
+				if((evp->code == KEY_ESC) && (evp->value == 1)) {
+				    quit_flag = 1;
+				}
+			}
+		}
+    }
+
 }
 
-static void initInput( void )
+
+static void doneKeyboard( void )
 {
-	initMouse();
-	initKeyboard();
+	if (keyboardFd!=-1) close(keyboardFd);
+	if (mouseFd!=-1) {
+	    ioctl(mouseFd, EVIOCGRAB, 0);
+		close(mouseFd);
+	}
 }
 
-static void updateInput( void )
-{
-	updateMouse();
-	updateKeyboard();
-}
-
-static void doneInput( void )
-{
-	doneMouse();
-	doneKeyboard();
-}
 
 /*----------------------------------------------------------*/
 
@@ -650,7 +574,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 	int tick;
 	useconds_t usec;
 
-	updateInput();
+	updateKeyboard();
 	hgio_touch( mouse_x, mouse_y, mouse_btn1 );
 
 	//int x, y, btn;
@@ -831,177 +755,6 @@ static int I2C_WriteByte( int ch, int value, int length )
 
 #endif
 
-/*----------------------------------------------------------*/
-//					Raspberry Pi SPI support
-/*----------------------------------------------------------*/
-#ifdef HSPRASPBIAN
-#include <sys/ioctl.h>
-#include <stdint.h>
-#include <linux/spi/spidev.h>
-
-#define HSPSPI_CHMAX 16
-#define HSPSPI_DEVNAME "/dev/spidev0."
-
-int spifd_ch[HSPSPI_CHMAX];
-
-void SPI_Init( void )
-{
-	int i;
-	for(i=0;i<HSPSPI_CHMAX;i++) {
-		spifd_ch[i] = 0;
-	}
-}
-
-void SPI_Close( int ch )
-{
-	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return;
-	if ( spifd_ch[ch] == 0 ) return;
-
-	close( spifd_ch[ch] );
-	spifd_ch[ch] = 0;
-}
-
-void SPI_Term( void )
-{
-	int i;
-	for(i=0;i<HSPSPI_CHMAX;i++) {
-		SPI_Close(i);
-	}
-}
-
-int SPI_Open( int ch, int ss )
-{
-	int fd;
-  char ss_char[2];
-  char devname[128] = HSPSPI_DEVNAME;
-
-  if(ss >= 10) return -2;   // FIXME: you need `itoa()`.
-
-	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-	if ( spifd_ch[ch] ) SPI_Close( ch );
-
-  ss_char[0] = ss + '0';
-  ss_char[1] = '\0';
-
-  strcat(devname, ss_char);
-
-	if((fd = open( devname, O_RDWR )) < 0){
-        return 1;
-    }
-
-  uint8_t spimode = SPI_MODE_0;
-  uint8_t msbfirst = 0;
-  // Set read mode 0
-  if (ioctl(fd, SPI_IOC_RD_MODE, &spimode) < 0) {
-    close( fd );
-    return 2;
-  }
-
-  // Set write mode 0
-  if (ioctl(fd, SPI_IOC_WR_MODE, &spimode) < 0) {
-    close( fd );
-    return 2;
-  }
-
-  // Set MSB first
-  if (ioctl(fd, SPI_IOC_RD_LSB_FIRST, &msbfirst) < 0) {
-    close( fd );
-    return 2;
-  }
-  if (ioctl(fd, SPI_IOC_WR_LSB_FIRST, &msbfirst) < 0) {
-    close( fd );
-    return 2;
-  }
-
-	spifd_ch[ch] = fd;
-	return 0;
-}
-
-int SPI_ReadByte( int ch )
-{
-	int res;
-	unsigned char data[8];
-
-	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-	if ( spifd_ch[ch] == 0 ) return -1;
-
-	res = read( spifd_ch[ch], data, 1 );
-	if ( res < 0 ) return -1;
-
-	res = (int)data[0];
-	return res;
-}
-
-int SPI_ReadWord( int ch )
-{
-	int res;
-	unsigned char data[8];
-
-	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-	if ( spifd_ch[ch] == 0 ) return -1;
-
-	res = read( spifd_ch[ch], data, 2 );
-	if ( res < 0 ) return -1;
-
-	res = ((int)data[1]) << 8;
-	res += (int)data[0];
-	return res;
-}
-
-int SPI_WriteByte( int ch, int value, int length )
-{
-	int res;
-	int len;
-	unsigned char *data;
-
-	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-	if ( spifd_ch[ch] == 0 ) return -1;
-	if ( ( length<0 )||( length>4 ) ) return -1;
-
-	len = length;
-	if ( len == 0 ) len = 1;
-	data = (unsigned char *)(&value);
-	res = write( spifd_ch[ch], data, len );
-	if ( res < 0 ) return -1;
-
-	return 0;
-}
-
-int MCP3008_FullDuplex(int spich, int adcch){
-  const int COMM_SIZE = 3;
-  const uint8_t START_BIT = 0x01;
-  const uint8_t SINGLE_ENDED = 0x80;
-  const uint8_t CHANNEL = adcch << 4;
-  int res;
-  struct spi_ioc_transfer tr;
-  memset(&tr, 0, sizeof(struct spi_ioc_transfer));
-  uint8_t tx[COMM_SIZE] = {0, };
-  uint8_t rx[COMM_SIZE] = {0, };
-
-	if ( ( spich<0 )||( spich>=HSPSPI_CHMAX ) ) return -1;
-  if(spifd_ch[spich] == 0) return -1;
-
-  tx[0] = START_BIT;
-  tx[1] = SINGLE_ENDED | CHANNEL;
-
-  tr.tx_buf = (unsigned long)tx;
-  tr.rx_buf = (unsigned long)rx;
-  tr.len = COMM_SIZE;
-  tr.delay_usecs = 0;
-  tr.bits_per_word = 8;
-  tr.cs_change = 0;
-  tr.speed_hz = 5000;
-
-  if(ioctl(spifd_ch[spich], SPI_IOC_MESSAGE(1), &tr) < 1){
-    return -2;
-  }
-
-  res = (0x03 & rx[1]) << 8;
-  res |= rx[2];
-
-  return res;
-}
-#endif
 /*----------------------------------------------------------*/
 //		GPIOデバイスコントロール関連
 /*----------------------------------------------------------*/
@@ -1186,25 +939,6 @@ static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
 		I2C_Close( p1 );
 		return 0;
 	}
-	if (( strcmp( cmd, "spireadw" )==0 )||( strcmp( cmd, "SPIREADW" )==0 )) {
-		return SPI_ReadWord( p1 );
-	}
-	if (( strcmp( cmd, "spiread" )==0 )||( strcmp( cmd, "SPIREAD" )==0 )) {
-		return SPI_ReadByte( p1 );
-	}
-	if (( strcmp( cmd, "spiwrite" )==0 )||( strcmp( cmd, "SPIWRITE" )==0 )) {
-		return SPI_WriteByte( p3, p1, p2 );
-	}
-	if (( strcmp( cmd, "spiopen" )==0 )||( strcmp( cmd, "SPIOPEN" )==0 )) {
-		return SPI_Open( p2, p1 );
-	}
-	if (( strcmp( cmd, "spiclose" )==0 )||( strcmp( cmd, "SPICLOSE" )==0 )) {
-		SPI_Close( p1 );
-    return 0;
-	}
-	if (( strcmp( cmd, "readmcpduplex" )==0 )||( strcmp( cmd, "READMCPDUPLEX" )==0 )) {
-    return MCP3008_FullDuplex(p2, p1);
-	}
 	return -1;
 }
 
@@ -1316,7 +1050,7 @@ int hsp3dish_init( char *startfile )
 	sy = (int)mem_engine.height;
 	autoscale = 0;
 
-	initInput();
+	initKeyboard();
 	gpio_init();
 	I2C_Init();
 
@@ -1384,22 +1118,11 @@ int hsp3dish_init( char *startfile )
 	exinfo = ctx->exinfo2;
 
 #ifdef USE_OBAQ
-	{
 	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_dw_extcmd( tinfo );
 	//hsp3typeinit_dw_extfunc( code_gettypeinfo( TYPE_USERDEF+1 ) );
-	}
-#endif
-
-#if 1
-	{
-	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF
-	tinfo->hspctx = ctx;
-	tinfo->hspexinfo = exinfo;
-	hsp3typeinit_sock_extcmd( tinfo );
-	}
 #endif
 
 	//		Initalize DEVINFO
@@ -1452,7 +1175,7 @@ static void hsp3dish_bye( void )
    eglDestroyContext( p_engine->display, p_engine->context );
    eglTerminate( p_engine->display );
 
-	doneInput();
+	doneKeyboard();
 	I2C_Term();
 	gpio_bye();
 

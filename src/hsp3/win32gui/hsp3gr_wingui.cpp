@@ -1035,11 +1035,14 @@ static int cmdfunc_extcmd( int cmd )
 		PVal *pval;
 		APTR aptr;
 		char *p;
+		int owmode;
 		aptr = code_getva( &pval );
 		if ( pval->flag != HSPVAR_FLAG_INT ) throw HSPERR_TYPE_MISMATCH;
 		p1 = code_getdi( 100 );
 		p = code_gets();
-		ctx->stat = bmscr->AddHSPObjectMultiBox( pval, aptr, p1, p, cmd==0x26 );
+		owmode = 0;
+		if (cmd == 0x26) owmode = 1;
+		ctx->stat = bmscr->AddHSPObjectMultiBox( pval, aptr, p1, p, owmode );
 		break;
 		}
 
@@ -1170,11 +1173,14 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 
 	case 0x2e:								// groll
-		p1=code_getdi(0);
-		p2=code_getdi(0);
-		bmscr->SetScroll( p1, p2 );
+	{
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		HSPREAL dp1 = code_getdd(bmscr->viewsx);
+		HSPREAL dp2 = code_getdd(bmscr->viewsy);
+		bmscr->SetScroll(p1, p2, dp1, dp2);
 		break;
-
+	}
 	case 0x2f:								// line
 		p1=code_getdi(0);
 		p2=code_getdi(0);
@@ -1252,7 +1258,7 @@ static int cmdfunc_extcmd( int cmd )
 #ifndef HSP_COMPACT
 	case 0x35:								// grect
 		{
-		double rot;
+		HSPREAL rot;
 		p1 = code_getdi(0);				// パラメータ1:数値
 		p2 = code_getdi(0);				// パラメータ2:数値
 		rot = code_getdd(0.0);			// パラメータ5:数値
@@ -1269,7 +1275,7 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x36:								// grotate
 		{
 		Bmscr *bm2;
-		double rot;
+		HSPREAL rot;
 
 		p1 = code_getdi(0);			// パラメータ1:数値
 		p2 = code_getdi(0);			// パラメータ2:数値
@@ -1442,7 +1448,7 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x3e:								// celput
 		{
 		Bmscr *bm2;
-		double zx,zy,rot;
+		HSPREAL zx,zy,rot;
 		int x,y,srcsx,srcsy,putsx,putsy,centerx,centery;
 
 		p1=code_getdi(1);
@@ -1465,10 +1471,10 @@ static int cmdfunc_extcmd( int cmd )
 		srcsy = bm2->divsy;
 		x = ( p2 % bm2->divx ) * srcsx;
 		y = ( p2 / bm2->divx ) * srcsy;
-		putsx = (int)((double)srcsx * zx );
-		putsy = (int)((double)srcsy * zy );
-		centerx = (int)((double)bm2->celofsx * zx );
-		centery = (int)((double)bm2->celofsy * zy );
+		putsx = (int)((HSPREAL)srcsx * zx );
+		putsy = (int)((HSPREAL)srcsy * zy );
+		centerx = (int)((HSPREAL)bm2->celofsx * zx );
+		centery = (int)((HSPREAL)bm2->celofsy * zy );
 		GRotateSub( bm2, x, y, srcsx, srcsy, putsx, putsy, rot, centerx, centery );
 		bmscr->cx += putsx;
 		break;
@@ -1528,6 +1534,8 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		bmscr->Setcolor((p1 >> 16) & 0xff, (p1>>8) & 0xff, p1 & 0xff );
+		break;
+	case 0x4f:								// viewcalc
 		break;
 
 

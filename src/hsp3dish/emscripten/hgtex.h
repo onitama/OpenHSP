@@ -4,10 +4,6 @@
 #ifndef __hgtex_h
 #define __hgtex_h
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define TEXINF_MAX 256
 #define TEXMES_CACHE_DEFAULT 8		// キャッシュのデフォルト生存フレーム
 #define TEXMES_NAME_BUFFER 32		// テキストハッシュネーム用バッファサイズ
@@ -39,6 +35,7 @@ TEXMODE_NONE = 0,
 TEXMODE_NORMAL,
 TEXMODE_MES8,
 TEXMODE_MES4,
+TEXMODE_BUFFER,
 TEXMODE_MAX,
 };
 
@@ -56,15 +53,15 @@ void TexProc( void );
 int RegistTexMem( unsigned char *ptr, int size );
 int RegistTex( char *fname );
 int MakeEmptyTex( int width, int height );
+int MakeEmptyTexBuffer( int width, int height );
 
 int GetCacheMesTextureID( char *msg, int font_size, int font_style );
 
 int TexFontInit( char *path, int size );
 void TexFontTerm( void );
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+int UpdateTexStar(int texid, int mode);
+int UpdateTex32(int texid, char* srcptr, int mode);
 
 #endif
 

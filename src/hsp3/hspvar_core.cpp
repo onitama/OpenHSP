@@ -186,7 +186,7 @@ void HspVarCoreDup( PVal *pval, PVal *arg, APTR aptr )
 void HspVarCoreDim( PVal *pval, int flag, int len1, int len2, int len3, int len4 )
 {
 	//		配列を確保する
-	//		(len1〜len4は、4byte単位なので注意)
+	//		(len1～len4は、4byte単位なので注意)
 	//
 	HspVarProc *p;
 	p = &hspvarproc[ flag ];
@@ -210,7 +210,7 @@ void HspVarCoreDim( PVal *pval, int flag, int len1, int len2, int len3, int len4
 void HspVarCoreDimFlex( PVal *pval, int flag, int len0, int len1, int len2, int len3, int len4 )
 {
 	//		配列を確保する(可変長配列用)
-	//		(len1〜len4は、4byte単位なので注意)
+	//		(len1～len4は、4byte単位なので注意)
 	//
 	HspVarProc *p;
 	p = &hspvarproc[ flag ];

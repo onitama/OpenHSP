@@ -469,9 +469,6 @@ void HspWnd::MakeBmscrOff( int id, int sx, int sy, int mode )
 
 	bm->wx = 0;
 	bm->wy = 0;
-	bm->wchg = 0;
-	bm->viewx=0;
-	bm->viewy=0;
 }
 
 
@@ -563,10 +560,6 @@ void HspWnd::MakeBmscrWnd( int id, int type, int xx, int yy, int wx, int wy, int
 	bm->Init( hInst, hwnd, sx, sy,
 	 ( mode & 0x01 ? BMSCR_PALMODE_PALETTECOLOR : BMSCR_PALMODE_FULLCOLOR ) );
 
-	bm->wchg = 0;
-	bm->viewx = 0;
-	bm->viewy = 0;
-
 	RECT rc;
 	rc.left = 0;
 	rc.top = 0;
@@ -580,6 +573,8 @@ void HspWnd::MakeBmscrWnd( int id, int type, int xx, int yy, int wx, int wy, int
 		bm->framesy = wfy;
 	}
 
+	bm->wx = wx;
+	bm->wy = wy;
 	bm->Width( wx, wy, -1, -1, 1 );
 
 	SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0,
@@ -661,6 +656,8 @@ int HspWnd::Picload( int id, char *fname, int mode )
 		sp_image = stbi_load_from_memory( (unsigned char *)pBuf, size, &psx, &psy, &components, 4 );
 		if ( sp_image == NULL ) return 3;
 
+		if (bm->palmode) return 3;
+
 		if (( mode == 0 )||( mode == 2 )) {
 			int palsw,type;
 			type = bm->type; palsw = bm->palmode;
@@ -670,7 +667,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
 		}
 
 		x = bm->cx; y = bm->cy;
-		bm->RenderAlphaBitmap( psx, psy, components, sp_image );
+		if (bm->RenderAlphaBitmap(psx, psy, components, sp_image)) return 4;
 		bm->Send( x, y, psx, psy );
 
 		stbi_image_free(sp_image);
@@ -888,6 +885,15 @@ void Bmscr::Cls( int mode )
 	//
 	ResetHSPObject();
 
+	//		Viewport clear
+	//
+	this->wchg = 0;
+	this->viewx = 0;
+	this->viewy = 0;
+	this->viewsx = 1.0;
+	this->viewsy = 1.0;
+	Viewcalc_reset();
+
 	//		text setting initalize
 	//
 	cx=0;cy=0;
@@ -933,7 +939,19 @@ void Bmscr::Bmspnt( HDC disthdc )
 		opal=SelectPalette( disthdc, hpal, 0 );
 		RealizePalette( disthdc );
 	}
-	BitBlt( disthdc, 0, 0, wx, wy, hdc, viewx, viewy, SRCCOPY );
+
+	if ((viewsx==1.0)&&(viewsy==1.0)) {
+		BitBlt(disthdc, 0, 0, wx, wy, hdc, viewx, viewy, SRCCOPY);
+	}
+	else {
+		double dx, dy;
+		dx = (double)wx * viewsx;
+		dy = (double)wy * viewsy;
+		SetStretchBltMode(hdc, COLORONCOLOR);
+		//SetStretchBltMode(hdc, HALFTONE);
+		
+		StretchBlt(disthdc, 0, 0, (int)dx, (int)dy, hdc, viewx, viewy, wx, wy, SRCCOPY);
+	}
 	if ( hpal != NULL ) {
 		SelectPalette( disthdc, opal, 0 );
 	}
@@ -1724,23 +1742,35 @@ void Bmscr::GetClientSize( int *xsize, int *ysize )
 }
 
 
-void Bmscr::SetScroll( int xbase, int ybase )
+void Bmscr::SetScroll( int xbase, int ybase, HSPREAL xscale, HSPREAL yscale )
 {
 	//		スクロール基点を設定
 	//
-	int ax,ay, _vx, _vy;
-	_vx = viewx;
-	_vy = viewy;
+	int ax, ay;
 	viewx = xbase;
-	if ( viewx < 0 ) viewx = 0;
 	viewy = ybase;
-	if ( viewy < 0 ) viewy = 0;
 
-	GetClientSize( &ax, &ay );
-	if ( ( viewx + ax ) > sx ) viewx = sx - ax;
-	if ( ( viewy + ay ) > sy ) viewy = sy - ay;
+	if ((sx == 0) || (sy == 0)) return;
 
-	if (( _vx != viewx )||( _vy != viewy )) Update();
+	GetClientSize(&ax, &ay);
+	double minscalex = (double)ax / sx;
+	double minscaley = (double)ay / sy;
+	double px, py;
+	px = xscale; if (px < minscalex) px = minscalex;
+	py = yscale; if (py < minscaley) py = minscaley;
+
+	viewsx = px; viewsxr = 1.0 / px;
+	viewsy = py; viewsyr = 1.0 / py;
+
+	px = (double)(ax+1) * viewsxr;
+	py = (double)(ay+1) * viewsyr;
+
+	if ((viewx + (int)px) >= sx) viewx = sx - (int)px;
+	if ((viewy + (int)py) >= sy) viewy = sy - (int)py;
+	if (viewx < 0) viewx = 0;
+	if (viewy < 0) viewy = 0;
+
+	Update();
 }
 
 
@@ -1923,6 +1953,7 @@ int Bmscr::RenderAlphaBitmap( int t_psx, int t_psy, int components, unsigned cha
 	p2_ofs = ( t_psx * 4 ) - ( psx * 4 );
 
 	if ( components < 4 ) {
+
 		//		24bit normal copy
 		for(b=0;b<psy;b++) {
 			for(a=0;a<psx;a++) {
@@ -1962,4 +1993,35 @@ int Bmscr::RenderAlphaBitmap( int t_psx, int t_psy, int components, unsigned cha
 	return 0;
 }
 
+
+/*------------------------------------------------------------*/
+/*
+		Viewport
+*/
+/*------------------------------------------------------------*/
+
+void Bmscr::Viewcalc_reset(void)
+{
+	//	Reset viewport
+	//
+	vp_flag = 0;
+}
+
+
+int Bmscr::Viewcalc_set(HSPREAL *viewmatrix)
+{
+	//	Setup viewport
+	//
+	Viewcalc_reset();
+	vp_flag = 1;
+	return 0;
+}
+
+
+void Bmscr::Viewcalc_calc(HSPREAL& axisx, HSPREAL& axisy)
+{
+	//	Calc viewport -> real axis
+	//
+	if (vp_flag == 0) return;
+}
 

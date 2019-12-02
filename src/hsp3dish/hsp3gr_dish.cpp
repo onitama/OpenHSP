@@ -868,6 +868,18 @@ static int cmdfunc_extcmd( int cmd )
 			if (p4 & HSPWND_OPTION_OFFSCREEN) typeval = HSPWND_TYPE_OFFSCREEN;
 			wnd->MakeBmscr(p1, typeval, p5, p6, p2, p3, p4);
 		}
+		else {
+			if (p1 != 0) throw HSPERR_ILLEGAL_FUNCTION;
+			bmscr = wnd->GetBmscr(p1);
+			bmscr->sx = p2;
+			bmscr->sx2 = p2;
+			bmscr->sy = p3;
+			bmscr->buffer_option = p4 & 0x100;
+#ifdef HSPWIN
+			ctx->runmode = RUNMODE_EXITRUN;
+			return RUNMODE_EXITRUN;
+#endif
+		}
 		bmscr = wnd->GetBmscr( p1 );
 		cur_window = p1;
 		hgio_gsel( (BMSCR *)bmscr );
@@ -914,6 +926,15 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 	}
 
+	case 0x2e:								// groll
+	{
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		HSPREAL dp1 = code_getdd(bmscr->viewsx);
+		HSPREAL dp2 = code_getdd(bmscr->viewsy);
+		bmscr->SetScroll(p1, p2, dp1, dp2);
+		break;
+	}
 	case 0x2f:								// line
 		p1=code_getdi(0);
 		p2=code_getdi(0);
@@ -1316,6 +1337,9 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		bmscr->Setcolor((p1 >> 16) & 0xff, (p1>>8) & 0xff, p1 & 0xff );
+		break;
+
+	case 0x4f:								// viewcalc
 		break;
 
 	case 0x5c:								// celbitmap

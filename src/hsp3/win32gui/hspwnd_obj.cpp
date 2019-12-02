@@ -61,11 +61,26 @@ LRESULT CALLBACK MyEditProc2( HWND hwnd , UINT msg , WPARAM wp , LPARAM lp ) {
 			SendMessage (hwnd, EM_SETSEL, 0, -1) ;
 			return 0;
 		}
-	case WM_KEYUP:
-	case WM_LBUTTONUP:
-	case WM_RBUTTONUP:
-		 //PutLineNumber();
-		 break;
+		break;
+	case WM_LBUTTONDOWN:
+	{
+		int id;
+		HWND hw;
+		Bmscr* bm;
+		HSPOBJINFO* obj;
+		hw = (HWND)GetWindowLongPtr(hwnd, GWLP_HWNDPARENT);
+		id = (int)GetWindowLongPtr(hw, GWLP_USERDATA);
+		bm = curwnd->GetBmscrSafe(id);
+		if (bm) {
+			id = (int)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+			obj = bm->GetHSPObjectSafe(id);
+			if (obj->owmode == HSPOBJ_NONE) break;
+			if (hwnd == obj->hCld) {
+				obj->exinfo2++;
+			}
+		}
+		break;
+	}
 	default:
 		 break;
 	}
@@ -255,19 +270,17 @@ static void Object_StrInput( HSPOBJINFO *info, int wparam )
 static void Object_MesboxInput( HSPOBJINFO *info, int wparam )
 {
 	HWND hwnd;
-	BMSCR *bm;
 	int notify;
-	int ln,ln_s,ln_e;
+	int ln_s,ln_e;
 
-	bm = (BMSCR *)info->bm;
-	hwnd = bm->hwnd;
+	hwnd = info->hCld;
 	notify = wparam>>16;
 	if ( notify != EN_UPDATE ) return;
 
 	SendMessage ( hwnd, EM_GETSEL, (WPARAM)&ln_s, (LPARAM)&ln_e );
-	ln=SendMessage ( hwnd, EM_LINEFROMCHAR, (WPARAM)ln_s, 0 );
-	info->exinfo1++;// = ln+1;
-	info->exinfo2 = ln_s;
+	//ln=SendMessage ( hwnd, EM_LINEFROMCHAR, (WPARAM)ln_s, 0 );
+	//info->exinfo1 = ln+1;
+	info->exinfo1 = ln_s;
 
 	Object_StrInput(info,wparam);
 }
@@ -285,6 +298,9 @@ static void Object_ListBox( HSPOBJINFO *info, int wparam )
 {
 	bmscr_obj_ival = (int)SendMessage( info->hCld, LB_GETCURSEL,0,0L );
 	Object_SendSetVar( info );
+	if (HIWORD(wparam) == LBN_DBLCLK) {
+		info->exinfo2++;
+	}
 }
 
 static void Object_SetMultiBox( HSPOBJINFO *info, int type, void *ptr )
@@ -300,7 +316,7 @@ static void Object_SetMultiBox( HSPOBJINFO *info, int type, void *ptr )
 
 	switch( type ) {
 	case TYPE_STRING:
-		if ( info->owid ) {
+		if ( info->owid & 1 ) {
 			m_ini=CB_RESETCONTENT;
 			m_add=CB_ADDSTRING;
 		} else {
@@ -317,7 +333,7 @@ static void Object_SetMultiBox( HSPOBJINFO *info, int type, void *ptr )
 		}
 		break;
 	case TYPE_INUM:
-		if ( info->owid ) {
+		if ( info->owid & 1 ) {
 			m_ini=CB_SETCURSEL;
 		} else {
 			m_ini=LB_SETCURSEL;
@@ -962,15 +978,16 @@ int Bmscr::AddHSPObjectMultiBox( PVal *pval, APTR aptr, int psize, char *defval,
 	sizex = ox; sizey = oy;
 	iptr = (int *)HspVarCorePtrAPTR( pval, aptr );
 
-	if ( mode ) {
+	if ( mode&1 ) {
 		hw = CreateWindowEx( WS_EX_CLIENTEDGE, TEXT("combobox"), TEXT(""),
 			objstyle|WS_VSCROLL|CBS_DROPDOWNLIST,
 			cx, cy, sizex, sizey + psize, hwnd,
 			reinterpret_cast< HMENU >( static_cast< WORD >( MESSAGE_HSPOBJ + id ) ), hInst, NULL );
 	} else {
+		int style = objstyle | WS_VSCROLL | LBS_NOTIFY;
 		sizey += psize;
 		hw = CreateWindowEx( WS_EX_CLIENTEDGE, TEXT("listbox"), TEXT(""),
-			objstyle|WS_VSCROLL|LBS_NOTIFY,
+			style,
 			cx, cy, sizex, sizey, hwnd,
 			reinterpret_cast< HMENU >( static_cast< WORD >( MESSAGE_HSPOBJ + id ) ), hInst, NULL );
 	}
@@ -981,7 +998,7 @@ int Bmscr::AddHSPObjectMultiBox( PVal *pval, APTR aptr, int psize, char *defval,
 		SetHSPObjectColor(obj);
 	}
 
-	if ( mode ) {
+	if ( mode&1 ) {
 		obj->func_notice = Object_ComboBox;
 	} else {
 		obj->func_notice = Object_ListBox;

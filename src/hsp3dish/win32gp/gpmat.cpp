@@ -375,7 +375,7 @@ float gamehsp::setMaterialBlend( Material* material, int gmode, int gfrate )
 	//	プレンド描画設定
 	//	gmdoe : HSPのgmode値
 	//	gfrate : HSPのgfrate値
-	//	(戻り値=alpha値(0.0〜1.0))
+	//	(戻り値=alpha値(0.0～1.0))
 	//
 	RenderState::StateBlock *state;
 	float alpha;

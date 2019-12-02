@@ -83,7 +83,8 @@ void CHsc3::AddSystemMacros( CToken *tk, int option )
 		tk->RegistExtMacro( "__date__",linfo.CurrentDate() );
 		tk->RegistExtMacro( "__time__",linfo.CurrentTime() );
 	    tk->RegistExtMacro( "__line__", 0 );
-        tk->RegistExtMacro( "__file__", "" );
+		tk->RegistExtMacro( "__file__", "" );
+		tk->RegistExtMacro( "__runtime__", "\"hsp3\"" );
 		if ( option & HSC3_OPT_DEBUGMODE ) tk->RegistExtMacro( "_debug", "" );
 	}
 }
@@ -110,7 +111,7 @@ int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 		tk.SetAHTBuffer( ahtbuf );
 	}
 
-	sprintf( mm,"#AHT processor ver%s / onion software 1997-2019(c)", hspver );
+	sprintf( mm,"#AHT processor ver%s / onion software 1997-2020(c)", hspver );
 	tk.Mes( mm );
 	res = tk.ExpandFile( outbuf, fname, fname );
 	if ( res < 0 ) return -1;
@@ -161,7 +162,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2019(c)", HSC3TITLE, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2020(c)", HSC3TITLE, hspver );
 	tk.Mes( mm );
 	tk.SetAdditionMode( 1 );
 
@@ -263,7 +264,7 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2019(c)", HSC3TITLE2, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2020(c)", HSC3TITLE2, hspver );
 	tk.Mes( mm );
 	if (genmode & HSC3_MODE_UTF8) {
 		tk.Mes("#use UTF-8 strings.");
