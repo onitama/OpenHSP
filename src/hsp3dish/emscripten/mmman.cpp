@@ -18,7 +18,77 @@
 
 #define sndbank(a) (char *)(mem_snd[a].mempt)
 
-#define MIX_MAX_CHANNEL 32
+#define MIX_MAX_CHANNEL 128
+
+//---------------------------------------------------------------------------
+
+//	SDL Music Object
+Mix_Music *m_music;
+
+void MusicInit( void )
+{
+	m_music = NULL;
+}
+
+void MusicTerm( void )
+{
+	if (m_music) {
+		Mix_HaltMusic();
+		Mix_FreeMusic(m_music);
+		m_music = NULL;
+	}
+}
+
+int MusicLoad( char *fname )
+{
+	MusicTerm();
+	m_music=Mix_LoadMUS((const char *)fname);
+	if (m_music==NULL) return -1;
+	return 0;
+}
+
+void MusicPlay( int mode )
+{
+	if (m_music==NULL) return;
+	Mix_HaltMusic();
+	Mix_PlayMusic(m_music,mode);
+}
+
+void MusicStop( void )
+{
+	if (m_music==NULL) return;
+	Mix_HaltMusic();
+}
+
+void MusicPause( void )
+{
+	if (m_music==NULL) return;
+	if (Mix_PausedMusic()!=0) {
+		Mix_ResumeMusic();
+	} else {
+		Mix_PauseMusic();
+	}
+}
+
+void MusicVolume( int vol )
+{
+	if (m_music==NULL) return;
+	Mix_VolumeMusic(vol);
+}
+
+int MusicStatue( int type )
+{
+	if (m_music==NULL) return 0;
+	int res=0;
+	switch(type) {
+	case 16:
+		res = Mix_PlayingMusic();
+		break;
+	default:
+		break;
+	}
+	return res;
+}
 
 //---------------------------------------------------------------------------
 
@@ -55,6 +125,7 @@ MMMan::MMMan()
 
 	mem_snd = NULL;
 	engine_flag = false;
+	MusicInit();
 
 	Mix_Init(MIX_INIT_OGG|MIX_INIT_MP3);
 	// Mix_ReserveChannels(16);
@@ -63,12 +134,14 @@ MMMan::MMMan()
 	//assert(ret == 0);
 
 	engine_flag = ret == 0;
+
 }
 
 
 MMMan::~MMMan()
 {
 	ClearAllBank();
+	MusicTerm();
 
 	while(Mix_Init(0))
 		Mix_Quit();
@@ -85,6 +158,12 @@ void MMMan::DeleteBank( int bank )
 		StopBank( m );
 		Mix_FreeChunk( m->chunk );
 	}
+	
+	if (m->fname!=NULL) {
+		free(m->fname);
+		m->fname = NULL;
+	}
+	
 	lpSnd = sndbank( bank );
 	if ( lpSnd != NULL ) {
 		free( lpSnd );
@@ -145,6 +224,8 @@ MMM *MMMan::SetBank( int num, int flag, int opt, void *mempt, char *fname, int s
 	// m->pan = 0;
 	m->start = start;
 	m->end = end;
+	m->chunk = NULL;
+	m->channel = -1;
 	return m;
 }
 
@@ -180,6 +261,7 @@ void MMMan::Pause( void )
 	//		pause all playing sounds
 	//
 	Mix_Pause( -1 );
+	MusicPause();
 }
 
 
@@ -188,6 +270,7 @@ void MMMan::Resume( void )
 	//		resume all playing sounds
 	//
 	Mix_Resume( -1 );
+	MusicPause();
 }
 
 
@@ -195,6 +278,7 @@ void MMMan::Stop( void )
 {
 	//		stop all playing sounds
 	//
+	MusicStop();
 	Mix_HaltChannel( -1 );
 }
 
@@ -221,9 +305,20 @@ void MMMan::PlayBank( MMM *mmm )
 
 int MMMan::BankLoad( MMM *mmm, char *fname )
 {
+	char fext[8];
 	if ( mmm == NULL ) return -9;
+
+	getpath(fname,fext,16+2);
+	if (!strcmp(fext,".mp3")) {
+		mmm->fname = (char *)malloc( strlen(fname)+1 );
+		strcpy( mmm->fname,fname );
+		mmm->flag = MMDATA_MUSIC;
+		return 0;
+	}
+
 	mmm->chunk = Mix_LoadWAV( fname );
 	mmm->channel = mmm->num;
+	mmm->flag = MMDATA_INTWAVE;
 	return 0;
 }
 
