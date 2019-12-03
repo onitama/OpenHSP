@@ -18,16 +18,19 @@
 
 #define sndbank(a) (char *)(mem_snd[a].mempt)
 
-#define MIX_MAX_CHANNEL 128
+#define MIX_MAX_CHANNEL 16
+//#define USE_MODMIX		// Use Modified SDLMix
 
 //---------------------------------------------------------------------------
 
 //	SDL Music Object
+int curmusic;
 Mix_Music *m_music;
 
 void MusicInit( void )
 {
 	m_music = NULL;
+	curmusic = -1;
 }
 
 void MusicTerm( void )
@@ -36,6 +39,7 @@ void MusicTerm( void )
 		Mix_HaltMusic();
 		Mix_FreeMusic(m_music);
 		m_music = NULL;
+		curmusic = -1;
 	}
 }
 
@@ -47,9 +51,10 @@ int MusicLoad( char *fname )
 	return 0;
 }
 
-void MusicPlay( int mode )
+void MusicPlay( int num, int mode )
 {
 	if (m_music==NULL) return;
+	curmusic = num;
 	Mix_HaltMusic();
 	Mix_PlayMusic(m_music,mode);
 }
@@ -57,6 +62,7 @@ void MusicPlay( int mode )
 void MusicStop( void )
 {
 	if (m_music==NULL) return;
+	curmusic = -1;
 	Mix_HaltMusic();
 }
 
@@ -72,13 +78,14 @@ void MusicPause( void )
 
 void MusicVolume( int vol )
 {
-	if (m_music==NULL) return;
 	Mix_VolumeMusic(vol);
 }
 
-int MusicStatus( int type )
+int MusicStatus( int num, int type )
 {
 	if (m_music==NULL) return 0;
+	if (num!=curmusic) return 0;
+
 	int res=0;
 	switch(type) {
 	case 16:
@@ -105,8 +112,8 @@ typedef struct MMM
 	short	lasttrk;		//	CD last track No.
 	void	*mempt;			//	pointer to sound data
 	char	*fname;			//	sound filename (sbstr)
-	// int		vol;
-	// int		pan;
+	int		vol;
+	int		pan;
 	int		start;
 	int		end;
 	
@@ -128,13 +135,11 @@ MMMan::MMMan()
 	MusicInit();
 
 	Mix_Init(MIX_INIT_OGG|MIX_INIT_MP3);
-	// Mix_ReserveChannels(16);
 
 	int ret = Mix_OpenAudio(0, 0, 0, 0);
 	//assert(ret == 0);
-
+	Mix_ReserveChannels(16);
 	engine_flag = ret == 0;
-
 }
 
 
@@ -155,8 +160,10 @@ void MMMan::DeleteBank( int bank )
 
 	m = &(mem_snd[bank]);
 	if ( m->flag == MMDATA_INTWAVE ) {
-		StopBank( m );
 		Mix_FreeChunk( m->chunk );
+	}
+	if ( m->flag == MMDATA_MUSIC ) {
+		if (m->num==curmusic) MusicTerm();
 	}
 	
 	if (m->fname!=NULL) {
@@ -168,7 +175,10 @@ void MMMan::DeleteBank( int bank )
 	if ( lpSnd != NULL ) {
 		free( lpSnd );
 	}
+	mem_snd[bank].flag = MMDATA_NONE;
 	mem_snd[bank].mempt=NULL;
+	mem_snd[bank].num = -1;
+	mem_snd[bank].channel = -1;
 }
 
 
@@ -208,6 +218,7 @@ MMM *MMMan::SetBank( int num, int flag, int opt, void *mempt, char *fname, int s
 	if ( bank < 0 ) {
 		bank = AllocBank();
 	} else {
+		StopBank( num );
 		DeleteBank( bank );
 	}
 
@@ -220,8 +231,8 @@ MMM *MMMan::SetBank( int num, int flag, int opt, void *mempt, char *fname, int s
 	m->mempt = mempt;
 	m->fname = NULL;
 	// m->pause_flag = 0;
-	// m->vol = 0;
-	// m->pan = 0;
+	m->vol = -1;
+	m->pan = 0;
 	m->start = start;
 	m->end = end;
 	m->chunk = NULL;
@@ -283,26 +294,6 @@ void MMMan::Stop( void )
 }
 
 
-void MMMan::StopBank( MMM *mmm )
-{
-}
-
-
-void MMMan::PauseBank( MMM *mmm )
-{
-}
-
-
-void MMMan::ResumeBank( MMM *mmm )
-{
-}
-
-
-void MMMan::PlayBank( MMM *mmm )
-{
-}
-
-
 int MMMan::BankLoad( MMM *mmm, char *fname )
 {
 	char fext[8];
@@ -317,7 +308,7 @@ int MMMan::BankLoad( MMM *mmm, char *fname )
 	}
 
 	mmm->chunk = Mix_LoadWAV( fname );
-	mmm->channel = mmm->num;
+	if (mmm->chunk==NULL) return 1;
 	mmm->flag = MMDATA_INTWAVE;
 	return 0;
 }
@@ -328,7 +319,6 @@ int MMMan::Load( char *fname, int num, int opt, int start, int end )
 	//		Load sound to bank
 	//			opt : 0=normal/1=loop/2=wait/3=continuous
 	//
-	if ( num < 0 || num >= MIX_MAX_CHANNEL ) return -1;
 	int flag,res;
 	MMM *mmm;
 
@@ -361,22 +351,27 @@ int MMMan::Play( int num, int ch )
 	if ( m == NULL ) {
 		return -1;
 	}
+	bool loop = m->opt & 1;
+
 	switch(m->flag) {
 	case MMDATA_INTWAVE:
-		if ( ch < 0 ) ch = m->channel;
-		if ( ch >= 0 && ch < MIX_MAX_CHANNEL ) {
-			bool loop = m->opt & 1;
-			Mix_HaltChannel( ch );
-#ifdef HSPLINUX
-			Mix_PlayChannel( ch, m->chunk, loop ? -1 : 0 );
+		if ( ch >= MIX_MAX_CHANNEL ) break;
+		if (ch>=0) Mix_HaltChannel( ch );
+#ifdef USE_MODMIX
+		m->channel = Mix_PlayChannel( ch, m->chunk, loop ? -1 : 0 , m->start, m->end );
 #else
-			Mix_PlayChannel( ch, m->chunk, loop ? -1 : 0 , m->start, m->end );
+		m->channel = Mix_PlayChannel( ch, m->chunk, loop ? -1 : 0 );
 #endif
+		if (m->vol) {
+			Mix_Volume( m->channel, m->vol );
 		}
 		break;
 	case MMDATA_MUSIC:
 		if ( MusicLoad(m->fname)!=0 ) return -1;
-		MusicPlay(m->opt);
+		if (m->vol) {
+			MusicVolume( m->vol );
+		}
+		MusicPlay(num,m->opt);
 		break;
 	default:
 		return 2;
@@ -406,19 +401,47 @@ void MMMan::GetInfo( int bank, char **fname, int *num, int *flag, int *opt )
 
 void MMMan::SetVol( int num, int vol )
 {
-	if ( num < 0 || num >= MIX_MAX_CHANNEL ) return;
+	MMM *mmm;
+	int bank,flg;
+	bank = SearchBank(num);
+	if (bank<0) return;
+	
+	mmm=&mem_snd[bank];
+	flg=mmm->flag;
+	
 	if ( vol >     0 ) vol =     0;
 	if ( vol < -1000 ) vol = -1000;
-	Mix_Volume( num, (int)(MIX_MAX_VOLUME * ((float)(vol + 1000) / 1000.0f)) );
+	mmm->vol = (int)(MIX_MAX_VOLUME * ((float)(vol + 1000) / 1000.0f));
+
+	if ( flg == MMDATA_INTWAVE ) {
+		int ch = mmm->channel;
+		if ( ch>=0 ) Mix_Volume( ch, mmm->vol );
+		if ( mmm->pan != 0 ) SetPan(num, mmm->pan);
+	}
+	if ( flg == MMDATA_MUSIC ) {
+		MusicVolume(mmm->vol);
+	}
 }
 
 
 
-void MMMan::SetPan( int num, int pan )
+void MMMan::SetPan( int num, int p_pan )
 {
-	if ( num < 0 || num >= MIX_MAX_CHANNEL ) return;
+	int ch;
+	int pan = p_pan;
+
+	MMM *mmm;
+	int bank,flg;
+	bank = SearchBank(num);
+	if (bank<0) return;
+	
+	mmm=&mem_snd[bank];
+	flg=mmm->flag;
+	
 	if ( pan >  1000 ) pan =  1000;
 	if ( pan < -1000 ) pan = -1000;
+	mmm->pan = pan;
+
 	int l, r;
 	int max = 255;
 	if ( pan > 0 ) {
@@ -428,22 +451,45 @@ void MMMan::SetPan( int num, int pan )
 		l = 1000 * max;
 		r = (1000 + pan) * max;
 	}
-	Mix_SetPanning( num, l / 1000, r / 1000 );
+	if ( flg == MMDATA_INTWAVE ) {
+		ch = mmm->channel;
+		if ( ch>=0 ) Mix_SetPanning( ch, l / 1000, r / 1000 );
+	}
 }
 
 
 int MMMan::GetStatus( int num, int infoid )
 {
-	if ( num >= MIX_MAX_CHANNEL ) return 0;
-
+	MMM *mmm;
+	int bank,flg;
+	bank = SearchBank(num);
+	if (bank<0) return 0;
+	
+	mmm=&mem_snd[bank];
+	flg=mmm->flag;
 
 	int res = 0;
 	switch( infoid ) {
+	case 0:
+		res = mmm->opt;
+		break;
+	case 1:
+		res = mmm->vol;
+		break;
+	case 2:
+		res = mmm->pan;
+		break;
 	case 16:
 		if ( num < 0 ) {
 			res = Mix_Playing( -1 );
-		} else {
-			res = Mix_Playing( num );
+			break;
+		}
+		if ( flg == MMDATA_INTWAVE ) {
+			int ch = mmm->channel;
+			if ( ch>=0 ) res = Mix_Playing( ch );
+		}
+		if ( flg == MMDATA_MUSIC ) {
+			res = MusicStatus(num,infoid);
 		}
 		break;
 	}
@@ -459,8 +505,21 @@ void MMMan::StopBank( int num )
 		Stop();
 		return;
 	}
-	if ( num < MIX_MAX_CHANNEL ) {
-		Mix_HaltChannel( num );
+
+	MMM *mmm;
+	int bank,flg;
+	bank = SearchBank(num);
+	if (bank<0) return;
+	
+	mmm=&mem_snd[bank];
+	flg=mmm->flag;
+
+	if ( flg == MMDATA_INTWAVE ) {
+		int ch = mmm->channel;
+		if ( ch>=0 ) Mix_HaltChannel( ch );
+	}
+	if ( flg == MMDATA_MUSIC ) {
+		if (num==curmusic) MusicStop();
 	}
 	return;
 }
