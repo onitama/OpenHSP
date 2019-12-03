@@ -136,9 +136,9 @@ MMMan::MMMan()
 
 	Mix_Init(MIX_INIT_OGG|MIX_INIT_MP3);
 
+	Mix_ReserveChannels(16);
 	int ret = Mix_OpenAudio(0, 0, 0, 0);
 	//assert(ret == 0);
-	Mix_ReserveChannels(16);
 	engine_flag = ret == 0;
 }
 
@@ -296,11 +296,14 @@ void MMMan::Stop( void )
 
 int MMMan::BankLoad( MMM *mmm, char *fname )
 {
+	bool is_music = false;
 	char fext[8];
 	if ( mmm == NULL ) return -9;
 
 	getpath(fname,fext,16+2);
-	if (!strcmp(fext,".mp3")) {
+	if (!strcmp(fext,".mp3")) is_music = true;
+	if (!strcmp(fext,".ogg")) is_music = true;
+	if ( is_music ) {
 		mmm->fname = (char *)malloc( strlen(fname)+1 );
 		strcpy( mmm->fname,fname );
 		mmm->flag = MMDATA_MUSIC;
@@ -362,13 +365,13 @@ int MMMan::Play( int num, int ch )
 #else
 		m->channel = Mix_PlayChannel( ch, m->chunk, loop ? -1 : 0 );
 #endif
-		if (m->vol) {
+		if (m->vol>=0) {
 			Mix_Volume( m->channel, m->vol );
 		}
 		break;
 	case MMDATA_MUSIC:
 		if ( MusicLoad(m->fname)!=0 ) return -1;
-		if (m->vol) {
+		if (m->vol>=0) {
 			MusicVolume( m->vol );
 		}
 		MusicPlay(num,m->opt);
