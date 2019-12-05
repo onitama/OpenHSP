@@ -314,7 +314,7 @@ void CToken::CalcCG( int ex )
 char *CToken::PickLongStringCG( char *str )
 {
 	//		指定文字列をmembufへ展開する
-	//		( 複数行対応 {"〜"} )
+	//		( 複数行対応 {"～"} )
 	//
 	char *p;
 	char *psrc;
@@ -515,13 +515,13 @@ char *CToken::GetTokenCG( char *str, int option )
 		throw CGERROR_UNKNOWN;
 	}
 
-	if (a1==0x22) {								// "〜"
+	if (a1==0x22) {								// "～"
 		vs++;
 		ttype = TK_STRING; cg_str = (char *)vs;
 		return PickStringCG( (char *)vs, 0x22 );
 	}
 
-	if (a1=='{') {							// {"〜"}
+	if (a1=='{') {							// {"～"}
 		if (vs[1]==0x22) {
 			vs+=2;
 			if ( *vs == 0 ) {
@@ -533,7 +533,7 @@ char *CToken::GetTokenCG( char *str, int option )
 		}
 	}
 
-	if (a1==0x27) {								// '〜'
+	if (a1==0x27) {								// '～'
 		char *p;
 		vs++; cg_str = (char *)vs;
 		p = PickStringCG( (char *)vs, 0x27 );

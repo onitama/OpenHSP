@@ -3,7 +3,7 @@ HSP3Dish emscripten
 
 Modify
 -----
-modify_emscriptenƒtƒHƒ‹ƒ_“à‚Éemscriptenƒ‰ƒCƒuƒ‰ƒŠ‚ÌC³‚ğŠÜ‚ñ‚Å‚¢‚Ü‚·
+modify_emscriptenãƒ•ã‚©ãƒ«ãƒ€å†…ã«emscriptenãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®ä¿®æ­£ã‚’å«ã‚“ã§ã„ã¾ã™
 
 Build
 -----

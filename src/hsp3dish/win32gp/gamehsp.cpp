@@ -146,7 +146,7 @@ bool gpobj::isVisible( bool lateflag )
 float gpobj::getAlphaRate( void )
 {
 	// Alpha値を取得する
-	// ( _transparent値を0.0〜1.0に変換する)
+	// ( _transparent値を0.0～1.0に変換する)
 	if ( _transparent >= 255 ) return 1.0f;
 	if ( _transparent <= 0 ) return 0.0f;
 	return ( 1.0f / 255.0f ) * (float)_transparent;
@@ -2841,7 +2841,7 @@ void gamehsp::setPolyDiffuseTex2D( float r, float g, float b, float a )
 float gamehsp::setPolyColorBlend( int gmode, int gfrate )
 {
 	//	2Dカラー描画設定
-	//	(戻り値=alpha値(0.0〜1.0))
+	//	(戻り値=alpha値(0.0～1.0))
 	//
 	Material *material;
 	material = _meshBatch->getMaterial();

@@ -1358,9 +1358,9 @@ static void *reffunc_intfunc( int *type_res, int arg )
 	code_next();
 
 	//		返値のタイプをargをもとに設定する
-	//		0〜255   : int
-	//		256〜383 : string
-	//		384〜511 : double(HSPREAL)
+	//		0～255   : int
+	//		256～383 : string
+	//		384～511 : double(HSPREAL)
 	//
 	switch( arg>>7 ) {
 		case 2:										// 返値がstr

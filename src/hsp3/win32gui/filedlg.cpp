@@ -61,7 +61,7 @@ void fd_ini( HWND hwnd, char *extname, char *extinfo )
 
 	// Shark++
 	// ※ MSも全角を推奨していたし(メニュー文字列だったけど)もう半角捨ててもいいよね...
-	// 　 ってことで"ファイル" は "ファイル" にしました。
+	// 　 ってことで"ﾌｧｲﾙ" は "ファイル" にしました。
 
 #define realloc_filter_buffer()                        \
 	pszFilterPtr = (LPTSTR)realloc(pszFilter, (nFilterLen + 1)*sizeof(TCHAR)); \

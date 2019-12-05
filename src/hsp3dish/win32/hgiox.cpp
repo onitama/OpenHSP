@@ -127,27 +127,21 @@ typedef struct _D3DTLVERTEX_ {
 }D3DTLVERTEX;
 
 typedef struct _D3DTLVERTEXC_ {
-	float x,y,z;
+	float x, y, z;
 	float rhw;
 	DWORD color;
 	DWORD specular;
 }D3DTLVERTEXC;
 
 typedef struct _D3DEXVERTEX_ {
-	float x,y,z;
+	float x, y, z;
 	DWORD color;
-//	DWORD specular;
-	float tu0,tv0;
+	//	DWORD specular;
+	float tu0, tv0;
 }D3DEXVERTEX;
 
-typedef struct _D3DLNVERTEX_ {
-	float x,y,z;
-	float nx,ny,nz;
-	float tu0,tv0;
-}D3DLNVERTEX;
-
 typedef struct _D3DEXVERTEXC_ {
-	float x,y,z;
+	float x, y, z;
 	DWORD color;
 	DWORD specular;
 }D3DEXVERTEXC;
@@ -157,15 +151,15 @@ typedef struct _D3DEXVERTEXC_ {
 #define D3DFVF_TLVERTEX 		(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
 #define D3DFVF_TLVERTEXC 		(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR )
 
-#define D3DFVF_LNVERTEX 		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1)
-#define D3DFVF_LNVERTEX2 		(D3DFVF_XYZ | D3DFVF_TEX1)
-#define D3DFVF_EXVERTEX 		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-//#define D3DFVF_EXVERTEX 		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
 #define D3DFVF_EXVERTEXC 		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR )
+#define D3DFVF_EXVERTEX 		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
 #define vertex2D_max 5
+
 static D3DTLVERTEX vertex2D[ vertex2D_max ];
 static D3DTLVERTEXC vertex2DC[ vertex2D_max ];
+static D3DEXVERTEX vertex2DEX[vertex2D_max];
+static D3DEXVERTEXC vertex2DEXC[vertex2D_max];
 static float linebasex, linebasey;
 
 static void InitDraw( void )
@@ -340,7 +334,9 @@ static void InitVertexTemp( void )
 {
 	int i;
 	D3DTLVERTEX *v;
-	D3DTLVERTEXC *vc;
+	D3DTLVERTEXC* vc;
+	D3DEXVERTEX* ve;
+	D3DEXVERTEXC* vec;
 	for( i=0;i<vertex2D_max;i++ ) {
 		v = &vertex2D[ i ];
 		v->z = 0.0f;
@@ -353,6 +349,15 @@ static void InitVertexTemp( void )
 		vc->rhw = 1.0f;
 		vc->color = 0;
 		vc->specular = 0;
+
+		ve = &vertex2DEX[i];
+		ve->z = 0.0f;
+		ve->color = 0;
+
+		vec = &vertex2DEXC[i];
+		vec->z = 0.0f;
+		vec->color = 0;
+		vec->specular = 0;
 	}
 }
 
@@ -537,6 +542,24 @@ static void ClearDest( int mode, int color, int tex )
 }
 
 
+static void InitTexture(void)
+{
+	//		テクスチャ情報初期化
+	//
+	SetSysReq(SYSREQ_CLSMODE, CLSMODE_NONE);
+	TexSetD3DParam(d3d, d3ddev, target_disp);
+	TexInit();
+
+	//		テキスト表示エリアを初期化
+	//
+	mestexid = RegistTexEmpty(nDestWidth, nDestHeight, 1);
+	if (mestexid >= 0) {
+		//		BMSCRにコピー用のデータを構築する
+		memset(&mestexbm, 0, sizeof(BMSCR));
+		mestexbm.texid = mestexid;
+	}
+}
+
 /*------------------------------------------------------------*/
 /*
 		interface
@@ -579,21 +602,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	//
 	Init3DDevicesW( (HWND)hwnd );
 	InitVertexTemp();
-
-	//		テクスチャ情報初期化
-	//
-	TexSetD3DParam( d3d, d3ddev, target_disp );
-	TexInit();
-	SetSysReq( SYSREQ_CLSMODE, CLSMODE_NONE );
-
-	//		テキスト表示エリアを初期化
-	//
-	mestexid = RegistTexEmpty( sx, sy, 1 );
-	if ( mestexid >= 0 ) {
-		//		BMSCRにコピー用のデータを構築する
-		memset( &mestexbm, 0, sizeof(BMSCR) );
-		mestexbm.texid = mestexid;
-	}
+	InitTexture();
 
 	//		infovalをリセット
 	//
@@ -601,6 +610,34 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	for(i=0;i<GINFO_EXINFO_MAX;i++) {
 		infoval[i] = 0.0;
 	}
+}
+
+
+void hgio_rebuild(int sx, int sy, int mode, void *hwnd)
+{
+	//	デバイスを再構築する
+	//
+	hgio_render_end();
+	TexTerm();
+
+	d3ddev->Reset(&d3dapp);		//	Direct3Dデバイス解放
+	RELEASE(d3ddev);
+	delete d3ddev;
+
+	drawflag = 0;
+	nDestWidth = sx;
+	nDestHeight = sy;
+	mestexid = -1;
+	mestexflag = 0;
+
+	SetSysReq(SYSREQ_DXMODE, mode);
+	if (mode) {
+		SetSysReq(SYSREQ_DXWIDTH, sx);
+		SetSysReq(SYSREQ_DXHEIGHT, sy);
+	}
+	master_wnd = (HWND)hwnd;
+	Init3DDevicesW((HWND)hwnd);
+	InitTexture();
 }
 
 
@@ -702,6 +739,25 @@ int hgio_render_start( void )
 		}
 	}
 
+	//	マトリクスを設定
+	D3DXMATRIX matrixIdentitiy;
+	D3DXMATRIX matrixScale;
+	ZeroMemory(&matrixIdentitiy, sizeof(matrixIdentitiy));
+	matrixIdentitiy._11 = 1.0f;
+	matrixIdentitiy._22 = 1.0f;
+	matrixIdentitiy._33 = 1.0f;
+	matrixIdentitiy._44 = 1.0f;
+	d3ddev->SetTransform(D3DTS_WORLD, &matrixIdentitiy);
+
+	//D3DXMatrixScaling(&matrixIdentitiy, 1.0f, 1.0f, 1.0f);
+	D3DXMatrixTranslation(&matrixIdentitiy, (float)-mainbm->viewx, (float)-mainbm->viewy, 0.0f);
+	D3DXMatrixScaling(&matrixScale, (float)mainbm->viewsx, (float)mainbm->viewsy, 1.0f);
+	matrixIdentitiy *= matrixScale;
+	d3ddev->SetTransform(D3DTS_VIEW, &matrixIdentitiy);
+	D3DXMATRIX matrixProj;
+	D3DXMatrixOrthoOffCenterLH(&matrixProj, 0.0f, (float)nDestWidth, (float)nDestHeight, 0.0f, -1.0f, 1.0f);
+	d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
+
 	//	画面クリア
 	int bgtex = -1;
 	if ( backbm != NULL ) { bgtex = backbm->texid; }
@@ -715,6 +771,7 @@ int hgio_render_start( void )
 	TexReset();
 	drawflag = 1;
 	mestexflag = 0;
+
 	return 0;
 }
 
@@ -804,7 +861,7 @@ int hgio_stick( int actsw )
 int hgio_redraw( BMSCR *bm, int flag )
 {
 	//		redrawモード設定
-	//		(必ずredraw 0〜redraw 1をペアにすること)
+	//		(必ずredraw 0～redraw 1をペアにすること)
 	//
 	if ( bm == NULL ) return -1;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
@@ -904,7 +961,7 @@ int hgio_font( char *fontname, int size, int style )
 
 int hgio_gsel( BMSCR *bm )
 {
-	//		gsel(描画先変更) 未実装
+	//		gsel(描画先変更)
 	//
 	hgio_render_end();
 	return 0;
@@ -1050,7 +1107,7 @@ void hgio_line( BMSCR *bm, float x, float y )
 	//		(ラインの座標は必要な数だけhgio_line2を呼び出す)
 	//
 	int color;
-	D3DTLVERTEXC *v;
+	D3DEXVERTEXC *v;
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
@@ -1062,13 +1119,13 @@ void hgio_line( BMSCR *bm, float x, float y )
 	linebasex = x;
 	linebasey = y;
 
-	v = vertex2DC;
+	v = vertex2DEXC;
 	v[0].color = v[1].color = color;
 
 	d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, FALSE );
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEXC);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
 }
 
 
@@ -1077,15 +1134,15 @@ void hgio_line2( float x, float y )
 	//		ライン描画
 	//		(hgio_lineで開始後に必要な回数呼ぶ、hgio_line(NULL)で終了すること)
 	//
-	D3DTLVERTEXC *v;
-	v = vertex2DC;
+	D3DEXVERTEXC *v;
+	v = vertex2DEXC;
 	v[0].x = (float)linebasex;
 	v[0].y = (float)linebasey;
 	v[1].x = (float)x;
 	v[1].y = (float)y;
 
 	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_LINELIST,1,vertex2DC,sizeof(D3DTLVERTEXC));
+	d3ddev->DrawPrimitiveUP(D3DPT_LINELIST,1,vertex2DEXC,sizeof(D3DEXVERTEXC));
 
 	linebasex = x;
 	linebasey = y;
@@ -1096,7 +1153,7 @@ void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
 {
 	//		矩形描画
 	//
-	D3DTLVERTEXC *v;
+	D3DEXVERTEXC *v;
 
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
@@ -1105,7 +1162,7 @@ void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
 	ChangeTex( -1 );
 	SetAlphaMode( 0 );
 
-	v = vertex2DC;
+	v = vertex2DEXC;
 	v[0].color = v[1].color = v[2].color = v[3].color = bm->color;
 
 	v[3].x = (float)x1;
@@ -1120,9 +1177,9 @@ void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
 	d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, FALSE );
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEXC);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
 	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DC,sizeof(D3DTLVERTEXC));
+	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2, vertex2DEXC,sizeof(D3DEXVERTEXC));
 }
 
 
@@ -1130,8 +1187,8 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 {
 	//		円描画
 	//
-	D3DTLVERTEXC *v;
-	D3DTLVERTEXC arScreen[CIRCLE_DIV + 2];
+	D3DEXVERTEXC *v;
+	D3DEXVERTEXC arScreen[CIRCLE_DIV + 2];
 	int col;
 	float x,y,rx,ry,sx,sy,rate;
 
@@ -1155,16 +1212,15 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 		v->x = x + (float)cos((float)i * rate)*rx;
 		v->y = y + (float)sin((float)i * rate)*ry;
 		v->z = 0.0f;
-		v->rhw = 1.0f;
 		v->color = col;
 		v++;
 	}
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEXC);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
 	// とりあえず直接描画(四角形)
 	d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,CIRCLE_DIV,arScreen,sizeof(D3DTLVERTEXC));
+	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,CIRCLE_DIV,arScreen,sizeof(D3DEXVERTEXC));
 	d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 }
 
@@ -1173,7 +1229,7 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 {
 	//		矩形(回転)描画
 	//
-	D3DTLVERTEXC *v;
+	D3DEXVERTEXC *v;
 	float x0,y0,x1,y1,ofsx,ofsy;
 
 	if ( bm == NULL ) return;
@@ -1196,7 +1252,7 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 
 	ChangeTex( -1 );
 
-	v = vertex2DC;
+	v = vertex2DEXC;
 	v[0].color = v[1].color = v[2].color = v[3].color =  GetCopyTexAlpha( bm ) | (bm->color & 0xffffff);
 
 
@@ -1217,9 +1273,9 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 	v++;
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEXC);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
 	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DC,sizeof(D3DTLVERTEXC));
+	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEXC,sizeof(D3DEXVERTEXC));
 }
 
 
@@ -1229,7 +1285,7 @@ void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *
 	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
 	//		カレントポジション、描画モードはBMSCRから取得
 	//
-	D3DTLVERTEX *v;
+	D3DEXVERTEX *v;
 	TEXINF *tex;
 	int texid;
 	float psx,psy;
@@ -1278,7 +1334,7 @@ void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *
 	ty0 *= sy;
 	ty1 *= sy;
 
-	v = vertex2D;
+	v = vertex2DEX;
 	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) | ( bm->mulcolor );
 
 	v[3].x = x1;
@@ -1299,9 +1355,9 @@ void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *
 	v[0].tv0 = ty1;
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEX);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEX);
 	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2D,sizeof(D3DTLVERTEX));
+	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEX,sizeof(D3DEXVERTEX));
 }
 
 
@@ -1311,7 +1367,7 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
 	//		カレントポジション、描画モードはBMSCRから取得
 	//
-	D3DTLVERTEX *v;
+	D3DEXVERTEX *v;
 	TEXINF *tex;
 	int texpx,texpy,texid;
 	float x,y,x0,y0,x1,y1,ofsx,ofsy,mx0,mx1,my0,my1;
@@ -1362,7 +1418,7 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	tx1 = ((float)(texpx)) * sx;
 	ty1 = ((float)(texpy)) * sy;
 
-	v = vertex2D;
+	v = vertex2DEX;
 	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) |  ( bm->mulcolor );
 
 	/*-------------------------------*/
@@ -1400,9 +1456,9 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	/*-------------------------------*/
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEX);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEX);
 	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2D,sizeof(D3DTLVERTEX));
+	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEX,sizeof(D3DEXVERTEX));
 }
 
 
@@ -1425,128 +1481,12 @@ void hgio_setfilter( int type, int opt )
 }
 
 
-#if 0
-void hgio_setcenter( float x, float y )
-{
-	center_x = x;
-	center_y = y;
-}
-
-
-void hgio_drawsprite( hgmodel *mdl, HGMODEL_DRAWPRM *prm )
-{
-	//		画像コピー(DG用)
-	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
-	//		カレントポジション、描画モードはBMSCRから取得
-	//
-	D3DTLVERTEX *v;
-	TEXINF *tex;
-	int texid;
-	short ua_ofsx, ua_ofsy;
-	float ang,x,y,x0,y0,x1,y1,ofsx,ofsy,mx0,mx1,my0,my1;
-	float tx0,ty0,tx1,ty1,sx,sy;
-
-	ang = prm->rot.z;
-	mx0=-(float)sin( ang );
-	my0=(float)cos( ang );
-	mx1 = -my0;
-	my1 = mx0;
-
-	ofsx = mdl->center_x * (prm->scale.x);
-	ofsy = mdl->center_y * (prm->scale.y);
-	x0 = mx0 * ofsy;
-	y0 = my0 * ofsy;
-	x1 = mx1 * ofsx;
-	y1 = my1 * ofsx;
-
-	//		基点の算出
-	x = ( prm->pos.x - (-x0+x1) ) + center_x;
-	y = ( prm->pos.y - (-y0+y1) ) + center_y;
-
-	/*-------------------------------*/
-
-	//		回転座標の算出
-	ofsx = -( mdl->sizex * (prm->scale.x) );
-	ofsy = -( mdl->sizey * (prm->scale.y) );
-	x0 = mx0 * ofsy;
-	y0 = my0 * ofsy;
-	x1 = mx1 * ofsx;
-	y1 = my1 * ofsx;
-
-	/*-------------------------------*/
-
-	texid = prm->tex;
-	ChangeTex( texid );
-	tex = GetTex( texid );
-	sx = tex->ratex;
-	sy = tex->ratey;
-
-	//Alertf( "%d (%f,%f)",texid, x,y );
-
-	ua_ofsx = prm->ua_ofsx;
-	ua_ofsy = prm->ua_ofsy;
-	tx0 = ((float)(mdl->uv[0]+ua_ofsx) ) * sx;
-	ty0 = ((float)(mdl->uv[1]+ua_ofsy) ) * sy;
-	tx1 = ((float)(mdl->uv[2]+ua_ofsx) ) * sx;
-	ty1 = ((float)(mdl->uv[3]+ua_ofsy) ) * sy;
-#if 0
-	texpx = xx + srcsx;
-	texpy = yy + srcsy;
-	tx0 = ((float)xx) * sx;
-	ty0 = ((float)yy) * sy;
-	tx1 = ((float)(texpx)) * sx;
-	ty1 = ((float)(texpy)) * sy;
-#endif
-
-	v = vertex2D;
-	v[0].color = v[1].color = v[2].color = v[3].color = SetAlphaModeDG( (int)prm->efx.x ) | 0xffffff;
-
-	/*-------------------------------*/
-
-	v->x = ((-x0+x1) + x);
-	v->y = ((-y0+y1) + y);
-	v->tu0 = tx1;
-	v->tv0 = ty1;
-	v++;
-
-	/*-------------------------------*/
-
-	v->x = ((x1) + x);
-	v->y = ((y1) + y);
-	v->tu0 = tx1;
-	v->tv0 = ty0;
-	v++;
-
-	/*-------------------------------*/
-
-	v->x = (x);
-	v->y = (y);
-	v->tu0 = tx0;
-	v->tv0 = ty0;
-	v++;
-
-	/*-------------------------------*/
-
-	v->x = ((-x0) + x);
-	v->y = ((-y0) + y);
-	v->tu0 = tx0;
-	v->tv0 = ty1;
-	v++;
-
-	/*-------------------------------*/
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEX);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2D,sizeof(D3DTLVERTEX));
-}
-#endif
 
 void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, int *uvy )
 {
 	//		四角形(square)テクスチャ描画
 	//
-	D3DTLVERTEX *v;
+	D3DEXVERTEX *v;
 	TEXINF *tex;
 	int texid;
 	float sx,sy;
@@ -1561,7 +1501,7 @@ void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, i
 	sx = tex->ratex;
 	sy = tex->ratey;
 
-	v = vertex2D;
+	v = vertex2DEX;
 	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) | 0xffffff;
 
 	v->x = (float)posx[2];
@@ -1585,9 +1525,9 @@ void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, i
 	v->tv0 = ((float)uvy[3]) * sy;
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEX);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEX);
 	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2D,sizeof(D3DTLVERTEX));
+	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEX,sizeof(D3DEXVERTEX));
 }
 
 
@@ -1595,7 +1535,7 @@ void hgio_square( BMSCR *bm, int *posx, int *posy, int *color )
 {
 	//		四角形(square)単色描画
 	//
-	D3DTLVERTEXC *v;
+	D3DEXVERTEXC *v;
 	int basecolor;
 
 	if ( bm == NULL ) return;
@@ -1604,7 +1544,7 @@ void hgio_square( BMSCR *bm, int *posx, int *posy, int *color )
 
 	ChangeTex( -1 );
 
-	v = vertex2DC;
+	v = vertex2DEXC;
 	basecolor = GetCopyTexAlpha( bm );
 
 	v[2].color = basecolor | ( color[0] & 0xffffff );
@@ -1625,9 +1565,9 @@ void hgio_square( BMSCR *bm, int *posx, int *posy, int *color )
 	v->y = (float)posy[3];
 
 	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_TLVERTEXC);
+	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
 	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DC,sizeof(D3DTLVERTEXC));
+	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEXC,sizeof(D3DEXVERTEXC));
 }
 
 

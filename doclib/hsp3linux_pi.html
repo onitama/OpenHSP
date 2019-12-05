@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project（http://dev.onionsoft.net/trac/wiki）">
+	<meta name="keywords" content="HSP3,HotSoupProcessor,Linux,Raspberry Pi">
+	<meta name="description" content="HSP3に関するドキュメントの一覧">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HSP3 for Linux/Raspberry Pi</title>
+</head>
+<body>
+	<div id="CONTAINER">
+		<!-- ヘッダー -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2020(c)</p>
+		<h1>HSP3 for Linux/Raspberry Pi</h1>
+		
+		<!-- 本文 -->
+
+		<h2 id="BRIEF">はじめに</h2>
+		<p>
+		HSP3 for Linux/Raspberry Piは、LinuxのGUI環境(X Window System)及びRaspberry Pi(Raspbian)で動作するHot Soup Processor(HSP)の開発環境です。<br>
+		安価で幅広く環境が整備されているLinux上で、HSP3の開発環境を含むサポートを目指して開発が進められています。
+		<a href="https://www.raspberrypi.org/" target="_blank">Raspberry Pi</a>は、その中でも非常にコンパクトで安価なデバイスとして、IoTやプログラミング教育の分野でも注目されています。<br>
+		いままでも、Windowsだけでなく、<a href="hsp3dish.html" target="_blank">HSP3Dish</a>というランタイムを通してAndroid,iOS,WebGL(html5)などの実行環境を整備してきましたが、
+		新たに、Linux及びRaspbian(Raspberry Pi上のOS)環境でも利用できるよう、整備を行なっていきます。
+		<br>
+		<br><img src="image/hsp_pi.jpg"><br><br>
+		最初のバージョンとして、簡易スクリプトエディタとHSP3Dish/HGIMG4実行環境を含むプレビュー版を公開しています。
+		Windows版HSP3とともにサポートを広げていく予定ですので、どうぞご期待ください。
+		<br>
+		<br>
+		最新版は、githubにてソースコードとともに公開されています。<BR>
+		Raspberry Piをご使用の方は、<a href="https://junji.jp/hsp/" target="_blank">JBOYSOFT様の「初心者入門 HSPプログラミング ラズベリーパイ版」</a>のページにて導入が説明されています。
+		<br>
+		<br>
+		</p>
+
+								<table>
+									<tr>
+										<td><img src="image/btn_next.gif" alt="" height="29" width="29" border="0"></td>
+										<td><font size="-1"><a href="https://junji.jp/hsp/" target="_blank">初心者入門 HSPプログラミング ラズベリーパイ版 by JBOYSOFT</a></font></td>
+									</tr>
+								</table>
+								<br clear="all">
+
+		<h2 id="DATA">Linuxインストール</h2>
+		<p>
+		LinuxのGUI環境(X Window System)で動作します。一部の機能は、OpenGL及びSDLライブラリを使用して動作します。
+		ネットワークに接続できる場合は、gitコマンドで直接リポジトリを取得してください。
+		</p><pre>
+	git clone http://github.com/onitama/OpenHSP
+		</pre><p>
+		アーカイブがある場合は、内容を任意のディレクトリに展開して、ソースをコンパイルしてください。コンパイルには、gcc及びmakeを実行できる環境が必要になります。
+コンパイルの際には、以下のライブラリが必要になりますので、あらかじめ確認を行なって下さい。
+		</p><pre>
+	OpenGLES2.0以降 / EGL
+	SDL1.2
+	gtk+-2
+		</pre><p>
+Debian(Ubuntu)の場合は、パッケージマネージャから以下のようにライブラリをインストールできます。
+		</p><pre>
+	sudo apt-get update
+	sudo apt-get install libgtk2.0-dev
+	sudo apt-get install libglew-dev
+	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
+	sudo apt-get install libgles2-mesa-dev libegl1-mesa-dev
+		</pre><p>
+リポジトリにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
+(Linuxのバージョンやディストリビューションによって正しくコンパイルされない場合は、修正が必要になります。)
+		</p><pre>
+	cd OpenHSP
+	make
+		</pre><p>
+必要なツールのコンパイルが行なわれ、HSP3が使用できる状態になります。
+		</p>
+
+
+		<h2 id="DATA">Raspberry Piインストール</h2>
+		<p>
+		<img src="image/hsp_pi2.jpg" align="right">
+		Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi4, Raspberry Pi zeo上で動作します。<br>
+		Raspbian OS上で動作します。(推奨バージョンは、September 2017 Kernel version4.9以降です)<br>
+		あらかじめ、Raspbianが動作してキーボード、マウスが接続されている状態でご使用ください。
+		<br>
+		hsp3dish及びhsp3gp(HGIMG4)、hsed(スクリプトエディタ)は、GUI環境でのみ動作します。<br>		
+		githubから最新版を任意のディレクトリに展開して、ソースをコンパイルしてください。コンパイルには、gcc及びmakeを実行できる環境が必要になります。
+		</p><pre>
+	git clone http://github.com/onitama/OpenHSP
+	cd OpenHSP
+		</pre><p>
+コンパイルの際には、追加のライブラリが必要になります。ネットワークに接続されている状態で以下のコマンドを実行することでセットアップが実行されます。
+		</p><pre>
+	./pisetup.sh
+		</pre><p>
+アーカイブにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
+(Raspbianのバージョンやディストリビューションによって正しくコンパイルされない場合は、修正が必要になります。)
+		</p><pre>
+	make -f makefile.raspbian
+		</pre><p>
+アーカイブの内容が展開されたディレクトリでmakeコマンドを実行してください。
+必要なツールのコンパイルが行なわれ、HSP3が使用できる状態になります。<br>
+		</p><pre>
+※ Raspberry Pi4の場合は、Linuxと同様の方法でmakeによるインストールを行ってください
+※ Raspberry Pi4ではフルスクリーンによる実行はサポートされません
+		</pre>
+
+		<h2 id="DATA">使用方法</h2>
+		<p>
+		インストールを行なうと、以下のコマンドが生成されます。
+		</p><pre>
+	hsed		スクリプトエディタ(簡易版)
+	hspcmp		HSP3コードコンパイラ
+	hsp3cl		HSP3コマンドラインランタイム
+	hsp3dish	HSP3Dishランタイム
+	hsp3gp		HGIMG4ランタイム
+		</pre><p>
+スクリプトエディタ(簡易版)は、HSP3のスクリプトを記述して、実行することのできるGUIアプリケーションです。
+基本的なスクリプトの編集、及びロード・セーブ機能を持っています。
+以下のコマンドで起動することができます。
+		</p><pre>
+	./hsed
+		</pre><p>
+[F5]キー、または「HSP」メニューから「Run」を選択することで編集しているスクリプトを実行できます。
+現在のバージョンでは、標準ランタイムとしてhsp3dishが使用されます。
+HSP3Dishに対応するサンプルコードがsampleフォルダに含まれていますので、お試しください。
+スクリプトの文字コードはUTF-8として扱われます。Windowsが使用する文字コード(SJIS)とは異なりますので注意してください。
+		<br><br>
+コマンドラインからスクリプトの実行を行なう場合は、hspcmpによりHSPオブジェクトファイルを作成する必要があります。
+		</p><pre>
+	./hspcmp -d -i -u test.hsp
+		</pre><p>
+上の例では、「test.hsp」ファイルからオブジェクトファイル「test.ax」を生成します。
+生成されたオブジェクトファイルを、ランタイムに渡して実行を行ないます。
+		</p><pre>
+	./hsp3cl test.ax
+		</pre><p>
+上の例では、「test.ax」をHSP3コマンドラインランタイムで実行します。
+同様に、「hsp3dish」「hsp3gp」などのランタイムに合わせたスクリプトを実行させることができます。
+(「hsp3dish」「hsp3gp」の実行は、GUI環境が必要になります。)
+		<br><br>
+Raspberry Pi版では、フルスクリーンで実行を行ないます。 実行の中断は、[ctrl]+[C]か[esc]キーを押してください。 キーボードだ正しく認識されていない場合など、中断ができなくなることがありますので注意してください。 GUIエディタだけでなく、コマンドラインから「./hsp3dish ****.ax」の形で実行を行なうことも可能です。
+		</p>
+		<table>
+				<tr>
+					<td><img src="image/btn_next.gif" alt="" height="29" width="29" border="0"></td>
+					<td><font size="-1"><a href="hsp3dish.html">HSP3Dishのページへ</a></font></td>
+				</tr>
+				<tr>
+					<td><img src="image/btn_next.gif" alt="" height="29" width="29" border="0"></td>
+					<td><font size="-1"><a href="http://www.onionsoft.net/hsp/v36/hsp3dish.htm">HSP3Dishオンラインマニュアル</a></font></td>
+				</tr>
+			</table>
+		<br clear="all">
+
+
+		<h2 id="DATA">exec、devprm命令について</h2>
+		<p>
+		Linux版、Raspberry Pi版ともにexec命令により、シェルのコマンドを呼び出すことができます。 また、devprm命令によりファイルシステム上のデバイスに文字列を出力することが可能です。
+		</p><pre>
+	devprm "/sys/class/gpio/export", "2"
+		</pre><p>
+		のように記述した場合は、「/sys/class/gpio/export」に「2」が出力されます。 シェルから「echo 2 > /sys/class/gpio/export」を実行するのと同じ動作になります。
+		</p>
+
+
+		<h2 id="DATA">Raspberry PiのGPIO入出力</h2>
+		<p>
+		Raspberry Pi版では、devcontrol(gpio)命令によりGPIO入出力を行なう拡張が行われています。<br>
+		GPIO出力を制御する場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "gpio", ポート番号, 出力値
+	( 「gpio ポート番号, 出力値」と記述することも可能 )
+		</pre><p>
+		ポート番号は、GPIOのポートを数値で指定します。
+		出力値は、1(ON)か0(OFF)を数値で指定することで、デジタルポートの出力を制御します。
+		入力を行う場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "gpioin", ポート番号
+	( 関数として「gpioin(ポート番号)」と記述することも可能 )
+		</pre><p>
+		命令の実行後にシステム変数statに0か1が代入されます。
+		(エラーが発生した場合は、マイナス値が代入されます)<br>
+		GPIO入出力は、hsp3dishだけでなくhsp3clからも使用することが可能です。
+		</p>
+
+
+		<h2 id="DATA">Raspberry PiのI2C入出力</h2>
+		<p>
+		Raspberry Pi版では、devcontrol(i2c～)命令によりI2Cデバイスとの入出力を行なう拡張が行われています。<br>
+		I2C制御を行う場合は、RaspberryPiのオプション設定でI2CをEnableにする必要があります。(I2C制御を行なわない場合は、設定の必要ありません) I2C制御を行う場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "i2copen", スレーブアドレス, チャンネル
+	( 「i2copen スレーブアドレス, チャンネル」と記述することも可能 )
+
+	「チャンネル」は複数のデバイスを同時に指定する場合に識別を行う番号です。(0～31の整数値)
+	単一のデバイスを制御する場合は省略(0)して構いません。
+	i2copenにより指定されたアドレスのデバイスを制御できる状態になります。
+	結果がシステム変数statに返ります。0の場合は成功、それ以外はエラーになります。
+		</pre><p>
+		データを出力する場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "i2cwrite", データ値, データサイズ, チャンネル
+	( 「i2cwrite データ値, データサイズ, チャンネル」と記述することも可能 )
+
+	データ値は、HSPが扱う32bitの整数値になります。
+	データサイズが0または省略した場合は、8bit(1byte)のみ出力されます。
+	データサイズは、1,2,3,4が指定できます。それぞれ、1～4byteのサイズが出力されます。
+		</pre><p>
+		データを入力する場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "i2cread", チャンネル
+	( 関数として「i2cread(チャンネル)」と記述することも可能 )
+
+	devcontrol "i2creadw", チャンネル
+	( 関数として「i2creadw(チャンネル)」と記述することも可能 )
+		</pre><p>
+命令の実行後にシステム変数statに結果が代入されます。 i2creadは、8bit(1byte)の値、i2creadwは、16bit(2byte)の値を取得します。 (エラーが発生した場合は、マイナス値が代入されます) I2C制御は、hsp3dishだけでなくhsp3clからも使用することが可能です。
+		</p>
+
+
+		<h2 id="COPYRIGHT">著作権とライセンス</h2>
+		<p>
+		HSP3 for Linux/Raspberry Piは、OpenHSPの派生物として取り扱い、ライセンスもOpenHSP/HSP3に準拠した修正BSDライセンスとなります。
+		</p>
+		<pre>
+-------------------------------------------------------------------------------
+Hot Soup Processor (HSP)
+Copyright (C) 1997-2020, Onion Software/onitama, all rights reserved.
+Made with base technology of OpenHSP.
+
+OpenHSP
+Copyright (C) 1997-2020, Onion Software/onitama, all rights reserved.
+
+These softwares are provided by the copyright holders and contributors "as is" and
+any express or implied warranties, including, but not limited to, the implied
+warranties of merchantability and fitness for a particular purpose are disclaimed.
+		</pre>
+
+
+		<!-- フッター -->
+		<ul id="FOOTER">
+			<a href="http://www.onionsoft.net/" target="_blank" align="right"><img src="image/onimark64.png"></a><br>
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="http://hsp.tv/" target="_blank">Go to HSPTV page</a></li>
+		</ul>
+	</div><!-- container -->
+</body>
+
+</html>

@@ -87,7 +87,6 @@ void hsp3cl_msgfunc( HSPCTX *hspctx )
 		case RUNMODE_WAIT:
 			//		wait命令による時間待ち
 			//		(実際はcode_exec_waitにtick countを渡す)
-			printf( "wait-%d\n",( hspctx->waitcount) );
 			usleep( ( hspctx->waitcount) * 10000 );
 			//hspctx->runmode = code_exec_wait( tick );
 			hspctx->runmode = RUNMODE_RUN;

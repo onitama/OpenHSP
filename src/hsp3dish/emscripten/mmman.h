@@ -13,6 +13,7 @@ enum
 {
 MMDATA_NONE = 0,
 MMDATA_INTWAVE,
+MMDATA_MUSIC,
 MMDATA_MAX,
 };
 
@@ -40,10 +41,6 @@ public:
 	void StopBank( int bank=-1 );
 	void Notify( void );
 
-	void PlayBank( MMM *mmm );
-	void StopBank( MMM *mmm );
-	void PauseBank( MMM *mmm );
-	void ResumeBank( MMM *mmm );
 //	void SeekBank( MMM *mmm, int pos, SLuint32 seekMode );
 	int BankLoad( MMM *mmm, char *fname );
 //	void SetLoopBank( MMM *mmm, int flag );

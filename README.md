@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 HSP : Hot Soup Processor  
 ホットスーププロセッサ  
-copyright 1997-2019 (c) onion software/onitama  
+copyright 1997-2020 (c) onion software/onitama  
 ------------------------------------------------------------------------------
 
 # はじめに
@@ -30,6 +30,15 @@ githubから最新のリポジトリを取得してご使用ください。
 	OpenGLES2.0以降 / EGL
 	SDL1.2
 	gtk+-2
+
+Debian(Ubuntu)の場合は、パッケージマネージャから以下のようにライブラリをインストールできます。
+
+	sudo apt-get update
+	sudo apt-get install libgtk2.0-dev
+	sudo apt-get install libglew-dev
+	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
+	sudo apt-get install libgles2-mesa-dev libegl1-mesa-dev
+
 
 アーカイブにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
 (Linuxのバージョンやディストリビューションによって正しくコンパイルされない場合は、修正が必要になります。)
@@ -84,6 +93,9 @@ Raspberry Pi版では、フルスクリーンで実行を行ないます。
 実行の中断は、[ctrl]+[C]か[esc]キーを押してください。
 キーボードだ正しく認識されていない場合など、中断ができなくなることがありますので注意してください。
 GUIエディタだけでなく、コマンドラインから「./hsp3dish ****.ax」の形で実行を行なうことも可能です。
+
+	※ Raspberry Pi4の場合は、Linuxと同様の方法でmakeによるインストールを行ってください
+	※ Raspberry Pi4ではフルスクリーンによる実行はサポートされません
 
 
 # 使用方法
@@ -242,7 +254,7 @@ HSP3 Linuxは、OpenHSPの派生物として取り扱い、ライセンスもOpe
 
 -------------------------------------------------------------------------------
 Hot Soup Processor (HSP) / OpenHSP
-Copyright (c) 1997-2018, onion software/onitama
+Copyright (c) 1997-2020, onion software/onitama
 in collaboration with Sencha, Yume-Yume Yuuka, Y-JINN, chobin,
 Usuaji, Kenji Yuukoku, puma, tom, sakura, fujidig, zakki, naznyark,
 Lonely Wolf, Shark++, HyperPageProject, Chokuto, S.Programs, 

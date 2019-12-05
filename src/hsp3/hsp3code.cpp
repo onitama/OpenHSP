@@ -2297,9 +2297,9 @@ static int cmdfunc_prog( int cmd )
 			label = code_getlb2();
 			if ( p1 == p2 ) {
 				if ( p3 ) {
-					otbak = label;			// on〜gosub
+					otbak = label;			// on～gosub
 				} else {
-					code_setpc( label);		// on〜goto
+					code_setpc( label);		// on～goto
 					break;
 				}
 			}

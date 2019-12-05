@@ -315,7 +315,7 @@ pickag:
 
 char *CToken::Pickstr2( char *str )
 {
-	//		Strings pick sub '〜'
+	//		Strings pick sub '～'
 	//
 	unsigned char *vs;
 	unsigned char *pp;
@@ -396,7 +396,7 @@ int CToken::GetToken( void )
 	int minmode;
 	unsigned char a1,a2,an;
 	int fpflag;
-	int *fpival;
+//	int *fpival;
 	unsigned char *wp_bak;
 	int ft_bak;
 
@@ -540,11 +540,16 @@ int CToken::GetToken( void )
 			if ( minmode ) val=-val;
 			break;
 		case 2:					// int形式のfloat値を返す
+#if 0
 			val_f = (float)atof( (char *)s3 );
 			if ( minmode ) val_f=-val_f;
 			fpival = (int *)&val_f;
 			val = *fpival;
 			break;
+#endif
+			val_d = atof((char*)s3);
+			if (minmode) val_d = -val_d;
+			return TK_DNUM;
 		case 4:					// double値(指数表記)
 			s3[a++]='e';
 			a1 = *wp;
@@ -718,7 +723,7 @@ void CToken::Calc_muldiv( CALCVAR &v )
 		Calc_unary(v2);
 		if (op=='*') v1*=v2;
 		else if (op=='/') {
-			if ( (int)v2==0 ) { ttype=TK_CALCERROR; return; }
+			if ( v2==0.0 ) { ttype=TK_CALCERROR; return; }
 			v1/=v2;
 		} else if (op==0x5c) {
 			if ( (int)v2==0 ) { ttype=TK_CALCERROR; return; }
@@ -929,7 +934,7 @@ char *CToken::ExpandAhtStr( char *str )
 char *CToken::ExpandStrEx( char *str )
 {
 	//		指定文字列をmembufへ展開する
-	//		( 複数行対応 {"〜"} )
+	//		( 複数行対応 {"～"} )
 	//
 	int a;
 	unsigned char *vs;
@@ -990,7 +995,7 @@ char *CToken::ExpandStrEx( char *str )
 
 char *CToken::ExpandStrComment( char *str, int opt )
 {
-	//		/*〜*/ コメントを展開する
+	//		/*～*/ コメントを展開する
 	//
 	int a;
 	unsigned char *vs;
@@ -1133,15 +1138,15 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 			return ExpandStrComment( (char *)vs+2, 0 );
 		}
 	}
-	if (a1==0x22) {							// "〜"
+	if (a1==0x22) {							// "～"
 		*type = TK_STRING;
 		return ExpandStr( (char *)vs+1, 1 );
 	}
-	if (a1==0x27) {							// '〜'
+	if (a1==0x27) {							// '～'
 		*type = TK_STRING;
 		return ExpandStr( (char *)vs+1, 2 );
 	}
-	if (a1=='{') {							// {"〜"}
+	if (a1=='{') {							// {"～"}
 		if (vs[1]==0x22) {
 			if (wrtbuf!=NULL) wrtbuf->PutStr( "{\"" );
 			mulstr = LMODE_STR;
@@ -1322,17 +1327,9 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 			char *ptr_dval;
 			ptr_dval = lb->GetData2( id );
 			if ( ptr_dval == NULL ) {
-#ifdef HSPWIN
-				_itoa( lb->GetOpt(id), cnvstr, 10 );
-#else
 				sprintf( cnvstr, "%d", lb->GetOpt(id) );
-#endif
 			} else {
-#ifdef HSPWIN
-				_gcvt( *(CALCVAR *)ptr_dval, 64, cnvstr );
-#else
 				sprintf( cnvstr, "%f", *(CALCVAR *)ptr_dval );
-#endif
 			}
 			chk = ReplaceLineBuf( str, (char *)vs, cnvstr, 0, NULL );
 			break;
@@ -2939,6 +2936,10 @@ ppresult_t CToken::PP_RuntimeOpt( void )
 	}
 
 	hed_option |= HEDINFO_RUNTIME;
+
+	sprintf(tmp, "\"%s\"", hed_runtime);
+	RegistExtMacro("__runtime__", tmp);			// ランタイム名マクロを更新
+
 	return PPRESULT_SUCCESS;
 }
 
@@ -3130,6 +3131,7 @@ ppresult_t CToken::Preprocess( char *str )
 	*s3 = 0;
 	wp = (unsigned char *)str;
 	unsigned char topUChar = *wp;
+
 	type = GetToken();
 	if (topUChar != *s3) {
 		type = TK_NONE;
@@ -3304,7 +3306,7 @@ int CToken::ExpandTokens( char *vp, CMemBuf *buf, int *lineext, int is_preproces
 			break;
 		}
 
-		// {"〜"}の処理
+		// {"～"}の処理
 		//
 		if ( mulstr == LMODE_STR ) {
 			wrtbuf = buf;
@@ -3312,7 +3314,7 @@ int CToken::ExpandTokens( char *vp, CMemBuf *buf, int *lineext, int is_preproces
 			if ( *vp!=0 ) continue;
 		}
 
-		// /*〜*/の処理
+		// /*～*/の処理
 		//
 		if ( mulstr == LMODE_COMMENT ) {
 			vp = ExpandStrComment( vp, 0 );

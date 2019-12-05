@@ -460,7 +460,10 @@ int dirlist( char *fname8, char **target, int p3 )
 			}
 			freehc(&p);
 		}
-		if ( !FindNextFile(sh,&fd) ) break;
+		if (!FindNextFile(sh, &fd)) {
+			int res = GetLastError();
+			if (res == ERROR_NO_MORE_FILES) break;
+		}
 	}
 	FindClose(sh);
 	return stat_main;

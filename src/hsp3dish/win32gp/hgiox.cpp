@@ -554,7 +554,7 @@ bool hgio_getkey( int kcode )
 int hgio_redraw( BMSCR *bm, int flag )
 {
 	//		redrawモード設定
-	//		(必ずredraw 0〜redraw 1をペアにすること)
+	//		(必ずredraw 0～redraw 1をペアにすること)
 	//
 	if ( bm == NULL ) return -1;
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return -1;

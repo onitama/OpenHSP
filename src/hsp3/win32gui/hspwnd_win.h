@@ -142,7 +142,7 @@ public:
 	void Line( int xx,int yy );
 	int Copy( Bmscr *src, int xx, int yy, int psx, int psy );
 	int Zoom( int dx, int dy, Bmscr *src, int xx, int yy, int psx, int psy, int mode );
-	void SetScroll( int xbase, int ybase );
+	void SetScroll( int xbase, int ybase, HSPREAL xscale=1.0, HSPREAL yscale=1.0 );
 
 	int NewHSPObject( void );
 	void ResetHSPObject( void );
@@ -180,6 +180,10 @@ public:
 	int CelPut( Bmscr *src, int id );
 
 	int RenderAlphaBitmap( int psx, int psy, int components, unsigned char *src );
+
+	void Viewcalc_reset(void);
+	int Viewcalc_set(HSPREAL* viewmatrix);
+	void Viewcalc_calc(HSPREAL& axisx, HSPREAL& axisy);
 
 	//
 	//		Window data structure
@@ -254,6 +258,11 @@ public:
 	short	celofsx, celofsy;			// CEL center offset
 
 	COLORREF objcolor;					// object color code
+
+	HSPREAL	viewsx, viewsy;				// buffer view size x,y
+	HSPREAL	viewsxr, viewsyr;			// buffer view size x,y (reverse)
+	int		vp_flag;					// Viewport enable flag (0=none)
+	HSPREAL	vp_matrix[16];				// Viewport matrix
 
 private:
 	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
@@ -390,6 +399,13 @@ typedef struct BMSCR
 	short	divx, divy;					// Divide value for CEL
 	short	divsx, divsy;				// CEL size
 	short	celofsx, celofsy;			// CEL center offset
+
+	COLORREF objcolor;					// object color code
+
+	HSPREAL	viewsx, viewsy;				// buffer view size x,y
+	HSPREAL	viewsxr, viewsyr;			// buffer view size x,y (reverse)
+	int		vp_flag;					// Viewport enable flag (0=none)
+	HSPREAL	vp_matrix[16];				// Viewport matrix
 
 } BMSCR;
 

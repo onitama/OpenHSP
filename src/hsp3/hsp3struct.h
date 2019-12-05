@@ -6,18 +6,24 @@
 #define __hsp3struct_h
 
 #include "hspvar_core.h"
-
-/*
-	rev 43
-	mingw : error : HSPERROR が未定義
-	に対処
-*/
 #include "hsp3debug.h"
 
 #ifdef _WIN64
 #define PTR64BIT        //  ポインタは64bit
 #else
 #define PTR32BIT        //  ポインタは32bit
+#endif
+
+//		HSPが使用する実数型
+//
+#define HSPREAL double
+
+//		HSPが使用する64bit整数値型
+//
+#ifdef HSP64
+#define HSPLPTR long
+#else
+#define HSPLPTR int
 #endif
 
 // command type

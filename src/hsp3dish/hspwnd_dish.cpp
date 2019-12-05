@@ -265,6 +265,9 @@ void HspWnd::Resume( void )
 				hgio_texload( (BMSCR *)bm, bm->resname );
 				bm->flag = BMSCR_FLAG_INUSE;
 			}
+			if ( bm->type == HSPWND_TYPE_OFFSCREEN ) {
+				hgio_buffer( (BMSCR *)bm );
+			}
 		}
 	}
 
@@ -355,6 +358,15 @@ void Bmscr::Cls( int mode )
 	tapstat = 0;
 	tapinvalid = 0;
 	cur_obj = NULL;
+
+	//		Viewport clear
+	//
+	this->wchg = 0;
+	this->viewx = 0;
+	this->viewy = 0;
+	this->viewsx = 1.0;
+	this->viewsy = 1.0;
+	Viewcalc_reset();
 
 	//		text setting initalize
 	//
@@ -955,5 +967,62 @@ int Bmscr::listMTouch( int *outbuf )
 		mt++;
 	}
 	return mtouch_num;
+}
+
+
+/*------------------------------------------------------------*/
+/*
+		Viewport
+*/
+/*------------------------------------------------------------*/
+
+void Bmscr::SetScroll(int xbase, int ybase, HSPREAL xscale, HSPREAL yscale)
+{
+	//		スクロール基点を設定
+	//
+	viewx = xbase;
+	viewy = ybase;
+
+	if ((sx == 0) || (sy == 0)) return;
+
+	double px, py;
+	px = xscale; if (px < 1.0) px = 1.0;
+	py = yscale; if (py < 1.0) py = 1.0;
+
+	viewsx = px; viewsxr = 1.0 / px;
+	viewsy = py; viewsyr = 1.0 / py;
+
+	px = (double)(sx) * viewsxr;
+	py = (double)(sy) * viewsyr;
+
+	if ((viewx + (int)px) >= sx) viewx = sx - (int)px;
+	if ((viewy + (int)py) >= sy) viewy = sy - (int)py;
+	if (viewx < 0) viewx = 0;
+	if (viewy < 0) viewy = 0;
+}
+
+void Bmscr::Viewcalc_reset(void)
+{
+	//	Reset viewport
+	//
+	vp_flag = 0;
+}
+
+
+int Bmscr::Viewcalc_set(HSPREAL* viewmatrix)
+{
+	//	Setup viewport
+	//
+	Viewcalc_reset();
+	vp_flag = 1;
+	return 0;
+}
+
+
+void Bmscr::Viewcalc_calc(HSPREAL& axisx, HSPREAL& axisy)
+{
+	//	Calc viewport -> real axis
+	//
+	if (vp_flag == 0) return;
 }
 

@@ -56,19 +56,6 @@
 
 //#define HSPDEBUG	// Debug version flag
 
-//		HSPが使用する実数型
-//
-#define HSPREAL double
-
-//		HSPが使用する64bit整数値型
-//
-#ifdef HSP64
-#define HSPLPTR long
-#else
-#define HSPLPTR int
-#endif
-
-
 //
 //		gcc使用のチェック
 //
