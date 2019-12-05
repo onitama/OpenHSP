@@ -1,4 +1,4 @@
-Copyright (C) 1997-2017, Onion Software/onitama.
+Copyright (C) 1997-2020, Onion Software/onitama.
 All rights reserved.
 
 ソースコード形式かバイナリ形式か、変更するかしないかを問わず、以下の条件を満たす場合に限り、再頒布および使用が許可されます。 

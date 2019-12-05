@@ -6,33 +6,38 @@
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
 	<meta name="author" content="OpenHSP3 Project（http://dev.onionsoft.net/trac/wiki）">
-	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSPTV,プログラミング生放送,プロ生ちゃん,暮井慧">
-	<meta name="description" content="HSPTVに関する情報を掲載">
-	<link href="tamane.css" rel="stylesheet" type="text/css" media="all">
-	<title>HGIMG4 3.6β1 PronamaChan Preview</title>
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSP3Dish,android,ndk,google">
+	<meta name="description" content="HSP3Dish android(NDK)版に関する情報を掲載">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HGIMG4 Unity連携ガイド</title>
 </head>
 <body>
 	<div id="CONTAINER">
-		<!-- ヘッダー -->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2019(c)</p>
-		<h1>HGIMG4 3.6β1プロ生ちゃんデモ版</h1>
+	<!-- ヘッダー -->
+	<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2019(c)</p>
+	<img src="hsp3dish.jpg" width="640" height="200" alt="タイトル">
+	<h1>HGIMG4 Unity連携ガイド</h1>
+
+	<!-- 目次 -->
+	<ol>
+		<li><a href="#ABOUT">はじめに</a></li>
+		<li><a href="#DEMO">プロ生ちゃんサンプルデモ一覧</a></li>
+		<li><a href="#FBXEXPORTER">Unity FBX Exporterによる出力の流れ</a></li>
+		<li><a href="#ANIMATION">Unity上でのアニメーション適用</a></li>
+		<li><a href="#LICENCE">著作権とライセンス</a></li>
+	</ol>
 
 		<h2 id="ABOUT">はじめに</h2>
 		<p><font size="-1">
-		「HGIMG4 3.6β1プロ生ちゃんデモ版」は、HSP3の3D機能をサポートするプラグインHGIMG4が、将来のバージョンに同梱される予定のものをテストすることが可能なβ版となります。<br>
-		プログラミング生放送のキャラクター<a href="https://kei.pronama.jp/" target="_blank">「プロ生ちゃん」</a>素材を使用したサンプルデモを含む特別なバージョンが収録されています。
+		HGIMG4とUnityを連携することで、より高度なモーションの適用や、3Dモデルの変換を行うことができます。
+		サンプルとして同梱されている「プロ生ちゃんデモ」(sample/pronama3d)により、HGIMG4を使った3Dキャラクターアニメーションのサンプルを確認することができます。<br>
+		これは、プログラミング生放送のキャラクター<a href="https://kei.pronama.jp/" target="_blank">「プロ生ちゃん」</a>素材を使用したサンプルデモです。
 		</p>
 		<p>
 		<img src="image/hgimg4_sample.jpg">
 		</p>
 
-		<h2 id="USAGE">パッケージ概要</h2>
-		<p>
-		HGIMG4 3.6β1プレビュー版は、HSPスクリプトエディタ、HSP3標準ランタイム、HGIMG4標準ランタイムを同梱しています。(フルセット版のHSP3.5からの差分として上書きして使用することも可能です)。
-		HSP3.5から大幅な仕様の変更はなく、HSPスクリプトエディタ(hsed3.exe)を起動して従来と同様にご利用頂けます。
-		</p>
-
-		<h2 id="DEMO">プロ生ちゃんサンプルデモ</h2>
+		<h2 id="DEMO">プロ生ちゃんサンプルデモ一覧</h2>
 
 		<li>pronama3.hsp</li>
 		<p>
@@ -69,19 +74,6 @@
 		<p>
 		<a href="image/pn5.png" target="_blank"><img src="image/pn5.png" width="512"></a>
 		</p>
-
-		<h2 id="NEWHGIMG">より使いやすく</h2>
-		<p>
-		新しいHGIMG4では、より使いやすく、シンプルに3D表示を活用できるよう開発が進められています。<br>
-		少ないデータ、スクリプトでモデルデータ・アニメーションといった高度な技術を活用するために、HGIMG4は独自の拡張を続けています。
-		OpenGL/DirectXによる描画、GLSLシェーダーの活用、物理エンジン(Bullet)、イベントシステムなどを搭載し、
-		キャラクターアニメーション、マルチパスレンダリング、ポストプロセッシングスタックなど強力なシステムを搭載します。<br>
-		新しいHSP3.6に向けて進化を続けるHGIMG4に、これからもご期待ください。
-		</p>
-		<p>
-		<img src="image/hgimg4_sample.jpg">
-		</p>
-
 
 		<h2 id="UNITYHSP">Unityとの連携</h2>
 		<p>
@@ -261,13 +253,15 @@
 		</pre>
 
 
-		<!-- フッター -->
-		<ul id="FOOTER">
-			<a href="http://www.onionsoft.net/" target="_blank" align="right"><img src="image/onimark64.png"></a><br>
-			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
-			<li><a href="http://hsp.tv/" target="_blank">Go to HSPTV page</a></li>
-		</ul>
-	</div><!-- container -->
+	<!-- フッター -->
+	<ul id="FOOTER">
+		<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+		<li><a href="../index.htm">インデックスに戻る</a></li>
+	</ul>
+	<a href="http://www.onionsoft.net/">
+		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+	</a>
+</div><!-- container -->
 </body>
-
 </html>
+
