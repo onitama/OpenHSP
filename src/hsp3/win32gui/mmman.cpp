@@ -213,7 +213,7 @@ int MMMan::Load( char *fname, int num, int opt )
 	//			opt : 0=normal/1=loop/2=wait/3=continuous
 	//
 	int a = 1,getlen;
-	char fext[8];
+//	char fext[8];
 	char a1,a2,a3;
 	char *pt;
 	int flag;
@@ -478,6 +478,40 @@ int MMMan::GetStatus( int num, int infoid )
 		break;
 	}
 	return res;
+}
+
+
+void MMMan::StopBank(int num)
+{
+	//		stop playing sound
+	//
+	MMM* mmm;
+	int bank, flg;
+
+	if (num < 0) {
+		Stop();
+		return;
+	}
+
+	bank = SearchBank(num);
+	if (bank < 0) return;
+	mmm = &mem_snd[bank];
+	flg = mmm->flag;
+	switch (flg) {
+	case MMDATA_INTWAVE:							// when "WAV"
+		sndPlaySound(NULL, 0);						// stop PCM sound
+		break;
+
+	case MMDATA_MCIVOICE:							// when "MID" file
+	case MMDATA_MCIVIDEO:							// when "AVI" file
+	case MMDATA_MPEGVIDEO:							// when "MPG" file
+		if (curmus != -1) {
+			SendMCI("stop myid");
+			SendMCI("close myid");
+			curmus = -1;
+		}
+		break;
+	}
 }
 
 

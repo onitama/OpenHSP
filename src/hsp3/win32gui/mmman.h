@@ -65,6 +65,7 @@ public:
 	void SetVol( int bank, int vol );
 	void SetPan( int bank, int pan );
 	int GetStatus( int bank, int infoid );
+	void StopBank(int num);
 
 	void SendMCIT(TCHAR*);
 

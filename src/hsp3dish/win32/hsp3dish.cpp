@@ -53,10 +53,13 @@ static char fpas[]={ 'H'-48,'S'-48,'P'-48,'H'-48,
 static char optmes[] = "HSPHED~~\0_1_________2_________3______";
 
 static int hsp_wx, hsp_wy, hsp_wd, hsp_ss;
+static int hsp_wposx, hsp_wposy, hsp_wstyle;
 static int drawflag;
 
 static	HWND m_hWnd;
 static	DWORD m_dwWindowStyle;
+static	HWND m_hWndParent;
+static	HINSTANCE m_hInstance;
 
 #ifndef HSPDEBUG
 static int hsp_sscnt, hsp_ssx, hsp_ssy;
@@ -249,6 +252,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		if ( exinfo != NULL ) {
 			bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
 			x = LOWORD(lParam); y = HIWORD(lParam);
+			hgio_cnvview((BMSCR *)bm,&x,&y);
 			bm->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
 			bm->savepos[BMSCR_SAVEPOS_MOSUEY] = y;
 			bm->UpdateAllObjects();
@@ -412,9 +416,14 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	return DefWindowProc (hwnd, uMessage, wParam, lParam) ;
 }
 
-
-static void hsp3dish_initwindow( HINSTANCE hInstance, int sx, int sy, char *windowtitle )
+static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int yy, int style)
 {
+#ifdef HSPDEBUG
+	char* windowtitle = "HSPDish ver" hspver;
+#else
+	char* windowtitle = NULL;
+#endif
+
 	// Register the windows class
 	WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
 							LoadIcon( hInstance, MAKEINTRESOURCE(128) ),
@@ -424,19 +433,39 @@ static void hsp3dish_initwindow( HINSTANCE hInstance, int sx, int sy, char *wind
 	RegisterClass( &wndClass );
 
 	// Set the window's initial style
-	m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
-						WS_MINIMIZEBOX | /*WS_MAXIMIZEBOX |*/ WS_VISIBLE | WS_CLIPCHILDREN;
+	//DWORD m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
+	//	WS_MINIMIZEBOX | /*WS_MAXIMIZEBOX |*/ WS_VISIBLE | WS_CLIPCHILDREN;
+	DWORD m_dwWindowStyle = 0;
+	int exstyle = 0;
+
+	// スクリーンタイプごとのウィンドウスタイルの設定。
+	if (style & 0x10100) {
+		m_dwWindowStyle = WS_POPUP | WS_CLIPCHILDREN | WS_VISIBLE;			// bgscr window
+	}
+	else {
+		m_dwWindowStyle = WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX
+			| WS_BORDER | WS_CLIPCHILDREN | WS_VISIBLE;
+		if (style & 0x08) {	// ツールウィンドウ。
+			exstyle |= WS_EX_TOOLWINDOW;
+		}
+		if (style & 0x10) {	// 縁が深い。
+			exstyle |= WS_EX_OVERLAPPEDWINDOW;
+		}
+	}
+
+	RECT rc;
+	SetRect(&rc, 0, 0, sx, sy);
 
 	// Set the window's initial width
-	RECT rc;
-	SetRect( &rc, 0, 0, sx, sy );
-	AdjustWindowRect( &rc, m_dwWindowStyle, false );
+	AdjustWindowRect(&rc, m_dwWindowStyle, false);
 
 	// Create the render window
-	m_hWnd = CreateWindow( "HSP3DishWindow", windowtitle, m_dwWindowStyle,
-								CW_USEDEFAULT, CW_USEDEFAULT,
-								(rc.right-rc.left), (rc.bottom-rc.top), 0,
-								NULL, hInstance, 0 );
+	m_hWnd = CreateWindowEx(exstyle, "HSP3DishWindow", windowtitle, m_dwWindowStyle,
+
+		(xx != -1 ? xx : CW_USEDEFAULT),
+		(yy != -1 ? yy : CW_USEDEFAULT),
+		(rc.right - rc.left), (rc.bottom - rc.top), 0,
+		NULL, hInstance, 0);
 
 	// 描画APIに渡す
 	hgio_init( 0, sx, sy, m_hWnd );
@@ -700,23 +729,43 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 #endif
 			break;
 	//	case RUNMODE_LOGMES:
-		case RUNMODE_EXITRUN:
+		case RUNMODE_RESTART:
 		{
+			//		画面サイズを変更して再構築する
 			Bmscr* bm;
 			int hsp_fullscr;
-			RECT rc,rw;
 			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
 			hsp_wx = bm->sx;
 			hsp_wy = bm->sy;
-			hsp_fullscr = bm->buffer_option;
+			hsp_wposx = bm->cx;
+			hsp_wposy = bm->cy;
+			hsp_wstyle = bm->buffer_option;
+			hsp_fullscr = hsp_wstyle & 0x100;
+			if (hsp_fullscr) {
+				hsp_wposx = 0;
+				hsp_wposy = 0;
+			}
 
-			GetWindowRect(m_hWnd, &rw);
-			SetRect(&rc, 0, 0, hsp_wx, hsp_wy);
-			AdjustWindowRect(&rc, m_dwWindowStyle, false);
-			MoveWindow(m_hWnd, rw.left, rw.top, rc.right, rc.bottom, true);
+			hsp3dish_drawoff();
+			if (m_hWnd != NULL) {
+				hgio_term();
+				DestroyWindow(m_hWnd);
+				m_hWnd = NULL;
+			}
+			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
+
+			SetSysReq(SYSREQ_DXMODE, 0);
+			if (hsp_fullscr) {
+				SetSysReq(SYSREQ_DXMODE, 1);
+				SetSysReq(SYSREQ_DXWIDTH, hsp_wx);
+				SetSysReq(SYSREQ_DXHEIGHT, hsp_wy);
+			}
+			hsp3dish_initwindow(m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle);
+			hsp3excmd_rebuild_window();
+			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
 
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
-			hgio_rebuild(hsp_wx, hsp_wy, hsp_fullscr, m_hWnd);
+			//hgio_rebuild(hsp_wx, hsp_wy, hsp_fullscr, m_hWnd);
 			hspctx->runmode = RUNMODE_RUN;
 			break;
 		}
@@ -803,6 +852,7 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	//
 	hsp = new Hsp3();
 	hsp->hspctx.instance = (void *)hInstance;
+	m_hInstance = hInstance;
 #ifdef HSPDEBUG
 	h_dbgwin = NULL;
 	dbgwnd = NULL;
@@ -838,6 +888,9 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 //	hsp_wy = 480;
 	hsp_wd = 0;
 	hsp_ss = 0;
+	hsp_wposx = -1;
+	hsp_wposy = -1;
+	hsp_wstyle = 0;
 
 	for( a=0 ; a<8; a++) {
 		a1=optmes[a]-48;if (a1==fpas[a]) orgexe++;
@@ -928,13 +981,7 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 
 	//		Initalize Window
 	//
-#ifdef HSPDEBUG
-	char * pc = "HSPDish ver" hspver;
-#else
-	char * pc = NULL;
-#endif
-
-	hsp3dish_initwindow( hInstance, hsp_wx, hsp_wy, pc );
+	hsp3dish_initwindow( m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle );
 
 #ifndef HSP_COM_UNSUPPORTED
 	HspVarCoreRegisterType( TYPE_COMOBJ, HspVarComobj_Init );

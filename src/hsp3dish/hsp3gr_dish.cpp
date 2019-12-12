@@ -491,10 +491,15 @@ static int cmdfunc_extcmd( int cmd )
 		}
 
 	case 0x03:								// dialog
-        ctx->waitcount = 0;
-        ctx->runmode = RUNMODE_WAIT;
+#ifdef HSPWIN
 		cmdfunc_dialog();
-        return ctx->runmode;
+		break;
+#else
+		ctx->waitcount = 0;
+		ctx->runmode = RUNMODE_WAIT;
+		cmdfunc_dialog();
+		return ctx->runmode;
+#endif
 
 #ifdef USE_MMAN
 	case 0x08:								// mmload
@@ -874,10 +879,17 @@ static int cmdfunc_extcmd( int cmd )
 			bmscr->sx = p2;
 			bmscr->sx2 = p2;
 			bmscr->sy = p3;
-			bmscr->buffer_option = p4 & 0x100;
+			bmscr->buffer_option = p4;
+			bmscr->cx = p5;
+			bmscr->cy = p6;
+			bmscr->gx = p7;
+			bmscr->gy = p8;
+			if (cmd == 0x2b) {
+				bmscr->buffer_option |= 0x10000;
+			}
 #ifdef HSPWIN
-			ctx->runmode = RUNMODE_EXITRUN;
-			return RUNMODE_EXITRUN;
+			ctx->runmode = RUNMODE_RESTART;
+			return RUNMODE_RESTART;
 #endif
 		}
 		bmscr = wnd->GetBmscr( p1 );
@@ -930,9 +942,7 @@ static int cmdfunc_extcmd( int cmd )
 	{
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
-		HSPREAL dp1 = code_getdd(bmscr->viewsx);
-		HSPREAL dp2 = code_getdd(bmscr->viewsy);
-		bmscr->SetScroll(p1, p2, dp1, dp2);
+		bmscr->SetScroll(p1, p2);
 		break;
 	}
 	case 0x2f:								// line
@@ -1340,7 +1350,17 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 
 	case 0x4f:								// viewcalc
+		{
+		HSPREAL dp1, dp2, dp3, dp4;
+		p1 = code_getdi(0);
+		dp1 = code_getdd(0.0);
+		dp2 = code_getdd(0.0);
+		dp3 = code_getdd(0.0);
+		dp4 = code_getdd(0.0);
+		p1 = bmscr->Viewcalc_set(p1, dp1, dp2, dp3, dp4);
+		if (p1) throw HSPERR_ILLEGAL_FUNCTION;
 		break;
+		}
 
 	case 0x5c:								// celbitmap
 		{
@@ -2925,10 +2945,8 @@ static void *reffunc_sysvar( int *type_res, int arg )
 	//	int function
 	case 0x000:								// mousex
 		reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEX ];
-		//reffunc_intfunc_ivalue = gb_getmousex();
 		break;
 	case 0x001:								// mousey
-		//reffunc_intfunc_ivalue = gb_getmousey();
 		reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEY ];
 		break;
 	case 0x002:								// mousew
@@ -3026,6 +3044,14 @@ void hsp3notify_extcmd( void )
 #ifdef USE_MMAN
 	mmman->Notify();
 #endif
+}
+
+
+void hsp3excmd_rebuild_window(void)
+{
+	if (wnd) delete wnd;
+	wnd = new HspWnd();
+	bmscr = wnd->GetBmscr(0);
 }
 
 

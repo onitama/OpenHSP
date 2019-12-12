@@ -76,7 +76,7 @@ void StackReset( void )
 void StackPush( int type, char *data, int size )
 {
 	STMDATA *stm;
-	double *dptr;
+//	double *dptr;
 	if ( stm_cur >= stm_maxptr ) throw HSPERR_STACK_OVERFLOW;
 	stm = stm_cur;
 	stm->type = type;

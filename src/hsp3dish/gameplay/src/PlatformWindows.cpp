@@ -1129,6 +1129,7 @@ Platform* Platform::create(Game* game, void* attachToWindow, int sizex, int size
         if (ChangeDisplaySettings(&dm, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
         {
             params.fullscreen = false;
+			MessageBox(NULL, "resolution not support", "", 0);
             GP_ERROR("Failed to start game in full-screen mode with resolution %dx%d.", width, height);
             goto error;
         }
@@ -1149,7 +1150,27 @@ Platform* Platform::create(Game* game, void* attachToWindow, int sizex, int size
 
         //SetWindowLongPtr(__hwnd, GWLP_WNDPROC, (LONG)(WNDPROC)__WndProc);
 
-        if (!initializeGL(NULL))
+		if (params.fullscreen)
+		{
+			DEVMODE dm;
+			memset(&dm, 0, sizeof(dm));
+			dm.dmSize = sizeof(dm);
+			dm.dmPelsWidth = width;
+			dm.dmPelsHeight = height;
+			dm.dmBitsPerPel = DEFAULT_COLOR_BUFFER_SIZE;
+			dm.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+			// Try to set selected mode and get results. NOTE: CDS_FULLSCREEN gets rid of start bar.
+			if (ChangeDisplaySettings(&dm, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+			{
+				params.fullscreen = false;
+				MessageBox(NULL, "resolution not support", "", 0);
+				GP_ERROR("Failed to start game in full-screen mode with resolution %dx%d.", width, height);
+				goto error;
+			}
+		}
+
+		if (!initializeGL(NULL))
             goto error;
     }
 

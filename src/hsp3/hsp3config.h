@@ -19,8 +19,8 @@
 //
 //		移植用のラベル
 //
-#define JPN			// IME use flag
-#define JPNMSG		// japanese message flag
+//#define JPN			// IME use flag
+//#define JPNMSG		// japanese message flag
 
 //
 //	Debug mode functions

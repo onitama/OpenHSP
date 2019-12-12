@@ -9,6 +9,5 @@
 
 int hgio_device_restore( void );
 void hgio_text_render( void );
-void hgio_rebuild(int sx, int sy, int mode, void* window);
 
 #endif

@@ -183,6 +183,9 @@ static		int m_tstyle;		// テキスト使用フォントのスタイル指定
 static		float center_x,center_y;
 static		float linebasex,linebasey;
 
+static		MATRIX mat_proj;	// プロジェクションマトリクス
+static		MATRIX mat_unproj;	// プロジェクション逆変換マトリクス
+
 #define CIRCLE_DIV 16
 #define DEFAULT_FONT_NAME ""
 #define DEFAULT_FONT_SIZE 18
@@ -229,6 +232,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	_rateX = 1.0f;
 	_rateY = 1.0f;
 #endif
+	GeometryInit();
 
 	//		infovalをリセット
 	//
@@ -429,6 +433,7 @@ int hgio_getHeight( void )
 void hgio_term( void )
 {
 	hgio_render_end();
+	GeometryTerm();
 }
 
 
@@ -465,6 +470,15 @@ int hgio_stick( int actsw )
 	if ( GetAsyncKeyState(1)&0x8000 )  ckey|=256;	// mouse_l
 	if ( GetAsyncKeyState(2)&0x8000 )  ckey|=512;	// mouse_r
 	if ( GetAsyncKeyState(9)&0x8000 )  ckey|=1024;	// [tab]
+
+	if (GetAsyncKeyState(90) & 0x8000)  ckey |= 1 << 11;	// [z]
+	if (GetAsyncKeyState(88) & 0x8000)  ckey |= 1 << 12;	// [x]
+	if (GetAsyncKeyState(67) & 0x8000)  ckey |= 1 << 13;	// [c]
+
+	if (GetAsyncKeyState(65) & 0x8000)  ckey |= 1 << 14;	// [a]
+	if (GetAsyncKeyState(87) & 0x8000)  ckey |= 1 << 15;	// [w]
+	if (GetAsyncKeyState(68) & 0x8000)  ckey |= 1 << 16;	// [d]
+	if (GetAsyncKeyState(83) & 0x8000)  ckey |= 1 << 17;	// [s]
 #endif
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
@@ -1732,7 +1746,6 @@ char *hgio_getdir( int id )
 
 #endif
 
-/*-------------------------------------------------------------------------------*/
 
 int hgio_bufferop(BMSCR* bm, int mode, char* ptr)
 {
@@ -1751,5 +1764,101 @@ int hgio_bufferop(BMSCR* bm, int mode, char* ptr)
 	}
 	return 0;
 }
+
+
+/*-------------------------------------------------------------------------------*/
+
+void hgio_setview(BMSCR* bm)
+{
+	// vp_flagに応じたビューポートの設定を行う
+	//
+	int i;
+	MATRIX* vmat;
+	MATRIX tmpmat;
+	float* vp;
+	vmat = &mat_proj;
+	vp = (float*)vmat;
+	float* mat = (float*)GetCurrentMatrixPtr();
+
+	switch (bm->vp_flag) {
+	case BMSCR_VPFLAG_2D:
+		//	2D projection mode
+		UnitMatrix();
+		RotZ(bm->vp_viewrotate[2]);
+		GetCurrentMatrix(&tmpmat);
+		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)nDestWidth / bm->vp_viewscale[0], (float)nDestHeight / bm->vp_viewscale[1], 0.0f, 1.0f);
+		MulMatrix(&tmpmat);
+		break;
+	case BMSCR_VPFLAG_3D:
+		//	3D projection mode
+		UnitMatrix();
+		RotZ(bm->vp_viewrotate[2]);
+		RotY(bm->vp_viewrotate[1]);
+		RotX(bm->vp_viewrotate[0]);
+		Scale(bm->vp_viewscale[0], bm->vp_viewscale[1], bm->vp_viewscale[2]);
+		Trans(bm->vp_viewtrans[0], bm->vp_viewtrans[1], bm->vp_viewtrans[2]);
+		GetCurrentMatrix(&tmpmat);
+		PerspectiveFOV(bm->vp_view3dprm[0], bm->vp_view3dprm[1], bm->vp_view3dprm[2], 0.0f, 0.0f, (float)nDestWidth / 10, (float)nDestHeight / 10);
+		//PerspectiveFOV(45.0f, 1.0f, 500.0f, 0.0f, 0.0f, (float)nDestWidth / 10, (float)nDestHeight / 10);
+		//PerspectiveWithZBuffer(10.0f, 0.0f, 60.0f, 1.0f, 0.0f);
+		MulMatrix(&tmpmat);
+		break;
+	case BMSCR_VPFLAG_MATRIX:
+		//	user matrix mode
+		mat = &bm->vp_viewtrans[0];
+		break;
+	case BMSCR_VPFLAG_NOUSE:
+	default:
+		return;
+	}
+
+	//	mat_projに設定する
+	for (i = 0; i < 16; i++) {
+		*vp++ = *mat++;
+	}
+
+	//D3DXMATRIX matrixProj;
+	//Mat2D3DMAT(&matrixProj, vmat);
+	//d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
+
+	//	投影マトリクスの逆行列を設定する
+	//D3DXMatrixInverse(&InvViewport, NULL, &matrixProj);
+	SetCurrentMatrix(vmat);
+	//InverseMatrix(&mat_unproj);
+
+}
+
+
+void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
+{
+	//	ビュー変換後の座標 -> 元の座標に変換する
+	//	(タッチ位置再現のため)
+	//
+	VECTOR v1, v2;
+	//if (bm->vp_flag == 0) return;
+	v1.x = (float)*xaxis;
+	v1.y = (float)(nDestHeight - *yaxis);
+	v1.z = 1.0f;
+	v1.w = 0.0f;
+
+	v1.x -= nDestWidth / 2;
+	v1.y -= nDestHeight / 2;
+	v1.x *= 2.0f / float(nDestWidth);
+	v1.y *= 2.0f / float(nDestHeight);
+
+	//	*xaxis = (int)(v1.x);
+	//	*yaxis = (int)(v1.y);
+
+	//	D3DXVECTOR3 a1,a2;
+	//	D3DXVec3TransformCoord(&a2, &D3DXVECTOR3(v1.x, v1.y, v1.z), &InvViewport);
+	//	*xaxis = (int)a2.x;
+	//	*yaxis = (int)a2.y;
+
+	ApplyMatrix(&mat_unproj, &v2, &v1);
+	*xaxis = (int)v2.x;
+	*yaxis = (int)v2.y;
+}
+
+
 
 

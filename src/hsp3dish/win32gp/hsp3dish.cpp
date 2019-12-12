@@ -54,6 +54,7 @@ static char fpas[]={ 'H'-48,'S'-48,'P'-48,'H'-48,
 static char optmes[] = "HSPHED~~\0_1_________2_________3______";
 
 static int hsp_wx, hsp_wy, hsp_wd, hsp_ss;
+static int hsp_wposx, hsp_wposy, hsp_wstyle;
 static int drawflag;
 
 static	HWND m_hWnd;
@@ -433,9 +434,14 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	return DefWindowProc (hwnd, uMessage, wParam, lParam) ;
 }
 
-
-static void hsp3dish_initwindow( HINSTANCE hInstance, int sx, int sy, char *windowtitle )
+static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int yy, int style)
 {
+#ifdef HSPDEBUG
+	char* windowtitle = "HSPDish ver" hspver;
+#else
+	char* windowtitle = NULL;
+#endif
+
 	// Register the windows class
 	WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
 							LoadIcon( hInstance, MAKEINTRESOURCE(128) ),
@@ -445,8 +451,25 @@ static void hsp3dish_initwindow( HINSTANCE hInstance, int sx, int sy, char *wind
 	RegisterClass( &wndClass );
 
 	// Set the window's initial style
-	DWORD m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
-						WS_MINIMIZEBOX | /*WS_MAXIMIZEBOX |*/ WS_VISIBLE | WS_CLIPCHILDREN;
+	//DWORD m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
+	//	WS_MINIMIZEBOX | /*WS_MAXIMIZEBOX |*/ WS_VISIBLE | WS_CLIPCHILDREN;
+	DWORD m_dwWindowStyle = 0;
+	int exstyle = 0;
+
+	// スクリーンタイプごとのウィンドウスタイルの設定。
+	if (style & 0x10100) {
+		m_dwWindowStyle = WS_POPUP | WS_CLIPCHILDREN | WS_VISIBLE;			// bgscr window
+	}
+	else {
+		m_dwWindowStyle = WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX
+			| WS_BORDER | WS_CLIPCHILDREN | WS_VISIBLE;
+		if (style & 0x08) {	// ツールウィンドウ。
+			exstyle |= WS_EX_TOOLWINDOW;
+		}
+		if (style & 0x10) {	// 縁が深い。
+			exstyle |= WS_EX_OVERLAPPEDWINDOW;
+		}
+	}
 
 	RECT rc;
 	SetRect(&rc, 0, 0, sx, sy);
@@ -462,8 +485,10 @@ static void hsp3dish_initwindow( HINSTANCE hInstance, int sx, int sy, char *wind
 
 
 	// Create the render window
-	m_hWnd = CreateWindow( "HSP3DishWindow", windowtitle, m_dwWindowStyle,
-								CW_USEDEFAULT, CW_USEDEFAULT,
+	m_hWnd = CreateWindowEx(exstyle, "HSP3DishWindow", windowtitle, m_dwWindowStyle,
+
+								(xx != -1 ? xx : CW_USEDEFAULT),
+								(yy != -1 ? yy : CW_USEDEFAULT),
 								(rc.right-rc.left), (rc.bottom-rc.top), m_hWndParent,
 								NULL, hInstance, 0 );
 
@@ -729,6 +754,57 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 #endif
 			break;
 	//	case RUNMODE_LOGMES:
+		case RUNMODE_RESTART:
+		{
+			//		画面サイズを変更して再構築する
+			Bmscr* bm;
+			int hsp_fullscr;
+			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+			hsp_wx = bm->sx;
+			hsp_wy = bm->sy;
+			hsp_wposx = bm->cx;
+			hsp_wposy = bm->cy;
+			hsp_wstyle = bm->buffer_option;
+			hsp_fullscr = hsp_wstyle & 0x100;
+			if (hsp_fullscr) {
+				hsp_wstyle = -1;
+				hsp_wposx = 0;
+				hsp_wposy = 0;
+			}
+
+			hsp3dish_drawoff();
+			platform->shutdownInternal();
+			delete platform;
+			if (m_hWnd != NULL) {
+				hgio_term();
+				DestroyWindow(m_hWnd);
+				m_hWnd = NULL;
+			}
+			if (game != NULL) {
+				delete game;
+			}
+
+			hsp3dish_initwindow(m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle);
+
+			game = new gamehsp;
+			gameplay::Logger::set(gameplay::Logger::LEVEL_INFO, logfunc);
+			gameplay::Logger::set(gameplay::Logger::LEVEL_WARN, logfunc);
+			gameplay::Logger::set(gameplay::Logger::LEVEL_ERROR, logfunc);
+
+			platform = gameplay::Platform::create( game, m_hWnd, hsp_wx, hsp_wy, hsp_fullscr!=0 );
+			if (platform == NULL) {
+				hsp3dish_dialog("OpenGL initalize failed.");
+			}
+			platform->enterMessagePump();
+			game->frame();
+
+			hsp3excmd_rebuild_window();
+			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+
+			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
+			hspctx->runmode = RUNMODE_RUN;
+			break;
+		}
 		default:
 			return;
 		}
@@ -830,6 +906,9 @@ int hsp3dish_setwindow(int bootprm, int wx, int wy)
 	hsp_wx = wx;
 	hsp_wy = wy;
 	hsp_wd = bootprm;
+	hsp_wposx = -1;
+	hsp_wposy = -1;
+	hsp_wstyle = 0;
 	return 0;
 }
 
@@ -998,13 +1077,7 @@ int hsp3dish_reset(void)
 
 	//		Initalize Window
 	//
-#ifdef HSPDEBUG
-	char * pc = "HGIMG4 ver" hspver;
-#else
-	char * pc = NULL;
-#endif
-
-	hsp3dish_initwindow( m_hInstance, hsp_wx, hsp_wy, pc );
+	hsp3dish_initwindow( m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy,hsp_wstyle);
 
 
 #ifndef HSP_COM_UNSUPPORTED

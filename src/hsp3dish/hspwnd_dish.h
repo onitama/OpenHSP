@@ -95,6 +95,19 @@ typedef struct HSPOBJINFO
 #define HSPWND_OPTION_OFFSCREEN 32
 #define HSPWND_OPTION_USERSHADER 64
 
+#define BMSCR_VPFLAG_NOUSE	0
+#define BMSCR_VPFLAG_2D	1
+#define BMSCR_VPFLAG_3D	2
+#define BMSCR_VPFLAG_MATRIX 3
+
+#define BMSCR_VPTYPE_OFF		0
+#define BMSCR_VPTYPE_TRANSLATE	1
+#define BMSCR_VPTYPE_ROTATE		2
+#define BMSCR_VPTYPE_SCALE		3
+#define BMSCR_VPTYPE_3DMATRIX	4
+#define BMSCR_VPTYPE_2D			5
+#define BMSCR_VPTYPE_3D			6
+
 #define BMSCR_MAX_MTOUCH	16		// Max Points of Multi-Touch
 typedef struct HSP3MTOUCH
 {
@@ -167,7 +180,7 @@ public:
 	int Pget( int xx, int yy );
 	void Pset( int xx,int yy );
 	void Line( int xx,int yy );
-	void SetScroll(int xbase, int ybase, HSPREAL xscale = 1.0, HSPREAL yscale = 1.0);
+	void SetScroll(int xbase, int ybase);
 	int Copy( Bmscr *src, int xx, int yy, int psx, int psy );
 	int Zoom( int dx, int dy, Bmscr *src, int xx, int yy, int psx, int psy, int mode );
 
@@ -210,9 +223,7 @@ public:
 	int listMTouch( int *outbuf );
 
 	void Viewcalc_reset(void);
-	int Viewcalc_set(HSPREAL* viewmatrix);
-	void Viewcalc_calc(HSPREAL& axisx, HSPREAL& axisy);
-
+	int Viewcalc_set(int type, HSPREAL x, HSPREAL y, HSPREAL p_sx, HSPREAL p_sy );
 
 	//
 	//		Window data structure
@@ -310,10 +321,11 @@ public:
 	void	*master_buffer;				// buffer pointer to off-screen
 	HSPREAL	accel_value[BMSCR_SAVEPOS_MAX];		// Accelerometer sensor value
 
-	HSPREAL	viewsx, viewsy;				// buffer view size x,y
-	HSPREAL	viewsxr, viewsyr;			// buffer view size x,y (reverse)
 	int		vp_flag;					// Viewport enable flag (0=none)
-	HSPREAL	vp_matrix[16];				// Viewport matrix
+	float	vp_viewtrans[4];			// View Translate X,Y,Z,W
+	float	vp_viewrotate[4];			// View Rotate X,Y,Z,W
+	float	vp_viewscale[4];			// View Scale X,Y,Z,W
+	float	vp_view3dprm[4];			// View 3D parameter
 
 private:
 //	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
@@ -471,10 +483,11 @@ typedef struct BMSCR
 	void* master_buffer;				// buffer pointer to off-screen
 	HSPREAL	accel_value[BMSCR_SAVEPOS_MAX];		// Accelerometer sensor value
 
-	HSPREAL	viewsx, viewsy;				// buffer view size x,y
-	HSPREAL	viewsxr, viewsyr;			// buffer view size x,y (reverse)
 	int		vp_flag;					// Viewport enable flag (0=none)
-	HSPREAL	vp_matrix[16];				// Viewport matrix
+	float	vp_viewtrans[4];			// View Translate X,Y,Z,W
+	float	vp_viewrotate[4];			// View Rotate X,Y,Z,W
+	float	vp_viewscale[4];			// View Scale X,Y,Z,W
+	float	vp_view3dprm[4];			// View 3D parameter
 
 } BMSCR;
 

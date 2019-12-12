@@ -124,7 +124,7 @@ void HspWnd::Reset( void )
 	sy = hgio_getHeight();
 
 	MakeBmscr( 0, HSPWND_TYPE_MAIN, 0, 0, sx, sy, 0 );
-	
+
 	//		global vals
 	//
 #if 0
@@ -364,8 +364,6 @@ void Bmscr::Cls( int mode )
 	this->wchg = 0;
 	this->viewx = 0;
 	this->viewy = 0;
-	this->viewsx = 1.0;
-	this->viewsy = 1.0;
 	Viewcalc_reset();
 
 	//		text setting initalize
@@ -976,53 +974,86 @@ int Bmscr::listMTouch( int *outbuf )
 */
 /*------------------------------------------------------------*/
 
-void Bmscr::SetScroll(int xbase, int ybase, HSPREAL xscale, HSPREAL yscale)
+void Bmscr::SetScroll(int xbase, int ybase)
 {
 	//		スクロール基点を設定
 	//
 	viewx = xbase;
 	viewy = ybase;
-
-	if ((sx == 0) || (sy == 0)) return;
-
-	double px, py;
-	px = xscale; if (px < 1.0) px = 1.0;
-	py = yscale; if (py < 1.0) py = 1.0;
-
-	viewsx = px; viewsxr = 1.0 / px;
-	viewsy = py; viewsyr = 1.0 / py;
-
-	px = (double)(sx) * viewsxr;
-	py = (double)(sy) * viewsyr;
-
-	if ((viewx + (int)px) >= sx) viewx = sx - (int)px;
-	if ((viewy + (int)py) >= sy) viewy = sy - (int)py;
-	if (viewx < 0) viewx = 0;
-	if (viewy < 0) viewy = 0;
 }
 
 void Bmscr::Viewcalc_reset(void)
 {
 	//	Reset viewport
 	//
-	vp_flag = 0;
+	int i;
+	for (i = 0; i < 4; i++) {
+		vp_viewtrans[i] = 0.0f;
+		vp_viewrotate[i] = 0.0f;
+		vp_viewscale[i] = 0.0f;
+		vp_view3dprm[i] = 0.0f;
+	}
+	vp_flag = BMSCR_VPFLAG_NOUSE;
 }
 
 
-int Bmscr::Viewcalc_set(HSPREAL* viewmatrix)
+int Bmscr::Viewcalc_set(int type, HSPREAL x, HSPREAL y, HSPREAL p_sx, HSPREAL p_sy)
 {
 	//	Setup viewport
 	//
-	Viewcalc_reset();
-	vp_flag = 1;
+	switch (type) {
+	case BMSCR_VPTYPE_OFF:
+		Viewcalc_reset();
+		break;
+	case BMSCR_VPTYPE_TRANSLATE:
+		vp_viewtrans[0] = (float)x;
+		vp_viewtrans[1] = (float)y;
+		vp_viewtrans[2] = (float)p_sx;
+		vp_viewtrans[3] = (float)p_sy;
+		break;
+	case BMSCR_VPTYPE_ROTATE:
+		vp_viewrotate[0] = (float)x;
+		vp_viewrotate[1] = (float)y;
+		vp_viewrotate[2] = (float)p_sx;
+		vp_viewrotate[3] = (float)p_sy;
+		break;
+	case BMSCR_VPTYPE_SCALE:
+		vp_viewscale[0] = (float)x;
+		vp_viewscale[1] = (float)y;
+		vp_viewscale[2] = (float)p_sx;
+		vp_viewscale[3] = (float)p_sy;
+		break;
+	case BMSCR_VPTYPE_3DMATRIX:
+		vp_view3dprm[0] = (float)x;
+		vp_view3dprm[1] = (float)y;
+		vp_view3dprm[2] = (float)p_sx;
+		vp_view3dprm[3] = (float)p_sy;
+		vp_flag = BMSCR_VPFLAG_MATRIX;
+		break;
+	case BMSCR_VPTYPE_2D:
+		if ((x == 0.0) || (y == 0.0)) return -1;
+		vp_viewscale[0] = (float)x;
+		vp_viewscale[1] = (float)y;
+		vp_viewscale[2] = 1.0f;
+		vp_viewscale[3] = 1.0f;
+		vp_viewrotate[0] = 0.0f;
+		vp_viewrotate[1] = 0.0f;
+		vp_viewrotate[2] = (float)p_sx;
+		vp_viewrotate[3] = 0.0f;
+		vp_flag = BMSCR_VPFLAG_2D;
+		break;
+	case BMSCR_VPTYPE_3D:
+		vp_view3dprm[0] = (float)x;
+		vp_view3dprm[1] = (float)y;
+		vp_view3dprm[2] = (float)p_sx;
+		vp_view3dprm[3] = (float)p_sy;
+		vp_flag = BMSCR_VPFLAG_3D;
+		break;
+	default:
+		return -1;
+	}
+	hgio_setview((BMSCR*)this);
 	return 0;
 }
 
-
-void Bmscr::Viewcalc_calc(HSPREAL& axisx, HSPREAL& axisy)
-{
-	//	Calc viewport -> real axis
-	//
-	if (vp_flag == 0) return;
-}
 
