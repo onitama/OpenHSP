@@ -164,6 +164,9 @@ static	double  total_tick;
 static	CFAbsoluteTime  lastTime;
 #endif
 
+static		MATRIX mat_proj;	// プロジェクションマトリクス
+static		MATRIX mat_unproj;	// プロジェクション逆変換マトリクス
+
 /*------------------------------------------------------------*/
 /*
 		Polygon Draw Routines
@@ -224,6 +227,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	_rateY = 1.0f;
 	_uvfix = 0;
 
+	GeometryInit();
     //色
     hgio_setColor( 0 );
 
@@ -464,6 +468,7 @@ void hgio_term( void )
 {
 	hgio_render_end();
 	TexTerm();
+	GeometryInit();
 }
 
 
@@ -2282,6 +2287,23 @@ char *hgio_getstorage( char *fname )
 	return my_storage_path;
 #endif
 	return fname;
+}
+
+
+/*-------------------------------------------------------------------------------*/
+
+void hgio_setview(BMSCR* bm)
+{
+	// vp_flagに応じたビューポートの設定を行う
+	//
+}
+
+
+void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
+{
+	//	ビュー変換後の座標 -> 元の座標に変換する
+	//	(タッチ位置再現のため)
+	//
 }
 
 
