@@ -445,6 +445,8 @@ void hgio_reset( void )
 	}
 #endif
 
+    hgio_setview( mainbm );
+
     //ブレンドの設定
     glEnable(GL_BLEND);
 #ifdef HSPIOS
@@ -736,12 +738,6 @@ void hgio_setOrigin( int x, int y )
 {
     _originX=x;
     _originY=y;
-}
-
-void hgio_scale_point( int xx, int yy, int &x, int & y )
-{
-	x = ( xx - _originX ) * _rateX;
-	y = ( yy - _originY ) * _rateY;
 }
 
 /*-------------------------------------------------------------------------------*/
@@ -1885,11 +1881,18 @@ char *hgio_getdir( int id )
 
 /*-------------------------------------------------------------------------------*/
 
+void hgio_scale_point( int xx, int yy, int &x, int & y )
+{
+	x = ( xx - _originX ) * _rateX;
+	y = ( yy - _originY ) * _rateY;
+}
+
 void hgio_touch( int xx, int yy, int button )
 {
     Bmscr *bm;
-	mouse_x = ( xx - _originX ) * _rateX;
-	mouse_y = ( yy - _originY ) * _rateY;
+	hgio_scale_point( xx,yy,mouse_x,mouse_y );
+	hgio_cnvview( mainbm, &mouse_x, &mouse_y );
+	mouse_y=-mouse_y;
 	mouse_btn = button;
     if ( mainbm != NULL ) {
         mainbm->savepos[BMSCR_SAVEPOS_MOSUEX] = mouse_x;
@@ -1907,8 +1910,10 @@ void hgio_mtouch( int old_x, int old_y, int xx, int yy, int button, int opt )
     int x,y,old_x2,old_y2;
     if ( mainbm == NULL ) return;
     bm = (Bmscr *)mainbm;
-	x = ( xx - _originX ) * _rateX;
-	y = ( yy - _originY ) * _rateY;
+    hgio_scale_point( xx,yy,x,y );
+    hgio_cnvview( mainbm, &mouse_x, &mouse_y );
+    mouse_y=-mouse_y;
+
     if ( opt == 0) {
         mouse_x = x;
         mouse_y = y;
@@ -2301,7 +2306,7 @@ void hgio_setview(BMSCR* bm)
 		UnitMatrix();
 		RotZ(bm->vp_viewrotate[2]);
 		GetCurrentMatrix(&tmpmat);
-		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)_bgsx / bm->vp_viewscale[0], (float)_bgsy / bm->vp_viewscale[1], 0.0f, 1.0f);
+		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)_bgsx / bm->vp_viewscale[0], (float)-_bgsy / bm->vp_viewscale[1], 0.0f, 1.0f);
 		MulMatrix(&tmpmat);
 		break;
 	case BMSCR_VPFLAG_3D:
@@ -2327,14 +2332,17 @@ void hgio_setview(BMSCR* bm)
 		return;
 	}
 
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(mat);
+
 	//	mat_projに設定する
 	for (i = 0; i < 16; i++) {
 		*vp++ = *mat++;
 	}
 
-	D3DXMATRIX matrixProj;
-	Mat2D3DMAT(&matrixProj, vmat);
-	d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
+	//D3DXMATRIX matrixProj;
+	//Mat2D3DMAT(&matrixProj, vmat);
+	//d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
 
 	//	投影マトリクスの逆行列を設定する
 	//D3DXMatrixInverse(&InvViewport, NULL, &matrixProj);
