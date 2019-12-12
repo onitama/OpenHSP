@@ -251,7 +251,6 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 //	SetSysReq( SYSREQ_CLSCOLOR, 0xffffff );
 
     //クリア色の設定
-	//hgio_reset();
 	Alertf( "Init:HGIOScreen(%d,%d)",sx,sy );
 
 	//フォント準備
@@ -436,7 +435,16 @@ void hgio_reset( void )
     glEnable(GL_TEXTURE_2D);
 #endif
 
-        
+
+#if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+	if ( GetSysReq( SYSREQ_CLSMODE ) == CLSMODE_SOLID ) {
+		//指定カラーで消去
+		int ccol = GetSysReq( SYSREQ_CLSCOLOR );
+		hgio_setClear( (ccol>>16)&0xff, (ccol>>8)&0xff, (ccol)&0xff );
+		hgio_clear();
+	}
+#endif
+
     //ブレンドの設定
     glEnable(GL_BLEND);
 #ifdef HSPIOS
@@ -2119,25 +2127,8 @@ int hgio_render_start( void )
     gb_render_start();
 #endif
     
-#if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
-	if ( GetSysReq( SYSREQ_CLSMODE ) == CLSMODE_SOLID ) {
-		//指定カラーで消去
-		int ccol = GetSysReq( SYSREQ_CLSCOLOR );
-		hgio_setClear( (ccol>>16)&0xff, (ccol>>8)&0xff, (ccol)&0xff );
-		hgio_clear();
-	}
-#endif
-
 
 	hgio_reset();
-
-
-#if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
-	if ( GetSysReq( SYSREQ_CLSMODE ) == CLSMODE_TEXTURE ) {
-		//テクスチャで消去
-	}
-#endif
-
 
 	drawflag = 1;
 	return 0;
@@ -2296,6 +2287,60 @@ void hgio_setview(BMSCR* bm)
 {
 	// vp_flagに応じたビューポートの設定を行う
 	//
+	int i;
+	MATRIX *vmat;
+	MATRIX tmpmat;
+	float* vp;
+	vmat = &mat_proj;
+	vp = (float*)vmat;
+	float* mat = (float*)GetCurrentMatrixPtr();
+
+	switch (bm->vp_flag) {
+	case BMSCR_VPFLAG_2D:
+		//	2D projection mode
+		UnitMatrix();
+		RotZ(bm->vp_viewrotate[2]);
+		GetCurrentMatrix(&tmpmat);
+		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)_bgsx / bm->vp_viewscale[0], (float)_bgsy / bm->vp_viewscale[1], 0.0f, 1.0f);
+		MulMatrix(&tmpmat);
+		break;
+	case BMSCR_VPFLAG_3D:
+		//	3D projection mode
+		UnitMatrix();
+		RotZ(bm->vp_viewrotate[2]);
+		RotY(bm->vp_viewrotate[1]);
+		RotX(bm->vp_viewrotate[0]);
+		Scale(bm->vp_viewscale[0], bm->vp_viewscale[1], bm->vp_viewscale[2]);
+		Trans(bm->vp_viewtrans[0], bm->vp_viewtrans[1], bm->vp_viewtrans[2]);
+		GetCurrentMatrix(&tmpmat);
+		PerspectiveFOV(bm->vp_view3dprm[0], bm->vp_view3dprm[1], bm->vp_view3dprm[2], 0.0f, 0.0f, (float)_bgsx / 10, (float)_bgsy / 10);
+		//PerspectiveFOV(45.0f, 1.0f, 500.0f, 0.0f, 0.0f, (float)nDestWidth / 10, (float)nDestHeight / 10);
+		//PerspectiveWithZBuffer(10.0f, 0.0f, 60.0f, 1.0f, 0.0f);
+		MulMatrix(&tmpmat);
+		break;
+	case BMSCR_VPFLAG_MATRIX:
+		//	user matrix mode
+		mat = &bm->vp_viewtrans[0];
+		break;
+	case BMSCR_VPFLAG_NOUSE:
+	default:
+		return;
+	}
+
+	//	mat_projに設定する
+	for (i = 0; i < 16; i++) {
+		*vp++ = *mat++;
+	}
+
+	D3DXMATRIX matrixProj;
+	Mat2D3DMAT(&matrixProj, vmat);
+	d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
+
+	//	投影マトリクスの逆行列を設定する
+	//D3DXMatrixInverse(&InvViewport, NULL, &matrixProj);
+	SetCurrentMatrix(vmat);
+	InverseMatrix(&mat_unproj);
+
 }
 
 
@@ -2304,6 +2349,29 @@ void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 	//	ビュー変換後の座標 -> 元の座標に変換する
 	//	(タッチ位置再現のため)
 	//
+	VECTOR v1,v2;
+	//if (bm->vp_flag == 0) return;
+	v1.x = (float)*xaxis;
+	v1.y = (float)(_bgsy-*yaxis);
+	v1.z = 1.0f;
+	v1.w = 0.0f;
+
+	v1.x -= _bgsx/2;
+	v1.y -= _bgsy/2;
+	v1.x *= 2.0f / float(_bgsx);
+	v1.y *= 2.0f / float(_bgsy);
+
+//	*xaxis = (int)(v1.x);
+//	*yaxis = (int)(v1.y);
+
+//	D3DXVECTOR3 a1,a2;
+//	D3DXVec3TransformCoord(&a2, &D3DXVECTOR3(v1.x, v1.y, v1.z), &InvViewport);
+//	*xaxis = (int)a2.x;
+//	*yaxis = (int)a2.y;
+
+	ApplyMatrix(&mat_unproj, &v2, &v1);
+	*xaxis = (int)v2.x;
+	*yaxis = (int)v2.y;
 }
 
 
