@@ -64,11 +64,15 @@
 #else
 
 //#include <GLES2/gl2.h>
+//#include <GLES2/gl2ext.h>
 //#include <EGL/egl.h>
+
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glext.h>
+
 //#include <GL/glut.h>
+
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_opengl.h"
@@ -228,8 +232,6 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	_uvfix = 0;
 
 	GeometryInit();
-    //色
-    hgio_setColor( 0 );
 
 	//グラフィックス設定
 	_flipMode = GRAPHICS_FLIP_NONE;
@@ -358,7 +360,7 @@ void hgio_autoscale( int mode )
 		_scaleY = adjy;
 		break;
 	}
-    Alertf( "Scale(%f,%f)",_scaleX,_scaleY );
+    //Alertf( "Scale(%f,%f)",_scaleX,_scaleY );
 }
 
 
@@ -381,7 +383,7 @@ void hgio_reset( void )
 	ox = (float)_bgsx;
 	oy = (float)_bgsy;
 
-#if defined(HSPRASPBIAN)
+#if defined(HSPRASPBIAN) || defined(HSPNDK)
 	glOrthof( 0, ox, -oy, 0,-100,100);
 #else
 	glOrtho( 0, ox, -oy, 0,-100,100);
@@ -399,9 +401,6 @@ void hgio_reset( void )
     glViewport((float)_originX,(float)_originY,ox * _scaleX,oy * _scaleY);
 //	glViewport(_originX,_originY, ox, oy );
 //	glViewport(_originX,-_originY, _sizex, _sizey );
-    
-
-
 
     //モデリング変換
     glMatrixMode(GL_MODELVIEW);
@@ -577,6 +576,76 @@ void hgio_setFilterMode( int mode )
     }
 }
 
+//色の指定
+/*
+static void hgio_setColorTex( int rval, int gval ,int bval )
+{
+	GLfloat r = FVAL_BYTE1 * rval;
+	GLfloat g = FVAL_BYTE1 * gval;
+	GLfloat b = FVAL_BYTE1 * bval;
+	GLfloat *flp = _panelColorsTex;
+	for (int i=0;i<4;i++) {
+		*flp++ = r;
+		*flp++ = g;
+		*flp++ = b;
+		*flp++ = 1.0f;
+	}
+}
+*/
+
+static void setColorTex_reset( float alpha )
+{
+	GLfloat *flp = _panelColorsTex;
+	for (int i=0;i<4;i++) {
+		*flp++ = 1.0f;
+		*flp++ = 1.0f;
+		*flp++ = 1.0f;
+		*flp++ = alpha;
+	}
+}
+
+static void setColorTex_color( float alpha )
+{
+	GLfloat *flp = _panelColorsTex;
+	GLfloat r,g,b;
+	if ( mainbm != NULL ) {
+		r = mainbm->colorvalue[0];
+		g = mainbm->colorvalue[1];
+		b = mainbm->colorvalue[2];
+	} else {
+		r = 1.0f;
+		g = 1.0f;
+		b = 1.0f;
+	}
+	for (int i=0;i<4;i++) {
+		*flp++ = r;
+		*flp++ = g;
+		*flp++ = b;
+		*flp++ = alpha;
+	}
+}
+
+static void setColorTex_mulcolor( float alpha )
+{
+	GLfloat *flp = _panelColorsTex;
+	GLfloat r,g,b;
+	if ( mainbm != NULL ) {
+		r = mainbm->mulcolorvalue[0];
+		g = mainbm->mulcolorvalue[1];
+		b = mainbm->mulcolorvalue[2];
+	} else {
+		r = 1.0f;
+		g = 1.0f;
+		b = 1.0f;
+	}
+	for (int i=0;i<4;i++) {
+		*flp++ = r;
+		*flp++ = g;
+		*flp++ = b;
+		*flp++ = alpha;
+	}
+}
+
 static void setBlendMode( int mode )
 {
 	// mode=2 はアルファあり半透明レート無効なのでアルファを 1.0 で埋める
@@ -610,114 +679,27 @@ static void setBlendMode( int mode )
     }
 }
 
-void hgio_setTexBlendMode( int mode, int aval )
+static void hgio_setTexBlendMode( int mode, int aval )
 {
     //ブレンドモード設定
 	setBlendMode( mode );
+
     if ( mode <= 1 ) {
         glDisableClientState(GL_COLOR_ARRAY);
 	} else {
-		GLfloat alpha = mode == 2 ? 1.0f : FVAL_BYTE1*( aval&0xff );
-		_panelColorsTex[3]=_panelColorsTex[7]=_panelColorsTex[11]=_panelColorsTex[15]=alpha;
+		GLfloat alpha;
+	    if ( mode >= 3 ) {
+			alpha = FVAL_BYTE1*( aval );
+		} else {
+			alpha = 1.0f;
+		}
+		setColorTex_mulcolor(alpha);
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(4,GL_FLOAT,0,_panelColorsTex);
     }
+
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,_filter); 
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,_filter); 
-}
-/*
-void hgio_setBlendModeFlat( int mode )
-{
-    //ブレンドモード設定(単色)
-    switch( mode ) {
-        case 0:                     //no blend
-            glDisable(GL_BLEND);
-            break;
-        case 5:                     //add
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            break;
-        case 6:                     //sub
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_REVERSE_SUBTRACT_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            break;
-        default:                    //normal blend
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
-            break;
-    }
-}
-
-void hgio_setBlendModeFlatAlpha( int mode )
-{
-    //ブレンドモード設定(単色+Alpha)
-    switch( mode ) {
-        case 0:                     //no blend
-            glDisable(GL_BLEND);
-            break;
-        case 3:                     //blend
-        case 4:                     //blend
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-            break;
-        case 5:                     //add
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            break;
-        case 6:                     //sub
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_REVERSE_SUBTRACT_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            break;
-        default:                    //normal blend
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
-            break;
-    }
-}
-*/
-
-//色の指定
-void hgio_setColor( int color )
-{
-	_color.r = RGBA2R(color);
-	_color.g = RGBA2G(color);
-	_color.b = RGBA2B(color);
-	_color.a = 1.0f;
-}
-
-void hgio_setColorTex( int rval, int gval ,int bval )
-{
-	GLfloat r = FVAL_BYTE1 * rval;
-	GLfloat g = FVAL_BYTE1 * gval;
-	GLfloat b = FVAL_BYTE1 * bval;
-	GLfloat *flp = _panelColorsTex;
-	for (int i=0;i<4;i++) {
-		*flp++ = r;
-		*flp++ = g;
-		*flp++ = b;
-		*flp++ = 1.0f;
-	}
 }
 
 //ライン幅の指定
@@ -891,106 +873,6 @@ bool hgio_getkey( int kcode )
 #endif
 
 
-int hgio_font( char *fontname, int size, int style )
-{
-#ifdef HSPLINUX
-	#ifdef USE_JAVA_FONT
-	if ( font_size != size ) {
-		TexFontInit( fontname, size );
-	}
-	#endif
-#endif
-
-	font_size = size;
-	font_style = style;
-#ifdef HSPIOS
-    gb_font( size, style, fontname );
-#endif
-
-	return 0;
-}
-
-
-static void hgio_messub( BMSCR *bm, char *str1 )
-{
-	// print per line
-	if ( bm->cy >= bm->sy ) return;
-	hgio_putTexFont( bm->cx, bm->cy, str1, bm->color );
-	if ( mes_sx > bm->printsizex ) bm->printsizex = mes_sx;
-	bm->printsizey += mes_sy;
-	bm->cy += mes_sy;
-}
-
-
-int hgio_mes( BMSCR *bm, char *str1 )
-{
-#if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
-
-	int spcur;
-	int org_cy;
-	unsigned char *p;
-	unsigned char *st;
-	unsigned char a1;
-	unsigned char a2;
-	unsigned char bak_a1;
-
-	org_cy = bm->cy;
-	bm->printsizex = 0;
-	bm->printsizey = 0;
-
-	p = (unsigned char *)str1;
-	st = p;
-	spcur = 0;
-
-	while(1) {
-		a1 = *p;
-		if ( a1 == 0 ) break;
-		if ( a1 == 13 ) {
-			bak_a1 = a1; *p = 0;		// 終端を仮設定
-			hgio_messub( bm, (char *)st );
-			*p = bak_a1;
-			p++; st = p; spcur = 0;		// 終端を戻す
-			a1 = *p;
-			if ( a1 == 10 ) p++;
-			continue;
-		}
-		if ( a1 == 10 ) {
-			bak_a1 = a1; *p = 0;		// 終端を仮設定
-			hgio_messub( bm, (char *)st );
-			*p = bak_a1;
-			p++; st = p; spcur = 0;		// 終端を戻す
-			continue;
-		}
-/*		
-		if (a1&128) {					// UTF8チェック
-			while(1) {
-				a2 = *p;
-				if ( a2==0 ) break;
-				if ( ( a2 & 0xc0 ) != 0x80 ) break;
-				p++; spcur++;
-			}
-		} else {
-			p++; spcur++;
-		}
-*/
-		p++; spcur++;
-	}
-
-	if ( spcur > 0 ) {
-		hgio_messub( bm, (char *)st );
-	}
-
-	bm->cy = org_cy;
-
-#endif
-
-#ifdef HSPIOS
-    gb_mes( bm, str1 );
-#endif
-	return 0;
-}
-
-
 int hgio_texload( BMSCR *bm, char *fname )
 {
 	TEXINF *t;
@@ -1038,11 +920,23 @@ static void setCurrentColor( GLfloat *colors, int vnum )
 {
 	GLfloat *flp;
 	flp = colors;
+	GLfloat r,g,b,a;
+
+	if ( mainbm ) {
+		r = mainbm->colorvalue[0];
+		g = mainbm->colorvalue[1];
+		b = mainbm->colorvalue[2];
+	} else {
+		r = 1.0f;
+		g = 1.0f;
+		b = 1.0f;
+	}
+
 	for (int i=0;i<vnum;i++) {
-		*flp++ = _color.r;
-		*flp++ = _color.g;
-		*flp++ = _color.b;
-		*flp++ = _color.a;
+		*flp++ = r;
+		*flp++ = g;
+		*flp++ = b;
+		*flp++ = 1.0f;
 	}
 
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -1163,17 +1057,7 @@ void hgio_line( BMSCR *bm, float x, float y )
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 
-	hgio_setColor( bm->color );
-
-	//カラー配列情報
-	GLfloat *flp;
-	flp = _line_colors;
-	for (int i=0;i<2;i++) {
-		*flp++ = _color.r;
-		*flp++ = _color.g;
-		*flp++ = _color.b;
-		*flp++ = _color.a;
-	}
+	setCurrentColor(_line_colors,2);
 
 	linebasex = x + 0.375f;
 	linebasey = y + 0.375f;
@@ -1215,7 +1099,7 @@ void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 
 	ChangeTex( -1 );
-	hgio_setColor( bm->color );
+	//hgio_setColor( bm->color );
 	hgio_boxfill( x1, y1, (x2-x1), (y2-y1) );
 }
 
@@ -1234,7 +1118,7 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 	yy = ((float)y1) + ry;
 
 	ChangeTex( -1 );
-	hgio_setColor( bm->color );
+	//hgio_setColor( bm->color );
 	if ( mode ) {
 		hgio_circleFill( xx, yy, rx, ry );
 	} else {
@@ -1359,7 +1243,11 @@ void hgio_fcopy( float distx, float disty, short xx, short yy, short srcsx, shor
     glTexCoordPointer( 2,GL_FLOAT,0,uvf2D );
 
 	setBlendMode( 3 );
-	hgio_panelcolor( colors, color, 255 );
+	setColorTex_color(255);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glColorPointer(4,GL_FLOAT,0,_panelColorsTex);
+
+//	hgio_panelcolor( colors, color, 255 );
 	
 //    glDisableClientState(GL_COLOR_ARRAY);
     glDrawArrays(GL_TRIANGLE_STRIP,0,4);
@@ -1558,7 +1446,7 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
     glTexCoordPointer(2,GL_FLOAT,0,uvf2D);
 
 	hgio_setTexBlendMode( bm->gmode, bm->gfrate );
-    //glDisableClientState(GL_COLOR_ARRAY);
+//    glDisableClientState(GL_COLOR_ARRAY);
     glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }
 
@@ -2024,7 +1912,7 @@ void hgio_test(void)
     hgio_render_start();
     //hgio_clear();
     
-	hgio_setColor( 0xff00ff );
+	//hgio_setColor( 0xff00ff );
 	hgio_boxfill( 100.1,100.2,200.5,50.2 );
 	//hgio_boxfill( 100,200,100,10 );
 	//hgio_setColor( 0xffffff );
@@ -2039,6 +1927,105 @@ void hgio_test(void)
 }
 
 
+int hgio_font( char *fontname, int size, int style )
+{
+#ifdef HSPLINUX
+	#ifdef USE_JAVA_FONT
+	if ( font_size != size ) {
+		TexFontInit( fontname, size );
+	}
+	#endif
+#endif
+
+	font_size = size;
+	font_style = style;
+#ifdef HSPIOS
+    gb_font( size, style, fontname );
+#endif
+
+	return 0;
+}
+
+
+static void hgio_messub( BMSCR *bm, char *str1 )
+{
+	// print per line
+	if ( bm->cy >= bm->sy ) return;
+	hgio_putTexFont( bm->cx, bm->cy, str1, bm->color );
+	if ( mes_sx > bm->printsizex ) bm->printsizex = mes_sx;
+	bm->printsizey += mes_sy;
+	bm->cy += mes_sy;
+}
+
+
+int hgio_mes( BMSCR *bm, char *str1 )
+{
+#if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+
+	int spcur;
+	int org_cy;
+	unsigned char *p;
+	unsigned char *st;
+	unsigned char a1;
+	unsigned char a2;
+	unsigned char bak_a1;
+
+	org_cy = bm->cy;
+	bm->printsizex = 0;
+	bm->printsizey = 0;
+
+	p = (unsigned char *)str1;
+	st = p;
+	spcur = 0;
+
+	while(1) {
+		a1 = *p;
+		if ( a1 == 0 ) break;
+		if ( a1 == 13 ) {
+			bak_a1 = a1; *p = 0;		// 終端を仮設定
+			hgio_messub( bm, (char *)st );
+			*p = bak_a1;
+			p++; st = p; spcur = 0;		// 終端を戻す
+			a1 = *p;
+			if ( a1 == 10 ) p++;
+			continue;
+		}
+		if ( a1 == 10 ) {
+			bak_a1 = a1; *p = 0;		// 終端を仮設定
+			hgio_messub( bm, (char *)st );
+			*p = bak_a1;
+			p++; st = p; spcur = 0;		// 終端を戻す
+			continue;
+		}
+/*		
+		if (a1&128) {					// UTF8チェック
+			while(1) {
+				a2 = *p;
+				if ( a2==0 ) break;
+				if ( ( a2 & 0xc0 ) != 0x80 ) break;
+				p++; spcur++;
+			}
+		} else {
+			p++; spcur++;
+		}
+*/
+		p++; spcur++;
+	}
+
+	if ( spcur > 0 ) {
+		hgio_messub( bm, (char *)st );
+	}
+
+	bm->cy = org_cy;
+
+#endif
+
+#ifdef HSPIOS
+    gb_mes( bm, str1 );
+#endif
+	return 0;
+}
+
 
 /*-------------------------------------------------------------------------------*/
 
@@ -2047,58 +2034,6 @@ void hgio_setcenter( float x, float y )
 {
 	center_x = x;
 	center_y = y;
-}
-
-
-void hgio_SetAlphaModeDG( int efxprm )
-{
-	int alphaop, aval;
-	alphaop = efxprm >> 8;
-	aval = efxprm & 0xff;
-
-    //ブレンドモード設定
-    switch( alphaop ) {
-        case 0:                     //blend+alpha
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-            break;
-        case 1:                     //blend+alpha
-        case 5:                     //add
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-            aval = 0xff;
-            break;
-		case 2:
-		case 6:
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_ADD_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            break;
-        case 3:                     //sub
-        case 7:                     //sub
-        case 4:                     //sub
-        case 8:                     //sub
-            glEnable(GL_BLEND);
-#ifdef HSPIOS
-            glBlendEquationOES(GL_FUNC_REVERSE_SUBTRACT_OES);
-#endif
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            break;
-    }
-	_panelColorsTex[3] = _panelColorsTex[4+3] = _panelColorsTex[8+3] = _panelColorsTex[12+3] = FVAL_BYTE1 * (aval&0xff);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(4,GL_FLOAT,0,_panelColorsTex);
-
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,_filter); 
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,_filter); 
 }
 
 
