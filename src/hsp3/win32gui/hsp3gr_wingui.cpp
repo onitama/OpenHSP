@@ -302,6 +302,9 @@ static int sysinfo( int p2 )
 		freehc(&p);
 		fl = HSPVAR_FLAG_STR;
 		break;
+	case 3:
+		*(int*)p3 = ctx->language;
+		break;
 	case 16:
 		*(int *)p3 = (int)si.dwProcessorType;
 		break;

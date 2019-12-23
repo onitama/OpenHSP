@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hsp3config.h"
-#include "hsp3debug.h"
+#include "hsp3code.h"
 #include "supio.h"
 
 /*------------------------------------------------------------*/
@@ -25,8 +25,8 @@
 /*------------------------------------------------------------*/
 
 #ifdef HSPDEBUG
-#ifdef JPNMSG
-static char *err[]={
+
+static char *err_jp[]={
 	"",												// 0
 	"システムエラーが発生しました",					// 1
 	"文法が間違っています",							// 2
@@ -71,7 +71,7 @@ static char *err[]={
 	"関数を命令として記述しています。\n(HSP2から関数化された名前を使用している可能性があります)",			// 41
 	"*"
 };
-#else
+
 static char *err[]={
 	"",									// 0
 	"Unknown system error",				// 1
@@ -117,11 +117,15 @@ static char *err[]={
 	"Invalid syntax for function",		// 41
 	"*"
 };
-#endif
 
 char *hspd_geterror( HSPERROR error )
 {
-	if ((error<0)||(error>=HSPERR_MAX)) return err[0];
+	if ((error<0)||(error>=HSPERR_MAX)) return "";
+
+	HSPCTX *ctx = code_getctx();
+	int lang = ctx->language;
+
+	if (lang== HSPCTX_LANGUAGE_JP) return err_jp[error];
 	return err[error];
 }
 
@@ -131,11 +135,14 @@ static char errmsg[256];
 
 char *hspd_geterror( HSPERROR error )
 {
-#ifdef JPNMSG
-	sprintf( errmsg, "内部エラーが発生しました(%d)", (int)error );
-#else
+	HSPCTX* ctx = code_getctx();
+	int lang = ctx->language;
+
+	if (lang == 1) {
+		sprintf(errmsg, "内部エラーが発生しました(%d)", (int)error);
+		return errmsg;
+	}
 	sprintf( errmsg, "Internal Error(%d)", (int)error );
-#endif
 	return errmsg;
 }
 
