@@ -7,8 +7,11 @@
 #include "gpcam.h"
 #include "gpphy.h"
 #include "gpevent.h"
+#include "gptexmes.h"
 
 using namespace gameplay;
+
+//#define USE_GPBFONT
 
 /**
  * Main game class.
@@ -352,7 +355,8 @@ public:
 	void clearFrameBuffer(void);
 
 	void drawTest( int matid );
-	int drawFont( int x, int y, char *text, Vector4 *p_color, int size );
+	void setFont(char *fontname, int size, int style);
+	int drawFont(int x, int y, char* text, Vector4* p_color, int* out_ysize);
 
 	int getObjectVector( int objid, int moc, Vector4 *prm );
 	void getNodeVector( gpobj *obj, Node *node, int moc, Vector4 *prm );
@@ -423,11 +427,28 @@ public:
 	char *getSpecularLightDefines(void) { return (char *)splight_defines.c_str(); }
 
 	/**
-	* update projection parameter
+	* 2D projection parameter
 	*/
 	void make2DRenderProjection(Matrix *mat, int sx, int sy);
 	void update2DRenderProjection(Material* material, Matrix *mat);
-	void update2DRenderProjectionSystem(Matrix *mat);
+	void update2DRenderProjectionSystem(Matrix* mat);
+	void setUser2DRenderProjectionSystem(Matrix* mat, bool updateinv);
+	void convert2DRenderProjection(Vector4 &pos);
+
+	/**
+	* Message texture manager
+	*/
+	void texmesInit(void);
+	void texmesTerm(void);
+	void texmesProc(void);
+	gptexmes* addTexmes(void);
+	gptexmes* texmesGet(int id);
+	int str2hash(char* msg, int* out_len);
+	int texmesGetCache(char* msg, short mycache);
+	int texmesRegist(char* msg);
+	unsigned char* texmesGetFont(char* msg, int* out_sx, int *out_sy, int* out_tsx, int* out_tsy);
+	void texmesDraw(int x, int y, char* msg, Vector4* p_color);
+	unsigned char *texmesBuffer(int size);
 
 protected:
     /**
@@ -468,8 +489,11 @@ private:
     bool updateNodeMaterial( Node* node, Material *material );
 	bool drawScene(Node* node);
 	bool init2DRender( void );
+	int Get2N(int val);
 
+#ifdef USE_GPBFONT
 	Font*	mFont;
+#endif
 	float _colrate;
 	int _tex_width;
 	int _tex_height;
@@ -493,6 +517,7 @@ private:
 	// gpevent
 	int _maxevent;
 	gpevent *_gpevent;
+
 
 	// default scene
 	int _curscene;
@@ -524,13 +549,27 @@ private:
 	Vector3 border2;		// BORDER座標2
 
 	// preset flat mesh
-    Matrix _projectionMatrix2D;					// 2D projection Matrix (単色のシステム用)
-    MeshBatch* _meshBatch;						// MeshBatch for Polygon
-    MeshBatch* _meshBatch_line;					// MeshBatch for Line
+	int proj2Dcode;								// 2D projection Matrix ID code
+	Matrix _projectionMatrix2Dpreset;			// 2D projection Matrix (画面全体用)
+	Matrix _projectionMatrix2D;					// 2D projection Matrix (システム用)
+	Matrix _projectionMatrix2Dinv;				// 2D projection Matrix (逆変換用)
+	MeshBatch* _meshBatch;						// MeshBatch for Polygon
+	MeshBatch* _meshBatch_line;					// MeshBatch for Line
+	MeshBatch* _meshBatch_font;					// MeshBatch for Font
+	Material* _fontMaterial;
 
 	Effect *_spriteEffect;
 	float _bufPolyColor[BUFSIZE_POLYCOLOR];
 	float _bufPolyTex[BUFSIZE_POLYTEX];
+
+	// gptexmes
+	int _maxtexmes;
+	int _area_px, _area_py;
+	int _fontsize, _fontstyle;
+	gptexmes* _gptexmes;
+	int _texmesbuf_max;
+	unsigned char* _texmesbuf;
+	std::string	_fontname;
 
 	// preset light defines
 	std::string	light_defines;
@@ -541,7 +580,6 @@ private:
 	std::string	user_fsh;
 	std::string	user_defines;
 
-	//Node *_nodetemp;
 };
 
 #endif

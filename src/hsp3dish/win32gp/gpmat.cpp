@@ -719,7 +719,9 @@ Material *gamehsp::makeMaterialTex2D(Texture *texture, int matopt)
 
     // Bind the texture to the material as a sampler
     Texture::Sampler* sampler = Texture::Sampler::create(texture); // +ref texture
-    mesh_material->getParameter(samplerUniform->getName())->setValue(sampler);
+
+	sampler->setFilterMode(Texture::Filter::NEAREST, Texture::Filter::NEAREST);		// 2Dはデフォルトでフィルタなし
+	mesh_material->getParameter(samplerUniform->getName())->setValue(sampler);
 
 	/*
 	Material* mesh_material = Material::create( SPRITE_VSH, SPRITE_FSH, NULL );

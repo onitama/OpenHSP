@@ -4,10 +4,11 @@
 #include "../supio.h"
 #include "../sysreq.h"
 
-// Default sprite shaders
-#define SPRITE_VSH "res/shaders/sprite.vert"
-#define SPRITE_FSH "res/shaders/sprite.frag"
+#include "shader_sprite.h"
 
+// Default sprite shaders
+//#define SPRITE_VSH "res/shaders/sprite.vert"
+//#define SPRITE_FSH "res/shaders/sprite.frag"
 #define SPRITECOL_VSH "res/shaders/spritecol.vert"
 #define SPRITECOL_FSH "res/shaders/spritecol.frag"
 
@@ -239,24 +240,29 @@ gpevent *gpobj::GetEvent(int entry)
 gamehsp::gamehsp()
 {
 	// コンストラクタ
+#ifdef USE_GPBFONT
 	mFont = NULL;
+#endif
 	_maxobj = 0;
 	_gpobj = NULL;
 	_gpmat = NULL;
 	_gpevent = NULL;
+	_gptexmes = NULL;
+	_texmesbuf = NULL;
 	_colrate = 1.0f / 255.0f;
 	_scene = NULL;
 	_meshBatch = NULL;
 	_meshBatch_line = NULL;
+	_meshBatch_font = NULL;
 	_spriteEffect = NULL;
-
 }
 
 void gamehsp::initialize()
 {
+#ifdef USE_GPBFONT
 	// フォント作成
 	mFont = Font::create("res/font.gpb");
-
+#endif
 	resetScreen();
 }
 
@@ -266,7 +272,9 @@ void gamehsp::finalize()
 	//
 	deleteAll();
 
+#ifdef USE_GPBFONT
 	SAFE_RELEASE(mFont);
+#endif
 }
 
 
@@ -274,6 +282,8 @@ void gamehsp::deleteAll( void )
 {
 	// release
 	//
+	texmesTerm();
+
 	if ( _gpobj ) {
 		int i;
 		for(i=0;i<_maxobj;i++) { deleteObj( i ); }
@@ -299,7 +309,7 @@ void gamehsp::deleteAll( void )
 		delete _meshBatch;
 		_meshBatch = NULL;
 	}
-	if ( _meshBatch_line ) {
+	if (_meshBatch_line) {
 		delete _meshBatch_line;
 		_meshBatch_line = NULL;
 	}
@@ -328,10 +338,14 @@ void gamehsp::render(float elapsedTime)
 	updateViewport(_viewx1, _viewy1, _viewx2, _viewy2);
 
 	// プロジェクションの初期化
-	update2DRenderProjectionSystem(&_projectionMatrix2D);
+	update2DRenderProjectionSystem(&_projectionMatrix2Dpreset);
 
 	// 画面クリア
 	clearFrameBuffer();
+
+	// 使用するマトリクスをコピー
+	_projectionMatrix2D = _projectionMatrix2Dpreset;
+	_projectionMatrix2D.invert(&_projectionMatrix2Dinv);
 
 }
 
@@ -485,6 +499,10 @@ void gamehsp::resetScreen( int opt )
 	else {
 		setFixedTime(fixedrate);
 	}
+
+	// gptexmat作成
+	texmesInit();
+
 }
 
 
@@ -572,12 +590,14 @@ bool gamehsp::init2DRender( void )
 {
 	// 2D用の初期化
 	//
+	proj2Dcode = -2;
 
 	// 2D用のプロジェクション
-	make2DRenderProjection(&_projectionMatrix2D,getWidth(),getHeight());
+	make2DRenderProjection(&_projectionMatrix2Dpreset,getWidth(),getHeight());
 
 	// スプライト用のshader
-	_spriteEffect = Effect::createFromFile(SPRITE_VSH, SPRITE_FSH);
+	_spriteEffect = Effect::createFromSource(intshd_sprite_vert, intshd_sprite_frag);
+	//_spriteEffect = Effect::createFromFile(SPRITE_VSH, SPRITE_FSH);
 	if ( _spriteEffect == NULL ) {
         GP_ERROR("2D shader initalize failed.");
         return false;
@@ -592,12 +612,11 @@ bool gamehsp::init2DRender( void )
     };
     unsigned int elementCount = sizeof(elements) / sizeof(VertexFormat::Element);
     _meshBatch = MeshBatch::create(VertexFormat(elements, elementCount), Mesh::TRIANGLE_STRIP, mesh_material, true, 16, 16 );
+
 	SAFE_RELEASE(mesh_material);
 
 	mesh_material = make2DMaterialForMesh();
 	_meshBatch_line = MeshBatch::create(VertexFormat(elements, elementCount), Mesh::LINES, mesh_material, true, 4, 4 );
-	SAFE_RELEASE(mesh_material);
-
 
 	int i;
 	for(i=0;i<BUFSIZE_POLYCOLOR;i++) {
@@ -607,6 +626,7 @@ bool gamehsp::init2DRender( void )
 		_bufPolyTex[i] = 0.0f;
 	}
 
+	SAFE_RELEASE(mesh_material);
 	return true;
 }
 
@@ -615,7 +635,7 @@ void gamehsp::make2DRenderProjection(Matrix *mat,int sx, int sy)
 {
 	//	2Dシステム用のプロジェクションを作成する
 	Matrix::createOrthographicOffCenter(0.0f, (float)sx, (float)sy, 0.0f, -1.0f, 1.0f, mat);
-	mat->translate(0.5f, 0.0f, 0.0f);						// 座標誤差修正のため0.5ドットずらす
+	//mat->translate(0.5f, 0.0f, 0.0f);						// 座標誤差修正のため0.5ドットずらす
 }
 
 
@@ -634,6 +654,31 @@ void gamehsp::update2DRenderProjectionSystem(Matrix *mat)
 	//	2Dシステム用のプロジェクションを再設定する
 	if (_meshBatch) update2DRenderProjection(_meshBatch->getMaterial(), mat);
 	if (_meshBatch_line) update2DRenderProjection(_meshBatch_line->getMaterial(), mat);
+	if (_meshBatch_font) update2DRenderProjection(_fontMaterial, &_projectionMatrix2D);
+
+}
+
+
+void gamehsp::setUser2DRenderProjectionSystem(Matrix* mat, bool updateinv)
+{
+	//	ユーザー用のプロジェクションを設定する
+	_projectionMatrix2D = *mat;
+	update2DRenderProjectionSystem(&_projectionMatrix2D);
+	if (updateinv) {
+		proj2Dcode--;
+		_projectionMatrix2D.invert(&_projectionMatrix2Dinv);
+	}
+}
+
+
+void gamehsp::convert2DRenderProjection(Vector4& pos)
+{
+	//	ユーザー用のプロジェクションを逆変換する
+	Vector4 result;
+	_projectionMatrix2Dinv.transformVector(pos,&result);
+	pos.x = result.x;
+	pos.y = result.y;
+	pos.z = result.z;
 }
 
 
@@ -2770,9 +2815,9 @@ float *gamehsp::startPolyTex2D(gpmat *mat, int material_id )
 	}
 	else {
 		//	メイン画面用の2Dプロジェクション
-		if (mat->_target_material_id != -2) {
+		if (mat->_target_material_id != proj2Dcode ) {
 			update2DRenderProjection(mat->_material, &_projectionMatrix2D);
-			mat->_target_material_id = -2;
+			mat->_target_material_id = proj2Dcode;
 		}
 	}
 
@@ -2855,13 +2900,13 @@ void gamehsp::drawTest( int matid )
 	float points[] ={
 	        0,100,0, 1,1,1,1,
 	        0,0,0, 1,1,1,1,
-	        100,100,0, 1,1,1,1,
-	        100,0,0, 1,1,1,1,
+	        100,100,0, 1,1,0,1,
+	        100,0,0, 1,1,0,1,
 
 	        0,300,0, 1,1,1,0,
 	        0,200,0, 1,1,1,0,
-	        100,300,0, 1,1,1,1,
-	        100,200,0, 1,1,1,1,
+	        100,300,0, 1,0,1,1,
+	        100,200,0, 1,0,1,1,
 	};
 
     //SPRITE_ADD_VERTEX(v[0], downLeft.x, downLeft.y, z, u1, v1, color.x, color.y, color.z, color.w);
@@ -2894,12 +2939,18 @@ void gamehsp::drawTest( int matid )
 Material* gamehsp::make2DMaterialForMesh( void )
 {
 	RenderState::StateBlock *state;
-	Material* mesh_material = Material::create( SPRITECOL_VSH, SPRITECOL_FSH, NULL );
+	Material* mesh_material = NULL;
+	Effect* _spritecol = Effect::createFromSource(intshd_spritecol_vert, intshd_spritecol_frag);
+//	Effect* _spritecol = Effect::createFromFile(SPRITECOL_VSH, SPRITECOL_FSH);
+	if (_spritecol) {
+		mesh_material = Material::create(_spritecol);
+	}
+	//Material* mesh_material = Material::create(SPRITECOL_VSH, SPRITECOL_FSH, NULL);
 	if ( mesh_material == NULL ) {
         GP_ERROR("2D initalize failed.");
         return NULL;
 	}
-	update2DRenderProjection(mesh_material, &_projectionMatrix2D);
+	update2DRenderProjection(mesh_material, &_projectionMatrix2Dpreset);
 
 	state = mesh_material->getStateBlock();
 	state->setCullFace(false);
@@ -2909,19 +2960,6 @@ Material* gamehsp::make2DMaterialForMesh( void )
 	state->setBlendSrc(RenderState::BLEND_SRC_ALPHA);
 	state->setBlendDst(RenderState::BLEND_ONE_MINUS_SRC_ALPHA);
 	return mesh_material;
-}
-
-
-int gamehsp::drawFont( int x, int y, char *text, Vector4 *p_color, int size )
-{
-	// フォントで描画
-	int xsize;
-	if ( mFont == NULL ) return 0;
-
-    mFont->start();
-    xsize = mFont->drawText(text, x, y, *p_color, size );
-    mFont->finish();
-	return xsize;
 }
 
 
@@ -2976,3 +3014,4 @@ int gamehsp::convertAxis(Vector3 *res, Vector3 *pos, int mode)
 
 	return 0;
 }
+

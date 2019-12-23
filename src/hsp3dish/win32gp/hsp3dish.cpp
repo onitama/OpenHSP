@@ -271,6 +271,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		if ( exinfo != NULL ) {
 			bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
 			x = LOWORD(lParam); y = HIWORD(lParam);
+			hgio_cnvview((BMSCR *)bm, &x, &y);
 			bm->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
 			bm->savepos[BMSCR_SAVEPOS_MOSUEY] = y;
 			bm->UpdateAllObjects();
@@ -1140,6 +1141,7 @@ int hsp3dish_reset(void)
 	hsp3dish_setdevinfo( devinfo );
 	hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
 
+	game->resetScreen();
 	gameplay::Logger::log(gameplay::Logger::LEVEL_INFO, "HGIMG4 %s initalized : %s\n", hspver, devinfo->devname);
 
 #ifdef HSPDEBUG

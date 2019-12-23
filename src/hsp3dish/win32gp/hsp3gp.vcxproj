@@ -295,6 +295,7 @@
     <ClCompile Include="gplgt.cpp" />
     <ClCompile Include="gpmat.cpp" />
     <ClCompile Include="gpphy.cpp" />
+    <ClCompile Include="gptexmes.cpp" />
     <ClCompile Include="hgiox.cpp" />
     <ClCompile Include="hsp3dish.cpp" />
     <ClCompile Include="main.cpp" />
@@ -335,11 +336,13 @@
     <ClInclude Include="gplgt.h" />
     <ClInclude Include="gpmat.h" />
     <ClInclude Include="gpphy.h" />
+    <ClInclude Include="gptexmes.h" />
     <ClInclude Include="hgiox.h" />
     <ClInclude Include="hsp3dish.h" />
     <ClInclude Include="hsp3extlib.h" />
     <ClInclude Include="hsp3ext_win.h" />
     <ClInclude Include="mmman.h" />
+    <ClInclude Include="shader_sprite.h" />
     <ClInclude Include="supio_win.h" />
     <ClInclude Include="webtask_win.h" />
   </ItemGroup>
