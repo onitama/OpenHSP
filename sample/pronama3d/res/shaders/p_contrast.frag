@@ -1,9 +1,12 @@
-#ifdef OPENGL_ES
+#if defined(OPENGL_ES) || defined(GL_ES)
+#extension GL_OES_standard_derivatives : enable
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
 precision mediump float;
 #endif
+#else
+precision mediump float;
 #endif
 
 ///////////////////////////////////////////////////////////
@@ -21,7 +24,7 @@ varying vec4 v_color;
 void main()
 {
    vec4 col = v_color * texture2D(u_texture, v_texCoord);
-   col.rgb = ((col.rgb - 0.5f) * max(u_contrast, 0)) + 0.5f;
+   col.rgb = ((col.rgb - 0.5) * max(u_contrast, 0.0)) + 0.5;
    col.rgb += u_brightness;
    gl_FragColor = col;
 }

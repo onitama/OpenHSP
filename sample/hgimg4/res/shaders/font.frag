@@ -5,6 +5,8 @@ precision highp float;
 #else
 precision mediump float;
 #endif
+#else
+precision mediump float;
 #endif
 
 ///////////////////////////////////////////////////////////
