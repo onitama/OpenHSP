@@ -27,16 +27,6 @@
 
 /*--------------------------------------------------------------------------------*/
 
-HSPCTX hspctx;
-
-HSPCTX *code_getctx(void)
-{
-	hspctx.language=0;
-	return &hspctx;
-}
-
-/*--------------------------------------------------------------------------------*/
-
 #define HSPDEBUG
 #define JPNMSG
 
@@ -46,6 +36,16 @@ char *gethsperror( int error )
 {
 	if ((error<0)||(error>=HSPERR_MAX)) return err[0];
 	return err[error];
+}
+
+/*--------------------------------------------------------------------------------*/
+
+HSPCTX hspctx;
+
+HSPCTX *code_getctx(void)
+{
+	hspctx.language=0;
+	return &hspctx;
 }
 
 /*--------------------------------------------------------------------------------*/
