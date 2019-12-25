@@ -1,4 +1,4 @@
-//		スクリプトエディタ
+//		HSP Script editor support
 //		created by K-K (http://www.binzume.net/)
 //		modified by onitama for OpenHSP
 //
@@ -24,6 +24,16 @@
 #define _MAX_FNAME	256
 #endif
 
+
+/*--------------------------------------------------------------------------------*/
+
+HSPCTX hspctx;
+
+HSPCTX *code_getctx(void)
+{
+	hspctx.language=0;
+	return &hspctx;
+}
 
 /*--------------------------------------------------------------------------------*/
 

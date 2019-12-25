@@ -6,7 +6,4 @@ sudo apt install -y libgtk2.0-dev
 sudo apt install -y libglew-dev
 sudo apt install -y libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
 sudo apt install -y libgles2-mesa-dev libegl1-mesa-dev
-make -f makefile.raspbian
-sudo cp hsed.png /usr/share/pixmaps/
-sudo cp hsed.desktop /usr/share/applications/
-lxpanelctl restart
+make

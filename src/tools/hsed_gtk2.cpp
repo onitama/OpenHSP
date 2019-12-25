@@ -1,4 +1,4 @@
-//		スクリプトエディタ
+//		HSP Script editor for GTK
 //		created by K-K (http://www.binzume.net/)
 //		modified by onitama for OpenHSP
 //

@@ -103,12 +103,12 @@ OBJS_GP = \
 	src/hsp3/strnote.gpo \
 	src/hsp3/linux/hsp3ext_sock.gpo \
 	src/hsp3dish/sysreq.gpo \
-	src/hsp3dish/emscripten/hgtex.gpo \
 	src/hsp3dish/emscripten/mmman.gpo \
 	src/hsp3dish/emscripten/main.gpo \
 	src/hsp3dish/emscripten/stb_image.gpo \
 	src/hsp3dish/win32gp/hgiox.gpo \
 	src/hsp3dish/win32gp/gamehsp.gpo \
+	src/hsp3dish/win32gp/gptexmes.gpo \
 	src/hsp3dish/win32gp/gpevent.gpo \
 	src/hsp3dish/win32gp/gpcam.gpo \
 	src/hsp3dish/win32gp/gplgt.gpo \
