@@ -520,10 +520,10 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	GLuint texture_format = 0;
 	colors = sdlsurf->format->BytesPerPixel;
 
-	unsigned char *p1;
+	unsigned char *p1 = buffer;
 	unsigned char *p2 = (unsigned char *)sdlsurf->pixels;
 
-	//Alertf( "Init:Surface(%d,%d) %d mask%x pitch%d",fontsystem_sx,fontsystem_sy,colors,sdlsurf->format->Rmask,sdlsurf->pitch );
+	//printf( "Init:Surface(%d,%d) %d destpitch%d pitch%d\r\n",fontsystem_sx,fontsystem_sy,colors,pitch,sdlsurf->pitch );
 
 	if (colors == 4) {   // alpha
 		for (int y = 0; y < fontsystem_sy; y++)
@@ -531,10 +531,10 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 			unsigned char *p1x = p1;
 			for (int x = 0; x < sdlsurf->pitch; x++)
 			{
-				*p1x++ = 0xff;
-				//*p1x++ = *p2++;
+				//*p1x++ = 0xff;
+				*p1x++ = *p2++;
 			}
-			p1 += pitch;
+			p1 += pitch * sizeof(int);
 		}
 	} else {			// alphaなし
 		int sx = sdlsurf->pitch / colors;
@@ -548,7 +548,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 				*p1x++ = *p2++;
 				*p1x++ = 0xff;
 			}
-			p1 += pitch;
+			p1 += pitch * sizeof(int);
 		}
 	}
 
@@ -709,7 +709,6 @@ int hgio_render_start( void )
         hgio_setinfo( GINFO_EXINFO_GYRO_Z, gyz );
     }
 #endif
-    
 	//シーンレンダー開始
 	if (game) {
 		if (gselbm == mainbm) {
