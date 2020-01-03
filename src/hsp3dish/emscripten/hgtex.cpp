@@ -46,9 +46,9 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_opengl.h"
 
 #include <emscripten.h>
 #endif
@@ -60,10 +60,10 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_opengl.h"
-#include <SDL/SDL_ttf.h>
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_opengl.h"
+#include <SDL2/SDL_ttf.h>
 
 #endif
 

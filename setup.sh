@@ -1,9 +1,9 @@
 #!/bin/bash
 set -eux
-echo "Setup HSP3 for Raspberry Pi"
+echo "Setup HSP3 for Linux"
 sudo apt update
 sudo apt install -y libgtk2.0-dev
 sudo apt install -y libglew-dev
-sudo apt install -y libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
+sudo apt install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
 sudo apt install -y libgles2-mesa-dev libegl1-mesa-dev
 make

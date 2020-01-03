@@ -395,8 +395,8 @@ OBJS_LINEAR_MATH = \
 	src/hsp3dish/extlib/src/LinearMath/btVector3.gpo
 
 TARGETS = hsp3dish hsp3gp hsp3cl hspcmp hsed
-LIBS1 = -lm -lGL -lEGL -lSDL -lSDL_image -lSDL_mixer -lSDL_ttf -lstdc++
-LIBS2 = -lm -lGL -lEGL -lSDL -lSDL_image -lSDL_mixer -lSDL_ttf -lstdc++
+LIBS1 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++
+LIBS2 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++
 LIBS_GP = \
 	libgameplay.a \
 	libBulletDynamics.a \

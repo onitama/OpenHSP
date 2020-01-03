@@ -44,7 +44,7 @@
 #endif
 
 #if defined(HSPLINUX)
-#include <SDL/SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 #define TTF_FONTFILE "/ipaexg.ttf"
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
@@ -58,7 +58,7 @@
 #include "GLES/gl.h"
 #include "EGL/egl.h"
 #include "EGL/eglext.h"
-#include "SDL/SDL.h"
+#include "SDL2/SDL.h"
 
 
 #else
@@ -73,13 +73,14 @@
 
 //#include <GL/glut.h>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_opengl.h"
 #endif
 
 #include "appengine.h"
 extern bool get_key_state(int sym);
+extern SDL_Window *window;
 #endif
 
 #include "../supio.h"
@@ -753,42 +754,43 @@ void hgio_setfilter( int type, int opt )
 int hgio_title( char *str1 )
 {
 #if defined(HSPEMSCRIPTEN)
-	SDL_WM_SetCaption( (const char *)str1, NULL );
+	SDL_SetWindowTitle( window, (const char *)str1 );
+	//SDL_WM_SetCaption( (const char *)str1, NULL );
 #endif
 #if defined(HSPLINUX)
 #ifndef HSPRASPBIAN
-	SDL_WM_SetCaption( (const char *)str1, NULL );
+	SDL_SetWindowTitle( window, (const char *)str1 );
+	//SDL_WM_SetCaption( (const char *)str1, NULL );
 #endif
 #endif
 	return 0;
 }
-
 
 int hgio_stick( int actsw )
 {
 	int ckey = 0;
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 #ifndef HSPRASPBIAN
-	if ( get_key_state(SDLK_LEFT) )  ckey|=1;		// [left]
-	if ( get_key_state(SDLK_UP) )    ckey|=1<<1;		// [up]
-	if ( get_key_state(SDLK_RIGHT) ) ckey|=1<<2;		// [right]
-	if ( get_key_state(SDLK_DOWN) )  ckey|=1<<3;		// [down]
-	if ( get_key_state(SDLK_SPACE) ) ckey|=1<<4;		// [spc]
-	if ( get_key_state(SDLK_RETURN) )ckey|=1<<5;		// [ent]
-	if ( get_key_state(SDLK_LCTRL) || get_key_state(SDLK_RCTRL) ) ckey|=1<<6;		// [ctrl]
-	if ( get_key_state(SDLK_ESCAPE) )ckey|=1<<7;	// [esc]
+	if ( get_key_state(SDL_SCANCODE_LEFT) )  ckey|=1;		// [left]
+	if ( get_key_state(SDL_SCANCODE_UP) )    ckey|=1<<1;		// [up]
+	if ( get_key_state(SDL_SCANCODE_RIGHT) ) ckey|=1<<2;		// [right]
+	if ( get_key_state(SDL_SCANCODE_DOWN) )  ckey|=1<<3;		// [down]
+	if ( get_key_state(SDL_SCANCODE_SPACE) ) ckey|=1<<4;		// [spc]
+	if ( get_key_state(SDL_SCANCODE_RETURN) )ckey|=1<<5;		// [ent]
+	if ( get_key_state(SDL_SCANCODE_LCTRL) || get_key_state(SDL_SCANCODE_RCTRL) ) ckey|=1<<6;		// [ctrl]
+	if ( get_key_state(SDL_SCANCODE_ESCAPE) )ckey|=1<<7;	// [esc]
 	if ( mouse_btn & SDL_BUTTON_LMASK ) ckey|=1<<8;	// mouse_l
 	if ( mouse_btn & SDL_BUTTON_RMASK ) ckey|=1<<9;	// mouse_r
-	if ( get_key_state(SDLK_TAB) )   ckey|=1<<10;	// [tab]
+	if ( get_key_state(SDL_SCANCODE_TAB) )   ckey|=1<<10;	// [tab]
 	
-	if ( get_key_state(SDLK_z) )     ckey|=1<<11;
-	if ( get_key_state(SDLK_x) )     ckey|=1<<12;
-	if ( get_key_state(SDLK_c) )     ckey|=1<<13;
+	if ( get_key_state(SDL_SCANCODE_Z) )     ckey|=1<<11;
+	if ( get_key_state(SDL_SCANCODE_X) )     ckey|=1<<12;
+	if ( get_key_state(SDL_SCANCODE_C) )     ckey|=1<<13;
 	
-	if ( get_key_state(SDLK_a) )     ckey|=1<<14;
-	if ( get_key_state(SDLK_w) )     ckey|=1<<15;
-	if ( get_key_state(SDLK_d) )     ckey|=1<<16;
-	if ( get_key_state(SDLK_s) )     ckey|=1<<17;
+	if ( get_key_state(SDL_SCANCODE_A) )     ckey|=1<<14;
+	if ( get_key_state(SDL_SCANCODE_W) )     ckey|=1<<15;
+	if ( get_key_state(SDL_SCANCODE_D) )     ckey|=1<<16;
+	if ( get_key_state(SDL_SCANCODE_S) )     ckey|=1<<17;
 #else
 	if ( get_key_state(37) ) ckey|=1;		// [left]
 	if ( get_key_state(38) ) ckey|=2;		// [up]
@@ -813,37 +815,37 @@ int hgio_stick( int actsw )
 #ifndef HSPRASPBIAN
 static const unsigned int key_map[256]={
 	/* 0- */
-	0, 0, 0, 3, 0, 0, 0, 0, SDLK_BACKSPACE, SDLK_TAB, 0, 0, 12, SDLK_RETURN, 0, 0,
-	0, 0, 0, SDLK_PAUSE, SDLK_CAPSLOCK, 0, 0, 0, 0, 0, 0, SDLK_ESCAPE, 0, 0, 0, 0,
+	0, 0, 0, 3, 0, 0, 0, 0, SDL_SCANCODE_BACKSPACE, SDL_SCANCODE_TAB, 0, 0, 12, SDL_SCANCODE_RETURN, 0, 0,
+	0, 0, 0, SDL_SCANCODE_PAUSE, SDL_SCANCODE_CAPSLOCK, 0, 0, 0, 0, 0, 0, SDL_SCANCODE_ESCAPE, 0, 0, 0, 0,
 	/* 32- */
-	SDLK_SPACE, SDLK_PAGEUP, SDLK_PAGEDOWN, SDLK_END, SDLK_HOME,
-	SDLK_LEFT, SDLK_UP, SDLK_RIGHT, SDLK_DOWN, 0, SDLK_PRINT, 0, 0, SDLK_INSERT, SDLK_DELETE, SDLK_HELP,
+	SDL_SCANCODE_SPACE, SDL_SCANCODE_PAGEUP, SDL_SCANCODE_PAGEDOWN, SDL_SCANCODE_END, SDL_SCANCODE_HOME,
+	SDL_SCANCODE_LEFT, SDL_SCANCODE_UP, SDL_SCANCODE_RIGHT, SDL_SCANCODE_DOWN, 0, SDL_SCANCODE_PRINTSCREEN, 0, 0, SDL_SCANCODE_INSERT, SDL_SCANCODE_DELETE, SDL_SCANCODE_HELP,
 	/* 48- */
-	SDLK_0, SDLK_1, SDLK_2, SDLK_3, SDLK_4, SDLK_5, SDLK_6, SDLK_7, SDLK_8, SDLK_9,
+	SDL_SCANCODE_0, SDL_SCANCODE_1, SDL_SCANCODE_2, SDL_SCANCODE_3, SDL_SCANCODE_4, SDL_SCANCODE_5, SDL_SCANCODE_6, SDL_SCANCODE_7, SDL_SCANCODE_8, SDL_SCANCODE_9,
 	0, 0, 0, 0, 0, 0, 0,
 	/* 65- */
-	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,
-	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,
-	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,
+	SDL_SCANCODE_A, SDL_SCANCODE_B, SDL_SCANCODE_C, SDL_SCANCODE_D, SDL_SCANCODE_E, SDL_SCANCODE_F, SDL_SCANCODE_G, SDL_SCANCODE_H, SDL_SCANCODE_I,
+	SDL_SCANCODE_J, SDL_SCANCODE_K, SDL_SCANCODE_L, SDL_SCANCODE_M, SDL_SCANCODE_N, SDL_SCANCODE_O, SDL_SCANCODE_P, SDL_SCANCODE_Q, SDL_SCANCODE_R,
+	SDL_SCANCODE_S, SDL_SCANCODE_T, SDL_SCANCODE_U, SDL_SCANCODE_V, SDL_SCANCODE_W, SDL_SCANCODE_X, SDL_SCANCODE_Y, SDL_SCANCODE_Z,
 	/* 91- */
-	SDLK_LSUPER, SDLK_RSUPER, 0, 0, 0,
-	SDLK_KP0, SDLK_KP1, SDLK_KP2, SDLK_KP3, SDLK_KP4, SDLK_KP5, SDLK_KP6, SDLK_KP7, SDLK_KP8, SDLK_KP9,
-	SDLK_KP_MULTIPLY, SDLK_KP_PLUS, 0, SDLK_KP_MINUS, SDLK_KP_PERIOD, SDLK_KP_DIVIDE, 
+	SDL_SCANCODE_LGUI, SDL_SCANCODE_RGUI, 0, 0, 0,
+	SDL_SCANCODE_KP_0, SDL_SCANCODE_KP_1, SDL_SCANCODE_KP_2, SDL_SCANCODE_KP_3, SDL_SCANCODE_KP_4, SDL_SCANCODE_KP_5, SDL_SCANCODE_KP_6, SDL_SCANCODE_KP_7, SDL_SCANCODE_KP_8, SDL_SCANCODE_KP_9,
+	SDL_SCANCODE_KP_MULTIPLY, SDL_SCANCODE_KP_PLUS, 0, SDL_SCANCODE_KP_MINUS, SDL_SCANCODE_KP_PERIOD, SDL_SCANCODE_KP_DIVIDE, 
 	/* 112- */
-	SDLK_F1, SDLK_F2, SDLK_F3, SDLK_F4, SDLK_F5, SDLK_F6, SDLK_F7, SDLK_F8, SDLK_F9, SDLK_F10,
-	SDLK_F11, SDLK_F12, SDLK_F13, SDLK_F14, SDLK_F15, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	SDL_SCANCODE_F1, SDL_SCANCODE_F2, SDL_SCANCODE_F3, SDL_SCANCODE_F4, SDL_SCANCODE_F5, SDL_SCANCODE_F6, SDL_SCANCODE_F7, SDL_SCANCODE_F8, SDL_SCANCODE_F9, SDL_SCANCODE_F10,
+	SDL_SCANCODE_F11, SDL_SCANCODE_F12, SDL_SCANCODE_F13, SDL_SCANCODE_F14, SDL_SCANCODE_F15, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 136- */
-	0, 0, 0, 0, 0, 0, 0, 0, SDLK_NUMLOCK, 145,
+	0, 0, 0, 0, 0, 0, 0, 0, SDL_SCANCODE_NUMLOCKCLEAR, 145,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 160- */
-	SDLK_LSHIFT, SDLK_RSHIFT, SDLK_LCTRL, SDLK_RCTRL, SDLK_LALT, SDLK_RALT,
+	SDL_SCANCODE_LSHIFT, SDL_SCANCODE_RSHIFT, SDL_SCANCODE_LCTRL, SDL_SCANCODE_RCTRL, SDL_SCANCODE_LALT, SDL_SCANCODE_RALT,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 186- */
-	SDLK_COLON, SDLK_SEMICOLON, SDLK_COMMA, SDLK_MINUS, SDLK_PERIOD, SDLK_SLASH, SDLK_AT, 
+	SDL_SCANCODE_SEMICOLON, SDL_SCANCODE_SEMICOLON, SDL_SCANCODE_COMMA, SDL_SCANCODE_MINUS, SDL_SCANCODE_PERIOD, SDL_SCANCODE_SLASH, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 219- */
-	SDLK_LEFTBRACKET, SDLK_BACKSLASH, SDLK_RIGHTBRACKET, SDLK_CARET,
-	0, 0, 0, SDLK_DOLLAR, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	SDL_SCANCODE_LEFTBRACKET, SDL_SCANCODE_BACKSLASH, SDL_SCANCODE_RIGHTBRACKET, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
@@ -856,9 +858,9 @@ bool hgio_getkey( int kcode )
 		case 4: res = (mouse_btn & SDL_BUTTON_MMASK) > 0; break;
 		case 5: res = (mouse_btn & SDL_BUTTON_X1MASK) > 0; break;
 		case 6: res = (mouse_btn & SDL_BUTTON_X2MASK) > 0; break;
-		case 16: res = get_key_state(SDLK_LSHIFT) | get_key_state(SDLK_RSHIFT); break;
-		case 17: res = get_key_state(SDLK_LCTRL) | get_key_state(SDLK_RCTRL); break;
-		case 18: res = get_key_state(SDLK_LALT) | get_key_state(SDLK_RALT); break;
+		case 16: res = get_key_state(SDL_SCANCODE_LSHIFT) | get_key_state(SDL_SCANCODE_RSHIFT); break;
+		case 17: res = get_key_state(SDL_SCANCODE_LCTRL) | get_key_state(SDL_SCANCODE_RCTRL); break;
+		case 18: res = get_key_state(SDL_SCANCODE_LALT) | get_key_state(SDL_SCANCODE_RALT); break;
 		default: res = get_key_state( key_map[ kcode & 255 ] ); break;
 	}
 	return res;
@@ -871,6 +873,7 @@ bool hgio_getkey( int kcode )
 #endif
 
 #endif
+
 
 
 int hgio_texload( BMSCR *bm, char *fname )
@@ -1780,7 +1783,6 @@ void hgio_touch( int xx, int yy, int button )
     Bmscr *bm;
 	hgio_scale_point( xx,yy,mouse_x,mouse_y );
 	hgio_cnvview( mainbm, &mouse_x, &mouse_y );
-	mouse_y=-mouse_y;
 	mouse_btn = button;
     if ( mainbm != NULL ) {
         mainbm->savepos[BMSCR_SAVEPOS_MOSUEX] = mouse_x;
@@ -1800,7 +1802,6 @@ void hgio_mtouch( int old_x, int old_y, int xx, int yy, int button, int opt )
     bm = (Bmscr *)mainbm;
     hgio_scale_point( xx,yy,x,y );
     hgio_cnvview( mainbm, &mouse_x, &mouse_y );
-    mouse_y=-mouse_y;
 
     if ( opt == 0) {
         mouse_x = x;
@@ -2100,7 +2101,8 @@ int hgio_render_end( void )
 #endif
 
 #if defined(HSPEMSCRIPTEN)
-	SDL_GL_SwapBuffers();
+	SDL_GL_SwapWindow(window);
+	//SDL_GL_SwapBuffers();
 #endif
 #if defined(HSPLINUX)
 
@@ -2111,7 +2113,8 @@ int hgio_render_end( void )
 	//hgio_fcopy( 0,80,  0, 0, 256, 128, font_texid, 0xffffff );
 
 #ifndef HSPRASPBIAN
-	SDL_GL_SwapBuffers();
+	SDL_GL_SwapWindow(window);
+	//SDL_GL_SwapBuffers();
 #endif
 #endif
 
@@ -2293,7 +2296,8 @@ void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 	//	(タッチ位置再現のため)
 	//
 	VECTOR v1,v2;
-	//if (bm->vp_flag == 0) return;
+	if (bm==NULL) return;
+	if (bm->vp_flag == 0) return;
 	v1.x = (float)*xaxis;
 	v1.y = (float)(_bgsy-*yaxis);
 	v1.z = 1.0f;
@@ -2314,7 +2318,7 @@ void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 
 	ApplyMatrix(&mat_unproj, &v2, &v1);
 	*xaxis = (int)v2.x;
-	*yaxis = (int)v2.y;
+	*yaxis = (int)-v2.y;
 }
 
 

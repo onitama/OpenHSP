@@ -31,6 +31,8 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #include <CoreFoundation/CoreFoundation.h>
+
+#include "iOSgpBridge.h"
 #endif
 
 #ifdef HSPEMSCRIPTEN
@@ -42,7 +44,7 @@
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_opengl.h"
 
-#include <SDL/SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 #define TTF_FONTFILE "/ipaexg.ttf"
 
 #endif
@@ -50,12 +52,15 @@
 #if defined(HSPLINUX)
 #include <unistd.h>
 #include <GL/gl.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
 //#include "SDL/SDL_opengl.h"
 
-#include <SDL/SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 #define TTF_FONTFILE "/ipaexg.ttf"
+
+extern bool get_key_state(int sym);
+extern SDL_Window *window;
 
 #endif
 
@@ -560,6 +565,132 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 #endif
 
 
+/*-------------------------------------------------------------------------------*/
+/*
+		android Font Manage Routines
+*/
+/*-------------------------------------------------------------------------------*/
+
+#if defined(HSPNDK)
+static	int fontsystem_sx;		// 横のサイズ
+static	int fontsystem_sy;		// 縦のサイズ
+static	unsigned char *fontdata_pix;
+static	int fontdata_size;
+static	int fontdata_color;
+
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy)
+{
+	//		msgの文字列をテクスチャバッファにレンダリングする
+	//		(bufferがNULLの場合はサイズだけを取得する)
+	//
+
+	if (buffer == NULL) {
+		fontsystem_sx = 0;
+		fontsystem_sy = 0;
+		fontdata_pix = (unsigned char *)j_callFontBitmap_s( (const char *)msg, m_tsize, m_tstyle, &fontsystem_sx, &fontsystem_sy, &fontdata_size, &fontdata_color );
+		*out_sx = fontsystem_sx;
+		*out_sy = fontsystem_sy;
+		if (fontdata_pix==NULL) return -1;
+		return 0;
+	}
+
+	//Alertf( "Init:Surface(%d,%d) %d destpitch%d",fontsystem_sx,fontsystem_sy,fontdata_color,pitch );
+
+	unsigned char *p1 = buffer;
+	unsigned char *p2 = fontdata_pix;
+
+	switch(fontdata_color) {
+	case 4:
+		for (int y = 0; y < fontsystem_sy; y++)
+		{
+			unsigned char *p1x = p1;
+			for (int x = 0; x < fontsystem_sx*4; x++)
+			{
+				*p1x++ = *p2++;
+			}
+			p1 += pitch * sizeof(int);
+		}
+		break;
+	case 2:
+		for (int y = 0; y < fontsystem_sy; y++)
+		{
+			unsigned char *p1x = p1;
+			unsigned char a1,a2,a3,a4;
+			for (int x = 0; x < fontsystem_sx; x++)
+			{
+				a1 = *p2++;
+				a2 = a1 & 0xf0; a1=(a1&15)<<4;
+				a3 = *p2++;
+				a4 = a3 & 0xf0; a3=(a3&15)<<4;
+				*p1x++ = a1;
+				*p1x++ = a2;
+				*p1x++ = a3;
+				*p1x++ = a4;
+			}
+			p1 += pitch * sizeof(int);
+		}
+		break;
+	case 1:
+		for (int y = 0; y < fontsystem_sy; y++)
+		{
+			unsigned char *p1x = p1;
+			unsigned char a1;
+			for (int x = 0; x < fontsystem_sx; x++)
+			{
+				a1 = *p2++;
+				*p1x++ = a1;
+				*p1x++ = a1;
+				*p1x++ = a1;
+				*p1x++ = a1;
+			}
+			p1 += pitch * sizeof(int);
+		}
+		break;
+	default:
+		break;
+	}
+
+	j_callFontBitmap_e();
+
+	return 0;
+}
+
+#endif
+
+
+/*-------------------------------------------------------------------------------*/
+/*
+		iOS Font Manage Routines
+*/
+/*-------------------------------------------------------------------------------*/
+
+#ifdef HSPIOS
+static	int fontsystem_sx;		// 横のサイズ
+static	int fontsystem_sy;		// 縦のサイズ
+
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy)
+{
+	//		msgの文字列をテクスチャバッファにレンダリングする
+	//		(bufferがNULLの場合はサイズだけを取得する)
+	//
+
+	if (buffer == NULL) {
+		fontsystem_sx = 0;
+		fontsystem_sy = 0;
+		gpb_textsize( msg, m_tsize, m_tstyle, &fontsystem_sx, &fontsystem_sy );
+		*out_sx = fontsystem_sx;
+		*out_sy = fontsystem_sy;
+		if (fontsystem_sx==0) return -1;
+		return 0;
+	}
+
+	//Alertf( "Init:Surface(%d,%d) %d destpitch%d",fontsystem_sx,fontsystem_sy,fontdata_color,pitch );
+    gpb_textbitmap( msg, m_tsize, m_tstyle, (char *)buffer, pitch );
+	return 0;
+}
+#endif
+
+
 /*------------------------------------------------------------*/
 /*
 		interface
@@ -880,69 +1011,67 @@ int hgio_stick( int actsw )
 #endif
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
-	if ( get_key_state(SDLK_LEFT) )  ckey|=1;		// [left]
-	if ( get_key_state(SDLK_UP) )    ckey|=1<<1;		// [up]
-	if ( get_key_state(SDLK_RIGHT) ) ckey|=1<<2;		// [right]
-	if ( get_key_state(SDLK_DOWN) )  ckey|=1<<3;		// [down]
-	if ( get_key_state(SDLK_SPACE) ) ckey|=1<<4;		// [spc]
-	if ( get_key_state(SDLK_RETURN) )ckey|=1<<5;		// [ent]
-	if ( get_key_state(SDLK_LCTRL) || get_key_state(SDLK_RCTRL) ) ckey|=1<<6;		// [ctrl]
-	if ( get_key_state(SDLK_ESCAPE) )ckey|=1<<7;	// [esc]
+	if ( get_key_state(SDL_SCANCODE_LEFT) )  ckey|=1;		// [left]
+	if ( get_key_state(SDL_SCANCODE_UP) )    ckey|=1<<1;		// [up]
+	if ( get_key_state(SDL_SCANCODE_RIGHT) ) ckey|=1<<2;		// [right]
+	if ( get_key_state(SDL_SCANCODE_DOWN) )  ckey|=1<<3;		// [down]
+	if ( get_key_state(SDL_SCANCODE_SPACE) ) ckey|=1<<4;		// [spc]
+	if ( get_key_state(SDL_SCANCODE_RETURN) )ckey|=1<<5;		// [ent]
+	if ( get_key_state(SDL_SCANCODE_LCTRL) || get_key_state(SDL_SCANCODE_RCTRL) ) ckey|=1<<6;		// [ctrl]
+	if ( get_key_state(SDL_SCANCODE_ESCAPE) )ckey|=1<<7;	// [esc]
 	if ( mouse_btn & SDL_BUTTON_LMASK ) ckey|=1<<8;	// mouse_l
 	if ( mouse_btn & SDL_BUTTON_RMASK ) ckey|=1<<9;	// mouse_r
-	if ( get_key_state(SDLK_TAB) )   ckey|=1<<10;	// [tab]
+	if ( get_key_state(SDL_SCANCODE_TAB) )   ckey|=1<<10;	// [tab]
 	
-	if ( get_key_state(SDLK_z) )     ckey|=1<<11;
-	if ( get_key_state(SDLK_x) )     ckey|=1<<12;
-	if ( get_key_state(SDLK_c) )     ckey|=1<<13;
+	if ( get_key_state(SDL_SCANCODE_Z) )     ckey|=1<<11;
+	if ( get_key_state(SDL_SCANCODE_X) )     ckey|=1<<12;
+	if ( get_key_state(SDL_SCANCODE_C) )     ckey|=1<<13;
 	
-	if ( get_key_state(SDLK_a) )     ckey|=1<<14;
-	if ( get_key_state(SDLK_w) )     ckey|=1<<15;
-	if ( get_key_state(SDLK_d) )     ckey|=1<<16;
-	if ( get_key_state(SDLK_s) )     ckey|=1<<17;
+	if ( get_key_state(SDL_SCANCODE_A) )     ckey|=1<<14;
+	if ( get_key_state(SDL_SCANCODE_W) )     ckey|=1<<15;
+	if ( get_key_state(SDL_SCANCODE_D) )     ckey|=1<<16;
+	if ( get_key_state(SDL_SCANCODE_S) )     ckey|=1<<17;
 #endif
 
 	return ckey;
 }
 
-
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 static const unsigned int key_map[256]={
 	/* 0- */
-	0, 0, 0, 3, 0, 0, 0, 0, SDLK_BACKSPACE, SDLK_TAB, 0, 0, 12, SDLK_RETURN, 0, 0,
-	0, 0, 0, SDLK_PAUSE, SDLK_CAPSLOCK, 0, 0, 0, 0, 0, 0, SDLK_ESCAPE, 0, 0, 0, 0,
+	0, 0, 0, 3, 0, 0, 0, 0, SDL_SCANCODE_BACKSPACE, SDL_SCANCODE_TAB, 0, 0, 12, SDL_SCANCODE_RETURN, 0, 0,
+	0, 0, 0, SDL_SCANCODE_PAUSE, SDL_SCANCODE_CAPSLOCK, 0, 0, 0, 0, 0, 0, SDL_SCANCODE_ESCAPE, 0, 0, 0, 0,
 	/* 32- */
-	SDLK_SPACE, SDLK_PAGEUP, SDLK_PAGEDOWN, SDLK_END, SDLK_HOME,
-	SDLK_LEFT, SDLK_UP, SDLK_RIGHT, SDLK_DOWN, 0, SDLK_PRINT, 0, 0, SDLK_INSERT, SDLK_DELETE, SDLK_HELP,
+	SDL_SCANCODE_SPACE, SDL_SCANCODE_PAGEUP, SDL_SCANCODE_PAGEDOWN, SDL_SCANCODE_END, SDL_SCANCODE_HOME,
+	SDL_SCANCODE_LEFT, SDL_SCANCODE_UP, SDL_SCANCODE_RIGHT, SDL_SCANCODE_DOWN, 0, SDL_SCANCODE_PRINTSCREEN, 0, 0, SDL_SCANCODE_INSERT, SDL_SCANCODE_DELETE, SDL_SCANCODE_HELP,
 	/* 48- */
-	SDLK_0, SDLK_1, SDLK_2, SDLK_3, SDLK_4, SDLK_5, SDLK_6, SDLK_7, SDLK_8, SDLK_9,
+	SDL_SCANCODE_0, SDL_SCANCODE_1, SDL_SCANCODE_2, SDL_SCANCODE_3, SDL_SCANCODE_4, SDL_SCANCODE_5, SDL_SCANCODE_6, SDL_SCANCODE_7, SDL_SCANCODE_8, SDL_SCANCODE_9,
 	0, 0, 0, 0, 0, 0, 0,
 	/* 65- */
-	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,
-	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,
-	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,
+	SDL_SCANCODE_A, SDL_SCANCODE_B, SDL_SCANCODE_C, SDL_SCANCODE_D, SDL_SCANCODE_E, SDL_SCANCODE_F, SDL_SCANCODE_G, SDL_SCANCODE_H, SDL_SCANCODE_I,
+	SDL_SCANCODE_J, SDL_SCANCODE_K, SDL_SCANCODE_L, SDL_SCANCODE_M, SDL_SCANCODE_N, SDL_SCANCODE_O, SDL_SCANCODE_P, SDL_SCANCODE_Q, SDL_SCANCODE_R,
+	SDL_SCANCODE_S, SDL_SCANCODE_T, SDL_SCANCODE_U, SDL_SCANCODE_V, SDL_SCANCODE_W, SDL_SCANCODE_X, SDL_SCANCODE_Y, SDL_SCANCODE_Z,
 	/* 91- */
-	SDLK_LSUPER, SDLK_RSUPER, 0, 0, 0,
-	SDLK_KP0, SDLK_KP1, SDLK_KP2, SDLK_KP3, SDLK_KP4, SDLK_KP5, SDLK_KP6, SDLK_KP7, SDLK_KP8, SDLK_KP9,
-	SDLK_KP_MULTIPLY, SDLK_KP_PLUS, 0, SDLK_KP_MINUS, SDLK_KP_PERIOD, SDLK_KP_DIVIDE, 
+	SDL_SCANCODE_LGUI, SDL_SCANCODE_RGUI, 0, 0, 0,
+	SDL_SCANCODE_KP_0, SDL_SCANCODE_KP_1, SDL_SCANCODE_KP_2, SDL_SCANCODE_KP_3, SDL_SCANCODE_KP_4, SDL_SCANCODE_KP_5, SDL_SCANCODE_KP_6, SDL_SCANCODE_KP_7, SDL_SCANCODE_KP_8, SDL_SCANCODE_KP_9,
+	SDL_SCANCODE_KP_MULTIPLY, SDL_SCANCODE_KP_PLUS, 0, SDL_SCANCODE_KP_MINUS, SDL_SCANCODE_KP_PERIOD, SDL_SCANCODE_KP_DIVIDE, 
 	/* 112- */
-	SDLK_F1, SDLK_F2, SDLK_F3, SDLK_F4, SDLK_F5, SDLK_F6, SDLK_F7, SDLK_F8, SDLK_F9, SDLK_F10,
-	SDLK_F11, SDLK_F12, SDLK_F13, SDLK_F14, SDLK_F15, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	SDL_SCANCODE_F1, SDL_SCANCODE_F2, SDL_SCANCODE_F3, SDL_SCANCODE_F4, SDL_SCANCODE_F5, SDL_SCANCODE_F6, SDL_SCANCODE_F7, SDL_SCANCODE_F8, SDL_SCANCODE_F9, SDL_SCANCODE_F10,
+	SDL_SCANCODE_F11, SDL_SCANCODE_F12, SDL_SCANCODE_F13, SDL_SCANCODE_F14, SDL_SCANCODE_F15, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 136- */
-	0, 0, 0, 0, 0, 0, 0, 0, SDLK_NUMLOCK, 145,
+	0, 0, 0, 0, 0, 0, 0, 0, SDL_SCANCODE_NUMLOCKCLEAR, 145,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 160- */
-	SDLK_LSHIFT, SDLK_RSHIFT, SDLK_LCTRL, SDLK_RCTRL, SDLK_LALT, SDLK_RALT,
+	SDL_SCANCODE_LSHIFT, SDL_SCANCODE_RSHIFT, SDL_SCANCODE_LCTRL, SDL_SCANCODE_RCTRL, SDL_SCANCODE_LALT, SDL_SCANCODE_RALT,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 186- */
-	SDLK_COLON, SDLK_SEMICOLON, SDLK_COMMA, SDLK_MINUS, SDLK_PERIOD, SDLK_SLASH, SDLK_AT, 
+	SDL_SCANCODE_SEMICOLON, SDL_SCANCODE_SEMICOLON, SDL_SCANCODE_COMMA, SDL_SCANCODE_MINUS, SDL_SCANCODE_PERIOD, SDL_SCANCODE_SLASH, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	/* 219- */
-	SDLK_LEFTBRACKET, SDLK_BACKSLASH, SDLK_RIGHTBRACKET, SDLK_CARET,
-	0, 0, 0, SDLK_DOLLAR, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	SDL_SCANCODE_LEFTBRACKET, SDL_SCANCODE_BACKSLASH, SDL_SCANCODE_RIGHTBRACKET, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-
 
 bool hgio_getkey( int kcode )
 {
@@ -953,9 +1082,9 @@ bool hgio_getkey( int kcode )
 		case 4: res = (mouse_btn & SDL_BUTTON_MMASK) > 0; break;
 		case 5: res = (mouse_btn & SDL_BUTTON_X1MASK) > 0; break;
 		case 6: res = (mouse_btn & SDL_BUTTON_X2MASK) > 0; break;
-		case 16: res = get_key_state(SDLK_LSHIFT) | get_key_state(SDLK_RSHIFT); break;
-		case 17: res = get_key_state(SDLK_LCTRL) | get_key_state(SDLK_RCTRL); break;
-		case 18: res = get_key_state(SDLK_LALT) | get_key_state(SDLK_RALT); break;
+		case 16: res = get_key_state(SDL_SCANCODE_LSHIFT) | get_key_state(SDL_SCANCODE_RSHIFT); break;
+		case 17: res = get_key_state(SDL_SCANCODE_LCTRL) | get_key_state(SDL_SCANCODE_RCTRL); break;
+		case 18: res = get_key_state(SDL_SCANCODE_LALT) | get_key_state(SDL_SCANCODE_RALT); break;
 		default: res = get_key_state( key_map[ kcode & 255 ] ); break;
 	}
 	return res;
@@ -996,7 +1125,7 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	return 0;
 #endif
 #ifdef HSPIOS
-    //gb_dialog( mode, str1, str2 );
+    gpb_dialog( mode, str1, str2 );
     //Alertf( str1 );
 #endif
 	return 0;
@@ -1012,11 +1141,13 @@ int hgio_title( char *str1 )
 #endif
 
 #if defined(HSPEMSCRIPTEN)
-	SDL_WM_SetCaption( (const char *)str1, NULL );
+	SDL_SetWindowTitle( window, (const char *)str1 );
+	//SDL_WM_SetCaption( (const char *)str1, NULL );
 #endif
 #if defined(HSPLINUX)
 #ifndef HSPRASPBIAN
-	SDL_WM_SetCaption( (const char *)str1, NULL );
+	SDL_SetWindowTitle( window, (const char *)str1 );
+	//SDL_WM_SetCaption( (const char *)str1, NULL );
 #endif
 #endif
 
@@ -1770,7 +1901,7 @@ int hgio_exec( char *stmp, char *option, int mode )
 	if (i < 32) return -1;
 #endif
 #ifdef HSPIOS
-    //gb_exec( mode, stmp );
+    gpb_exec( mode, stmp );
 #endif
 	return 0;
 }
@@ -1867,8 +1998,8 @@ char *hgio_sysinfo( int p2, int *res, char *outbuf )
 		strcpy(p1, "Android");
 #endif
 #ifdef HSPIOS
-        strcpy(p1, "iOS");
-        //gb_getSysVer( p1 );
+        //strcpy(p1, "iOS");
+        gpb_getSysVer( p1 );
 #endif
 		fl=HSPVAR_FLAG_STR;
 		break;

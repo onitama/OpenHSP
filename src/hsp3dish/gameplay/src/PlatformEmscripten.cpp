@@ -12,9 +12,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-//#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+//#include "SDL2/SDL_opengl.h"
+
+extern SDL_Window *window;
 
 #define TOUCH_COUNT_MAX     4
 #define MAX_GAMEPADS 4
@@ -178,7 +180,8 @@ namespace gameplay
 
     void Platform::swapBuffers()
     {
-        SDL_GL_SwapBuffers();
+        //SDL_GL_SwapBuffers();
+	  SDL_GL_SwapWindow(window);
     }
 
     void Platform::sleep(long ms)

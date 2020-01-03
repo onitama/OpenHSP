@@ -34,9 +34,8 @@ struct engine;
 //#include <GL/gl.h>
 //#include <GL/glut.h>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-//#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
 
 //#define USE_OBAQ
 
@@ -71,7 +70,11 @@ static bool fs_initialized = false;
 static int hsp_sscnt, hsp_ssx, hsp_ssy;
 #endif
 
-static bool keys[SDLK_LAST];
+#define SDLK_SCANCODE_MAX 0x200
+static bool keys[SDLK_SCANCODE_MAX];
+SDL_Window *window;
+static SDL_Renderer *renderer;
+static SDL_GLContext context;
 
 #ifdef HSPDISHGP
 gamehsp *game;
@@ -165,7 +168,6 @@ static int handleEvent( void ) {
 #else
 					hgio_scale_point( m->x, m->y, x, y );
 					hgio_cnvview((BMSCR *)bm,&x,&y);
-					y=-y;
 #endif
 
 					bm->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
@@ -194,16 +196,12 @@ static int handleEvent( void ) {
 				break;
 			}
 		case SDL_KEYDOWN:
-			if (!keys[event.key.keysym.sym]) {
-				keys[event.key.keysym.sym] = true;
-				//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
-			}
+			keys[event.key.keysym.scancode] = true;
+			//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 		case SDL_KEYUP:
-			if (keys[event.key.keysym.sym]) {
-				keys[event.key.keysym.sym] = false;
-				//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
-			}
+			keys[event.key.keysym.scancode] = false;
+			//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 		case SDL_QUIT: /** ウィンドウのxボタンやctrl-Cを押した場合 */
 			res = -1;
@@ -220,14 +218,6 @@ bool get_key_state(int sym)
 static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowtitle )
 {
 	printf("INIT %dx%d %s\n", sx,sy,windowtitle);
-	// glutInit(NULL, NULL);
-	// glutInitWindowSize(sx, sy);
-
-	// glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-
-	// glutCreateWindow(windowtitle);
-
-	SDL_Surface *screen;
 
 	// Slightly different SDL initialization
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
@@ -235,14 +225,17 @@ static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowt
 		return;
 	}
 
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-	screen = SDL_SetVideoMode( sx, sy, 16, SDL_OPENGL );
-	if ( !screen ) {
-		printf("Unable to set video mode: %s\n", SDL_GetError());
+	window = SDL_CreateWindow( "HSPDish ver" hspver, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sx, sy, SDL_WINDOW_OPENGL );
+	if ( window==NULL ) {
+		printf("Unable to set window: %s\n", SDL_GetError());
 		return;
 	}
-	SDL_WM_SetCaption( "HSPDish ver" hspver, NULL );
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+	context = SDL_GL_CreateContext(window);
+	if ( window==NULL ) {
+		printf("Unable to set GLContext: %s\n", SDL_GetError());
+		return;
+	}
 
 	// 描画APIに渡す
 	hgio_init( 0, sx, sy, p_engine );
@@ -356,6 +349,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 	while(1) {
 		// logmes なら先に処理する
 		if ( hspctx->runmode == RUNMODE_LOGMES ) {
+			printf( "%s\r\n",ctx->stmp );
 			hspctx->runmode = RUNMODE_RUN;
 			return;
 		}
@@ -555,7 +549,7 @@ int hsp3dish_init( char *startfile )
 
 //#endif
 
-	for (int i = 0; i < SDLK_LAST; i++) {
+	for (int i = 0; i < SDLK_SCANCODE_MAX; i++) {
 		keys[i] = false;
 	}
 
