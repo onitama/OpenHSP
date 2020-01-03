@@ -27,6 +27,9 @@ struct engine;
 
 //#include "../emscripten/appengine.h"
 
+#include "../../hsp3/linux/devctrl_io.h"
+#define DEVCTRL_IO			// GPIO,I2C control
+
 #ifdef HSPDISHGP
 #include "../win32gp/gamehsp.h"
 #endif
@@ -625,7 +628,12 @@ int hsp3dish_init( char *startfile )
 	//		Initalize DEVINFO
 	HSP3DEVINFO *devinfo;
 	devinfo = hsp3extcmd_getdevinfo();
+
+#ifdef DEVCTRL_IO
+	hsp3dish_setdevinfo_io( devinfo );
+#else
 	hsp3dish_setdevinfo( devinfo );
+#endif
 
 #ifdef HSPDISHGP
 	gameplay::Logger::log(gameplay::Logger::LEVEL_INFO, "HGIMG4 %s initalized : %s\n", hspver, devinfo->devname);
@@ -659,15 +667,12 @@ static void hsp3dish_bye( void )
 	}
 #endif
 
+#ifdef DEVCTRL_IO
+	hsp3dish_termdevinfo_io();
+#endif
 	//		HSP関連の解放
 	//
 	if ( hsp != NULL ) { delete hsp; hsp = NULL; }
-
-	// if ( m_hWnd != NULL ) {
-	// 	hgio_term();
-	// 	DestroyWindow( m_hWnd );
-	// 	m_hWnd = NULL;
-	// }
 }
 
 

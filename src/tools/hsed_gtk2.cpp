@@ -134,6 +134,7 @@ static int dialog_open( gchar *title, gchar *msg )
   }
   //ダイアログを閉じる
   gtk_widget_destroy(dialog);
+  return res;
 }
 
 static int dialog_openyn( gchar *title, gchar *msg )
