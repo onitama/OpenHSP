@@ -3,7 +3,7 @@ CXX = g++
 AR = ar
 CFLAGS_DISH =  -Wno-write-strings -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -DUSE_OBAQ -I /opt/vc/include
 CFLAGS_GP =  -Wno-write-strings -g -O0 -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -I /opt/vc/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src -std=c++11
-LDFLAGS= -lm -L$(SDKSTAGE)/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lSDL -lSDL_mixer -lSDL_ttf
+LDFLAGS= -lm -L$(SDKSTAGE)/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lSDL2 -lSDL2_mixer -lSDL2_ttf
 CFLAGS_CL =  -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSPRASPBIAN
 CFLAGS_CMP =  -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
 
@@ -41,6 +41,7 @@ OBJS = \
 	src/hsp3dish/raspbian/hsp3dish.do \
 	src/hsp3dish/linux/webtask_linux.do \
 	src/hsp3/linux/hsp3ext_sock.do \
+	src/hsp3/linux/devctrl_io.do \
 	src/hsp3dish/linux/supio_linux.do
 
 OBJS_CMP = \
@@ -80,6 +81,7 @@ OBJS_CL = \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
 	src/hsp3/linux/hsp3ext_sock.o \
+	src/hsp3/linux/devctrl_io.do \
 	src/hsp3/linux/hsp3gr_linux.o
 
 TARGETS = hsp3dish hsp3cl hspcmp hsed

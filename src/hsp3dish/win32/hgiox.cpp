@@ -99,6 +99,9 @@ static		BMSCR *backbm;		// 背景消去用のBMSCR(null=NC)
 
 static		HSPREAL infoval[GINFO_EXINFO_MAX];
 
+static		MATRIX mat_proj;	// プロジェクションマトリクス
+static		MATRIX mat_unproj;	// プロジェクション逆変換マトリクス
+
 //		DirectX objects
 //
 static		D3DDISPLAYMODE target_disp;
@@ -574,6 +577,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 
 	//		設定の初期化
 	//
+	GeometryInit();
 	SetSysReq( SYSREQ_RESULT, 0 );
 	SetSysReq( SYSREQ_RESVMODE, 0 );
 
@@ -610,34 +614,6 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	for(i=0;i<GINFO_EXINFO_MAX;i++) {
 		infoval[i] = 0.0;
 	}
-}
-
-
-void hgio_rebuild(int sx, int sy, int mode, void *hwnd)
-{
-	//	デバイスを再構築する
-	//
-	hgio_render_end();
-	TexTerm();
-
-	d3ddev->Reset(&d3dapp);		//	Direct3Dデバイス解放
-	RELEASE(d3ddev);
-	delete d3ddev;
-
-	drawflag = 0;
-	nDestWidth = sx;
-	nDestHeight = sy;
-	mestexid = -1;
-	mestexflag = 0;
-
-	SetSysReq(SYSREQ_DXMODE, mode);
-	if (mode) {
-		SetSysReq(SYSREQ_DXWIDTH, sx);
-		SetSysReq(SYSREQ_DXHEIGHT, sy);
-	}
-	master_wnd = (HWND)hwnd;
-	Init3DDevicesW((HWND)hwnd);
-	InitTexture();
 }
 
 
@@ -723,8 +699,33 @@ int hgio_render_end( void )
 }
 
 
+static void Mat2D3DMAT(D3DXMATRIX* dst, MATRIX* src)
+{
+	dst->_11 = src->m00;
+	dst->_12 = src->m01;
+	dst->_13 = src->m02;
+	dst->_14 = src->m03;
+
+	dst->_21 = src->m10;
+	dst->_22 = src->m11;
+	dst->_23 = src->m12;
+	dst->_24 = src->m13;
+
+	dst->_31 = src->m20;
+	dst->_32 = src->m21;
+	dst->_33 = src->m22;
+	dst->_34 = src->m23;
+
+	dst->_41 = src->m30;
+	dst->_42 = src->m31;
+	dst->_43 = src->m32;
+	dst->_44 = src->m33;
+}
+
+
 int hgio_render_start( void )
 {
+	//static D3DXMATRIX InvViewport;
 	if ( drawflag ) {
 		hgio_render_end();
 	}
@@ -741,27 +742,34 @@ int hgio_render_start( void )
 
 	//	マトリクスを設定
 	D3DXMATRIX matrixIdentitiy;
-	D3DXMATRIX matrixScale;
 	ZeroMemory(&matrixIdentitiy, sizeof(matrixIdentitiy));
 	matrixIdentitiy._11 = 1.0f;
 	matrixIdentitiy._22 = 1.0f;
 	matrixIdentitiy._33 = 1.0f;
 	matrixIdentitiy._44 = 1.0f;
 	d3ddev->SetTransform(D3DTS_WORLD, &matrixIdentitiy);
-
-	//D3DXMatrixScaling(&matrixIdentitiy, 1.0f, 1.0f, 1.0f);
-	D3DXMatrixTranslation(&matrixIdentitiy, (float)-mainbm->viewx, (float)-mainbm->viewy, 0.0f);
-	D3DXMatrixScaling(&matrixScale, (float)mainbm->viewsx, (float)mainbm->viewsy, 1.0f);
-	matrixIdentitiy *= matrixScale;
 	d3ddev->SetTransform(D3DTS_VIEW, &matrixIdentitiy);
+
+	//D3DXMATRIX matrixView;
+	//Mat2D3DMAT(&matrixView, GetCurrentMatrixPtr());
+	//d3ddev->SetTransform(D3DTS_VIEW, &matrixView);
+
+	//	標準の投影マトリクスを設定する
 	D3DXMATRIX matrixProj;
-	D3DXMatrixOrthoOffCenterLH(&matrixProj, 0.0f, (float)nDestWidth, (float)nDestHeight, 0.0f, -1.0f, 1.0f);
+	MATRIX *mymat = &mat_proj;
+	UnitMatrix();
+	OrthoMatrix(0.0f, 0.0f, (float)nDestWidth, (float)nDestHeight, 0.0f, 1.0f);
+	GetCurrentMatrix(mymat);
+	Mat2D3DMAT(&matrixProj, mymat);
 	d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
 
 	//	画面クリア
 	int bgtex = -1;
-	if ( backbm != NULL ) { bgtex = backbm->texid; }
-	ClearDest( GetSysReq( SYSREQ_CLSMODE ), GetSysReq( SYSREQ_CLSCOLOR ), bgtex );
+	if (backbm != NULL) { bgtex = backbm->texid; }
+	ClearDest(GetSysReq(SYSREQ_CLSMODE), GetSysReq(SYSREQ_CLSCOLOR), bgtex);
+
+	//	ユーザー設定の投影マトリクスを設定する
+	hgio_setview(mainbm);
 
 	//	デバイス初期化
 	InitDraw();
@@ -828,6 +836,7 @@ void hgio_term( void )
 	hgio_render_end();
 	TexTerm();
 	Term3DDevices();
+	GeometryTerm();
 }
 
 
@@ -854,6 +863,16 @@ int hgio_stick( int actsw )
 	if ( GetAsyncKeyState(1)&0x8000 )  ckey|=256;	// mouse_l
 	if ( GetAsyncKeyState(2)&0x8000 )  ckey|=512;	// mouse_r
 	if ( GetAsyncKeyState(9)&0x8000 )  ckey|=1024;	// [tab]
+
+	if (GetAsyncKeyState(90) & 0x8000)  ckey |= 1<<11;	// [z]
+	if (GetAsyncKeyState(88) & 0x8000)  ckey |= 1<<12;	// [x]
+	if (GetAsyncKeyState(67) & 0x8000)  ckey |= 1<<13;	// [c]
+
+	if (GetAsyncKeyState(65) & 0x8000)  ckey |= 1 << 14;	// [a]
+	if (GetAsyncKeyState(87) & 0x8000)  ckey |= 1 << 15;	// [w]
+	if (GetAsyncKeyState(68) & 0x8000)  ckey |= 1 << 16;	// [d]
+	if (GetAsyncKeyState(83) & 0x8000)  ckey |= 1 << 17;	// [s]
+
 	return ckey;
 }
 
@@ -1750,3 +1769,99 @@ int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSC
 
 	return total;
 }
+
+
+void hgio_setview(BMSCR* bm)
+{
+	// vp_flagに応じたビューポートの設定を行う
+	//
+	int i;
+	MATRIX *vmat;
+	MATRIX tmpmat;
+	float* vp;
+	vmat = &mat_proj;
+	vp = (float*)vmat;
+	float* mat = (float*)GetCurrentMatrixPtr();
+
+	switch (bm->vp_flag) {
+	case BMSCR_VPFLAG_2D:
+		//	2D projection mode
+		UnitMatrix();
+		RotZ(bm->vp_viewrotate[2]);
+		GetCurrentMatrix(&tmpmat);
+		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)nDestWidth / bm->vp_viewscale[0], (float)nDestHeight / bm->vp_viewscale[1], 0.0f, 1.0f);
+		MulMatrix(&tmpmat);
+		break;
+	case BMSCR_VPFLAG_3D:
+		//	3D projection mode
+		UnitMatrix();
+		RotZ(bm->vp_viewrotate[2]);
+		RotY(bm->vp_viewrotate[1]);
+		RotX(bm->vp_viewrotate[0]);
+		Scale(bm->vp_viewscale[0], bm->vp_viewscale[1], bm->vp_viewscale[2]);
+		Trans(bm->vp_viewtrans[0], bm->vp_viewtrans[1], bm->vp_viewtrans[2]);
+		GetCurrentMatrix(&tmpmat);
+		PerspectiveFOV(bm->vp_view3dprm[0], bm->vp_view3dprm[1], bm->vp_view3dprm[2], 0.0f, 0.0f, (float)nDestWidth / 10, (float)nDestHeight / 10);
+		//PerspectiveFOV(45.0f, 1.0f, 500.0f, 0.0f, 0.0f, (float)nDestWidth / 10, (float)nDestHeight / 10);
+		//PerspectiveWithZBuffer(10.0f, 0.0f, 60.0f, 1.0f, 0.0f);
+		MulMatrix(&tmpmat);
+		break;
+	case BMSCR_VPFLAG_MATRIX:
+		//	user matrix mode
+		mat = &bm->vp_viewtrans[0];
+		break;
+	case BMSCR_VPFLAG_NOUSE:
+	default:
+		return;
+	}
+
+	//	mat_projに設定する
+	for (i = 0; i < 16; i++) {
+		*vp++ = *mat++;
+	}
+
+	D3DXMATRIX matrixProj;
+	Mat2D3DMAT(&matrixProj, vmat);
+	d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
+
+	//	投影マトリクスの逆行列を設定する
+	//D3DXMatrixInverse(&InvViewport, NULL, &matrixProj);
+	SetCurrentMatrix(vmat);
+	InverseMatrix(&mat_unproj);
+
+}
+
+
+void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
+{
+	//	ビュー変換後の座標 -> 元の座標に変換する
+	//	(タッチ位置再現のため)
+	//
+	VECTOR v1,v2;
+	//if (bm->vp_flag == 0) return;
+	v1.x = (float)*xaxis;
+	v1.y = (float)(nDestHeight-*yaxis);
+	v1.z = 1.0f;
+	v1.w = 0.0f;
+
+	v1.x -= nDestWidth/2;
+	v1.y -= nDestHeight/2;
+	v1.x *= 2.0f / float(nDestWidth);
+	v1.y *= 2.0f / float(nDestHeight);
+
+//	*xaxis = (int)(v1.x);
+//	*yaxis = (int)(v1.y);
+
+//	D3DXVECTOR3 a1,a2;
+//	D3DXVec3TransformCoord(&a2, &D3DXVECTOR3(v1.x, v1.y, v1.z), &InvViewport);
+//	*xaxis = (int)a2.x;
+//	*yaxis = (int)a2.y;
+
+	ApplyMatrix(&mat_unproj, &v2, &v1);
+	*xaxis = (int)v2.x;
+	*yaxis = (int)v2.y;
+}
+
+
+
+

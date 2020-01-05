@@ -15,6 +15,9 @@
 #const global CLSMODE_SOLID 1
 #const global CLSMODE_TEXTURE 2
 
+#define global screen_offscreen (32)
+#define global screen_usergcopy (64)
+
 ;	system request
 ;
 #enum global SYSREQ_MAXMODEL=1
@@ -64,18 +67,26 @@
 #enum global SYSREQ_DEFAULT_FRICTION
 #enum global SYSREQ_MESCACHE_MAX
 
-#const global PLATFORM_WINDOWS 0
-#const global PLATFORM_IOS 1
-#const global PLATFORM_ANDROID 2
-#const global PLATFORM_WEBGL 3
-#const global PLATFORM_LINUX 4
-#const global PLATFORM_RASPBIAN 5
+#const global PLATFORM_WINDOWS (0)
+#const global PLATFORM_IOS (1)
+#const global PLATFORM_ANDROID (2)
+#const global PLATFORM_WEBGL (3)
+#const global PLATFORM_LINUX (4)
+#const global PLATFORM_RASPBIAN (5)
 
 #define global SYSREQ_DEBUG $10000
 
 #define global ginfo_accx ginfo(0x100)
 #define global ginfo_accy ginfo(0x101)
 #define global ginfo_accz ginfo(0x102)
+
+#define global vptype_off (0)
+#define global vptype_translate (1)
+#define global vptype_rotate (2)
+#define global vptype_scale (3)
+#define global vptype_3dmatrix (4)
+#define global vptype_2d (5)
+#define global vptype_3d (6)
 
 ;
 ;	http value

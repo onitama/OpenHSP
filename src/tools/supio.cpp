@@ -1,4 +1,4 @@
-//		スクリプトエディタ
+//		HSP Script editor support
 //		created by K-K (http://www.binzume.net/)
 //		modified by onitama for OpenHSP
 //
@@ -36,6 +36,16 @@ char *gethsperror( int error )
 {
 	if ((error<0)||(error>=HSPERR_MAX)) return err[0];
 	return err[error];
+}
+
+/*--------------------------------------------------------------------------------*/
+
+HSPCTX hspctx;
+
+HSPCTX *code_getctx(void)
+{
+	hspctx.language=0;
+	return &hspctx;
 }
 
 /*--------------------------------------------------------------------------------*/

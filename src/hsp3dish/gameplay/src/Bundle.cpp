@@ -432,7 +432,7 @@ Scene* Bundle::loadScene(const char* id)
             Node* node = readNode(scene, NULL);
             if (node)
             {
-				GP_WARN( "AddScene %s",node->getId() );
+				//GP_WARN( "AddScene %s",node->getId() );
                 scene->addNode(node);
                 node->release(); // scene now owns node
             }
@@ -513,13 +513,13 @@ Node* Bundle::loadNode(const char* id, Scene* sceneContext)
 
 	// Load the node and any referenced joints with node tracking enabled.
 	_trackedNodes = new std::map<std::string, Node*>();
-	GP_WARN("Load Node[%s]", id);
+	//GP_WARN("Load Node[%s]", id);
 
 	Node* node = loadNode(id, sceneContext, NULL);
 	if (node) {
 		resolveJointReferences(sceneContext, node);
 	}
-	GP_WARN("Load Node End[%s]", id);
+	//GP_WARN("Load Node End[%s]", id);
 
     // Load all animations targeting any nodes or mesh skins under this node's hierarchy.
     for (unsigned int i = 0; i < _referenceCount; i++)

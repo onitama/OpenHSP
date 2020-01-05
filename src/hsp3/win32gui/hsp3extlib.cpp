@@ -230,7 +230,6 @@ static int Hsp3ExtAddPlugin( void )
 	MEM_HPIDAT *hpi;
 	HSP3TYPEINFO *info;
 	HINSTANCE hd;
-	TCHAR tmp[512];
 
 	hed = hspctx->hsphed; ptr = (char *)hed;
 	org_hpi = (HPIDAT *)(ptr + hed->pt_hpidat);
@@ -329,7 +328,6 @@ int Hsp3ExtLibInit( HSP3TYPEINFO *info )
 {
 	int i;
 	STRUCTDAT *st;
-	char tmp[1024];
 
 	hspctx = info->hspctx;
 	exinfo = info->hspexinfo;

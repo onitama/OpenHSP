@@ -17,6 +17,9 @@
 #include <windowsx.h>
 #include <direct.h>
 #include <shlobj.h>
+
+#pragma comment(lib, "d3d8.lib")
+#pragma comment(lib, "dxguid.lib")
 #endif
 
 /*

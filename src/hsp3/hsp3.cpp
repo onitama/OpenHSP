@@ -252,6 +252,9 @@ int Hsp3::Reset( int mode )
 		}
 	}
 
+	//		language setup
+	hspctx.language = HSPCTX_LANGUAGE_EN;				// Default Language
+
 	//		debug
 	//Alertf( "#HSP objcode initalized.(CS=%d/DS=%d/OT=%d/VAR=%d)\n",hsphed->max_cs, hsphed->max_ds, hsphed->max_ot, hsphed->max_val );
 	code_setpc( hspctx.mem_mcs );

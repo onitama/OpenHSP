@@ -685,11 +685,59 @@ void ZBufferMatrix(float N, float F, float Zn, float Zf, float r)
 -----------------------------------------------*/
 void  PerspectiveWithZBuffer(float r, float N, float F, float Zn, float Zf)
 {
-  ZBufferMatrix(N, F, Zn, Zf, r);
-  Perspective(r);
+   ZBufferMatrix(N, F, Zn, Zf, r);
+   Perspective(r);
+//  currentMatrix->m00 *= 0.001f;
+//  currentMatrix->m11 *= 0.001f;
+
+  float right = 480.0f;
+  float left = 0.0f;
+  float top = 0.0f;
+  float bottom = 800.0f;
+
+  MATRIX *mat = currentMatrix;
+
+  mat->m00 *= 2.0f / (right - left);
+  mat->m11 *= 2.0f / (top - bottom);
+
+  mat->m30 = -(right + left) / (right - left);
+  mat->m31 = -(top + bottom) / (top - bottom);
+  mat->m32 = 0.5f;
+
 }
 
 
+void  PerspectiveFOV(float fov, float Zn, float Zf, float left, float top, float right, float bottom)
+{
+	float f_n = 1.0f / (Zf - Zn);
+	float theta = DEG2RAD(fov) * 0.5f;
+	float divisor = tan(theta);
+	float factor = 1.0f / divisor;
+	MATRIX* mat = currentMatrix;
+
+	mat->m00 = factor * (2.0f / (right - left));
+	mat->m01 = 0.0f;
+	mat->m02 = 0.0f;
+	mat->m03 = 0.0f;
+
+	mat->m10 = 0.0f;
+	mat->m11 = factor * (2.0f / (top - bottom));
+	mat->m12 = 0.0f;
+	mat->m13 = 0.0f;
+
+	mat->m20 = 0.0f;
+	mat->m21 = 0.0f;
+	mat->m22 = (-(Zf + Zn)) * f_n;
+	mat->m23 = -2.0f * Zf * Zn * f_n;
+
+	mat->m30 = 0.0f;
+	mat->m31 = 0.0f;
+	mat->m32 = -1.0f;
+	mat->m33 = 1.0f;
+
+	mat->m30 = -(right + left) / (right - left);
+	mat->m31 = -(top + bottom) / (top - bottom);
+}
 
 
 /*-----------------------------------------------
@@ -866,9 +914,104 @@ float Determinant3(MATRIX *src)
 
 /*-----------------------------------------------
   逆行列
+ *     0   4   8   12
+ *     1   5   9   13
+ *     2   6   10  14
+ *     3   7   11  15
+
 -----------------------------------------------*/
-int InverseMatrix(MATRIX *dst)
+int InverseMatrix(MATRIX *p_dst)
 {
+	float m[16];
+	MATRIX *dst = p_dst;
+	if (dst == NULL) {
+		dst = currentMatrix;
+	}
+
+	m[0]  = currentMatrix->m00;
+	m[4]  = currentMatrix->m01;
+	m[8]  = currentMatrix->m02;
+	m[12] = currentMatrix->m03;
+
+	m[1]  = currentMatrix->m10;
+	m[5]  = currentMatrix->m11;
+	m[9]  = currentMatrix->m12;
+	m[13] = currentMatrix->m13;
+
+	m[2]  = currentMatrix->m20;
+	m[6]  = currentMatrix->m21;
+	m[10] = currentMatrix->m22;
+	m[14] = currentMatrix->m23;
+
+	m[3]  = currentMatrix->m30;
+	m[7]  = currentMatrix->m31;
+	m[11] = currentMatrix->m32;
+	m[15] = currentMatrix->m33;
+
+	float a0 = m[0] * m[5] - m[1] * m[4];
+	float a1 = m[0] * m[6] - m[2] * m[4];
+	float a2 = m[0] * m[7] - m[3] * m[4];
+	float a3 = m[1] * m[6] - m[2] * m[5];
+	float a4 = m[1] * m[7] - m[3] * m[5];
+	float a5 = m[2] * m[7] - m[3] * m[6];
+	float b0 = m[8] * m[13] - m[9] * m[12];
+	float b1 = m[8] * m[14] - m[10] * m[12];
+	float b2 = m[8] * m[15] - m[11] * m[12];
+	float b3 = m[9] * m[14] - m[10] * m[13];
+	float b4 = m[9] * m[15] - m[11] * m[13];
+	float b5 = m[10] * m[15] - m[11] * m[14];
+
+	// Calculate the determinant.
+	float det = a0 * b5 - a1 * b4 + a2 * b3 + a3 * b2 - a4 * b1 + a5 * b0;
+
+	// Close to zero, can't invert.
+	if (fabs(det) == 0.0f) return FALSE;
+
+	// Support the case where m == dst.
+	dst->m00 = m[5] * b5 - m[6] * b4 + m[7] * b3;
+	dst->m10 = -m[1] * b5 + m[2] * b4 - m[3] * b3;
+	dst->m20 = m[13] * a5 - m[14] * a4 + m[15] * a3;
+	dst->m30 = -m[9] * a5 + m[10] * a4 - m[11] * a3;
+
+	dst->m01 = -m[4] * b5 + m[6] * b2 - m[7] * b1;
+	dst->m11 = m[0] * b5 - m[2] * b2 + m[3] * b1;
+	dst->m21 = -m[12] * a5 + m[14] * a2 - m[15] * a1;
+	dst->m31 = m[8] * a5 - m[10] * a2 + m[11] * a1;
+
+	dst->m02 = m[4] * b4 - m[5] * b2 + m[7] * b0;
+	dst->m12 = -m[0] * b4 + m[1] * b2 - m[3] * b0;
+	dst->m22 = m[12] * a4 - m[13] * a2 + m[15] * a0;
+	dst->m32 = -m[8] * a4 + m[9] * a2 - m[11] * a0;
+
+	dst->m03 = -m[4] * b3 + m[5] * b1 - m[6] * b0;
+	dst->m13 = m[0] * b3 - m[1] * b1 + m[2] * b0;
+	dst->m23 = -m[12] * a3 + m[13] * a1 - m[14] * a0;
+	dst->m33 = m[8] * a3 - m[9] * a1 + m[10] * a0;
+
+	float w = 1.0f / det;
+
+	dst->m00 *= w;
+	dst->m01 *= w;
+	dst->m02 *= w;
+	dst->m03 *= w;
+
+	dst->m10 *= w;
+	dst->m11 *= w;
+	dst->m12 *= w;
+	dst->m13 *= w;
+
+	dst->m20 *= w;
+	dst->m21 *= w;
+	dst->m22 *= w;
+	dst->m23 *= w;
+
+	dst->m30 *= w;
+	dst->m31 *= w;
+	dst->m32 *= w;
+	dst->m33 *= w;
+
+#if 0
+
   MATRIX *src;
   MATRIX mt, mat3;
   float invA;
@@ -967,6 +1110,8 @@ int InverseMatrix(MATRIX *dst)
   dst->m33 = Determinant3(&mat3) * invA;
 
   Transpose(NULL);
+#endif
+
   return TRUE;
 }
 
@@ -1018,6 +1163,14 @@ void ApplyMatrix(VECTOR *v1, VECTOR *v0)
   v1->z *= oow;
   v1->w = w;
 */
+}
+
+void ApplyMatrix(MATRIX* mat, VECTOR *v1, VECTOR *v0)
+{
+  v1->x = (v0->x * mat->m00 + v0->y * mat->m10 + v0->z * mat->m20) + mat->m30;
+  v1->y = (v0->x * mat->m01 + v0->y * mat->m11 + v0->z * mat->m21) + mat->m31;
+  v1->z = (v0->x * mat->m02 + v0->y * mat->m12 + v0->z * mat->m22) + mat->m32;
+  v1->w = (v0->x * mat->m03 + v0->y * mat->m13 + v0->z * mat->m23) + mat->m33;
 }
 
 /*-----------------------------------------------
@@ -1151,9 +1304,9 @@ void  LookAtWithRoll(VECTOR *cam_pos, VECTOR *cam_int, float roll)
 /*---------------------------------------------------------------------*
  *	透視投影
  *---------------------------------------------------------------------*/
-/*
-static void PerspectiveViewScreen( float scrz, float ax, float ay, 
-	       float xcenter, float ycenter, float zbufsmall, float zbufbig, float zD, float zF, float D, float F, float W, float H)
+
+void PerspectiveViewScreen(ViewScreen* vs, float scrz, float ax, float ay,
+	float xcenter, float ycenter, float zbufsmall, float zbufbig, float zD, float zF, float fognearz, float fogfarz, float W, float H)
 {
 
 		// D = nearz, F = farz, W = width/2, H = Height/2
@@ -1169,8 +1322,8 @@ static void PerspectiveViewScreen( float scrz, float ax, float ay,
 
 	float p, q, fscale, foffset, zscale, zoffset, qa, qb, za, zb;
 
-		p = (F+D)/(F-D);
-		q = -2*F*D/(F-D);
+		p = (zF+zD)/(zF-zD);
+		q = -2*zF*zD/(zF-zD);
 
 		SetVector( &vs->a, scrz * ax / W, scrz * ay / H, p, 1.0f );
 		SetVector( &vs->b, 0.0f, 0.0f, q, 0.0f);
@@ -1200,17 +1353,67 @@ static void PerspectiveViewScreen( float scrz, float ax, float ay,
 		SetVector( &vs->v, xcenter, ycenter, zoffset, fscale );
 		SetVector( &vs->t, W, H, zscale, foffset);
 
-		SetVector( &vs->cmin, -W + xcenter, -H + ycenter, -D, 1.0f );
-		SetVector( &vs->cmax,  W + xcenter,  H + ycenter,  F, -zb );
+		SetVector( &vs->cmin, -W + xcenter, -H + ycenter, -zD, 1.0f );
+		SetVector( &vs->cmax,  W + xcenter,  H + ycenter,  zF, -zb );
 }
 
-void PerspectiveViewScreen( ViewScreen * vs, float scrz, float ax, float ay, 
-	       float xcenter, float ycenter, float zbufsmall, float zbufbig, float D, float F, float fognearz, float fogfarz, float W, float H)
+
+/*---------------------------------------------------------------------*
+ *	平行投影(垂直投影)
+ *---------------------------------------------------------------------*/
+
+void OrthoMatrix(float basex, float basey, float width, float height, float Znear, float Zfar )
 {
-		PerspectiveViewScreenEx(vs, scrz, ax, ay, xcenter, ycenter, zbufsmall, zbufbig, D, F, D, F, fognearz, fogfarz, W, H);
+	MATRIX* mat = currentMatrix;
+
+	float right = basex+width;
+	float left = basex;
+	float top = basey;
+	float bottom = basey+height;
+
+	mat->m00 = 2.0f / (right - left);
+	mat->m01 = 0.0f;
+	mat->m02 = 0.0f;
+	mat->m03 = 0.0f;
+
+	mat->m10 = 0.0f;
+	mat->m11 = 2.0f / (top - bottom);
+	mat->m12 = 0.0f;
+	mat->m13 = 0.0f;
+
+	mat->m20 = 0.0f;
+	mat->m21 = 0.0f;
+	mat->m22 = 1.0f / (Znear - Zfar );
+	mat->m23 = 0.0f;
+
+	mat->m30 = -(right + left) / (right - left);
+	mat->m31 = -(top + bottom) / (top - bottom);
+	mat->m32 = -Znear / (Znear - Zfar );
+	mat->m33 = 1.0f;
+
+	/*
+	mat->m00 = 0.1f;
+	mat->m01 = 0.0f;
+	mat->m02 = 0.0f;
+	mat->m03 = 0.0f;
+
+	mat->m10 = 0.0f;
+	mat->m11 = 0.1f;
+	mat->m12 = 0.0f;
+	mat->m13 = 0.0f;
+
+	mat->m20 = 0.0f;
+	mat->m21 = 0.0f;
+	mat->m22 = 1.0f;
+	mat->m23 = 0.0f;
+
+	mat->m30 = 0.0f;
+	mat->m31 = 0.0f;
+	mat->m32 = 0.0f;
+	mat->m33 = 1.0f;
+	*/
 }
 
-*/
 
 /*-----------------------------------------------
   2点間の距離を求める(3D)

@@ -102,14 +102,16 @@ void handleEvent() {
 				if ( exinfo != NULL ) {
 					SDL_MouseMotionEvent *m = (SDL_MouseMotionEvent*)&event;
 					int x, y;
+					bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
 #ifdef HSPDISHGP
 					x = m->x;
 					y = m->y;
 #else
 					hgio_scale_point( m->x, m->y, x, y );
+					hgio_cnvview((BMSCR *)bm,&x,&y);
+					y=-y;
 #endif
 
-					bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
 					bm->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
 					bm->savepos[BMSCR_SAVEPOS_MOSUEY] = y;
 					bm->UpdateAllObjects();
@@ -336,6 +338,13 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 #endif
 			break;
 	//	case RUNMODE_LOGMES:
+		case RUNMODE_RESTART:
+		{
+			//	rebuild window
+
+			hspctx->runmode = RUNMODE_RUN;
+			break;
+		}
 		default:
 			return;
 		}

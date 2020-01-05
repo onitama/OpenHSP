@@ -890,8 +890,6 @@ void Bmscr::Cls( int mode )
 	this->wchg = 0;
 	this->viewx = 0;
 	this->viewy = 0;
-	this->viewsx = 1.0;
-	this->viewsy = 1.0;
 	Viewcalc_reset();
 
 	//		text setting initalize
@@ -940,18 +938,7 @@ void Bmscr::Bmspnt( HDC disthdc )
 		RealizePalette( disthdc );
 	}
 
-	if ((viewsx==1.0)&&(viewsy==1.0)) {
-		BitBlt(disthdc, 0, 0, wx, wy, hdc, viewx, viewy, SRCCOPY);
-	}
-	else {
-		double dx, dy;
-		dx = (double)wx * viewsx;
-		dy = (double)wy * viewsy;
-		SetStretchBltMode(hdc, COLORONCOLOR);
-		//SetStretchBltMode(hdc, HALFTONE);
-		
-		StretchBlt(disthdc, 0, 0, (int)dx, (int)dy, hdc, viewx, viewy, wx, wy, SRCCOPY);
-	}
+	BitBlt(disthdc, 0, 0, wx, wy, hdc, viewx, viewy, SRCCOPY);
 	if ( hpal != NULL ) {
 		SelectPalette( disthdc, opal, 0 );
 	}
@@ -1742,34 +1729,14 @@ void Bmscr::GetClientSize( int *xsize, int *ysize )
 }
 
 
-void Bmscr::SetScroll( int xbase, int ybase, HSPREAL xscale, HSPREAL yscale )
+void Bmscr::SetScroll( int xbase, int ybase )
 {
 	//		スクロール基点を設定
 	//
-	int ax, ay;
 	viewx = xbase;
 	viewy = ybase;
 
 	if ((sx == 0) || (sy == 0)) return;
-
-	GetClientSize(&ax, &ay);
-	double minscalex = (double)ax / sx;
-	double minscaley = (double)ay / sy;
-	double px, py;
-	px = xscale; if (px < minscalex) px = minscalex;
-	py = yscale; if (py < minscaley) py = minscaley;
-
-	viewsx = px; viewsxr = 1.0 / px;
-	viewsy = py; viewsyr = 1.0 / py;
-
-	px = (double)(ax+1) * viewsxr;
-	py = (double)(ay+1) * viewsyr;
-
-	if ((viewx + (int)px) >= sx) viewx = sx - (int)px;
-	if ((viewy + (int)py) >= sy) viewy = sy - (int)py;
-	if (viewx < 0) viewx = 0;
-	if (viewy < 0) viewy = 0;
-
 	Update();
 }
 

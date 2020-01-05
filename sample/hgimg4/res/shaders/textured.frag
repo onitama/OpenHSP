@@ -1,4 +1,5 @@
 #if defined(OPENGL_ES) || defined(GL_ES)
+#extension GL_OES_standard_derivatives : enable
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -124,7 +125,11 @@ void main()
     if(v_clipDistance < 0.0) discard;
     #endif
  
+    #if defined(MIRRORTEX)
+    _baseColor = texture2D(u_diffuseTexture, vec2(1.0-v_texCoord.x,v_texCoord.y));
+    #else
     _baseColor = texture2D(u_diffuseTexture, v_texCoord);
+    #endif
  
     gl_FragColor.a = _baseColor.a;
 

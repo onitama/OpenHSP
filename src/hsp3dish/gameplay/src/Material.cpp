@@ -7,6 +7,8 @@
 #include "Properties.h"
 #include "Node.h"
 
+
+
 namespace gameplay
 {
 
@@ -127,9 +129,9 @@ Material* Material::create(const char* vshPath, const char* fshPath, const char*
     material->_techniques.push_back(technique);
 
     Pass* pass = new Pass(NULL, technique);
-    if (!pass->initialize(vshPath, fshPath, defines))
+	if (!pass->initialize(vshPath, fshPath, defines))
     {
-        GP_WARN("Failed to create pass for material: vertexShader = %s, fragmentShader = %s, defines = %s", vshPath, fshPath, defines ? defines : "");
+		GP_WARN("Failed to create pass for material: vertexShader = %s, fragmentShader = %s, defines = %s", vshPath, fshPath, defines ? defines : "");
         SAFE_RELEASE(pass);
         SAFE_RELEASE(material);
         return NULL;
@@ -138,7 +140,7 @@ Material* Material::create(const char* vshPath, const char* fshPath, const char*
 
     material->_currentTechnique = technique;
 
-    return material;
+	return material;
 }
 
 unsigned int Material::getTechniqueCount() const

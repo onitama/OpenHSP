@@ -17,6 +17,7 @@ CFLAGS = $(CFLAGS_CORE) $(CFLAGS_DEBUG) -DUSE_OBAQ\
 
 CFLAGS_GP = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
 		  -s FULL_ES2=1 -O3\
+		  -s ALLOW_MEMORY_GROWTH=1\
 		  -D_LARGEFILE64_SOURCE \
 		  -DHSPDISHGP -I emscripten/extlib/include -I extlib/src -I gameplay/src -I win32gp
 
@@ -82,6 +83,7 @@ OBJS_GP = \
 	../hsp3/strnote.gp.bc \
 	sysreq.gp.bc \
 	win32gp/gamehsp.gp.bc \
+	win32gp/gptexmes.gp.bc \
 	win32gp/gpevent.gp.bc \
 	win32gp/gpcam.gp.bc \
 	win32gp/gplgt.gp.bc \

@@ -125,6 +125,8 @@ void  Scale(float x, float y, float z);
 void  Perspective(float r);
 //  透視投影かつＺをＺバッファ値に
 void  PerspectiveWithZBuffer(float r, float N, float F, float Zn, float Zf);
+void  PerspectiveFOV(float fov, float Zn, float Zf, float left, float top, float right, float bottom);
+
 //  マトリックス同士の積（カレントマトリックスに左から掛ける）
 void  MulMatrix(MATRIX *left);
 //  マトリックス同士の積（カレントマトリックスに右から掛ける）
@@ -140,6 +142,7 @@ int  InverseMatrix(MATRIX *mat);
 //  ベクトル＊マトリックス -> ベクトル
 void  ApplyMatrix(VECTOR *v0, VECTOR *v1);
 void  ApplyMatrixN(VECTOR *v0, VECTOR *v1, int nb);
+void  ApplyMatrix(MATRIX* mat, VECTOR* v1, VECTOR* v0);
 //  ベクトル＊マトリックス -> ベクトル（回転のみ）
 void  ApplyMatrixRot(VECTOR *v0, VECTOR *v1);
 //  ベクトル＊マトリックス -> ベクトル（平行移動のみ）
@@ -158,6 +161,10 @@ void GetTargetAngle( VECTOR *ang, VECTOR *src, VECTOR *target );
 //	View->Screenマトリクス生成
 void PerspectiveViewScreen( ViewScreen * vs, float scrz, float ax, float ay, 
 	       float xcenter, float ycenter, float zbufsmall, float zbufbig, float D, float F, float fognearz, float fogfarz, float W, float H);
+
+//	平行投影マトリクス生成
+void OrthoMatrix(float basex, float basey, float width, float height, float Znear, float Zfar);
+
 
 //	ポリゴン接触判定
 int HasPoint2D( float x, float y, VECTOR *v );

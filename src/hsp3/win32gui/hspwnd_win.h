@@ -142,7 +142,7 @@ public:
 	void Line( int xx,int yy );
 	int Copy( Bmscr *src, int xx, int yy, int psx, int psy );
 	int Zoom( int dx, int dy, Bmscr *src, int xx, int yy, int psx, int psy, int mode );
-	void SetScroll( int xbase, int ybase, HSPREAL xscale=1.0, HSPREAL yscale=1.0 );
+	void SetScroll(int xbase, int ybase);
 
 	int NewHSPObject( void );
 	void ResetHSPObject( void );
@@ -259,10 +259,8 @@ public:
 
 	COLORREF objcolor;					// object color code
 
-	HSPREAL	viewsx, viewsy;				// buffer view size x,y
-	HSPREAL	viewsxr, viewsyr;			// buffer view size x,y (reverse)
 	int		vp_flag;					// Viewport enable flag (0=none)
-	HSPREAL	vp_matrix[16];				// Viewport matrix
+	float	vp_matrix[16];				// Viewport matrix
 
 private:
 	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
@@ -402,10 +400,8 @@ typedef struct BMSCR
 
 	COLORREF objcolor;					// object color code
 
-	HSPREAL	viewsx, viewsy;				// buffer view size x,y
-	HSPREAL	viewsxr, viewsyr;			// buffer view size x,y (reverse)
 	int		vp_flag;					// Viewport enable flag (0=none)
-	HSPREAL	vp_matrix[16];				// Viewport matrix
+	float	vp_matrix[16];				// Viewport matrix
 
 } BMSCR;
 

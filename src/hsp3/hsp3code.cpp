@@ -3082,9 +3082,11 @@ rerun:
 			i = RUNMODE_END;
 		} else if ( code == HSPERR_INTJUMP ) {
 			goto rerun;
-		} else if ( code == HSPERR_EXITRUN ) {
+		}
+		else if (code == HSPERR_EXITRUN) {
 			i = RUNMODE_EXITRUN;
-		} else {
+		}
+		else {
 			code_catcherror(code);
 			i = RUNMODE_ERROR;
 			if ( hspctx->runmode != i ) goto rerun;

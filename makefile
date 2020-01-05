@@ -27,6 +27,7 @@ OBJS = \
 	src/hsp3/strbuf.do \
 	src/hsp3/strnote.do \
 	src/hsp3/linux/hsp3ext_sock.do \
+	src/hsp3/linux/devctrl_io.do \
 	src/hsp3dish/sysreq.do \
 	src/hsp3dish/emscripten/hgtex.do \
 	src/hsp3dish/emscripten/hgiox.do \
@@ -79,6 +80,7 @@ OBJS_CL = \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
 	src/hsp3/linux/hsp3ext_sock.o \
+	src/hsp3/linux/devctrl_io.o \
 	src/hsp3/linux/hsp3gr_linux.o
 
 OBJS_GP = \
@@ -102,13 +104,14 @@ OBJS_GP = \
 	src/hsp3/strbuf.gpo \
 	src/hsp3/strnote.gpo \
 	src/hsp3/linux/hsp3ext_sock.gpo \
+	src/hsp3/linux/devctrl_io.gpo \
 	src/hsp3dish/sysreq.gpo \
-	src/hsp3dish/emscripten/hgtex.gpo \
 	src/hsp3dish/emscripten/mmman.gpo \
 	src/hsp3dish/emscripten/main.gpo \
 	src/hsp3dish/emscripten/stb_image.gpo \
 	src/hsp3dish/win32gp/hgiox.gpo \
 	src/hsp3dish/win32gp/gamehsp.gpo \
+	src/hsp3dish/win32gp/gptexmes.gpo \
 	src/hsp3dish/win32gp/gpevent.gpo \
 	src/hsp3dish/win32gp/gpcam.gpo \
 	src/hsp3dish/win32gp/gplgt.gpo \
@@ -395,8 +398,8 @@ OBJS_LINEAR_MATH = \
 	src/hsp3dish/extlib/src/LinearMath/btVector3.gpo
 
 TARGETS = hsp3dish hsp3gp hsp3cl hspcmp hsed
-LIBS1 = -lm -lGL -lEGL -lSDL -lSDL_image -lSDL_mixer -lSDL_ttf -lstdc++
-LIBS2 = -lm -lGL -lEGL -lSDL -lSDL_image -lSDL_mixer -lSDL_ttf -lstdc++
+LIBS1 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++
+LIBS2 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++
 LIBS_GP = \
 	libgameplay.a \
 	libBulletDynamics.a \

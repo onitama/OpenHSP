@@ -203,16 +203,25 @@ void FBXSceneEncoder::loadScene(FbxScene* fbxScene)
 
         // Don't include the FBX root node in the GPB.
         const int childCount = rootNode->GetChildCount();
-        printf("Load nodes.(%d)\n",childCount);
-        for (int i = 0; i < childCount; ++i)
-        {
-			printf("Node:%s\n",rootNode->GetChild(i)->GetName());
-            Node* node = loadNode(rootNode->GetChild(i));
-            if (node)
-            {
-                scene->add(node);
-            }
-        }
+		if (childCount == 0) {
+			printf("Load single node.\n");
+			Node* node = loadNode(rootNode);
+			if (node)
+			{
+				scene->add(node);
+			}
+		} else {
+			printf("Load nodes.(%d)\n",childCount);
+			for (int i = 0; i < childCount; ++i)
+			{
+				printf("Node:%s\n",rootNode->GetChild(i)->GetName());
+				Node* node = loadNode(rootNode->GetChild(i));
+				if (node)
+				{
+					scene->add(node);
+				}
+			}
+		}
 
 		//printf("Process Mesh.\n");
 		//scene->processSceneMesh(0);
@@ -971,14 +980,18 @@ void FBXSceneEncoder::loadMaterials(FbxScene* fbxScene)
     {
         // Don't include the FBX root node
         const int childCount = rootNode->GetChildCount();
-        for (int i = 0; i < childCount; ++i)
-        {
-            FbxNode* fbxNode = rootNode->GetChild(i);
-            if (fbxNode)
-            {
-                loadMaterial(fbxNode);
-            }
-        }
+		if (childCount == 0) {
+				loadMaterial(rootNode);
+		} else {
+			for (int i = 0; i < childCount; ++i)
+			{
+				FbxNode* fbxNode = rootNode->GetChild(i);
+				if (fbxNode)
+				{
+					loadMaterial(fbxNode);
+				}
+			}
+		}
     }
 }
 

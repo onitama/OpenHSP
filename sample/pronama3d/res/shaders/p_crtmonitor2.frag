@@ -1,4 +1,5 @@
-#ifdef OPENGL_ES
+#if defined(OPENGL_ES) || defined(GL_ES)
+#extension GL_OES_standard_derivatives : enable
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -14,7 +15,7 @@ uniform float u_curvex;
 uniform float u_curvey;
 uniform float u_brightness;
 uniform float u_contrast;
-#define SCANLINE 424.0		// ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³
+#define SCANLINE 424.0		// ƒXƒLƒƒƒ“ƒ‰ƒCƒ“
 
 ///////////////////////////////////////////////////////////
 // Varyings

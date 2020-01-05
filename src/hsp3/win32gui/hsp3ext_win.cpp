@@ -64,9 +64,42 @@ static LPTSTR atxwndclass = NULL;
 
 #endif	// !defined(HSP_COM_UNSUPPORTED)
 
-
 #define GetPRM(id) (&hspctx->mem_finfo[id])
 #define strp(dsptr) &hspctx->mem_mds[dsptr]
+
+
+/*------------------------------------------------------------*/
+/*
+		Language initialization
+*/
+/*------------------------------------------------------------*/
+
+typedef int(CALLBACK* _Kernel_GetUserDefaultUILanguage)(void);
+static _Kernel_GetUserDefaultUILanguage fn_GetUserDefaultUILanguage = NULL;
+static HINSTANCE hinst_kerneldll = NULL;
+
+static void InitLanguage(void)
+{
+	hinst_kerneldll = LoadLibrary(TEXT("kernel32"));
+	if (hinst_kerneldll == NULL) return;
+	fn_GetUserDefaultUILanguage = (_Kernel_GetUserDefaultUILanguage)GetProcAddress(hinst_kerneldll, "GetUserDefaultUILanguage");
+	if (fn_GetUserDefaultUILanguage == NULL) return;
+
+	int lang = fn_GetUserDefaultUILanguage();
+	if (lang == 0x411) {
+		//	Set Japanese language
+		HSPCTX* ctx = code_getctx();
+		ctx->language = HSPCTX_LANGUAGE_JP;
+	}
+}
+
+static void TermLanguage(void)
+{
+	if (hinst_kerneldll) {
+		FreeLibrary(hinst_kerneldll);
+		hinst_kerneldll = NULL;
+	}
+}
 
 /*------------------------------------------------------------*/
 /*
@@ -1233,10 +1266,11 @@ static int termfunc_dllcmd( int option )
 	//
 #ifndef HSP_COM_UNSUPPORTED
 	VariantClear( &comconv_var );
-	// TermAtxDll();
+	//TermAtxDll();
 #endif
 
 	Hsp3ExtLibTerm();
+	TermLanguage();
 	return 0;
 }
 
@@ -1250,6 +1284,8 @@ void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 	VariantInit( &comconv_var );
 	comres_pval = NULL;
 #endif	// !defined( HSP_COM_UNSUPPORTED )
+
+	InitLanguage();
 
 	hspctx = info->hspctx;
 	exinfo = info->hspexinfo;

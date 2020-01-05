@@ -302,6 +302,9 @@ static int sysinfo( int p2 )
 		freehc(&p);
 		fl = HSPVAR_FLAG_STR;
 		break;
+	case 3:
+		*(int*)p3 = ctx->language;
+		break;
 	case 16:
 		*(int *)p3 = (int)si.dwProcessorType;
 		break;
@@ -778,7 +781,8 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 
 	case 0x0a:								// mmstop
-		mmman->Stop();
+		p1 = code_getdi(-1);
+		mmman->StopBank(p1);
 		break;
 
 	case 0x0b:								// mci
@@ -1176,9 +1180,7 @@ static int cmdfunc_extcmd( int cmd )
 	{
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
-		HSPREAL dp1 = code_getdd(bmscr->viewsx);
-		HSPREAL dp2 = code_getdd(bmscr->viewsy);
-		bmscr->SetScroll(p1, p2, dp1, dp2);
+		bmscr->SetScroll(p1, p2);
 		break;
 	}
 	case 0x2f:								// line
@@ -1242,7 +1244,8 @@ static int cmdfunc_extcmd( int cmd )
 			VK_CONTROL, VK_ESCAPE,
 			(GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON),
 			(GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON),
-			VK_TAB
+			VK_TAB,
+			90, 88, 67, 65, 87, 68, 83		// Z,X,C, A,W,D,S
 		};
 
 		for ( size_t i = 0; i < sizeof(stick_keys) / sizeof(int); i++ ) {

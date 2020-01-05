@@ -510,6 +510,7 @@ RUNMODE_INTJUMP,
 RUNMODE_ASSERT,
 RUNMODE_LOGMES,
 RUNMODE_EXITRUN,
+RUNMODE_RESTART,
 RUNMODE_MAX
 };
 
@@ -571,6 +572,7 @@ struct HSPCTX
 	int	prmstack_max;					// Parameter Stack Max(hsp3cnv) (3.3)
 	int *dsindex;						// DSBuffer index (3.6)
 	int dsindex_size;					// DSBuffer index size (3.6)
+	int language;						// HSPCTX_LANGUAGE_* flag (3.6)
 };
 
 #define HSPCTX_REFSTR_MAX 4096
@@ -591,6 +593,9 @@ struct HSPCTX
 #define TYPE_EX_ENDOFPARAM 0x200		// パラメーター終端(HSPtoC)
 #define TYPE_EX_ARRAY_VARS 0x201		// 配列要素付き変数用スタックタイプ(HSPtoC)
 #define TYPE_EX_LOCAL_VARS 0x202		// ローカル変数用スタックタイプ(HSPtoC)
+
+#define HSPCTX_LANGUAGE_EN 0
+#define HSPCTX_LANGUAGE_JP 1
 
 typedef struct
 {

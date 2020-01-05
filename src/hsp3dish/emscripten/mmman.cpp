@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include "../../hsp3/hsp3config.h"
 #include "../../hsp3/dpmread.h"
 #include "../../hsp3/strbuf.h"
