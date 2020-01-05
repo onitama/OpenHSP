@@ -21,26 +21,29 @@ LinuxのGUI環境(X Window System)で動作します。
 
 githubから最新のリポジトリを取得してご使用ください。
 
-	git clone http://github.com/onitama/OpenHSP
+	git clone https://github.com/onitama/OpenHSP
 
-取得したリポジトリのソースをコンパイルしてください。
+アーカイブにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
 コンパイルには、gcc及びmakeを実行できる環境が必要です。
 コンパイルの際には、以下のライブラリが必要になりますので、あらかじめ確認を行なって下さい。
 
 	OpenGLES2.0以降 / EGL
-	SDL1.2
+	SDL2
 	gtk+-2
 
-Debian(Ubuntu)の場合は、パッケージマネージャから以下のようにライブラリをインストールできます。
+Debian(Ubuntu)であれば、取得したリポジトリに移動して、
 
-	sudo apt-get update
-	sudo apt-get install libgtk2.0-dev
-	sudo apt-get install libglew-dev
-	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
-	sudo apt-get install libgles2-mesa-dev libegl1-mesa-dev
+	./setup.sh
 
+を実行することで、ライブラリのインストール及びHSPのコンパイルを行います。
+手動でライブラリを準備する場合は、パッケージマネージャから以下のようにライブラリをインストールできます。
 
-アーカイブにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
+	sudo apt update
+	sudo apt install -y libgtk2.0-dev
+	sudo apt install -y libglew-dev
+	sudo apt install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+	sudo apt install -y libgles2-mesa-dev libegl1-mesa-dev
+
 (Linuxのバージョンやディストリビューションによって正しくコンパイルされない場合は、修正が必要になります。)
 
 	make
@@ -57,38 +60,19 @@ hsp3dish及び、hsed(スクリプトエディタ)は、GUI環境でのみ動作
 
 githubから最新版を取得してください。
 
-	git clone http://github.com/onitama/OpenHSP
+	git clone https://github.com/onitama/OpenHSP
 
 Raspberry Piインストール用にpisetup.shスクリプトを同梱しています。
 home/pi/OpenHSPに最新版を取得されている状態で、
 
 	cd OpenHSP
-	bash pisetup.sh
+	./pisetup.sh
 
 を実行することで、HSPのコンパイル及びメニューへの登録を行います。
-
-自前でmakeコマンドを使用してHSPのツールセットを準備する場合は以下のような流れになります。
-コンパイルには、gcc及びmakeを実行できる環境が必要になります。
-コンパイルの際には、追加のライブラリが必要になります。ネットワークに
-接続されている状態で以下のコマンドを実行することで取得できます。
-
-	sudo apt-get update
-	sudo apt-get install libgtk2.0-dev
-	sudo apt-get install libglew-dev
-	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
-
-makeによってコンパイルを行います。
+makeによってコンパイルを行う場合は、以下のように指定してください。
 
 	make -f makefile.raspbian
 		
-アーカイブの内容が展開されたディレクトリでmakeコマンドを実行してください。
-必要なツールのコンパイルが行なわれ、HSP3が使用できる状態になります。
-
-	./hsed
-
-上記のプログラムを起動することで、スクリプトエディタ(簡易版)がGUIで動作します。
-HSP3のスクリプトを記述して、実行することのできる簡易的なエディタです。
-
 Raspberry Pi版では、フルスクリーンで実行を行ないます。
 実行の中断は、[ctrl]+[C]か[esc]キーを押してください。
 キーボードだ正しく認識されていない場合など、中断ができなくなることがありますので注意してください。
@@ -112,14 +96,17 @@ Linux上で手軽にプログラミングを楽しむことができるよう構
 
 スクリプトエディタ(簡易版)は、HSP3のスクリプトを記述して、実行することのできる
 GUIアプリケーションです。
+
+	./hsed
+
+上記のプログラムを起動することで、スクリプトエディタ(簡易版)がGUIで動作します。
+HSP3のスクリプトを記述して、実行することのできる簡易的なエディタです。
 基本的なスクリプトの編集、及びロード・セーブ機能を持っています。
 [F5]キー、または「HSP」メニューから「Run」を選択することで編集している
 スクリプトを実行できます。
-現在のバージョンでは、標準ランタイムとしてhsp3dishが使用されます。
-HSP3Dishに対応するサンプルコードがsampleフォルダに含まれていますので、
-お試しください。
-スクリプトの文字コードはUTF-8として扱われます。Windowsが使用する文字コード
-(SJIS)とは異なりますので注意してください。
+現在のバージョンでは、ランタイムとしてhsp3dish,hsp3cl,hgimg4(hsp3gp)が用意されています。
+サンプルコードがsampleフォルダに含まれていますので、お試しください。
+スクリプトの文字コードはUTF-8として扱われます。Windowsが使用する文字コード(SJIS)とは異なりますので注意してください。
 
 コマンドラインからスクリプトの実行を行なう場合は、hspcmpにより
 HSPオブジェクトファイルを作成する必要があります。
@@ -207,11 +194,11 @@ I2C制御は、hsp3dishだけでなくhsp3clからも使用することが可能
 
 # オンラインマニュアル
 
-HSP3.5に関する情報はオンラインマニュアルでご覧いただけます。
-http://www.onionsoft.net/hsp/v35/
+HSP3.6に関する情報はオンラインマニュアルでご覧いただけます。
+https://www.onionsoft.net/hsp/v36/
 
 HSPについての最新情報やコミュニティは、HSPTV!サイトにて提供されています。
-http://hsp.tv/
+https://hsp.tv/
 
 
 # 将来の予定
@@ -222,7 +209,7 @@ HSP3標準ランタイム、及びヘルプリファレンスや周辺ツール�
 パッケージの不備やアドバイスなどありましたら、お知らせ頂ければ幸いです。
 
 	onion software (hsp@onionsoft.net)
-	http://www.onionsoft.net/
+	https://www.onionsoft.net/
 
 頂いたメールには、すべて目を通しておりますが、返信や、要望の反映などについては
 作者がすぐに対応できないこともありますので、予めご了承下さい。
