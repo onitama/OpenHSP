@@ -13,18 +13,21 @@ CFLAGS_DEBUG =
 #CFLAGS_DEBUG = -g3 --js-opts 0 -s SAFE_HEAP=1
 
 CFLAGS = $(CFLAGS_CORE) $(CFLAGS_DEBUG) -DUSE_OBAQ\
-	   -s LEGACY_GL_EMULATION=1 -O3
+	   -s USE_SDL=2 -O3\
+	   -s LEGACY_GL_EMULATION=1
 
 CFLAGS_GP = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
-		  -s FULL_ES2=1 -O3\
+		  -s FULL_ES2=1\
+		  -s USE_SDL=2 -s USE_SDL_TTF=2\
 		  -s ALLOW_MEMORY_GROWTH=1\
-		  -D_LARGEFILE64_SOURCE \
+		  -D_LARGEFILE64_SOURCE -O3\
 		  -DHSPDISHGP -I emscripten/extlib/include -I extlib/src -I gameplay/src -I win32gp
 
 CFLAGS_EXTLIB = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
-		  -s FULL_ES2=1 -O3 \
-		  -D_LARGEFILE64_SOURCE \
+		  -s FULL_ES2=1\
+		  -D_LARGEFILE64_SOURCE -O3\
 		  -I emscripten/extlib/include -I extlib/src -I gameplay/src
+
 
 OBJS = \
 	../hsp3/dpmread.bc \

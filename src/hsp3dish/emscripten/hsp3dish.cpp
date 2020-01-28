@@ -42,7 +42,6 @@
 #include "../obaq/hsp3dw.h"
 #endif
 
-//typedef BOOL (CALLBACK *HSP3DBGFUNC)(HSP3DEBUG *,int,int,int);
 
 /*----------------------------------------------------------*/
 
@@ -67,7 +66,11 @@ static bool fs_initialized = false;
 static int hsp_sscnt, hsp_ssx, hsp_ssy;
 #endif
 
-static bool keys[SDLK_LAST];
+#define SDLK_SCANCODE_MAX 0x200
+static bool keys[SDLK_SCANCODE_MAX];
+SDL_Window *window;
+static SDL_Renderer *renderer;
+static SDL_GLContext context;
 
 #ifdef HSPDISHGP
 gamehsp *game;
@@ -82,17 +85,18 @@ static std::string gplog;
 extern "C" {
 	static void logfunc( gameplay::Logger::Level level, const char *msg )
 	{
-		if (GetSysReq(SYSREQ_LOGWRITE)) {
-			gplog += msg;
-			if (( level == gameplay::Logger::LEVEL_ERROR )||( level == gameplay::Logger::LEVEL_WARN )) printf( "#%s\n",msg );
-		}
+		if (GetSysReq(SYSREQ_LOGWRITE)) gplog += msg;
+		if (( level == gameplay::Logger::LEVEL_ERROR )||( level == gameplay::Logger::LEVEL_WARN )) printf( "#%s\n",msg );
 	}
 }
 
 #endif
 
 /*----------------------------------------------------------*/
-void handleEvent() {
+
+/*----------------------------------------------------------*/
+static int handleEvent( void ) {
+	int res=0;
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch(event.type) {
@@ -109,7 +113,6 @@ void handleEvent() {
 #else
 					hgio_scale_point( m->x, m->y, x, y );
 					hgio_cnvview((BMSCR *)bm,&x,&y);
-					y=-y;
 #endif
 
 					bm->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
@@ -126,31 +129,30 @@ void handleEvent() {
 		case SDL_MOUSEBUTTONDOWN:
 			{
 				SDL_MouseButtonEvent *m = (SDL_MouseButtonEvent*)&event;
-				// printf("button down: %d,%d  %d,%d\n", m->button, m->state, m->x, m->y);
-				hgio_touch( m->x, m->y, SDL_GetMouseState(NULL, NULL) );
+				//printf("button down: %d,%d  %d,%d\n", m->button, m->state, m->x, m->y);
+				hgio_touch( m->x, m->y, 1 );
 				break;
 			}
 		case SDL_MOUSEBUTTONUP:
 			{
 				SDL_MouseButtonEvent *m = (SDL_MouseButtonEvent*)&event;
-				// printf("button up: %d,%d  %d,%d\n", m->button, m->state, m->x, m->y);
-				hgio_touch( m->x, m->y, SDL_GetMouseState(NULL, NULL) );
+				//printf("button up: %d,%d  %d,%d\n", m->button, m->state, m->x, m->y);
+				hgio_touch( m->x, m->y, 0 );
 				break;
 			}
 		case SDL_KEYDOWN:
-			if (!keys[event.key.keysym.sym]) {
-				keys[event.key.keysym.sym] = true;
-				//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
-			}
+			keys[event.key.keysym.scancode] = true;
+			//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 		case SDL_KEYUP:
-			if (keys[event.key.keysym.sym]) {
-				keys[event.key.keysym.sym] = false;
-				//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
-			}
+			keys[event.key.keysym.scancode] = false;
+			//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
+		case SDL_QUIT: /** ウィンドウのxボタンやctrl-Cを押した場合 */
+			res = -1;
 		}
 	}
+	return res;
 }
 
 bool get_key_state(int sym)
@@ -158,17 +160,9 @@ bool get_key_state(int sym)
 	return keys[sym];
 }
 
-static void hsp3dish_initwindow( engine* engine, int sx, int sy, char *windowtitle )
+static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowtitle )
 {
 	printf("INIT %dx%d %s\n", sx,sy,windowtitle);
-	// glutInit(NULL, NULL);
-	// glutInitWindowSize(sx, sy);
-
-	// glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-
-	// glutCreateWindow(windowtitle);
-
-	SDL_Surface *screen;
 
 	// Slightly different SDL initialization
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
@@ -176,16 +170,20 @@ static void hsp3dish_initwindow( engine* engine, int sx, int sy, char *windowtit
 		return;
 	}
 
+	window = SDL_CreateWindow( "HSPDish ver" hspver, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sx, sy, SDL_WINDOW_OPENGL );
+	if ( window==NULL ) {
+		printf("Unable to set window: %s\n", SDL_GetError());
+		return;
+	}
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-	screen = SDL_SetVideoMode( sx, sy, 16, SDL_OPENGL );
-	if ( !screen ) {
-		printf("Unable to set video mode: %s\n", SDL_GetError());
+	context = SDL_GL_CreateContext(window);
+	if ( window==NULL ) {
+		printf("Unable to set GLContext: %s\n", SDL_GetError());
 		return;
 	}
 
 	// 描画APIに渡す
-	hgio_init( 0, sx, sy, engine );
+	hgio_init( 0, sx, sy, p_engine );
 	hgio_clsmode( CLSMODE_SOLID, 0xffffff, 0 );
 
 	// マルチタッチ初期化
@@ -784,3 +782,4 @@ int hsp3dish_exec( void )
 
 	return 0;
 }
+
