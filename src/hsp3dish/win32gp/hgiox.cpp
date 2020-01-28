@@ -44,8 +44,11 @@
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_opengl.h"
 
-#include <SDL2/SDL_ttf.h>
+#include <SDL/SDL_ttf.h>
 #define TTF_FONTFILE "/ipaexg.ttf"
+
+extern bool get_key_state(int sym);
+extern SDL_Window *window;
 
 #endif
 
@@ -497,11 +500,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	if (buffer == NULL) {
 
 		SDL_Color dcolor={255,255,255,255};
-#if defined(HSPLINUX)
 		sdlsurf = TTF_RenderUTF8_Blended(font, msg, dcolor );
-#else
-		sdlsurf = TTF_RenderText_Solid( font, msg, dcolor );
-#endif
 
 	    if (sdlsurf == NULL) {
 			Alertf( "TTF_Render : error" );

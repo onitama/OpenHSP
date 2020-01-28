@@ -299,38 +299,6 @@ char *strchr2( char *target, char code )
 }
 
 
-void getpath( char *stmp, char *outbuf, int p2 )
-{
-	char *p;
-	char p_drive[_MAX_PATH];
-	char p_dir[_MAX_DIR];
-	char p_fname[_MAX_FNAME];
-	char p_ext[_MAX_EXT];
-
-	p = outbuf;
-	if (p2&16) strcase( stmp );
-	_splitpath( stmp, p_drive, p_dir, p_fname, p_ext );
-	strcat( p_drive, p_dir );
-	if ( p2&8 ) {
-		strcpy( stmp, p_fname ); strcat( stmp, p_ext );
-	} else if ( p2&32 ) {
-		strcpy( stmp, p_drive );
-	}
-	switch( p2&7 ) {
-	case 1:			// Name only ( without ext )
-		stmp[ strlen(stmp)-strlen(p_ext) ] = 0;
-		strcpy( p, stmp );
-		break;
-	case 2:			// Ext only
-		strcpy( p, p_ext );
-		break;
-	default:		// Direct Copy
-		strcpy( p, stmp );
-		break;
-	}
-}
-
-
 void getpathW( HSPAPICHAR *stmp, HSPAPICHAR *outbuf, int p2 )
 {
 	HSPAPICHAR *p = 0;

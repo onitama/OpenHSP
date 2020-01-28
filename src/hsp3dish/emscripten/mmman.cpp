@@ -7,8 +7,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+
+#ifdef HSPEMSCRIPTEN
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
+#else
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
+#endif
+
 #include "../../hsp3/hsp3config.h"
 #include "../../hsp3/dpmread.h"
 #include "../../hsp3/strbuf.h"

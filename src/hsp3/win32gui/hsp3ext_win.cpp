@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <ocidl.h>
+#include <locale.h>
 
 //	Atlのヘッダ
 //#include <atlbase.h>
@@ -90,6 +91,7 @@ static void InitLanguage(void)
 		//	Set Japanese language
 		HSPCTX* ctx = code_getctx();
 		ctx->language = HSPCTX_LANGUAGE_JP;
+		setlocale(LC_ALL, "Japanese");
 	}
 }
 

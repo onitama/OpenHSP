@@ -210,7 +210,19 @@ void getpath( char *stmp, char *outbuf, int p2 )
 
 	p = outbuf;
 	if (p2&16) strcase( stmp );
-	_splitpath( stmp, p_drive, p_dir, p_fname, p_ext );
+
+	//新しいVC++で0x5cコードが正しく処理されないためSJIS版の_splitpathは使用せず
+	//_splitpath( stmp, p_drive, p_dir, p_fname, p_ext );
+	wchar_t wszBufPath[_MAX_PATH], wdrive[_MAX_DRIVE], wdir[_MAX_DIR], wfname[_MAX_FNAME], wext[_MAX_EXT];
+
+	mbstowcs(wszBufPath, stmp, strlen(stmp) + 1);
+	_wsplitpath(wszBufPath, wdrive, wdir, wfname, wext);
+
+	wcstombs(p_drive, wdrive, _MAX_DRIVE);
+	wcstombs(p_dir, wdir, _MAX_DIR);
+	wcstombs(p_fname, wfname, _MAX_FNAME);
+	wcstombs(p_ext, wext, _MAX_EXT);
+
 	strcat( p_drive, p_dir );
 	if ( p2&8 ) {
 		strcpy( stmp, p_fname ); strcat( stmp, p_ext );
