@@ -7,7 +7,7 @@
 #include "gpcam.h"
 #include "gpphy.h"
 #include "gpevent.h"
-#include "gptexmes.h"
+#include "../texmes.h"
 
 using namespace gameplay;
 
@@ -356,7 +356,7 @@ public:
 
 	void drawTest( int matid );
 	void setFont(char *fontname, int size, int style);
-	int drawFont(int x, int y, char* text, Vector4* p_color, int* out_ysize);
+	int drawFont(int x, int y, char* text, Vector4* p_color, int* out_ysize, int areasx=0, int areasy=0);
 
 	int getObjectVector( int objid, int moc, Vector4 *prm );
 	void getNodeVector( gpobj *obj, Node *node, int moc, Vector4 *prm );
@@ -436,19 +436,10 @@ public:
 	void convert2DRenderProjection(Vector4 &pos);
 
 	/**
-	* Message texture manager
+	* Message texture service
 	*/
-	void texmesInit(void);
-	void texmesTerm(void);
 	void texmesProc(void);
-	gptexmes* addTexmes(void);
-	gptexmes* texmesGet(int id);
-	int str2hash(char* msg, int* out_len);
-	int texmesGetCache(char* msg, short mycache);
-	int texmesRegist(char* msg);
-	unsigned char* texmesGetFont(char* msg, int* out_sx, int *out_sy, int* out_tsx, int* out_tsy);
-	void texmesDraw(int x, int y, char* msg, Vector4* p_color);
-	unsigned char *texmesBuffer(int size);
+	void texmesDraw(int x, int y, char* msg, Vector4* p_color,int areasx=0, int areasy=0);
 
 protected:
     /**
@@ -489,11 +480,9 @@ private:
     bool updateNodeMaterial( Node* node, Material *material );
 	bool drawScene(Node* node);
 	bool init2DRender( void );
-	int Get2N(int val);
 
-#ifdef USE_GPBFONT
 	Font*	mFont;
-#endif
+
 	float _colrate;
 	int _tex_width;
 	int _tex_height;
@@ -562,14 +551,8 @@ private:
 	float _bufPolyColor[BUFSIZE_POLYCOLOR];
 	float _bufPolyTex[BUFSIZE_POLYTEX];
 
-	// gptexmes
-	int _maxtexmes;
-	int _area_px, _area_py;
-	int _fontsize, _fontstyle;
-	gptexmes* _gptexmes;
-	int _texmesbuf_max;
-	unsigned char* _texmesbuf;
-	std::string	_fontname;
+	// texmes
+	texmesManager tmes;
 
 	// preset light defines
 	std::string	light_defines;

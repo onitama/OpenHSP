@@ -59,17 +59,6 @@ static void Object_ButtonDraw( HSPOBJINFO *info )
 	x2 = info->x + info->sx - 1; y2 = info->y + info->sy - 1;
 
 	btn = info->btnset;
-	if ( btn->messx < 0 ) {
-		bm->gmode = 3;
-		bm->gfrate = 0;
-		bm->cx = x1;
-		bm->cy = y1;
-		bm->Setcolor( 0 );
-		bm->Print( info->btnset->name );
-		btn->messx = bm->printsizex;
-		btn->messy = bm->printsizey;
-	}
-
 	tcol = 0xff000000;
 	//tcol = 0xffffffff;
 	if ( info->srcid < 0 ) {
@@ -116,8 +105,10 @@ static void Object_ButtonDraw( HSPOBJINFO *info )
 	bm->gmode = 3;
 	bm->gfrate = 255;
 	bm->Setcolor( tcol );
-	bm->cx = info->x + ( info->sx - btn->messx )/2;
-	bm->cy = info->y + ( info->sy - btn->messy )/2;
+	bm->cx = info->x;
+	bm->cy = info->y;
+	bm->printoffsetx = info->sx;
+	bm->printoffsety = info->sy;
 	if ( info->tapflag == 1 ) {
 		bm->cx++;
 		bm->cy++;

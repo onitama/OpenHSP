@@ -5,6 +5,7 @@
 #define __hgiox_h
 
 #include "hgtex.h"
+#include "fontsystem.h"
 
 //フリップ定数
 #define GRAPHICS_FLIP_NONE       -1

@@ -2,20 +2,26 @@
 //		OpenGL Texture lib (iOS/android/opengl/ndk)
 //			onion software/onitama 2011/11
 //
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
 #include <string.h>
 
-#include "stb_image.h"
-
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+#include <unistd.h>
 #include "../../hsp3/hsp3config.h"
 #else
+#if defined(HSPNDK) || defined(HSPIOS)
 #include "../hsp3config.h"
+#else
+#include "../../hsp3/hsp3config.h"
+#endif
+#endif
+
+#ifdef HSPWIN
+#define STRICT
+#include <windows.h>
 #endif
 
 #ifdef HSPNDK
@@ -36,42 +42,82 @@
 #include "appengine.h"
 #endif
 
-#ifdef HSPEMSCRIPTEN
+
+#if defined(HSPLINUX)
+#include <SDL2/SDL_ttf.h>
+#define USE_TTFFONT
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
 #define FONT_TEX_SY 128
-#include "appengine.h"
+//#include "font_data.h"
+#endif
+
+#if defined(HSPEMSCRIPTEN)
+#include <emscripten.h>
+#ifdef HSPDISHGP
+#include <SDL/SDL_ttf.h>
+#define USE_TTFFONT
+#endif
+#define USE_JAVA_FONT
+#define FONT_TEX_SX 512
+#define FONT_TEX_SY 128
+int hgio_fontsystem_get_texid(void);
+#endif
+
+#if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+#ifdef HSPRASPBIAN
+#include "bcm_host.h"
+#include "GLES/gl.h"
+#include "EGL/egl.h"
+#include "EGL/eglext.h"
+#include "SDL2/SDL.h"
+
+
+#else
+
+//#include <GLES2/gl2.h>
+//#include <GLES2/gl2ext.h>
+//#include <EGL/egl.h>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glext.h>
 
+//#include <GL/glut.h>
+
+#ifdef HSPEMSCRIPTEN
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_opengl.h"
-
-#include <emscripten.h>
-#endif
-
-#ifdef HSPLINUX
-
-#include "appengine.h"
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#include <GL/glext.h>
-
+#else
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_opengl.h"
-#include <SDL2/SDL_ttf.h>
+#endif
 
+#endif
+
+#ifdef USE_TTFFONT
+#include <SDL2/SDL_ttf.h>
+#define TTF_FONTFILE "/ipaexg.ttf"
+#endif
+
+
+#include "appengine.h"
+extern bool get_key_state(int sym);
+extern SDL_Window *window;
 #endif
 
 #include "../supio.h"
 #include "../sysreq.h"
 #include "../hgio.h"
 
+#include "../texmes.h"
+
+#include "stb_image.h"
+
 #define USE_STAR_FIELD
+#define USE_TEXMES
 
 /*-------------------------------------------------------------------------------*/
 
@@ -270,11 +316,6 @@ void DeleteTexInf( TEXINF *t )
 	//
 	if ( t->mode == TEXMODE_NONE ) return;
 	glDeleteTextures( 1, (GLuint *)&t->texid );
-	if ( t->text ) {
-		free( t->text );		// 拡張されたネーム用バッファがあれば解放する
-		t->text = NULL;
-	}
-
 	t->mode = TEXMODE_NONE;
 }
 
@@ -382,9 +423,7 @@ static int SetTex( int sel, short mode, short opt, short sx, short sy, short wid
 	t->ratex = 1.0f / (float)sx;
 	t->ratey = 1.0f / (float)sy;
 	t->texid = (int)texid;
-	t->hash = 0;
-	t->life = TEXMES_CACHE_DEFAULT;
-	t->text = NULL;
+
 	return myid;
 }
 
@@ -421,7 +460,7 @@ int RegistTexMem( unsigned char *ptr, int size )
 			//	Exchange to 2N bitmap
 			char *p;
 			char *p2;
-			int x,y;
+			int y;
 			pImg2 = (unsigned char *)mem_ini( sx * sy * 4 );
 			p = (char *)pImg;
 			p2 = (char *)pImg2;
@@ -452,7 +491,7 @@ int RegistTexMem( unsigned char *ptr, int size )
 		Alertf( "Tex:ID%d (%d,%d)(%dx%d)",texid,sx,sy,tsx,tsy );
 		return texid;
 	}
-	Alertf( "Tex:failed" );
+	Alertf( "Tex:failed(%d)",size );
 	return -1;
 }
 
@@ -467,7 +506,7 @@ int RegistTex( char *fname )
 	int id;
 
 	len = dpm_exist( fname );
-	//Alertf( "Tex:read(%s)(%d)", fname, len );
+	Alertf( "Tex:read(%s)(%d)", fname, len );
 	if ( len < 0 ) return -1;
 	ptr = mem_ini( len );
 	dpm_read( fname, ptr, len, 0 );
@@ -484,7 +523,7 @@ int MakeEmptyTex( int width, int height )
 	GLuint id;
 	int texid;
 	int sx,sy;
-	unsigned char *pImg;
+	//unsigned char *pImg;
 
 	sx = Get2N( width );
 	sy = Get2N( height );
@@ -507,7 +546,7 @@ int MakeEmptyTexBuffer( int width, int height )
 	GLuint id;
 	int texid;
 	int sx,sy;
-	unsigned char *pImg;
+	//unsigned char *pImg;
 
 	sx = Get2N( width );
 	sy = Get2N( height );
@@ -556,380 +595,3 @@ int UpdateTexStar(int texid, int mode)
 }
 
 
-/*--------------------------------------------------------------------------------*/
-
-static short str2hash( char *msg, int *out_len )
-{
-	//		文字列の簡易ハッシュ(short)を得る
-	//		同時にout_lenに文字列長を返す
-	//
-	int len;
-	short cache;
-	unsigned char a1;
-	unsigned char *p;
-	p = (unsigned char *)msg;
-	len = 0;
-	a1 = *p;
-	cache = ((short)a1)<<8;		// 先頭の文字コードを上位8bitにする
-	while(1) {
-		if ( a1 == 0 ) break;
-		a1 = *p++;
-		len++;
-	}
-	*out_len = len;
-	if ( len > 0 ) {			// 終端の文字コードを下位8bitにする
-		p--;
-		cache += (short)*p;
-	}
-	return cache;
-}
-
-
-static int getCache( char *msg, short mycache, int font_size, int font_style )
-{
-	//		キャッシュ済みの文字列があればTEXINFを返す
-	//		(存在しない場合はNULL)
-	//
-	int i;
-	TEXINF *t;
-	t = texinf;
-	for(i=0;i<TEXINF_MAX;i++) {
-		if ( t->mode == TEXMODE_MES8 ) {		// メッセージテクスチャだった時
-			if ( t->hash == mycache ) {			// まずハッシュを比べる
-				if ( t->font_size == font_size && t->font_style == font_style ) {	// サイズ・スタイルを比べる
-					if ( t->text ) {
-						if ( strcmp( msg, t->text ) == 0 ) {
-							t->life = TEXMES_CACHE_DEFAULT;			// キャッシュを保持
-							return i;
-						}
-					} else {
-						if ( strcmp( msg, t->buf ) == 0 ) {
-							t->life = TEXMES_CACHE_DEFAULT;			// キャッシュを保持
-							return i;
-						}
-					}
-				}
-			}
-		}
-		t++;
-	}
-	return -1;
-}
-
-
-void TexProc( void )
-{
-	//		フレーム単位でのキャッシュリフレッシュ
-	//		(キャッシュサポート時は、毎フレームごとに呼び出すこと)
-	//
-	int i;
-	TEXINF *t;
-	t = texinf;
-	curmestex = 0;
-	for(i=0;i<TEXINF_MAX;i++) {
-		if ( t->mode == TEXMODE_MES8 ) {		// メッセージテクスチャだった時
-			if ( t->life > 0 ) {
-				t->life--;						// キャッシュのライフを減らす
-				curmestex++;
-			} else {
-				DeleteTexInf( t );				// テクスチャのエントリを破棄する
-			}
-		}
-		t++;
-	}
-}
-
-
-int GetCacheMesTextureID( char *msg, int font_size, int font_style )
-{
-	//		キャッシュ済みのテクスチャIDを返す(OpenGLテクスチャIDを返す)
-	//		(作成されていないメッセージテクスチャは自動的に作成する)
-	//		(作成の必要がない場合は-1を返す)
-	//
-#ifdef HSPNDK
-	GLuint id;
-	int texid;
-	int tsx,tsy;
-	unsigned char *pImg;
-
-	TEXINF *t;
-	int mylen;
-	short mycache;
-	
-	mycache = str2hash( msg, &mylen );			// キャッシュを取得
-	if ( mylen <= 0 ) return -1;
-
-	texid = getCache( msg, mycache, font_size, font_style );
-	if ( texid >= 0 ) {
-		return texid;							// キャッシュがあった
-	}
-
-	//		キャッシュが存在しないので作成
-	pImg = (unsigned char *)j_callFontBitmap( msg, font_size, font_style, &tsx, &tsy );
-	texid = MakeEmptyTex( tsx, tsy );
-	if ( texid < 0 ) return -1;
-
-	t = GetTex( texid );
-	t->hash = mycache;
-	t->font_size = font_size;
-	t->font_style = font_style;
-
-	if ( curmestex >= GetSysReq(SYSREQ_MESCACHE_MAX) ) {	// エントリ数がオーバーしているものは次のフレームで破棄
-		t->life = 0;
-		t->buf[0] = 0;
-	} else {
-		//		キャッシュの登録
-		if ( mylen >= ( TEXMES_NAME_BUFFER - 1 ) ) {
-			t->text = (char *)malloc( mylen+1 );		// テキストハッシュネーム用バッファを作成する
-			strcpy( t->text, msg );
-		} else {
-			strcpy( t->buf, msg );						// 標準バッファにコピーする
-		}
-	}
-
-	id = (GLuint)t->texid;
-
-	glBindTexture( GL_TEXTURE_2D, id );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1);
-
-	glTexSubImage2D(
-		GL_TEXTURE_2D,
-		0,
-		(GLint)0,
-		(GLint)0,
-		(GLsizei)tsx,
-		(GLsizei)tsy,
-		GL_ALPHA,
-		GL_UNSIGNED_BYTE,
-		pImg
-	);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	free(pImg);
-
-	return texid;
-#endif
-
-#ifdef HSPEMSCRIPTEN
-	GLuint id;
-	int texid;
-	int tsx,tsy;
-	unsigned char *pImg;
-
-	TEXINF *t;
-	int mylen;
-	short mycache;
-
-	mycache = str2hash( msg, &mylen );			// キャッシュを取得
-	if ( mylen <= 0 ) return -1;
-
-	texid = getCache( msg, mycache, font_size, font_style );
-	if ( texid >= 0 ) {
-		return texid;							// キャッシュがあった
-	}
-
-	EM_ASM_({
-		var d = document.getElementById('hsp3dishFontDiv');
-		if (!d) {
-			d = document.createElement("div");
-			d.id = 'hsp3dishFontDiv';
-			d.style.setProperty("width", "auto");
-			d.style.setProperty("height", "auto");
-			d.style.setProperty("position", "absolute");
-			d.style.setProperty("visibility", "hidden");
-		}
-		d.style.setProperty("font", $1 + "px 'sans-serif'");
-		document.body.appendChild(d);
-
-		var t = document.createTextNode(Pointer_stringify($0));
-		if (d.hasChildNodes())
-			d.removeChild(d.firstChild);
-		d.appendChild(t);
-		}, msg, font_size);
-	tsx = EM_ASM_INT_V({
-		var d = document.getElementById('hsp3dishFontDiv');
-		return d.clientWidth;
-	});
-	tsy = EM_ASM_INT_V({
-		var d = document.getElementById('hsp3dishFontDiv');
-		return d.clientHeight;
-	});
-	//printf("texsize %dx%d '%s'\n", tsx, tsy, msg);
-
-	//		キャッシュが存在しないので作成
-	//pImg = (unsigned char *)j_callFontBitmap( msg, font_size, font_style, &tsx, &tsy );
-
-	texid = MakeEmptyTex( tsx, tsy );
-	if ( texid < 0 ) return -1;
-
-	t = GetTex( texid );
-	t->hash = mycache;
-	t->font_size = font_size;
-	t->font_style = font_style;
-
-	if ( curmestex >= GetSysReq(SYSREQ_MESCACHE_MAX) ) {	// エントリ数がオーバーしているものは次のフレームで破棄
-		t->life = 0;
-		t->buf[0] = 0;
-	} else {
-		//		キャッシュの登録
-		if ( mylen >= ( TEXMES_NAME_BUFFER - 1 ) ) {
-			t->text = (char *)malloc( mylen+1 );		// テキストハッシュネーム用バッファを作成する
-			strcpy( t->text, msg );
-		} else {
-			strcpy( t->buf, msg );						// 標準バッファにコピーする
-		}
-	}
-
-	id = (GLuint)t->texid;
-
-	glBindTexture( GL_TEXTURE_2D, id );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1);
-
-	EM_ASM_({
-		var canvas = document.getElementById('hsp3dishFontCanvas');
-		if (canvas) {
-			document.body.removeChild(canvas);
-		}
-		canvas = document.createElement("canvas");
-		canvas.id = 'hsp3dishFontCanvas';
-		//canvas.style.setProperty("position", "absolute");
-		canvas.style.setProperty("visibility", "hidden");
-		canvas.width = $2;
-		canvas.height = $3;
-		document.body.appendChild(canvas);
-
-		var context = canvas.getContext("2d");
-		context.font = $1 + "px 'sans-serif'";
-
-		var msg = Pointer_stringify($0);
-		context.clearRect ( 0 , 0 , $2 , $3);
-		//context.fillStyle = 'rgba(0, 0, 255, 255)';
-		context.fillStyle = 'rgba(255, 255, 255, 255)';
-		//context.strokeText(msg, 150, 150);
-		context.fillText(msg, 0, $1);
-		console.log(msg);
-
-		//GLctx.texImage2D(GLctx.TEXTURE_2D, 0, GLctx.ALPHA, GLctx.ALPHA, GLctx.UNSIGNED_BYTE, canvas);
-		GLctx.texImage2D(GLctx.TEXTURE_2D, 0, GLctx.RGBA, GLctx.RGBA, GLctx.UNSIGNED_BYTE, canvas);
-		}, msg, font_size, t->sx, t->sy);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	return texid;
-#endif
-
-#ifdef HSPLINUX
-
-	GLuint id;
-	int texid;
-	int tsx,tsy;
-	unsigned char *pImg;
-
-	TEXINF *t;
-	int mylen;
-	short mycache;
-	
-	mycache = str2hash( msg, &mylen );			// キャッシュを取得
-	if ( mylen <= 0 ) return -1;
-
-	texid = getCache( msg, mycache, font_size, font_style );
-	if ( texid >= 0 ) {
-		return texid;							// キャッシュがあった
-	}
-
-	//		キャッシュが存在しないので作成
-	if ( font == NULL ) {
-		//Alertf( "No font." );
-		return -1;
-	}
-
-	if ( font_size != font_defsize ) {
-		TexFontInit( fontpath, font_size );
-	}
-
-	SDL_Color dcolor={255,255,255,255};
-	SDL_Surface *surf = TTF_RenderUTF8_Blended(font, msg, dcolor );
-
-    if (surf == NULL) {
-		//Alertf( "TTF_RenderUTF8_Blended : error" );
-		return -1;
-	}
-
-	int colors;
-	GLuint texture_format = 0;
-	tsx = surf->w;
-	tsy = surf->h;
-	colors = surf->format->BytesPerPixel;
-	//Alertf( "Init:Surface(%d,%d) %d mask%x pitch%d",tsx,tsy,colors,surf->format->Rmask,surf->pitch );
-
-	texid = MakeEmptyTex( tsx, tsy );
-	if ( texid < 0 ) return -1;
-
-	t = GetTex( texid );
-	t->hash = mycache;
-	t->font_size = font_size;
-	t->font_style = font_style;
-
-	if ( curmestex >= GetSysReq(SYSREQ_MESCACHE_MAX) ) {	// エントリ数がオーバーしているものは次のフレームで破棄
-		t->life = 0;
-		t->buf[0] = 0;
-	} else {
-		//		キャッシュの登録
-		if ( mylen >= ( TEXMES_NAME_BUFFER - 1 ) ) {
-			t->text = (char *)malloc( mylen+1 );		// テキストハッシュネーム用バッファを作成する
-			strcpy( t->text, msg );
-		} else {
-			strcpy( t->buf, msg );						// 標準バッファにコピーする
-		}
-	}
-
-	id = (GLuint)t->texid;
-
-	glBindTexture( GL_TEXTURE_2D, id );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1);
-
-#ifdef HSPRASPBIAN
-
-	//glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, tsx, tsy, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels );
-	glTexSubImage2D( GL_TEXTURE_2D, 0, (GLint)0, (GLint)0, (GLsizei)tsx, (GLsizei)tsy, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels );
-
-#else
-	if (colors == 4) {   // alpha
-		if (surf->format->Rmask == 0x000000ff)
-			texture_format = GL_RGBA;
-			else texture_format = GL_BGRA_EXT;
-	} else {             // no alpha
-		if (surf->format->Rmask == 0x000000ff)
-			texture_format = GL_RGB;
-			else texture_format = GL_BGR_EXT;
-	}
-
-	glTexSubImage2D( GL_TEXTURE_2D, 0, (GLint)0, (GLint)0, (GLsizei)tsx, (GLsizei)tsy, texture_format, GL_UNSIGNED_BYTE, surf->pixels );
-	//glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, tsx, tsy, 0, texture_format, GL_UNSIGNED_BYTE, surf->pixels );
-#endif
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    //Clean up the surface
-    SDL_FreeSurface(surf);
-
-	return texid;
-#endif
-
-	return -1;
-}

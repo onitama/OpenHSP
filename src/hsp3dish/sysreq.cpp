@@ -85,7 +85,7 @@ void InitSysReq( void )
 
 	sysreq[ SYSREQ_MAXMATERIAL ] = 128;
 
-	SetSysReq( SYSREQ_MESCACHE_MAX, 64 );
+	SetSysReq( SYSREQ_MESCACHE_MAX, 256 );
 
 	sysreq[SYSREQ_DLIGHT_MAX] = 1;			// number of Directional Light(HGIMG4)
 	sysreq[SYSREQ_PLIGHT_MAX] = 0;			// number of Point Light(HGIMG4)

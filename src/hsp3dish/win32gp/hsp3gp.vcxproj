@@ -280,12 +280,15 @@
     <ClCompile Include="..\..\hsp3\win32gui\hsp3extlib.cpp" />
     <ClCompile Include="..\..\hsp3\win32gui\hsp3ext_win.cpp" />
     <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp" />
+    <ClCompile Include="..\emscripten\fontsystem.cpp" />
+    <ClCompile Include="..\essprite.cpp" />
     <ClCompile Include="..\geometry.cpp" />
     <ClCompile Include="..\hsp3gr_dish.cpp" />
     <ClCompile Include="..\hspwnd_dish.cpp" />
     <ClCompile Include="..\hspwnd_obj.cpp" />
     <ClCompile Include="..\random.cpp" />
     <ClCompile Include="..\sysreq.cpp" />
+    <ClCompile Include="..\texmes.cpp" />
     <ClCompile Include="..\win32\dxsnd.cpp" />
     <ClCompile Include="..\win32\mmman.cpp" />
     <ClCompile Include="..\win32\webtask_win.cpp" />
@@ -295,7 +298,6 @@
     <ClCompile Include="gplgt.cpp" />
     <ClCompile Include="gpmat.cpp" />
     <ClCompile Include="gpphy.cpp" />
-    <ClCompile Include="gptexmes.cpp" />
     <ClCompile Include="hgiox.cpp" />
     <ClCompile Include="hsp3dish.cpp" />
     <ClCompile Include="main.cpp" />
@@ -319,6 +321,8 @@
     <ClInclude Include="..\..\hsp3\supio.h" />
     <ClInclude Include="..\..\hsp3\win32gui\hspvar_comobj.h" />
     <ClInclude Include="..\..\hsp3\win32gui\hspvar_variant.h" />
+    <ClInclude Include="..\emscripten\fontsystem.h" />
+    <ClInclude Include="..\essprite.h" />
     <ClInclude Include="..\geometry.h" />
     <ClInclude Include="..\hsp3ext.h" />
     <ClInclude Include="..\hsp3gr.h" />
@@ -328,6 +332,7 @@
     <ClInclude Include="..\random.h" />
     <ClInclude Include="..\supio.h" />
     <ClInclude Include="..\sysreq.h" />
+    <ClInclude Include="..\texmes.h" />
     <ClInclude Include="..\webtask.h" />
     <ClInclude Include="dxsnd.h" />
     <ClInclude Include="gamehsp.h" />
@@ -336,7 +341,6 @@
     <ClInclude Include="gplgt.h" />
     <ClInclude Include="gpmat.h" />
     <ClInclude Include="gpphy.h" />
-    <ClInclude Include="gptexmes.h" />
     <ClInclude Include="hgiox.h" />
     <ClInclude Include="hsp3dish.h" />
     <ClInclude Include="hsp3extlib.h" />

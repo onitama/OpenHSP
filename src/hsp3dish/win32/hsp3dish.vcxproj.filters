@@ -138,6 +138,15 @@
     <ClCompile Include="..\..\obaq\physics\vessel.cpp">
       <Filter>ソース ファイル\obaq</Filter>
     </ClCompile>
+    <ClCompile Include="..\essprite.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\texmes.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\emscripten\fontsystem.cpp">
+      <Filter>ソース ファイル\win</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\hsp3\dpmread.h">
@@ -256,6 +265,15 @@
     </ClInclude>
     <ClInclude Include="..\hgio.h">
       <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\essprite.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\texmes.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\emscripten\fontsystem.h">
+      <Filter>ヘッダー ファイル\win</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

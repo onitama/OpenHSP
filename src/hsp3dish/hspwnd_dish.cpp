@@ -218,7 +218,7 @@ Bmscr *HspWnd::GetBmscrSafe( int id )
 	//
 	Bmscr *bm;
 	if (( id < 0 )||( id >= bmscr_max )) throw HSPERR_ILLEGAL_FUNCTION;
-	bm = GetBmscr( id );
+	bm = this->GetBmscr( id );
 	if ( bm == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
 	if ( bm->flag == BMSCR_FLAG_NOUSE ) throw HSPERR_ILLEGAL_FUNCTION;
 	return bm;
@@ -382,6 +382,8 @@ void Bmscr::Cls( int mode )
 		savepos[i] = 0;
 		accel_value[i] = (HSPREAL)0.0;
 	}
+	printoffsetx = 0;
+	printoffsety = 0;
 
 	//		CEL initalize
 	//
@@ -465,7 +467,7 @@ void Bmscr::SetFont( char *fontname, int size, int style )
 
 void Bmscr::SetDefaultFont( void )
 {
-	SetFont( font_curname, font_cursize, font_curstyle );
+	SetFontInternal( font_curname, font_cursize, font_curstyle );
 }
 
 

@@ -100,6 +100,28 @@ static int handleEvent( void ) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch(event.type) {
+		case SDL_FINGERMOTION:
+		case SDL_FINGERDOWN:
+			{
+				int id;
+				float x,y;
+				x = event.tfinger.x;
+				y = event.tfinger.y;
+				id = event.tfinger.touchId;
+				hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
+				break;
+			}
+		case SDL_FINGERUP:
+			{
+				int id;
+				float x,y;
+				x = event.tfinger.x;
+				y = event.tfinger.y;
+				id = event.tfinger.touchId;
+				hgio_mtouchid( id, (int)x, (int)y, 0, 0 );
+				break;
+			}
+
 		case SDL_MOUSEMOTION:
 			{
 				Bmscr *bm;

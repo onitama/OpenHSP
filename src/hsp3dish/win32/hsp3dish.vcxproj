@@ -169,6 +169,8 @@
     <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp" />
     <ClCompile Include="..\..\obaq\physics\rock.cpp" />
     <ClCompile Include="..\..\obaq\physics\vessel.cpp" />
+    <ClCompile Include="..\emscripten\fontsystem.cpp" />
+    <ClCompile Include="..\essprite.cpp" />
     <ClCompile Include="..\geometry.cpp" />
     <ClCompile Include="..\hsp3gr_dish.cpp" />
     <ClCompile Include="..\hspwnd_dish.cpp" />
@@ -178,6 +180,7 @@
     <ClCompile Include="..\obaq\omkedraw.cpp" />
     <ClCompile Include="..\random.cpp" />
     <ClCompile Include="..\sysreq.cpp" />
+    <ClCompile Include="..\texmes.cpp" />
     <ClCompile Include="dxsnd.cpp" />
     <ClCompile Include="hgiox.cpp" />
     <ClCompile Include="hgtex.cpp" />
@@ -206,6 +209,8 @@
     <ClInclude Include="..\..\obaq\physics\ptttypes.h" />
     <ClInclude Include="..\..\obaq\physics\rock.h" />
     <ClInclude Include="..\..\obaq\physics\vessel.h" />
+    <ClInclude Include="..\emscripten\fontsystem.h" />
+    <ClInclude Include="..\essprite.h" />
     <ClInclude Include="..\geometry.h" />
     <ClInclude Include="..\hgio.h" />
     <ClInclude Include="..\hsp3gr.h" />
@@ -218,6 +223,7 @@
     <ClInclude Include="..\random.h" />
     <ClInclude Include="..\supio.h" />
     <ClInclude Include="..\sysreq.h" />
+    <ClInclude Include="..\texmes.h" />
     <ClInclude Include="..\webtask.h" />
     <ClInclude Include="dxsnd.h" />
     <ClInclude Include="hginc.h" />

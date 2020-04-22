@@ -309,7 +309,7 @@ const std::string& Bundle::getMaterialPath()
     if (_materialPath.empty())
     {
         int pos = _path.find_last_of('.');
-        if (pos > 2)
+        if (pos > 0)
         {
             _materialPath = _path.substr(0, pos);
             _materialPath.append(".material");
@@ -1020,18 +1020,18 @@ Model* Bundle::readModel(const char* nodeId)
                 {
                     std::string materialName = readString(_stream);
                     std::string materialPath = getMaterialPath();
-                    if (materialPath.length() > 0)
-                    {
-                        materialPath.append("#");
-                        materialPath.append(materialName);
-                        Material* material = Material::create(materialPath.c_str());
-                        if (material)
-                        {
-                            int partIndex = model->getMesh()->getPartCount() > 0 ? i : -1;
-                            model->setMaterial(material, partIndex);
-                            SAFE_RELEASE(material);
-                        }
-                    }
+					if (materialPath.length() > 0)
+					{
+						materialPath.append("#");
+						materialPath.append(materialName);
+						Material* material = Material::create(materialPath.c_str());
+						if (material)
+						{
+							int partIndex = model->getMesh()->getPartCount() > 0 ? i : -1;
+							model->setMaterial(material, partIndex);
+							SAFE_RELEASE(material);
+						}
+					}
                 }
             }
             return model;

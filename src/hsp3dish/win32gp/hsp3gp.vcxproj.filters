@@ -132,7 +132,13 @@
     <ClCompile Include="gpevent.cpp">
       <Filter>ソース ファイル\win</Filter>
     </ClCompile>
-    <ClCompile Include="gptexmes.cpp">
+    <ClCompile Include="..\essprite.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\texmes.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\emscripten\fontsystem.cpp">
       <Filter>ソース ファイル\win</Filter>
     </ClCompile>
   </ItemGroup>
@@ -263,10 +269,16 @@
     <ClInclude Include="gpevent.h">
       <Filter>ヘッダー ファイル\win</Filter>
     </ClInclude>
-    <ClInclude Include="gptexmes.h">
+    <ClInclude Include="shader_sprite.h">
       <Filter>ヘッダー ファイル\win</Filter>
     </ClInclude>
-    <ClInclude Include="shader_sprite.h">
+    <ClInclude Include="..\essprite.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\texmes.h">
+      <Filter>ヘッダー ファイル\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\emscripten\fontsystem.h">
       <Filter>ヘッダー ファイル\win</Filter>
     </ClInclude>
   </ItemGroup>

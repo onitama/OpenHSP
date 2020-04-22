@@ -240,15 +240,12 @@ gpevent *gpobj::GetEvent(int entry)
 gamehsp::gamehsp()
 {
 	// コンストラクタ
-#ifdef USE_GPBFONT
+
 	mFont = NULL;
-#endif
 	_maxobj = 0;
 	_gpobj = NULL;
 	_gpmat = NULL;
 	_gpevent = NULL;
-	_gptexmes = NULL;
-	_texmesbuf = NULL;
 	_colrate = 1.0f / 255.0f;
 	_scene = NULL;
 	_meshBatch = NULL;
@@ -259,10 +256,10 @@ gamehsp::gamehsp()
 
 void gamehsp::initialize()
 {
-#ifdef USE_GPBFONT
 	// フォント作成
-	mFont = Font::create("res/font.gpb");
-#endif
+	if (GetSysReq(SYSREQ_USEGPBFONT)) {
+		mFont = Font::create("res/font.gpb");
+	}
 	resetScreen();
 }
 
@@ -272,9 +269,7 @@ void gamehsp::finalize()
 	//
 	deleteAll();
 
-#ifdef USE_GPBFONT
 	SAFE_RELEASE(mFont);
-#endif
 }
 
 
@@ -282,7 +277,7 @@ void gamehsp::deleteAll( void )
 {
 	// release
 	//
-	texmesTerm();
+	tmes.texmesTerm();
 
 	if ( _gpobj ) {
 		int i;
@@ -312,6 +307,10 @@ void gamehsp::deleteAll( void )
 	if (_meshBatch_line) {
 		delete _meshBatch_line;
 		_meshBatch_line = NULL;
+	}
+	if (_meshBatch_font) {
+		delete _meshBatch_font;
+		_meshBatch_font = NULL;
 	}
 
 	SAFE_RELEASE(_spriteEffect);
@@ -500,8 +499,37 @@ void gamehsp::resetScreen( int opt )
 		setFixedTime(fixedrate);
 	}
 
-	// gptexmat作成
-	texmesInit();
+	// texmat作成
+	tmes.texmesInit(GetSysReq(SYSREQ_MESCACHE_MAX));
+
+	int sx = 32;
+	int sy = 32;
+
+	Texture* texture;
+	texture = Texture::create(Texture::Format::RGBA, sx, sy, NULL, false, Texture::TEXTURE_2D);
+	//texture = Texture::create(id, sx, sy, Texture::Format::RGBA);
+	//texture = Texture::create("chr.png");
+	if (texture == NULL) {
+		Alertf("ERR");
+		return;
+	}
+	//texture->setData( (const unsigned char *)data );
+	_fontMaterial = makeMaterialTex2D(texture, GPOBJ_MATOPT_NOMIPMAP);
+	if (_fontMaterial == NULL) {
+		Alertf("ERR");
+		return;
+	}
+	SAFE_RELEASE(texture);
+
+	VertexFormat::Element elements[] =
+	{
+		VertexFormat::Element(VertexFormat::POSITION, 3),
+		VertexFormat::Element(VertexFormat::TEXCOORD0, 2),
+		VertexFormat::Element(VertexFormat::COLOR, 4)
+	};
+
+	unsigned int elementCount = sizeof(elements) / sizeof(VertexFormat::Element);
+	_meshBatch_font = MeshBatch::create(VertexFormat(elements, elementCount), Mesh::TRIANGLE_STRIP, _fontMaterial, true, 16, 256);
 
 }
 
@@ -2641,6 +2669,130 @@ gpobj *gamehsp::getNextObj( void )
 	_find_count++;
 	_find_gpobj++;
 	return res;
+}
+
+
+/*------------------------------------------------------------*/
+/*
+		Text message support
+*/
+/*------------------------------------------------------------*/
+
+void gamehsp::texmesProc(void)
+{
+	tmes.texmesProc();
+}
+
+
+void gamehsp::texmesDraw(int x, int y, char* msg, Vector4* p_color, int areasx, int areasy)
+{
+	//		フォントメッセージを表示する
+	//
+	int id;
+	int offsetx, offsety;
+	texmes* tex;
+//	float psx, psy;
+	float x1, y1, x2, y2;
+	float tx0, ty0, tx1, ty1;
+
+	float a_val = 1.0f;
+
+	id = tmes.texmesRegist(msg);
+	if (id < 0) return;
+	tex = tmes.texmesGet(id);
+	if (tex == NULL) return;
+
+	//		meshのTextureを差し替える
+	Uniform* samplerUniform = NULL;
+	for (unsigned int i = 0, count = _spriteEffect->getUniformCount(); i < count; ++i)
+	{
+		Uniform* uniform = _spriteEffect->getUniform(i);
+		if (uniform && uniform->getType() == GL_SAMPLER_2D)
+		{
+			samplerUniform = uniform;
+			break;
+		}
+	}
+
+	MaterialParameter* mp = _fontMaterial->getParameter(samplerUniform->getName());
+	mp->setValue(tex->_texture);
+
+	//		描画する
+	tx0 = 0.0f;
+	ty0 = 0.0f;
+	tx1 = tex->ratex;
+	ty1 = tex->ratey;
+
+	offsetx = 0; offsety = 0;
+	if (areasx > 0) {
+		offsetx = (areasx - tex->sx) / 2;
+	}
+	if (areasy > 0) {
+		offsety = (areasy - tex->sy) / 2;
+	}
+
+	x1 = (float)x + offsetx;
+	y1 = (float)y + offsety;
+	x2 = x1 + tex->sx - 1.0f;
+	y2 = y1 + tex->sy - 1.0f;
+
+	float* v = _bufPolyTex;
+
+	*v++ = x1; *v++ = y2; v++;
+	*v++ = tx0; *v++ = ty1;
+	*v++ = p_color->x; *v++ = p_color->y; *v++ = p_color->z; *v++ = p_color->w;
+	*v++ = x1; *v++ = y1; v++;
+	*v++ = tx0; *v++ = ty0;
+	*v++ = p_color->x; *v++ = p_color->y; *v++ = p_color->z; *v++ = p_color->w;
+	*v++ = x2; *v++ = y2; v++;
+	*v++ = tx1; *v++ = ty1;
+	*v++ = p_color->x; *v++ = p_color->y; *v++ = p_color->z; *v++ = p_color->w;
+	*v++ = x2; *v++ = y1; v++;
+	*v++ = tx1; *v++ = ty0;
+	*v++ = p_color->x; *v++ = p_color->y; *v++ = p_color->z; *v++ = p_color->w;
+
+	static unsigned short indices[] = { 0, 1, 2, 3 };
+
+	_meshBatch_font->start();
+	_meshBatch_font->add(_bufPolyTex, 4, indices, 4);
+	_meshBatch_font->finish();
+	_meshBatch_font->draw();
+
+	mp->setValue(0);
+}
+
+
+int gamehsp::drawFont(int x, int y, char* text, Vector4* p_color, int* out_ysize, int areasx, int areasy )
+{
+	// フォントで描画
+	int xsize, ysize;
+
+	if (GetSysReq(SYSREQ_USEGPBFONT)) {
+		if (mFont == NULL) {
+			mFont = Font::create("res/font.gpb");
+			if (mFont == NULL) return 0;
+		}
+		mFont->start();
+		xsize = mFont->drawText(text, x, y, *p_color, tmes._fontsize);
+		mFont->finish();
+		ysize = tmes._fontsize;
+		*out_ysize = ysize;
+		return xsize;
+	}
+
+	texmesDraw(x, y, text, p_color,areasx,areasy);
+	xsize = tmes._area_px;
+	ysize = tmes._area_py;
+
+	*out_ysize = ysize;
+	return xsize;
+}
+
+
+void gamehsp::setFont(char* fontname, int size, int style)
+{
+	// フォント設定
+	tmes.setFont(fontname,size,style);
 }
 
 

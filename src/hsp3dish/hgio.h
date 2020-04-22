@@ -83,6 +83,11 @@ void hgio_cnvview(BMSCR* bm, int *xaxis, int *yaxis);
 void hgio_draw_gpsprite( Bmscr *bmscr, bool lateflag );
 void hgio_draw_all(Bmscr *bmscr, int option);
 
+// for texmes
+void hgio_fontsystem_init(char* fontname, int size, int style);
+void hgio_fontsystem_delete(int id);
+int hgio_fontsystem_setup(int sx, int sy, void *buffer);
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy);
 
 
 enum {

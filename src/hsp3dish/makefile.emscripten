@@ -50,11 +50,14 @@ OBJS = \
 	../hsp3/strbuf.bc \
 	../hsp3/strnote.bc \
 	sysreq.bc \
+	texmes.bc \
+	essprite.bc \
 	obaq/hsp3dw.bc \
 	obaq/omkedraw.bc \
 	obaq/game.bc \
 	../obaq/physics/vessel.bc \
 	../obaq/physics/rock.bc \
+	emscripten/fontsystem.bc \
 	emscripten/hgtex.bc \
 	emscripten/hgiox.bc \
 	emscripten/hsp3dish.bc \
@@ -85,13 +88,15 @@ OBJS_GP = \
 	../hsp3/strbuf.gp.bc \
 	../hsp3/strnote.gp.bc \
 	sysreq.gp.bc \
+	texmes.gp.bc \
+	essprite.gp.bc \
 	win32gp/gamehsp.gp.bc \
-	win32gp/gptexmes.gp.bc \
 	win32gp/gpevent.gp.bc \
 	win32gp/gpcam.gp.bc \
 	win32gp/gplgt.gp.bc \
 	win32gp/gpmat.gp.bc \
 	win32gp/gpphy.gp.bc \
+	emscripten/fontsystem.gp.bc \
 	emscripten/hgtex.gp.bc \
 	win32gp/hgiox.gp.bc \
 	emscripten/hsp3dish.gp.bc \

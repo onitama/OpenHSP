@@ -27,12 +27,15 @@ OBJS = \
 	src/hsp3/stack.do \
 	src/hsp3/strbuf.do \
 	src/hsp3/strnote.do \
+	src/hsp3dish/essprite.do \
+	src/hsp3dish/texmes.do \
 	src/hsp3dish/sysreq.do \
 	src/hsp3dish/emscripten/hgtex.do \
 	src/hsp3dish/emscripten/hgiox.do \
 	src/hsp3dish/emscripten/mmman.do \
 	src/hsp3dish/emscripten/main.do \
 	src/hsp3dish/emscripten/stb_image.do \
+	src/hsp3dish/emscripten/fontsystem.do \
 	src/hsp3dish/obaq/omkedraw.do \
 	src/hsp3dish/obaq/hsp3dw.do \
 	src/hsp3dish/obaq/game.do \

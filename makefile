@@ -28,12 +28,15 @@ OBJS = \
 	src/hsp3/strnote.do \
 	src/hsp3/linux/hsp3ext_sock.do \
 	src/hsp3/linux/devctrl_io.do \
+	src/hsp3dish/essprite.do \
+	src/hsp3dish/texmes.do \
 	src/hsp3dish/sysreq.do \
 	src/hsp3dish/emscripten/hgtex.do \
 	src/hsp3dish/emscripten/hgiox.do \
 	src/hsp3dish/emscripten/mmman.do \
 	src/hsp3dish/emscripten/main.do \
 	src/hsp3dish/emscripten/stb_image.do \
+	src/hsp3dish/emscripten/fontsystem.do \
 	src/hsp3dish/obaq/omkedraw.do \
 	src/hsp3dish/obaq/hsp3dw.do \
 	src/hsp3dish/obaq/game.do \
@@ -105,13 +108,15 @@ OBJS_GP = \
 	src/hsp3/strnote.gpo \
 	src/hsp3/linux/hsp3ext_sock.gpo \
 	src/hsp3/linux/devctrl_io.gpo \
+	src/hsp3dish/essprite.gpo \
+	src/hsp3dish/texmes.gpo \
 	src/hsp3dish/sysreq.gpo \
 	src/hsp3dish/emscripten/mmman.gpo \
 	src/hsp3dish/emscripten/main.gpo \
 	src/hsp3dish/emscripten/stb_image.gpo \
+	src/hsp3dish/emscripten/fontsystem.gpo \
 	src/hsp3dish/win32gp/hgiox.gpo \
 	src/hsp3dish/win32gp/gamehsp.gpo \
-	src/hsp3dish/win32gp/gptexmes.gpo \
 	src/hsp3dish/win32gp/gpevent.gpo \
 	src/hsp3dish/win32gp/gpcam.gpo \
 	src/hsp3dish/win32gp/gplgt.gpo \

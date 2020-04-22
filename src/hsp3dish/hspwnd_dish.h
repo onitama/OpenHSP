@@ -327,6 +327,8 @@ public:
 	float	vp_viewscale[4];			// View Scale X,Y,Z,W
 	float	vp_view3dprm[4];			// View 3D parameter
 
+	int		printoffsetx;				// print offset-x (for centering) 0=none
+	int		printoffsety;				// print offset-y (for centering) 0=none
 private:
 //	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
 //	void CnvRGB16( PTRIVERTEX target, DWORD src );
@@ -489,6 +491,8 @@ typedef struct BMSCR
 	float	vp_viewscale[4];			// View Scale X,Y,Z,W
 	float	vp_view3dprm[4];			// View 3D parameter
 
+	int		printoffsetx;				// print offset-x (for centering) 0=none
+	int		printoffsety;				// print offset-y (for centering) 0=none
 } BMSCR;
 
 #endif
