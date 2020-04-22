@@ -259,45 +259,6 @@ static void star_draw(char *dest, int sx, int sy, int mode)
 
 /*-------------------------------------------------------------------------------*/
 /*
-		Font Manage Routines
-*/
-/*-------------------------------------------------------------------------------*/
-
-#if defined(HSPLINUX)
-static	char fontpath[HSP_MAX_PATH+1];
-static	TTF_Font *font = NULL;
-static	int font_defsize;
-
-void TexFontTerm( void )
-{
-	if ( font != NULL ) {
-	    TTF_CloseFont(font);
-	    font = NULL;
-	}
-}
-
-int TexFontInit( char *path, int size )
-{
-	if ( font != NULL ) TexFontTerm();
-
-	if (*path != 0) {
-		strcpy ( fontpath, path );
-	}
-	font = TTF_OpenFont( fontpath, size );
-	font_defsize = size;
-
-	if (font == NULL){
-		Alertf( "Init:TTF_OpenFont error" );
-		return -2;
-	}
-	//Alertf( "Init:TTF_Init:%s (%x)",fontpath,font );
-	return 0;
-}
-
-#endif
-
-/*-------------------------------------------------------------------------------*/
-/*
 		Texture Manage Routines
 */
 /*-------------------------------------------------------------------------------*/
