@@ -1390,12 +1390,12 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( 255 );
 		p2 = code_getdi( 255 );
 		p3 = code_getdi( 255 );
-		bmscr->Setcolor2( RGB(p1,p2,p3) );
+		bmscr->Setcolor2( ((p1&0xff)<<16)|((p2&0xff)<<8)|(p3&0xff) );
 		break;
 	case 0x4e:								// rgbcolor
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
-		bmscr->Setcolor((p1 >> 16) & 0xff, (p1>>8) & 0xff, p1 & 0xff );
+		bmscr->Setcolor(p1);
 		break;
 
 	case 0x4f:								// viewcalc
