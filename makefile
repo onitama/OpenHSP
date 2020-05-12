@@ -22,6 +22,7 @@ OBJS = \
 	src/hsp3/hspvar_struct.do \
 	src/hsp3dish/hspwnd_dish.do \
 	src/hsp3dish/hspwnd_obj.do \
+	src/hsp3dish/hspwnd_edit.do \
 	src/hsp3dish/random.do \
 	src/hsp3/stack.do \
 	src/hsp3/strbuf.do \
@@ -102,6 +103,7 @@ OBJS_GP = \
 	src/hsp3/hspvar_struct.gpo \
 	src/hsp3dish/hspwnd_dish.gpo \
 	src/hsp3dish/hspwnd_obj.gpo \
+	src/hsp3dish/hspwnd_edit.gpo \
 	src/hsp3dish/random.gpo \
 	src/hsp3/stack.gpo \
 	src/hsp3/strbuf.gpo \

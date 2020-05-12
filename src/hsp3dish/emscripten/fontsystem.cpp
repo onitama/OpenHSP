@@ -425,7 +425,7 @@ int TexFontInit( char *path, int size )
 		Alertf( "Init:TTF_OpenFont error" );
 		return -2;
 	}
-	Alertf( "Init:TTF_Init:%s (%x)",fontpath,font );
+	//Alertf( "Init:TTF_Init:%s (%x)",fontpath,font );
 	return 0;
 }
 
