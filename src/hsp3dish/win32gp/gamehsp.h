@@ -135,13 +135,13 @@ public:
 	void reset( int id, int celid, int gmode, void *bmscr );
 	int getDistanceHit( Vector3 *v, float size );
 
-	int _id;							// è¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆID
-	int _celid;							// è¡¨ç¤ºã‚»ãƒ«ID
-	int _gmode;							// gmodeå€¤
-	void *_bmscr;						// å‚ç…§å…ƒbmscrãƒã‚¤ãƒ³ã‚¿
-	Vector4 _pos;						// ä½ç½®
-	Vector4 _ang;						// å›è»¢è§’åº¦
-	Vector4 _scale;						// ã‚¹ã‚±ãƒ¼ãƒ«
+	int _id;							// eƒIƒuƒWƒFƒNƒgID
+	int _celid;							// •\¦ƒZƒ‹ID
+	int _gmode;							// gmode’l
+	void *_bmscr;						// QÆŒ³bmscrƒ|ƒCƒ“ƒ^
+	Vector4 _pos;						// ˆÊ’u
+	Vector4 _ang;						// ‰ñ“]Šp“x
+	Vector4 _scale;						// ƒXƒP[ƒ‹
 };
 
 
@@ -150,12 +150,12 @@ class gpobj : public Ref {
 public:
 	gpobj();
 	~gpobj();
-	void reset( int id );				// åˆæœŸåŒ–
-	bool isVisible( void );				// è¡¨ç¤ºã§ãã‚‹ã‹èª¿ã¹ã‚‹
-	bool isVisible( bool lateflag );	// è¡¨ç¤ºã§ãã‚‹ã‹èª¿ã¹ã‚‹(lateflagã‚ã‚Š)
-	float getAlphaRate( void );			// Alphaå€¤ã‚’å–å¾—ã™ã‚‹
-	void updateParameter( Material *mat );	// å¾Œå‡¦ç†
-	int executeFade(void);				// ãƒ•ã‚§ãƒ¼ãƒ‰å‡¦ç†
+	void reset( int id );				// ‰Šú‰»
+	bool isVisible( void );				// •\¦‚Å‚«‚é‚©’²‚×‚é
+	bool isVisible( bool lateflag );	// •\¦‚Å‚«‚é‚©’²‚×‚é(lateflag‚ ‚è)
+	float getAlphaRate( void );			// Alpha’l‚ğæ“¾‚·‚é
+	void updateParameter( Material *mat );	// Œãˆ—
+	int executeFade(void);				// ƒtƒF[ƒhˆ—
 
 	int GetEmptyEvent(void);
 	void DeleteEvent(int entry);
@@ -171,37 +171,37 @@ public:
 	int setState(char *name, char *value, int part);
 	void setFilter(Texture::Filter value, int part);
 
-	short _flag;						// å­˜åœ¨ãƒ•ãƒ©ã‚°
-	short _mark;						// ãƒãƒ¼ã‚¯å‡¦ç†ç”¨
-	int _mode;							// ãƒ¢ãƒ¼ãƒ‰(GPOBJ_MODE_*)
-	int _id;							// ãƒãƒ¼ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆID
-	int _timer;							// ã‚¿ã‚¤ãƒãƒ¼å€¤
-	int	_mygroup;						// è‡ªåˆ†ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—
-	int	_colgroup;						// å¯¾è±¡ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚°ãƒ«ãƒ¼ãƒ—
-	int _shape;							// ç”Ÿæˆã•ã‚ŒãŸå½¢çŠ¶
-	int _usegpmat;						// gpmatä½¿ç”¨æ™‚ã®ID(-1=å›ºæœ‰Material)
-	int _usegpphy;						// gpphyä½¿ç”¨æ™‚ã®ID
-	int _colilog;						// è¡çªãƒ­ã‚°ID
-	int	_transparent;					// é€æ˜åº¦(0=é€æ˜/255=ä¸é€æ˜)
-	int _fade;							// ãƒ•ã‚§ãƒ¼ãƒ‰è¨­å®š(0=ãªã—/+-ã§å¢—æ¸›)
-	int _rendergroup;					// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚°ãƒ«ãƒ¼ãƒ—
-	int _lightgroup;					// ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚°ãƒ«ãƒ¼ãƒ—
+	short _flag;						// ‘¶İƒtƒ‰ƒO
+	short _mark;						// ƒ}[ƒNˆ——p
+	int _mode;							// ƒ‚[ƒh(GPOBJ_MODE_*)
+	int _id;							// ƒm[ƒhƒIƒuƒWƒFƒNƒgID
+	int _timer;							// ƒ^ƒCƒ}[’l
+	int	_mygroup;						// ©•ª‚ÌƒRƒŠƒWƒ‡ƒ“ƒOƒ‹[ƒv
+	int	_colgroup;						// ‘ÎÛ‚ÌƒRƒŠƒWƒ‡ƒ“ƒOƒ‹[ƒv
+	int _shape;							// ¶¬‚³‚ê‚½Œ`ó
+	int _usegpmat;						// gpmatg—p‚ÌID(-1=ŒÅ—LMaterial)
+	int _usegpphy;						// gpphyg—p‚ÌID
+	int _colilog;						// Õ“ËƒƒOID
+	int	_transparent;					// “§–¾“x(0=“§–¾/255=•s“§–¾)
+	int _fade;							// ƒtƒF[ƒhİ’è(0=‚È‚µ/+-‚Å‘Œ¸)
+	int _rendergroup;					// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒOƒ‹[ƒv
+	int _lightgroup;					// ƒ‰ƒCƒeƒBƒ“ƒOƒOƒ‹[ƒv
 
-	gpspr *_spr;						// ç”Ÿæˆã•ã‚ŒãŸ2Dã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæƒ…å ±
-	gpphy *_phy;						// ç”Ÿæˆã•ã‚ŒãŸã‚³ãƒªã‚¸ãƒ§ãƒ³æƒ…å ±
-	Node *_node;						// ç”Ÿæˆã•ã‚ŒãŸNode
-	Model *_model;						// ç”Ÿæˆã•ã‚ŒãŸModel
-	Camera *_camera;					// ç”Ÿæˆã•ã‚ŒãŸCamera
-	Light *_light;						// ç”Ÿæˆã•ã‚ŒãŸLight
-	Animation *_animation;				// ç”Ÿæˆã•ã‚ŒãŸAnimation
-	Vector3 _sizevec;					// ç”Ÿæˆã•ã‚ŒãŸã‚µã‚¤ã‚ºãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
-	Vector4 _vec[GPOBJ_USERVEC_MAX];	// ãƒ¯ãƒ¼ã‚¯ç”¨ãƒ™ã‚¯ã‚¿ãƒ¼
+	gpspr *_spr;						// ¶¬‚³‚ê‚½2DƒXƒvƒ‰ƒCƒgî•ñ
+	gpphy *_phy;						// ¶¬‚³‚ê‚½ƒRƒŠƒWƒ‡ƒ“î•ñ
+	Node *_node;						// ¶¬‚³‚ê‚½Node
+	Model *_model;						// ¶¬‚³‚ê‚½Model
+	Camera *_camera;					// ¶¬‚³‚ê‚½Camera
+	Light *_light;						// ¶¬‚³‚ê‚½Light
+	Animation *_animation;				// ¶¬‚³‚ê‚½Animation
+	Vector3 _sizevec;					// ¶¬‚³‚ê‚½ƒTƒCƒYƒpƒ‰ƒ[ƒ^[
+	Vector4 _vec[GPOBJ_USERVEC_MAX];	// ƒ[ƒN—pƒxƒNƒ^[
 
-	gameplay::MaterialParameter *_prm_modalpha;	// Alphaãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ãƒˆç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
+	gameplay::MaterialParameter *_prm_modalpha;	// Alphaƒ‚ƒWƒ…ƒŒ[ƒg—pƒpƒ‰ƒ[ƒ^[
 
 	gpevent *_event[GPOBJ_MULTIEVENT_MAX];		// Event List
 	float	_time[GPOBJ_MULTIEVENT_MAX];		// Event Time
-	Vector4 _evvec[GPOBJ_MULTIEVENT_MAX];		// ã‚¤ãƒ™ãƒ³ãƒˆãƒ¯ãƒ¼ã‚¯ç”¨ãƒ™ã‚¯ã‚¿ãƒ¼
+	Vector4 _evvec[GPOBJ_MULTIEVENT_MAX];		// ƒCƒxƒ“ƒgƒ[ƒN—pƒxƒNƒ^[
 
 };
 
@@ -356,7 +356,7 @@ public:
 
 	void drawTest( int matid );
 	void setFont(char *fontname, int size, int style);
-	int drawFont(int x, int y, char* text, Vector4* p_color, int* out_ysize, int areasx=0, int areasy=0);
+	int drawFont(void *bmscr, int x, int y, char* text, int* out_ysize);
 
 	int getObjectVector( int objid, int moc, Vector4 *prm );
 	void getNodeVector( gpobj *obj, Node *node, int moc, Vector4 *prm );
@@ -439,7 +439,8 @@ public:
 	* Message texture service
 	*/
 	void texmesProc(void);
-	void texmesDraw(int x, int y, char* msg, Vector4* p_color,int areasx=0, int areasy=0);
+	void texmesDrawClip(void *bmscr, int x, int y, int psx, int psy, texmes *tex, int basex, int basey);
+	texmesManager *getTexmesManager(void) { return &tmes; };
 
 protected:
     /**
@@ -534,14 +535,14 @@ private:
 	int _spot_light[BUFSIZE_MULTILIGHT];
 
 	// Obj support value
-	Vector3 border1;		// BORDERåº§æ¨™1
-	Vector3 border2;		// BORDERåº§æ¨™2
+	Vector3 border1;		// BORDERÀ•W1
+	Vector3 border2;		// BORDERÀ•W2
 
 	// preset flat mesh
 	int proj2Dcode;								// 2D projection Matrix ID code
-	Matrix _projectionMatrix2Dpreset;			// 2D projection Matrix (ç”»é¢å…¨ä½“ç”¨)
-	Matrix _projectionMatrix2D;					// 2D projection Matrix (ã‚·ã‚¹ãƒ†ãƒ ç”¨)
-	Matrix _projectionMatrix2Dinv;				// 2D projection Matrix (é€†å¤‰æ›ç”¨)
+	Matrix _projectionMatrix2Dpreset;			// 2D projection Matrix (‰æ–Ê‘S‘Ì—p)
+	Matrix _projectionMatrix2D;					// 2D projection Matrix (ƒVƒXƒeƒ€—p)
+	Matrix _projectionMatrix2Dinv;				// 2D projection Matrix (‹t•ÏŠ·—p)
 	MeshBatch* _meshBatch;						// MeshBatch for Polygon
 	MeshBatch* _meshBatch_line;					// MeshBatch for Line
 	MeshBatch* _meshBatch_font;					// MeshBatch for Font

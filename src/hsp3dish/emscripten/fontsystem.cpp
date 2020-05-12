@@ -334,7 +334,7 @@ int hgio_fontsystem_execsub(long code, unsigned char* buffer, int pitch, int off
 }
 
 
-int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy)
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *info)
 {
 	//		msgの文字列をテクスチャバッファにレンダリングする
 	//		(bufferがNULLの場合はサイズだけを取得する)
@@ -342,6 +342,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	if (htexfont == NULL) return -1;
 
 	int x = 0;
+	int count = 0;
 	long code;
 	unsigned char *p = (unsigned char*)msg;
 	unsigned char a1;
@@ -360,15 +361,26 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 				p++;
 			}
 		}
-
+		if (info) {
+			if (count < info->maxlength) {
+				info->pos[count] = (short)x;
+			}
+		}
 		x += hgio_fontsystem_execsub(code, buffer, pitch, x);
+		count++;
 	}
 
 	fontsystem_sx = x;
 
+	if (info) {
+		if (count < info->maxlength) {
+			info->pos[count] = (short)x;
+		}
+		info->length = count;
+	}
 	*out_sx = fontsystem_sx;
 	*out_sy = fontsystem_sy;
-	return 0;
+	return count;
 }
 
 #endif
@@ -437,7 +449,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	fontsystem_style = style;
 }
 
-int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy)
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *info)
 {
 	//		msgの文字列をテクスチャバッファにレンダリングする
 	//		(bufferがNULLの場合はサイズだけを取得する)
@@ -546,7 +558,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	fontsystem_style = style;
 }
 
-int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy)
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *info)
 {
 	//		msgの文字列をテクスチャバッファにレンダリングする
 	//		(bufferがNULLの場合はサイズだけを取得する)
@@ -678,7 +690,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	fontsystem_style = style;
 }
 
-int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy)
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *info)
 {
 	//		msgの文字列をテクスチャバッファにレンダリングする
 	//		(bufferがNULLの場合はサイズだけを取得する)
@@ -699,7 +711,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 		d.style.setProperty("font", $1 + "px 'sans-serif'");
 		document.body.appendChild(d);
 
-		var t = document.createTextNode(Pointer_stringify($0));
+		var t = document.createTextNode(UTF8ToString($0));
 		if (d.hasChildNodes())
 			d.removeChild(d.firstChild);
 		d.appendChild(t);
@@ -747,7 +759,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 		var context = canvas.getContext("2d");
 		context.font = $1 + "px 'sans-serif'";
 
-		var msg = Pointer_stringify($0);
+		var msg = UTF8ToString($0);
 		context.clearRect ( 0 , 0 , $2 , $3);
 		context.fillStyle = 'rgba(255, 255, 255, 255)';
 		context.fillText(msg, 0, $1);
@@ -803,7 +815,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	fontsystem_style = style;
 }
 
-int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy)
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *info)
 {
 	//		msgの文字列をテクスチャバッファにレンダリングする
 	//		(bufferがNULLの場合はサイズだけを取得する)

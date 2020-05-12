@@ -34,25 +34,25 @@ public:
 	void setFilter( Texture::Filter value );
 	int updateTex32(char* ptr, int mode);
 
-	short _flag;						// å­˜åœ¨ãƒ•ãƒ©ã‚°
-	short _mark;						// ãƒãƒ¼ã‚¯å‡¦ç†ç”¨
-	int _mode;							// ãƒ¢ãƒ¼ãƒ‰(GPMAT_MODE_*)
-	int _id;							// ãƒãƒ†ãƒªã‚¢ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆID
-	Matrix _projectionMatrix2D;			// 2Dç”¨ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒˆãƒªã‚¯ã‚¹
-	Material *_material;				// ç”Ÿæˆã•ã‚ŒãŸMaterial
-	MeshBatch *_mesh;					// MeshBatch(2Dç”¨)
-	int _sx,_sy;						// Texture X,Y Size(2Dç”¨)
+	short _flag;						// ‘¶İƒtƒ‰ƒO
+	short _mark;						// ƒ}[ƒNˆ——p
+	int _mode;							// ƒ‚[ƒh(GPMAT_MODE_*)
+	int _id;							// ƒ}ƒeƒŠƒAƒ‹ƒIƒuƒWƒFƒNƒgID
+	Matrix _projectionMatrix2D;			// 2D—pƒvƒƒWƒFƒNƒVƒ‡ƒ“ƒ}ƒgƒŠƒNƒX
+	Material *_material;				// ¶¬‚³‚ê‚½Material
+	MeshBatch *_mesh;					// MeshBatch(2D—p)
+	int _sx,_sy;						// Texture X,Y Size(2D—p)
 	float _texratex;					// Texture UV rate (1.0/xsize)
 	float _texratey;					// Texture UV rate (1.0/ysize)
-	int _target_material_id;			// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°å¯¾è±¡ã®ãƒãƒ†ãƒªã‚¢ãƒ«IDä¿å­˜ç”¨
-	int _matopt;						// ãƒãƒ†ãƒªã‚¢ãƒ«ã‚ªãƒ—ã‚·ãƒ§ãƒ³ä¿å­˜ç”¨
-	int _matcolor;						// ãƒãƒ†ãƒªã‚¢ãƒ«ã‚«ãƒ©ãƒ¼ä¿å­˜ç”¨
+	int _target_material_id;			// ƒŒƒ“ƒ_ƒŠƒ“ƒO‘ÎÛ‚Ìƒ}ƒeƒŠƒAƒ‹ID•Û‘¶—p
+	int _matopt;						// ƒ}ƒeƒŠƒAƒ‹ƒIƒvƒVƒ‡ƒ“•Û‘¶—p
+	int _matcolor;						// ƒ}ƒeƒŠƒAƒ‹ƒJƒ‰[•Û‘¶—p
 
 protected:
 	/**
 	* Internal use
 	*/
-	gamehsp *_owner;					// ç”Ÿæˆå…ƒã®gamehsp
+	gamehsp *_owner;					// ¶¬Œ³‚Ìgamehsp
 
 };
 

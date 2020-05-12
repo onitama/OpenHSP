@@ -147,6 +147,9 @@
     <ClCompile Include="..\emscripten\fontsystem.cpp">
       <Filter>ソース ファイル\win</Filter>
     </ClCompile>
+    <ClCompile Include="..\hspwnd_edit.cpp">
+      <Filter>ソース ファイル\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\hsp3\dpmread.h">

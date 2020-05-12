@@ -24,7 +24,7 @@ bool hasParameter( Material* material, const char* name );
 
 gpmat::gpmat()
 {
-	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 	_flag = GPMAT_FLAG_NONE;
 }
 
@@ -320,15 +320,15 @@ void gamehsp::setMaterialDefaultBinding( Material* material, int icolor, int mat
 	Vector4 color;
 	Node *light_node;
 
-	//	ã‚«ãƒ¬ãƒ³ãƒˆãƒ©ã‚¤ãƒˆã‚’åæ˜ ã•ã›ã‚‹
+	//	ƒJƒŒƒ“ƒgƒ‰ƒCƒg‚ð”½‰f‚³‚¹‚é
 	gpobj *lgt;
 	lgt = getObj(_curlight);
 	light_node = lgt->_node;
-	// ãƒ©ã‚¤ãƒˆã®æ–¹å‘è¨­å®š
+	// ƒ‰ƒCƒg‚Ì•ûŒüÝ’è
 	if (hasParameter(material, "u_directionalLightDirection[0]"))
 		material->getParameter("u_directionalLightDirection[0]")->bindValue(light_node, &Node::getForwardVectorView);
-	// ãƒ©ã‚¤ãƒˆã®è‰²è¨­å®š
-	// (ãƒªã‚¢ãƒ«ã‚¿ã‚¤ãƒ ã«å¤‰æ›´ã‚’åæ˜ ã•ã›ã‚‹å ´åˆã¯å†è¨­å®šãŒå¿…è¦ã€‚ç¾åœ¨ã¯æœªå¯¾å¿œ)
+	// ƒ‰ƒCƒg‚ÌFÝ’è
+	// (ƒŠƒAƒ‹ƒ^ƒCƒ€‚É•ÏX‚ð”½‰f‚³‚¹‚éê‡‚ÍÄÝ’è‚ª•K—vBŒ»Ý‚Í–¢‘Î‰ž)
 	Vector3 *vambient;
 	vambient = (Vector3 *)&lgt->_vec[GPOBJ_USERVEC_DIR];
 	if (hasParameter(material, "u_directionalLightColor[0]"))
@@ -372,25 +372,25 @@ void gamehsp::setMaterialDefaultBinding( Material* material, int icolor, int mat
 
 float gamehsp::setMaterialBlend( Material* material, int gmode, int gfrate )
 {
-	//	ãƒ—ãƒ¬ãƒ³ãƒ‰æç”»è¨­å®š
-	//	gmdoe : HSPã®gmodeå€¤
-	//	gfrate : HSPã®gfrateå€¤
-	//	(æˆ»ã‚Šå€¤=alphaå€¤(0.0ï½ž1.0))
+	//	ƒvƒŒƒ“ƒh•`‰æÝ’è
+	//	gmdoe : HSP‚Ìgmode’l
+	//	gfrate : HSP‚Ìgfrate’l
+	//	(–ß‚è’l=alpha’l(0.0`1.0))
 	//
 	RenderState::StateBlock *state;
 	float alpha;
 
 	state = material->getStateBlock();
 
-    //ãƒ–ãƒ¬ãƒ³ãƒ‰ãƒ¢ãƒ¼ãƒ‰è¨­å®š
+    //ƒuƒŒƒ“ƒhƒ‚[ƒhÝ’è
     switch( gmode ) {
         case 0:                     //no blend
 			state->setBlendSrc(RenderState::BLEND_ONE);
 			state->setBlendDst(RenderState::BLEND_ZERO);
 			alpha = 1.0f;
             break;
-        case 1:                     //blend+alpha one
-        case 2:                     //blend+alpha one
+		case 1:                     //blend+alpha one
+		case 2:                     //blend+alpha one
 			state->setBlendSrc(RenderState::BLEND_SRC_ALPHA);
 			state->setBlendDst(RenderState::BLEND_ONE_MINUS_SRC_ALPHA);
 			alpha = 1.0f;
@@ -417,7 +417,7 @@ float gamehsp::setMaterialBlend( Material* material, int gmode, int gfrate )
 
 int gamehsp::makeNewMat( Material* material, int mode, int color, int matopt )
 {
-	//	ãƒžãƒ†ãƒªã‚¢ãƒ«ã‚’ç”Ÿæˆã™ã‚‹
+	//	ƒ}ƒeƒŠƒAƒ‹‚ð¶¬‚·‚é
 	gpmat *mat = addMat();
 	if ( mat == NULL ) return -1;
 	mat->_material = material;
@@ -430,7 +430,7 @@ int gamehsp::makeNewMat( Material* material, int mode, int color, int matopt )
 
 int gamehsp::makeNewMatFromObj(int objid, int part)
 {
-	//	ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå›ºæœ‰ã®ãƒžãƒ†ãƒªã‚¢ãƒ«ã‚’å‚ç…§ã™ã‚‹
+	//	ƒIƒuƒWƒFƒNƒgŒÅ—L‚Ìƒ}ƒeƒŠƒAƒ‹‚ðŽQÆ‚·‚é
 	gpobj *obj = getObj(objid);
 	if (obj == NULL) return -1;
 	if (obj->_model == NULL) return -1;
@@ -446,7 +446,7 @@ int gamehsp::makeNewMatFromObj(int objid, int part)
 
 int gamehsp::makeNewMat2D( char *fname, int matopt )
 {
-	//	ãƒžãƒ†ãƒªã‚¢ãƒ«ã‚’ç”Ÿæˆã™ã‚‹(2D)
+	//	ƒ}ƒeƒŠƒAƒ‹‚ð¶¬‚·‚é(2D)
 	gpmat *mat = addMat();
 	if ( mat == NULL ) return -1;
 
@@ -478,7 +478,7 @@ int gamehsp::makeNewMat2D( char *fname, int matopt )
 	mat->_texratex = 1.0f / (float)_tex_width;
 	mat->_texratey = 1.0f / (float)_tex_height;
 
-	// 2Dç”¨ã®ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³
+	// 2D—p‚ÌƒvƒƒWƒFƒNƒVƒ‡ƒ“
 	make2DRenderProjection(&mat->_projectionMatrix2D, _tex_width, _tex_height);
 	mat->_target_material_id = -1;
 	mat->_matcolor = -1;
@@ -526,7 +526,7 @@ int gamehsp::makeNewMatFromFB(gameplay::FrameBuffer *fb, int matopt)
 	mat->_texratex = 1.0f / (float)tex_width;
 	mat->_texratey = 1.0f / (float)tex_height;
 
-	// 2Dç”¨ã®ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³
+	// 2D—p‚ÌƒvƒƒWƒFƒNƒVƒ‡ƒ“
 	make2DRenderProjection(&mat->_projectionMatrix2D, tex_width, tex_height);
 	mat->_target_material_id = -1;
 	mat->_matcolor = -1;
@@ -550,7 +550,7 @@ Material *gamehsp::makeMaterialFromShader(char *vshd, char *fshd, char *defs)
 
 void gamehsp::setupDefines(void)
 {
-	//	ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®defineå®šç¾©ã‚’ä½œæˆ
+	//	ƒVƒF[ƒ_[—p‚Ìdefine’è‹`‚ðì¬
 	//
 	char tmp[8];
 	light_defines = "MODULATE_ALPHA";
@@ -575,7 +575,7 @@ void gamehsp::setupDefines(void)
 	}
 	splight_defines = light_defines + ";SPECULAR";
 
-	// ã‚«ã‚¹ã‚¿ãƒ ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®åˆæœŸåŒ–
+	// ƒJƒXƒ^ƒ€ƒVƒF[ƒ_[‚Ì‰Šú‰»
 	user_vsh = SPRITE_VSH;
 	user_fsh = SPRITE_FSH;
 	user_defines = "";
@@ -584,7 +584,7 @@ void gamehsp::setupDefines(void)
 
 void gamehsp::setUserShader2D(char *vsh, char *fsh, char *defines)
 {
-	// ã‚«ã‚¹ã‚¿ãƒ ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®è¨­å®š
+	// ƒJƒXƒ^ƒ€ƒVƒF[ƒ_[‚ÌÝ’è
 	user_vsh = vsh;
 	user_fsh = fsh;
 	user_defines = defines;
@@ -720,7 +720,7 @@ Material *gamehsp::makeMaterialTex2D(Texture *texture, int matopt)
     // Bind the texture to the material as a sampler
     Texture::Sampler* sampler = Texture::Sampler::create(texture); // +ref texture
 
-	sampler->setFilterMode(Texture::Filter::NEAREST, Texture::Filter::NEAREST);		// 2Dã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ãƒ•ã‚£ãƒ«ã‚¿ãªã—
+	sampler->setFilterMode(Texture::Filter::NEAREST, Texture::Filter::NEAREST);		// 2D‚ÍƒfƒtƒHƒ‹ƒg‚ÅƒtƒBƒ‹ƒ^‚È‚µ
 	mesh_material->getParameter(samplerUniform->getName())->setValue(sampler);
 
 	/*

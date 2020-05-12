@@ -355,9 +355,6 @@ void Bmscr::Cls( int mode )
 	//		object initalize
 	//
 	ResetHSPObject();
-	tapstat = 0;
-	tapinvalid = 0;
-	cur_obj = NULL;
 
 	//		Viewport clear
 	//
@@ -369,21 +366,26 @@ void Bmscr::Cls( int mode )
 	//		text setting initalize
 	//
 	cx=0;cy=0;
-	Setcolor(0,0,0);
+	Setcolor(0);
+	Setcolor2(0);
 	SetMulcolor(255,255,255);
 
 	//		vals initalize
 	//
 	textspeed=0;
-	ox=64;oy=32;py=0;
-	gx=32;gy=32;gmode=0;
-	objstyle = 00;
+	ox = 64; oy = 24; py = 0;
+	gx = 32; gy = 32; gmode = 0;
+
+	objstyle = 0;
 	for (i = 0; i<BMSCR_SAVEPOS_MAX; i++) {
 		savepos[i] = 0;
 		accel_value[i] = (HSPREAL)0.0;
 	}
 	printoffsetx = 0;
 	printoffsety = 0;
+	keybuf_index = 0;
+	prevtime = 0;
+	passed_time = 0;
 
 	//		CEL initalize
 	//
@@ -392,6 +394,7 @@ void Bmscr::Cls( int mode )
 	//		all update
 	//
 	fl_udraw = fl_dispw;
+	window_active = 1;
 
 	//		Update HGI/O
 	//
@@ -430,9 +433,15 @@ void Bmscr::Setcolor( int a1, int a2, int a3 )
 }
 
 
+void Bmscr::Setcolor2(int rgbcolor)
+{
+	objcolor = 0xff000000 | ( rgbcolor & 0xffffff );
+}
+
+
 void Bmscr::Setcolor( int icolor )
 {
-	color = icolor;
+	color = 0xff000000 | icolor;
 
 	int a1 = ( icolor >> 16 ) & 0xff;
 	int a2 = ( icolor >>  8 ) & 0xff;
@@ -478,17 +487,89 @@ void Bmscr::SetFontInternal( char *fontname, int size, int style )
 }
 
 
-void Bmscr::Print( char *mes )
+void Bmscr::Print(texmesPos *tpos)
 {
-	hgio_mes( (BMSCR *)this, mes );
-	Posinc( printsizey );
+	//		texmesPosによる文字表示
+	//
+	int x1, y1;
+	x1 = cx; y1 = cy;
+	hgio_mestex((BMSCR *)this, tpos);
 }
 
 
-void Bmscr::Boxfill( int x1,int y1,int x2,int y2 )
+void Bmscr::Print( char *mes, int sw )
+{
+	//		mes,printによる文字表示
+	//		(sw=1の場合は改行しないで終了)
+	//
+	int spcur;
+	int org_cy;
+	unsigned char* p;
+	unsigned char* st;
+	unsigned char a1;
+	unsigned char bak_a1;
+
+	printsizex = 0;
+	printsizey = 0;
+
+	p = (unsigned char*)mes;
+	st = p;
+	spcur = 0;
+
+	while (1) {
+		a1 = *p;
+		if (a1 == 0) break;
+		if (a1 == 13) {
+			bak_a1 = a1; *p = 0;		// 終端を仮設定
+			hgio_mes((BMSCR *)this, (char*)st);
+			*p = bak_a1;
+			p++; st = p; spcur = 0;		// 終端を戻す
+			a1 = *p;
+			if (a1 == 10) p++;
+			continue;
+		}
+		if (a1 == 10) {
+			bak_a1 = a1; *p = 0;		// 終端を仮設定
+			hgio_mes((BMSCR *)this, (char*)st);
+			*p = bak_a1;
+			p++; st = p; spcur = 0;		// 終端を戻す
+			continue;
+		}
+#ifdef HSPUTF8
+		if (a1 & 128) {					// UTF8チェック
+			while (1) {
+				unsigned char a2;
+				a2 = *p;
+				if (a2 == 0) break;
+				if ((a2 & 0xc0) != 0x80) break;
+				p++; spcur++;
+			}
+		}
+		else {
+			p++; spcur++;
+		}
+#endif
+		p++; spcur++;
+	}
+
+	if (spcur > 0) {
+		org_cy = cy;
+		printsizex = 0;
+		printsizey = 0;
+		hgio_mes((BMSCR *)this, (char*)st);
+		if (sw) {
+			cx += printsizex;
+			cy = org_cy;
+		}
+	}
+
+}
+
+
+void Bmscr::Boxfill( int x1,int y1,int x2,int y2, int mode )
 {
 	//		boxf
-	hgio_boxf( (BMSCR *)this, (float)x1, (float)y1, (float)x2, (float)y2 );
+	hgio_boxfAlpha( (BMSCR *)this, (float)x1, (float)y1, (float)x2, (float)y2, mode );
 }
 
 
@@ -505,7 +586,7 @@ void Bmscr::Pset( int xx,int yy )
 	//		pset
 	//
 	hgio_line( (BMSCR *)this, (float)xx, (float)yy );
-	hgio_line2( (float)xx, (float)yy );
+	hgio_line2( (float)xx+1, (float)yy );
 	hgio_line( NULL, 0.0f, 0.0f );
 }
 

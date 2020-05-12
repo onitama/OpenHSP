@@ -558,22 +558,12 @@ static int cmdfunc_extcmd( int cmd )
 
 	case 0x0f:								// mes,print
 		{
-		int chk;
-		int sw,x,y;
+		int sw;
 		char *ptr;
 		ptr = code_getdsi( "" );
+		code_stmpstr(ptr);
 		sw = code_getdi(0);
-		strsp_ini();
-		while(1) {
-			chk = strsp_get( ptr, ctx->stmp, 0, 1022 );
-			x = bmscr->cx; y = bmscr->cy;
-			bmscr->Print( ctx->stmp );
-			if ( chk == 0 ) break;
-		}
-		if ( sw ) {		// 改行しない
-			bmscr->cx = x + bmscr->printsizex;
-			bmscr->cy = y;
-		}
+		bmscr->Print(ctx->stmp,sw);
 		break;
 		}
 	case 0x10:								// title
@@ -650,9 +640,6 @@ static int cmdfunc_extcmd( int cmd )
 					bmscr->DrawAllObjects();	// オブジェクトを描画する
 					bmscr->SetDefaultFont();	// フォントを元に戻す
 				}
-#ifdef HSPWIN
-				hgio_text_render();
-#endif
 			}
 		} else {
 			if ( p1 & 16 ) {
@@ -660,9 +647,6 @@ static int cmdfunc_extcmd( int cmd )
 					bmscr->DrawAllObjects();	// オブジェクトを描画する
 					bmscr->SetDefaultFont();	// フォントを元に戻す
 				}
-#ifdef HSPWIN
-				hgio_text_render();
-#endif
 				break;
 			}
 		}
@@ -684,7 +668,6 @@ static int cmdfunc_extcmd( int cmd )
 		}
 #endif
 #endif
-
 		hgio_setback( (BMSCR *)src );
 		ctx->stat = hgio_redraw( (BMSCR *)bmscr, p1 );
 		break;
@@ -791,6 +774,19 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 		}
 
+	case 0x25:								// chkbox
+	{
+		char name[256];
+		PVal *pval;
+		APTR aptr;
+		strncpy(name, code_gets(), 255);
+		aptr = code_getva(&pval);
+		if (pval->flag != HSPVAR_FLAG_INT) throw HSPERR_TYPE_MISMATCH;
+		ctx->stat = bmscr->AddHSPObjectCheckBox(name, pval, aptr);
+		break;
+	}
+
+#ifdef HSPCL
 	case 0x27:								// input (console)
 		{
 		PVal *pval;
@@ -861,6 +857,31 @@ static int cmdfunc_extcmd( int cmd )
 		}
 		break;
 		}
+#else
+	case 0x27:								// input
+	{
+		PVal *pval;
+		APTR aptr;
+		char *ptr;
+		int type, size;
+		aptr = code_getva(&pval);
+
+		p1 = code_getdi(bmscr->ox);
+		p2 = code_getdi(bmscr->oy);
+		size = 32;
+		type = pval->flag;
+		ptr = (char *)HspVarCorePtrAPTR(pval, aptr);
+		if (type == TYPE_STRING) {
+			ptr = (char *)HspVarCoreGetBlockSize(pval, (PDAT *)ptr, &size);
+		}
+		else {
+			ptr = (char *)HspVarCoreCnv(pval->flag, HSPVAR_FLAG_STR, ptr);	// 文字列に変換
+		}
+		p3 = code_getdi(size);
+		ctx->stat = bmscr->AddHSPObjectInput(pval, aptr, p1, p2, ptr, p3, type);
+		break;
+	}
+#endif
 
 	case 0x29:								// buffer
 	case 0x2a:								// screen
@@ -947,6 +968,11 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 	}
 
+	case 0x2d:								// objsel
+		p1 = code_getdi(0);
+		ctx->stat = bmscr->ActivateHSPObject(p1);
+		break;
+
 	case 0x2e:								// groll
 	{
 		p1 = code_getdi(0);
@@ -979,7 +1005,21 @@ static int cmdfunc_extcmd( int cmd )
 		p2 = code_getdi( 0 );
 		p3 = code_getdi( bmscr->sx );
 		p4 = code_getdi( bmscr->sy );
-		bmscr->Boxfill( p1, p2, p3, p4 );
+		p5 = code_getdi(0);
+		bmscr->Boxfill( p1, p2, p3, p4, p5 );
+		break;
+
+	case 0x32:								// objprm
+		p1 = code_getdi(0);
+		if (code_get() <= PARAM_END) throw HSPERR_NO_DEFAULT;
+		bmscr->UpdateHSPObject(p1, mpval->flag, mpval->pt);
+		break;
+
+	case 0x33:								// objmode (ver2.5 enhanced )
+		p1 = code_getdi(0);
+		p2 = code_getdi(bmscr->tabmove);
+		bmscr->objmode = p1;
+		bmscr->tabmove = p2;
 		break;
 
 	case 0x34:								// stick
@@ -1350,7 +1390,7 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( 255 );
 		p2 = code_getdi( 255 );
 		p3 = code_getdi( 255 );
-		//bmscr->Setcolor2( RGB(p1,p2,p3) );
+		bmscr->Setcolor2( RGB(p1,p2,p3) );
 		break;
 	case 0x4e:								// rgbcolor
 		p1 = code_getdi(0);

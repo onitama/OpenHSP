@@ -1011,6 +1011,7 @@ void hgio_rect( float x, float y, float w, float h )
     glDrawArrays(GL_LINE_LOOP,0,4);
 }
 
+
 //矩形の塗り潰し
 void hgio_boxfill( float x, float y, float w, float h )
 {
@@ -1123,7 +1124,7 @@ void hgio_line2( float x, float y )
 }
 
 
-void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
+void hgio_boxfAlpha(BMSCR *bm, float x1, float y1, float x2, float y2, int alphamode)
 {
 	//		矩形描画
 	//
@@ -1131,8 +1132,36 @@ void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 
 	ChangeTex( -1 );
-	//hgio_setColor( bm->color );
-	hgio_boxfill( x1, y1, (x2-x1), (y2-y1) );
+
+	float x = x1;
+	float y = y1;
+	float w = (x2-x1);
+	float h = (y2-y1);
+
+    //頂点配列情報
+	GLfloat colors[4*4];
+	GLfloat vert[8]={
+		x,   -y,
+		x,   -y-h,
+		x+w, -y,
+		x+w, -y-h
+	};
+
+	if (alphamode) {
+		setBlendMode( bm->gmode );
+		hgio_panelcolor( colors, bm->color, bm->gmode < 3 ? 255 : bm->gfrate );
+	} else {
+		glDisable(GL_BLEND);
+		setCurrentColor(colors,4);
+	}
+	glVertexPointer(2,GL_FLOAT,0,vert);
+	glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+}
+
+
+void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
+{
+	hgio_boxfAlpha(bm, x1, y1, x2, y2, 0);
 }
 
 
@@ -1290,13 +1319,12 @@ void hgio_fcopy( float distx, float disty, short xx, short yy, short srcsx, shor
 }
 
 
-void hgio_fontcopy( float distx, float disty, float ratex, float ratey, int srcsx, int srcsy, int texid, int color )
+void hgio_fontcopy( BMSCR *bm, float distx, float disty, float ratex, float ratey, int srcsx, int srcsy, int texid, int basex, int basey )
 {
 	//		画像コピー(フォント用)
 	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に等倍でコピー
 	//		描画モードは3,100%、転送先はdistx,disty
 	//
-	GLfloat colors[16];
     GLfloat *flp;
     GLfloat x1,y1,x2,y2;
 
@@ -1316,10 +1344,15 @@ void hgio_fontcopy( float distx, float disty, float ratex, float ratey, int srcs
     *flp++ = y2;
 
     flp = uvf2D;
-	x1 = (GLfloat)0.0f;
-	y1 = (GLfloat)0.0f;
-	x2 = (GLfloat)ratex;
-	y2 = (GLfloat)ratey;
+	x1 = (GLfloat)basex;
+	y1 = (GLfloat)basey;
+	x2 = (GLfloat)basex+srcsx;
+	y2 = (GLfloat)basey+srcsy;
+
+	x1 *= ratex;
+	y1 *= ratey;
+	x2 *= ratex;
+	y2 *= ratey;
 
     *flp++ = x1;
     *flp++ = y1;
@@ -1969,23 +2002,38 @@ void hgio_test(void)
 }
 
 
-static void hgio_messub(BMSCR* bm, char* msg)
+int hgio_font(char *fontname, int size, int style)
+{
+	//		文字フォント指定
+	//
+	tmes.setFont(fontname, size, style);
+	return 0;
+}
+
+int hgio_mes(BMSCR* bm, char* msg)
 {
 	//		mes,print 文字表示
 	//
 	int xsize, ysize;
-	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return -1;
 	if (drawflag == 0) hgio_render_start();
 
 	// print per line
-	if (bm->cy >= bm->sy) return;
+	if (bm->cy >= bm->sy) return -1;
+
+	if (*msg == 0) {
+		ysize = tmes._fontsize;
+		bm->printsizey += ysize;
+		bm->cy += ysize;
+		return 0;
+	}
 
 	int id;
 	texmes* tex;
 	id = tmes.texmesRegist(msg);
-	if (id < 0) return;
+	if (id < 0) return -1;
 	tex = tmes.texmesGet(id);
-	if (tex == NULL) return;
+	if (tex == NULL) return -1;
 
 	xsize = tex->sx;
 	ysize = tex->sy;
@@ -2005,82 +2053,112 @@ static void hgio_messub(BMSCR* bm, char* msg)
 		bm->printoffsety = 0;
 	}
 
-	if (tex->_texture>=0) {
-		hgio_fontcopy( bm->cx, bm->cy, tex->ratex, tex->ratey, xsize, ysize, tex->_texture, bm->color );
-	}
+	hgio_fontcopy(bm, bm->cx, bm->cy, tex->ratex, tex->ratey, xsize, ysize, tex->_texture, 0, 0);
 
 	if (xsize > bm->printsizex) bm->printsizex = xsize;
 	bm->printsizey += ysize;
 	bm->cy += ysize;
+	return 0;
 }
 
-int hgio_font(char *fontname, int size, int style)
+
+int hgio_mestex(BMSCR *bm, texmesPos *tpos)
 {
-	//		文字フォント指定
+	//		TEXMESPOSによる文字表示
 	//
-	tmes.setFont(fontname, size, style);
+	int mode, x, y, sx, sy;
+	int orgx, orgy;
+	int tx, ty;
+	int xsize, ysize;
+	int esx, esy;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return -1;
+	if (drawflag == 0) hgio_render_start();
+
+	// print per line
+	orgx = bm->cx;
+	orgy = bm->cy;
+	mode = tpos->mode;
+
+	sx = tpos->sx;
+	if (sx <= 0) {
+		sx = bm->sx - orgx;
+		if (sx <= 0) return -1;
+	}
+	sy = tpos->sy;
+	if (sy <= 0) {
+		sy = bm->sy - orgy;
+		if (sy <= 0) return -1;
+	}
+
+	int id = tpos->texid;
+	if (id < 0) {
+		char *str = tpos->getString();
+		id = tmes.texmesRegist(str, tpos);
+		if (id < 0) {
+			ysize = tmes._fontsize;
+			x = orgx; y = orgy;
+			if (mode & TEXMES_MODE_CENTERX) {
+				int px = sx / 2;
+				x += px;
+			}
+			if (mode & TEXMES_MODE_CENTERY) {
+				int py = (sy - ysize) / 2;
+				if (py < 0) { py = 0; }
+				y += py;
+			}
+			tpos->lastcx = x;
+			tpos->lastcy = y;
+			tpos->printysize = ysize;
+			return -1;
+		}
+		tpos->texid = id;
+	}
+
+	texmes* tex;
+	tex = tmes.texmesUpdateLife(id);
+	if (tex == NULL) return -1;
+
+	xsize = tex->sx;
+	ysize = tex->sy;
+	tpos->printysize = ysize;
+
+	x = orgx; y = orgy;
+	tx = 0; ty = 0;
+
+	esx = x + sx;
+	esy = y + sy;
+
+	if (mode & TEXMES_MODE_CENTERX) {
+		int px = (sx - xsize) / 2;
+		if (px < 0) { px = 0; }
+		x += px;
+	}
+	if (mode & TEXMES_MODE_CENTERY) {
+		int py = (sy - ysize) / 2;
+		if (py < 0) { py = 0; }
+		y += py;
+	}
+	tpos->lastcx = x;
+	tpos->lastcy = y;
+
+	if ( tpos->attribute == NULL ) {
+		if ((x + xsize) >= esx) {
+			xsize = esx - x;
+			if (xsize <= 0) return -1;
+		}
+		if ((y + ysize) >= esy) {
+			ysize = esy - y;
+			if (ysize <= 0) return -1;
+		}
+		hgio_fontcopy(bm, x, y, tex->ratex, tex->ratey, xsize, ysize, tex->_texture, tx, ty);
+	}
+
+	bm->cy += ysize;
+	bm->printsizex = xsize;
+	bm->printsizey = ysize;
 	return 0;
 }
 
-int hgio_mes(BMSCR* bm, char* str1)
-{
-	int spcur;
-	int org_cy;
-	unsigned char* p;
-	unsigned char* st;
-	unsigned char a1;
-	unsigned char bak_a1;
-
-	org_cy = bm->cy;
-	bm->printsizex = 0;
-	bm->printsizey = 0;
-
-	p = (unsigned char*)str1;
-	st = p;
-	spcur = 0;
-
-	while (1) {
-		a1 = *p;
-		if (a1 == 0) break;
-		if (a1 == 13) {
-			bak_a1 = a1; *p = 0;		// 終端を仮設定
-			hgio_messub(bm, (char*)st);
-			*p = bak_a1;
-			p++; st = p; spcur = 0;		// 終端を戻す
-			a1 = *p;
-			if (a1 == 10) p++;
-			continue;
-		}
-		if (a1 == 10) {
-			bak_a1 = a1; *p = 0;		// 終端を仮設定
-			hgio_messub(bm, (char*)st);
-			*p = bak_a1;
-			p++; st = p; spcur = 0;		// 終端を戻す
-			continue;
-		}
-#ifdef HSPUTF8
-				if (a1&128) {					// UTF8チェック
-					while(1) {
-						unsigned char a2;
-						a2 = *p;
-						if ( a2==0 ) break;
-						if ( ( a2 & 0xc0 ) != 0x80 ) break;
-						p++; spcur++;
-					}
-				} else {
-					p++; spcur++;
-				}
-#endif
-		p++; spcur++;
-	}
-
-	if (spcur > 0) {
-		hgio_messub(bm, (char*)st);
-	}
-
-	bm->cy = org_cy;
-	return 0;
-}
 
 void hgio_fontsystem_delete(int id)
 {

@@ -42,10 +42,12 @@ int hgio_title( char *str1 );
 int hgio_stick( int actsw );
 
 int hgio_font( char *fontname, int size, int style );
-int hgio_mes( BMSCR *bm, char *str1 );
+int hgio_mes(BMSCR *bm, char *str1);
+int hgio_mestex(BMSCR *bm, texmesPos *tpos);
 
 void hgio_line( BMSCR *bm, float x, float y );
 void hgio_line2( float x, float y );
+void hgio_boxfAlpha(BMSCR *bm, float x1, float y1, float x2, float y2, int alphamode);
 void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 );
 void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode );
 void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *bmsrc, float psx, float psy );
@@ -85,9 +87,14 @@ void hgio_draw_all(Bmscr *bmscr, int option);
 
 // for texmes
 void hgio_fontsystem_init(char* fontname, int size, int style);
+void hgio_fontsystem_term(void);
 void hgio_fontsystem_delete(int id);
 int hgio_fontsystem_setup(int sx, int sy, void *buffer);
-int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy);
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *lineinfo=NULL);
+
+// for edit component
+void hgio_editputclip(BMSCR* bm, char *str);
+char *hgio_editgetclip(BMSCR* bm);
 
 
 enum {

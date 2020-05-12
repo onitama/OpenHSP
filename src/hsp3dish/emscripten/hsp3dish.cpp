@@ -103,22 +103,28 @@ static int handleEvent( void ) {
 		case SDL_FINGERMOTION:
 		case SDL_FINGERDOWN:
 			{
-				int id;
+				//int id;
 				float x,y;
-				x = event.tfinger.x;
-				y = event.tfinger.y;
-				id = event.tfinger.touchId;
-				hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
+				Bmscr *bm;
+				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+				x = event.tfinger.x * bm->sx;
+				y = event.tfinger.y * bm->sy;
+				//id = event.tfinger.touchId;
+				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
+				hgio_touch( (int)x, (int)y, 1 );
 				break;
 			}
 		case SDL_FINGERUP:
 			{
-				int id;
+				//int id;
 				float x,y;
-				x = event.tfinger.x;
-				y = event.tfinger.y;
-				id = event.tfinger.touchId;
-				hgio_mtouchid( id, (int)x, (int)y, 0, 0 );
+				Bmscr *bm;
+				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+				x = event.tfinger.x * bm->sx;
+				y = event.tfinger.y * bm->sy;
+				//id = event.tfinger.touchId;
+				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
+				hgio_touch( (int)x, (int)y, 0 );
 				break;
 			}
 
@@ -163,11 +169,13 @@ static int handleEvent( void ) {
 				break;
 			}
 		case SDL_KEYDOWN:
-			keys[event.key.keysym.scancode] = true;
+			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX)
+				keys[event.key.keysym.scancode] = true;
 			//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 		case SDL_KEYUP:
-			keys[event.key.keysym.scancode] = false;
+			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX)
+				keys[event.key.keysym.scancode] = false;
 			//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 		case SDL_QUIT: /** ウィンドウのxボタンやctrl-Cを押した場合 */
@@ -179,7 +187,11 @@ static int handleEvent( void ) {
 
 bool get_key_state(int sym)
 {
-	return keys[sym];
+	if (sym >= 0 && sym < SDLK_SCANCODE_MAX) {
+		return keys[sym];
+	} else {
+		return false;
+	}
 }
 
 static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowtitle )
@@ -389,7 +401,7 @@ static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
 		if (syncdir.size() > 0) {
 			// IDBに保存
 			EM_ASM_({
-				var dir = Pointer_stringify($0);
+				var dir = UTF8ToString($0);
 				FS.syncfs(function (err) {
 					console.log("syncfs", err);
 					});
@@ -557,7 +569,7 @@ int hsp3dish_init( char *startfile )
 		return 1;
 	}
 
-	for (int i = 0; i < SDLK_LAST; i++) {
+	for (int i = 0; i < SDLK_SCANCODE_MAX; i++) {
 		keys[i] = false;
 	}
 
@@ -782,7 +794,7 @@ int hsp3dish_exec( void )
 		// IDBから読み込み
 		fs_initialized = false;
 		EM_ASM_({
-			var dir = Pointer_stringify($0);
+			var dir = UTF8ToString($0);
 			FS.mkdir(dir);
 			FS.mount(IDBFS, {}, dir);
 			FS.syncfs(true, function (err) {

@@ -12,8 +12,8 @@
 
 #include "supio.h"
 #include "sysreq.h"
-#include "texmes.h"
 #include "hgio.h"
+#include "texmes.h"
 
 /*------------------------------------------------------------*/
 /*
@@ -26,6 +26,7 @@ texmes::texmes()
 	// コンストラクタ
 	flag = 0;
 	text = NULL;
+	textsize = 0;
 #ifdef HSPDISHGP
 	_texture = NULL;
 #else
@@ -35,6 +36,7 @@ texmes::texmes()
 
 texmes::~texmes()
 {
+	terminate();
 }
 
 void texmes::clear(void)
@@ -50,11 +52,17 @@ void texmes::clear(void)
 		_texture = -1;
 	}
 #endif
+	flag = 0;
+}
+
+
+void texmes::terminate(void)
+{
+	clear();
 	if (text) {
 		free(text);		// 拡張されたネーム用バッファがあれば解放する
 		text = NULL;
 	}
-	flag = 0;
 }
 
 
@@ -69,19 +77,25 @@ void texmes::reset(int width, int height, int p_texsx, int p_texsy, void *data)
 	texsy = p_texsy;
 
 #ifdef HSPDISHGP
+#ifdef HSPEMSCRIPTEN
+	TextureHandle texid;
+	texid = hgio_fontsystem_setup( texsx, texsy, data);
+	Texture* texture = Texture::create(texid,texsx, texsy, Texture::Format::RGBA);
+#else
 	Texture* texture = Texture::create(Texture::Format::RGBA, texsx, texsy, NULL, false, Texture::TEXTURE_2D);
 	texture->setData((const unsigned char*)data);
-
+#endif
 	// Bind the texture to the material as a sampler
 	_texture = Texture::Sampler::create(texture); // +ref texture
 	_texture->setFilterMode(Texture::Filter::NEAREST, Texture::Filter::NEAREST);
+
 #else
 	_texture = hgio_fontsystem_setup( texsx, texsy, data);
 
 #endif
 
-	ratex = ( 1.0f / (float)texsx) * (sx);
-	ratey = ( 1.0f / (float)texsy) * (sy);
+	ratex = ( 1.0f / (float)texsx);
+	ratey = ( 1.0f / (float)texsy);
 	hash = 0;
 	life = TEXMES_CACHE_DEFAULT;
 	font_size = 0;
@@ -95,8 +109,15 @@ int texmes::registText(char* msg)
 	//		文字列を設定する
 	//
 	int mylen = strlen(msg);
-	if (mylen >= (TEXMES_NAME_BUFFER - 1)) {
-		text = (char*)malloc(mylen + 1);		// テキストハッシュネーム用バッファを作成する
+	if (mylen >= TEXMES_NAME_BUFFER) {
+		int size = mylen + 1;
+		if ( size > textsize) {
+			if (text != NULL) {
+				free(text);
+			}
+			text = (char*)malloc(size);		// テキストハッシュネーム用バッファを作成する
+			textsize = size;
+		}
 		strcpy(text, msg);
 	}
 	else {
@@ -104,7 +125,6 @@ int texmes::registText(char* msg)
 	}
 	return 0;
 }
-
 
 
 /*------------------------------------------------------------*/
@@ -253,9 +273,19 @@ int texmesManager::texmesGetCache(char* msg, short mycache)
 
 texmes* texmesManager::texmesGet(int id)
 {
-	if ((id<0)||(id>=_maxtexmes)) {
+	if ((id < 0) || (id >= _maxtexmes)) {
 		return NULL;
 	}
+	return &_texmes[id];
+}
+
+
+texmes* texmesManager::texmesUpdateLife(int id)
+{
+	if ((id < 0) || (id >= _maxtexmes)) {
+		return NULL;
+	}
+	_texmes[id].life = TEXMES_CACHE_DEFAULT;
 	return &_texmes[id];
 }
 
@@ -297,8 +327,7 @@ int texmesManager::Get2N(int val)
 	return res;
 }
 
-
-int texmesManager::texmesRegist(char* msg)
+int texmesManager::texmesRegist(char* msg, texmesPos *info)
 {
 	//		キャッシュ済みのテクスチャIDを返す(texmesIDを返す)
 	//		(作成されていないメッセージテクスチャは自動的に作成する)
@@ -327,7 +356,7 @@ int texmesManager::texmesRegist(char* msg)
 	if (tex == NULL) return -1;
 
 	//		ビットマップを作成
-	pImg = texmesGetFont(msg, &sx, &sy, &tsx, &tsy);
+	pImg = texmesGetFont(msg, &sx, &sy, &tsx, &tsy, info);
 	tex->reset(sx,sy,tsx,tsy,pImg);
 	_area_px = sx;
 	_area_py = sy;
@@ -341,12 +370,16 @@ int texmesManager::texmesRegist(char* msg)
 }
 
 
-unsigned char* texmesManager::texmesGetFont(char* msg, int* out_sx, int* out_sy, int *out_tsx, int *out_tsy)
+unsigned char* texmesManager::texmesGetFont(char* msg, int* out_sx, int* out_sy, int *out_tsx, int *out_tsy, texmesPos *info)
 {
 	int sx, sy, size;
 	int pitch,tsx,tsy;
 
-	hgio_fontsystem_exec(msg, NULL, 0, &sx, &sy);
+	if (info) {
+		info->length = 0;
+	}
+
+	hgio_fontsystem_exec(msg, NULL, 0, &sx, &sy, info);
 
 	tsx = Get2N(sx);
 	tsy = Get2N(sy);
@@ -359,7 +392,7 @@ unsigned char* texmesManager::texmesGetFont(char* msg, int* out_sx, int* out_sy,
 	size = pitch * tsy * sizeof(int);
 	unsigned char* buf = texmesBuffer(size);
 
-	hgio_fontsystem_exec(msg, buf, pitch, &sx, &sy);
+	hgio_fontsystem_exec(msg, buf, pitch, &sx, &sy, NULL);
 
 	*out_sx = sx;
 	*out_sy = sy;

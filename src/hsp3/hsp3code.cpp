@@ -2499,7 +2499,11 @@ HSP3TYPEINFO *code_gettypeinfo( int type )
 	HSP3TYPEINFO *info;
 	id = type;
 	if ( id < 0 ) {
-		id = tinfo_cur++;
+		id = tinfo_cur;
+	}
+
+	if ( id >= tinfo_cur ) {
+		tinfo_cur = id + 1;
 		hsp3tinfo = (HSP3TYPEINFO *)sbExpand( (char *)hsp3tinfo, sizeof(HSP3TYPEINFO) * tinfo_cur );
 		hsp3typeinit_default( id );
 	}

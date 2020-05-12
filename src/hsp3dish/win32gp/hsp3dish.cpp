@@ -85,7 +85,7 @@ static int	timer_period = -1;
 static int	timerid = 0;
 
 //
-// TimerFunc --- ã‚¿ã‚¤ãƒãƒ¼ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+// TimerFunc --- ƒ^ƒCƒ}[ƒR[ƒ‹ƒoƒbƒNŠÖ”
 //
 static void CALLBACK TimerFunc( UINT wID, UINT wUser, DWORD dwUser, DWORD dw1, DWORD dw2 )
 {
@@ -114,8 +114,8 @@ extern "C" {
 
 #ifndef WM_TOUCH
 
-#define NID_MULTI_INPUT		0x40	// ãƒãƒ«ãƒã‚¿ãƒƒãƒå¯èƒ½ãƒ•ãƒ©ã‚°
-#define NID_READY		0x80		// ã‚¿ãƒƒãƒå…¥åŠ›å¯èƒ½ãƒ•ãƒ©ã‚°
+#define NID_MULTI_INPUT		0x40	// ƒ}ƒ‹ƒ`ƒ^ƒbƒ`‰Â”\ƒtƒ‰ƒO
+#define NID_READY		0x80		// ƒ^ƒbƒ`“ü—Í‰Â”\ƒtƒ‰ƒO
 
 #define WM_GESTURE		0x0119
 #define WM_TOUCH		0x0240
@@ -145,7 +145,7 @@ DWORD cyContact;
 
 #endif
 
-static	int mt_flag;				// ãƒãƒ«ãƒã‚¿ãƒƒãƒåˆæœŸåŒ–ãƒ¢ãƒ¼ãƒ‰(1=ãƒãƒ«ãƒã‚¿ãƒƒãƒ/0=NORMAL)
+static	int mt_flag;				// ƒ}ƒ‹ƒ`ƒ^ƒbƒ`‰Šú‰»ƒ‚[ƒh(1=ƒ}ƒ‹ƒ`ƒ^ƒbƒ`/0=NORMAL)
 static	HMODULE h_user32;
 static	bool (WINAPI *i_RegisterTouchWindow)( HWND, int ); 
 static	bool (WINAPI *i_GetTouchInputInfo)( HANDLE, int, TOUCHINPUT *, int );
@@ -242,7 +242,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 			}
 #ifdef HSPERR_HANDLE
 		}
-		catch (HSPERROR code) {						// HSPã‚¨ãƒ©ãƒ¼ä¾‹å¤–å‡¦ç†
+		catch (HSPERROR code) {						// HSPƒGƒ‰[—áŠOˆ—
 			code_catcherror(code);
 		}
 #endif
@@ -251,7 +251,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	switch (uMessage)
 	{
 	case WM_PAINT:
-		//		Display å…¨æç”»
+		//		Display ‘S•`‰æ
 		//
 		break;
 
@@ -338,7 +338,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 				bm->setMTouchByPointId( -1, bm->savepos[BMSCR_SAVEPOS_MOSUEX], bm->savepos[BMSCR_SAVEPOS_MOSUEY], true );
 			}
 
-			// WM_MOUSELEAVE ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ç™»éŒ²å‡¦ç†
+			// WM_MOUSELEAVE ƒƒbƒZ[ƒW‚Ì“o˜^ˆ—
 			TRACKMOUSEEVENT tme;
 			tme.cbSize = sizeof( TRACKMOUSEEVENT );
 			tme.dwFlags = TME_LEAVE;
@@ -353,7 +353,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam);
 #ifdef HSPERR_HANDLE
 			}
-			catch (HSPERROR code) {						// HSPã‚¨ãƒ©ãƒ¼ä¾‹å¤–å‡¦ç†
+			catch (HSPERROR code) {						// HSPƒGƒ‰[—áŠOˆ—
 				code_catcherror(code);
 			}
 #endif
@@ -363,7 +363,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 
 	case WM_TOUCH:
 		{
-		//			ãƒãƒ«ãƒã‚¿ãƒƒãƒå…¥åŠ›ã®å‡¦ç†
+		//			ƒ}ƒ‹ƒ`ƒ^ƒbƒ`“ü—Í‚Ìˆ—
 		int i;
 		bool res;
 		Bmscr *bm;
@@ -403,6 +403,108 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		}
 		return 0;
 
+	case WM_CHAR:
+		if (exinfo != NULL) {			// inputƒIƒuƒWƒFƒNƒg—p
+			Bmscr* bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+			if (bm) {
+				int wparam = (int)wParam;
+				if (bm->keybuf_index == 0) {
+					int sjflg = 0;
+					if (wparam >= 0x81) if (wparam < 0xa0) sjflg++;
+					if (wparam >= 0xe0) sjflg++;
+
+					if (sjflg) {
+						bm->keybuf[0] = (unsigned char)(wparam & 0xff);
+						bm->keybuf_index++;
+					}
+					else {
+						if (wparam >= 32) bm->SendHSPObjectNotice(wparam);
+					}
+				}
+				else {
+					bm->keybuf[1] = (unsigned char)(wparam & 0xff);
+					bm->keybuf[2] = 0;
+					bm->keybuf_index = 0;
+					bm->SendHSPObjectNotice(HSPOBJ_NOTICE_KEY_BUFFER);
+				}
+			}
+		}
+		return 0;
+
+	case WM_KEYDOWN:
+		if (exinfo != NULL) {			// inputƒIƒuƒWƒFƒNƒg—p
+			int wparam = (int)wParam;
+			int iparam = (int)MapVirtualKey(wparam, 2);
+			bool notice = false;
+
+			if (iparam != 0) {
+				if ((wparam >= 'A') && (wparam <= 'Z')) {
+					if (GetKeyState(VK_CONTROL) < 0) {
+						wparam = HSPOBJ_NOTICE_KEY_CTRLADD + (wparam - '@');
+						notice = true;
+					}
+				}
+				switch (wparam) {
+				case HSPOBJ_NOTICE_KEY_BS:	// WM_CHAR‚Å‘—M‚³‚ê‚éCTRL+H
+				case HSPOBJ_NOTICE_KEY_TAB:
+				case HSPOBJ_NOTICE_KEY_CR:
+					notice = true;
+					break;
+				default:
+					break;
+				}
+				if (notice) {
+					Bmscr* bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+					if (bm) {
+						bm->SendHSPObjectNotice(wparam);
+					}
+				}
+			}
+			else {
+				switch (wparam) {
+				case HSPOBJ_NOTICE_KEY_DEL:
+				case HSPOBJ_NOTICE_KEY_INS:
+					notice = true;
+					break;
+				case HSPOBJ_NOTICE_KEY_F1:
+				case HSPOBJ_NOTICE_KEY_F2:
+				case HSPOBJ_NOTICE_KEY_F3:
+				case HSPOBJ_NOTICE_KEY_F4:
+				case HSPOBJ_NOTICE_KEY_F5:
+				case HSPOBJ_NOTICE_KEY_F6:
+				case HSPOBJ_NOTICE_KEY_F7:
+				case HSPOBJ_NOTICE_KEY_F8:
+				case HSPOBJ_NOTICE_KEY_F9:
+				case HSPOBJ_NOTICE_KEY_F10:
+				case HSPOBJ_NOTICE_KEY_F11:
+				case HSPOBJ_NOTICE_KEY_F12:
+					notice = true;
+					wparam += HSPOBJ_NOTICE_KEY_CTRLADD;
+					break;
+				case HSPOBJ_NOTICE_KEY_LEFT:
+				case HSPOBJ_NOTICE_KEY_UP:
+				case HSPOBJ_NOTICE_KEY_RIGHT:
+				case HSPOBJ_NOTICE_KEY_DOWN:
+				case HSPOBJ_NOTICE_KEY_HOME:
+				case HSPOBJ_NOTICE_KEY_END:
+				case HSPOBJ_NOTICE_KEY_SCROLL_UP:
+				case HSPOBJ_NOTICE_KEY_SCROLL_DOWN:
+					notice = true;
+					if (GetKeyState(VK_SHIFT) < 0) wparam += HSPOBJ_NOTICE_KEY_SHIFTADD;
+					break;
+				default:
+					break;
+				}
+				if (notice) {
+					Bmscr* bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+					if (bm) {
+						bm->SendHSPObjectNotice(wparam);
+					}
+				}
+			}
+
+		}
+		return 0;
 
 	case WM_QUERYENDSESSION:
 	case WM_CLOSE:
@@ -416,10 +518,10 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 				int iparam = 0;
 				if (uMessage == WM_QUERYENDSESSION) iparam++;
 				retval = code_sendirq(HSPIRQ_ONEXIT, iparam, id, 0);
-				if (retval == RUNMODE_INTJUMP) retval = code_execcmd2();	// onexit gotoæ™‚ã¯å®Ÿè¡Œã—ã¦ã¿ã‚‹
+				if (retval == RUNMODE_INTJUMP) retval = code_execcmd2();	// onexit goto‚ÍÀs‚µ‚Ä‚İ‚é
 #ifdef HSPERR_HANDLE
 			}
-			catch (HSPERROR code) {						// HSPã‚¨ãƒ©ãƒ¼ä¾‹å¤–å‡¦ç†
+			catch (HSPERROR code) {						// HSPƒGƒ‰[—áŠOˆ—
 				code_catcherror(code);
 			}
 #endif
@@ -457,17 +559,17 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 	DWORD m_dwWindowStyle = 0;
 	int exstyle = 0;
 
-	// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚¿ã‚¤ãƒ—ã”ã¨ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«ã®è¨­å®šã€‚
+	// ƒXƒNƒŠ[ƒ“ƒ^ƒCƒv‚²‚Æ‚ÌƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹‚Ìİ’èB
 	if (style & 0x10100) {
 		m_dwWindowStyle = WS_POPUP | WS_CLIPCHILDREN | WS_VISIBLE;			// bgscr window
 	}
 	else {
 		m_dwWindowStyle = WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX
 			| WS_BORDER | WS_CLIPCHILDREN | WS_VISIBLE;
-		if (style & 0x08) {	// ãƒ„ãƒ¼ãƒ«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
+		if (style & 0x08) {	// ƒc[ƒ‹ƒEƒBƒ“ƒhƒEB
 			exstyle |= WS_EX_TOOLWINDOW;
 		}
-		if (style & 0x10) {	// ç¸ãŒæ·±ã„ã€‚
+		if (style & 0x10) {	// ‰‚ª[‚¢B
 			exstyle |= WS_EX_OVERLAPPEDWINDOW;
 		}
 	}
@@ -493,14 +595,14 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 								(rc.right-rc.left), (rc.bottom-rc.top), m_hWndParent,
 								NULL, hInstance, 0 );
 
-	// æç”»APIã«æ¸¡ã™
+	// •`‰æAPI‚É“n‚·
 	hgio_init( 0, sx, sy, m_hWnd );
 	hgio_clsmode( CLSMODE_SOLID, 0xffffff, 0 );
 
-	// ãƒãƒ«ãƒã‚¿ãƒƒãƒåˆæœŸåŒ–
+	// ƒ}ƒ‹ƒ`ƒ^ƒbƒ`‰Šú‰»
 	MTouchInit( m_hWnd );
 
-	// HWNDã‚’HSPCTXã«ä¿å­˜ã™ã‚‹
+	// HWND‚ğHSPCTX‚É•Û‘¶‚·‚é
 	ctx->wnd_parent = m_hWnd;
 }
 
@@ -514,7 +616,7 @@ void hsp3dish_dialog( char *mes )
 #ifdef HSPDEBUG
 char *hsp3dish_debug( int type )
 {
-	//		ãƒ‡ãƒãƒƒã‚°æƒ…å ±å–å¾—
+	//		ƒfƒoƒbƒOî•ñæ“¾
 	//
 	char *p;
 	p = code_inidbg();
@@ -540,7 +642,7 @@ char *hsp3dish_debug( int type )
 
 void hsp3dish_drawon( void )
 {
-	//		æç”»é–‹å§‹æŒ‡ç¤º
+	//		•`‰æŠJnw¦
 	//
 	if ( drawflag == 0 ) {
 		hgio_render_start();
@@ -551,7 +653,7 @@ void hsp3dish_drawon( void )
 
 void hsp3dish_drawoff( void )
 {
-	//		æç”»çµ‚äº†æŒ‡ç¤º
+	//		•`‰æI—¹w¦
 	//
 	if ( drawflag ) {
 		hgio_render_end();
@@ -562,7 +664,7 @@ void hsp3dish_drawoff( void )
 
 int hsp3dish_debugopen( void )
 {
-	//		ãƒ‡ãƒãƒƒã‚°ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¥è¡¨ç¤º
+	//		ƒfƒoƒbƒOƒEƒCƒ“ƒhƒD•\¦
 	//
 #ifdef HSPDEBUG
 	if ( h_dbgwin != NULL ) return 0;
@@ -599,7 +701,7 @@ static void hsp3dish_dispatch( MSG *msg )
 	DispatchMessage( msg );
 
 #ifndef HSPDEBUG
-	//		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚»ãƒ¼ãƒãƒ¼çµ‚äº†ãƒã‚§ãƒƒã‚¯
+	//		ƒXƒNƒŠ[ƒ“ƒZ[ƒo[I—¹ƒ`ƒFƒbƒN
 	//
 	if ( ctx->hspstat & HSPSTAT_SSAVER ) {
 		int x,y;
@@ -627,7 +729,7 @@ static void hsp3dish_dispatch( MSG *msg )
 				code_sendirq(HSPIRQ_ONKEY, (int)MapVirtualKey(msg->wParam, 2), (int)msg->wParam, (int)msg->lParam);
 #ifdef HSPERR_HANDLE
 			}
-			catch (HSPERROR code) {						// HSPã‚¨ãƒ©ãƒ¼ä¾‹å¤–å‡¦ç†
+			catch (HSPERROR code) {						// HSPƒGƒ‰[—áŠOˆ—
 				code_catcherror(code);
 			}
 #endif
@@ -639,8 +741,8 @@ static void hsp3dish_dispatch( MSG *msg )
 
 int hsp3dish_wait( int tick )
 {
-	//		æ™‚é–“å¾…ã¡(wait)
-	//		(awaitã«å¤‰æ›ã—ã¾ã™)
+	//		ŠÔ‘Ò‚¿(wait)
+	//		(await‚É•ÏŠ·‚µ‚Ü‚·)
 	//
 	if ( ctx->waitcount <= 0 ) {
 		ctx->runmode = RUNMODE_RUN;
@@ -653,7 +755,7 @@ int hsp3dish_wait( int tick )
 
 int hsp3dish_await( int tick )
 {
-	//		æ™‚é–“å¾…ã¡(await)
+	//		ŠÔ‘Ò‚¿(await)
 	//
 	if ( ctx->waittick < 0 ) {
 		if ( ctx->lasttick == 0 ) ctx->lasttick = tick;
@@ -674,7 +776,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 	int tick;
 
 	while(1) {
-		// logmes ãªã‚‰å…ˆã«å‡¦ç†ã™ã‚‹
+		// logmes ‚È‚çæ‚Éˆ—‚·‚é
 		if ( hspctx->runmode == RUNMODE_LOGMES ) {
 			hspctx->runmode = RUNMODE_RUN;
 #ifdef HSPDEBUG
@@ -709,7 +811,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 		case RUNMODE_AWAIT:
 			if ( timer_period == -1 ) {
 
-				//	é€šå¸¸ã®ã‚¿ã‚¤ãƒãƒ¼
+				//	’Êí‚Ìƒ^ƒCƒ}[
 				tick = GetTickCount();
 				if ( code_exec_await( tick ) != RUNMODE_RUN ) {
 					MsgWaitForMultipleObjects(0, NULL, FALSE, hspctx->waittick - tick, QS_ALLINPUT );
@@ -721,13 +823,13 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 #endif
 				}
 			} else {
-				//	é«˜ç²¾åº¦ã‚¿ã‚¤ãƒãƒ¼
-				tick = timeGetTime()+5;				// ã™ã“ã—æ—©ã‚ã«æŠœã‘ã‚‹ã‚ˆã†ã«ã™ã‚‹
+				//	‚¸“xƒ^ƒCƒ}[
+				tick = timeGetTime()+5;				// ‚·‚±‚µ‘‚ß‚É”²‚¯‚é‚æ‚¤‚É‚·‚é
 				if ( code_exec_await( tick ) != RUNMODE_RUN ) {
 					MsgWaitForMultipleObjects(0, NULL, FALSE, hspctx->waittick - tick, QS_ALLINPUT );
 				} else {
 					tick = timeGetTime();
-					while( tick < hspctx->waittick ) {	// ç´°ã‹ã„waitã‚’å–ã‚‹
+					while( tick < hspctx->waittick ) {	// ×‚©‚¢wait‚ğæ‚é
 						Sleep(1);
 						tick = timeGetTime();
 					}
@@ -757,7 +859,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 	//	case RUNMODE_LOGMES:
 		case RUNMODE_RESTART:
 		{
-			//		ç”»é¢ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã—ã¦å†æ§‹ç¯‰ã™ã‚‹
+			//		‰æ–ÊƒTƒCƒY‚ğ•ÏX‚µ‚ÄÄ\’z‚·‚é
 			Bmscr* bm;
 			int hsp_fullscr;
 			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
@@ -815,7 +917,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 
 
 /*----------------------------------------------------------*/
-//		ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«é–¢é€£
+//		ƒfƒoƒCƒXƒRƒ“ƒgƒ[ƒ‹ŠÖ˜A
 /*----------------------------------------------------------*/
 static HSP3DEVINFO *mem_devinfo;
 static int devinfo_dummy;
@@ -869,7 +971,7 @@ static void hsp3dish_setdevinfo( HSP3DEVINFO *devinfo )
 
 static void hsp3dish_savelog( void )
 {
-	//		ãƒ­ã‚°ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›ã™ã‚‹
+	//		ƒƒO‚ğƒtƒ@ƒCƒ‹‚Éo—Í‚·‚é
 	//
 	if (game != NULL) {
 		char fname[_MAX_PATH + 1];
@@ -888,7 +990,7 @@ static void hsp3dish_savelog( void )
 
 int app_init(void)
 {
-	//		Windowsã‚·ã‚¹ãƒ†ãƒ é–¢é€£ã®åˆæœŸåŒ–(æœ€åˆã«å®Ÿè¡Œ)
+	//		WindowsƒVƒXƒeƒ€ŠÖ˜A‚Ì‰Šú‰»(Å‰‚ÉÀs)
 	//
 	if (FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
 		return 1;
@@ -901,8 +1003,8 @@ int app_init(void)
 
 int hsp3dish_setwindow(int bootprm, int wx, int wy)
 {
-	//		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚’æŒ‡å®šã™ã‚‹
-	//		(wxãŒãƒã‚¤ãƒŠã‚¹ã®å ´åˆã¯.iniãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰å–å¾—ã™ã‚‹)
+	//		ƒEƒCƒ“ƒhƒEƒTƒCƒY‚ğw’è‚·‚é
+	//		(wx‚ªƒ}ƒCƒiƒX‚Ìê‡‚Í.iniƒtƒ@ƒCƒ‹‚©‚çæ“¾‚·‚é)
 	//
 	hsp_wx = wx;
 	hsp_wy = wy;
@@ -915,7 +1017,7 @@ int hsp3dish_setwindow(int bootprm, int wx, int wy)
 
 int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 {
-	//		HSP3Dishã‚·ã‚¹ãƒ†ãƒ é–¢é€£ã®åˆæœŸåŒ–
+	//		HSP3DishƒVƒXƒeƒ€ŠÖ˜A‚Ì‰Šú‰»
 	//
 	int orgexe, mode;
 	char fname[_MAX_PATH + 1];
@@ -925,12 +1027,12 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 #endif
 
 	InitSysReq();
-	SetSysReq(SYSREQ_MAXMATERIAL, 128);		// ãƒãƒ†ãƒªã‚¢ãƒ«ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤
+	SetSysReq(SYSREQ_MAXMATERIAL, 128);		// ƒ}ƒeƒŠƒAƒ‹‚ÌƒfƒtƒHƒ‹ƒg’l
 
 	game = NULL;
 	platform = NULL;
 
-	//		HSPé–¢é€£ã®åˆæœŸåŒ–
+	//		HSPŠÖ˜A‚Ì‰Šú‰»
 	//
 	hsp = new Hsp3();
 	hsp->hspctx.instance = (void *)hInstance;
@@ -963,7 +1065,7 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 #endif
 
 
-	//		å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã‹ãƒ‡ãƒãƒƒã‚°ä¸­ã‹ã‚’èª¿ã¹ã‚‹
+	//		Àsƒtƒ@ƒCƒ‹‚©ƒfƒoƒbƒO’†‚©‚ğ’²‚×‚é
 	//
 	mode = 0;
 	orgexe = 0;
@@ -990,7 +1092,7 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 	}
 #endif
 
-	//		èµ·å‹•ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ã‚«ãƒ¬ãƒ³ãƒˆã«ã™ã‚‹
+	//		‹N“®ƒtƒ@ƒCƒ‹‚ÌƒfƒBƒŒƒNƒgƒŠ‚ğƒJƒŒƒ“ƒg‚É‚·‚é
 	//
 #ifndef HSPDEBUG
 	if ((hsp_wd & 2) == 0) {
@@ -1000,7 +1102,7 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 	}
 #endif
 
-	//	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚’è¨­å®šã™ã‚‹
+	//	ƒEƒCƒ“ƒhƒEƒTƒCƒY‚ğİ’è‚·‚é
 	//
 	if ((hsp_wx <= 0) || (hsp_wy <= 0)) {
 		if (OpenIniFile("hsp3dish.ini") == 0) {
@@ -1012,7 +1114,7 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 	if (hsp_wx <= 0) hsp_wx = 960;
 	if (hsp_wy <= 0) hsp_wy = 640;
 
-	//	axãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿
+	//	axƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
 	//
 	if (hsp->Reset(mode)) {
 		hsp3dish_dialog("Startup failed.");
@@ -1029,7 +1131,7 @@ int hsp3dish_reset(void)
 
 #ifndef HSP3DLL
 	{
-	//		ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³é–¢é€£
+	//		ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ŠÖ˜A
 	ss = GetCommandLine();
 	ss = strsp_cmds( ss );
 #ifdef HSPDEBUG
@@ -1039,7 +1141,7 @@ int hsp3dish_reset(void)
 #else
 	ss = "";
 #endif
-	sbStrCopy(&ctx->cmdline, ss);					// ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’ä¿å­˜
+	sbStrCopy(&ctx->cmdline, ss);					// ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒpƒ‰ƒ[ƒ^[‚ğ•Û‘¶
 
 	//		SSaver proc
 	//
@@ -1065,7 +1167,7 @@ int hsp3dish_reset(void)
 		if (a1=='s') {
 			ShowCursor(FALSE);
 		} else {
-			hsp_ss = 0;								// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚»ãƒ¼ãƒãƒ¼æ™‚ä»¥å¤–ã¯ãƒ¢ãƒ¼ãƒ‰OFF
+			hsp_ss = 0;								// ƒXƒNƒŠ[ƒ“ƒZ[ƒo[ˆÈŠO‚Íƒ‚[ƒhOFF
 		}
 		ctx->hspstat |= hsp_ss;
 	}
@@ -1088,12 +1190,12 @@ int hsp3dish_reset(void)
 
 	//		Start Timer
 	//
-	// timerGetTimeé–¢æ•°ã«ã‚ˆã‚‹ç²¾åº¦ã‚¢ãƒƒãƒ—(Î¼ç§’å˜ä½)
+	// timerGetTimeŠÖ”‚É‚æ‚é¸“xƒAƒbƒv(ƒÊ•b’PˆÊ)
 	timer_period = -1;
 	if (( ctx->hsphed->bootoption & HSPHED_BOOTOPT_NOMMTIMER ) == 0 ) {
 		TIMECAPS caps;
 		if ( timeGetDevCaps(&caps,sizeof(TIMECAPS)) == TIMERR_NOERROR ){
-			// ãƒãƒ«ãƒãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒãƒ¼ã®ã‚µãƒ¼ãƒ“ã‚¹ç²¾åº¦ã‚’æœ€å¤§ã«
+			// ƒ}ƒ‹ƒ`ƒƒfƒBƒAƒ^ƒCƒ}[‚ÌƒT[ƒrƒX¸“x‚ğÅ‘å‚É
 			timer_period = caps.wPeriodMin;
 			timeBeginPeriod( timer_period );
 		}
@@ -1153,11 +1255,11 @@ int hsp3dish_reset(void)
 
 void hsp3dish_bye(void)
 {
-	//		Windowé–¢é€£ã®è§£æ”¾
+	//		WindowŠÖ˜A‚Ì‰ğ•ú
 	//
 	hsp3dish_drawoff();
 
-	//		ã‚¿ã‚¤ãƒãƒ¼ã®é–‹æ”¾
+	//		ƒ^ƒCƒ}[‚ÌŠJ•ú
 	//
 	if (timer_period != -1) {
 		timeEndPeriod(timer_period);
@@ -1165,14 +1267,14 @@ void hsp3dish_bye(void)
 	}
 
 #ifdef HSPDEBUG
-	//		ãƒ‡ãƒãƒƒã‚°ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¥ã®è§£æ”¾
+	//		ƒfƒoƒbƒOƒEƒCƒ“ƒhƒD‚Ì‰ğ•ú
 	//
 	if (h_dbgwin != NULL) { FreeLibrary(h_dbgwin); h_dbgwin = NULL; }
 #endif
 
 	DllManager().free_all_library();
 
-	//		HSPé–¢é€£ã®è§£æ”¾
+	//		HSPŠÖ˜A‚Ì‰ğ•ú
 	//
 	if (hsp != NULL) { delete hsp; hsp = NULL; }
 
@@ -1182,7 +1284,7 @@ void hsp3dish_bye(void)
 		m_hWnd = NULL;
 	}
 
-	//		gameplayé–¢é€£ã®è§£æ”¾
+	//		gameplayŠÖ˜A‚Ì‰ğ•ú
 	//
 	if (platform != NULL) {
 		platform->shutdownInternal();
@@ -1203,7 +1305,7 @@ void hsp3dish_bye(void)
 
 void app_bye(void)
 {
-	//		ã‚·ã‚¹ãƒ†ãƒ é–¢é€£ã®è§£æ”¾
+	//		ƒVƒXƒeƒ€ŠÖ˜A‚Ì‰ğ•ú
 	//
 #ifndef HSP_COM_UNSUPPORTED
 	OleUninitialize();
@@ -1244,14 +1346,14 @@ void hsp3dish_error( void )
 
 int hsp3dish_exec( void )
 {
-	//		å®Ÿè¡Œãƒ¡ã‚¤ãƒ³ã‚’å‘¼ã³å‡ºã™
+	//		ÀsƒƒCƒ“‚ğŒÄ‚Ño‚·
 	//
 	int runmode;
 	int endcode;
 
 	hsp3dish_msgfunc( ctx );
 
-	//		ãƒ‡ãƒãƒƒã‚°ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¥ç”¨
+	//		ƒfƒoƒbƒOƒEƒCƒ“ƒhƒD—p
 	//
 #ifdef HSPDEBUG
 	if ( ctx->hsphed->bootoption & HSPHED_BOOTOPT_DEBUGWIN ) {
@@ -1259,7 +1361,7 @@ int hsp3dish_exec( void )
 	}
 #endif
 
-	//		å®Ÿè¡Œã®é–‹å§‹
+	//		Às‚ÌŠJn
 	//
 	runmode = code_execcmd();
 	if ( runmode == RUNMODE_ERROR ) {

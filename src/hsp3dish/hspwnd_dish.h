@@ -5,12 +5,17 @@
 #ifndef __hspwnd_dish_h
 #define __hspwnd_dish_h
 
+#include <string>
 #include "../hsp3/hsp3config.h"
 #include "../hsp3/hsp3code.h"
 
 //	Window Object Info
 //
 #define HSPOBJ_LIMIT_DEFAULT	128
+
+#define HSPOBJ_OPTION_SETFONT	0x1000
+#define HSPOBJ_OPTION_EDITSEL	0x2000
+#define HSPOBJ_OPTION_MULTISEL	0x4000
 
 #define HSPOBJ_INPUT_STR 2
 #define HSPOBJ_INPUT_DOUBLE 3
@@ -19,11 +24,125 @@
 #define HSPOBJ_INPUT_READONLY 0x200
 #define HSPOBJ_INPUT_HSCROLL 0x400
 
+#define HSPOBJ_FONTMODE_NONE 0
+#define HSPOBJ_FONTMODE_OPAQUE 1
+#define HSPOBJ_FONTMODE_TRANSPARENT 2
+#define HSPOBJ_FONTMODE_GUIFONT 4
+
 #define HSPOBJ_NONE 0
 #define HSPOBJ_TAB_ENABLE 1
 #define HSPOBJ_TAB_DISABLE 2
 #define HSPOBJ_TAB_SKIP 3
 #define HSPOBJ_TAB_SELALLTEXT 4
+
+#define HSPOBJ_NOTICE_KEY_CTRLADD (0x2000)
+#define HSPOBJ_NOTICE_KEY_SHIFTADD (0x1000)
+
+#define HSPOBJ_NOTICE_NONE 0
+#define HSPOBJ_NOTICE_KEY_BUFFER 0x8000
+#define HSPOBJ_NOTICE_CLICK 0x10000
+#define HSPOBJ_NOTICE_CLICK_END 0x10001
+#define HSPOBJ_NOTICE_CLICK_MOVE 0x10002
+#define HSPOBJ_NOTICE_KEY_BS (8)
+#define HSPOBJ_NOTICE_KEY_DEL (46)
+#define HSPOBJ_NOTICE_KEY_LEFT (37)
+#define HSPOBJ_NOTICE_KEY_UP (38)
+#define HSPOBJ_NOTICE_KEY_RIGHT (39)
+#define HSPOBJ_NOTICE_KEY_DOWN (40)
+#define HSPOBJ_NOTICE_KEY_HOME (36)
+#define HSPOBJ_NOTICE_KEY_END (35)
+#define HSPOBJ_NOTICE_KEY_INS (45)
+#define HSPOBJ_NOTICE_KEY_SCROLL_UP (33)
+#define HSPOBJ_NOTICE_KEY_SCROLL_DOWN (34)
+#define HSPOBJ_NOTICE_KEY_TAB (9)
+#define HSPOBJ_NOTICE_KEY_CR (13)
+
+#define HSPOBJ_NOTICE_KEY_F1 (112)
+#define HSPOBJ_NOTICE_KEY_F2 (113)
+#define HSPOBJ_NOTICE_KEY_F3 (114)
+#define HSPOBJ_NOTICE_KEY_F4 (115)
+#define HSPOBJ_NOTICE_KEY_F5 (116)
+#define HSPOBJ_NOTICE_KEY_F6 (117)
+#define HSPOBJ_NOTICE_KEY_F7 (118)
+#define HSPOBJ_NOTICE_KEY_F8 (119)
+#define HSPOBJ_NOTICE_KEY_F9 (120)
+#define HSPOBJ_NOTICE_KEY_F10 (121)
+#define HSPOBJ_NOTICE_KEY_F11 (122)
+#define HSPOBJ_NOTICE_KEY_F12 (123)
+
+#define HSPOBJ_NOTICE_KEY_SLEFT (37+HSPOBJ_NOTICE_KEY_SHIFTADD)
+#define HSPOBJ_NOTICE_KEY_SUP (38+HSPOBJ_NOTICE_KEY_SHIFTADD)
+#define HSPOBJ_NOTICE_KEY_SRIGHT (39+HSPOBJ_NOTICE_KEY_SHIFTADD)
+#define HSPOBJ_NOTICE_KEY_SDOWN (40+HSPOBJ_NOTICE_KEY_SHIFTADD)
+#define HSPOBJ_NOTICE_KEY_SHOME (36+HSPOBJ_NOTICE_KEY_SHIFTADD)
+#define HSPOBJ_NOTICE_KEY_SEND (35+HSPOBJ_NOTICE_KEY_SHIFTADD)
+#define HSPOBJ_NOTICE_KEY_SSCROLL_UP (33+HSPOBJ_NOTICE_KEY_SHIFTADD)
+#define HSPOBJ_NOTICE_KEY_SSCROLL_DOWN (34+HSPOBJ_NOTICE_KEY_SHIFTADD)
+
+#define TEXMESPOS_MAX 256			// ポジション情報の最大数
+#define TEXMES_MODE_NONE (0)
+#define TEXMES_MODE_CENTERX (1)
+#define TEXMES_MODE_CENTERY (2)
+
+class texmesPos
+{
+public:
+	//	TEXMESPOS class
+	//	単一行の文字列と文字位置を管理します
+	//
+	texmesPos(void);
+	~texmesPos(void);
+	void invalidate(void);
+	int getPosX( int id );
+	int getPosFromX( int x );
+	void setCaret(int id= TEXMESPOS_MAX);
+	void setCaretHome(bool select = false);
+	void setCaretEnd(bool select = false);
+	void moveCaret(int value, bool select=false);
+	void setCaretFromX( int x );
+	int getCaretX(void);
+	void setString(char *str);
+	char *getString(void);
+	void addStringFromCaret(char *str);
+	void deleteStringFromCaret(bool backspace = true);
+	void toggleInsertMode(void);
+	void setMaxLength(int max);
+	void deleteAttribue(void);
+	int addAttribue(int startid, int attr);
+	void setSize(int sizex, int sizey);
+	void setSelection(int *sel);
+	void setSelection(int start, int end);
+	bool getSelection(int *start, int *end);
+	bool deleteStringSelection(void);
+	void clearSelection(void);
+	void allSelection(void);
+	int getSelectionString(std::string &out);
+
+	int mode;					// mode flag (TEXMES_MODE_*)
+	int texid;					// texmes ID
+	int length;					// string length
+	int maxlength;				// maxlength
+	int printysize;				// print y-size (-1=none)
+	bool insert_mode;			// insert mode flag
+	std::string msg;			// button name
+
+	int caret;					// caret flag
+	int caret_cnt;				// caret blink counter
+	int lastcx, lastcy;			// last print size
+
+	int sx, sy;					// size limit
+	int index_offset;			// index offset for multiline
+	int *selection;				// selection reference
+	short *attribute;			// extra attribute data
+
+	short pos[TEXMESPOS_MAX];	// position table
+
+protected:
+	void validateInternalString(void);
+	int validateString(char *str, int max = 0);
+	int GetMultibyteCharacter(unsigned char *text);
+	int getStringByteFromPos(int pos);
+};
 
 typedef struct HSP3VARSET
 {
@@ -35,15 +154,24 @@ typedef struct HSP3VARSET
 	void *ptr;
 } HSP3VARSET;
 
-typedef struct HSP3BTNSET
-{
-	//	HSP3BTNSET structure
-	//	(HSP3VARSETと同サイズにすること)
+class Hsp3ObjBase {
+public:
+	//	HSP3OBJBASE
 	//
-	char name[64];				// button name
+	Hsp3ObjBase(void);
+	~Hsp3ObjBase(void);
+	std::string name;			// button name
 	short messx, messy;			// message rect size
+	int value;					// master value
+	HSPREAL dval;				// master value (dval)
+};
 
-	//	参照元
+class Hsp3ObjButton : public Hsp3ObjBase {
+public:
+	//	Hsp3Object for button
+	//
+
+	//	image参照元
 	short normal_x, normal_y;	// 通常時
 	short push_x, push_y;		// 押下時
 	short focus_x, focus_y;		// フォーカス時
@@ -51,7 +179,23 @@ typedef struct HSP3BTNSET
 	short jumpmode;				// jump mode
 	short ext;					// dummy
 	void *ptr;					// jump 呼び出し先
-} HSP3BTNSET;
+};
+
+class Hsp3ObjChkbox : public Hsp3ObjBase {
+public:
+	//	Hsp3Object for check box
+	//
+
+};
+
+class Hsp3ObjInput : public Hsp3ObjBase {
+public:
+	//	Hsp3Object for input box
+	//
+	texmesPos tpos;
+	int sel_start;				// selection start
+	int sel_end;				// selection end
+};
 
 typedef struct HSPOBJINFO
 {
@@ -70,7 +214,16 @@ typedef struct HSPOBJINFO
 	short tapflag;		// タップフラグ
 	short srcid;		// 参照BufferID
 
-	HSP3BTNSET *btnset;	// objectから設定される情報
+	short fontmode;		// フォント設定モード(HSPOBJ_FONTMODE_*)
+	short fontedit;		// フォントエディット(0=none/1=edit/2=multiline)
+	short fontsize;		// フォントサイズ
+	short fontstyle;	// フォントスタイル
+	int fontcolor;		// テキスト色
+	int backcolor;		// 背景色
+	std::string *fontname;	// font name
+
+	Hsp3ObjBase *btnset;	// objectから設定される情報
+	HSP3VARSET *varset;	// objectから設定される情報
 
 	//		callback function
 	void	(*func_draw)( struct HSPOBJINFO * );
@@ -166,6 +319,7 @@ public:
 	void Title( char *str );
 	void Setcolor( int a1, int a2, int a3 );
 	void Setcolor( int icolor );
+	void Setcolor2( int rgbcolor );
 	void SetMulcolor( int a1, int a2, int a3 );
 	void SetHSVColor( int hval, int sval, int vval );
 	int BmpSave( char *fname );
@@ -174,8 +328,9 @@ public:
 	void SetFontInternal( char *fontname, int size, int style );
 	void SetDefaultFont( void );
 
-	void Print( char *mes );
-	void Boxfill( int x1,int y1,int x2,int y2 );
+	void Print(char *mes, int sw = 0);
+	void Print(texmesPos *tpos);
+	void Boxfill(int x1, int y1, int x2, int y2, int mode=0);
 	void Circle( int x1,int y1,int x2,int y2, int mode );
 	int Pget( int xx, int yy );
 	void Pset( int xx,int yy );
@@ -198,19 +353,29 @@ public:
 
 	int NewHSPObject( void );
 	void ResetHSPObject( void );
+	int ActivateHSPObject(int id);
+	void SelectEditHSPObject(void);
 	void NextObject( int plus );
 
 	HSPOBJINFO *AddHSPObject( int id, int mode );
 	HSPOBJINFO *GetHSPObject( int id );
 	HSPOBJINFO *GetHSPObjectSafe( int id );
+	HSPOBJINFO *AddHSPVarEventObject(int id, int mode, PVal *pval, APTR aptr, int type, void *ptr);
 	void DeleteHSPObject( int id );
 	void EnableObject( int id, int sw );
 	void SetObjectMode( int id, int owmode );
 	int DrawAllObjects( void );
 	int UpdateAllObjects( void );
 
+	void SetButtonImage(int id, int bufid, int x1, int y1, int x2, int y2, int x3, int y3);
+	void SetHSPObjectFont(int id);
+	void SendHSPObjectNotice(int wparam);
+	void UpdateHSPObject(int id, int type, void *ptr);
+
 	int AddHSPObjectButton( char *name, int eventid, void *callptr );
-	void SetButtonImage( int id, int bufid, int x1, int y1, int x2, int y2, int x3, int y3 );
+	int AddHSPObjectCheckBox(char *name, PVal *pval, APTR aptr);
+	int AddHSPObjectInput(PVal *pval, APTR aptr, int sizex, int sizey, char *defval, int limit, int mode);
+	int AddHSPObjectMultiBox(PVal *pval, APTR aptr, int psize, char *defval, int mode);
 
 	void setMTouch( HSP3MTOUCH *mt, int x, int y, bool touch );
 	void setMTouchByPoint( int old_x, int old_y, int x, int y, bool touch );
@@ -264,7 +429,7 @@ public:
 //	HFONT	hfont;				// FONT handle
 //	HFONT	holdfon;			// FONT handle (old)
 //	COLORREF color;				// text color code
-	int		 color;				// text color code
+	int		color;				// text color code
 	int		textspeed;			// slow text speed
 	int		cx2,cy2;			// slow text cursor x,y
 	int		tex,tey;			// slow text limit x,y
@@ -321,6 +486,8 @@ public:
 	void	*master_buffer;				// buffer pointer to off-screen
 	HSPREAL	accel_value[BMSCR_SAVEPOS_MAX];		// Accelerometer sensor value
 
+	int		objcolor;					// object color code
+
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_viewtrans[4];			// View Translate X,Y,Z,W
 	float	vp_viewrotate[4];			// View Rotate X,Y,Z,W
@@ -329,6 +496,17 @@ public:
 
 	int		printoffsetx;				// print offset-x (for centering) 0=none
 	int		printoffsety;				// print offset-y (for centering) 0=none
+	int		tapobj_posx;				// Tap Object position-x (tap start)
+	int		tapobj_posy;				// Tap Object position-y (tap start)
+	int		tapobj_posex;				// Tap Object position-x (tap end)
+	int		tapobj_posey;				// Tap Object position-y (tap end)
+	int		keybuf_index;				// key buffer index
+	unsigned char keybuf[8];			// key buffer for editor input
+	int		cur_objid;					// Select focus object ID
+	int		window_active;				// Window active flag (0=none/1=active)
+	HSPOBJINFO *cur_mo_obj;				// Mouse over focus object
+	int		prevtime;					// previous frame time
+	int		passed_time;				// Passed millisecond from previous frame
 private:
 //	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
 //	void CnvRGB16( PTRIVERTEX target, DWORD src );
@@ -428,7 +606,7 @@ typedef struct BMSCR
 //	HFONT	hfont;				// FONT handle
 //	HFONT	holdfon;			// FONT handle (old)
 //	COLORREF color;				// text color code
-	int		 color;				// text color code
+	int		color;				// text color code
 	int		textspeed;			// slow text speed
 	int		cx2,cy2;			// slow text cursor x,y
 	int		tex,tey;			// slow text limit x,y
@@ -485,6 +663,8 @@ typedef struct BMSCR
 	void* master_buffer;				// buffer pointer to off-screen
 	HSPREAL	accel_value[BMSCR_SAVEPOS_MAX];		// Accelerometer sensor value
 
+	int		objcolor;					// object color code
+
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_viewtrans[4];			// View Translate X,Y,Z,W
 	float	vp_viewrotate[4];			// View Rotate X,Y,Z,W
@@ -493,6 +673,17 @@ typedef struct BMSCR
 
 	int		printoffsetx;				// print offset-x (for centering) 0=none
 	int		printoffsety;				// print offset-y (for centering) 0=none
+	int		tapobj_posx;				// Tap Object position-x (tap start)
+	int		tapobj_posy;				// Tap Object position-y (tap start)
+	int		tapobj_posex;				// Tap Object position-x (tap end)
+	int		tapobj_posey;				// Tap Object position-y (tap end)
+	int		keybuf_index;				// key buffer index
+	unsigned char keybuf[8];			// key buffer for editor input
+	int		cur_objid;					// Select focus object ID
+	int		window_active;				// Window active flag (0=none/1=active)
+	HSPOBJINFO *cur_mo_obj;				// Mouse over focus object
+	int		prevtime;					// previous frame time
+	int		passed_time;				// Passed millisecond from previous frame
 } BMSCR;
 
 #endif

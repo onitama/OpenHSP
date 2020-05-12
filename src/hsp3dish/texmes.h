@@ -27,6 +27,7 @@ public:
 	~texmes();
 	void reset(int sizex, int sizey, int p_texsx, int p_texsy, void *data);
 	void clear(void);
+	void terminate(void);
 	int registText(char* msg);
 
 	int entry;			// entry ID
@@ -40,7 +41,8 @@ public:
 
 	int hash;			// Text Hashcode
 	int life;			// Text Cache life
-	char* text;			// Text Message
+	char* text;			// Long Text Message
+	int textsize;		// Long Text Message size
 	int font_size;		// Text font size
 	int font_style;		// Text font style
 	char buf[TEXMES_NAME_BUFFER];		// Text Data Buffer
@@ -52,6 +54,7 @@ public:
 #endif
 };
 
+class texmesPos;
 
 // メッセージマネージャー
 class texmesManager {
@@ -62,14 +65,11 @@ public:
 	void texmesInit(int maxmes);
 	void texmesTerm(void);
 	void texmesProc(void);
-	texmes* addTexmes(void);
-	texmes* texmesGet(int id);
-	int str2hash(char* msg, int* out_len);
-	int texmesGetCache(char* msg, short mycache);
-	int texmesRegist(char* msg);
-	unsigned char* texmesGetFont(char* msg, int* out_sx, int *out_sy, int* out_tsx, int* out_tsy);
-	unsigned char *texmesBuffer(int size);
+
 	void setFont(char *fontname, int size, int style);
+	int texmesRegist(char* msg, texmesPos *info=NULL);
+	texmes* texmesGet(int id);
+	texmes* texmesUpdateLife(int id);
 
 	int _area_px, _area_py;
 	int _fontsize, _fontstyle;
@@ -77,6 +77,11 @@ public:
 
 protected:
 	int Get2N(int val);
+	texmes* addTexmes(void);
+	int str2hash(char* msg, int* out_len);
+	int texmesGetCache(char* msg, short mycache);
+	unsigned char* texmesGetFont(char* msg, int* out_sx, int *out_sy, int* out_tsx, int* out_tsy, texmesPos *info);
+	unsigned char *texmesBuffer(int size);
 
 	// gptexmes
 	int _maxtexmes;
