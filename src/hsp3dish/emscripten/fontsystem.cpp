@@ -403,6 +403,33 @@ static	int fontsystem_sy;		// 縦のサイズ
 static	int fontsystem_size;
 static	int fontsystem_style;
 
+int GetMultibyteCharacter(unsigned char *text)
+{
+	//		マルチバイト文字のサイズを得る
+	//
+	const unsigned char *p = text;
+	unsigned char a1;
+	int mulchr = 1;
+
+	a1 = *p;
+
+	if (a1 & 0x80) {				// 全角文字チェック(UTF8)
+		int utf8bytes = 0;
+		if ((a1 & 0xe0) == 0x0c0) utf8bytes = 1;
+		if ((a1 & 0xf0) == 0x0e0) utf8bytes = 2;
+		if ((a1 & 0xf8) == 0x0f0) utf8bytes = 3;
+
+		int utf8cnt = 0;
+		while (utf8bytes > 0) {
+			if ((*(++p) & 0xc0) != 0x80) break;
+			utf8cnt++;
+			utf8bytes--;
+		}
+		mulchr += utf8cnt;
+	}
+	return mulchr;
+}
+
 void TexFontTerm( void )
 {
 	if ( font != NULL ) {
@@ -449,6 +476,49 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	fontsystem_style = style;
 }
 
+int hgio_fontsystem_exec_pos(char* msg, texmesPos *info)
+{
+	unsigned char *p = (unsigned char*)msg;
+	unsigned char a1;
+	unsigned char code[8];
+	int i;
+	int x = 0;
+	int count = 0;
+	int mulchr;
+	int w,h;
+
+	w = 0; h = 0;
+
+	while (1) {
+		a1 = *p;
+		if (a1 == 0) break;
+		if (a1 < 32) continue;
+
+		if (count < info->maxlength) {
+			info->pos[count] = (short)x;
+		}
+
+		mulchr = GetMultibyteCharacter(p);
+		i = 0;
+		while(1) {
+			if (mulchr<=0) break;
+			code[i++] = *p++;
+			mulchr--;
+		}
+		code[i] = 0;
+		TTF_SizeUTF8(font, (const char *)code, &w, &h);
+
+		x += w;
+		count++;
+	}
+
+	if (count < info->maxlength) {
+	info->pos[count] = (short)x;
+	}
+	info->length = count;
+	return 0;
+}
+
 int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *info)
 {
 	//		msgの文字列をテクスチャバッファにレンダリングする
@@ -456,6 +526,10 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	//
 
 	if (buffer == NULL) {
+
+		if (info) {
+			hgio_fontsystem_exec_pos(msg,info);
+		}
 
 		SDL_Color dcolor={255,255,255,255};
 		sdlsurf = TTF_RenderUTF8_Blended(font, msg, dcolor );
