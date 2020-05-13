@@ -158,6 +158,34 @@ static int handleEvent( void ) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch(event.type) {
+		case SDL_FINGERMOTION:
+		case SDL_FINGERDOWN:
+			{
+				//int id;
+				float x,y;
+				Bmscr *bm;
+				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+				x = event.tfinger.x * bm->sx;
+				y = event.tfinger.y * bm->sy;
+				//id = event.tfinger.touchId;
+				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
+				hgio_touch( (int)x, (int)y, 1 );
+				break;
+			}
+		case SDL_FINGERUP:
+			{
+				//int id;
+				float x,y;
+				Bmscr *bm;
+				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+				x = event.tfinger.x * bm->sx;
+				y = event.tfinger.y * bm->sy;
+				//id = event.tfinger.touchId;
+				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
+				hgio_touch( (int)x, (int)y, 0 );
+				break;
+			}
+
 		case SDL_MOUSEMOTION:
 			{
 				Bmscr *bm;
@@ -199,15 +227,29 @@ static int handleEvent( void ) {
 				break;
 			}
 		case SDL_KEYDOWN:
-			keys[event.key.keysym.scancode] = true;
+			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX)
+				keys[event.key.keysym.scancode] = true;
 			//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 		case SDL_KEYUP:
-			keys[event.key.keysym.scancode] = false;
+			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX)
+				keys[event.key.keysym.scancode] = false;
 			//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 		case SDL_QUIT: /** ウィンドウのxボタンやctrl-Cを押した場合 */
+			{
+			int id,retval;
+			id = 0;
+			if (code_isirq(HSPIRQ_ONEXIT)) {
+				int iparam = 0;
+				retval = code_sendirq(HSPIRQ_ONEXIT, iparam, id, 0);
+				if (retval == RUNMODE_INTJUMP) retval = code_execcmd2();	// onexit goto時は実行してみる
+				if (retval != RUNMODE_END) return 0;
+			}
+			code_puterror(HSPERR_NONE);
 			res = -1;
+			break;
+			}
 		}
 	}
 	return res;
