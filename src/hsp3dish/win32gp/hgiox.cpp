@@ -107,12 +107,12 @@ extern gameplay::Platform *platform;
 static int		mouse_x;
 static int		mouse_y;
 static int		mouse_btn;
-static int   _originX; 	//Œ´“_X
-static int   _originY; 	//Œ´“_Y
-static float _scaleX;	// ƒXƒP[ƒ‹X
-static float _scaleY;	// ƒXƒP[ƒ‹Y
-static float _rateX;	// 1/ƒXƒP[ƒ‹X
-static float _rateY;	// 1/ƒXƒP[ƒ‹Y
+static int   _originX; 	//åŸç‚¹X
+static int   _originY; 	//åŸç‚¹Y
+static float _scaleX;	// ã‚¹ã‚±ãƒ¼ãƒ«X
+static float _scaleY;	// ã‚¹ã‚±ãƒ¼ãƒ«Y
+static float _rateX;	// 1/ã‚¹ã‚±ãƒ¼ãƒ«X
+static float _rateY;	// 1/ã‚¹ã‚±ãƒ¼ãƒ«Y
 
 #ifdef HSPNDK
 static engine	*appengine;
@@ -147,12 +147,12 @@ void InitMemFile( void )
 int OpenMemFilePtr( char *fname )
 {
 	int fsize;
-	fsize = dpm_exist( fname );		// ƒtƒ@ƒCƒ‹‚ÌƒTƒCƒY‚ğæ“¾
+	fsize = dpm_exist( fname );		// ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚µã‚¤ã‚ºã‚’å–å¾—
 	if ( fsize <= 0 ) return -1;
 	mfptr_depth++;
 	if ( mfptr_depth >= MFPTR_MAX ) return -1;
 	mfptr[mfptr_depth] = (char *)malloc( fsize );
-	dpm_read( fname, mfptr[mfptr_depth], fsize, 0 );	// ƒtƒ@ƒCƒ‹“Ç‚İ‚İ
+	dpm_read( fname, mfptr[mfptr_depth], fsize, 0 );	// ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
 	return fsize;
 }
 
@@ -180,33 +180,33 @@ void CloseMemFilePtr( void )
 
 //		Settings
 //
-static		int nDestWidth;		// •`‰æÀ•W•
-static		int nDestHeight;	// •`‰æÀ•W‚‚³
+static		int nDestWidth;		// æç”»åº§æ¨™å¹…
+static		int nDestHeight;	// æç”»åº§æ¨™é«˜ã•
 static		float _rate_sx,_center_sx;
 static		float _rate_sy, _center_sy;
 
 #ifdef HSPWIN
-static		HWND master_wnd;	// •\¦‘ÎÛWindow
-static		HCURSOR cursor_arrow;	// ’ÊíƒJ[ƒ\ƒ‹
-static		HCURSOR cursor_ibeam;	// ƒeƒLƒXƒgƒGƒŠƒA—pƒJ[ƒ\ƒ‹
+static		HWND master_wnd;	// è¡¨ç¤ºå¯¾è±¡Window
+static		HCURSOR cursor_arrow;	// é€šå¸¸ã‚«ãƒ¼ã‚½ãƒ«
+static		HCURSOR cursor_ibeam;	// ãƒ†ã‚­ã‚¹ãƒˆã‚¨ãƒªã‚¢ç”¨ã‚«ãƒ¼ã‚½ãƒ«
 #endif
-static		int drawflag;		// ƒŒƒ“ƒ_[ŠJnƒtƒ‰ƒO
-static		BMSCR mestexbm;		// ƒeƒLƒXƒg•\¦—pƒ_ƒ~[BMSCR
+static		int drawflag;		// ãƒ¬ãƒ³ãƒ€ãƒ¼é–‹å§‹ãƒ•ãƒ©ã‚°
+static		BMSCR mestexbm;		// ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºç”¨ãƒ€ãƒŸãƒ¼BMSCR
 
-static		BMSCR *mainbm;		// ƒƒCƒ“ƒXƒNƒŠ[ƒ“‚ÌBMSCR
+static		BMSCR *mainbm;		// ãƒ¡ã‚¤ãƒ³ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®BMSCR
 static		HSPREAL infoval[GINFO_EXINFO_MAX];
-static		BMSCR *backbm;		// ”wŒiÁ‹—p‚ÌBMSCR(null=NC)
-static		BMSCR *gselbm;		// •`‰ææ‚ÌBMSCR
+static		BMSCR *backbm;		// èƒŒæ™¯æ¶ˆå»ç”¨ã®BMSCR(null=NC)
+static		BMSCR *gselbm;		// æç”»å…ˆã®BMSCR
 
-static		char m_tfont[256];	// ƒeƒLƒXƒgg—pƒtƒHƒ“ƒg
-static		int m_tsize;		// ƒeƒLƒXƒgg—pƒtƒHƒ“ƒg‚ÌƒTƒCƒY
-static		int m_tstyle;		// ƒeƒLƒXƒgg—pƒtƒHƒ“ƒg‚ÌƒXƒ^ƒCƒ‹w’è
+static		char m_tfont[256];	// ãƒ†ã‚­ã‚¹ãƒˆä½¿ç”¨ãƒ•ã‚©ãƒ³ãƒˆ
+static		int m_tsize;		// ãƒ†ã‚­ã‚¹ãƒˆä½¿ç”¨ãƒ•ã‚©ãƒ³ãƒˆã®ã‚µã‚¤ã‚º
+static		int m_tstyle;		// ãƒ†ã‚­ã‚¹ãƒˆä½¿ç”¨ãƒ•ã‚©ãƒ³ãƒˆã®ã‚¹ã‚¿ã‚¤ãƒ«æŒ‡å®š
 
 static		float center_x,center_y;
 static		float linebasex,linebasey;
 
-static		MATRIX mat_proj;	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“ƒ}ƒgƒŠƒNƒX
-static		MATRIX mat_unproj;	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹t•ÏŠ·ƒ}ƒgƒŠƒNƒX
+static		MATRIX mat_proj;	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒˆãƒªã‚¯ã‚¹
+static		MATRIX mat_unproj;	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³é€†å¤‰æ›ãƒãƒˆãƒªã‚¯ã‚¹
 
 #define CIRCLE_DIV 16
 #define DEFAULT_FONT_NAME ""
@@ -223,11 +223,11 @@ static		MATRIX mat_unproj;	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹t•ÏŠ·ƒ}ƒgƒŠƒNƒX
 
 void hgio_init( int mode, int sx, int sy, void *hwnd )
 {
-	//		ƒtƒ@ƒCƒ‹ƒT[ƒrƒXİ’è
+	//		ãƒ•ã‚¡ã‚¤ãƒ«ã‚µãƒ¼ãƒ“ã‚¹è¨­å®š
 	//
 	InitMemFile();
 
-	//		İ’è‚Ì‰Šú‰»
+	//		è¨­å®šã®åˆæœŸåŒ–
 	//
 	SetSysReq( SYSREQ_RESULT, 0 );
 	SetSysReq( SYSREQ_RESVMODE, 0 );
@@ -262,7 +262,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 #endif
 	GeometryInit();
 
-	//		infoval‚ğƒŠƒZƒbƒg
+	//		infovalã‚’ãƒªã‚»ãƒƒãƒˆ
 	//
 	int i;
 	for(i=0;i<GINFO_EXINFO_MAX;i++) {
@@ -276,7 +276,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 #endif
 
 #if defined(HSPLINUX)
-	//TTF‰Šú‰»
+	//TTFåˆæœŸåŒ–
 	char fontpath[HSP_MAX_PATH+1];
 	*fontpath = 0;
 	strcpy( fontpath, hgio_getdir(1) );
@@ -289,7 +289,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 #endif
 
 #ifdef HSPWIN
-	//		ƒJ[ƒ\ƒ‹“Ç‚İ‚İ
+	//		ã‚«ãƒ¼ã‚½ãƒ«èª­ã¿è¾¼ã¿
 	//
 	cursor_arrow = LoadCursor(NULL, IDC_ARROW);
 	cursor_ibeam = LoadCursor(NULL, IDC_IBEAM);
@@ -308,7 +308,7 @@ void hgio_clsmode( int mode, int color, int tex )
 
 int hgio_device_restore( void )
 {
-	//	ƒfƒoƒCƒX‚ÌC•œ
+	//	ãƒ‡ãƒã‚¤ã‚¹ã®ä¿®å¾©
 	//		(0=OK/1=NG)
 	//
 	return 0;
@@ -334,11 +334,11 @@ int hgio_render_end( void )
 	res = 0;
 
 	if (gselbm == mainbm) {
-		// ƒƒCƒ“‰æ–Ê‚Ìê‡‚ÍƒtƒŠƒbƒv
+		// ãƒ¡ã‚¤ãƒ³ç”»é¢ã®å ´åˆã¯ãƒ•ãƒªãƒƒãƒ—
 		if (platform) platform->swapBuffers();
 	}
 	else {
-		// ƒIƒtƒXƒNƒŠ[ƒ“‚Ìê‡
+		// ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®å ´åˆ
 		game->resumeFrameBuffer();
 	}
 
@@ -370,14 +370,14 @@ int hgio_render_start( void )
         hgio_setinfo( GINFO_EXINFO_GYRO_Z, gyz );
     }
 #endif
-	//ƒV[ƒ“ƒŒƒ“ƒ_[ŠJn
+	//ã‚·ãƒ¼ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ¼é–‹å§‹
 	if (game) {
 		if (gselbm == mainbm) {
-			// ƒƒCƒ“‰æ–Ê‚Ìê‡
+			// ãƒ¡ã‚¤ãƒ³ç”»é¢ã®å ´åˆ
 			game->frame();
 		}
 		else {
-			// ƒIƒtƒXƒNƒŠ[ƒ“‚Ìê‡
+			// ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®å ´åˆ
 			game->selectFrameBuffer((gameplay::FrameBuffer *)gselbm->master_buffer, gselbm->sx, gselbm->sy);
 		}
 	}
@@ -390,13 +390,13 @@ int hgio_render_start( void )
 
 int hgio_gsel(BMSCR *bm)
 {
-	//		•`‰ææİ’è
-	//		(gsel‘Š“–)
+	//		æç”»å…ˆè¨­å®š
+	//		(gselç›¸å½“)
 	//
 	hgio_render_end();
 	gselbm = bm;
 
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“‚Ì‰Šú‰»
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã®åˆæœŸåŒ–
 	int id = gselbm->texid;
 	if (id >= 0) {
 		gpmat *mat;
@@ -410,8 +410,8 @@ int hgio_gsel(BMSCR *bm)
 
 int hgio_buffer(BMSCR *bm)
 {
-	//		ƒIƒtƒXƒNƒŠ[ƒ“ì¬
-	//		(buffer‘Š“–)
+	//		ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ä½œæˆ
+	//		(bufferç›¸å½“)
 	//
 	int option = 0;
 	if (bm->type == HSPWND_TYPE_OFFSCREEN) {
@@ -430,8 +430,8 @@ int hgio_buffer(BMSCR *bm)
 
 void hgio_screen( BMSCR *bm )
 {
-	//		ƒXƒNƒŠ[ƒ“Äİ’è
-	//		(cls‘Š“–)
+	//		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³å†è¨­å®š
+	//		(clsç›¸å½“)
 	//
 	drawflag = 0;
 	if (bm->type == HSPWND_TYPE_MAIN) {
@@ -444,8 +444,8 @@ void hgio_screen( BMSCR *bm )
 
 void hgio_setback(BMSCR *bm)
 {
-	//		”wŒi‰æ‘œ‚Ìİ’è
-	//		(NULL=‚È‚µ)
+	//		èƒŒæ™¯ç”»åƒã®è¨­å®š
+	//		(NULL=ãªã—)
 	//
 	backbm = bm;
 }
@@ -453,8 +453,8 @@ void hgio_setback(BMSCR *bm)
 
 void hgio_delscreen(BMSCR *bm)
 {
-	//		ƒXƒNƒŠ[ƒ“‚ğ”jŠü
-	//		(BmscrƒNƒ‰ƒX‚Ìdelete)
+	//		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚’ç ´æ£„
+	//		(Bmscrã‚¯ãƒ©ã‚¹ã®deleteæ™‚)
 	//
 	if ( bm->flag == BMSCR_FLAG_NOUSE ) return;
 	if ( bm->texid != -1 ) {
@@ -503,7 +503,7 @@ void hgio_setColorTex( int rval, int gval ,int bval )
 
 int hgio_stick( int actsw )
 {
-	//		stick—p‚Ì“ü—Í‚ğ•Ô‚·
+	//		stickç”¨ã®å…¥åŠ›ã‚’è¿”ã™
 	//
 	int ckey = 0;
 
@@ -624,8 +624,8 @@ bool hgio_getkey( int kcode )
 
 int hgio_redraw( BMSCR *bm, int flag )
 {
-	//		redrawƒ‚[ƒhİ’è
-	//		(•K‚¸redraw 0`redraw 1‚ğƒyƒA‚É‚·‚é‚±‚Æ)
+	//		redrawãƒ¢ãƒ¼ãƒ‰è¨­å®š
+	//		(å¿…ãšredraw 0ï½redraw 1ã‚’ãƒšã‚¢ã«ã™ã‚‹ã“ã¨)
 	//
 	if ( bm == NULL ) return -1;
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return -1;
@@ -642,7 +642,7 @@ int hgio_redraw( BMSCR *bm, int flag )
 	}
 
 #ifdef HSPWIN
-	//	ƒEƒCƒ“ƒhƒEƒAƒNƒeƒBƒu‚ÌXV
+	//	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã®æ›´æ–°
 	//
 	HWND hwnd;
 	hwnd = GetActiveWindow();
@@ -653,7 +653,7 @@ int hgio_redraw( BMSCR *bm, int flag )
 		bm->window_active = 1;
 	}
 
-	//	ƒJ[ƒ\ƒ‹‚ÌXV
+	//	ã‚«ãƒ¼ã‚½ãƒ«ã®æ›´æ–°
 	//
 	HSPOBJINFO *info = bm->cur_mo_obj;
 	HCURSOR hc = cursor_arrow;
@@ -673,7 +673,7 @@ int hgio_redraw( BMSCR *bm, int flag )
 
 int hgio_dialog( int mode, char *str1, char *str2 )
 {
-	//		dialog•\¦
+	//		dialogè¡¨ç¤º
 	//
 #ifdef HSPWIN
 	int i,res;
@@ -690,13 +690,21 @@ int hgio_dialog( int mode, char *str1, char *str2 )
     gpb_dialog( mode, str1, str2 );
     //Alertf( str1 );
 #endif
+#ifdef HSPLINUX
+	{
+	int i = 0;
+	if (mode>=16) return 0;
+	if (mode&1) i|=SDL_MESSAGEBOX_WARNING; else i|=SDL_MESSAGEBOX_INFORMATION;
+	SDL_ShowSimpleMessageBox(i, str2, str1, NULL);
+	}
+#endif
 	return 0;
 }
 
 
 int hgio_title( char *str1 )
 {
-	//		title•ÏX
+	//		titleå¤‰æ›´
 	//
 #ifdef HSPWIN
 	SetWindowText( master_wnd, str1 );
@@ -719,7 +727,7 @@ int hgio_title( char *str1 )
 
 int hgio_texload( BMSCR *bm, char *fname )
 {
-	//		ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+	//		ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 	//
 	gpmat *mat;
 
@@ -737,7 +745,7 @@ int hgio_texload( BMSCR *bm, char *fname )
 
 int hgio_mestex(BMSCR *bm, texmesPos *tpos)
 {
-	//		TEXMESPOS‚É‚æ‚é•¶š•\¦
+	//		TEXMESPOSã«ã‚ˆã‚‹æ–‡å­—è¡¨ç¤º
 	//
 	int mode, x, y, sx, sy;
 	int orgx, orgy;
@@ -837,7 +845,7 @@ int hgio_mestex(BMSCR *bm, texmesPos *tpos)
 
 int hgio_mes(BMSCR* bm, char* msg)
 {
-	//		mes,print •¶š•\¦
+	//		mes,print æ–‡å­—è¡¨ç¤º
 	//
 	int xsize, ysize;
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return -1;
@@ -873,14 +881,14 @@ int hgio_mes(BMSCR* bm, char* msg)
 	xsize = tex->sx;
 	ysize = tex->sy;
 
-	if (bm->printoffsetx > 0) {			// ƒZƒ“ƒ^ƒŠƒ“ƒO‚ğs‚¤(X)
+	if (bm->printoffsetx > 0) {			// ã‚»ãƒ³ã‚¿ãƒªãƒ³ã‚°ã‚’è¡Œã†(X)
 		int offset = (bm->printoffsetx - xsize) / 2;
 		if (offset > 0) {
 			bm->cx += offset;
 		}
 		bm->printoffsetx = 0;
 	}
-	if (bm->printoffsety > 0) {			// ƒZƒ“ƒ^ƒŠƒ“ƒO‚ğs‚¤(Y)
+	if (bm->printoffsety > 0) {			// ã‚»ãƒ³ã‚¿ãƒªãƒ³ã‚°ã‚’è¡Œã†(Y)
 		int offset = (bm->printoffsety - ysize) / 2;
 		if (offset > 0) {
 			bm->cy += offset;
@@ -906,10 +914,10 @@ int hgio_mes(BMSCR* bm, char* msg)
 
 void hgio_line( BMSCR *bm, float x, float y )
 {
-	//		ƒ‰ƒCƒ“•`‰æ
-	//		(bm!=NULL ‚Ìê‡Aƒ‰ƒCƒ“•`‰æŠJn)
-	//		(bm==NULL ‚Ìê‡Aƒ‰ƒCƒ“•`‰æŠ®—¹)
-	//		(ƒ‰ƒCƒ“‚ÌÀ•W‚Í•K—v‚È”‚¾‚¯hgio_line2‚ğŒÄ‚Ño‚·)
+	//		ãƒ©ã‚¤ãƒ³æç”»
+	//		(bm!=NULL ã®å ´åˆã€ãƒ©ã‚¤ãƒ³æç”»é–‹å§‹)
+	//		(bm==NULL ã®å ´åˆã€ãƒ©ã‚¤ãƒ³æç”»å®Œäº†)
+	//		(ãƒ©ã‚¤ãƒ³ã®åº§æ¨™ã¯å¿…è¦ãªæ•°ã ã‘hgio_line2ã‚’å‘¼ã³å‡ºã™)
 	//
 	if ( bm == NULL ) {
 		return;
@@ -929,8 +937,8 @@ void hgio_line( BMSCR *bm, float x, float y )
 
 void hgio_line2( float x, float y )
 {
-	//		ƒ‰ƒCƒ“•`‰æ
-	//		(hgio_line‚ÅŠJnŒã‚É•K—v‚È‰ñ”ŒÄ‚ÔAhgio_line(NULL)‚ÅI—¹‚·‚é‚±‚Æ)
+	//		ãƒ©ã‚¤ãƒ³æç”»
+	//		(hgio_lineã§é–‹å§‹å¾Œã«å¿…è¦ãªå›æ•°å‘¼ã¶ã€hgio_line(NULL)ã§çµ‚äº†ã™ã‚‹ã“ã¨)
 	//
 
 	float *v = game->startLineColor2D();
@@ -948,7 +956,7 @@ void hgio_line2( float x, float y )
 
 void hgio_boxfAlpha(BMSCR *bm, float x1, float y1, float x2, float y2, int alphamode)
 {
-	//		‹éŒ`•`‰æ
+	//		çŸ©å½¢æç”»
 	//
 	if (bm == NULL) return;
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return;
@@ -994,7 +1002,7 @@ void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
 
 void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 {
-	//		‰~•`‰æ
+	//		å††æç”»
 	//
 	float x,y,rx,ry,sx,sy,rate;
 	if ( bm == NULL ) return;
@@ -1044,7 +1052,7 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 
 void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 {
-	//		‹éŒ`(‰ñ“])•`‰æ
+	//		çŸ©å½¢(å›è»¢)æç”»
 	//
 	if ( bm == NULL ) return;
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return;
@@ -1099,9 +1107,9 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 
 void hgio_copy(BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *bmsrc, float s_psx, float s_psy)
 {
-	//		‰æ‘œƒRƒs[
-	//		texid“à‚Ì(xx,yy)-(xx+srcsx,yy+srcsy)‚ğŒ»İ‚Ì‰æ–Ê‚É(psx,psy)ƒTƒCƒY‚ÅƒRƒs[
-	//		ƒJƒŒƒ“ƒgƒ|ƒWƒVƒ‡ƒ“A•`‰æƒ‚[ƒh‚ÍBMSCR‚©‚çæ“¾
+	//		ç”»åƒã‚³ãƒ”ãƒ¼
+	//		texidå†…ã®(xx,yy)-(xx+srcsx,yy+srcsy)ã‚’ç¾åœ¨ã®ç”»é¢ã«(psx,psy)ã‚µã‚¤ã‚ºã§ã‚³ãƒ”ãƒ¼
+	//		ã‚«ãƒ¬ãƒ³ãƒˆãƒã‚¸ã‚·ãƒ§ãƒ³ã€æç”»ãƒ¢ãƒ¼ãƒ‰ã¯BMSCRã‹ã‚‰å–å¾—
 	//
 	float psx, psy;
 	float x1, y1, x2, y2, sx, sy;
@@ -1177,9 +1185,9 @@ void hgio_copy(BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *b
 
 int hgio_celputmulti(BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSCR *bmsrc)
 {
-	//		ƒ}ƒ‹ƒ`‰æ‘œƒRƒs[
-	//		int”z—ñ“à‚ÌX,Y,CelID‚ğŒ³‚É“™”{ƒRƒs[‚ğs‚È‚¤(count=ŒÂ”)
-	//		ƒJƒŒƒ“ƒgƒ|ƒWƒVƒ‡ƒ“A•`‰æƒ‚[ƒh‚ÍBMSCR‚©‚çæ“¾
+	//		ãƒãƒ«ãƒç”»åƒã‚³ãƒ”ãƒ¼
+	//		inté…åˆ—å†…ã®X,Y,CelIDã‚’å…ƒã«ç­‰å€ã‚³ãƒ”ãƒ¼ã‚’è¡Œãªã†(count=å€‹æ•°)
+	//		ã‚«ãƒ¬ãƒ³ãƒˆãƒã‚¸ã‚·ãƒ§ãƒ³ã€æç”»ãƒ¢ãƒ¼ãƒ‰ã¯BMSCRã‹ã‚‰å–å¾—
 	//
 	int psx,psy;
 	float f_psx,f_psy;
@@ -1200,7 +1208,7 @@ int hgio_celputmulti(BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSCR
 	if (drawflag == 0) hgio_render_start();
 
 	gpmat *mat = game->getMat(bmsrc->texid);
-	if (mat == NULL) return NULL;
+	if (mat == NULL) return 0;
 	master_v = game->startPolyTex2D(mat, bm->texid);
 	if (master_v == NULL) return 0;
 
@@ -1276,9 +1284,9 @@ int hgio_celputmulti(BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSCR
 
 void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, float s_ofsx, float s_ofsy, BMSCR *bmsrc, float psx, float psy, float ang )
 {
-	//		‰æ‘œƒRƒs[
-	//		texid“à‚Ì(xx,yy)-(xx+srcsx,yy+srcsy)‚ğŒ»İ‚Ì‰æ–Ê‚É(psx,psy)ƒTƒCƒY‚ÅƒRƒs[
-	//		ƒJƒŒƒ“ƒgƒ|ƒWƒVƒ‡ƒ“A•`‰æƒ‚[ƒh‚ÍBMSCR‚©‚çæ“¾
+	//		ç”»åƒã‚³ãƒ”ãƒ¼
+	//		texidå†…ã®(xx,yy)-(xx+srcsx,yy+srcsy)ã‚’ç¾åœ¨ã®ç”»é¢ã«(psx,psy)ã‚µã‚¤ã‚ºã§ã‚³ãƒ”ãƒ¼
+	//		ã‚«ãƒ¬ãƒ³ãƒˆãƒã‚¸ã‚·ãƒ§ãƒ³ã€æç”»ãƒ¢ãƒ¼ãƒ‰ã¯BMSCRã‹ã‚‰å–å¾—
 	//
 	float x,y,x0,y0,x1,y1,ofsx,ofsy,mx0,mx1,my0,my1;
 	float tx0,ty0,tx1,ty1,sx,sy;
@@ -1308,11 +1316,11 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	x1 = mx1 * ofsx;
 	y1 = my1 * ofsx;
 
-	//		Šî“_‚ÌZo
+	//		åŸºç‚¹ã®ç®—å‡º
 	x = ( (float)bm->cx - (-x0+x1) );
 	y = ( (float)bm->cy - (-y0+y1) );
 
-	//		‰ñ“]À•W‚ÌZo
+	//		å›è»¢åº§æ¨™ã®ç®—å‡º
 	ofsx = -psx;
 	ofsy = -psy;
 	x0 = mx0 * ofsy;
@@ -1387,7 +1395,7 @@ void hgio_setfilter( int type, int opt )
 
 void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, int *uvy )
 {
-	//		lŠpŒ`(square)ƒeƒNƒXƒ`ƒƒ•`‰æ
+	//		å››è§’å½¢(square)ãƒ†ã‚¯ã‚¹ãƒãƒ£æç”»
 	//
 	float sx,sy;
 	if ( bm == NULL ) return;
@@ -1439,7 +1447,7 @@ void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, i
 
 void hgio_square( BMSCR *bm, int *posx, int *posy, int *color )
 {
-	//		lŠpŒ`(square)’PF•`‰æ
+	//		å››è§’å½¢(square)å˜è‰²æç”»
 	//
 	if ( bm == NULL ) return;
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return;
@@ -1479,7 +1487,7 @@ void hgio_square( BMSCR *bm, int *posx, int *posy, int *color )
 
 int hgio_gettick( void )
 {
-    // Œo‰ßŠÔ‚ÌŒv‘ª
+    // çµŒéæ™‚é–“ã®è¨ˆæ¸¬
 #ifdef HSPWIN
 	return timeGetTime();
 #endif
@@ -1713,11 +1721,11 @@ void hgio_draw_gpsprite(Bmscr *bmscr, bool lateflag)
 			bmscr->gfrate = obj->_transparent;
 
 			if ((rot == 0.0f) && (zx == 1.0f) && (zy == 1.0f)) {
-				//	•ÏŒ`‚È‚µ
+				//	å¤‰å½¢ãªã—
 				bmscr->CelPut((Bmscr *)spr->_bmscr, spr->_celid);
 			}
 			else {
-				//	•ÏŒ`‚ ‚è
+				//	å¤‰å½¢ã‚ã‚Š
 				bmscr->CelPut((Bmscr *)spr->_bmscr, spr->_celid, zx, zy, rot);
 			}
 		}
@@ -1965,7 +1973,7 @@ void hgio_setmainarg( char *hsp_mainpath, char *cmdprm )
 
 char *hgio_getdir( int id )
 {
-	//		dirinfo–½—ß‚Ì“à—e‚ğİ’è‚·‚é
+	//		dirinfoå‘½ä»¤ã®å†…å®¹ã‚’è¨­å®šã™ã‚‹
 	//
 	char dirtmp[HSP_MAX_PATH+1];
 	char *p;
@@ -1974,20 +1982,20 @@ char *hgio_getdir( int id )
 	p = dirtmp;
 
 	switch( id ) {
-	case 0:				//    ƒJƒŒƒ“ƒg(Œ»İ‚Ì)ƒfƒBƒŒƒNƒgƒŠ
+	case 0:				//    ã‚«ãƒ¬ãƒ³ãƒˆ(ç¾åœ¨ã®)ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		getcwd( p, HSP_MAX_PATH );
 		break;
-	case 1:				//    HSP‚ÌÀsƒtƒ@ƒCƒ‹‚ª‚ ‚éƒfƒBƒŒƒNƒgƒŠ
+	case 1:				//    HSPã®å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		p = dir_hsp;
 		break;
-	case 2:				//    WindowsƒfƒBƒŒƒNƒgƒŠ
+	case 2:				//    Windowsãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		break;
-	case 3:				//    Windows‚ÌƒVƒXƒeƒ€ƒfƒBƒŒƒNƒgƒŠ
+	case 3:				//    Windowsã®ã‚·ã‚¹ãƒ†ãƒ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		break;
-	case 4:				//    ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“•¶š—ñ
+	case 4:				//    ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³æ–‡å­—åˆ—
 		p = dir_cmdline;
 		break;
-	case 5:				//    HSPTV‘fŞ‚ª‚ ‚éƒfƒBƒŒƒNƒgƒŠ
+	case 5:				//    HSPTVç´ æãŒã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		strcpy( p, dir_hsp );
 		strcat( p, "/hsptv" );
 		break;
@@ -2002,7 +2010,7 @@ char *hgio_getdir( int id )
 
 int hgio_bufferop(BMSCR* bm, int mode, char* ptr)
 {
-	//		ƒIƒtƒXƒNƒŠ[ƒ“ƒoƒbƒtƒ@‚ğ‘€ì
+	//		ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒãƒƒãƒ•ã‚¡ã‚’æ“ä½œ
 	//
 	gpmat* mat;
 	int texid = bm->texid;
@@ -2021,14 +2029,14 @@ int hgio_bufferop(BMSCR* bm, int mode, char* ptr)
 
 void hgio_text_render(void)
 {
-	//		ƒeƒLƒXƒgƒoƒbƒtƒ@‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒO(WIN32‚Ì‚İ)
+	//		ãƒ†ã‚­ã‚¹ãƒˆãƒãƒƒãƒ•ã‚¡ã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°(WIN32ã®ã¿)
 	//
 }
 
 
 int hgio_font(char* fontname, int size, int style)
 {
-	//		•¶šƒtƒHƒ“ƒgw’è
+	//		æ–‡å­—ãƒ•ã‚©ãƒ³ãƒˆæŒ‡å®š
 	//
 	if (game) {
 		game->setFont(fontname, size, style);
@@ -2045,11 +2053,11 @@ int hgio_fontsystem_setup(int sx, int sy, void *buffer)
 #endif
 
 
-#ifdef HSPWIN
 void hgio_editputclip(BMSCR* bm, char *str)
 {
-	//		ƒNƒŠƒbƒvƒ{[ƒhƒRƒs[
+	//		ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚³ãƒ”ãƒ¼
 	//
+#ifdef HSPWIN
 	HGLOBAL hg;
 	char *strMem;
 	if (!OpenClipboard(master_wnd)) return;
@@ -2063,13 +2071,18 @@ void hgio_editputclip(BMSCR* bm, char *str)
 
 	SetClipboardData(CF_TEXT, hg);
 	CloseClipboard();
+#endif
+#if (defined(HSPLINUX)||defined(HSPEMSCRIPTEN))
+	SDL_SetClipboardText( (const char *)str );
+#endif
 }
 
 
 char *hgio_editgetclip(BMSCR* bm)
 {
-	//		ƒNƒŠƒbƒvƒ{[ƒhƒy[ƒXƒg•¶š—ñæ“¾
+	//		ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ãƒšãƒ¼ã‚¹ãƒˆæ–‡å­—åˆ—å–å¾—
 	//
+#ifdef HSPWIN
 	HGLOBAL hg;
 	char *strClip;
 	if (OpenClipboard(master_wnd) && (hg = GetClipboardData(CF_TEXT))) {
@@ -2080,15 +2093,20 @@ char *hgio_editgetclip(BMSCR* bm)
 		CloseClipboard();
 		return p;
 	}
+#endif
+#if (defined(HSPLINUX)||defined(HSPEMSCRIPTEN))
+	if ( SDL_HasClipboardText() ) {
+		return (SDL_GetClipboardText());
+	}
+#endif
 	return NULL;
 }
-#endif
 
 /*-------------------------------------------------------------------------------*/
 
 void hgio_setview(BMSCR* bm)
 {
-	// vp_flag‚É‰‚¶‚½ƒrƒ…[ƒ|[ƒg‚Ìİ’è‚ğs‚¤
+	// vp_flagã«å¿œã˜ãŸãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®è¨­å®šã‚’è¡Œã†
 	//
 	int i;
 	MATRIX* vmat;
@@ -2130,7 +2148,7 @@ void hgio_setview(BMSCR* bm)
 		return;
 	}
 
-	//	mat_proj‚Éİ’è‚·‚é
+	//	mat_projã«è¨­å®šã™ã‚‹
 	for (i = 0; i < 16; i++) {
 		*vp++ = *mat++;
 	}
@@ -2148,7 +2166,7 @@ void hgio_setview(BMSCR* bm)
 
 #if 1
 	if (setinv) {
-		//	“Š‰eƒ}ƒgƒŠƒNƒX‚Ì‹ts—ñ‚ğİ’è‚·‚é
+		//	æŠ•å½±ãƒãƒˆãƒªã‚¯ã‚¹ã®é€†è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹
 		SetCurrentMatrix(vmat);
 		InverseMatrix(&mat_unproj);
 	}
@@ -2158,12 +2176,12 @@ void hgio_setview(BMSCR* bm)
 
 void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 {
-	//	ƒrƒ…[•ÏŠ·Œã‚ÌÀ•W -> Œ³‚ÌÀ•W‚É•ÏŠ·‚·‚é
-	//	(ƒ^ƒbƒ`ˆÊ’uÄŒ»‚Ì‚½‚ß)
+	//	ãƒ“ãƒ¥ãƒ¼å¤‰æ›å¾Œã®åº§æ¨™ -> å…ƒã®åº§æ¨™ã«å¤‰æ›ã™ã‚‹
+	//	(ã‚¿ãƒƒãƒä½ç½®å†ç¾ã®ãŸã‚)
 	//
 
 	if (bm->vp_flag == BMSCR_VPFLAG_NOUSE) return;
-	if (bm->vp_flag == BMSCR_VPFLAG_3D) return;			// 3D‚Ì•ÏŠ·‚É‚Í–¢‘Î‰
+	if (bm->vp_flag == BMSCR_VPFLAG_3D) return;			// 3Dã®å¤‰æ›ã«ã¯æœªå¯¾å¿œ
 
 #if 0
 	Vector4 v1;

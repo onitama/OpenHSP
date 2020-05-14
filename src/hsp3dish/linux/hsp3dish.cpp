@@ -227,15 +227,124 @@ static int handleEvent( void ) {
 				break;
 			}
 		case SDL_KEYDOWN:
-			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX)
-				keys[event.key.keysym.scancode] = true;
+			{
+			int wparam = 0;
+			int code = (int)event.key.keysym.scancode;
+			if (code < SDLK_SCANCODE_MAX) {
+				keys[code] = true;
+			}
+			switch(code) {
+			case SDL_SCANCODE_BACKSPACE:
+				wparam = HSPOBJ_NOTICE_KEY_BS;
+				break;
+			case SDL_SCANCODE_TAB:
+				wparam = HSPOBJ_NOTICE_KEY_TAB;
+				break;
+			case SDL_SCANCODE_RETURN:
+				wparam = HSPOBJ_NOTICE_KEY_CR;
+				break;
+			case SDL_SCANCODE_DELETE:
+				wparam = HSPOBJ_NOTICE_KEY_DEL;
+				break;
+			case SDL_SCANCODE_INSERT:
+				wparam = HSPOBJ_NOTICE_KEY_INS;
+				break;
+			case SDL_SCANCODE_F1:
+				wparam = HSPOBJ_NOTICE_KEY_F1 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F2:
+				wparam = HSPOBJ_NOTICE_KEY_F2 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F3:
+				wparam = HSPOBJ_NOTICE_KEY_F3 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F4:
+				wparam = HSPOBJ_NOTICE_KEY_F4 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F5:
+				wparam = HSPOBJ_NOTICE_KEY_F5 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F6:
+				wparam = HSPOBJ_NOTICE_KEY_F6 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F7:
+				wparam = HSPOBJ_NOTICE_KEY_F7 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F8:
+				wparam = HSPOBJ_NOTICE_KEY_F8 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F9:
+				wparam = HSPOBJ_NOTICE_KEY_F9 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F10:
+				wparam = HSPOBJ_NOTICE_KEY_F10 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F11:
+				wparam = HSPOBJ_NOTICE_KEY_F11 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_F12:
+				wparam = HSPOBJ_NOTICE_KEY_F12 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				break;
+			case SDL_SCANCODE_LEFT:
+				wparam = HSPOBJ_NOTICE_KEY_LEFT;
+				break;
+			case SDL_SCANCODE_UP:
+				wparam = HSPOBJ_NOTICE_KEY_UP;
+				break;
+			case SDL_SCANCODE_RIGHT:
+				wparam = HSPOBJ_NOTICE_KEY_RIGHT;
+				break;
+			case SDL_SCANCODE_DOWN:
+				wparam = HSPOBJ_NOTICE_KEY_DOWN;
+				break;
+			case SDL_SCANCODE_HOME:
+				wparam = HSPOBJ_NOTICE_KEY_HOME;
+				break;
+			case SDL_SCANCODE_END:
+				wparam = HSPOBJ_NOTICE_KEY_END;
+				break;
+			case SDL_SCANCODE_PAGEUP:
+				wparam = HSPOBJ_NOTICE_KEY_SCROLL_UP;
+				break;
+			case SDL_SCANCODE_PAGEDOWN:
+				wparam = HSPOBJ_NOTICE_KEY_SCROLL_DOWN;
+				break;
+			}
+			if ((code >= SDL_SCANCODE_A)&&(code <= SDL_SCANCODE_Z)) {
+				if (keys[SDL_SCANCODE_LCTRL]||keys[SDL_SCANCODE_RCTRL]) {
+					wparam = (code-SDL_SCANCODE_A) + 1 + HSPOBJ_NOTICE_KEY_CTRLADD;
+				}
+			}
+			if ( wparam > 0 ) {
+				if (keys[SDL_SCANCODE_LSHIFT]||keys[SDL_SCANCODE_RSHIFT]) {
+					wparam += HSPOBJ_NOTICE_KEY_SHIFTADD;
+				}
+				Bmscr *bm;
+				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+				if (bm) {
+					bm->SendHSPObjectNotice(wparam);
+				}
+			}
 			//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
+			}
 		case SDL_KEYUP:
-			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX)
+			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX) {
 				keys[event.key.keysym.scancode] = false;
+			}
 			//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
+
+		case SDL_TEXTINPUT:
+			{
+				Bmscr *bm;
+				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+				strcpy((char *)bm->keybuf,event.text.text);
+				bm->keybuf_index = 0;
+				bm->SendHSPObjectNotice(HSPOBJ_NOTICE_KEY_BUFFER);
+				break;
+			}
+
 		case SDL_QUIT: /** ウィンドウのxボタンやctrl-Cを押した場合 */
 			{
 			int id,retval;
@@ -293,7 +402,7 @@ static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowt
 
 void hsp3dish_dialog( char *mes )
 {
-	//MessageBox( NULL, mes, "Error",MB_ICONEXCLAMATION | MB_OK );
+	//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", mes, window);
 	printf( "%s\n", mes );
 }
 

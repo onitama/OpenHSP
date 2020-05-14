@@ -460,7 +460,6 @@ static int Object_InputBoxApplySpecialKey(HSPOBJINFO *info, int code)
 		edit->tpos.allSelection();
 		return 0;
 
-#ifdef HSPWIN
 	case 'C':
 	case 'X':
 	{
@@ -482,7 +481,6 @@ static int Object_InputBoxApplySpecialKey(HSPOBJINFO *info, int code)
 		}
 		return 0;
 	}
-#endif
 
 	default:
 		break;
