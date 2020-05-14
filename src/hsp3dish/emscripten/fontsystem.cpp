@@ -492,7 +492,7 @@ int hgio_fontsystem_exec_pos(char* msg, texmesPos *info)
 	while (1) {
 		a1 = *p;
 		if (a1 == 0) break;
-		if (a1 < 32) continue;
+		if (a1 < 32) { p++; continue; }
 
 		if (count < info->maxlength) {
 			info->pos[count] = (short)x;
