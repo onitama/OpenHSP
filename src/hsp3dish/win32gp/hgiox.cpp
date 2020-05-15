@@ -683,8 +683,8 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	res = MessageBox( master_wnd, str1, str2, i );
 	return res;
 #endif
-#if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
-	return 0;
+#ifdef HSPNDK
+	j_dispDialog( str1, str2, mode );
 #endif
 #ifdef HSPIOS
     gpb_dialog( mode, str1, str2 );

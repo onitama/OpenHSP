@@ -49,6 +49,7 @@ struct engine;
 extern char *hsp_mainpath;
 
 //typedef BOOL (CALLBACK *HSP3DBGFUNC)(HSP3DEBUG *,int,int,int);
+void hsp3dish_msgfunc( HSPCTX *hspctx );
 
 /*----------------------------------------------------------*/
 
@@ -61,6 +62,7 @@ static char fpas[]={ 'H'-48,'S'-48,'P'-48,'H'-48,
 static char optmes[] = "HSPHED~~\0_1_________2_________3______";
 
 static int hsp_wx, hsp_wy, hsp_wd, hsp_ss;
+static int hsp_wposx, hsp_wposy, hsp_wstyle;
 static int drawflag;
 static int hsp_fps;
 static int hsp_limit_step_per_frame;
@@ -75,7 +77,7 @@ static int hsp_sscnt, hsp_ssx, hsp_ssy;
 
 #define SDLK_SCANCODE_MAX 0x200
 static bool keys[SDLK_SCANCODE_MAX];
-SDL_Window *window;
+SDL_Window *window = NULL;
 static SDL_Renderer *renderer;
 static SDL_GLContext context;
 
@@ -369,41 +371,54 @@ bool get_key_state(int sym)
 	return keys[sym];
 }
 
-static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowtitle )
+void hsp3dish_dialog( char *mes )
 {
-	printf("INIT %dx%d %s\n", sx,sy,windowtitle);
+	//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", mes, window);
+	printf( "%s\n", mes );
+}
 
-	// Slightly different SDL initialization
-	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
-		printf("Unable to initialize SDL: %s\n", SDL_GetError());
-		return;
+static int hsp3dish_initwindow( engine* p_engine, int sx, int sy, int autoscale, char *windowtitle )
+{
+	int flags;
+	int hsp_fullscr = hsp_wstyle & 0x100;
+
+	flags = SDL_WINDOW_OPENGL;
+	if (hsp_fullscr) {
+		flags |= SDL_WINDOW_FULLSCREEN;
+		hsp_wposx = 0;
+		hsp_wposy = 0;
+	} else {
+		if ( hsp_wstyle & 0x10000) {
+			flags |= SDL_WINDOW_BORDERLESS;
+		}
 	}
-
-	window = SDL_CreateWindow( "HSPDish ver" hspver, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sx, sy, SDL_WINDOW_OPENGL );
+	window = SDL_CreateWindow( windowtitle, hsp_wposx, hsp_wposy, sx, sy, flags );
 	if ( window==NULL ) {
 		printf("Unable to set window: %s\n", SDL_GetError());
-		return;
+		return -1;
 	}
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 	context = SDL_GL_CreateContext(window);
 	if ( window==NULL ) {
 		printf("Unable to set GLContext: %s\n", SDL_GetError());
-		return;
+		return -1;
 	}
 
 	// 描画APIに渡す
 	hgio_init( 0, sx, sy, p_engine );
 	hgio_clsmode( CLSMODE_SOLID, 0xffffff, 0 );
 
+	if ( sx != hsp_wx || sy != hsp_wy ) {
+#ifndef HSPDISHGP
+		hgio_view( sx, sy );
+		hgio_size( hsp_wx, hsp_wy );
+		hgio_autoscale( autoscale );
+#endif
+	}
+
 	// マルチタッチ初期化
 	//MTouchInit( m_hWnd );
-}
-
-
-void hsp3dish_dialog( char *mes )
-{
-	//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", mes, window);
-	printf( "%s\n", mes );
+	return 0;
 }
 
 
@@ -492,75 +507,6 @@ int hsp3dish_await( int tick )
 }
 
 
-void hsp3dish_msgfunc( HSPCTX *hspctx )
-{
-	int tick;
-
-	if ( handleEvent() ) {
-		hspctx->runmode = RUNMODE_END;
-	}
-
-	while(1) {
-		// logmes なら先に処理する
-		if ( hspctx->runmode == RUNMODE_LOGMES ) {
-			printf( "%s\r\n",ctx->stmp );
-			hspctx->runmode = RUNMODE_RUN;
-			return;
-		}
-
-		switch( hspctx->runmode ) {
-		case RUNMODE_STOP:
-			return;
-		case RUNMODE_WAIT:
-			tick = hgio_gettick();
-			hspctx->runmode = code_exec_wait( tick );
-		case RUNMODE_AWAIT:
-			//	高精度タイマー
-			tick = hgio_gettick();					// すこし早めに抜けるようにする
-			if ( code_exec_await( tick ) != RUNMODE_RUN ) {
-					SDL_Delay( ( hspctx->waittick - tick) / 2 );
-			} else {
-				tick = hgio_gettick();
-				while( tick < hspctx->waittick ) {	// 細かいwaitを取る
-					SDL_Delay(1);
-					tick = hgio_gettick();
-				}
-				hspctx->lasttick = tick;
-				hspctx->runmode = RUNMODE_RUN;
-#ifndef HSPDEBUG
-				if ( ctx->hspstat & HSPSTAT_SSAVER ) {
-					if ( hsp_sscnt ) hsp_sscnt--;
-				}
-#endif
-			}
-			break;
-//		case RUNMODE_END:
-//			throw HSPERR_NONE;
-		case RUNMODE_RETURN:
-			throw HSPERR_RETURN_WITHOUT_GOSUB;
-		case RUNMODE_INTJUMP:
-			throw HSPERR_INTJUMP;
-		case RUNMODE_ASSERT:
-			hspctx->runmode = RUNMODE_STOP;
-#ifdef HSPDEBUG
-			hsp3dish_debugopen();
-#endif
-			break;
-	//	case RUNMODE_LOGMES:
-		case RUNMODE_RESTART:
-		{
-			//	rebuild window
-
-			hspctx->runmode = RUNMODE_RUN;
-			break;
-		}
-		default:
-			return;
-		}
-	}
-}
-
-
 /*----------------------------------------------------------*/
 //		デバイスコントロール関連
 /*----------------------------------------------------------*/
@@ -625,6 +571,53 @@ static void hsp3dish_savelog( void )
 	}
 }
 #endif
+
+int hsp3dish_init_sub( int sx, int sy, int autoscale )
+{
+	//		システム関連の初期化(HSP以外)
+	//
+	int res;
+	for (int i = 0; i < SDLK_SCANCODE_MAX; i++) {
+		keys[i] = false;
+	}
+
+	//		Register Type
+	//
+	drawflag = 0;
+	ctx->msgfunc = hsp3dish_msgfunc;
+
+	//		Initalize Window
+	//
+	res = hsp3dish_initwindow( NULL, sx, sy, autoscale, "HSPDish ver" hspver );
+	if (res) return res;
+
+//	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+//	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
+
+#ifdef HSPDISHGP
+	//		Initalize gameplay
+	//
+	game = new gamehsp;
+
+	gameplay::Logger::set(gameplay::Logger::LEVEL_INFO, logfunc);
+	gameplay::Logger::set(gameplay::Logger::LEVEL_WARN, logfunc);
+	gameplay::Logger::set(gameplay::Logger::LEVEL_ERROR, logfunc);
+
+
+	//	platform = gameplay::Platform::create( game, NULL, hsp_wx, hsp_wy, false );
+	platform = gameplay::Platform::create( game, NULL, hsp_wx, hsp_wy, false );
+	if ( platform == NULL ) {
+		//hsp3dish_dialog( (char *)gplog.c_str() );
+		hsp3dish_dialog( "OpenGL initalize failed." );
+		hsp3dish_savelog();
+		return 1;
+	}
+	platform->enterMessagePump();
+	game->frame();
+#endif
+
+	return 0;
+}
 
 int hsp3dish_init( char *startfile )
 {
@@ -702,54 +695,22 @@ int hsp3dish_init( char *startfile )
 	if ( sy == 0 ) sy = hsp_wy;
 
 //#endif
-
-	for (int i = 0; i < SDLK_SCANCODE_MAX; i++) {
-		keys[i] = false;
-	}
-
 	ctx = &hsp->hspctx;
 
-	//		Register Type
-	//
-	drawflag = 0;
-	ctx->msgfunc = hsp3dish_msgfunc;
-
-	//		Initalize Window
-	//
-	hsp3dish_initwindow( NULL, sx, sy, "HSPDish ver" hspver );
-
-	if ( sx != hsp_wx || sy != hsp_wy ) {
-#ifndef HSPDISHGP
-		hgio_view( hsp_wx, hsp_wy );
-		hgio_size( sx, sy );
-		hgio_autoscale( autoscale );
-#endif
-	}
-
-//	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
-//	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
-
-#ifdef HSPDISHGP
-	//		Initalize gameplay
-	//
-	game = new gamehsp;
-
-	gameplay::Logger::set(gameplay::Logger::LEVEL_INFO, logfunc);
-	gameplay::Logger::set(gameplay::Logger::LEVEL_WARN, logfunc);
-	gameplay::Logger::set(gameplay::Logger::LEVEL_ERROR, logfunc);
-
-
-	//	platform = gameplay::Platform::create( game, NULL, hsp_wx, hsp_wy, false );
-	platform = gameplay::Platform::create( game, NULL, hsp_wx, hsp_wy, false );
-	if ( platform == NULL ) {
-		//hsp3dish_dialog( (char *)gplog.c_str() );
-		hsp3dish_dialog( "OpenGL initalize failed." );
-		hsp3dish_savelog();
+	// Slightly different SDL initialization
+	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
+		hsp3dish_dialog("Unable to initialize SDL");
 		return 1;
 	}
-	platform->enterMessagePump();
-	game->frame();
-#endif
+
+	//		Window initalize
+	//
+	hsp_wstyle = 0;
+	hsp_wposx = SDL_WINDOWPOS_UNDEFINED;
+	hsp_wposy = SDL_WINDOWPOS_UNDEFINED;
+	if ( hsp3dish_init_sub(sx,sy,autoscale) ) {
+		return 1;
+	}
 
 	//		Initalize GUI System
 	//
@@ -767,14 +728,12 @@ int hsp3dish_init( char *startfile )
 	}
 #endif
 
-#if 1
 	{
 	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_sock_extcmd( tinfo );
 	}
-#endif
 
 	//		Initalize DEVINFO
 	HSP3DEVINFO *devinfo;
@@ -794,11 +753,12 @@ int hsp3dish_init( char *startfile )
 }
 
 
-static void hsp3dish_bye( void )
+static void hsp3dish_bye_sub( void )
 {
 	//		Window関連の解放
 	//
 	hsp3dish_drawoff();
+	hgio_term();
 
 #ifdef HSPDISHGP
 	//		gameplay関連の解放
@@ -807,16 +767,26 @@ static void hsp3dish_bye( void )
 		platform->shutdownInternal();
 		delete platform;
 	}
-
-	if (GetSysReq(SYSREQ_LOGWRITE)) {
-		hsp3dish_savelog();
-	}
-
 	if (game != NULL) {
 		//game->exit();
 	    delete game;
 	}
 #endif
+
+	if (window) {
+		SDL_DestroyWindow(window);
+	}
+}
+
+static void hsp3dish_bye( void )
+{
+#ifdef HSPDISHGP
+	if (GetSysReq(SYSREQ_LOGWRITE)) {
+		hsp3dish_savelog();
+	}
+#endif
+	hsp3dish_bye_sub();
+	SDL_Quit();
 
 #ifdef DEVCTRL_IO
 	hsp3dish_termdevinfo_io();
@@ -886,4 +856,94 @@ int hsp3dish_exec( void )
 	hsp3dish_bye();
 	return endcode;
 }
+
+
+void hsp3dish_msgfunc( HSPCTX *hspctx )
+{
+	int tick;
+
+	if ( handleEvent() ) {
+		hspctx->runmode = RUNMODE_END;
+	}
+
+	while(1) {
+		// logmes なら先に処理する
+		if ( hspctx->runmode == RUNMODE_LOGMES ) {
+			printf( "%s\r\n",ctx->stmp );
+			hspctx->runmode = RUNMODE_RUN;
+			return;
+		}
+
+		switch( hspctx->runmode ) {
+		case RUNMODE_STOP:
+			return;
+		case RUNMODE_WAIT:
+			tick = hgio_gettick();
+			hspctx->runmode = code_exec_wait( tick );
+		case RUNMODE_AWAIT:
+			//	高精度タイマー
+			tick = hgio_gettick();					// すこし早めに抜けるようにする
+			if ( code_exec_await( tick ) != RUNMODE_RUN ) {
+					SDL_Delay( ( hspctx->waittick - tick) / 2 );
+			} else {
+				tick = hgio_gettick();
+				while( tick < hspctx->waittick ) {	// 細かいwaitを取る
+					SDL_Delay(1);
+					tick = hgio_gettick();
+				}
+				hspctx->lasttick = tick;
+				hspctx->runmode = RUNMODE_RUN;
+#ifndef HSPDEBUG
+				if ( ctx->hspstat & HSPSTAT_SSAVER ) {
+					if ( hsp_sscnt ) hsp_sscnt--;
+				}
+#endif
+			}
+			break;
+//		case RUNMODE_END:
+//			throw HSPERR_NONE;
+		case RUNMODE_RETURN:
+			throw HSPERR_RETURN_WITHOUT_GOSUB;
+		case RUNMODE_INTJUMP:
+			throw HSPERR_INTJUMP;
+		case RUNMODE_ASSERT:
+			hspctx->runmode = RUNMODE_STOP;
+#ifdef HSPDEBUG
+			hsp3dish_debugopen();
+#endif
+			break;
+	//	case RUNMODE_LOGMES:
+		case RUNMODE_RESTART:
+		{
+			//	rebuild window
+
+			Bmscr* bm;
+			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+			hsp_wx = bm->sx;
+			hsp_wy = bm->sy;
+			hsp_wposx = bm->cx;
+			hsp_wposy = bm->cy;
+			if ( hsp_wposx < 0 ) hsp_wposx = SDL_WINDOWPOS_UNDEFINED;
+			if ( hsp_wposy < 0 ) hsp_wposy = SDL_WINDOWPOS_UNDEFINED;
+			hsp_wstyle = bm->buffer_option;
+			hsp3dish_bye_sub();
+
+			if ( hsp_wstyle & 0x100 ) {
+				SDL_DisplayMode dm;
+				SDL_GetDesktopDisplayMode(0,&dm);
+				hsp_wx = dm.w; hsp_wy = dm.h;
+			}
+			if ( hsp3dish_init_sub(hsp_wx,hsp_wy,0) ) {
+				return;
+			}
+			hspctx->runmode = RUNMODE_RUN;
+			break;
+		}
+		default:
+			return;
+		}
+	}
+}
+
+
 

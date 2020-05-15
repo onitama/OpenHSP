@@ -917,7 +917,7 @@ static int cmdfunc_extcmd( int cmd )
 			if (cmd == 0x2b) {
 				bmscr->buffer_option |= 0x10000;
 			}
-#ifdef HSPWIN
+#if (defined(HSPWIN)||defined(HSPLINUX))
 			ctx->runmode = RUNMODE_RESTART;
 			return RUNMODE_RESTART;
 #endif
@@ -925,8 +925,6 @@ static int cmdfunc_extcmd( int cmd )
 		bmscr = wnd->GetBmscr( p1 );
 		cur_window = p1;
 		hgio_gsel( (BMSCR *)bmscr );
-		//
-		//Alertf("screen---(%x)\n",bmscr);
 		break;
 		}
 
@@ -3573,11 +3571,6 @@ static int get_ginfo( int arg )
 		//return GetBValue( bmscr->color );
 		return ( (bmscr->color)&0xff );
 	case 19:
-//		hdc=GetDC(NULL);
-//		i = 0;
-//		if ( GetDeviceCaps( hdc,RASTERCAPS ) & RC_PALETTE ) i = 1;
-//		ReleaseDC( NULL, hdc );
-//		return i;
 		return 0;
 	case 20:
 #ifdef HSPWIN

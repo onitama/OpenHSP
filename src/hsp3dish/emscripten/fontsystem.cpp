@@ -486,6 +486,8 @@ int hgio_fontsystem_exec_pos(char* msg, texmesPos *info)
 	int count = 0;
 	int mulchr;
 	int w,h;
+	int c;
+	int ww,hh,adv;
 
 	w = 0; h = 0;
 
@@ -506,9 +508,32 @@ int hgio_fontsystem_exec_pos(char* msg, texmesPos *info)
 			mulchr--;
 		}
 		code[i] = 0;
-		TTF_SizeUTF8(font, (const char *)code, &w, &h);
 
-		x += w;
+		// UTF8->UTF32に変換
+		switch(i) {
+		case 2:
+			c = ((int)(code[0] & 0x1f))<<6;
+			c |= code[1] & 0x3f;
+			break;
+		case 3:
+			c  = ((int)(code[0] & 0x0f))<<12;
+			c |= ((int)(code[1] & 0x3f))<<6;
+			c |= code[2] & 0x3f;
+			break;
+		case 4:
+			c  = ((int)(code[0] & 0x07))<<18;
+			c |= ((int)(code[1] & 0x3f))<<12;
+			c |= ((int)(code[2] & 0x3f))<<6;
+			c |= code[3] & 0x3f;
+			break;
+		default:
+			c = (int)code[0];
+			break;
+		}
+		TTF_GlyphMetrics(font, (Uint16)c, &w, &ww, &h, &hh, &adv);
+		x += adv;
+		//TTF_SizeUTF8(font, (const char *)code, &w, &h);
+		//x += w;
 		count++;
 	}
 

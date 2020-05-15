@@ -299,7 +299,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 #endif
 
 #if defined(HSPLINUX)
-	#ifdef USE_JAVA_FONT
+	#ifdef USE_TTFFONT
 
 	//TTF初期化
 	char fontpath[HSP_MAX_PATH+1];
@@ -764,12 +764,22 @@ void hgio_clsmode( int mode, int color, int tex )
 
 int hgio_getWidth( void )
 {
+#ifdef HSPLINUX
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(0,&dm);
+	return dm.w;
+#endif
 	return _bgsx;
 }
 
 
 int hgio_getHeight( void )
 {
+#ifdef HSPLINUX
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(0,&dm);
+	return dm.h;
+#endif
 	return _bgsy;
 }
 
