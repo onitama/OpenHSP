@@ -40,7 +40,7 @@
 #include <OpenGLES/ES1/gl.h>
 #include <OpenGLES/ES1/glext.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include "iOSBridge.h"
+#include "iOSgpBridge.h"
 #include "appengine.h"
 #endif
 
