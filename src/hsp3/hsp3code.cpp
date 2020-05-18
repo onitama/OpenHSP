@@ -190,7 +190,7 @@ char *code_strp(int dsptr)
 {
 	if (strmap_enable) {
 		if (strmap_entry.count(dsptr)) {
-			char* p = strmap_entry.at(dsptr);
+			char* p = strmap_entry[dsptr];
 			return p;
 		}
 	}
