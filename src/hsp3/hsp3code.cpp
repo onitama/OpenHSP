@@ -1859,7 +1859,8 @@ static int cmdfunc_var( int cmd )
 				return RUNMODE_RUN;
 			}
 		}
-		if ( pval->flag != mpval->flag ) {
+		if (( pval->flag != mpval->flag )||( pval->flag == HSPVAR_FLAG_STRUCT )) {
+			// HSPVAR_FLAG_STRUCTの場合は常に既存のデータをクリアする
 			if ( aptr != 0 ) throw HSPERR_INVALID_ARRAYSTORE;	// 型変更の場合は配列要素0のみ
 			HspVarCoreClear( pval, mpval->flag );		// 最小サイズのメモリを確保
 			proc = HspVarCoreGetProc( pval->flag );
@@ -2761,7 +2762,7 @@ int code_exec_await( int tick )
 {
 	//		時間待ち(await)
 	//
-	if ( hspctx->waittick < 0 ) {
+	if ( hspctx->waittick == -1 ) {
 		if ( hspctx->lasttick == 0 ) hspctx->lasttick = tick;
 		hspctx->waittick = hspctx->lasttick + hspctx->waitcount;
 	}
