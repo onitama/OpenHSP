@@ -23,6 +23,7 @@ OBJS = \
 	src/hsp3/hspvar_struct.do \
 	src/hsp3dish/hspwnd_dish.do \
 	src/hsp3dish/hspwnd_obj.do \
+	src/hsp3dish/hspwnd_edit.do \
 	src/hsp3dish/random.do \
 	src/hsp3/stack.do \
 	src/hsp3/strbuf.do \
@@ -62,6 +63,7 @@ OBJS_CMP = \
 	src/hspcmp/localinfo.o \
 	src/hspcmp/membuf.o \
 	src/hspcmp/strnote.o \
+	src/hspcmp/hsmanager.o \
 	src/hspcmp/tagstack.o
 
 OBJS_CL = \

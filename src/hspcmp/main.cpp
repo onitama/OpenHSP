@@ -9,6 +9,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef HSPLINUX
+#include <unistd.h>
+#endif
+
+#ifdef HSPWIN
+#include <direct.h>
+#endif
 #include <string.h>
 #include <ctype.h>
 
@@ -17,6 +25,7 @@
 
 #include "hsc3.h"
 #include "token.h"
+#include "hsmanager.h"
 
 /*----------------------------------------------------------*/
 
@@ -34,6 +43,7 @@ static 	char *p[] = {
 	"       -e?   execute/view .ax runtime",
 	"       -r    execute runtime with result",
 	"       -s    output string map",
+	"       -h??? output command help",
 	"       --syspath=??? set system folder for execute",
 	"       --compath=??? set common path to ???",
 	NULL };
@@ -48,24 +58,26 @@ int main( int argc, char *argv[] )
 {
 	char a1,a2,a3;
 	int b,st;
-	int cmpopt,ppopt,utfopt,pponly,execobj,strmap;
+	int cmpopt,ppopt,utfopt,pponly,execobj,strmap,hsphelp;
 	char fname[HSP_MAX_PATH];
 	char fname2[HSP_MAX_PATH];
 	char oname[HSP_MAX_PATH];
 	char compath[HSP_MAX_PATH];
 	char syspath[HSP_MAX_PATH];
+	char helpkey[256];
 	CHsc3 *hsc3=NULL;
 
 	//	check switch and prm
 
 	if (argc<2) { usage1();return -1; }
 
-	st = 0; ppopt = 0; cmpopt = 0; utfopt = 0; pponly = 0; strmap = 0;
+	st = 0; ppopt = 0; cmpopt = 0; utfopt = 0; pponly = 0; strmap = 0; hsphelp = 0;
 	execobj = 0;
 	fname[0]=0;
 	fname2[0]=0;
 	oname[0]=0;
 	syspath[0]=0;
+	helpkey[0] = 0;
 
 #ifdef HSPLINUX
 	strcpy( compath,"common/" );
@@ -107,7 +119,7 @@ int main( int argc, char *argv[] )
 			case 's':
 				strmap = 1; cmpopt |= HSC3_MODE_STRMAP; break;
 			case 'o':
-				strcpy( oname,argv[b]+2 );
+				strcpy(oname, argv[b] + 2);
 				break;
 			case 'e':
 				execobj = 1;
@@ -117,6 +129,10 @@ int main( int argc, char *argv[] )
 				execobj = 2;
 				if ( a3=='0' ) execobj|=8;
 				break;
+			case 'h':
+				hsphelp = 1;
+				strcpy(helpkey, argv[b] + 2);
+				break;
 			default:
 				st=1;break;
 			}
@@ -124,8 +140,21 @@ int main( int argc, char *argv[] )
 	}
 
 	if (st) { printf("Illegal switch selected.\n");return 1; }
-	if (fname[0]==0) { printf("No file name selected.\n");return 1; }
 
+	//		help main
+	if (hsphelp) {
+		int res;
+		HspHelpManager hman;
+		strcat(syspath, "hsphelp");
+		res = hman.initalize(syspath);
+		if (res == 0) {
+			res = hman.searchIndex(helpkey);
+		}
+		puts(hman.getMessage());
+		return res;
+	}
+
+	if (fname[0]==0) { printf("No file name selected.\n");return 1; }
 
 	if (oname[0]==0) {
 		strcpy( oname,fname ); cutext( oname );

@@ -159,7 +159,7 @@ ifneq ($(filter win32_mingw,$(PLATFORM)),)
 
     OBJS = ahtmodel.o ahtobj.o codegen.o comutil.o errormsg.o hsc3.o \
            hspcmd.o label.o localinfo.o main.o membuf.o strnote.o \
-           tagstack.o token.o \
+           hsmanager.o tagstack.o token.o \
            supio_win.o
     LIBS = ole32
 

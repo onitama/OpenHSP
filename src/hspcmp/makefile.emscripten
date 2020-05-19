@@ -11,7 +11,7 @@ CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive \
 
 OBJS = ahtmodel.bc ahtobj.bc codegen_utf8.bc comutil.bc errormsg_utf8.bc hsc3.bc \
     hspcmd.bc label.bc localinfo.bc membuf.bc strnote.bc \
-    tagstack.bc token_utf8.bc \
+    hsmanager.bc tagstack.bc token_utf8.bc \
 	win32dll/dpm.bc \
 	emscripten/supio_emscripten.bc emscripten/hspcmp3.bc
 TARGET = hspcmp.js
