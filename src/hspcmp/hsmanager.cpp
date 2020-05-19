@@ -405,7 +405,10 @@ int HspHelpManager::getInfoFromHS(int target_line)
 	i = target_line;
 
 	i = getTaggedInfoFromHS(i);
-	if (tagname != "index") return -2;	// 最初のタグは%indexのはず
+	if (tagname != "index") {
+		m_message += "Bad Index.\r\n";
+		return -2;	// 最初のタグは%indexのはず
+	}
 
 	while (1) {
 		if ( i<=0 ) break;
