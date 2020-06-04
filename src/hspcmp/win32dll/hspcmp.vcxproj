@@ -14,17 +14,18 @@
     <ProjectGuid>{56775D30-4CDD-48E3-80EE-1CF2956D36B6}</ProjectGuid>
     <RootNamespace>hspcmp</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -90,6 +91,7 @@
     <ClCompile Include="..\comutil.cpp" />
     <ClCompile Include="..\errormsg.cpp" />
     <ClCompile Include="..\hsc3.cpp" />
+    <ClCompile Include="..\hsmanager.cpp" />
     <ClCompile Include="..\hspcmd.cpp" />
     <ClCompile Include="..\label.cpp" />
     <ClCompile Include="..\localinfo.cpp" />
@@ -107,6 +109,7 @@
     <ClInclude Include="..\comutil.h" />
     <ClInclude Include="..\errormsg.h" />
     <ClInclude Include="..\hsc3.h" />
+    <ClInclude Include="..\hsmanager.h" />
     <ClInclude Include="..\hspdll.h" />
     <ClInclude Include="..\label.h" />
     <ClInclude Include="..\localinfo.h" />

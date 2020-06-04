@@ -882,6 +882,7 @@ int hgio_redraw( BMSCR *bm, int flag )
 			bm->passed_time = curtick - bm->prevtime;
 		}
 		bm->prevtime = curtick;
+		return 0;
 	} else {
 		hgio_render_start();
 	}

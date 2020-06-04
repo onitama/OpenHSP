@@ -299,16 +299,20 @@ char *strchr2( char *target, char code )
 }
 
 
-void getpathW( HSPAPICHAR *stmp, HSPAPICHAR *outbuf, int p2 )
+void getpathW( HSPAPICHAR *p_stmp, HSPAPICHAR *outbuf, int p2 )
 {
 	HSPAPICHAR *p = 0;
+	HSPAPICHAR *stmp = p_stmp;
 	HSPAPICHAR p_drive[_MAX_PATH];
 	HSPAPICHAR p_dir[_MAX_DIR];
 	HSPAPICHAR p_fname[_MAX_FNAME];
 	HSPAPICHAR p_ext[_MAX_EXT];
 
 	p = outbuf;
-	if (p2&16) strcaseW( stmp );
+	if (p2 & 16) {
+		stmp = _wcslwr(p_stmp);
+		//strcaseW(stmp);
+	}
 	_tsplitpath( stmp, p_drive, p_dir, p_fname, p_ext );
 	_tcscat( p_drive, p_dir );
 	if ( p2&8 ) {

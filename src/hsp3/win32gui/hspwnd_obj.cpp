@@ -561,6 +561,11 @@ HSPOBJINFO *Bmscr::AddHSPObject( int id, HWND handle, int mode )
 	obj->exinfo1 = 0;
 	obj->exinfo2 = 0;
 
+	HspWnd *wnd = (HspWnd *)this->master_hspwnd;
+	if (wnd) {
+		obj->hspctx = wnd->hspctx;
+	}
+
 	return obj;
 }
 
@@ -657,7 +662,9 @@ void Bmscr::DeleteHSPObject( int id )
 			hf=(HFONT)SendMessage( obj->hCld, WM_GETFONT, 0, 0 );
 			if (hf!=NULL) DeleteObject( hf );
 		}
-		if ( obj->func_delete != NULL ) obj->func_delete( obj );
+	}
+	if (obj->func_delete != NULL) {
+		obj->func_delete(obj);
 	}
 	obj->owmode = HSPOBJ_NONE;
 	obj->hCld = NULL;
@@ -670,6 +677,7 @@ void Bmscr::UpdateHSPObject( int id, int type, void *ptr )
 	//
 	HSPOBJINFO *obj;
 	obj = GetHSPObjectSafe( id );
+	if ( obj->owmode == HSPOBJ_NONE ) return;
 	if ( obj->func_objprm != NULL ) {
 		obj->func_objprm( obj, type, ptr );
 	} else {
@@ -719,6 +727,28 @@ void Bmscr::SendHSPObjectNotice( int wparam )
 
 	if ( obj->func_notice != NULL ) {
 		obj->func_notice( obj, wparam );
+	}
+}
+
+
+void Bmscr::SendHSPLayerObjectNotice(int layer, int cmd)
+{
+	//		レイヤーオブジェクトの通知処理
+	//
+	int i;
+	HSPOBJINFO *obj;
+	obj = mem_obj;
+	for (i = 0; i < objmax; i++) {
+		if (obj->owmode) {
+			if (obj->owmode & HSPOBJ_OPTION_LAYEROBJ) {
+				if (obj->option == layer) {
+					if (obj->func_notice != NULL) {
+						obj->func_notice(obj, cmd);
+					}
+				}
+			}
+		}
+		obj++;
 	}
 }
 
@@ -817,12 +847,6 @@ int Bmscr::AddHSPObjectButton( char *name, int flag, void *callptr )
 
 	id = NewHSPObject();
 	ws = objstyle | BS_PUSHBUTTON;
-/*
-	rev 43
-	mingw : warning : 変数型から大きさの異なるポインタ型への変換
-	に対処
-	以降4ヶ所も同様。
-*/
 	hw = CreateWindow( TEXT("button"), chartoapichar(name,&hactmp1), ws,
 				cx, cy, ox, oy, hwnd,
 				reinterpret_cast< HMENU >( static_cast< WORD >( MESSAGE_HSPOBJ + id ) ), hInst, NULL );
@@ -1010,4 +1034,106 @@ int Bmscr::AddHSPObjectMultiBox( PVal *pval, APTR aptr, int psize, char *defval,
 	Object_SetMultiBox( obj, TYPE_INUM, iptr );
 	return id;
 }
+
+
+static void Object_LayerDelete(HSPOBJINFO *info)
+{
+	info->hspctx->iparam = info->owsize;
+	info->hspctx->wparam = info->owid;
+	info->hspctx->lparam = HSPOBJ_LAYER_CMD_TERM;
+	code_call((unsigned short *)info->varset.ptr);
+}
+
+static void Object_LayerNotice(HSPOBJINFO *info, int wparam)
+{
+	info->hspctx->iparam = info->exinfo2;
+	info->hspctx->wparam = info->owid;
+	info->hspctx->lparam = wparam;
+	code_call((unsigned short *)info->varset.ptr);
+	info->exinfo2++;
+}
+
+static void Object_SetLayerObject(HSPOBJINFO *info, int type, void *ptr)
+{
+	int ptype = HSPOBJ_LAYER_CMD_PRMI;
+	int iparam = 0;
+	switch (type) {
+	case TYPE_STRING:
+		ptype = HSPOBJ_LAYER_CMD_PRMS;
+		strncpy(info->hspctx->refstr, (char *)ptr, HSPCTX_REFSTR_MAX-1);
+		break;
+	case TYPE_INUM:
+		iparam = *(int *)ptr;
+		break;
+	case TYPE_DNUM:
+		ptype = HSPOBJ_LAYER_CMD_PRMD;
+		info->hspctx->refdval = *(HSPREAL *)ptr;
+		iparam = (int)info->hspctx->refdval;
+		break;
+	default:
+		throw HSPERR_TYPE_MISMATCH;
+	}
+	info->hspctx->iparam = iparam;
+	info->hspctx->wparam = info->owid;
+	info->hspctx->lparam = ptype;
+	code_call((unsigned short *)info->varset.ptr);
+}
+
+
+int Bmscr::AddHSPObjectLayer(int sizex, int sizey, int layer, int val, int mode, void *callptr)
+{
+	//		create screen layer object
+	//
+	int id,lay;
+	HSPOBJINFO *obj;
+
+	lay = layer & 0xff;
+	if (lay < HSPOBJ_OPTION_LAYER_MIN) lay = HSPOBJ_OPTION_LAYER_MIN;
+	if (lay > HSPOBJ_OPTION_LAYER_MAX) lay = HSPOBJ_OPTION_LAYER_MAX;
+
+	if ((layer & HSPOBJ_OPTION_LAYER_MULTI) == 0) {		// 重複登録を検出する
+		obj = mem_obj;
+		for (int i = 0; i < objmax; i++) {
+			if (obj->owmode != HSPOBJ_NONE) {
+				if (obj->owmode & HSPOBJ_OPTION_LAYEROBJ) {
+					if (obj->varset.ptr == callptr) return -1;
+				}
+			}
+			obj++;
+		}
+	}
+
+	id = NewHSPObject();
+
+	obj = AddHSPObject(id, NULL, HSPOBJ_OPTION_LAYEROBJ| HSPOBJ_TAB_SKIP);
+	obj->owid = id;
+	obj->owsize = this->wid;
+
+	obj->option = lay;
+	obj->exinfo1 = val;
+	obj->exinfo2 = 0;
+
+	HSP3BTNSET *bset = (HSP3BTNSET *)(&obj->varset);
+	bset->normal_x = cx;
+	bset->normal_y = cy;
+	bset->push_x = sizex;
+	bset->push_y = sizey;
+	bset->focus_x = 0;
+	bset->focus_y = 0;
+	bset->ptr = callptr;
+
+	obj->func_notice = Object_LayerNotice;
+	obj->func_delete = Object_LayerDelete;
+	obj->func_objprm = Object_SetLayerObject;
+	Posinc(sizey);
+
+	obj->hspctx->iparam = val;
+	obj->hspctx->wparam = id;
+	obj->hspctx->lparam = HSPOBJ_LAYER_CMD_INIT;
+	code_call((unsigned short *)callptr);
+
+	return id;
+}
+
+
 

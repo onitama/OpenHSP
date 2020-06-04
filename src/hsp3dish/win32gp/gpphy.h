@@ -24,11 +24,11 @@ public:
 	void bindNodeAsBox( Node *node, Vector3 &size, PhysicsRigidBody::Parameters *rigParams );
 	void bindNodeAsSphere( Node *node, float radius, Vector3 &center, PhysicsRigidBody::Parameters *rigParams );
 
-	short _flag;						// ‘¶İƒtƒ‰ƒO
-	short _mark;						// ƒ}[ƒNˆ——p
-	int _mode;							// ƒ‚[ƒh
-	int _id;							// ƒtƒBƒWƒbƒNƒXƒIƒuƒWƒFƒNƒgID
-	PhysicsRigidBody *_colObj;	// ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒg
+	short _flag;						// å­˜åœ¨ãƒ•ãƒ©ã‚°
+	short _mark;						// ãƒãƒ¼ã‚¯å‡¦ç†ç”¨
+	int _mode;							// ãƒ¢ãƒ¼ãƒ‰
+	int _id;							// ãƒ•ã‚£ã‚¸ãƒƒã‚¯ã‚¹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆID
+	PhysicsRigidBody *_colObj;	// ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 
 };
 

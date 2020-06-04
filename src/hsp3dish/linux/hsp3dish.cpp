@@ -721,7 +721,7 @@ int hsp3dish_init( char *startfile )
 
 #ifdef USE_OBAQ
 	{
-	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 );// TYPE_USERDEF
+	HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF );
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_dw_extcmd( tinfo );
@@ -753,8 +753,45 @@ int hsp3dish_init( char *startfile )
 }
 
 
+void hsp3dish_error( void )
+{
+	char errmsg[1024];
+	char *msg;
+	char *fname;
+	HSPERROR err;
+	int ln;
+	err = code_geterror();
+	ln = code_getdebug_line();
+	msg = hspd_geterror(err);
+	fname = code_getdebug_name();
+
+	if ( ln < 0 ) {
+		sprintf( errmsg, "#Error %d\n-->%s\n",(int)err,msg );
+		fname = NULL;
+	} else {
+		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
+	}
+	hsp3dish_debugopen();
+	hsp3dish_dialog( errmsg );
+}
+
+
 static void hsp3dish_bye_sub( void )
 {
+	//		クリーンアップ
+	//
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+		hsp->Dispose();
+#ifdef HSPERR_HANDLE
+	}
+	catch (HSPERROR code) {						// HSPエラー例外処理
+		hsp->hspctx.err = code;
+		hsp3dish_error();
+	}
+#endif
+
 	//		Window関連の解放
 	//
 	hsp3dish_drawoff();
@@ -794,29 +831,6 @@ static void hsp3dish_bye( void )
 	//		HSP関連の解放
 	//
 	if ( hsp != NULL ) { delete hsp; hsp = NULL; }
-}
-
-
-void hsp3dish_error( void )
-{
-	char errmsg[1024];
-	char *msg;
-	char *fname;
-	HSPERROR err;
-	int ln;
-	err = code_geterror();
-	ln = code_getdebug_line();
-	msg = hspd_geterror(err);
-	fname = code_getdebug_name();
-
-	if ( ln < 0 ) {
-		sprintf( errmsg, "#Error %d\n-->%s\n",(int)err,msg );
-		fname = NULL;
-	} else {
-		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
-	}
-	hsp3dish_debugopen();
-	hsp3dish_dialog( errmsg );
 }
 
 
@@ -936,6 +950,8 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			if ( hsp3dish_init_sub(hsp_wx,hsp_wy,0) ) {
 				return;
 			}
+			HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF );
+			hsp3typeinit_dw_restart( tinfo );
 			hspctx->runmode = RUNMODE_RUN;
 			break;
 		}
@@ -944,6 +960,5 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 		}
 	}
 }
-
 
 

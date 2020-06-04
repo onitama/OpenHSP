@@ -12,13 +12,15 @@ extern PVal *mpval;
 
 void code_init( void );
 void code_bye( void );
+void code_cleanup(void);
 void code_termfunc( void );
 void code_setctx( HSPCTX *ctx );
 void code_resetctx( HSPCTX *ctx );
 HSPCTX *code_getctx( void );
 void code_setpc( const unsigned short *pc );
 void code_setpci( const unsigned short *pc );
-void code_call( const unsigned short *pc );
+void code_call(const unsigned short *pc);
+void code_callback(const unsigned short *pc);
 void cmdfunc_return( void );
 unsigned short *code_getpcbak( void );
 

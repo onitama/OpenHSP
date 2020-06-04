@@ -66,7 +66,7 @@ int gamehsp::selectCamera( int camid )
 		obj = getObj(camid);
 	}
 	else {
-		//	GPOBJ_ID_EXFLAG‚Ìê‡
+		//	GPOBJ_ID_EXFLAGã®å ´åˆ
 		switch (camid) {
 		case GPOBJ_ID_CAMERA:
 			obj = getObj(_defcamera);
@@ -81,7 +81,7 @@ int gamehsp::selectCamera( int camid )
 
 	_curcamera = camid;
 	_cameraDefault = obj->_camera;
-	_scene->setActiveCamera( _cameraDefault );	// ƒJƒƒ‰Ý’è
+	_scene->setActiveCamera( _cameraDefault );	// ã‚«ãƒ¡ãƒ©è¨­å®š
 	return 0;
 }
 

@@ -15,6 +15,7 @@
 
 #include "hgio.h"
 #include "supio.h"
+#include "sysreq.h"
 #include "hspwnd.h"
 
 HspWnd *curwnd;
@@ -350,6 +351,7 @@ void Bmscr::Cls( int mode )
 	//		Font initalize
 	//
 	SetFont( "", 18, 0 );
+	fonteff_size = HSPMES_FONT_EFFSIZE_DEFAULT;
 	//Sysfont(0);
 
 	//		object initalize
@@ -497,13 +499,58 @@ void Bmscr::Print(texmesPos *tpos)
 }
 
 
-void Bmscr::Print( char *mes, int sw )
+
+void Bmscr::Print(char *mes, int option)
+{
+	int px;
+	int x, y;
+	int mycolor = color;
+	x = cx; y = cy;
+
+	if (option & HSPMES_GMODE) {		// gmodeを有効
+		SetSysReq(SYSREQ_FIXMESALPHA, 0);
+	}
+	else {
+		SetSysReq(SYSREQ_FIXMESALPHA, 1);
+	}
+
+	if (option & HSPMES_SHADOW) {		// 影文字
+		Setcolor(objcolor);
+		cx = x + fonteff_size; cy = y + fonteff_size;
+		PrintSub(mes);
+		Setcolor(mycolor);
+		cx = x; cy = y;
+	}
+	if (option & HSPMES_OUTLINE) {		// アウトライン
+		Setcolor(objcolor);
+		cx = x; cy = y - fonteff_size;
+		PrintSub(mes);
+		cx = x - fonteff_size; cy = y;
+		PrintSub(mes);
+		cx = x + fonteff_size; cy = y;
+		PrintSub(mes);
+		cx = x; cy = y + fonteff_size;
+		PrintSub(mes);
+		Setcolor(mycolor);
+		cx = x; cy = y;
+	}
+
+	px = PrintSub(mes);
+
+	if (option & HSPMES_NOCR) {		// 改行しない
+		cx = x + px;
+		cy = y;
+	}
+}
+
+
+int Bmscr::PrintSub( char *mes )
 {
 	//		mes,printによる文字表示
 	//		(sw=1の場合は改行しないで終了)
 	//
 	int spcur;
-	int org_cy;
+	int px;
 	unsigned char* p;
 	unsigned char* st;
 	unsigned char a1;
@@ -515,6 +562,7 @@ void Bmscr::Print( char *mes, int sw )
 	p = (unsigned char*)mes;
 	st = p;
 	spcur = 0;
+	px = 0;
 
 	while (1) {
 		a1 = *p;
@@ -553,16 +601,10 @@ void Bmscr::Print( char *mes, int sw )
 	}
 
 	if (spcur > 0) {
-		org_cy = cy;
-		printsizex = 0;
-		printsizey = 0;
 		hgio_mes((BMSCR *)this, (char*)st);
-		if (sw) {
-			cx += printsizex;
-			cy = org_cy;
-		}
 	}
 
+	return printsizex;
 }
 
 

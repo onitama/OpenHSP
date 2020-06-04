@@ -104,7 +104,7 @@ gpevent *gamehsp::addEvent(int id)
 	if (ev == NULL) {
 		return newev;
 	}
-	while (1) {								// Šù‘¶‚ÌƒCƒyƒ“ƒg‚É’Ç‰Á‚·‚é
+	while (1) {								// æ—¢å­˜ã®ã‚¤ãƒšãƒ³ãƒˆã«è¿½åŠ ã™ã‚‹
 		ev_next = ev->GetNextEvent();
 		if (ev_next == NULL) break;
 		ev = ev_next;
@@ -293,7 +293,7 @@ int gamehsp::AddSuicideEvent(int eventid, int mode)
 
 void gamehsp::storeNextVector(gpevent *myevent)
 {
-	//		Ÿ‚Ìmovevector‚ğŒŸõ‚µ‚Ä•âŠ®‚·‚é
+	//		æ¬¡ã®movevectorã‚’æ¤œç´¢ã—ã¦è£œå®Œã™ã‚‹
 	//
 	int flag, fl;
 	int target;
@@ -308,8 +308,8 @@ void gamehsp::storeNextVector(gpevent *myevent)
 		if (ev == NULL) break;
 		if (ev == myevent) break;
 		flag = ev->_flag;
-		if ((flag == GPEVENT_FLAG_MOVETARGET2) || (flag == GPEVENT_FLAG_MOVETARGET4)) {			// ƒXƒvƒ‰ƒCƒ“ˆÚ“®‚©?
-			if (ev->_target == target) {															// ©•ª‚Æ“¯‚¶ƒ^[ƒQƒbƒg‚©?
+		if ((flag == GPEVENT_FLAG_MOVETARGET2) || (flag == GPEVENT_FLAG_MOVETARGET4)) {			// ã‚¹ãƒ—ãƒ©ã‚¤ãƒ³ç§»å‹•ã‹?
+			if (ev->_target == target) {															// è‡ªåˆ†ã¨åŒã˜ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‹?
 				myevent->nextvec = ev->GetEventVector(); return;
 			}
 		}
@@ -324,17 +324,17 @@ void gamehsp::storeNextVector(gpevent *myevent)
 			ev = ev->GetNextEvent();
 		}
 	}
-	myevent->nextvec = myevent->GetEventVector();			// Ÿ‚Ìƒf[ƒ^‚ª‚È‚¢ê‡‚Í©•ª‚Ìvector‚ğ“ü‚ê‚é
+	myevent->nextvec = myevent->GetEventVector();			// æ¬¡ã®ãƒ‡ãƒ¼ã‚¿ãŒãªã„å ´åˆã¯è‡ªåˆ†ã®vectorã‚’å…¥ã‚Œã‚‹
 }
 
 void gamehsp::putEventError(gpobj *obj, gpevent *ev, char *msg)
 {
-	Alertf("ƒCƒxƒ“ƒgÀs’†‚ÌƒGƒ‰[‚Å‚·B\n(ObjectID:%d/EventID:%d)\n%s", obj->_id, ev->_id, msg);
+	Alertf("ã‚¤ãƒ™ãƒ³ãƒˆå®Ÿè¡Œä¸­ã®ã‚¨ãƒ©ãƒ¼ã§ã™ã€‚\n(ObjectID:%d/EventID:%d)\n%s", obj->_id, ev->_id, msg);
 }
 
 void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 {
-	//	ƒCƒxƒ“ƒgÀs
+	//	ã‚¤ãƒ™ãƒ³ãƒˆå®Ÿè¡Œ
 	gpevent *ev;
 	gpevent *nextev;
 	float tbase;
@@ -360,7 +360,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 				tval = tbase * ev->_timer;
 			}
 			if (tval >= 1.0f) {
-				obj->SetEvent(ev->GetNextEvent(), entry);		// Ÿ‚ÌƒCƒxƒ“ƒg‚Öi‚Ş
+				obj->SetEvent(ev->GetNextEvent(), entry);		// æ¬¡ã®ã‚¤ãƒ™ãƒ³ãƒˆã¸é€²ã‚€
 				return;
 			}
 			return;
@@ -368,7 +368,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 			if (ev->_value) {
 				fl = rand() % 100;
 				if (fl >= ev->_value) {
-					obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+					obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 					break;
 				}
 			}
@@ -381,7 +381,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 			if (obj->_spr) {
 				obj->_spr->_celid = ev->_target;
 			}
-			obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+			obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 			break;
 		}
 		case GPEVENT_FLAG_SUICIDE:
@@ -391,57 +391,57 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 
 		case GPEVENT_FLAG_PRMSET:
 			if (setObjectPrm(obj->_id, ev->_target, ev->_value) < 0) {
-				putEventError(obj, ev, "–³Œø‚Èƒpƒ‰ƒ[ƒ^[ID");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ID");
 			}
-			obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+			obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 			break;
 		case GPEVENT_FLAG_PRMON:
 			if (getObjectPrm(obj->_id, ev->_target, &fl) < 0) {
-				putEventError(obj, ev, "–³Œø‚Èƒpƒ‰ƒ[ƒ^[ID");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ID");
 			}
 			fl |= ev->_value;
 			setObjectPrm(obj->_id, ev->_target, fl);
-			obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+			obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 			break;
 		case GPEVENT_FLAG_PRMOFF:
 			if (getObjectPrm(obj->_id, ev->_target, &fl) < 0) {
-				putEventError(obj, ev, "–³Œø‚Èƒpƒ‰ƒ[ƒ^[ID");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ID");
 			}
 			fl &= ~ev->_value;
 			setObjectPrm(obj->_id, ev->_target, fl);
-			obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+			obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 			break;
 		case GPEVENT_FLAG_PRMADD:
 			if (getObjectPrm(obj->_id, ev->_target, &fl) < 0) {
-				putEventError(obj, ev, "–³Œø‚Èƒpƒ‰ƒ[ƒ^[ID");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ID");
 			}
 			fl += ev->_value;
 			if (fl < ev->_value_low) fl = ev->_value_low;
 			if (fl > ev->_value_high) fl = ev->_value_high;
 			setObjectPrm(obj->_id, ev->_target, fl);
-			obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+			obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 			break;
 		case GPEVENT_FLAG_PLUSTARGET:
 		{
-			// target+=dir:dir+=vec ‚ğÀs‚·‚é
+			// target+=dir:dir+=vec ã‚’å®Ÿè¡Œã™ã‚‹
 			gameplay::Vector3 *pv1;
 			pv1 = ev->GetEventVector();
 			v1.set( pv1->x, pv1->y, pv1->z, 1.0f );
 			if (addObjectVector(obj->_id, ev->_target, &v1) < 0) {
-				putEventError(obj, ev, "–³Œø‚ÈMOCİ’è");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªMOCè¨­å®š");
 			}
 			break;
 		}
 		case GPEVENT_FLAG_TRIMTARGET:
 		{
-			// target‚Ì”ÍˆÍ‚ğŒÀ’è‚·‚é
+			// targetã®ç¯„å›²ã‚’é™å®šã™ã‚‹
 			gameplay::Vector3 *pv1;
 			gameplay::Vector3 *pv2;
 			pv1 = ev->GetEventVector();
 			pv2 = ev->GetEventVector2();
 
 			if (getObjectVector(obj->_id, ev->_target, &v1) < 0) {
-				putEventError(obj, ev, "–³Œø‚ÈMOCİ’è");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªMOCè¨­å®š");
 			}
 			if (v1.x < pv1->x) { v1.x = pv1->x; }
 			if (v1.y < pv1->y) { v1.y = pv1->y; }
@@ -450,12 +450,12 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 			if (v1.y > pv2->y) { v1.y = pv2->y; }
 			if (v1.z > pv2->z) { v1.z = pv2->z; }
 			setObjectVector(obj->_id, ev->_target, &v1);
-			obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+			obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 			break;
 		}
 		case GPEVENT_FLAG_SETTARGET:
 		{
-			// target‚ğÄİ’è‚·‚é
+			// targetã‚’å†è¨­å®šã™ã‚‹
 			float t1, t2, t3;
 			gameplay::Vector3 *pv1;
 			gameplay::Vector3 *pv2;
@@ -477,18 +477,18 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 				v1.z = pv2->z * t3 + pv1->z;
 			}
 			if (setObjectVector(obj->_id, ev->_target, &v1) < 0) {
-				putEventError(obj, ev, "–³Œø‚ÈMOCİ’è");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªMOCè¨­å®š");
 			}
-			obj->SetEvent(ev->GetNextEvent(), entry);	// ƒCƒxƒ“ƒg‚ğƒpƒX‚·‚é
+			obj->SetEvent(ev->GetNextEvent(), entry);	// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒ‘ã‚¹ã™ã‚‹
 			break;
 		}
 		case GPEVENT_FLAG_MOVETARGET:
 		{
-			// target‚Élinear•âŠÔ
+			// targetã«linearè£œé–“
 			gameplay::Vector3 *pv1;
 			gameplay::Vector4 *pv2;
 			if (getObjectVector(obj->_id, ev->_target, &v1) < 0) {
-				putEventError(obj, ev, "–³Œø‚ÈMOCİ’è");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªMOCè¨­å®š");
 			}
 
 			pv1 = ev->GetEventVector();
@@ -509,11 +509,11 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 		}
 		case GPEVENT_FLAG_MOVETARGET3:
 		{
-			// target‚Élinear•âŠÔ(‘Š‘Î)
+			// targetã«linearè£œé–“(ç›¸å¯¾)
 			gameplay::Vector3 *pv1;
 			gameplay::Vector4 *pv2;
 			if (getObjectVector(obj->_id, ev->_target, &v1) < 0) {
-				putEventError(obj, ev, "–³Œø‚ÈMOCİ’è");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªMOCè¨­å®š");
 			}
 
 			pv1 = ev->GetEventVector();
@@ -534,7 +534,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 		}
 		case GPEVENT_FLAG_MOVETARGET2:
 		{
-			// target‚Éspline•âŠÔ
+			// targetã«splineè£œé–“
 			Vector3	key0;
 			Vector3	key1;
 			Vector3	key2;
@@ -549,7 +549,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 			if (ev->nextvec == NULL) storeNextVector(ev);
 
 			if (getObjectVector(obj->_id, ev->_target, &v1) < 0) {
-				putEventError(obj, ev, "–³Œø‚ÈMOCİ’è");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªMOCè¨­å®š");
 			}
 			pv1 = ev->GetEventVector();
 			pv2 = &(obj->_evvec[entry]);
@@ -604,7 +604,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 		}
 		case GPEVENT_FLAG_MOVETARGET4:
 		{
-			// target‚Éspline•âŠÔ(‘Š‘Î)
+			// targetã«splineè£œé–“(ç›¸å¯¾)
 			Vector3	key0;
 			Vector3	key1;
 			Vector3	key2;
@@ -619,7 +619,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 			if (ev->nextvec == NULL) storeNextVector(ev);
 
 			if (getObjectVector(obj->_id, ev->_target, &v1) < 0) {
-				putEventError(obj, ev, "–³Œø‚ÈMOCİ’è");
+				putEventError(obj, ev, "ç„¡åŠ¹ãªMOCè¨­å®š");
 			}
 			pv1 = ev->GetEventVector();
 			pv2 = &(obj->_evvec[entry]);
@@ -675,7 +675,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 
 
 		default:
-			putEventError(obj,ev,"–³Œø‚ÈƒCƒxƒ“ƒg");
+			putEventError(obj,ev,"ç„¡åŠ¹ãªã‚¤ãƒ™ãƒ³ãƒˆ");
 			obj->SetEvent(NULL, entry);
 			return;
 		}

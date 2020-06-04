@@ -2,6 +2,12 @@
 #include "FileSystem.h"
 #include "Image.h"
 
+#define USE_STBIMAGE
+#ifdef USE_STBIMAGE
+#include "stb_image.h"
+#endif
+
+
 namespace gameplay
 {
 // Callback for reading a png image using Stream
@@ -18,7 +24,60 @@ Image* Image::create(const char* path)
 {
     GP_ASSERT(path);
 
-    // Open the file.
+#ifdef USE_STBIMAGE
+
+	int size;
+	char *p;
+	p = FileSystem::readAll(path, &size);
+	if ( p == NULL ) {
+		GP_ERROR("Failed to open image file '%s'.", path);
+		return NULL;
+	}
+
+	int tsx, tsy, comp;
+	unsigned char *pImg;
+
+	pImg = stbi_load_from_memory((unsigned char *)p, size, &tsx, &tsy, &comp, 4);
+
+	if (pImg == NULL) {
+		delete[] p;
+		GP_ERROR("Bad image file '%s'.", path);
+		return NULL;
+	}
+
+	Image* image = new Image();
+	image->_width = tsx;
+	image->_height = tsy;
+	switch (comp)
+	{
+	case 3:
+	case 4:
+		image->_format = Image::RGBA;
+		break;
+
+	default:
+		delete[] p;
+		GP_ERROR("Unsupported color type (%d) for image file '%s'.", comp, path);
+		return NULL;
+	}
+
+	unsigned int dataSize = tsx * tsy * 4;
+	image->_data = new unsigned char[dataSize];
+	//memcpy(image->_data, pImg, dataSize);
+	
+	unsigned char *dstptr = image->_data;
+	unsigned char *srcptr = pImg;
+	int pitch = tsx * 4;
+	srcptr += pitch * tsy;
+	for (int j = 0; j < tsy; j++) {				// V-Flip pixel data
+		srcptr -= tsx * 4;
+		memcpy(dstptr, srcptr, pitch);
+		dstptr += pitch;
+	}
+	delete[] p;
+
+#else
+	// Open the file.
     std::unique_ptr<Stream> stream(FileSystem::open(path));
     if (stream.get() == NULL || !stream->canRead())
     {
@@ -103,6 +162,7 @@ Image* Image::create(const char* path)
 
     // Clean up.
     png_destroy_read_struct(&png, &info, NULL);
+#endif
 
     return image;
 }

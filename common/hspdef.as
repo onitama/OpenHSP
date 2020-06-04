@@ -27,6 +27,11 @@
 #define global gmode_sub (6)
 #define global gmode_pixela (7)
 
+#define global mesopt_nocr (1)
+#define global mesopt_shadow (2)
+#define global mesopt_outline (4)
+#define global mesopt_gmode (16)
+
 #define global ginfo_mx ginfo(0)
 #define global ginfo_my ginfo(1)
 #define global ginfo_act ginfo(2)
@@ -89,11 +94,12 @@
 #define global objmode_normal (0)
 #define global objmode_guifont (1)
 #define global objmode_usefont (2)
+#define global objmode_usecolor (4)
 
 #define global gsquare_grad (-257)
 
-#define global msgothic ""
-#define global msmincho ""
+#define global msgothic "‚l‚r ƒSƒVƒbƒN"
+#define global msmincho "‚l‚r –¾’©"
 
 #define global do  %tbreak %i0 %tcontinue %i0 %tdo *%i
 #define global until(%1=1) %tcontinue *%o : %tdo if (%1)=0 { goto *%o } %tbreak *%o
@@ -111,8 +117,8 @@
 #define global swbreak %tswitch goto *%p1
 #define global swend %tswitch %o0 } *%o
 
-#define global ddim(%1,%2,%3=0,%4=0,%5=0) dimtype %1,3,%2,%3,%4,%5
-#define global ldim(%1,%2,%3=0,%4=0,%5=0) dimtype %1,1,%2,%3,%4,%5
+#define global ddim(%1,%2=1,%3=0,%4=0,%5=0) dimtype %1,3,%2,%3,%4,%5
+#define global ldim(%1,%2=1,%3=0,%4=0,%5=0) dimtype %1,1,%2,%3,%4,%5
 #define global alloc sdim
 
 #define global M_PI	3.14159265358979323846
@@ -140,6 +146,24 @@
 #define global notefind_match (0)
 #define global notefind_first (1)
 #define global notefind_instr (2)
+
+#define global objlayer_min (0)
+#define global objlayer_bg (1)
+#define global objlayer_normal (2)
+#define global objlayer_posteff (3)
+#define global objlayer_max (4)
+#define global objlayer_multi ($100)
+
+#define global objlayer_cmdinit (1)
+#define global objlayer_cmdterm (2)
+#define global objlayer_cmdprmi (3)
+#define global objlayer_cmdprms (4)
+#define global objlayer_cmdprmd (5)
+#define global objlayer_cmddraw (6)
+#define global objlayer_cmdtime (7)
+
+#define global objlayer_info_axis (5)
+#define global objlayer_info_size (6)
 
 
 #ifndef _DEBUG

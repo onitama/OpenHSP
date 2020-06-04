@@ -1,0 +1,62 @@
+
+・gameplay.libの変更
+
+
+ScriptController
+AudioController
+
+を引き剥がす
+
+
+AudioController → 空のクラスに変更
+ScriptController → 空のクラスに変更
+
+
+プロジェクトから除外
+
+AudioSource.cpp
+AudioBuffer.cpp
+gameplay-main-windows.cpp
+
+リンクライブラリから
+ogg関連、lua関連を除外
+
+
+base.h
+GP_ERRORマクロでexitしないように修正
+
+
+PlatformWindows.cpp
+
+	以下をコメントアウト
+        //SetWindowLongPtr(__hwnd, GWLP_WNDPROC, (LONG)(WNDPROC)__WndProc);
+
+error:
+	//    exit(0);
+
+
+Node.cpp
+
+_audioSource呼び出し部分をコメントアウト
+
+SceneLoader.cpp
+
+case SceneNodeProperty::AUDIO:
+のAudioSource呼び出し部分をコメントアウト
+
+
+
+font.cpp
+
+void drawText(const char* text, int x, int y, const Vector4& color, unsigned int size = 0, bool rightToLeft = false);
+
+の表示Xサイズをint値で返すように設定
+(「return xPos - x;」を追加)
+
+
+・マルチスレッド(DLLなし)でライブラリ再作成
+
+libpng,zlib をマルチスレッド(DLLなし)でライブラリ再作成
+
+
+

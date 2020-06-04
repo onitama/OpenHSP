@@ -20,6 +20,14 @@ extern "C" {
 #define ESSPFLAG_BLINK (0x8000)
 #define ESSPFLAG_NODISP (0x10000)
 
+#define ESSPSET_POS (0)
+#define ESSPSET_ADDPOS (1)
+#define ESSPSET_FALL (2)
+#define ESSPSET_BOUNCE (3)
+#define ESSPSET_ZOOM (4)
+#define ESSPSET_DIRECT (0x1000)
+#define ESSPSET_MASKBIT (0x2000)
+
 #define ESSPOPT_NONE (0)
 #define ESSPOPT_EXTDISP (1)
 #define ESSPOPT_FADEIN (4)
@@ -101,6 +109,8 @@ typedef struct SPOBJ
 	int zoomy;			//	Y方向倍率(16bit固定少数)
 	int	rotz;			//	回転角度
 	int	splink;			//	link to other sprite
+	unsigned short *sbr;//	callback
+
 } SPOBJ;
 
 class essprite {
@@ -110,7 +120,6 @@ public:
 	void reset(void);
 	int init(int maxsprite=512, int maxchr=1024, int rotrate=64, int maxmap=16);
 	void setResolution(HspWnd *wnd, int sx, int sy);
-	void setWindow(int x, int y, int sx, int sy, int cutoff);
 	void setArea(int x, int y, int sx, int sy );
 	void setSize(int p1, int p2, int p3, int p4);
 	void setLand(int p1, int p2);
@@ -119,12 +128,12 @@ public:
 	void setOffset(int p1, int p2);
 	int setPattern(int p1, int p2, int p3, int p4, int window_id);
 	int setLink(int p1, int p2);
-	int setParent(int spno, int parent, int option);
+
 	void clear(int spno);
 	void clear(int p1, int p2);
 	void setTransparentMode(int tp);
 	SPOBJ* resetSprite(int spno);
-	int put(int x, int y, int chr, int tpflag=-1);
+	int put(int x, int y, int chr, int tpflag=-1, int zoomx=0x10000, int zoomy=0x10000, int rotz=0);
 	int drawSub(SPOBJ* sp);
 	int draw(int start, int num, int dispflag, int sortflag);
 	int find(int chktype, int spno, int endspno = -1, int step = 0);
@@ -138,7 +147,7 @@ public:
 
 	int setSpriteFlag(int spno, int flag);
 	int setSpritePosChr(int spno, int xx, int yy, int chrno, int option, int pri);
-	int setSpritePos(int spno, int xx, int yy, bool realaxis=false);
+	int setSpritePos(int spno, int xx, int yy, int opt=0);
 	int setSpriteAddPos(int spno, int xx, int yy, bool realaxis = false);
 	int setSpriteAddPosRate(int spno, int xx, int yy, int rate);
 	int setSpriteChr(int spno, int chrno);
@@ -147,6 +156,13 @@ public:
 	int setSpriteAim(int spno, int xx, int yy, int dirrate);
 	int getSpritePos(int* xpos, int* ypos, int spno, int option);
 	int modifySpriteAxis(int spno, int endspno, int type, int x, int y, int option);
+
+	int setSpriteParent(int spno, int parent, int option);
+	int setSpriteFade(int p1, int p2, int p3);
+	int setSpriteEffect(int id, int tpflag, int mulcolor);
+	int setSpriteRotate(int id, int angle, int zoomx, int zoomy, int rate);
+	void setSpritePriority(int id, int pri);
+	void setSpriteCallback(int p1, unsigned short *callback = NULL);
 
 	SPOBJ* getObj(int id);
 	BGMAP* getMap(int id);
@@ -186,8 +202,6 @@ private:
 	BGMAP* mem_map;
 
 	int		main_sx, main_sy;	// default window size
-	int		tpx, tpy;			// for sprite window
-	int		window_sx, window_sy;
 	int		ofsx, ofsy;			// for sprite offset
 	int		ox1, oy1, ox2, oy2;	// valid area
 	int		land_x, land_y;		// common ground axis
@@ -197,6 +211,7 @@ private:
 	int* vpx, *vpy;				// sin,cosテーブル
 
 	int		dotshift;			// 座標シフト値
+	int		dotshift_base;		// 座標シフト値(1.0)
 
 	int		df_bsx, df_bsy, df_colx, df_coly;
 	int		df_colsx, df_colsy, df_tpflag;

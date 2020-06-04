@@ -1733,11 +1733,19 @@ void Bmscr::SetScroll( int xbase, int ybase )
 {
 	//		スクロール基点を設定
 	//
+	int ax, ay, _vx, _vy;
+	_vx = viewx;
+	_vy = viewy;
 	viewx = xbase;
+	if (viewx < 0) viewx = 0;
 	viewy = ybase;
+	if (viewy < 0) viewy = 0;
 
-	if ((sx == 0) || (sy == 0)) return;
-	Update();
+	GetClientSize(&ax, &ay);
+	if ((viewx + ax) > sx) viewx = sx - ax;
+	if ((viewy + ay) > sy) viewy = sy - ay;
+
+	if ((_vx != viewx) || (_vy != viewy)) Update();
 }
 
 

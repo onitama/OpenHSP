@@ -9,5 +9,6 @@
 
 void hsp3typeinit_dw_extcmd( HSP3TYPEINFO *info );
 void hsp3typeinit_dw_extfunc( HSP3TYPEINFO *info );
+void hsp3typeinit_dw_restart( HSP3TYPEINFO *info );
 
 #endif

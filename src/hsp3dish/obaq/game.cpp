@@ -502,8 +502,8 @@ float GAME::moveRockToTarget( ROCK *pR, float x, float y, float angle, float max
 	px = x - pR->center.x;
 	py = y - pR->center.y;
 	gorot = atan2( py, px );
-	px = abs( px );
-	py = abs( py );
+	px = fabs( px );
+	py = fabs( py );
 	org = sqrt( px*px + py*py );
 	dist = px + py;
 

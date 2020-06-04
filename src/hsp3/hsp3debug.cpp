@@ -67,8 +67,9 @@ static char *err_jp[]={
 	"変数型の変換に失敗しました",					// 37
 	"外部DLLの呼び出しに失敗しました",				// 38
 	"外部オブジェクトの呼び出しに失敗しました",		// 39
-	"関数の戻り値が設定されていません。",			// 40
+	"関数の戻り値が設定されていません",				// 40
 	"関数を命令として記述しています。\n(HSP2から関数化された名前を使用している可能性があります)",			// 41
+	"コールバック内で使用できない命令です",			// 42
 	"*"
 };
 
@@ -115,6 +116,7 @@ static char *err[]={
 	"External COM call failed",			// 39
 	"No function result",				// 40
 	"Invalid syntax for function",		// 41
+	"function not allowed in callback",	// 42
 	"*"
 };
 

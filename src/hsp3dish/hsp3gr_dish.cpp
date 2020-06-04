@@ -563,7 +563,7 @@ static int cmdfunc_extcmd( int cmd )
 		ptr = code_getdsi( "" );
 		code_stmpstr(ptr);
 		sw = code_getdi(0);
-		bmscr->Print(ctx->stmp,sw);
+		bmscr->Print(ptr,sw);
 		break;
 		}
 	case 0x10:								// title
@@ -591,12 +591,15 @@ static int cmdfunc_extcmd( int cmd )
 		bmscr->Cls( p1 );
 		break;
 	case 0x14:								// font
-		{
+	{
 		char fontname[256];
 		strncpy( fontname, code_gets(), 255 );
 		p1 = code_getdi( 12 );
 		p2 = code_getdi( 0 );
+		p3 = code_getdi(HSPMES_FONT_EFFSIZE_DEFAULT);
 		bmscr->SetFont( fontname, p1, p2 );
+		bmscr->fonteff_size = p3;
+		ctx->stat = 0;
 		break;
 		}
 	case 0x16:								// objsize
@@ -634,28 +637,14 @@ static int cmdfunc_extcmd( int cmd )
 		p3 = code_getdi( 0 );
 		p4 = code_getdi( 0 );
 		p5 = code_getdi( 0 );
-		if ( p1&1 ) {
-			if (( p1 & 16 ) == 0 ) {
-				if (bmscr->objmax) {
-					bmscr->DrawAllObjects();	// オブジェクトを描画する
-					bmscr->SetDefaultFont();	// フォントを元に戻す
-				}
-			}
-		} else {
-			if ( p1 & 16 ) {
-				if (bmscr->objmax) {
-					bmscr->DrawAllObjects();	// オブジェクトを描画する
-					bmscr->SetDefaultFont();	// フォントを元に戻す
-				}
-				break;
-			}
-		}
+
 		bgtex = GetSysReq( SYSREQ_CLSTEX );
 		if ( bgtex >= 0 ) {
 			src = wnd->GetBmscrSafe( bgtex );
 		} else {
 			src = NULL;
 		}
+		hgio_setback((BMSCR *)src);
 
 #ifdef HSPLINUX
 #ifdef HSPRASPBIAN
@@ -668,8 +657,25 @@ static int cmdfunc_extcmd( int cmd )
 		}
 #endif
 #endif
-		hgio_setback( (BMSCR *)src );
+		if (p1 & 1) {
+			if (bmscr->objmax) {
+				bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_POSTEFF, HSPOBJ_LAYER_CMD_DRAW);
+				bmscr->DrawAllObjects();	// オブジェクトを描画する
+				bmscr->SetDefaultFont();	// フォントを元に戻す
+				bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_MAX, HSPOBJ_LAYER_CMD_DRAW);
+			}
+		}
+
 		ctx->stat = hgio_redraw( (BMSCR *)bmscr, p1 );
+
+		if ((p1 & 1)==0) {
+			if (bmscr->objmax) {
+				bmscr->SetDefaultFont();	// フォントを元に戻す
+				bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_BG, HSPOBJ_LAYER_CMD_DRAW);
+				bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_NORMAL, HSPOBJ_LAYER_CMD_DRAW);
+				bmscr->SetDefaultFont();	// フォントを元に戻す
+			}
+		}
 		break;
 		}
 
@@ -1393,6 +1399,10 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x4e:								// rgbcolor
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
+		if (p2 == 1) {
+			bmscr->Setcolor2(p1);
+			break;
+		}
 		bmscr->Setcolor(p1);
 		break;
 
@@ -1406,6 +1416,17 @@ static int cmdfunc_extcmd( int cmd )
 		dp4 = code_getdd(0.0);
 		p1 = bmscr->Viewcalc_set(p1, dp1, dp2, dp3, dp4);
 		if (p1) throw HSPERR_ILLEGAL_FUNCTION;
+		break;
+		}
+	case 0x50:								// layerobj
+		{
+		unsigned short *sbr;
+		p1 = code_getdi(bmscr->sx);
+		p2 = code_getdi(bmscr->sy);
+		p3 = code_getdi(HSPOBJ_OPTION_LAYER_MIN);
+		sbr = code_getlb2();
+		p4 = code_getdi(0);
+		ctx->stat = bmscr->AddHSPObjectLayer(p1, p2, p3, p4, 0, (void *)sbr);
 		break;
 		}
 
@@ -2864,7 +2885,7 @@ static int cmdfunc_extcmd( int cmd )
 		p3 = code_getdi(0);
 		p4 = code_getdi(0);
 		p5 = code_getdi(0);
-		sprite->setWindow(p1,p2,p3,p4,p5);
+		//sprite->setWindow(p1,p2,p3,p4,p5);
 		break;
 	}
 	case 0x202:								// es_area
@@ -2885,7 +2906,7 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_geti();
 		p2 = code_geti();
 		p3 = code_getdi(100);
-		p4 = code_getdi(0);
+		p4 = code_getdi(0x3ff);
 		sprite->setSize(p1, p2, p3, p4);
 		break;
 	}
@@ -3096,25 +3117,28 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x212:								// es_pos
 	{
 		//		set sprite x,y pos data (type0)
-		//		es_pos spno, x, y
+		//		es_pos spno, x, y, opt
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
+		p4 = code_getdi(0);
 		if (sprite->sprite_enable) {
-			ctx->stat = sprite->setSpritePos(p1, p2, p3);
+			ctx->stat = sprite->setSpritePos(p1, p2, p3, p4);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
-	case 0x213:								// es_posd
+	case 0x213:								// es_setrot
 	{
-		//		set sprite x,y pos data (type0)
-		//		es_posd spno, x, y
+		//		Set Rotate (type0)
+		//		es_setrot spno, angle, zoomx, zoomy, rate%
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
-		p3 = code_getdi(0);
+		p3 = code_getdi(-1);
+		p4 = code_getdi(-1);
+		p5 = code_getdi(100);
 		if (sprite->sprite_enable) {
-			ctx->stat = sprite->setSpritePos(p1, p2, p3, true);
+			ctx->stat = sprite->setSpriteRotate(p1, p2, p3, p4, p5);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
@@ -3133,15 +3157,13 @@ static int cmdfunc_extcmd( int cmd )
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
-	case 0x215:								// es_aposd
+	case 0x215:								// es_setgosub
 	{
-		//		sprite axis add data set (type0)
-		//		es_aposd spno, px, py
+		unsigned short *sbr;
 		p1 = code_getdi(0);
-		p2 = code_getdi(0);
-		p3 = code_getdi(0);
+		sbr = code_getlb2();
 		if (sprite->sprite_enable) {
-			ctx->stat = sprite->setSpriteAddPos(p1, p2, p3, true);
+			sprite->setSpriteCallback(p1, sbr);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
@@ -3209,19 +3231,57 @@ static int cmdfunc_extcmd( int cmd )
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
-	case 0x21b:								// es_blink
+	case 0x21b:								// es_fade
+	{
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setSpriteFade(p1, p2, p3);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
 	case 0x21c:								// es_effect
+	{
+		p1 = code_getdi(0);
+		p2 = code_getdi(0x3ff);
+		p3 = code_getdi(-1);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setSpriteEffect(p1, p2, p3);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
 	case 0x21d:								// es_move
+	{
+		throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
 	case 0x21e:								// es_setpri
+	{
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			sprite->setSpritePriority(p1,p2);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
 	case 0x21f:								// es_put
 	{
 		//		put a character (type0)
-		//		es_put x,y,chr
+		//		es_put x,y,chr, effect, zoomx, zoomy, angle
+		int p7;
 		p1 = code_geti();
 		p2 = code_geti();
 		p3 = code_getdi(0);
+		p4 = code_getdi(-1);
+		p5 = code_getdi(0x10000);
+		p6 = code_getdi(0x10000);
+		p7 = code_getdi(0);
 		if (sprite->sprite_enable) {
-			sprite->put(p1, p2, p3);
+			sprite->put(p1, p2, p3, p4, p5, p6, p7);
 		} else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
@@ -3248,11 +3308,16 @@ static int cmdfunc_extcmd( int cmd )
 	}
 	case 0x223:								// es_dist
 	{
+		PVal* p_pval;
+		APTR p_aptr;
+		int res;
+		p_aptr = code_getva(&p_pval);
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
 		p4 = code_getdi(0);
-		ctx->stat = sprite->utilGetDistance(p1, p2, p3, p4);
+		res = sprite->utilGetDistance(p1, p2, p3, p4);
+		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
 		break;
 	}
 	case 0x224:								// es_opt
@@ -3440,15 +3505,15 @@ static int cmdfunc_extcmd( int cmd )
 		ctx->stat = res;
 		break;
 	}
-	case 0x22b:								// es_parent
+	case 0x22b:								// es_setparent
 	{
 		//		Set Parent (type0)
-		//		es_parent spno, parentid, option
+		//		es_setparent spno, parentid, option
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
 		if (sprite->sprite_enable) {
-			ctx->stat = sprite->setParent(p1, p2, p3);
+			ctx->stat = sprite->setSpriteParent(p1, p2, p3);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
@@ -3640,6 +3705,18 @@ static void *reffunc_function( int *type_res, int arg )
 		}
 		break;
 
+	case 0x001:								// objinfo
+		{
+		int *iptr;
+		int p1, p2;
+		p1 = code_geti();
+		p2 = code_geti();
+		if ((p1 < 0) || (p1 >= bmscr->objmax)) throw HSPERR_ILLEGAL_FUNCTION;
+		iptr = (int *)bmscr->GetHSPObject(p1);
+		if (p2 < 0) throw HSPERR_ILLEGAL_FUNCTION;
+		reffunc_intfunc_ivalue = iptr[p2];
+		break;
+		}
 
 	case 0x002:								// dirinfo
 		p1 = code_geti();
@@ -3744,6 +3821,7 @@ void hsp3typeinit_extcmd( HSP3TYPEINFO *info )
 	type = exinfo->nptype;
 	val = exinfo->npval;
 	wnd = new HspWnd();
+	wnd->SetHSPCTX(ctx);
 	bmscr = wnd->GetBmscr( 0 );
 	SetObjectEventNoticePtr( &ctx->stat );
 
@@ -3802,6 +3880,7 @@ void hsp3excmd_rebuild_window(void)
 {
 	if (wnd) delete wnd;
 	wnd = new HspWnd();
+	wnd->SetHSPCTX(ctx);
 	bmscr = wnd->GetBmscr(0);
 }
 

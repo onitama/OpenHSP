@@ -59,7 +59,7 @@ static DWORD threadid;
 
 DWORD WINAPI vThreadFunc(LPVOID pParam) {
 
-	// ƒXƒgƒŠ[ƒ€ƒXƒŒƒbƒhƒ‹[ƒv
+	// ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚¹ãƒ¬ãƒƒãƒ‰ãƒ«ãƒ¼ãƒ—
 	threadflag = true;
 	hsp3dish_reset();
 	hsp3dish_result = hsp3dish_exec();
@@ -71,38 +71,38 @@ DWORD WINAPI vThreadFunc(LPVOID pParam) {
 
 static int StartThread(void)
 {
-	// ƒXƒŒƒbƒh‚ğŠJn‚·‚é
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’é–‹å§‹ã™ã‚‹
 	threadflag = false;
 
-	// ƒCƒxƒ“ƒgƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é
+	// ã‚¤ãƒ™ãƒ³ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
 	hevent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	// ƒXƒŒƒbƒh‚ğ¶¬‚·‚é
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’ç”Ÿæˆã™ã‚‹
 	hthread = CreateThread(NULL, 0x40000, (LPTHREAD_START_ROUTINE)vThreadFunc, (LPVOID)NULL, 0, &threadid);
 	if (hthread == NULL) {
 		return -1;
 	}
-	// ƒXƒŒƒbƒh‚Ì—Dæ‡ˆÊ‚ğ•ÏX‚·‚é
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ã®å„ªå…ˆé †ä½ã‚’å¤‰æ›´ã™ã‚‹
 	SetThreadPriority(hthread, THREAD_PRIORITY_TIME_CRITICAL);
 	return 0;
 }
 
 static int StopThread(void)
 {
-	// ƒXƒŒƒbƒh‚ğ’â~‚·‚é
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’åœæ­¢ã™ã‚‹
 	if (threadflag == FALSE) return -1;
 
-	// ƒCƒxƒ“ƒgƒIƒuƒWƒFƒNƒg”jŠü
+	// ã‚¤ãƒ™ãƒ³ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç ´æ£„
 	threadflag = FALSE;
 	SetEvent(hevent);
 	CloseHandle(hevent);
 	hevent = NULL;
-	// ƒXƒŒƒbƒh’â~‚ğ‘Ò‚Â
+	// ã‚¹ãƒ¬ãƒƒãƒ‰åœæ­¢ã‚’å¾…ã¤
 	DWORD	dActive = 0;
 	GetExitCodeThread(hthread, &dActive);
 	if (dActive == STILL_ACTIVE) {
 		WaitForSingleObject(hthread, INFINITE);
 	}
-	// ƒXƒŒƒbƒh”jŠü
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ç ´æ£„
 	CloseHandle(hthread);
 
 	hthread = NULL;
@@ -133,12 +133,12 @@ int WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 
 EXPORT BOOL WINAPI hsp3dll_init(int p1, int p2, int p3, int p4)
 {
-	//		HSP‰Šú‰»
-	//		p1: bit0=window”ñ•\¦
-	//			bit1=ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ•ÏX‹Ö~
+	//		HSPåˆæœŸåŒ–
+	//		p1: bit0=windowéè¡¨ç¤º
+	//			bit1=ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªå¤‰æ›´ç¦æ­¢
 	//		p2: X size
 	//		p3: Y size
-	//		p4: ewindow handle
+	//		p4: è¦ªwindow handle
 	//
 	int i;
 	HWND parent = (HWND)p4;
@@ -152,7 +152,7 @@ EXPORT BOOL WINAPI hsp3dll_init(int p1, int p2, int p3, int p4)
 
 EXPORT BOOL WINAPI hsp3dll_exec(int p1, int p2, int p3, void *p4)
 {
-	//		HSP‚Ìƒpƒ‰ƒ[ƒ^[İ’è/æ“¾
+	//		HSPã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼è¨­å®š/å–å¾—
 	//		p1 : 0     = default X,Y (p2,p3)
 	//		     1     = seed1,seed2 (p2,p3)
 	//		     0x100 = HSPCTX (->p4)
@@ -171,7 +171,7 @@ EXPORT BOOL WINAPI hsp3dll_exec(int p1, int p2, int p3, void *p4)
 
 EXPORT BOOL WINAPI hsp3dll_quit(int p1, int p2, int p3, int p4)
 {
-	//		HSPI—¹ˆ—
+	//		HSPçµ‚äº†å‡¦ç†
 	//
 	hsp3dish_quit = 1;
 	return 0;

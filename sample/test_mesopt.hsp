@@ -1,0 +1,25 @@
+	#include "hsp3dish.as"
+
+	buf="aaa\nbbb\nccc\n"
+
+	cls 2
+	font msgothic,40,1,4
+
+*main
+	redraw 0
+	rgbcolor $a0a0a0:boxf
+
+	rgbcolor -1
+	objcolor 0,0,0
+
+	pos 0,0
+	mes buf,1+2
+	objcolor 0,0,160
+	mes buf,1+4
+	color 255,200,64
+	mes buf
+
+	redraw 1
+	await 1000/60
+
+	goto *main

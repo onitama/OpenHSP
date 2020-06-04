@@ -19,6 +19,12 @@
 #include "../token.h"
 #include "../ahtobj.h"
 
+#define USE_HSMANAGER
+#ifdef USE_HSMANAGER
+#include "../hsmanager.h"
+static HspHelpManager hsman;
+#endif
+
 #define DPM_SUPPORT		// DPMファイルマネージャをサポート
 #include "dpm.h"
 
@@ -1390,5 +1396,70 @@ EXPORT BOOL WINAPI aht_getexid( HSPEXINFO *hei, int p1, int p2, int p3 )
 	return 0;
 }
 
+
+//----------------------------------------------------------
+
+#ifdef USE_HSMANAGER
+
+EXPORT BOOL WINAPI hman_init(HSPEXINFO *hei, int p1, int p2, int p3)
+{
+	//
+	//		hman_init "pathname", mode (type$202)
+	//			( mode:未使用 )
+	//
+	char *ep1;
+	int ep2;
+	int res;
+	char path[256];
+
+	ep1 = hei->HspFunc_prm_gets();			// パラメータ1:文字列
+	strncpy(path, ep1, 255);
+	ep2 = hei->HspFunc_prm_getdi(0);		// パラメータ2:数値
+
+	res = hsman.initalize( path );
+	if (res < 0) return -1;
+
+	return 0;
+}
+
+EXPORT BOOL WINAPI hman_search(HSPEXINFO *hei, int p1, int p2, int p3)
+{
+	//
+	//		hman_search "keyword" (type$202)
+	//			( 文字列を指定してヘルプを検索する )
+	//
+	char key[256];
+	char *ep1;
+	int res;
+
+	ep1 = hei->HspFunc_prm_gets();			// パラメータ1:文字列
+	strncpy(key, ep1, 255);
+
+	res = hsman.searchIndex(key);
+	if (res < 0) return -1;
+
+	return 0;
+}
+
+EXPORT BOOL WINAPI hman_getresult(HSPEXINFO *hei, int p1, int p2, int p3)
+{
+	//
+	//		hman_getresult var,option (type$202)
+	//			( varに結果文字列を代入する )
+	//
+	PVal *pv;
+	APTR ap;
+	char *res;
+	int ep1;
+
+	ap = hei->HspFunc_prm_getva(&pv);		// パラメータ1:変数
+	ep1 = hei->HspFunc_prm_getdi(0);		// パラメータ2:数値
+	res = hsman.getMessage();
+	hei->HspFunc_prm_setva(pv, ap, TYPE_STRING, res);	// 変数に値を代入
+
+	return 0;
+}
+
+#endif
 
 //----------------------------------------------------------

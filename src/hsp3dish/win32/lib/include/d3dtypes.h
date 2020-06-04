@@ -54,22 +54,22 @@ typedef LONG D3DFIXED;
 #ifndef RGB_MAKE
 /*
  * Format of CI colors is
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  ++++++++++++++++++++++++++++++++
  *  |    alpha      |         color index           |   fraction    |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  ++++++++++++++++++++++++++++++++
  */
 #define CI_GETALPHA(ci)    ((ci) >> 24)
 #define CI_GETINDEX(ci)    (((ci) >> 8) & 0xffff)
 #define CI_GETFRACTION(ci) ((ci) & 0xff)
-#define CI_ROUNDINDEX(ci)  CI_GETINDEX((ci) + 0x80)
+#define CI_ROUNDINDEX(ci)  CI_GETINDEX((ci)  0x80)
 #define CI_MASKALPHA(ci)   ((ci) & 0xffffff)
 #define CI_MAKE(a, i, f)    (((a) << 24) | ((i) << 8) | (f))
 
 /*
  * Format of RGBA colors is
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  ++++++++++++++++++++++++++++++++
  *  |    alpha      |      red      |     green     |     blue      |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  ++++++++++++++++++++++++++++++++
  */
 #define RGBA_GETALPHA(rgb)      ((rgb) >> 24)
 #define RGBA_GETRED(rgb)        (((rgb) >> 16) & 0xff)
@@ -89,9 +89,9 @@ typedef LONG D3DFIXED;
 
 /*
  * Format of RGB colors is
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  ++++++++++++++++++++++++++++++++
  *  |    ignored    |      red      |     green     |     blue      |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  ++++++++++++++++++++++++++++++++
  */
 #define RGB_GETRED(rgb)         (((rgb) >> 16) & 0xff)
 #define RGB_GETGREEN(rgb)       (((rgb) >> 8) & 0xff)
@@ -237,7 +237,7 @@ public:
     // Assignment operators
     // =====================================
 
-    _D3DVECTOR& operator += (const _D3DVECTOR& v);
+    _D3DVECTOR& operator = (const _D3DVECTOR& v);
     _D3DVECTOR& operator -= (const _D3DVECTOR& v);
     _D3DVECTOR& operator *= (const _D3DVECTOR& v);
     _D3DVECTOR& operator /= (const _D3DVECTOR& v);
@@ -248,7 +248,7 @@ public:
     // Unary operators
     // =====================================
 
-    friend _D3DVECTOR operator + (const _D3DVECTOR& v);
+    friend _D3DVECTOR operator  (const _D3DVECTOR& v);
     friend _D3DVECTOR operator - (const _D3DVECTOR& v);
 
 
@@ -257,7 +257,7 @@ public:
     // =====================================
 
     // Addition and subtraction
-        friend _D3DVECTOR operator + (const _D3DVECTOR& v1, const _D3DVECTOR& v2);
+        friend _D3DVECTOR operator  (const _D3DVECTOR& v1, const _D3DVECTOR& v2);
         friend _D3DVECTOR operator - (const _D3DVECTOR& v1, const _D3DVECTOR& v2);
     // Scalar multiplication and division
         friend _D3DVECTOR operator * (const _D3DVECTOR& v, D3DVALUE s);
@@ -1119,7 +1119,7 @@ typedef enum _D3DPRIMITIVETYPE {
 /*
  * A state which sets the override flag for the specified state type.
  */
-#define D3DSTATE_OVERRIDE(type) (D3DRENDERSTATETYPE)(((DWORD) (type) + D3DSTATE_OVERRIDE_BIAS))
+#define D3DSTATE_OVERRIDE(type) (D3DRENDERSTATETYPE)(((DWORD) (type)  D3DSTATE_OVERRIDE_BIAS))
 
 #if(DIRECT3D_VERSION < 0x0800)
 
@@ -1528,7 +1528,7 @@ typedef enum _D3DMATERIALCOLORSOURCE
 
 #endif //(DIRECT3D_VERSION < 0x0800)
 
-#define D3DRENDERSTATE_STIPPLEPATTERN(y) (D3DRENDERSTATE_STIPPLEPATTERN00 + (y))
+#define D3DRENDERSTATE_STIPPLEPATTERN(y) (D3DRENDERSTATE_STIPPLEPATTERN00  (y))
 
 typedef struct _D3DSTATE {
     union {
@@ -1656,33 +1656,33 @@ typedef enum _D3DTEXTUREOP
     D3DTOP_ADDSIGNED2X  =  9,   // as above but left  1 bit
     D3DTOP_SUBTRACT     = 10,   // Arg1 - Arg2, with no saturation
     D3DTOP_ADDSMOOTH    = 11,   // add 2 args, subtract product
-                                // Arg1 + Arg2 - Arg1*Arg2
-                                // = Arg1 + (1-Arg1)*Arg2
+                                // Arg1  Arg2 - Arg1*Arg2
+                                // = Arg1  (1-Arg1)*Arg2
 
-// Linear alpha blend: Arg1*(Alpha) + Arg2*(1-Alpha)
+// Linear alpha blend: Arg1*(Alpha)  Arg2*(1-Alpha)
     D3DTOP_BLENDDIFFUSEALPHA    = 12, // iterated alpha
     D3DTOP_BLENDTEXTUREALPHA    = 13, // texture alpha
     D3DTOP_BLENDFACTORALPHA     = 14, // alpha from D3DRENDERSTATE_TEXTUREFACTOR
-    // Linear alpha blend with pre-multiplied arg1 input: Arg1 + Arg2*(1-Alpha)
+    // Linear alpha blend with pre-multiplied arg1 input: Arg1  Arg2*(1-Alpha)
     D3DTOP_BLENDTEXTUREALPHAPM  = 15, // texture alpha
     D3DTOP_BLENDCURRENTALPHA    = 16, // by alpha of current color
 
 // Specular mapping
     D3DTOP_PREMODULATE            = 17,     // modulate with next texture before use
-    D3DTOP_MODULATEALPHA_ADDCOLOR = 18,     // Arg1.RGB + Arg1.A*Arg2.RGB
+    D3DTOP_MODULATEALPHA_ADDCOLOR = 18,     // Arg1.RGB  Arg1.A*Arg2.RGB
                                             // COLOROP only
-    D3DTOP_MODULATECOLOR_ADDALPHA = 19,     // Arg1.RGB*Arg2.RGB + Arg1.A
+    D3DTOP_MODULATECOLOR_ADDALPHA = 19,     // Arg1.RGB*Arg2.RGB  Arg1.A
                                             // COLOROP only
-    D3DTOP_MODULATEINVALPHA_ADDCOLOR = 20,  // (1-Arg1.A)*Arg2.RGB + Arg1.RGB
+    D3DTOP_MODULATEINVALPHA_ADDCOLOR = 20,  // (1-Arg1.A)*Arg2.RGB  Arg1.RGB
                                             // COLOROP only
-    D3DTOP_MODULATEINVCOLOR_ADDALPHA = 21,  // (1-Arg1.RGB)*Arg2.RGB + Arg1.A
+    D3DTOP_MODULATEINVCOLOR_ADDALPHA = 21,  // (1-Arg1.RGB)*Arg2.RGB  Arg1.A
                                             // COLOROP only
 
 // Bump mapping
     D3DTOP_BUMPENVMAP           = 22, // per pixel env map perturbation
     D3DTOP_BUMPENVMAPLUMINANCE  = 23, // with luminance channel
     // This can do either diffuse or specular bump mapping with correct input.
-    // Performs the function (Arg1.R*Arg2.R + Arg1.G*Arg2.G + Arg1.B*Arg2.B)
+    // Performs the function (Arg1.R*Arg2.R  Arg1.G*Arg2.G  Arg1.B*Arg2.B)
     // where each component has been scaled and offset to make it signed.
     // The result is replicated into all four (including alpha) channels.
     // This is a valid COLOROP only.
@@ -2090,10 +2090,10 @@ typedef enum _D3DTEXTURETRANSFORMFLAGS {
 #define D3DFVF_TEXTUREFORMAT3 1         // Three floating point values
 #define D3DFVF_TEXTUREFORMAT4 2         // Four floating point values
 
-#define D3DFVF_TEXCOORDSIZE3(CoordIndex) (D3DFVF_TEXTUREFORMAT3 << (CoordIndex*2 + 16))
+#define D3DFVF_TEXCOORDSIZE3(CoordIndex) (D3DFVF_TEXTUREFORMAT3 << (CoordIndex*2  16))
 #define D3DFVF_TEXCOORDSIZE2(CoordIndex) (D3DFVF_TEXTUREFORMAT2)
-#define D3DFVF_TEXCOORDSIZE4(CoordIndex) (D3DFVF_TEXTUREFORMAT4 << (CoordIndex*2 + 16))
-#define D3DFVF_TEXCOORDSIZE1(CoordIndex) (D3DFVF_TEXTUREFORMAT1 << (CoordIndex*2 + 16))
+#define D3DFVF_TEXCOORDSIZE4(CoordIndex) (D3DFVF_TEXTUREFORMAT4 << (CoordIndex*2  16))
+#define D3DFVF_TEXCOORDSIZE1(CoordIndex) (D3DFVF_TEXTUREFORMAT1 << (CoordIndex*2  16))
 
 
 #endif /* DIRECT3D_VERSION >= 0x0700 */

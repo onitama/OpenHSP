@@ -398,7 +398,9 @@ static void OmkeDraw( int mode )
 					break;
 				}
 			}
-			if ( mode == 0 ) OmkeDrawDebug( pR );
+			if (mode == 0) {
+				OmkeDrawDebug(pR);
+			}
 		}
 	}
 
@@ -1401,8 +1403,16 @@ void hsp3typeinit_dw_extcmd( HSP3TYPEINFO *info )
 
 }
 
-void hsp3typeinit_dw_extfunc( HSP3TYPEINFO *info )
+void hsp3typeinit_dw_extfunc(HSP3TYPEINFO *info)
 {
+}
+
+
+void hsp3typeinit_dw_restart(HSP3TYPEINFO *info)
+{
+	OmkeTerm();
+	OmkeInit();
+	OmkeDrawSetBMSCR((BMSCR *)exinfo->HspFunc_getbmscr(0));
 }
 
 

@@ -120,13 +120,13 @@
 #const global GPCNVAXIS_WORLDVIEW (2)
 #const global GPCNVAXIS_WORLD (3)
 
-#define global vptype_off (0)
-#define global vptype_translate (1)
-#define global vptype_rotate (2)
-#define global vptype_scale (3)
-#define global vptype_3dmatrix (4)
-#define global vptype_2d (5)
-#define global vptype_3d (6)
+#const global vptype_off (0)
+#const global vptype_translate (1)
+#const global vptype_rotate (2)
+#const global vptype_scale (3)
+#const global vptype_3dmatrix (4)
+#const global vptype_2d (5)
+#const global vptype_3d (6)
 
 ;
 ;	system request
@@ -185,6 +185,10 @@
 #enum global SYSREQ_LOGWRITE
 #enum global SYSREQ_FIXEDFRAME
 
+#enum global SYSREQ_DRAWNUMOBJ
+#enum global SYSREQ_DRAWNUMPOLY
+#enum global SYSREQ_USEGPBFONT
+
 #const global PLATFORM_WINDOWS 0
 #const global PLATFORM_IOS 1
 #const global PLATFORM_ANDROID 2
@@ -207,10 +211,10 @@
 #enum global HTTPMODE_DATAEND
 #define global HTTPMODE_ERROR (-1)
 
-#define global HTTPINFO_MODE 0		; ÁèæÂú®„ÅÆ„É¢„Éº„Éâ
-#define global HTTPINFO_SIZE 1		; „Éá„Éº„Çø„Çµ„Ç§„Ç∫
-#define global HTTPINFO_DATA 16		; ÂèñÂæó„Éá„Éº„Çø
-#define global HTTPINFO_ERROR 17	; „Ç®„É©„ÉºÊñáÂ≠óÂàó
+#define global HTTPINFO_MODE 0		; åªç›ÇÃÉÇÅ[Éh
+#define global HTTPINFO_SIZE 1		; ÉfÅ[É^ÉTÉCÉY
+#define global HTTPINFO_DATA 16		; éÊìæÉfÅ[É^
+#define global HTTPINFO_ERROR 17	; ÉGÉâÅ[ï∂éöóÒ
 
 #regcmd 9
 
@@ -256,6 +260,7 @@
 #cmd getcolor $85
 #cmd getwork $86
 #cmd getwork2 $87
+#cmd getang $89
 
 #cmd getposi $90
 #cmd getquati $91
@@ -364,6 +369,7 @@
 #cmd objaim $10c
 #cmd gpscrmat $10d
 #cmd setobjrender $10e
+#cmd getangr $10f
 
 #cmd event_pos $110
 #cmd event_quat $111
@@ -374,7 +380,7 @@
 #cmd event_work $116
 #cmd event_work2 $117
 #cmd event_axang $118
-#cmd event_angx $119
+#cmd event_ang $119
 #cmd event_angy $11a
 #cmd event_angz $11b
 #cmd event_angr $11c
@@ -388,7 +394,7 @@
 #cmd event_addwork $126
 #cmd event_addwork2 $127
 #cmd event_addaxang $128
-#cmd event_addangx $129
+#cmd event_addang $129
 #cmd event_addangy $12a
 #cmd event_addangz $12b
 #cmd event_addangr $12c
@@ -402,7 +408,7 @@
 #cmd event_setwork $136
 #cmd event_setwork2 $137
 #cmd event_setaxang $138
-#cmd event_setangx $139
+#cmd event_setang $139
 #cmd event_setangy $13a
 #cmd event_setangz $13b
 #cmd event_setangr $13c
@@ -413,7 +419,7 @@
 #cmd event_wdir $143
 #cmd event_wefx $144
 #cmd event_wcolor $145
-#cmd event_wangx $149
+#cmd event_wang $149
 #cmd event_wangy $14a
 #cmd event_wangz $14b
 #cmd event_wangr $14c
@@ -423,6 +429,113 @@
 #define fcos(%1,%2) %1=cos(%2)
 #define fsqr(%1,%2) %1=sqrt(%2)
 #define froti(%1,%2) %1=%2/6433.98175455188992
+
+#endif
+
+;
+;	es sprite header for HSP3Dish
+;
+#ifndef __essprite__
+#define __essprite__
+
+#regcmd 9
+#cmd es_ini $200
+#cmd es_window $201
+#cmd es_area $202
+#cmd es_size $203
+#cmd es_pat $204
+#cmd es_link $205
+#cmd es_clear $206
+#cmd es_new $207
+#cmd es_get $208
+#cmd es_setp $209
+#cmd es_find $20a
+#cmd es_check $20b
+#cmd es_offset $20c
+#cmd es_set $20d
+#cmd es_flag $20e
+#cmd es_chr $20f
+#cmd es_type $210
+#cmd es_kill $211
+#cmd es_pos $212
+#cmd es_setrot $213
+#cmd es_apos $214
+#cmd es_setgosub $215
+#cmd es_adir $216
+#cmd es_aim $217
+#cmd es_draw $218
+#cmd es_gravity $219
+#cmd es_bound $21a
+#cmd es_fade $21b
+#cmd es_effect $21c
+#cmd es_move $21d
+#cmd es_setpri $21e
+#cmd es_put $21f
+#cmd es_ang $220
+#cmd es_sin $221
+#cmd es_cos $222
+#cmd es_dist $223
+#cmd es_opt $224
+#cmd es_exnew $225
+#cmd es_patanim $226
+#cmd es_getpos $227
+#cmd es_bgmap $228
+#cmd es_putbg $229
+#cmd es_bgmes $22a
+#cmd es_setparent $22b
+#cmd es_modaxis $22c
+
+#define global es_fmes mes
+#define global es_bye
+
+#define global ESI_FLAG 0
+#define global ESI_POSX 1
+#define global ESI_POSY_2
+#define global ESI_SPDX 3
+#define global ESI_SPDY 4
+#define global ESI_PRGCOUNT 5
+#define global ESI_ANIMECOUNT 6
+#define global ESI_CHRNO 7
+#define global ESI_TYPE 8
+#define global ESI_ACCELX 9
+#define global ESI_ACCELY 10
+#define global ESI_BOUNCEPOW 11
+#define global ESI_BOUNCEFLAG 12
+#define global ESI_OPTION 13
+#define global ESI_PRIORITY 14
+#define global ESI_ALPHA 15
+#define global ESI_FADEPRM 16
+#define global ESI_ZOOMX 17
+#define global ESI_ZOOMY 18
+#define global ESI_ROTZ 19
+
+#define global ESSPFLAG_NONE (0)
+#define global ESSPFLAG_STATIC (0x100)
+#define global ESSPFLAG_MOVE (0x200)
+#define global ESSPFLAG_GRAVITY (0x400)
+#define global ESSPFLAG_BGLINK (0x800)
+#define global ESSPFLAG_NOWIPE (0x1000)
+#define global ESSPFLAG_XBOUNCE (0x2000)
+#define global ESSPFLAG_YBOUNCE (0x4000)
+#define global ESSPFLAG_BLINK (0x8000)
+#define global ESSPFLAG_NODISP (0x10000)
+
+#define global ESSPPAT_1SHOT (0x1000)
+
+#define global ESSPSET_POS (0)
+#define global ESSPSET_ADDPOS (1)
+#define global ESSPSET_FALL (2)
+#define global ESSPSET_BOUNCE (3)
+#define global ESSPSET_ZOOM (4)
+#define global ESSPSET_DIRECT (0x1000)
+#define global ESSPSET_MASKBIT (0x2000)
+
+#define global ESSPOPT_NONE (0)
+#define global ESSPOPT_EXTDISP (1)
+#define global ESSPOPT_FADEIN (4)
+#define global ESSPOPT_FADEOUT (8)
+#define global ESSPOPT_ADDCOLOR (16)
+#define global ESSPOPT_SUBCOLOR (32)
 
 #endif
 

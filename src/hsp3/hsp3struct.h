@@ -573,6 +573,7 @@ struct HSPCTX
 	int *dsindex;						// DSBuffer index (3.6)
 	int dsindex_size;					// DSBuffer index size (3.6)
 	int language;						// HSPCTX_LANGUAGE_* flag (3.6)
+	int callback_flag;					// Callback flag (3.6)
 };
 
 #define HSPCTX_REFSTR_MAX 4096

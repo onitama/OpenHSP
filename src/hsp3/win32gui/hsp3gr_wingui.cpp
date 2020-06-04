@@ -912,8 +912,15 @@ static int cmdfunc_extcmd( int cmd )
 		p3 = code_getdi( 0 );
 		p4 = code_getdi( 0 );
 		p5 = code_getdi( 0 );
-		if (p1==0) p1=2;
-		if (p1<2) {
+		if (p1 == 0) {
+			bmscr->fl_udraw = 0;
+			bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_BG, HSPOBJ_LAYER_CMD_DRAW);
+			bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_NORMAL, HSPOBJ_LAYER_CMD_DRAW);
+			break;
+		}
+		if (p1==1) {
+			bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_POSTEFF, HSPOBJ_LAYER_CMD_DRAW);
+			bmscr->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_MAX, HSPOBJ_LAYER_CMD_DRAW);
 			bmscr->fl_udraw=1;
 			if ((p4==0)||(p5==0)) bmscr->Update();
 			else {
@@ -1540,7 +1547,17 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 	case 0x4f:								// viewcalc
 		break;
-
+	case 0x50:								// layerobj
+	{
+		unsigned short *sbr;
+		p1 = code_getdi(bmscr->sx);
+		p2 = code_getdi(bmscr->sy);
+		p3 = code_getdi(HSPOBJ_OPTION_LAYER_MIN);
+		sbr = code_getlb2();
+		p4 = code_getdi(0);
+		ctx->stat = bmscr->AddHSPObjectLayer(p1, p2, p3, p4, 0, (void *)sbr);
+		break;
+	}
 
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
@@ -1667,6 +1684,7 @@ static void *reffunc_function( int *type_res, int arg )
 		p2 = code_geti();
 		if (( p1 < 0 )||( p1 >= bmscr->objmax )) throw HSPERR_ILLEGAL_FUNCTION;
 		iptr = (int *)bmscr->GetHSPObject( p1 );
+		if (p2 < 0) throw HSPERR_ILLEGAL_FUNCTION;
 		reffunc_intfunc_ivalue = iptr[p2];
 		break;
 		}
@@ -1867,6 +1885,7 @@ void hsp3typeinit_extcmd( HSP3TYPEINFO *info, int sx, int sy, int wd, int xx, in
 
 	mmman = new MMMan;
 	wnd = new HspWnd( hInstance, cname );
+	wnd->hspctx = ctx;
 
 	flag = wd & 0x100;								// スクリーンセーバープレビューフラグ
 	if ( flag ) wnd->SetParentWindow( ctx->wnd_parent );

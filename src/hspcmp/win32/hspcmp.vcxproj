@@ -91,6 +91,7 @@
     <ClCompile Include="..\comutil.cpp" />
     <ClCompile Include="..\errormsg.cpp" />
     <ClCompile Include="..\hsc3.cpp" />
+    <ClCompile Include="..\hsmanager.cpp" />
     <ClCompile Include="..\hspcmd.cpp" />
     <ClCompile Include="..\label.cpp" />
     <ClCompile Include="..\localinfo.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="..\comutil.h" />
     <ClInclude Include="..\errormsg.h" />
     <ClInclude Include="..\hsc3.h" />
+    <ClInclude Include="..\hsmanager.h" />
     <ClInclude Include="..\hspdll.h" />
     <ClInclude Include="..\label.h" />
     <ClInclude Include="..\localinfo.h" />

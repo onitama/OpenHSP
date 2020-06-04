@@ -508,7 +508,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #endif
 			if (retval != RUNMODE_END) return 0;
 		}
-		code_puterror(HSPERR_NONE);
+		//code_puterror(HSPERR_NONE);
 		PostQuitMessage(0);
 		return (uMessage == WM_QUERYENDSESSION) ? true : false;
 		}
@@ -868,6 +868,9 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			hsp3dish_initwindow(m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle);
 			hsp3excmd_rebuild_window();
 			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+#ifdef USE_OBAQ
+			hsp3typeinit_dw_restart(code_gettypeinfo(TYPE_USERDEF));
+#endif
 
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
 			//hgio_rebuild(hsp_wx, hsp_wy, hsp_fullscr, m_hWnd);
@@ -1116,19 +1119,19 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	hsp3typeinit_extcmd( code_gettypeinfo( TYPE_EXTCMD ) );
 	hsp3typeinit_extfunc( code_gettypeinfo( TYPE_EXTSYSVAR ) );
 
+	//		Initalize DEVINFO
+	HSP3DEVINFO *devinfo;
+	devinfo = hsp3extcmd_getdevinfo();
+	hsp3dish_setdevinfo(devinfo);
+
+	hsp3extcmd_sysvars((int)hInstance, (int)m_hWnd, 0);
+
 #ifdef USE_OBAQ
 	hsp3typeinit_dw_extcmd( code_gettypeinfo( TYPE_USERDEF ) );
 	//hsp3typeinit_dw_extfunc( code_gettypeinfo( TYPE_USERDEF+1 ) );
 #endif
 
 	exinfo = ctx->exinfo2;
-
-	//		Initalize DEVINFO
-	HSP3DEVINFO *devinfo;
-	devinfo = hsp3extcmd_getdevinfo();
-	hsp3dish_setdevinfo( devinfo );
-
-	hsp3extcmd_sysvars((int)hInstance, (int)m_hWnd, 0);
 
 #ifdef HSPDEBUG
 	dbginfo = code_getdbg();
@@ -1137,11 +1140,45 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 }
 
 
+void hsp3dish_error(void)
+{
+	char errmsg[1024];
+	char *msg;
+	char *fname;
+	HSPERROR err;
+	int ln;
+	err = code_geterror();
+	ln = code_getdebug_line();
+	msg = hspd_geterror(err);
+	fname = code_getdebug_name();
+
+	if (ln < 0) {
+		sprintf(errmsg, "#Error %d\n-->%s\n", (int)err, msg);
+		fname = NULL;
+	}
+	else {
+		sprintf(errmsg, "#Error %d in line %d (%s)\n-->%s\n", (int)err, ln, fname, msg);
+	}
+	hsp3dish_debugopen();
+	hsp3dish_dialog(errmsg);
+}
+
+
 static void hsp3dish_bye( void )
 {
-	//		Window関連の解放
+	//		クリーンアップ
 	//
-	hsp3dish_drawoff();
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+		hsp->Dispose();
+#ifdef HSPERR_HANDLE
+	}
+	catch (HSPERROR code) {						// HSPエラー例外処理
+		hsp->hspctx.err = code;
+		hsp3dish_error();
+	}
+#endif
 
 	//		タイマーの開放
 	//
@@ -1156,18 +1193,16 @@ static void hsp3dish_bye( void )
 	if (h_dbgwin != NULL) { FreeLibrary(h_dbgwin); h_dbgwin = NULL; }
 #endif
 
-	//		HSP関連の解放
-	//
-	if ( hsp != NULL ) { delete hsp; hsp = NULL; }
-
-	DllManager().free_all_library();
-
 	if ( m_hWnd != NULL ) {
 		hgio_term();
 		DestroyWindow( m_hWnd );
 		m_hWnd = NULL;
 	}
 
+	//		HSP関連の解放
+	//
+	if (hsp != NULL) { delete hsp; hsp = NULL; }
+	DllManager().free_all_library();
 
 	//		システム関連の解放
 	//
@@ -1175,29 +1210,6 @@ static void hsp3dish_bye( void )
 	OleUninitialize();
 	CoUninitialize();
 #endif
-}
-
-
-void hsp3dish_error( void )
-{
-	char errmsg[1024];
-	char *msg;
-	char *fname;
-	HSPERROR err;
-	int ln;
-	err = code_geterror();
-	ln = code_getdebug_line();
-	msg = hspd_geterror(err);
-	fname = code_getdebug_name();
-
-	if ( ln < 0 ) {
-		sprintf( errmsg, "#Error %d\n-->%s\n",(int)err,msg );
-		fname = NULL;
-	} else {
-		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
-	}
-	hsp3dish_debugopen();
-	hsp3dish_dialog( errmsg );
 }
 
 

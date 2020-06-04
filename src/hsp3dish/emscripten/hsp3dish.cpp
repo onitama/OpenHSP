@@ -100,8 +100,9 @@ static int handleEvent( void ) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch(event.type) {
-		case SDL_FINGERMOTION:
 		case SDL_FINGERDOWN:
+			//Alertf("down: %f,%f  %d\n", event.tfinger.x,event.tfinger.y,event.tfinger.fingerId);
+		case SDL_FINGERMOTION:
 			{
 				//int id;
 				float x,y;
@@ -109,9 +110,9 @@ static int handleEvent( void ) {
 				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
 				x = event.tfinger.x * bm->sx;
 				y = event.tfinger.y * bm->sy;
-				//id = event.tfinger.touchId;
-				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
-				hgio_touch( (int)x, (int)y, 1 );
+				int id = event.tfinger.fingerId;
+				hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
+				//hgio_touch( (int)x, (int)y, 1 );
 				break;
 			}
 		case SDL_FINGERUP:
@@ -122,9 +123,10 @@ static int handleEvent( void ) {
 				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
 				x = event.tfinger.x * bm->sx;
 				y = event.tfinger.y * bm->sy;
-				//id = event.tfinger.touchId;
-				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
-				hgio_touch( (int)x, (int)y, 0 );
+				int id = event.tfinger.fingerId;
+				hgio_mtouchid( id, (int)x, (int)y, 0, 0 );
+				//hgio_touch( (int)x, (int)y, 0 );
+				//Alertf("up  : %f,%f  %d\n", event.tfinger.x,event.tfinger.y,event.tfinger.fingerId);
 				break;
 			}
 
@@ -146,8 +148,10 @@ static int handleEvent( void ) {
 					bm->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
 					bm->savepos[BMSCR_SAVEPOS_MOSUEY] = y;
 					bm->UpdateAllObjects();
-					bm->setMTouchByPointId( -1, x, y, true );
-
+					HSP3MTOUCH *mt = bm->getMTouchByPointId(-1);
+					if (mt) {
+						bm->setMTouchByPointId( -1, x, y, true );
+					}
 					//printf("motion: %d,%d  %d,%d\n", m->x, m->y, m->xrel, m->yrel);
 				}
 				//assert(x == m->x && y == m->y);
@@ -168,6 +172,7 @@ static int handleEvent( void ) {
 				hgio_touch( m->x, m->y, 0 );
 				break;
 			}
+
 		case SDL_KEYDOWN:
 			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX)
 				keys[event.key.keysym.scancode] = true;
@@ -640,11 +645,48 @@ int hsp3dish_init( char *startfile )
 }
 
 
+void hsp3dish_error( void )
+{
+	char errmsg[1024];
+	char *msg;
+	char *fname;
+	HSPERROR err;
+	int ln;
+	err = code_geterror();
+	ln = code_getdebug_line();
+	msg = hspd_geterror(err);
+	fname = code_getdebug_name();
+
+	if ( ln < 0 ) {
+		sprintf( errmsg, "#Error %d --> %s\n",(int)err,msg );
+		fname = NULL;
+	} else {
+		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
+	}
+	hsp3dish_debugopen();
+	hsp3dish_dialog( errmsg );
+}
+
+
 static void hsp3dish_bye( void )
 {
 	//		Window関連の解放
 	//
 	hsp3dish_drawoff();
+
+	//		クリーンアップ
+	//
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+		hsp->Dispose();
+#ifdef HSPERR_HANDLE
+	}
+	catch (HSPERROR code) {						// HSPエラー例外処理
+		hsp->hspctx.err = code;
+		hsp3dish_error();
+	}
+#endif
 
 	//		タイマーの開放
 	//
@@ -671,29 +713,6 @@ static void hsp3dish_bye( void )
 	// 	DestroyWindow( m_hWnd );
 	// 	m_hWnd = NULL;
 	// }
-}
-
-
-void hsp3dish_error( void )
-{
-	char errmsg[1024];
-	char *msg;
-	char *fname;
-	HSPERROR err;
-	int ln;
-	err = code_geterror();
-	ln = code_getdebug_line();
-	msg = hspd_geterror(err);
-	fname = code_getdebug_name();
-
-	if ( ln < 0 ) {
-		sprintf( errmsg, "#Error %d --> %s\n",(int)err,msg );
-		fname = NULL;
-	} else {
-		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
-	}
-	hsp3dish_debugopen();
-	hsp3dish_dialog( errmsg );
 }
 
 

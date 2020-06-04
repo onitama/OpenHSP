@@ -32,6 +32,24 @@
 #define HSPOBJ_TAB_SKIP 3
 #define HSPOBJ_TAB_SELALLTEXT 4
 
+#define HSPOBJ_OPTION_LAYEROBJ 0x8000
+#define HSPOBJ_OPTION_LAYER_MIN 0
+#define HSPOBJ_OPTION_LAYER_BG 1
+#define HSPOBJ_OPTION_LAYER_NORMAL 2
+#define HSPOBJ_OPTION_LAYER_POSTEFF 3
+#define HSPOBJ_OPTION_LAYER_MAX 4
+#define HSPOBJ_OPTION_LAYER_MULTI 0x100
+
+#define HSPOBJ_LAYER_CMD_NONE (0)
+#define HSPOBJ_LAYER_CMD_INIT (1)
+#define HSPOBJ_LAYER_CMD_TERM (2)
+#define HSPOBJ_LAYER_CMD_PRMI (3)
+#define HSPOBJ_LAYER_CMD_PRMS (4)
+#define HSPOBJ_LAYER_CMD_PRMD (5)
+#define HSPOBJ_LAYER_CMD_DRAW (6)
+#define HSPOBJ_LAYER_CMD_TIME (7)
+
+
 typedef struct HSP3VARSET
 {
 	//	HSP3VARSET structure
@@ -77,6 +95,7 @@ typedef struct HSPOBJINFO
 	COLORREF color_back;
 	COLORREF color_text;
 	int		exinfo1,exinfo2;
+	HSPCTX *hspctx;
 
 } HSPOBJINFO;
 
@@ -160,11 +179,13 @@ public:
 	void SetHSPObjectFont( int id );
 	void SendHSPObjectNotice( int wparam );
 	void UpdateHSPObject( int id, int type, void *ptr );
+	void SendHSPLayerObjectNotice(int layer, int cmd);
 
 	int AddHSPObjectButton( char *name, int eventid, void *callptr );
 	int AddHSPObjectCheckBox( char *name, PVal *pval, APTR aptr );
 	int AddHSPObjectInput( PVal *pval, APTR aptr, int sizex, int sizey, char *defval, int limit, int mode );
 	int AddHSPObjectMultiBox( PVal *pval, APTR aptr, int psize, char *defval, int mode );
+	int AddHSPObjectLayer(int sizex, int sizey, int layer, int val, int mode, void *callptr);
 	void SetButtonImage( int id, int bufid, int x1, int y1, int x2, int y2, int x3, int y3 );
 	void DrawHSPCustomButton( HSPOBJINFO *obj, HDC drawhdc, int flag );
 	void SetHSPObjectColor( HSPOBJINFO *obj );
@@ -301,6 +322,7 @@ public:
 	int mwfx,mwfy;
 	int mouse_x, mouse_y;
 	int sys_iprm, sys_wprm, sys_lprm;
+	HSPCTX *hspctx;				// HSP context
 
 private:
 	void Reset( HANDLE instance, char *wndcls );

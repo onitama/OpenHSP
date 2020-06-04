@@ -1925,7 +1925,22 @@ void hgio_touch( int xx, int yy, int button )
         mainbm->tapstat = button!=0;
         bm = (Bmscr *)mainbm;
         bm->UpdateAllObjects();
-        bm->setMTouchByPointId( 0, mouse_x, mouse_y, button!=0 );
+		HSP3MTOUCH *mt;
+		bool notice = false;
+		if (button!=0) {
+			mt = bm->getMTouchByPointId(-1);
+			if (mt==NULL) {
+				mt = bm->getMTouch(0);
+				if (mt->flag == 0) notice=true;
+			} else {
+				notice=true;
+			}
+		} else {
+			notice=true;
+		}
+		if (notice) {
+	        bm->setMTouchByPointId( -1, mouse_x, mouse_y, button!=0 );
+		}
     }
 }
 

@@ -109,14 +109,7 @@ Texture* Texture::create(const char* path, bool generateMipmaps, bool cubemap)
         switch (strlen(ext))
         {
         case 4:
-            if (tolower(ext[1]) == 'p' && tolower(ext[2]) == 'n' && tolower(ext[3]) == 'g')
-            {
-                Image* image = Image::create(path);
-                if (image)
-                    texture = create(image, generateMipmaps,cubemap);
-                SAFE_RELEASE(image);
-            }
-            else if (tolower(ext[1]) == 'p' && tolower(ext[2]) == 'v' && tolower(ext[3]) == 'r')
+            if (tolower(ext[1]) == 'p' && tolower(ext[2]) == 'v' && tolower(ext[3]) == 'r')
             {
                 // PowerVR Compressed Texture RGBA.
                 texture = createCompressedPVRTC(path);
@@ -125,7 +118,13 @@ Texture* Texture::create(const char* path, bool generateMipmaps, bool cubemap)
             {
                 // DDS file format (DXT/S3TC) compressed textures
                 texture = createCompressedDDS(path);
-            }
+			}
+			else {
+				Image* image = Image::create(path);
+				if (image)
+					texture = create(image, generateMipmaps, cubemap);
+				SAFE_RELEASE(image);
+			}
             break;
         }
     }

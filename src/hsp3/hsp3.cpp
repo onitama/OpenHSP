@@ -65,9 +65,14 @@ void Hsp3::SetFileName( char *name )
 
 void Hsp3::Dispose( void )
 {
+	//		クリーンアップ
+	//
+	if (hspctx.mem_mcs == NULL) return;
+	
+	code_cleanup();
+
 	//		axを破棄
 	//
-	if ( hspctx.mem_mcs == NULL ) return;
 	if ( hspctx.mem_var != NULL ) {
 		int i;
 		for(i=0;i<maxvar;i++) {

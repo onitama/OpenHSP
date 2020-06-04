@@ -35,6 +35,23 @@
 #define HSPOBJ_TAB_SKIP 3
 #define HSPOBJ_TAB_SELALLTEXT 4
 
+#define HSPOBJ_OPTION_LAYEROBJ 0x8000
+#define HSPOBJ_OPTION_LAYER_MIN 0
+#define HSPOBJ_OPTION_LAYER_BG 1
+#define HSPOBJ_OPTION_LAYER_NORMAL 2
+#define HSPOBJ_OPTION_LAYER_POSTEFF 3
+#define HSPOBJ_OPTION_LAYER_MAX 4
+#define HSPOBJ_OPTION_LAYER_MULTI 0x100
+
+#define HSPOBJ_LAYER_CMD_NONE (0)
+#define HSPOBJ_LAYER_CMD_INIT (1)
+#define HSPOBJ_LAYER_CMD_TERM (2)
+#define HSPOBJ_LAYER_CMD_PRMI (3)
+#define HSPOBJ_LAYER_CMD_PRMS (4)
+#define HSPOBJ_LAYER_CMD_PRMD (5)
+#define HSPOBJ_LAYER_CMD_DRAW (6)
+#define HSPOBJ_LAYER_CMD_TIME (7)
+
 #define HSPOBJ_NOTICE_KEY_CTRLADD (0x2000)
 #define HSPOBJ_NOTICE_KEY_SHIFTADD (0x1000)
 
@@ -83,6 +100,13 @@
 #define TEXMES_MODE_NONE (0)
 #define TEXMES_MODE_CENTERX (1)
 #define TEXMES_MODE_CENTERY (2)
+
+#define HSPMES_FONT_EFFSIZE_DEFAULT (1)
+#define HSPMES_NOCR (1)
+#define HSPMES_SHADOW (2)
+#define HSPMES_OUTLINE (4)
+#define HSPMES_GMODE (16)
+
 
 class texmesPos
 {
@@ -221,9 +245,11 @@ typedef struct HSPOBJINFO
 	int fontcolor;		// テキスト色
 	int backcolor;		// 背景色
 	std::string *fontname;	// font name
+	int exinfo1, exinfo2;	// extra info
 
 	Hsp3ObjBase *btnset;	// objectから設定される情報
 	HSP3VARSET *varset;	// objectから設定される情報
+	HSPCTX *hspctx;
 
 	//		callback function
 	void	(*func_draw)( struct HSPOBJINFO * );
@@ -328,7 +354,9 @@ public:
 	void SetFontInternal( char *fontname, int size, int style );
 	void SetDefaultFont( void );
 
-	void Print(char *mes, int sw = 0);
+	void Print(char *mes, int sw);
+	int PrintSub(char *mes);
+
 	void Print(texmesPos *tpos);
 	void Boxfill(int x1, int y1, int x2, int y2, int mode=0);
 	void Circle( int x1,int y1,int x2,int y2, int mode );
@@ -371,11 +399,13 @@ public:
 	void SetHSPObjectFont(int id);
 	void SendHSPObjectNotice(int wparam);
 	void UpdateHSPObject(int id, int type, void *ptr);
+	void SendHSPLayerObjectNotice(int layer, int cmd);
 
 	int AddHSPObjectButton( char *name, int eventid, void *callptr );
 	int AddHSPObjectCheckBox(char *name, PVal *pval, APTR aptr);
 	int AddHSPObjectInput(PVal *pval, APTR aptr, int sizex, int sizey, char *defval, int limit, int mode);
 	int AddHSPObjectMultiBox(PVal *pval, APTR aptr, int psize, char *defval, int mode);
+	int AddHSPObjectLayer(int sizex, int sizey, int layer, int val, int mode, void *callptr);
 
 	void setMTouch( HSP3MTOUCH *mt, int x, int y, bool touch );
 	void setMTouchByPoint( int old_x, int old_y, int x, int y, bool touch );
@@ -487,6 +517,7 @@ public:
 	HSPREAL	accel_value[BMSCR_SAVEPOS_MAX];		// Accelerometer sensor value
 
 	int		objcolor;					// object color code
+	int		fonteff_size;				// effect size for font
 
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_viewtrans[4];			// View Translate X,Y,Z,W
@@ -524,6 +555,8 @@ public:
 	HspWnd( void );
 	~HspWnd( void );
 	void Resume( void );
+	void SetHSPCTX(HSPCTX *ctx) { hspctx = ctx; };
+	HSPCTX *GetHSPCTX(void) { return hspctx; };
 
 	void SetMasterSize( int m_sx, int m_sy );
 	void SetMasterInstance( void *m_inst );
@@ -559,6 +592,7 @@ private:
 
 	//	Info for HSP3Dish Device
 	HSP3DEVINFO devinfo;
+	HSPCTX *hspctx;				// HSP context
 };
 
 
@@ -664,6 +698,7 @@ typedef struct BMSCR
 	HSPREAL	accel_value[BMSCR_SAVEPOS_MAX];		// Accelerometer sensor value
 
 	int		objcolor;					// object color code
+	int		fonteff_size;				// effect size for font
 
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_viewtrans[4];			// View Translate X,Y,Z,W
