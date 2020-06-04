@@ -596,8 +596,9 @@ int Bmscr::PrintSub( char *mes )
 		else {
 			p++; spcur++;
 		}
-#endif
+#else
 		p++; spcur++;
+#endif
 	}
 
 	if (spcur > 0) {

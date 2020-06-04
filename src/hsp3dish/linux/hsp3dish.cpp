@@ -950,8 +950,10 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			if ( hsp3dish_init_sub(hsp_wx,hsp_wy,0) ) {
 				return;
 			}
+#ifdef USE_OBAQ
 			HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF );
 			hsp3typeinit_dw_restart( tinfo );
+#endif
 			hspctx->runmode = RUNMODE_RUN;
 			break;
 		}
