@@ -85,6 +85,7 @@
 	devcontrol "spiclose",_p1
 	return
 
+#global
 #endif
 
 
