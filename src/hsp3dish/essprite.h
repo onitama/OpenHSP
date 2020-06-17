@@ -35,7 +35,16 @@ extern "C" {
 #define ESSPOPT_ADDCOLOR (16)
 #define ESSPOPT_SUBCOLOR (32)
 
+#define ESDRAW_NORMAL (0)
+#define ESDRAW_NOMOVE (1)
+#define ESDRAW_NOANIM (2)
+#define ESDRAW_NOCALLBACK (4)
+#define ESDRAW_NODISP (8)
+#define ESDRAW_NOSORT (16)
+
 #define ESSPLINK_BGMAP (0x10000)
+
+#define ESMAP_OPT_IGNORE0 (1)
 
 //
 //	sprite move flag (fl) condition :
@@ -134,8 +143,9 @@ public:
 	void setTransparentMode(int tp);
 	SPOBJ* resetSprite(int spno);
 	int put(int x, int y, int chr, int tpflag=-1, int zoomx=0x10000, int zoomy=0x10000, int rotz=0);
-	int drawSub(SPOBJ* sp);
-	int draw(int start, int num, int dispflag, int sortflag);
+	int drawSubMove(SPOBJ* sp, int mode);
+	int drawSubPut(SPOBJ* sp, int mode);
+	int draw(int start, int num, int mode, int start_pri, int end_pri);
 	int find(int chktype, int spno, int endspno = -1, int step = 0);
 	int checkCollisionSub(SPOBJ *sp);
 	int checkCollision(int spno, int chktype);
@@ -222,6 +232,12 @@ private:
 	int		colx, coly, colex, coley;
 	int		fade_mode, fade_upd, fade_val, fade_tar;
 };
+
+//	sprite pack info ( for sort )
+typedef struct {
+	int ikey;
+	int info;
+} SPRDATA;
 
 
 /*---------------------------------------------------------------------------*/

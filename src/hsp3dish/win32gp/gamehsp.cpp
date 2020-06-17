@@ -1709,20 +1709,20 @@ int gamehsp::makeFloorNode( float xsize, float ysize, int color, int matid )
 	//Mesh* floorMesh = createFloorMesh( xsize, ysize );
 
 	Material *material;
-	if ( matid < 0 ) {
+	if (matid < 0) {
 		int matopt = 0;
-		if ( _curlight < 0 ) matopt |= GPOBJ_MATOPT_NOLIGHT;
-		material = makeMaterialColor( color, matopt );
+		if (_curlight < 0) matopt |= GPOBJ_MATOPT_NOLIGHT;
+		material = makeMaterialColor(color, matopt);
 		makeNewModel(obj, floorMesh, material);
 	}
 	else {
-		material = getMaterial( matid );
-		if (material == NULL) {
-			material = makeMaterialColor(-1, GPOBJ_MATOPT_NOLIGHT);
-			makeNewModel(obj, floorMesh, material);
+		material = getMaterial(matid);
+		if (material) {
+			makeNewModelWithMat(obj, floorMesh, matid);
 		}
 		else {
-			makeNewModelWithMat(obj, floorMesh, matid);
+			material = makeMaterialColor(-1, GPOBJ_MATOPT_NOLIGHT);
+			makeNewModel(obj, floorMesh, material);
 		}
 	}
 

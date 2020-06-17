@@ -127,6 +127,8 @@ static	double  total_tick;
 static	CFAbsoluteTime  lastTime;
 #endif
 
+#define USE_STAR_FIELD
+
 /*------------------------------------------------------------*/
 /*
 		HSP File Service
@@ -171,6 +173,127 @@ void CloseMemFilePtr( void )
 		mfptr_depth--;
 	}
 }
+
+
+/*------------------------------------------------------------*/
+/*
+		Star Field
+*/
+/*------------------------------------------------------------*/
+
+#ifdef USE_STAR_FIELD
+
+#define STAR_RNG_PERIOD     ((1 << 17) - 1)
+#define RGB_MAXIMUM         224
+#define STAR_SX         256
+#define STAR_SY         256
+
+static unsigned char m_stars[STAR_RNG_PERIOD];
+static int m_stars_enabled = 0;
+static int m_stars_count;
+static int m_star_rng_origin;
+static unsigned int m_star_color[64];
+
+static void star_init(void)
+{
+	//	星(StarField)の初期化
+	m_stars_count = 0;
+	m_stars_enabled = 1;
+
+	//	テーブル作成
+	unsigned int shiftreg;
+	int i;
+
+	shiftreg = 0;
+	for (i = 0; i < STAR_RNG_PERIOD; i++)
+	{
+		int enabled = ((shiftreg & 0x1fe01) == 0x1fe00);
+		int color = (~shiftreg & 0x1f8) >> 3;
+		m_stars[i] = color | (enabled << 7);
+		// LFSRによる乱数生成
+		shiftreg = (shiftreg >> 1) | ((((shiftreg >> 12) ^ ~shiftreg) & 1) << 16);
+	}
+
+	unsigned int minval = RGB_MAXIMUM * 130 / 150;
+	unsigned int midval = RGB_MAXIMUM * 130 / 100;
+	unsigned int maxval = RGB_MAXIMUM * 130 / 60;
+
+	unsigned int starmap[4]{
+			0,
+			minval,
+			minval + (255 - minval) * (midval - minval) / (maxval - minval),
+			255 };
+
+	for (i = 0; i < 64; i++)
+	{
+		int bit0, bit1;
+
+		bit0 = (i >> 5) & 1;
+		bit1 = (i >> 4) & 1;
+		int r = starmap[(bit1 << 1) | bit0];
+		bit0 = (i >> 3) & 1;
+		bit1 = (i >> 2) & 1;
+		int g = starmap[(bit1 << 1) | bit0];
+		bit0 = (i >> 1) & 1;
+		bit1 = i & 1;
+		int b = starmap[(bit1 << 1) | bit0];
+		m_star_color[i] = 0xff000000 + (r << 16) + (g << 8) + (b);
+	}
+
+}
+
+static void star_draw_y(unsigned char *dest, int y, int maxx, int offset)
+{
+	//	星(StarField)の描画(1line)
+	int x;
+	int ofs;
+	unsigned int *ptr;
+	unsigned char star;
+
+	ofs = offset %= STAR_RNG_PERIOD;
+	ptr = (unsigned int*)dest;
+
+	/* iterate over the specified number of 6MHz pixels */
+	for (x = 0; x < maxx; x++)
+	{
+		int enable_star = (y ^ (x >> 3)) & 1;
+		star = m_stars[ofs++];
+		if (ofs >= STAR_RNG_PERIOD) ofs = 0;
+		if (enable_star && (star & 0x80) != 0 && (star & 0xff) != 0) {
+			*ptr++ = m_star_color[star & 63];
+		}
+		else {
+			*ptr++ = 0;
+		}
+	}
+
+}
+
+static void star_draw(char *dest, int sx, int sy, int mode)
+{
+	//	星(StarField)の描画
+	if (m_stars_enabled == 0) return;
+
+	int y;
+	unsigned char *ptr = (unsigned char*)dest;
+
+	for (y = 0; y < 224; y++)
+	{
+		int star_offs = (m_star_rng_origin >> 1) + y * 512;
+		star_draw_y(ptr, y, 256, star_offs);
+		ptr += sx;
+	}
+
+	m_star_rng_origin += (mode & 3);
+	if (mode & 4) {
+		if ((m_stars_count & 63) == 63) {
+			m_star_rng_origin = rand() + rand();
+		}
+	}
+	m_stars_count++;
+}
+
+#endif
 
 /*------------------------------------------------------------*/
 /*
@@ -295,6 +418,9 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	cursor_ibeam = LoadCursor(NULL, IDC_IBEAM);
 #endif
 
+#ifdef USE_STAR_FIELD
+	star_init();
+#endif
 }
 
 
@@ -930,8 +1056,8 @@ void hgio_line( BMSCR *bm, float x, float y )
 	float b_val = bm->colorvalue[2];
 	game->setPolyDiffuse2D( r_val, g_val, b_val, 1.0f );
 
-	linebasex = x;
-	linebasey = y;
+	linebasex = x + 0.5f;
+	linebasey = y + 0.5f;
 }
 
 
@@ -945,8 +1071,8 @@ void hgio_line2( float x, float y )
 
 	*v++ = linebasex; *v++ = linebasey; v++;
 	v+=4;
-	linebasex = x;
-	linebasey = y;
+	linebasex = x + 0.5f;
+	linebasey = y + 0.5f;
 	*v++ = linebasex; *v++ = linebasey; v++;
 
 	game->drawLineColor2D();
@@ -2008,6 +2134,34 @@ char *hgio_getdir( int id )
 #endif
 
 
+static int GetSurface(int x, int y, int sx, int sy, int px, int py, void *res, int mode)
+{
+	//	VRAMの情報を取得する
+	//
+	int ybase = nDestHeight - (sy - y);
+
+#ifdef	GP_USE_ANGLE
+	return -1;
+#else
+#if defined(HSPWIN)||defined(HSPLINUX)
+	glReadBuffer(GL_BACK);
+#endif
+#endif
+
+	// OpenGLで画面に描画されている内容をバッファに格納
+	glReadPixels(
+		x,              //読み取る領域の左下隅のx座標
+		ybase,          //読み取る領域の左下隅のy座標
+		sx,             //読み取る領域の幅
+		sy,             //読み取る領域の高さ
+		GL_RGBA,		//取得したい色情報の形式
+		GL_UNSIGNED_BYTE,  //読み取ったデータを保存する配列の型
+		res                //ビットマップのピクセルデータ（実際にはバイト配列）へのポインタ
+	);
+
+	return 0;
+}
+
 int hgio_bufferop(BMSCR* bm, int mode, char* ptr)
 {
 	//		オフスクリーンバッファを操作
@@ -2016,13 +2170,27 @@ int hgio_bufferop(BMSCR* bm, int mode, char* ptr)
 	int texid = bm->texid;
 	if (texid < 0) return -1;
 
-	switch (mode) {
-	case 0:
+#ifdef USE_STAR_FIELD
+	if (mode & 0x1000) {
+		star_draw(ptr, STAR_SX * 4, STAR_SY, mode & 0xfff);
 		mat = game->getMat(texid);
 		return mat->updateTex32(ptr, 0);
+	}
+#endif
+
+	switch (mode) {
+	case 0:
+	case 1:
+		mat = game->getMat(texid);
+		return mat->updateTex32(ptr, mode);
+	case 16:
+	case 17:
+		GetSurface(0, 0, bm->sx, bm->sy, 1, 1, ptr, mode & 15);
+		return 0;
 	default:
 		return -2;
 	}
+
 	return 0;
 }
 

@@ -124,15 +124,15 @@ void gpmat::setFilter(Texture::Filter value)
 
 int gpmat::updateTex32(char* ptr, int mode)
 {
-	MaterialParameter* mprm = _material->getParameter("u_diffuseTexture");
+	MaterialParameter* mprm = _material->getParameter("u_texture");
     if (mprm == NULL) {
-        mprm = _material->getParameter("u_texture");
+        mprm = _material->getParameter("u_diffuseTexture");
         if (mprm == NULL) return -1;
     }
 	Texture::Sampler* sampler = mprm->getSampler();
-	if (sampler == NULL) return -1;
+	if (sampler == NULL) return -2;
 	Texture* tex = sampler->getTexture();
-	if (tex == NULL) return -1;
+	if (tex == NULL) return -3;
 
 	tex->setData( (unsigned char *)ptr );
 
