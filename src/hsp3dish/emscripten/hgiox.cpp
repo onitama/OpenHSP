@@ -559,6 +559,35 @@ int hgio_buffer(BMSCR *bm)
 }
 
 
+static int GetSurface(int x, int y, int sx, int sy, int px, int py, void *res, int mode)
+{
+	//	VRAMの情報を取得する
+	//
+	int ybase = nDestHeight - (sy - y);
+
+#ifdef	GP_USE_ANGLE
+	return -1;
+#else
+#if defined(HSPWIN)||defined(HSPLINUX)
+	glReadBuffer(GL_BACK);
+#endif
+#endif
+
+	// OpenGLで画面に描画されている内容をバッファに格納
+	glReadPixels(
+		x,              //読み取る領域の左下隅のx座標
+		ybase,          //読み取る領域の左下隅のy座標
+		sx,             //読み取る領域の幅
+		sy,             //読み取る領域の高さ
+		GL_RGBA,		//取得したい色情報の形式
+		GL_UNSIGNED_BYTE,  //読み取ったデータを保存する配列の型
+		res                //ビットマップのピクセルデータ（実際にはバイト配列）へのポインタ
+	);
+
+	return 0;
+}
+
+
 int hgio_bufferop(BMSCR* bm, int mode, char *ptr)
 {
 	//		オフスクリーンバッファを操作
@@ -572,10 +601,16 @@ int hgio_bufferop(BMSCR* bm, int mode, char *ptr)
 
 	switch (mode) {
 	case 0:
-		return UpdateTex32(texid, ptr, 0);
+	case 1:
+		return UpdateTex32(texid, ptr, mode);
+	case 16:
+	case 17:
+		GetSurface(0, 0, bm->sx, bm->sy, 1, 1, ptr, mode & 15);
+		return 0;
 	default:
 		return -2;
 	}
+
 	return 0;
 }
 
@@ -764,6 +799,18 @@ void hgio_clsmode( int mode, int color, int tex )
 
 int hgio_getWidth( void )
 {
+	return _bgsx;
+}
+
+
+int hgio_getHeight( void )
+{
+	return _bgsy;
+}
+
+
+int hgio_getDesktopWidth( void )
+{
 #ifdef HSPLINUX
 	SDL_DisplayMode dm;
 	SDL_GetDesktopDisplayMode(0,&dm);
@@ -773,7 +820,7 @@ int hgio_getWidth( void )
 }
 
 
-int hgio_getHeight( void )
+int hgio_getDesktopHeight( void )
 {
 #ifdef HSPLINUX
 	SDL_DisplayMode dm;

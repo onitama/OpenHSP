@@ -3198,13 +3198,14 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x218:								// es_draw
 	{
 		//		execute drawing ESCD system (type0)
-		//		es_draw start,kazz,dispflag,sortflag
+		//		es_draw start,kazz,start_pri,end_pri
 		p1 = code_getdi(0);
 		p2 = code_getdi(-1);
 		p3 = code_getdi(0);
-		p4 = code_getdi(0);
+		p4 = code_getdi(-1);
+		p5 = code_getdi(-1);
 		if (sprite->sprite_enable) {
-			sprite->draw(p1, p2, p3, p4);
+			sprite->draw(p1, p2, p3, p4, p5);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
@@ -3467,7 +3468,7 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x229:								// es_putbg
 	{
 		//		get sprite axis
-		//		es_bgpos bgno, x, y, offsetx, offsety
+		//		es_putbg bgno, x, y, offsetx, offsety
 		int res;
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
@@ -3640,15 +3641,19 @@ static int get_ginfo( int arg )
 	case 20:
 #ifdef HSPWIN
 		return GetSystemMetrics( SM_CXSCREEN );
-#else
-		return hgio_getWidth();
 #endif
+#ifdef HSPLINUX
+		return hgio_getDesktopWidth();
+#endif
+		return hgio_getWidth();
 	case 21:
 #ifdef HSPWIN
 		return GetSystemMetrics( SM_CYSCREEN );
-#else
-		return hgio_getHeight();
 #endif
+#ifdef HSPLINUX
+		return hgio_getDesktopHeight();
+#endif
+		return hgio_getHeight();
 	case 22:
 		return bmscr->cx;
 	case 23:
