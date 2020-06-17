@@ -608,6 +608,28 @@ int hgio_getHeight( void )
 }
 
 
+int hgio_getDesktopWidth( void )
+{
+#ifdef HSPLINUX
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(0,&dm);
+	return dm.w;
+#endif
+	return nDestWidth;
+}
+
+
+int hgio_getDesktopHeight( void )
+{
+#ifdef HSPLINUX
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(0,&dm);
+	return dm.h;
+#endif
+	return nDestHeight;
+}
+
+
 void hgio_term( void )
 {
 	hgio_render_end();
