@@ -1,0 +1,82 @@
+
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample9
+	;		スプライトの衝突を検出
+	;		カーソルキーの上下左右で移動します
+	;------------------------------------------------------------------
+
+	screen 0,640,480			; スクリーン初期化
+
+	es_ini					; スプライトを初期化
+
+	buffer 3
+	picload "testchr.png"
+	es_size 64,64,100
+	es_pat 0, 0,0				; 顔
+	es_pat 1, 64,0				; リンゴ
+
+	gsel 0
+
+	es_set 0,320,200,0			; スプライトを配置
+
+	es_set 1,100,100,1			; りんごを配置
+	es_setrot 1,rot,200,200			; 2x2倍サイズで表示する
+
+*main
+	stick key,15
+	if key&$80 : goto *owari
+
+	gosub *keychk
+
+	es_check chk,0
+
+	redraw 0
+	rgbcolor $404040
+	if chk>=0 : rgbcolor $808080		; 衝突した時に背景色を変える
+
+	boxf					; 背景を消去
+	es_draw					; スプライトを描画
+
+	rgbcolor $ffffff:pos 0,0
+	mes "Check="+chk
+	redraw 1
+
+	await 1000/60				; タスク更新
+	goto *main
+
+*owari
+	es_bye
+	end
+
+*keychk
+	;	カーソルキー入力で自分(変数myx,myy)を動かすサブルーチン
+	;	(カーソルキーを同時に押すことにより斜めにも移動できます)
+	;
+	es_getpos 0,myx,myy			; スプライト0の座標を得る
+	if key&2 : goto *go_up			; 上を押しているか?
+	if key&8 : goto *go_down		; 下を押しているか?
+	goto *keychk2				; 左右のチェックにジャンプ
+*go_up
+	if myy>0 : myy-=8
+	goto *keychk2
+*go_down
+	if myy<420 : myy+=8
+
+*keychk2
+	if key&1 : goto *go_left		; 左を押しているか?
+	if key&4 : goto *go_right		; 右を押しているか?
+	goto *keychk3
+*go_left
+	if myx>0 : myx-=8
+	goto *keychk3
+*go_right
+	if myx<580 : myx+=8
+	goto *keychk3
+
+*keychk3
+	es_pos 0,myx,myy			; スプライト0の座標を設定する
+	return
+
+

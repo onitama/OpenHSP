@@ -1,13 +1,47 @@
 ------------------------------------------------------------------------------
 Hot Soup Processor ver3.6                           HSP : Hot Soup Processor  
-更新履歴                              copyright 1997-2019 (c) onion software  
+更新履歴                              copyright 1997-2020 (c) onion software  
 ------------------------------------------------------------------------------
 
 ・hsp3関連 更新履歴
 
-	2019/11/22 3.6 beta2
+	2020/06/10 3.6 beta3
 
-	groll命令によるグラフィック表示面のスケーリング機能を追加
+	mes(print)命令に影付け、縁取りなどの描画オプションを追加
+	ユーザー定義による配置オブジェクトを追加するlayerobj命令を追加
+	on〜命令などによる割り込みコールバックルーチンの制約を厳格化してエラーチェックを追加
+	500時間以上起動したPC上でwait,await命令の待ち時間が正しく反映されなくなる不具合を修正
+	スクリプトエディタの最終行へ移動メニューが動作していなかった不具合を修正
+	hsedsdkのhsed_gettextで最後の1文字が取得されない不具合を修正
+	モジュール型変数に別のモジュール型変数値を代入した際に元のデストラクタが呼ばれない不具合を修正
+	stick命令互換で動作するmod_joystick2.asモジュールを追加
+	β2版でgroll命令の制限が正しく行われていなかった不具合を修正
+	β2版でobaq関連命令が正しく初期化されていなかった不具合を修正
+	[hsp3utf] getpath命令の小文字変換で文字列が壊れることがある不具合を修正
+	[hsp3_64] ラベル型の引数受け渡しでエラーが発生する問題を修正
+	[hspcmp] hsphelpフォルダのキーワード検索オプションを追加
+	[HSP3Dish] celbitmap命令に描画画面の読み出しオプションを追加
+	[HSP3Dish] フォント描画時の負荷を軽減
+	[HSP3Dish] アプリケーション終了処理時の不正なアクセスを修正
+	[HSP3Dish] mes(print)命令の改行処理がHSP3標準と違っていたのを修正
+	[HSP3Dish] objmode,objsel,objprm,objcolor,objenable命令のサポートを追加
+	[HSP3Dish] hsp3js及びLinux版のマルチタッチ情報取得に対応
+	[HSP3Dish][hsp3js] デバッグ情報を付加して変換するオプションを追加
+	[HSP3Dish][hsp3js] WebAssembly形式で変換するオプションを追加
+	[HSP3Dish][hsp3js] mobileデバイスのタッチ操作が反映されない不具合を修正
+	[HSP3Dish][hsp3js] mobileデバイスで音が再生されない不具合を修正
+	[HSP3Dish][Linux] bgscr,screen命令による表示サイズ変更、及びフルスクリーン化に対応
+	[HSP3Dish] input,chkbox命令による配置オブジェクトをサポート(Windows/Linuxのみ)
+	[HSP3Dish] GUI配置オブジェクトのフォントをHSP標準に近い形に修正
+	[HSP3Dish] hspdxプラグイン互換のスプライト命令を追加
+	[HGIMG4] 画像ファイル処理をHSP3Dishと同一に修正、各種フォーマットに対応
+	[HGIMG4] 大きな画像のコピー時にUVが正しく反映されないことがある不具合を修正
+	[HGIMG4] .gpbファイルの名前が2文字以下の時にマテリアルの読み込みに失敗する不具合を修正
+
+	2020/01/14 3.6 beta2
+
+	システムの言語設定に応じてエラーメッセージを変更するように修正
+	stick命令で[Z][X][C][A][W][D][S]のキー情報を取得できるように修正
 	#const定義された実数の評価時にエラーが発生することがある不具合を修正
 	#const定義の演算時に1.0未満の値で除算した際にエラーが発生する不具合を修正
 	float値(1.0f等)の表現を実数(double)値として評価するように修正
@@ -23,16 +57,26 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 	プリプロセッサのシステムマクロとして、ランタイム名を示す__runtime__を追加
 	mod_appconfig.as,mod_dirboxモジュール及び、サンプルを追加
 	mmstop,mmvol,mmpan,mmstatの仕様を標準命令とHSP3Dishで共通化できるように修正
+	スクリプトエディタのSDK機能のHSED_GETCARETPOSが無効になっていた不具合を修正
+	getpath関数で$5cコードを含む全角が正しく認識されなくなっていた不具合を修正
 	[HGIMG4] getobjname命令で正しい名前が取得できない不具合を修正
+	[HGIMG4] フォントを使用した日本語を含む文字列表示に対応
+	[HGIMG4] 2D描画に関するシェーダーファイルを内蔵する形に修正
+	[HGIMG4] HGIMG4ツールを更新、マテリアルの確認と編集機能を追加
+	[HGIMG4] システムリクエストにSYSREQ_USEGPBFONT項目を追加
 	[HSP3Dish] 配列変数の内容をグラフィックデータとして画面に転送するcelbitmap命令を追加
+	[HSP3Dish] 2D描画時の座標変換式を指定するviewcalc命令を追加
 	[HSP3Dish][android] 一部の機種でダイアログの改行コード文字が表示される不具合を修正
 	[HSP3Dish][android] AndroidManifest.xmlにvibrateを必須としない設定を追加
 	[HSP3Dish][Windows] hsp3dish.iniファイルがない場合に起動に失敗する不具合を修正
 	[HSP3Dish][Windows] エラー発生時にDebugウインドウが閉じないことがある不具合を修正
 	[HSP3Dish][Windows] onexit,onkey,onclick,oncmd命令による割り込みをサポート
-	[HSP3Dish][Windows] screen命令による表示サイズ変更、及びフルスクリーンに対応
+	[HSP3Dish][Windows] bgscr,screen命令による表示サイズ変更、及びフルスクリーン化に対応
+	[HSP3Dish][Windows] dialog命令実行後にエラーが出ることがあった不具合を修正
+	[HSP3Dish][Windows] ginfoによるデスクトップサイズの取得に対応
+	[HSP3Dish][iOS] 新しいiOS上でアプリが起動しないことがある不具合を修正
 	[HSP3Dish][hsp3js][linux] MP3サウンド再生に対応
-	[HSP3Dish][android][iOS][hsp3js][linux] プログレッシブJPEG読み込みに対応
+	[HSP3Dish][android][iOS][hsp3js][linux] プログレッシブJPEGの読み込みに対応
 
 	2019/09/03 3.6 beta1
 
@@ -367,7 +411,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 	2013/07/10 3.4β2
 
 	windowsの終了セッションにHSPランタイムが残ってしまう不具合を修正
-	on gosub～命令の指定先でend命令が認識されない不具合を修正(BT#263)
+	on gosub〜命令の指定先でend命令が認識されない不具合を修正(BT#263)
 	[HGIMG4] 最初のバージョンを同梱
 	[HSP3Dish] Windows版でmp3のボリューム設定が反映されないことがある不具合を修正
 	[HSP3Dish][android] アプリのレジューム時にテクスチャデータが復帰しないことがある不具合を修正
@@ -652,8 +696,8 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 	2009/05/22 3.2b3
 
 	CEL関連命令(celload、celdiv、celput)を追加
-	ver3.2β1～β2で終了時にエラーが起こることがあった不具合を修正
-	ver3.2β1～β2でバージョン番号(hspver)がおかしかった不具合を修正
+	ver3.2β1〜β2で終了時にエラーが起こることがあった不具合を修正
+	ver3.2β1〜β2でバージョン番号(hspver)がおかしかった不具合を修正
 	HGIMG3ランタイムで別なプラグインを使用した際の解放が正しく行なわれなかった不具合を修正
 	HGIMG3で、hgbyeによる解放後に再度hginiによる初期化を失敗する不具合を修正
 	ラベル型の配列変数を作成するためのldimマクロを追加
@@ -861,7 +905,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 		不必要なモジュール、DLLインポート情報をオブジェクトファイルから破棄する最適化機能を追加。
 		コンパイル時の設定をソース内に記述するための#cmpoptプリプロセッサ命令を追加。
 		プリプロセッサ出力ファイル(hsptmp.i)を標準で生成しないように修正。
-		複数行文字列({"～"})内に半角文字列がある時にエラーが出る不具合を修正。(HSPBT#51)
+		複数行文字列({"〜"})内に半角文字列がある時にエラーが出る不具合を修正。(HSPBT#51)
 		メニューバー作成モジュール(mod_menu.as)の不具合を修正。
 		onkey割り込み時のiparamの内容がキーコードだったものを文字コードとなるように修正。
 		拡張プラグインHGIMG3の機能追加と不具合をいくつか修正(詳細はhgimg3.txtを参照してください)。
@@ -953,7 +997,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 
 	2005/06/27 3.0β11
 
-		複数行文字列({"～"})指定中にあるダブルクォートが正しく処理されない不具合を修正。(HSPBT#24)
+		複数行文字列({"〜"})指定中にあるダブルクォートが正しく処理されない不具合を修正。(HSPBT#24)
 		onexit命令実行時にWindowsのシャットダウン処理が常に中止される不具合を修正。(HSPBT#26)
 		sendmsg命令のパラメーターをHSP2.61のobjsend命令と互換のある形式に修正。
 		COMイベント作成を行なうcomevent命令の仕様を一部変更。
@@ -1163,7 +1207,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 	2004/11/06 3.0α11
 
 		COMオートメーション(IDispatch)に対応(一部仮実装)。
-		mcall,exgoto,on～goto/gosub,circle,syscolor命令を実装。
+		mcall,exgoto,on〜goto/gosub,circle,syscolor命令を実装。
 		hsvcolor,gsquare,grect,grotate命令を標準として実装。
 		ginfo関数を実装。
 		文字列型の比較演算子(=,!=)を実装。
@@ -1194,7 +1238,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 		callfunc,strmid,instr関数を実装。
 		変数のIDが重複することがある不具合を修正。
 		複数行のif命令記述がエラーになる不具合を修正。
-		複数行の文字列 {"～"} が認識されなかったのを修正。
+		複数行の文字列 {"〜"} が認識されなかったのを修正。
 		割り込みが多重に発生した時に正常に実行されない不具合を修正。
 		割り込みジャンプからの復帰時にstop命令を越える不具合を修正。
 
@@ -1339,7 +1383,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 	・コマンドライン起動、ドラッグアンドドロップでのファイル オープンがうまく動作していない
 	　バグを修正しました。
 	・一部のキーワードが色分けされていなかったバグを修正しました(仮)。
-	・色分け可能なキーワードに文字列("～")とプリプロセッサ命令(#～)を追加しました。
+	・色分け可能なキーワードに文字列("〜")とプリプロセッサ命令(#〜)を追加しました。
 	・設定の初期化機能を実装しました。
 	・「非文字」の設定が保存されていなかった不具合を修正しました。
 

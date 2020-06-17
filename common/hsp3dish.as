@@ -6,6 +6,7 @@
 #define global _HSP3DISH
 
 #runtime "hsp3dish"
+#addition "dish_enhance.as"
 
 #const global FILTER_NONE 0
 #const global FILTER_LINEAR 1
@@ -17,6 +18,10 @@
 
 #define global screen_offscreen (32)
 #define global screen_usergcopy (64)
+
+#define global celbitmap_bgr (0)
+#define global celbitmap_rgb (1)
+#define global celbitmap_capture (16)
 
 ;	system request
 ;
@@ -99,10 +104,10 @@
 #enum global HTTPMODE_DATAEND
 #define global HTTPMODE_ERROR (-1)
 
-#define global HTTPINFO_MODE 0		; åªç›ÇÃÉÇÅ[Éh
-#define global HTTPINFO_SIZE 1		; ÉfÅ[É^ÉTÉCÉY
-#define global HTTPINFO_DATA 16		; éÊìæÉfÅ[É^
-#define global HTTPINFO_ERROR 17	; ÉGÉâÅ[ï∂éöóÒ
+#define global HTTPINFO_MODE 0		; ÁèæÂú®„ÅÆ„É¢„Éº„Éâ
+#define global HTTPINFO_SIZE 1		; „Éá„Éº„Çø„Çµ„Ç§„Ç∫
+#define global HTTPINFO_DATA 16		; ÂèñÂæó„Éá„Éº„Çø
+#define global HTTPINFO_ERROR 17	; „Ç®„É©„ÉºÊñáÂ≠óÂàó
 
 
 #endif
@@ -321,6 +326,13 @@
 #define global ESSPOPT_FADEOUT (8)
 #define global ESSPOPT_ADDCOLOR (16)
 #define global ESSPOPT_SUBCOLOR (32)
+
+#define global ESDRAW_NORMAL (0)
+#define global ESDRAW_NOMOVE (1)
+#define global ESDRAW_NOANIM (2)
+#define global ESDRAW_NOCALLBACK (4)
+#define global ESDRAW_NODISP (8)
+#define global ESDRAW_NOSORT (16)
 
 #endif
 

@@ -1,0 +1,45 @@
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample7
+	;		BGマップ表示のテスト
+	;		4×4サイズのマップを表示します
+	;		[ESC]キーで終了
+	;
+	;------------------------------------------------------------------
+
+	randomize
+	wx=640:wy=480
+	screen 0,wx,wy				; スクリーン初期化
+	es_ini					; スプライト初期化
+
+*start
+	buffer 3
+	picload "testchr.png"
+	gsel 0
+
+	mapsx=4:mapsy=4				; マップサイズ
+	dim map,mapsx*mapsy			; マップデータ変数
+	celdiv 3,64,64				; マップのセル設定
+	es_bgmap 0,map,mapsx,mapsy,mapsx,mapsy,3	; マップ登録
+
+	map(0)=1:map(5)=6			; マップデータを設定
+
+*main
+	stick ky,$1f				; カーソルキーの情報を取得
+	if ky&$80 : goto *owari
+
+	redraw 0
+	es_putbg 0				; マップを描画
+	es_draw					; スプライト描画
+
+	redraw 1
+	await 1000/60				; タスク更新
+
+	goto *main
+
+*owari
+	es_bye
+	end
+
+

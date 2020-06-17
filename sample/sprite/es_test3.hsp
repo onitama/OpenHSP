@@ -1,0 +1,84 @@
+
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample3
+	;		スプライトを表示、カーソルキーで上下左右に移動。
+	;		スペースキーで、リンゴを発射。たくさん発射。
+	;		[ESC]キーで終了
+	;
+	;------------------------------------------------------------------
+
+	screen 0,640,480			; スクリーン初期化
+*start
+	es_ini					; スプライトを初期化
+
+	buffer 3
+	picload "testchr.png"
+	es_size 64,64,50
+	es_pat 0, 0,0			; 顔
+	es_pat 1, 64,0			; リンゴ
+
+	gsel 0
+
+	myx=300:myy=200
+	es_set 0,myx,myy,0			; メインのスプライト
+
+*main
+	stick ky,$1f				; カーソルキーの情報を取得
+	gosub *keychk
+	if ky&$10 : gosub *ringo
+	if ky&$80 : goto *owari
+	es_pos 0,myx,myy
+
+	redraw 0
+	color 64,64,64
+	boxf					; 背景を塗りつぶし
+
+	es_draw					; スプライトを描画
+
+	rgbcolor $ffffff
+	pos 0,0:mes "Sprite Sample"		; 文字列を描画
+
+	redraw 1
+	await 1000/60				; タスク更新
+
+	goto *main
+
+*ringo
+	;	リンゴ発射
+	;
+	es_new a,2
+	es_set a,myx,myy,1
+	es_adir a,rnd(64),400
+	return
+
+*owari
+	es_bye
+	end
+
+
+*keychk
+	;	カーソルキー入力で自分(変数myx,myy)を動かすサブルーチン
+	;	(カーソルキーを同時に押すことにより斜めにも移動できます)
+	;
+	if ky&2 : goto *go_up			; 上を押しているか?
+	if ky&8 : goto *go_down			; 下を押しているか?
+	goto *keychk2				; 左右のチェックにジャンプ
+*go_up
+	if myy>0 : myy-=8
+	goto *keychk2
+*go_down
+	if myy<420 : myy+=8
+*keychk2
+	if ky&1 : goto *go_left			; 左を押しているか?
+	if ky&4 : goto *go_right		; 右を押しているか?
+	return
+*go_left
+	if myx>0 : myx-=8
+	return
+*go_right
+	if myx<580 : myx+=8
+	return
+
+

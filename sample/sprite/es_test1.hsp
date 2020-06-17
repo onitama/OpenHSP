@@ -1,0 +1,30 @@
+
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample1
+	;		スプライトを表示
+	;
+	;------------------------------------------------------------------
+
+	screen 0,640,480			; スクリーン初期化
+
+	es_ini					; スプライトを初期化
+
+	buffer 3
+	picload "testchr.png"
+	es_size 64,64,50
+	es_pat 0, 0,0				; 顔
+
+	gsel 0
+
+	es_set 0,320,200,0			; スプライトを配置
+
+*main
+	redraw 0
+	es_draw					; スプライトを描画
+	redraw 1
+	await 1000/60				; タスク更新
+
+	goto *main
+

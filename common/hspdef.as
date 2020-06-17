@@ -98,8 +98,8 @@
 
 #define global gsquare_grad (-257)
 
-#define global msgothic "‚l‚r ƒSƒVƒbƒN"
-#define global msmincho "‚l‚r –¾’©"
+#define global msgothic "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯"
+#define global msmincho "ï¼­ï¼³ æ˜æœ"
 
 #define global do  %tbreak %i0 %tcontinue %i0 %tdo *%i
 #define global until(%1=1) %tcontinue *%o : %tdo if (%1)=0 { goto *%o } %tbreak *%o

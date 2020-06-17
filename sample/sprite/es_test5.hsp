@@ -1,0 +1,165 @@
+
+#include "hsp3dish.as"
+
+	;
+	;	HSPDX.DLL sample5
+	;		シューティングゲームのサンプル。
+	;		カーソルキーで移動、スペースで発射
+	;		[ESC]キーで終了
+	;
+
+	;------------------------------------------------------------------
+
+	randomize
+	wx=640:wy=480
+	screen 0,wx,wy				; スクリーン初期化
+	es_ini					; スプライト初期化
+
+*start
+	chrsx=64:chrsy=64			; キャラクタのサイズを指定
+
+	celload "yamabg.jpg",4
+	bgsx=1280:bgsy=480
+
+	buffer 3
+	picload "testchr.png"
+	es_size chrsx,chrsy,60
+	es_pat 0, 128,0			; 顔
+	es_pat 1, 192,0			; リンゴ
+	es_pat 2, 256,0			; リンゴ
+	es_pat 3, 320,0			; リンゴ
+	es_pat 4, 384,0			; リンゴ
+
+	gsel 0
+
+	myx=100:myy=100
+	es_set 0,myx,myy,0
+
+	a=0
+	tt=0
+	bgx=0
+	gcnt=0
+	gres=0
+	gwt=0
+*gmain
+	stick ky,$3f				; キーの情報を取得
+	if ky&$80 : goto *owari			; [ESC]中断チェック
+
+	redraw 0
+
+	gosub *rollbg
+	gosub *keychk
+	gosub *fire
+	gosub *enemy
+
+	es_draw
+
+	rgbcolor $ffffff
+	pos 0,0:mes "Sprite Sample"		; 文字列を描画
+
+	redraw 1
+	await 1000/60				; タスク更新
+
+	gcnt+
+	if gres=0 : goto *gmain
+	gwt++
+	goto *gmain
+
+*owari
+	es_bye
+	end
+
+
+*enemy
+	;	敵の出現 & 移動
+	;
+	a=rnd(32)+64
+	es_find n,4,a:if n<0 : goto *noset	
+
+	;	敵ミサイル
+	;
+	if rnd(10)<5 : goto *noset
+	es_getpos n,x,y
+	es_new a,128
+	es_set a,x,y,3
+	es_type a,8
+	es_aim a,myx,myy,600
+*noset
+	if gcnt&15 : return
+
+	;	敵キャラ配置
+	;
+	es_new a,64:y=rnd(300)
+	es_set a,640,y+60,4
+	es_type a,4
+	es_adir a,rnd(8)+44,400
+	return
+
+*fire
+	;	自機ミサイルHIT CHECK
+	;
+	n=0
+	repeat
+	es_find n,2,n:if n=-1 : break		; ミサイルのスプライトを検出
+	es_check a,n,4				; 衝突チェック
+	if a>=0 : es_kill n:es_chr a,2:es_type a,16:es_flag a,20
+	n+
+	loop
+
+	;	自機ミサイル発射
+	;
+	if gres : return
+	if gcnt&3 : return			; 4回に1回ごとにチェック
+	if (ky&$10)=0 : return			; キーチェック
+	es_new a
+	es_set a,myx,myy,1
+	es_type a,2
+	es_adir a,rnd(4)+15,2000
+	return
+
+
+*rollbg
+	;	背景をスクロールしながら表示routine
+	;
+	bgx=bgx+2				; スクロールする速さ
+	if bgx>=bgsx : bgx-=bgsx
+	gmode 0,wx,wy
+	pos 0,0:gcopy 4,bgx,0
+	if bgx<wx : return
+	pos wx-(bgx-wx+1),0:gcopy 4,0,0
+	return
+
+
+*keychk
+	;	カーソルキー入力で自分(変数myx,myy)を動かすサブルーチン
+	;	(カーソルキーを同時に押すことにより斜めにも移動できます)
+	;
+	if gres : return
+	;
+	if ky&2 : goto *go_up			; 上を押しているか?
+	if ky&8 : goto *go_down			; 下を押しているか?
+	goto *keychk2				; 左右のチェックにジャンプ
+*go_up
+	if myy>-32 : myy-=4
+	goto *keychk2
+*go_down
+	if myy<380 : myy+=4
+*keychk2
+	if ky&1 : goto *go_left			; 左を押しているか?
+	if ky&4 : goto *go_right		; 右を押しているか?
+	goto *setme
+*go_left
+	if myx>-32 : myx-=4
+	goto *setme
+*go_right
+	if myx<580 : myx+=4
+*setme
+	es_pos 0,myx,myy			; スプライト座標設定
+	es_check a,0,12
+	if a<0 : return
+	gres=1
+	es_flag 0,30
+	es_chr 0,2
+	return
+
+

@@ -1,0 +1,56 @@
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample4
+	;		リンゴをいっぱい表示。
+	;		[ESC]キーで終了
+	;
+	;------------------------------------------------------------------
+
+	wx=640:wy=480
+	screen 0,wx,wy				; スクリーン初期化
+	es_ini					; スプライト初期化
+
+*start
+	buffer 3
+	picload "testchr.png"
+	es_size 64,64,50
+	es_pat 0, 0,0			; 顔
+	es_pat 1, 64,0			; リンゴ
+
+	gsel 0
+
+	es_area -64,-64,wx,wy			; 画面ボーダー設定
+
+	repeat 100
+	a=rnd(64):spd=rnd(10)*25+250
+	x=rnd(640):y=rnd(480)
+	es_set cnt,x,y,1
+	es_adir cnt,a,spd
+	es_flag cnt,ESSPFLAG_XBOUNCE+ESSPFLAG_YBOUNCE+ESSPFLAG_MOVE	; X,Yバウンド設定
+	loop
+
+*main
+	stick ky,$1f				; カーソルキーの情報を取得
+	if ky&$80 : goto *owari
+
+	redraw 0
+	color 64,64,64
+	boxf
+
+	es_draw					; スプライト描画
+
+	rgbcolor $ffffff
+	pos 0,0:mes "Sprite Sample"		; 文字列を描画
+
+	redraw 1
+	await 1000/60				; タスク更新
+
+	goto *main
+
+
+*owari
+	es_bye
+	end
+
+

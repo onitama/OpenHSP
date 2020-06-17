@@ -43,7 +43,7 @@
 #define ctype acosh(%1)         logf(sqrt(double(%1)*(%1)-1.0)+(%1))    ; cosh(y)=xとなるy
 #define ctype atanh(%1)         (logf((1.0+(%1)) / (1.0-(%1)))/2.0)             ; tanh(y)=xとなるy
 
-#define ctype isfinite(%1)      ((%1)*0=0)                              ; 有限／無限･非数の判定
+#define ctype isfinite(%1)      ((%1)*0=0)                              ; 有限／無限・非数の判定
 #define ctype isnan(%1)         ((%1)!(%1))                             ; 非数の判定
 
 #define ctype round(%1)         double(strf("%%0.0f", %1))              ; 四捨五入

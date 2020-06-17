@@ -1,0 +1,39 @@
+
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample2
+	;		スプライトを変形して表示
+	;		カーソルキーの左右で回転します
+	;------------------------------------------------------------------
+
+	screen 0,640,480			; スクリーン初期化
+
+	es_ini					; スプライトを初期化
+
+	buffer 3
+	picload "testchr.png"
+	es_size 64,64,50
+	es_pat 0, 0,0				; 顔
+
+	gsel 0
+
+	es_set 0,320,200,0			; スプライトを配置
+	es_setrot 0,rot,400,400			; 4x4倍サイズで表示する
+	es_effect 0,$380			; 半透明 ( gmode 3,,,128 相当 )
+	rot=0
+
+*main
+	stick key,15
+	if key&1 : rot=rot+1			; [<-]キーで回転させる
+	if key&4 : rot=rot-1			; [->]キーで回転させる
+
+	es_setrot 0,rot				; 角度を設定する
+
+	redraw 0
+	es_draw					; スプライトを描画
+	redraw 1
+
+	await 1000/60				; タスク更新
+	goto *main
+
