@@ -563,7 +563,7 @@ static int GetSurface(int x, int y, int sx, int sy, int px, int py, void *res, i
 {
 	//	VRAMの情報を取得する
 	//
-	int ybase = nDestHeight - (sy - y);
+	int ybase = _bgsy - (sy - y);
 
 #ifdef	GP_USE_ANGLE
 	return -1;
