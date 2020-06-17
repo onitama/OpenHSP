@@ -9,7 +9,7 @@
 	x1=0:y1=0				; 画面左上の座標
 	x2=ginfo_winx:y2=ginfo_winy		; 画面右下の座標
 
-	screen 0,x2,y2
+	;screen 0,x2,y2
 	title "ブロック崩し"
 	;cls 4
 *gstart
