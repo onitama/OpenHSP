@@ -1774,48 +1774,42 @@ int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSC
 
 /*-------------------------------------------------------------------------------*/
 
+#if defined(HSPLINUX) || defined(HSPNDK)
+    static time_t basetick;
+    static bool tick_reset = false;
+#endif
 
 int hgio_gettick( void )
 {
-#if defined(HSPLINUX) || defined(HSPNDK)
+    // 経過時間の計測
+
+#if defined(HSPLINUX) || defined(HSPNDK) || defined(HSPEMSCRIPTEN)
 	int i;
 	timespec ts;
 	double nsec;
     clock_gettime(CLOCK_REALTIME,&ts);
     nsec = (double)(ts.tv_nsec) * 0.001 * 0.001;
-    i = (int)ts.tv_sec * 1000 + (int)nsec;
-    //return ((double)(ts.tv_sec) + (double)(ts.tv_nsec) * 0.001 * 0.001 * 0.001);
-	return i;
+    //i = (int)ts.tv_sec * 1000 + (int)nsec;
+    time_t sec = ts.tv_sec;
+    if ( tick_reset ) {
+	sec -= basetick;
+    } else {
+	tick_reset = true;
+	basetick = sec;
+	sec = 0;
+     }
+    i =((int)sec) * 1000 + (int)nsec;
+    return i;
 #endif
 
-    // 経過時間の計測
 #ifdef HSPIOS
     CFAbsoluteTime now;
     now = CFAbsoluteTimeGetCurrent();
     total_tick += now - lastTime;
     lastTime = now;
-#endif
-
-#ifdef HSPIOS
     return (int)(total_tick * 1000.0 );
-    //return (int)( CFAbsoluteTimeGetCurrent() * 1000.0 );
 #endif
 
-#if defined(HSPEMSCRIPTEN)
-	int i;
-	timespec ts;
-	double nsec;
-	static bool init = false;
-	static int initTime = 0;
-	clock_gettime(CLOCK_REALTIME,&ts);
-	nsec = (double)(ts.tv_nsec) * 0.001 * 0.001;
-	i = (int)ts.tv_sec * 1000 + (int)nsec;
-	if (!init) {
-		init = true;
-		initTime = i;
-	}
-	return i - initTime;
-#endif
 }
 
 int hgio_exec( char *msg, char *option, int mode )
