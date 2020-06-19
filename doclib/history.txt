@@ -5,7 +5,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
-	2020/06/10 3.6 beta3
+	2020/06/19 3.6 beta3
 
 	mes(print)命令に影付け、縁取りなどの描画オプションを追加
 	ユーザー定義による配置オブジェクトを追加するlayerobj命令を追加
@@ -30,6 +30,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 	[HSP3Dish][hsp3js] WebAssembly形式で変換するオプションを追加
 	[HSP3Dish][hsp3js] mobileデバイスのタッチ操作が反映されない不具合を修正
 	[HSP3Dish][hsp3js] mobileデバイスで音が再生されない不具合を修正
+	[HSP3Dish][Linux] exec/wait/await命令が特定の条件で無限ループになる不具合を修正
 	[HSP3Dish][Linux] bgscr,screen命令による表示サイズ変更、及びフルスクリーン化に対応
 	[HSP3Dish] input,chkbox命令による配置オブジェクトをサポート(Windows/Linuxのみ)
 	[HSP3Dish] GUI配置オブジェクトのフォントをHSP標準に近い形に修正
