@@ -3887,6 +3887,12 @@ void hsp3excmd_rebuild_window(void)
 	wnd = new HspWnd();
 	wnd->SetHSPCTX(ctx);
 	bmscr = wnd->GetBmscr(0);
+
+#ifdef USE_ESSPRITE
+	if (sprite) delete sprite;
+	sprite = new essprite;
+	sprite->setResolution( wnd, bmscr->sx, bmscr->sy);
+#endif
 }
 
 
