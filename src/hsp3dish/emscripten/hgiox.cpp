@@ -1774,7 +1774,7 @@ int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSC
 
 /*-------------------------------------------------------------------------------*/
 
-#if defined(HSPLINUX) || defined(HSPNDK)
+#if defined(HSPLINUX) || defined(HSPNDK) || defined(HSPEMSCRIPTEN)
     static time_t basetick;
     static bool tick_reset = false;
 #endif
@@ -1823,6 +1823,19 @@ int hgio_exec( char *msg, char *option, int mode )
 #ifdef HSPLINUX
 	system(msg);
 #endif
+
+#ifdef HSPEMSCRIPTEN
+	{
+	EM_ASM_({
+		if ($1>=16) {
+			window.open(UTF8ToString($0));
+		} else {
+			window.eval(UTF8ToString($0));
+		}
+	},msg,mode );
+	}
+#endif
+
     return 0;
 }
 
@@ -1842,6 +1855,11 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	if (mode&1) i|=SDL_MESSAGEBOX_WARNING; else i|=SDL_MESSAGEBOX_INFORMATION;
 	SDL_ShowSimpleMessageBox(i, str2, str1, NULL);
 	}
+#endif
+#ifdef HSPEMSCRIPTEN
+	EM_ASM_({
+		alert(UTF8ToString($0));
+	},str1 );
 #endif
 	return 0;
 }

@@ -372,6 +372,8 @@ static void InitVertexTemp( void )
 
 int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mode )
 {
+	//	VRAMの情報を取得する
+	//
 	HRESULT hr;
 	IDirect3DSurface8 *pBackBuffer;
 	IDirect3DSurface8 *pTmp;
@@ -398,7 +400,7 @@ int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mod
 	if ( FAILED(hr) ) return -1;
 
 	// ARGB用フォーマットのサーフェースをつくる
-	hr = d3ddev->CreateImageSurface( sx, sy, D3DFMT_A8R8G8B8, &pTmp );
+	hr = d3ddev->CreateImageSurface(sx, sy, D3DFMT_A8R8G8B8, &pTmp);
 	if( FAILED(hr) ) return -5;
 
 	hr = D3DXLoadSurfaceFromSurface( pTmp, NULL, &tmparea, pBackBuffer, NULL, &area, D3DX_FILTER_NONE, 0 );
@@ -411,24 +413,30 @@ int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mod
 	xand = ( px - 1 )<<2;
 	switch( mode ) {
 	case 0:
-		for(j=0;j<sy;j+=py) {
-			base = ((BYTE *)rect.pBits ) + rect.Pitch * j;
-			for(i=0;i<sx;i+=px) {
-				ofsx = rand() & xand;
-				*data++  = (base[ofsx+2]<<16)|(base[ofsx+1]<<8)|base[ofsx];
-				base+=4*px;
+		//	HSP互換(RGBA)
+		for (j = 0; j < sy; j += py) {
+			hspvram = ((BYTE *)res) + ((sx * 4) * j);
+			base = ((BYTE *)rect.pBits) + rect.Pitch * j;
+			for (i = 0; i < sx; i += px) {
+				*hspvram++ = base[2];
+				*hspvram++ = base[1];
+				*hspvram++ = base[0];
+				*hspvram++ = 0xff;
+				base += 4;
 			}
 		}
 		break;
 	case 1:
-		for(j=0;j<sy;j+=py) {
-			hspvram = ( (BYTE *)res ) + ( (sx * 3 ) * (sy-j-1));
-			base = ((BYTE *)rect.pBits ) + rect.Pitch * j;
-			for(i=0;i<sx;i+=px) {
-				ofsx = i<<2;
-				*hspvram++  = base[ofsx];
-				*hspvram++  = base[ofsx+1];
-				*hspvram++  = base[ofsx+2];
+		//	OpenGL互換(BGRA)
+		for (j = 0; j < sy; j += py) {
+			hspvram = ((BYTE *)res) + ((sx * 4) * j);
+			base = ((BYTE *)rect.pBits) + rect.Pitch * j;
+			for (i = 0; i < sx; i += px) {
+				*hspvram++ = base[0];
+				*hspvram++ = base[1];
+				*hspvram++ = base[2];
+				*hspvram++ = 0xff;
+				base += 4;
 			}
 		}
 		break;
@@ -992,7 +1000,12 @@ int hgio_bufferop(BMSCR* bm, int mode, char *ptr)
 
 	switch (mode) {
 	case 0:
-		return UpdateTex32(texid, ptr, 0);
+	case 1:
+		return UpdateTex32(texid, ptr, mode);
+	case 16:
+	case 17:
+		GetSurface(0, 0, bm->sx, bm->sy, 1, 1, ptr, mode & 15);
+		return 0;
 	default:
 		return -2;
 	}

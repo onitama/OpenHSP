@@ -576,7 +576,24 @@ int UpdateTex32(int texid, char * srcptr, int mode)
 		// 転送先のサーフェイスの始点(32bit)
 		char* p;
 		p = (char*)lock.pBits;
-		memcpy( p, srcptr, sx*sy*4 );
+		if (mode & 1) {
+			memcpy(p, srcptr, sx*sy * 4);
+		}
+		else {
+			int i;
+			char *src = srcptr;
+			char a1,a2,a3,a4;
+			for (i = 0; i < sx*sy; i++) {
+				a1 = *src++;
+				a2 = *src++;
+				a3 = *src++;
+				a4 = *src++;
+				*p++ = a3;
+				*p++ = a2;
+				*p++ = a1;
+				*p++ = a4;
+			}
+		}
 		break;
 	}
 	pTex->UnlockRect(0);

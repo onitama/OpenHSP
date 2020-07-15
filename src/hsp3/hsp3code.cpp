@@ -3508,8 +3508,8 @@ void code_execirq( IRQDAT *irq, int wparam, int lparam )
 #ifdef HSPEMSCRIPTEN
 		code_call( irq->ptr );
 #else
-		code_callback( (unsigned short *)irq->ptr );
-		//cmdfunc_gosub( (unsigned short *)irq->ptr );
+		//code_callback( (unsigned short *)irq->ptr );
+		cmdfunc_gosub( (unsigned short *)irq->ptr );
 		if ( hspctx->runmode != RUNMODE_END ) {
 			hspctx->runmode = RUNMODE_RUN;
 		}

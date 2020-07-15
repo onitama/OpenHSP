@@ -56,10 +56,10 @@
 
 #if defined(HSPEMSCRIPTEN)
 #include <emscripten.h>
-#ifdef HSPDISHGP
-#include <SDL/SDL_ttf.h>
-#define USE_TTFFONT
-#endif
+//#ifdef HSPDISHGP
+//#include <SDL/SDL_ttf.h>
+//#define USE_TTFFONT
+//#endif
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
 #define FONT_TEX_SY 128
