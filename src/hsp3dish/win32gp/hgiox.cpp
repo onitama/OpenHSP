@@ -1712,13 +1712,13 @@ int hgio_exec( char *stmp, char *option, int mode )
 	if (i < 32) return -1;
 #endif
 #ifdef HSPNDK
-	j_callActivity( msg, option, mode );
+	j_callActivity( stmp, option, mode );
 #endif
 #ifdef HSPIOS
-    gb_exec( mode, msg );
+    gb_exec( mode, stmp );
 #endif
 #ifdef HSPLINUX
-	system(msg);
+	system(stmp);
 #endif
 
 #ifdef HSPEMSCRIPTEN
