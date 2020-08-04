@@ -569,7 +569,9 @@ static int GetSurface(int x, int y, int sx, int sy, int px, int py, void *res, i
 	return -1;
 #else
 #if defined(HSPWIN)||defined(HSPLINUX)
+#ifndef HSPRASPBIAN
 	glReadBuffer(GL_BACK);
+#endif
 #endif
 #endif
 
