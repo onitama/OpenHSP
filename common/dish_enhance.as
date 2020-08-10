@@ -61,20 +61,20 @@
 	devcontrol "i2cwrite",_p1,_p2,_p3
 	return
 
-#deffunc spireadw int _p1
+#defcfunc spireadw int _p1
 	devcontrol "spireadw",_p1
-	return
+	return stat
 
-#deffunc spiread int _p1
+#defcfunc spiread int _p1
 	devcontrol "spiread",_p1
-	return
+	return stat
 
 #deffunc spiwrite int _p1,int _p2,int _p3
 	devcontrol "spiwrite",_p1,_p2,_p3
 	return
 
-#deffunc spiopen int _p1
-	devcontrol "spiopen",_p1,_p1
+#deffunc spiopen int _p1, int _p2
+	devcontrol "spiopen",_p1,_p2
 	return
 
 #defcfunc spiget int _p1, int _p2
