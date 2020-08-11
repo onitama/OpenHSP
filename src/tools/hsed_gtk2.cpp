@@ -238,7 +238,7 @@ static int status;
 static void hsed_about(GtkWidget *w,int d)
 {
 	int res;
-	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2019(C) onion software" );
+	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2020(C) onion software" );
 }
 
 void file_dlg_cancel(GtkWidget *widget,GtkWidget *dlg){
@@ -767,6 +767,11 @@ static void HSP_run(GtkWidget *w,int flag)
 		}
 		runtime[sch++] = 0;
 	}
+
+	if ( strcmp(runtime,"hsp3")==0 ) {
+		strcpy( runtime, "hsp3cl" );					// 当面はhsp3ランタイムはhsp3clで代替
+	}
+
 	printf("hsed: Runtime [%s].\n",runtime);
 
 	needres = 0;
