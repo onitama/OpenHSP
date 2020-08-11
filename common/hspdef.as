@@ -5,6 +5,7 @@
 #ifndef __hspdef__
 #define __hspdef__
 #addition "userdef.as"
+#addition "dish_enhance.as"
 
 #define global and &
 #define global or |
