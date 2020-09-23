@@ -8,6 +8,7 @@
 #define global _HGIMG4
 
 #runtime "hsp3gp"
+#addition "dish_enhance.as"
 
 #define global screen_offscreen (32)
 #define global screen_usergcopy (64)

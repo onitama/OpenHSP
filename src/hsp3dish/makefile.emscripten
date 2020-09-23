@@ -5,7 +5,7 @@ AR = emar
 #CFLAGS = -Wall -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG -fpermissive -g4 -s LEGACY_GL_EMULATION=1
 
 CFLAGS_CORE = -Wall -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG \
-	   -fpermissive -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
+	   -fpermissive -s WASM=0 -s ALLOW_MEMORY_GROWTH=1 \
 	   -s "EXTRA_EXPORTED_RUNTIME_METHODS=['addRunDependency', 'removeRunDependency', 'FS_createPreloadedFile', 'FS_createPath']" \
 	   -s DISABLE_EXCEPTION_CATCHING=0 \
 	   --memory-init-file 0

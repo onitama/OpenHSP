@@ -6,6 +6,7 @@
 #define global _HSP3DISH
 
 #runtime "hsp3dish"
+#addition "dish_enhance.as"
 
 #const global FILTER_NONE 0
 #const global FILTER_LINEAR 1

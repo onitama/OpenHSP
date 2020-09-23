@@ -1150,7 +1150,7 @@ static int cmdfunc_intcmd( int cmd )
 		s_rep = code_gets();
 
 		ReplaceSetMatch( s_buffer, s_match, s_result, len_buffer, len_match, len_result );
-		ReplaceStr( s_rep );
+		s_result = ReplaceStr( s_rep );
 
 		code_setva( pval, aptr, TYPE_STRING, s_result );
 		ctx->stat = ReplaceDone();

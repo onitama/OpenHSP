@@ -880,6 +880,7 @@ void Bmscr::Cls( int mode )
 	//		Font initalize
 	//
 	Sysfont(0);
+	fonteff_size = HSPMES_FONT_EFFSIZE_DEFAULT;
 
 	//		object initalize
 	//
@@ -1278,7 +1279,95 @@ void Bmscr::SetPalcolor( int palno )
 }
 
 
-void Bmscr::Print( char *mes )
+void Bmscr::Print(char *mes, int option)
+{
+	int px;
+	int x, y, i;
+	COLORREF mycolor = color;
+	x = cx; y = cy;
+
+	if (option & HSPMES_SHADOW) {		// 影文字
+		i = fonteff_size;
+		if (i > 0) {
+			Setcolor(objcolor);
+			if ((i == 1) || (option & HSPMES_LIGHT)) {
+				cx = x + fonteff_size; cy = y + fonteff_size;
+				PrintSub(mes);
+			}
+			else {
+				PrintSubMul(mes, x, y + i, 1, -1, i);
+				PrintSubMul(mes, x + i, y, -1, -1, i);
+			}
+		}
+		Setcolor(mycolor);
+		cx = x; cy = y;
+	}
+	if (option & HSPMES_OUTLINE) {		// アウトライン
+		i = fonteff_size;
+		if (i > 0) {
+			Setcolor(objcolor);
+			if ((i == 1)||(option & HSPMES_LIGHT)) {
+				cx = x; cy = y - i;
+				PrintSub(mes);
+				cx = x - i; cy = y;
+				PrintSub(mes);
+				cx = x + i; cy = y;
+				PrintSub(mes);
+				cx = x; cy = y + i;
+				PrintSub(mes);
+			}
+			else {
+				PrintSubMul(mes, x, y - i, -1, 1, i);
+				PrintSubMul(mes, x - i, y, 1, 1, i);
+				PrintSubMul(mes, x, y + i, 1, -1, i);
+				PrintSubMul(mes, x + i, y, -1, -1, i);
+			}
+		}
+		Setcolor(mycolor);
+		cx = x; cy = y;
+	}
+
+	px = PrintSub(mes);
+
+	if (option & HSPMES_NOCR) {		// 改行しない
+		cx = x + px;
+		cy = y;
+	}
+}
+
+
+int Bmscr::PrintSubMul(char *mes, int x, int y, int px, int py, int times)
+{
+	int i,curx,cury;
+	curx = x; cury = y;
+	for (i = 0; i < times; i++) {
+		cx = curx; cy = cury;
+		PrintSub(mes);
+		curx += px; cury += py;
+	}
+	return 0;
+}
+
+
+int Bmscr::PrintSub(char *mes)
+{
+	int chk;
+	int px;
+	char stmp[1024];
+	px = 0;
+
+	strsp_ini();
+	while (1) {
+		chk = strsp_get(mes, stmp, 0, 1022);
+		PrintLine(stmp);
+		if (px < printsize.cx) px = printsize.cx;
+		if (chk == 0) break;
+	}
+	return px;
+}
+
+
+void Bmscr::PrintLine( char *mes )
 {
 	int a;
 	long res;

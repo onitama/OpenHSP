@@ -809,24 +809,13 @@ static int cmdfunc_extcmd( int cmd )
 
 	case 0x0f:								// mes,print
 		{
-		int chk;
-		int sw,x,y;
+		int sw;
 		char *ptr;
 		ptr = code_getdsi( "" );
 		sw = code_getdi(0);
-		strsp_ini();
-		while(1) {
-			chk = strsp_get( ptr, ctx->stmp, 0, 1022 );
-			x = bmscr->cx; y = bmscr->cy;
-			bmscr->Print( ctx->stmp );
-			if ( chk == 0 ) break;
-		}
-		if ( sw ) {		// 改行しない
-			bmscr->cx = x + bmscr->printsize.cx;
-			bmscr->cy = y;
-		}
+		bmscr->Print(ptr, sw );
 		break;
-		}
+	}
 	case 0x10:								// title
 		{
 		char *p;
@@ -855,8 +844,10 @@ static int cmdfunc_extcmd( int cmd )
 		char fontname[256];
 		strncpy( fontname, code_gets(), 255 );
 		p1 = code_getdi( 12 );
-		p2 = code_getdi( 0 );
+		p2 = code_getdi(0);
+		p3 = code_getdi(HSPMES_FONT_EFFSIZE_DEFAULT);
 		ctx->stat = bmscr->Newfont( fontname, p1, p2, 0 );
+		bmscr->fonteff_size = p3;
 		break;
 		}
 	case 0x15:								// sysfont
@@ -1543,7 +1534,11 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x4e:								// rgbcolor
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
-		bmscr->Setcolor((p1 >> 16) & 0xff, (p1>>8) & 0xff, p1 & 0xff );
+		if (p2 == 1) {
+			bmscr->Setcolor2( RGB((p1 >> 16) & 0xff, (p1 >> 8) & 0xff, p1 & 0xff) );
+			break;
+		}
+		bmscr->Setcolor((p1 >> 16) & 0xff, (p1 >> 8) & 0xff, p1 & 0xff);
 		break;
 	case 0x4f:								// viewcalc
 		break;

@@ -863,10 +863,13 @@ char *ReplaceStr( char *repstr )
 		}
 
 		//	バッファチェック
-		i = cursize + csize;
-		if ( i >= len_result ) {
-			len_result += 0x8000;
-			s_result = sbExpand( s_result, len_result );
+		i = cursize + csize + len_buffer + 1;	// 置き換え後に十分なサイズを確保する
+		if (i >= len_result) {
+			while (1) {
+				len_result += 0x8000;
+				if (i < len_result) break;
+			}
+			s_result = sbExpand(s_result, len_result);
 		}
 
 		if ( psize ) {				// 置き換え

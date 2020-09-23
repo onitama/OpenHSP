@@ -49,6 +49,12 @@
 #define HSPOBJ_LAYER_CMD_DRAW (6)
 #define HSPOBJ_LAYER_CMD_TIME (7)
 
+#define HSPMES_FONT_EFFSIZE_DEFAULT (1)
+#define HSPMES_NOCR (1)
+#define HSPMES_SHADOW (2)
+#define HSPMES_OUTLINE (4)
+#define HSPMES_LIGHT (8)
+#define HSPMES_GMODE (16)
 
 typedef struct HSP3VARSET
 {
@@ -153,7 +159,10 @@ public:
 	int BmpSave( char *fname );
 	void GetClientSize( int *xsize, int *ysize );
 
-	void Print( char *mes );
+	void Print(char *mes, int option);
+	void PrintLine(char *mes);
+	int PrintSub(char *mes);
+	int PrintSubMul(char *mes, int x, int y, int px, int py, int times);
 	void Boxfill( int x1,int y1,int x2,int y2 );
 	void Circle( int x1,int y1,int x2,int y2, int mode );
 	COLORREF Pget( int xx, int yy );
@@ -279,6 +288,7 @@ public:
 	short	celofsx, celofsy;			// CEL center offset
 
 	COLORREF objcolor;					// object color code
+	int		fonteff_size;				// effect size for font
 
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_matrix[16];				// Viewport matrix
@@ -421,6 +431,7 @@ typedef struct BMSCR
 	short	celofsx, celofsy;			// CEL center offset
 
 	COLORREF objcolor;					// object color code
+	int		fonteff_size;				// effect size for font
 
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_matrix[16];				// Viewport matrix

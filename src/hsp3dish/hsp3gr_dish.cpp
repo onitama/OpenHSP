@@ -540,21 +540,32 @@ static int cmdfunc_extcmd( int cmd )
 		mmman->StopBank( p1 );
 		break;
 #endif
-
-
-#if 0
-	case 0x0d:								// pget
-		p1 = code_getdi( bmscr->cx );
-		p2 = code_getdi( bmscr->cy );
-		bmscr->Pget( p1, p2 );
-		break;
+	case 0x0b:								// mci
+#ifdef HSPWIN
+		ctx->stat = mmman->SendMCI(code_gets());
+		strncpy(ctx->refstr, mmman->GetMCIResult(), HSPCTX_REFSTR_MAX - 1);
+#else
+		code_gets();
 #endif
+		break;
 
 	case 0x0c:								// pset
 		p1 = code_getdi( bmscr->cx );
 		p2 = code_getdi( bmscr->cy );
 		bmscr->Pset( p1, p2 );
 		break;
+
+#if 0
+	case 0x0d:								// pget
+		p1 = code_getdi(bmscr->cx);
+		p2 = code_getdi(bmscr->cy);
+		bmscr->Pget(p1, p2);
+		break;
+	case 0x0e:								// syscolor
+		p1 = code_getdi(0);
+		bmscr->SetSystemcolor(p1);
+		break;
+#endif
 
 	case 0x0f:								// mes,print
 		{
@@ -1145,8 +1156,8 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x3c:								// celload
 		{
 		//int i;
-		char fname[64];
-		strncpy( fname, code_gets(), 63 );
+		char fname[HSP_MAX_PATH];
+		strncpy( fname, code_gets(), HSP_MAX_PATH-1);
 		p1 = code_getdi( -1 );
 		p2 = code_getdi( 0 );
 		if ( p1 < 0 ) p1 = wnd->GetEmptyBufferId();
@@ -3376,14 +3387,14 @@ static int cmdfunc_extcmd( int cmd )
 		//		es_patanim var, num, x, y, anim_wait, chrno, window_id
 		//		option=(0:loop,0x1000=1shot,0x2000=wipe)
 		int i,res,p7,sx,sy;
-		PVal* p_pval;
-		APTR p_aptr;
-		p_aptr = code_getva(&p_pval);
+		//PVal* p_pval;
+		//APTR p_aptr;
+		//p_aptr = code_getva(&p_pval);
+		p1 = code_getdi(-1);
 		p7 = code_getdi(1);
 		p3 = code_geti();
 		p4 = code_geti();
 		p5 = code_getdi(1);
-		p1 = code_getdi(-1);
 		p6 = code_getdi(cur_window);
 		res = -1;
 		p2 = p7 & 0xfff;
@@ -3408,7 +3419,7 @@ static int cmdfunc_extcmd( int cmd )
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		ctx->stat = res;
-		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
+		//code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
 		break;
 	}
 	case 0x227:								// es_getpos
@@ -3892,6 +3903,12 @@ void hsp3excmd_rebuild_window(void)
 	if (sprite) delete sprite;
 	sprite = new essprite;
 	sprite->setResolution( wnd, bmscr->sx, bmscr->sy);
+#endif
+
+#ifdef USE_MMAN
+	delete mmman;
+	mmman = new MMMan;
+	mmman->Reset(ctx->wnd_parent);
 #endif
 }
 

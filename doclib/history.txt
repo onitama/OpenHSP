@@ -5,6 +5,25 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
+	2020/09/24 3.6 beta4
+
+	strrep命令で32Kを超える文字列置き換えを行った際にバッファの内容が壊れる不具合を修正
+	UTF8のソースが引数付きマクロの展開に失敗することがある不具合を修正
+	アイコン埋め込み(iconins.exe)がhsp3dishの書き換えに失敗する不具合を修正
+	コールバックルーチンのエラーチェックからlogmes命令を除外
+	[HSP3Dish][hsp3js] 200個を超える大量のデータファイルを変換した際にhtmlの変換に失敗する不具合を修正
+	[HSP3Dish][hsp3js] 日本語の文字列表示でブラウザが応答しなくなる不具合を修正
+	[HSP3Dish][hsp3js] OBAQ機能の描画が正しく行われなかった不具合を修正
+	[HSP3Dish][android] リリース時のapk署名に、署名スキームV2が適用されるように修正
+	[HSP3Dish][Windows] MCI命令をサポート(Windowsプラットフォームのみ)
+	[HSP3Dish][Windows] screen命令での画面サイズ変更時に.mp3などのループ再生ができなくなる不具合を修正
+	[HSP3Dish][Windows] celload,picload命令で64文字以上のパス名がエラーになる不具合を修正
+	[HSP3Dish] 標準スプライトのESDRAW_NOSORTオプションが正しく動作していない不具合を修正
+	[HSP3Dish] β3版の標準スプライトでスプライト描画後の割り込み時のiparamが正しく設定されなかった不具合を修正
+	[HGIMG3] 拡張プラグインを指定した場合に正しく動作しないことがある不具合を修正
+	[HGIMG4] フォントの生成時にメモリリークが起こるのを修正
+	[HGIMG4][Windows] packfileからの読み込み及びdpmファイルに仮対応(Windowsプラットフォームのみ)
+
 	2020/07/09 3.6 beta3
 
 	mes(print)命令に影付け、縁取りなどの描画オプションを追加
