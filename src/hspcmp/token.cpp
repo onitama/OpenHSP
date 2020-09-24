@@ -255,10 +255,12 @@ void CToken::Pickstr( void )
 	//
 	int a=0;
 	unsigned char a1;
+	int skip, i;
 	while(1) {
 
 pickag:
 		a1=(unsigned char)*wp;
+#if 0
 		if (a1>=0x81) {
 			if (a1<0xa0) {				// s-jis code
 				s3[a++]=a1;wp++;
@@ -271,6 +273,7 @@ pickag:
 				continue;
 			}
 		}
+#endif
 
 		if (a1==0x5c) {					// '\' extra control
 			wp++;a1=tolower(*wp);
@@ -307,7 +310,17 @@ pickag:
 			if ( *wp == 0 ) wp=NULL;
 			break;
 		}
-		s3[a++]=a1;wp++;
+
+#if 0
+		s3[a++] = a1; wp++;
+#else
+		skip = SkipMultiByte(a1);	// 全角文字チェック
+		for (i = 0; i <= skip; i++) {
+			s3[a++] = a1; wp++;
+			a1 = *wp;
+		}	
+#endif
+
 	}
 	s3[a]=0;
 }

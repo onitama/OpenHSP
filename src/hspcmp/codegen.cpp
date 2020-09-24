@@ -1503,6 +1503,11 @@ void CToken::GenerateCodePP_regcmd( void )
 		PutHPI( HPIDAT_FLAG_SELFFUNC, 0, "", "" );
 		cg_pptype = val;
 		break;
+	case TK_NONE:
+		if (val == '*') {
+			cg_typecnt++;
+		}
+		break;
 	default:
 		throw CGERROR_PP_NO_REGCMD;
 	}
