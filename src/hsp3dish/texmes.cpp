@@ -88,6 +88,7 @@ void texmes::reset(int width, int height, int p_texsx, int p_texsy, void *data)
 	// Bind the texture to the material as a sampler
 	_texture = Texture::Sampler::create(texture); // +ref texture
 	_texture->setFilterMode(Texture::Filter::NEAREST, Texture::Filter::NEAREST);
+	SAFE_RELEASE(texture);
 
 #else
 	_texture = hgio_fontsystem_setup( texsx, texsy, data);
@@ -100,7 +101,7 @@ void texmes::reset(int width, int height, int p_texsx, int p_texsy, void *data)
 	life = TEXMES_CACHE_DEFAULT;
 	font_size = 0;
 	font_style = 0;
-	text = NULL;
+	if (text!=NULL) text[0] = 0;
 	buf[0] = 0;
 }
 

@@ -105,6 +105,7 @@
 #define HSPMES_NOCR (1)
 #define HSPMES_SHADOW (2)
 #define HSPMES_OUTLINE (4)
+#define HSPMES_LIGHT (8)
 #define HSPMES_GMODE (16)
 
 
@@ -356,6 +357,7 @@ public:
 
 	void Print(char *mes, int sw);
 	int PrintSub(char *mes);
+	int PrintSubMul(char *mes, int x, int y, int px, int py, int times);
 
 	void Print(texmesPos *tpos);
 	void Boxfill(int x1, int y1, int x2, int y2, int mode=0);

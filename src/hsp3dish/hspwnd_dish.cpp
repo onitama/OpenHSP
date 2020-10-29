@@ -337,7 +337,10 @@ void Bmscr::Init( char *fname )
 		throw HSPERR_PICTURE_MISSING;
 	}
 	Init( sx, sy );
-	strncpy( resname, fname, RESNAME_MAX-1 );
+
+	char _name[HSP_MAX_PATH];
+	getpath( fname, _name, 8 );
+	strncpy( resname, _name, RESNAME_MAX-1 );
 	//Alertf( "(%d,%d)",sx,sy );
 }
 
@@ -478,6 +481,8 @@ void Bmscr::SetFont( char *fontname, int size, int style )
 
 void Bmscr::SetDefaultFont( void )
 {
+	printoffsetx = 0;
+	printoffsety = 0;
 	SetFontInternal( font_curname, font_cursize, font_curstyle );
 }
 
@@ -499,11 +504,13 @@ void Bmscr::Print(texmesPos *tpos)
 }
 
 
-
 void Bmscr::Print(char *mes, int option)
 {
+	//		mes,printによる文字表示
+	//		(option=1の場合は改行しないで終了)
+	//
 	int px;
-	int x, y;
+	int x, y, i;
 	int mycolor = color;
 	x = cx; y = cy;
 
@@ -515,22 +522,42 @@ void Bmscr::Print(char *mes, int option)
 	}
 
 	if (option & HSPMES_SHADOW) {		// 影文字
-		Setcolor(objcolor);
-		cx = x + fonteff_size; cy = y + fonteff_size;
-		PrintSub(mes);
+		i = fonteff_size;
+		if (i > 0) {
+			Setcolor(objcolor);
+			if ((i == 1) || (option & HSPMES_LIGHT)) {
+				cx = x + fonteff_size; cy = y + fonteff_size;
+				PrintSub(mes);
+			}
+			else {
+				PrintSubMul(mes, x, y + i, 1, -1, i);
+				PrintSubMul(mes, x + i, y, -1, -1, i);
+			}
+		}
 		Setcolor(mycolor);
 		cx = x; cy = y;
 	}
 	if (option & HSPMES_OUTLINE) {		// アウトライン
-		Setcolor(objcolor);
-		cx = x; cy = y - fonteff_size;
-		PrintSub(mes);
-		cx = x - fonteff_size; cy = y;
-		PrintSub(mes);
-		cx = x + fonteff_size; cy = y;
-		PrintSub(mes);
-		cx = x; cy = y + fonteff_size;
-		PrintSub(mes);
+		i = fonteff_size;
+		if (i > 0) {
+			Setcolor(objcolor);
+			if ((i == 1) || (option & HSPMES_LIGHT)) {
+				cx = x; cy = y - i;
+				PrintSub(mes);
+				cx = x - i; cy = y;
+				PrintSub(mes);
+				cx = x + i; cy = y;
+				PrintSub(mes);
+				cx = x; cy = y + i;
+				PrintSub(mes);
+			}
+			else {
+				PrintSubMul(mes, x, y - i, -1, 1, i);
+				PrintSubMul(mes, x - i, y, 1, 1, i);
+				PrintSubMul(mes, x, y + i, 1, -1, i);
+				PrintSubMul(mes, x + i, y, -1, -1, i);
+			}
+		}
 		Setcolor(mycolor);
 		cx = x; cy = y;
 	}
@@ -544,11 +571,21 @@ void Bmscr::Print(char *mes, int option)
 }
 
 
+int Bmscr::PrintSubMul(char *mes, int x, int y, int px, int py, int times)
+{
+	int i, curx, cury;
+	curx = x; cury = y;
+	for (i = 0; i < times; i++) {
+		cx = curx; cy = cury;
+		PrintSub(mes);
+		curx += px; cury += py;
+	}
+	return 0;
+}
+
+
 int Bmscr::PrintSub( char *mes )
 {
-	//		mes,printによる文字表示
-	//		(sw=1の場合は改行しないで終了)
-	//
 	int spcur;
 	int px;
 	unsigned char* p;
@@ -585,12 +622,22 @@ int Bmscr::PrintSub( char *mes )
 		}
 #ifdef HSPUTF8
 		if (a1 & 128) {					// UTF8チェック
-			while (1) {
-				unsigned char a2;
-				a2 = *p;
-				if (a2 == 0) break;
-				if ((a2 & 0xc0) != 0x80) break;
-				p++; spcur++;
+			int utf8bytes = 1;
+			if ((a1 >= 0xc2) && (a1 <= 0xdf)) {
+				utf8bytes = 2;
+			} else if ((a1 >= 0xe0) && (a1 <= 0xef)) {
+				utf8bytes = 3;
+			} else if ((a1 >= 0xf0) && (a1 <= 0xf7)) {
+				utf8bytes = 4;
+			} else if ((a1 >= 0xf8) && (a1 <= 0xfb)) {
+				utf8bytes = 5;
+			} else if ((a1 >= 0xfc) && (a1 <= 0xfd)) {
+				utf8bytes = 6;
+			}
+			while (utf8bytes > 0) {
+				p++;
+				spcur++;
+				utf8bytes--;
 			}
 		}
 		else {

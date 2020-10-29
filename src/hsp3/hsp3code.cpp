@@ -1364,7 +1364,7 @@ static int cmdfunc_gosub( unsigned short *subr )
 				break;
 			} else {
 				if (hspctx->callback_flag) {
-					if ((hspctx->runmode != RUNMODE_RUN)&&(hspctx->runmode != RUNMODE_END)) throw HSPERR_INVALID_CALLBACK;
+					if ((hspctx->runmode != RUNMODE_RUN) && (hspctx->runmode != RUNMODE_END) && (hspctx->runmode != RUNMODE_LOGMES)) throw HSPERR_INVALID_CALLBACK;
 				}
 				hspctx->msgfunc( hspctx );
 			}
@@ -1421,7 +1421,7 @@ static int code_callfunc( int cmd )
 				break;
 			} else {
 				if (hspctx->callback_flag) {
-					if ((hspctx->runmode != RUNMODE_RUN) && (hspctx->runmode != RUNMODE_END)) throw HSPERR_INVALID_CALLBACK;
+					if ((hspctx->runmode != RUNMODE_RUN) && (hspctx->runmode != RUNMODE_END) && (hspctx->runmode != RUNMODE_LOGMES)) throw HSPERR_INVALID_CALLBACK;
 				}
 				hspctx->msgfunc( hspctx );
 			}

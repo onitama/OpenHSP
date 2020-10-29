@@ -817,7 +817,7 @@ int essprite::draw(int start, int num, int mode, int start_pri, int end_pri)
 		a--;
 	}
 
-	if (mode_p & ESDRAW_NOSORT) priselect = false;
+	if (mode & ESDRAW_NOSORT) priselect = false;
 
 	if (priselect) {
 		std::sort(selspr, selspr + maxspr, less_int_1);
@@ -833,7 +833,7 @@ int essprite::draw(int start, int num, int mode, int start_pri, int end_pri)
 			if (sp->fl) {
 				if (mode_p & ESDRAW_NOCALLBACK) {
 					if (sp->sbr) {
-						ctx->iparam = a1;
+						ctx->iparam = spr->info;
 						ctx->wparam = sp->type;
 						ctx->lparam = sp->chr;
 						code_call(sp->sbr);

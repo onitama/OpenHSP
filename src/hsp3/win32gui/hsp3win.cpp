@@ -453,14 +453,46 @@ int hsp3win_init( HINSTANCE hInstance, char *startfile )
 	return 0;
 }
 
+void hsp3win_error(void)
+{
+	char errmsg[1024];
+	char *msg;
+	char *fname;
+	HSPERROR err;
+	int ln;
+	err = code_geterror();
+	ln = code_getdebug_line();
+	msg = hspd_geterror(err);
+	fname = code_getdebug_name();
+
+	if (ln < 0) {
+		sprintf(errmsg, "#Error %d\n-->%s\n", (int)err, msg);
+		fname = NULL;
+	}
+	else {
+		sprintf(errmsg, "#Error %d in line %d (%s)\n-->%s\n", (int)err, ln, fname, msg);
+	}
+	hsp3win_debugopen();
+	hsp3win_dialog(errmsg);
+}
+
+
 void hsp3win_bye( void )
 {
-	//		HSP関連の解放
-	//
-	if ( hsp != NULL ) { delete hsp; hsp = NULL; }
-
 	//		タイマーの開放
 	//
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+		hsp->Dispose();
+#ifdef HSPERR_HANDLE
+	}
+	catch (HSPERROR code) {						// HSPエラー例外処理
+		hsp->hspctx.err = code;
+		hsp3win_error();
+	}
+#endif
+
 	if ( timer_period != -1 ) {
 		timeEndPeriod( timer_period );
 		timer_period = -1;
@@ -474,35 +506,16 @@ void hsp3win_bye( void )
 
 	DllManager().free_all_library();
 
+	//		HSP関連の解放
+	//
+	if (hsp != NULL) { delete hsp; hsp = NULL; }
+
 	//		システム関連の解放
 	//
 #ifndef HSP_COM_UNSUPPORTED
 	OleUninitialize();
 	CoUninitialize();
 #endif
-}
-
-
-void hsp3win_error( void )
-{
-	char errmsg[1024];
-	char *msg;
-	char *fname;
-	HSPERROR err;
-	int ln;
-	err = code_geterror();
-	ln = code_getdebug_line();
-	msg = hspd_geterror(err);
-	fname = code_getdebug_name();
-
-	if ( ln < 0 ) {
-		sprintf( errmsg, "#Error %d\n-->%s\n",(int)err,msg );
-		fname = NULL;
-	} else {
-		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
-	}
-	hsp3win_debugopen();
-	hsp3win_dialog( errmsg );
 }
 
 
