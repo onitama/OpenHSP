@@ -2125,6 +2125,13 @@ ppresult_t CToken::PP_Define( void )
 		}
 		ctype=1;
 		strcase( word );
+		if (tstrcmp(word, "global")) {		// global macro
+			if (GetToken() != TK_OBJ || glmode==1) {
+				SetError("bad macro syntax"); return PPRESULT_ERROR;
+			}
+			glmode = 1;
+			strcase(word);
+		}
 	}
 	strcpy( keyword, word );
 	if ( glmode ) FixModuleName( keyword ); else AddModuleName( keyword );
