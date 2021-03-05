@@ -1,0 +1,52 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	;	ポイントライトテスト
+	;	マウス/タッチドラッグでカメラを動かすことができます
+	;
+	randomize
+
+	gpreset
+	gpresetlight 1,1			; ポイントライトを1個追加する
+	setcls CLSMODE_SOLID, $404040		; 背景色
+
+	setcolor GPOBJ_LIGHT, 0.3,0.3,0.3	; 標準ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.2,0.2,0.2		; 標準アンビエントカラーを設定
+
+	;	ポイントライトを設定します
+	gpnull id_light				; ヌルノードを生成する
+	gplight id_light, GPOBJ_LGTOPT_POINT,6	; ポイントライトとして設定する
+	setcolor id_light, 0,1,0		; ライトカラーを設定
+	setpos id_light, 0, 0.5, 0		; ライトの座標を設定
+	gpuselight id_light			; ポイントライトをカレントに登録する
+
+	setpos GPOBJ_CAMERA, 0,2,6		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, 0,0.3,0		; カメラから指定した座標を見る
+
+	;	3Dモデルを生成
+	;	(生成される3Dモデルはカレントライトの影響を受けます)
+	gpbox id_model, 1			; 箱ノードを生成する
+	setpos id_model, -1,0.5,0
+
+	gpbox id_model2, 1			; 箱ノードを生成する
+	setpos id_model2, 1,0.5,0
+
+	gpfloor id_floor, 40,40, $808080	; 床ノードを追加
+
+*main
+	stick key,15+256
+	if key&128 : end
+
+	redraw 0			; 描画開始
+
+	addang id_model,0,0.02		; ノード回転
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+	goto *main

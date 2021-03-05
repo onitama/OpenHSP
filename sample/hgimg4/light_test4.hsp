@@ -1,0 +1,73 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	;	スポットライトテスト
+	;	マウス/タッチドラッグでライトの方向を動かすことができます
+	;
+	randomize
+
+	gpreset
+	gpresetlight 1,0,1			; スポットライトを1個追加する
+	setcls CLSMODE_SOLID, $404040		; 背景色
+
+	setcolor GPOBJ_LIGHT, 0.1,0.1,0.5	; 標準ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.2,0.2,0.2		; 標準アンビエントカラーを設定
+
+	gpnull id_light				; ノードを生成する
+	gplight id_light, GPOBJ_LGTOPT_SPOT,10	; スポットライトとして設定する
+	setcolor id_light, 1,1,1		; ライトカラーを設定
+	setpos id_light,0,3,0
+
+	gpuselight id_light			; スポットライトを使用する
+
+
+	;	モデルをたくさん配置する
+	i=-1
+	mdx=10:mdz=10				; X,Z方向の個数
+	px=20.0/mdx:pz=20.0/mdz			; 間隔を計算する
+	z=-10.0					; 配置開始Z座標
+	repeat mdz
+	x=-10.0					; 配置開始X座標
+	repeat mdx
+		if i<0 {
+			gpbox id_base, 1	; 箱ノードを生成する
+			i=id_base
+		} else {
+			gpclone i, id_base	; クローンでモデルを作成する
+		}
+		setpos i, x,1,z
+		x+=px
+	loop
+	z+=pz
+	loop
+
+	gpfloor id_floor, 40,40, $8080ff	; 床ノードを追加
+
+	setpos GPOBJ_CAMERA, -6.75,13.5,3.0	; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, 0,1.8,0		; カメラから指定した座標を見る
+
+
+	px=0.0:pz=0.0
+
+*main
+	stick key,15+256
+	if key&128 : end
+
+	if key&256 {
+		px=double(mousex)/ginfo_sx*20-10
+		pz=double(mousey)/ginfo_sy*20-10
+	}
+	gplookat id_light,px,0,pz		; ライトの方向を設定する
+
+	redraw 0			; 描画開始
+
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+	goto *main

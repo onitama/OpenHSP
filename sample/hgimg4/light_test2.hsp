@@ -1,0 +1,115 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	;	複数のポイントライトテスト
+	;	マウス/タッチドラッグでカメラを動かすことができます
+	;
+	randomize
+
+	gpreset
+	gpresetlight 1,3			; ポイントライトを3個追加する
+
+	setcls CLSMODE_SOLID, $404040		; 背景色
+
+	setcolor GPOBJ_LIGHT, 0.5,0.5,0.5	; 標準ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.2,0.2,0.2		; 標準アンビエントカラーを設定
+
+	;	ポイントライトを設定(1個目)
+	gpnull id_light					; ヌルノードを生成する
+	gplight id_light, GPOBJ_LGTOPT_POINT,5		; ポイントライトとして設定する
+	setpos id_light, -3, 2, -3			; ライトの座標を設定する
+	setcolor id_light, 0,1,0			; ライトカラーを設定
+	gpuselight id_light				; ポイントライトをカレントに設定する
+
+	;	ポイントライトを設定(2個目)
+	gpnull id_light2				; ヌルノードを生成する
+	gplight id_light2, GPOBJ_LGTOPT_POINT,5		; ポイントライトとして設定する
+	setpos id_light2, 0, 2, 3			; ライトの座標を設定する
+	setcolor id_light2, 1,0,0			; ライトカラーを設定
+	gpuselight id_light2,1				; ポイントライトをカレントに設定する
+
+	;	ポイントライトを設定(3個目)
+	gpnull id_light3				; ヌルノードを生成する
+	gplight id_light3, GPOBJ_LGTOPT_POINT,5		; ポイントライトとして設定する
+	setpos id_light3, 3, 2, 0			; ライトの座標を設定する
+	setcolor id_light3, 0,0,1			; ライトカラーを設定
+	gpuselight id_light3,2				; ポイントライトをカレントに設定する
+
+	;	モデルをたくさん配置する
+	i=-1
+	mdx=5:mdz=5				; X,Z方向の個数
+	px=20.0/mdx:pz=20.0/mdz			; 間隔を計算する
+	z=-10.0					; 配置開始Z座標
+	repeat mdz
+	x=-10.0					; 配置開始X座標
+	repeat mdx
+		if i<0 {
+			gpbox id_base, 1	; 箱ノードを追加
+			;gpload id_base,"res/duck"; モデル読み込み
+			i=id_base
+		} else {
+			gpclone i, id_base	; クローンでモデルを作成する
+		}
+		setpos i, x,1,z
+		x+=px
+	loop
+	z+=pz
+	loop
+
+	gpfloor id_floor, 40,40, $808080	; 床ノードを追加
+
+	gosub *caminit
+
+	myx=0.0:myy=3.0:myz=0.0				; 光源の座標
+	px=0.0:pz=0.0
+	tx=0.0:tz=0.0
+	rate = 0.01				; 光源が動く速さ
+	hval=0
+
+*main
+	stick key,15+256
+	if key&128 : end
+
+	gosub *cammove
+
+	redraw 0			; 描画開始
+
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+	goto *main
+
+
+*caminit
+	camx=0.0:camy=3.0:camz=3.0
+	return
+
+*cammove
+	;	タッチでカメラ位置を動かす
+	a=key&256
+	if dragmd {	; ドラッグ中
+		if a {
+			camx=0.05*(mousex-dragx)+cx
+			camy=0.05*(mousey-dragy)+cz
+		} else {
+			dragmd=0
+		}
+	} else {	; ドラッグなし
+		if a {
+			cx=camx:cz=camz
+			dragx=mousex:dragy=mousey
+			dragmd=1
+		}
+	}
+	setpos GPOBJ_CAMERA, camx,camy,camz		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, 0,1.8,0		; カメラから指定した座標を見る
+	return
+
+
+

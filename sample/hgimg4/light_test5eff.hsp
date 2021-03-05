@@ -1,0 +1,102 @@
+#include "hgimg4.as"
+#include "mod_posteffect.as"
+
+title "HGIMG4 Test"
+
+	;	ポイントライト色変化テスト
+	;	マウス/タッチドラッグでカメラを動かすことができます
+	;
+	randomize
+
+	gpreset
+	post_reset
+	post_select POSTID_GLOW2		; ポストエフェクト設定
+	post_setprm 192,0.55,6			; ポストエフェクトのパラメーター
+
+	gpresetlight 1,1			; ポイントライトを1個追加する
+
+	setcolor GPOBJ_LIGHT, 0.8,0.8,0.8	; 標準ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.2,0.2,0.2		; 標準アンビエントカラーを設定
+
+	;	nullライトとして設定します
+	gpnull id_model
+	gplight id_model, GPOBJ_LGTOPT_POINT,10	; ポイントライトとして設定する
+	setcolor id_model, 1,1,1			; ライトカラーを設定
+	gpuselight id_model				; ポイントライトを使用する
+	setpos id_model,0,5,0
+
+	;	イベントリストを登録
+	;
+	newevent ev1			; 新しいイベントIDを取得
+	event_addang ev1, 0.02, 0.02, 0	; 少しずつ回転する
+	event_wait ev1, 1
+	event_jump ev1
+
+	;	モデルをたくさん配置する
+	;
+	i=-1
+	mdx=10:mdz=10				; X,Z方向の個数
+	px=20.0/mdx:pz=20.0/mdz			; 間隔を計算する
+	z=-10.0					; 配置開始Z座標
+	repeat mdz
+	x=-10.0					; 配置開始X座標
+	repeat mdx
+		if i<0 {
+			;gpload id_base,"res/duck"	; モデル読み込み
+			gpbox id_base, 1, $c0c0c0	; 箱ノードを生成する
+			i=id_base
+		} else {
+			gpclone i, id_base	; クローンでモデルを作成する
+		}
+		y=rnd(11)+2	
+		setpos i, x,y,z
+		setangr i, rnd(256),rnd(256)
+		setevent i,ev1
+		x+=px
+	loop
+	z+=pz
+	loop
+
+	gpfloor id_floor, 40,40, $606060	; 床ノードを追加
+
+	camang = 0.0
+	camdist = 10.0
+	speed = 0.01
+	camy=3.0
+	hval=0
+
+*main
+	stick key,15+256
+	if key&128 : end
+	if key&2 : camy-=0.025
+	if key&8 : camy+=0.025
+
+	camang+=speed
+	camx=sin(camang)*camdist
+	camz=cos(camang)*camdist
+	setpos GPOBJ_CAMERA, camx,camy,camz		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, 0,5,0		; カメラから指定した座標を見る
+
+	;	ライトの色を変化させる
+	;	hsvcolorの値をRGB値に変換する
+	hsvcolor hval,255,255
+	hval+:if hval>192 : hval=0
+	rval=double(ginfo_r)/255.0
+	gval=double(ginfo_g)/255.0
+	bval=double(ginfo_b)/255.0
+	setcolor id_model, rval,gval,bval	; ライトカラーを設定
+
+	addang id_model,0,0.02		; ノード回転
+
+	post_drawstart			; 描画開始
+	rgbcolor $303030:boxf		; 背景クリア
+	gpdraw				; シーンの描画
+	gmode 0
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+	post_drawend			; 描画終了
+
+	await 1000/60			; 待ち時間
+
+	goto *main
+

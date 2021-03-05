@@ -1,0 +1,46 @@
+#include "hgimg4.as"
+
+	gpbox box,1,$888888					//箱を生成
+	setang box,1,1
+	setscale box,2,1,1		//箱の角度と拡大率を設定
+	setpos box,0,5,0
+	setcoli box,1,2			//コリジョングループを設定
+	gppbind box,1			//箱に物理を与える
+
+	gpfloor grd,10,10,$AABB99			//床を生成
+	setpos grd,0,-3,0:setalpha grd,100	//床の位置調整をして半透明にする
+	setcoli grd,2,0			//コリジョングループを設定
+	gppbind grd,0						//床に物理を与える
+	setpos gpobj_camera,0,0,10			//カメラの位置を調整
+
+	; テクスチャマテリアル作成
+	gptexmat id_ptex, "res/efx.png"	,GPOBJ_MATOPT_BLENDADD|GPOBJ_MATOPT_NOZWRITE
+
+	;	イベントリストを登録
+	;
+	newevent ev1			; 新しいイベントIDを取得
+	event_setdir ev1, -0.2,0.2,-0.5, 0.2,0.7,0.2
+	event_adddir ev1, 0, -0.05, 0
+	event_wait ev1, 40
+	event_suicide ev1
+
+	ddim respos,4
+	resid=0
+
+*main
+	gppcontact res,box			; 接触
+	if res>0 {
+		gppinfo respos,resid,box,0
+
+		gpplate id, 1.8,1.8,-2,id_ptex		; 板ノードを追加
+		setobjmode id, OBJ_MOVE			; 自動移動を設定する
+		setpos id,respos(0),respos(1),respos(2)
+		setevent id, ev1
+	}
+	redraw 0
+	color:boxf
+	gpdraw
+	redraw 1
+	await 16
+
+	goto *main

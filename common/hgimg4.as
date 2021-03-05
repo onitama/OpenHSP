@@ -8,6 +8,7 @@
 #define global _HGIMG4
 
 #runtime "hsp3gp"
+#addition "dish_enhance.as"
 
 #define global screen_offscreen (32)
 #define global screen_usergcopy (64)
@@ -54,6 +55,7 @@
 #const global GPOBJ_MATOPT_USERBUFFER (256)
 #const global GPOBJ_MATOPT_MIRROR (512)
 #const global GPOBJ_MATOPT_CUBEMAP (1024)
+#const global GPOBJ_MATOPT_NODISCARD (2048)
 
 #enum global PRMSET_FLAG = 2
 #enum global PRMSET_MODE
@@ -91,6 +93,7 @@
 #enum global GPPSET_ANGULAR_FACTOR
 #enum global GPPSET_ANGULAR_VELOCITY
 #enum global GPPSET_LINEAR_VELOCITY
+#enum global GPPSET_MASS_CENTER
 
 #const global GPPAPPLY_FORCE (0)
 #const global GPPAPPLY_IMPULSE (1)
@@ -131,6 +134,9 @@
 #const global vptype_3dmatrix (4)
 #const global vptype_2d (5)
 #const global vptype_3d (6)
+
+#const global GPPBIND_NOSCALE (1)
+#const global GPPBIND_MESH (2)
 
 ;
 ;	system request
@@ -369,6 +375,7 @@
 #cmd event_prmoff $108
 #cmd event_prmadd $109
 #cmd event_suicide $10a
+#cmd event_delobj $10a
 #cmd event_aim $10b
 #cmd objaim $10c
 #cmd gpscrmat $10d
@@ -428,6 +435,17 @@
 #cmd event_wangz $14b
 #cmd event_wangr $14c
 
+#define event_fade(%1,%2) event_prmset (%1), PRMSET_FADE, (%2)
+
+#cmd gpresetlight $150
+#cmd setobjlight $151
+#cmd gpmeshclear $152
+#cmd gpmeshpolygon $153
+#cmd gpmeshadd $154
+#cmd gpmesh $155
+#cmd gppcontact $156
+#cmd gppinfo $157
+#cmd gppraytest $158
 
 #define fsin(%1,%2) %1=sin(%2)
 #define fcos(%1,%2) %1=cos(%2)

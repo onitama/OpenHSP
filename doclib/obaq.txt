@@ -1,428 +1,428 @@
 ------------------------------------------------------------------------------
 OBAQ for HSP ver3.4 REFERENCE MANUAL                HSP : Hot Soup Processor  
-ＨＳＰ拡張拡張DLLリファレンス    Copyright 2014 (c) Zener Works/kuni/onitama  
+�g�r�o�g���g��DLL���t�@�����X    Copyright 2014 (c) Zener Works/kuni/onitama  
 ------------------------------------------------------------------------------
 
-・はじめに
+�E�͂��߂�
 
-	このDLLは、Hot Soup Processor ver3.2以降とともに使用することで、
-	物理エンジン(OBAQ)が持つ機能を手軽に利用することができるプラグインです。
-	OBAQは、DLL内にすべての機能を内包しており、HSPが実行可能な環境であれば
-	追加のモジュールやDLLをインストールする必要はありません。
-
-
-・OBAQの機能概要
-
-	OBAQを使用することにより、2Dベースによる剛体の衝突、重力シミューレーション
-	を扱うことができます。
-	OBAQは誰にでも手軽に、物理演算による自然な動きを実現することが
-	できるよう、2Dに特化し、設定や命令もシンプルにまとめられています。
-	精度の高い技術計算というよりも、ゲームやデモンストレーション等を
-	サポートするためのお手軽なシステムと考えてください。
-
-	OBAQには、スプライトマネージャーを内蔵しており、標準機能のみを使用した
-	スプライト描画を手軽に行なうことができます。また、表示座標をユーザーが
-	管理することにより、DirectX等を使った表示システムにも対応可能です。
+	����DLL�́AHot Soup Processor ver3.2�ȍ~�ƂƂ��Ɏg�p���邱�ƂŁA
+	�����G���W��(OBAQ)�����@�\����y�ɗ��p���邱�Ƃ��ł���v���O�C���ł��B
+	OBAQ�́ADLL���ɂ��ׂĂ̋@�\�����Ă���AHSP�����s�\�Ȋ��ł����
+	�ǉ��̃��W���[����DLL���C���X�g�[������K�v�͂���܂���B
 
 
-・使用のための準備
+�EOBAQ�̋@�\�T�v
 
-	OBAQ.DLLは、最新のHSP3フルセットに同梱されています。
-	DLLが動作しない場合は、実行に使われているHSP3.EXEと同じディレクトリに、
-	OBAQ.DLLがあるかどうかを確認してください。
-	OBAQを使用する場合は、スクリプトの先頭に必ず「#include "obaq.as"」
-	という行を追加してください。以上で、HSPの機能が拡張され、この
-	リファレンスで説明をしている命令を使用することができるようになります。
-	まず最初に、試しにサンプルスクリプト(sample/obaqフォルダ内)を実行
-	してみてください。
-	拡張された機能の簡単な使用例を見ることができるはずです。
+	OBAQ���g�p���邱�Ƃɂ��A2D�x�[�X�ɂ�鍄�̂̏ՓˁA�d�̓V�~���[���[�V����
+	���������Ƃ��ł��܂��B
+	OBAQ�͒N�ɂł���y�ɁA�������Z�ɂ�鎩�R�ȓ������������邱�Ƃ�
+	�ł���悤�A2D�ɓ������A�ݒ�▽�߂��V���v���ɂ܂Ƃ߂��Ă��܂��B
+	���x�̍����Z�p�v�Z�Ƃ��������A�Q�[����f�����X�g���[�V��������
+	�T�|�[�g���邽�߂̂���y�ȃV�X�e���ƍl���Ă��������B
+
+	OBAQ�ɂ́A�X�v���C�g�}�l�[�W���[��������Ă���A�W���@�\�݂̂��g�p����
+	�X�v���C�g�`�����y�ɍs�Ȃ����Ƃ��ł��܂��B�܂��A�\�����W�����[�U�[��
+	�Ǘ����邱�Ƃɂ��ADirectX�����g�����\���V�X�e���ɂ��Ή��\�ł��B
 
 
-・使い方の概要
+�E�g�p�̂��߂̏���
 
-	OBAQは、シンプルな表示物の管理と、描画機能を内蔵しています。
-	管理される最小の単位を、オブジェクトと呼んでいます。
-	オブジェクトには、四角形、三角形を始めとして任意の形状を割り当てる
-	ことができます。また、描画機能によりオブジェクトを画面上に表示したり、
-	画像を割り当てることが可能です。
-	OBAQでは、オブジェクトに割り当てられた形状をもとに画面内を1つの空間と
-	見なして、すべての衝突と重力を考慮して配置、移動が行なわれます。
-	つまり、画面内にあるすべてのオブジェクトは、現実と同様に重さを持ち、
-	材質(摩擦や反発力など)のパラメーターを持っています。
-	これらを適切に設定することで、リアルな物理挙動を手軽に再現することが
-	できるようになります。
+	OBAQ.DLL�́A�ŐV��HSP3�t���Z�b�g�ɓ�������Ă��܂��B
+	DLL�����삵�Ȃ��ꍇ�́A���s�Ɏg���Ă���HSP3.EXE�Ɠ����f�B���N�g���ɁA
+	OBAQ.DLL�����邩�ǂ������m�F���Ă��������B
+	OBAQ���g�p����ꍇ�́A�X�N���v�g�̐擪�ɕK���u#include "obaq.as"�v
+	�Ƃ����s��ǉ����Ă��������B�ȏ�ŁAHSP�̋@�\���g������A����
+	���t�@�����X�Ő��������Ă��閽�߂��g�p���邱�Ƃ��ł���悤�ɂȂ�܂��B
+	�܂��ŏ��ɁA�����ɃT���v���X�N���v�g(sample/obaq�t�H���_��)�����s
+	���Ă݂Ă��������B
+	�g�����ꂽ�@�\�̊ȒP�Ȏg�p������邱�Ƃ��ł���͂��ł��B
 
-	OBAQを使用する際には、最初に初期化を行なう必要があります。
 
-	qreset				OBAQ初期化
+�E�g�����̊T�v
 
-	qreset命令により、すべての情報が初期化され何もない状態になります。
-	この時、HSPの描画対象として設定されていたウィンドウが、OBAQでも
-	描画の対象となります。
-	qreset命令により初期化を行なうと、画面全体を囲む壁(枠)が自動的に
-	設定されます。これは、何も壁のない状態で画面内にオブジェクトを配置
-	した際に、画面外まで落下するのを防ぐためのものです。
-	壁のサイズや位置を変更したい場合は、qborder命令により再設定を
-	行なってください。
+	OBAQ�́A�V���v���ȕ\�����̊Ǘ��ƁA�`��@�\��������Ă��܂��B
+	�Ǘ������ŏ��̒P�ʂ��A�I�u�W�F�N�g�ƌĂ�ł��܂��B
+	�I�u�W�F�N�g�ɂ́A�l�p�`�A�O�p�`���n�߂Ƃ��ĔC�ӂ̌`������蓖�Ă�
+	���Ƃ��ł��܂��B�܂��A�`��@�\�ɂ��I�u�W�F�N�g����ʏ�ɕ\��������A
+	�摜�����蓖�Ă邱�Ƃ��\�ł��B
+	OBAQ�ł́A�I�u�W�F�N�g�Ɋ��蓖�Ă�ꂽ�`������Ƃɉ�ʓ���1�̋�Ԃ�
+	���Ȃ��āA���ׂĂ̏Փ˂Əd�͂��l�����Ĕz�u�A�ړ����s�Ȃ��܂��B
+	�܂�A��ʓ��ɂ��邷�ׂẴI�u�W�F�N�g�́A�����Ɠ��l�ɏd���������A
+	�ގ�(���C�┽���͂Ȃ�)�̃p�����[�^�[�������Ă��܂��B
+	������K�؂ɐݒ肷�邱�ƂŁA���A���ȕ�����������y�ɍČ����邱�Ƃ�
+	�ł���悤�ɂȂ�܂��B
 
-	オブジェクトは、それぞれ表示するための位置(座標)が設定されています。
-	OBAQでは、内部で独自を座標系を持っており、画面左上を(0,0)として、
-	右下に向かうほど値が増えていきます。(Xの正方向が右、Yの正方向が下)
-	OBAQに内蔵された描画機能を使用する場合は、初期設定の段階では
-	内部座標を4倍したものが、表示の座標(画面上のドット数換算)となっています。
-	この座標変換は、qview命令によりユーザーが任意に設定することが
-	できるようになっていますので、ズームや縮小、位置などを調整することが
-	できます。
+	OBAQ���g�p����ۂɂ́A�ŏ��ɏ��������s�Ȃ��K�v������܂��B
 
-	OBAQの初期化が終了したら、表示のためのメインループを作成してください。
-	以下は、一般的なループの例です。
+	qreset				OBAQ������
 
-		qreset		; OBAQの初期化
+	qreset���߂ɂ��A���ׂĂ̏�񂪏��������ꉽ���Ȃ���ԂɂȂ�܂��B
+	���̎��AHSP�̕`��ΏۂƂ��Đݒ肳��Ă����E�B���h�E���AOBAQ�ł�
+	�`��̑ΏۂƂȂ�܂��B
+	qreset���߂ɂ�菉�������s�Ȃ��ƁA��ʑS�̂��͂ޕ�(�g)�������I��
+	�ݒ肳��܂��B����́A�����ǂ̂Ȃ���Ԃŉ�ʓ��ɃI�u�W�F�N�g��z�u
+	�����ۂɁA��ʊO�܂ŗ�������̂�h�����߂̂��̂ł��B
+	�ǂ̃T�C�Y��ʒu��ύX�������ꍇ�́Aqborder���߂ɂ��Đݒ��
+	�s�Ȃ��Ă��������B
+
+	�I�u�W�F�N�g�́A���ꂼ��\�����邽�߂̈ʒu(���W)���ݒ肳��Ă��܂��B
+	OBAQ�ł́A�����œƎ������W�n�������Ă���A��ʍ����(0,0)�Ƃ��āA
+	�E���Ɍ������قǒl�������Ă����܂��B(X�̐��������E�AY�̐���������)
+	OBAQ�ɓ������ꂽ�`��@�\���g�p����ꍇ�́A�����ݒ�̒i�K�ł�
+	�������W��4�{�������̂��A�\���̍��W(��ʏ�̃h�b�g�����Z)�ƂȂ��Ă��܂��B
+	���̍��W�ϊ��́Aqview���߂ɂ�胆�[�U�[���C�ӂɐݒ肷�邱�Ƃ�
+	�ł���悤�ɂȂ��Ă��܂��̂ŁA�Y�[����k���A�ʒu�Ȃǂ𒲐����邱�Ƃ�
+	�ł��܂��B
+
+	OBAQ�̏��������I��������A�\���̂��߂̃��C�����[�v���쐬���Ă��������B
+	�ȉ��́A��ʓI�ȃ��[�v�̗�ł��B
+
+		qreset		; OBAQ�̏�����
 	*main
-		;	メインループ
+		;	���C�����[�v
 		;
-		redraw 0		; 画面の更新を開始
-		color 0,0,0:boxf	; 画面をクリア
-		qexec			; OBAQによるオブジェクトの更新
+		redraw 0		; ��ʂ̍X�V���J�n
+		color 0,0,0:boxf	; ��ʂ��N���A
+		qexec			; OBAQ�ɂ��I�u�W�F�N�g�̍X�V
 
-		;	ここにユーザーの処理を入れてください
+		;	�����Ƀ��[�U�[�̏��������Ă�������
 
-		qdraw			; オブジェクトの描画
-		redraw 1		; 画面の更新を終了
-		await 12		; 一定時間待つ
+		qdraw			; �I�u�W�F�N�g�̕`��
+		redraw 1		; ��ʂ̍X�V���I��
+		await 12		; ��莞�ԑ҂�
 		goto *main
 
-	メインループでは、必ずqexec命令によりオブジェクトの移動更新を
-	行なう必要があります。内部の描画を利用する場合は、qdraw命令による
-	画面の更新も必要になります。
-	qdraw命令による描画は、WindowsのシステムAPI(GDI)を利用しています
-	ので、画面クリアと、redraw命令による更新も行なってください。
-	他のシステムによる描画(DirectX等)を行なう場合は、qexec命令による
-	更新だけを行なってから、各オブジェクトの表示位置を自前で取得して
-	描画を行なう必要があります。(表示座標の変換用にqcnvaxis命令や
-	qgetaxis命令が用意されています。)
+	���C�����[�v�ł́A�K��qexec���߂ɂ��I�u�W�F�N�g�̈ړ��X�V��
+	�s�Ȃ��K�v������܂��B�����̕`��𗘗p����ꍇ�́Aqdraw���߂ɂ��
+	��ʂ̍X�V���K�v�ɂȂ�܂��B
+	qdraw���߂ɂ��`��́AWindows�̃V�X�e��API(GDI)�𗘗p���Ă��܂�
+	�̂ŁA��ʃN���A�ƁAredraw���߂ɂ��X�V���s�Ȃ��Ă��������B
+	���̃V�X�e���ɂ��`��(DirectX��)���s�Ȃ��ꍇ�́Aqexec���߂ɂ��
+	�X�V�������s�Ȃ��Ă���A�e�I�u�W�F�N�g�̕\���ʒu�����O�Ŏ擾����
+	�`����s�Ȃ��K�v������܂��B(�\�����W�̕ϊ��p��qcnvaxis���߂�
+	qgetaxis���߂��p�ӂ���Ă��܂��B)
 
-	オブジェクトを追加することで、画面上に表示物が現われます。
-	OBAQでは、それぞれのオブジェクトをID番号で管理しています。
-	オブジェクトを登録する場合は、以下の命令を使用します。
-	qaddpoly命令は、３角形・４角形など任意の多角形を生成することが
-	できます。qaddmodel命令では、より自由な形状をあらかじめ
-	配列変数に座標データとして格納したものを使用してオブジェクトを
-	生成します。
+	�I�u�W�F�N�g��ǉ����邱�ƂŁA��ʏ�ɕ\�����������܂��B
+	OBAQ�ł́A���ꂼ��̃I�u�W�F�N�g��ID�ԍ��ŊǗ����Ă��܂��B
+	�I�u�W�F�N�g��o�^����ꍇ�́A�ȉ��̖��߂��g�p���܂��B
+	qaddpoly���߂́A�R�p�`�E�S�p�`�ȂǔC�ӂ̑��p�`�𐶐����邱�Ƃ�
+	�ł��܂��Bqaddmodel���߂ł́A��莩�R�Ȍ`������炩����
+	�z��ϐ��ɍ��W�f�[�^�Ƃ��Ċi�[�������̂��g�p���ăI�u�W�F�N�g��
+	�������܂��B
 
-	qaddpoly			多角形オブジェクト追加
-	qaddmodel			自由設定オブジェクト追加
+	qaddpoly			���p�`�I�u�W�F�N�g�ǉ�
+	qaddmodel			���R�ݒ�I�u�W�F�N�g�ǉ�
 
-	これらの命令は、任意の場所に指定された形状のオブジェクトを追加します。
-	追加されたオブジェクトのIDを変数で受け取ることができるので、
-	パラメーターを変更する際は保存しておいてください。
+	�����̖��߂́A�C�ӂ̏ꏊ�Ɏw�肳�ꂽ�`��̃I�u�W�F�N�g��ǉ����܂��B
+	�ǉ����ꂽ�I�u�W�F�N�g��ID��ϐ��Ŏ󂯎�邱�Ƃ��ł���̂ŁA
+	�p�����[�^�[��ύX����ۂ͕ۑ����Ă����Ă��������B
 
-	オブジェクトを削除(破棄)する場合には、以下の命令を使用します。
+	�I�u�W�F�N�g���폜(�j��)����ꍇ�ɂ́A�ȉ��̖��߂��g�p���܂��B
 
-	qdel				オブジェクト削除
+	qdel				�I�u�W�F�N�g�폜
 
-	qdel命令は、個別のオブジェクトを削除します。
-	qreset命令により、すべてのオブジェクトと設定情報を破棄して、
-	初期状態に戻すことができます。
+	qdel���߂́A�ʂ̃I�u�W�F�N�g���폜���܂��B
+	qreset���߂ɂ��A���ׂẴI�u�W�F�N�g�Ɛݒ����j�����āA
+	������Ԃɖ߂����Ƃ��ł��܂��B
 
-	オブジェクトが登録されると、後は物理挙動に従って、自動的に動き
-	始めます。それぞれのオブジェクトには、多くのパラメーターがあり
-	以下の命令によって設定することができます。
+	�I�u�W�F�N�g���o�^�����ƁA��͕��������ɏ]���āA�����I�ɓ���
+	�n�߂܂��B���ꂼ��̃I�u�W�F�N�g�ɂ́A�����̃p�����[�^�[������
+	�ȉ��̖��߂ɂ���Đݒ肷�邱�Ƃ��ł��܂��B
 
-	qtype				typeパラメーターを設定
-	qstat				statパラメーターを設定
-	qpos				位置、角度パラメーターを設定
-	qspeed				加速パラメーターを設定
-	qgroup				グループパラメーターを設定
-	qweight				重さなどのパラメーターを設定
-	qdamper				吸振などのパラメーターを設定
-	qinertia			惰性などのパラメーターを設定
-	qmat				マテリアルパラメーターを設定
-	qmat2				マテリアル詳細パラメーターを設定
-	qmat3				マテリアル表示パラメーターを設定
-	quser				ユーザー定義データを設定
-	quser2				ユーザー定義データを設定2
+	qtype				type�p�����[�^�[��ݒ�
+	qstat				stat�p�����[�^�[��ݒ�
+	qpos				�ʒu�A�p�x�p�����[�^�[��ݒ�
+	qspeed				�����p�����[�^�[��ݒ�
+	qgroup				�O���[�v�p�����[�^�[��ݒ�
+	qweight				�d���Ȃǂ̃p�����[�^�[��ݒ�
+	qdamper				�z�U�Ȃǂ̃p�����[�^�[��ݒ�
+	qinertia			�Đ��Ȃǂ̃p�����[�^�[��ݒ�
+	qmat				�}�e���A���p�����[�^�[��ݒ�
+	qmat2				�}�e���A���ڍ׃p�����[�^�[��ݒ�
+	qmat3				�}�e���A���\���p�����[�^�[��ݒ�
+	quser				���[�U�[��`�f�[�^��ݒ�
+	quser2				���[�U�[��`�f�[�^��ݒ�2
 
-	また、設定できるパラメーターと対になる形で、設定された内容を変数に
-	読み出すための命令も用意されています。
+	�܂��A�ݒ�ł���p�����[�^�[�Ƒ΂ɂȂ�`�ŁA�ݒ肳�ꂽ���e��ϐ���
+	�ǂݏo�����߂̖��߂��p�ӂ���Ă��܂��B
 
-	qgetpos				位置、角度パラメーターを取得
-	qgetweight			重さなどのパラメーターを取得
-	qgetdamper			吸振などのパラメーターを取得
-	qgetinertia			惰性などのパラメーターを取得
-	qgetspeed			加速パラメーターを取得
-	qgetgroup			グループパラメーターを取得
-	qgettype			typeパラメーターを取得
-	qgetstat			statパラメーターを取得
-	qgetmat				マテリアルパラメーターを取得
-	qgetmat2			マテリアル詳細パラメーターを取得
-	qgetmat3			マテリアル表示パラメーターを取得
-	qgetuser			ユーザー定義データを取得
-	qgetuser2			ユーザー定義データを取得2
+	qgetpos				�ʒu�A�p�x�p�����[�^�[���擾
+	qgetweight			�d���Ȃǂ̃p�����[�^�[���擾
+	qgetdamper			�z�U�Ȃǂ̃p�����[�^�[���擾
+	qgetinertia			�Đ��Ȃǂ̃p�����[�^�[���擾
+	qgetspeed			�����p�����[�^�[���擾
+	qgetgroup			�O���[�v�p�����[�^�[���擾
+	qgettype			type�p�����[�^�[���擾
+	qgetstat			stat�p�����[�^�[���擾
+	qgetmat				�}�e���A���p�����[�^�[���擾
+	qgetmat2			�}�e���A���ڍ׃p�����[�^�[���擾
+	qgetmat3			�}�e���A���\���p�����[�^�[���擾
+	qgetuser			���[�U�[��`�f�[�^���擾
+	qgetuser2			���[�U�[��`�f�[�^���擾2
 
-	オブジェクトの挙動や表示方法は、すべてこれらのパラメーターにより設定
-	することができます。
-	オブジェクトの挙動で、基本となる動作を設定するのがtypeとstatの
-	バラメーターです。これらは、qtype、qstat命令で設定することが
-	できます。
+	�I�u�W�F�N�g�̋�����\�����@�́A���ׂĂ����̃p�����[�^�[�ɂ��ݒ�
+	���邱�Ƃ��ł��܂��B
+	�I�u�W�F�N�g�̋����ŁA��{�ƂȂ铮���ݒ肷��̂�type��stat��
+	�o�����[�^�[�ł��B�����́Aqtype�Aqstat���߂Őݒ肷�邱�Ƃ�
+	�ł��܂��B
 
-	typeパラメーターは以下の値を持ちます。
+	type�p�����[�^�[�͈ȉ��̒l�������܂��B
 
-		マクロ名        値	内容
+		�}�N����        �l	���e
 		---------------------------------------------
-		stat_reserve 	0	未使用オブジェクト
-		stat_sleep 	1	出現待ちオブジェクト
-		stat_active 	2	出現しているオブジェクト
+		stat_reserve 	0	���g�p�I�u�W�F�N�g
+		stat_sleep 	1	�o���҂��I�u�W�F�N�g
+		stat_active 	2	�o�����Ă���I�u�W�F�N�g
 
-	登録されたオブジェクトは、通常stat_activeが設定されています。
-	stat_sleepが設定されているオブジェクトは、画面上で点滅表示となり
-	接触判定などが行なわれません。
+	�o�^���ꂽ�I�u�W�F�N�g�́A�ʏ�stat_active���ݒ肳��Ă��܂��B
+	stat_sleep���ݒ肳��Ă���I�u�W�F�N�g�́A��ʏ�œ_�ŕ\���ƂȂ�
+	�ڐG����Ȃǂ��s�Ȃ��܂���B
 
-	statパラメーターは以下の値を持ちます。
+	stat�p�����[�^�[�͈ȉ��̒l�������܂��B
 
-		マクロ名        値	内容
+		�}�N����        �l	���e
 		-----------------------------------------------------------
-		type_normal	0	通常のオブジェクト
-		type_inner	1	接触判定を反転したオブジェクト
-		type_bindX	0x40	X軸を背景に固定
-		type_bindY	0x80	Y軸を背景に固定
-		type_bindR	0x100	回転を固定
-		type_bind	0x1c0	背景に完全固定(物理挙動なし)
-		type_autowipe	0x100000  ボーダー範囲を越えたら自動的に消去
+		type_normal	0	�ʏ�̃I�u�W�F�N�g
+		type_inner	1	�ڐG����𔽓]�����I�u�W�F�N�g
+		type_bindX	0x40	X����w�i�ɌŒ�
+		type_bindY	0x80	Y����w�i�ɌŒ�
+		type_bindR	0x100	��]���Œ�
+		type_bind	0x1c0	�w�i�Ɋ��S�Œ�(���������Ȃ�)
+		type_autowipe	0x100000  �{�[�_�[�͈͂��z�����玩���I�ɏ���
 
-	通常のオブジェクトは、type_normalが設定されており、物理挙動を反映した
-	動作を行ないます。
+	�ʏ�̃I�u�W�F�N�g�́Atype_normal���ݒ肳��Ă���A���������𔽉f����
+	������s�Ȃ��܂��B
 
-	qpos命令により、オブジェクトの座標、角度を変更することができます。
-	ただし、OBAQでは、基本的に物体を動かす場合でも、直接物体の座標を
-	変更するのではなく動かしたい方向に力を加えたり、qgetspeed命令により
-	加速度を設定することで実現してください。
+	qpos���߂ɂ��A�I�u�W�F�N�g�̍��W�A�p�x��ύX���邱�Ƃ��ł��܂��B
+	�������AOBAQ�ł́A��{�I�ɕ��̂𓮂����ꍇ�ł��A���ڕ��̂̍��W��
+	�ύX����̂ł͂Ȃ����������������ɗ͂���������Aqgetspeed���߂ɂ��
+	�����x��ݒ肷�邱�ƂŎ������Ă��������B
 
-	qweight、qdamper、qinertia命令はオブジェクトの材質や挙動に関する
-	パラメーターを設定することができます。
-	これらの値については、ある程度物理法則について理解があると、より予測が
-	つけられると思います。わからない人は、以下の説明を参考に、適切な値を
-	設定するようにしてください。特にいじる必要のないパラメーターについては、
-	デフォルトの値を使用しておいて構いません。
+	qweight�Aqdamper�Aqinertia���߂̓I�u�W�F�N�g�̍ގ��⋓���Ɋւ���
+	�p�����[�^�[��ݒ肷�邱�Ƃ��ł��܂��B
+	�����̒l�ɂ��ẮA������x�����@���ɂ��ė���������ƁA���\����
+	������Ǝv���܂��B�킩��Ȃ��l�́A�ȉ��̐������Q�l�ɁA�K�؂Ȓl��
+	�ݒ肷��悤�ɂ��Ă��������B���ɂ�����K�v�̂Ȃ��p�����[�^�[�ɂ��ẮA
+	�f�t�H���g�̒l���g�p���Ă����č\���܂���B
 
-	qweight num,weight,moment		重さなどのパラメーターを設定
+	qweight num,weight,moment		�d���Ȃǂ̃p�����[�^�[��ݒ�
 
-		num(0) : オブジェクトID
-		weight(6.0)    : 重さ
-		moment(1200.0) : モーメント
+		num(0) : �I�u�W�F�N�gID
+		weight(6.0)    : �d��
+		moment(1200.0) : ���[�����g
 
-	パラメーターのそれぞれのカッコ内は、初期値(省略時の値)です。
-	weight(重さ)は、半径rの円に標準的な比重の場合、
+	�p�����[�^�[�̂��ꂼ��̃J�b�R���́A�����l(�ȗ����̒l)�ł��B
+	weight(�d��)�́A���ar�̉~�ɕW���I�Ȕ�d�̏ꍇ�A
 
 		(r ^ 2) / 32.0
 
-	くらいを目安に設定してください。
-	moment(モーメント)は、回転のしやすさに関わるパラメーターだと考えて
-	下さい。
+	���炢��ڈ��ɐݒ肵�Ă��������B
+	moment(���[�����g)�́A��]�̂��₷���Ɋւ��p�����[�^�[���ƍl����
+	�������B
 
-	半径rの円盤： weight * (r ^ 2) / 2.0
-	辺の長さがa, bの長方形 : weight * ((a ^ 2) + (b ^ 2)) / 12.0
+	���ar�̉~�ՁF weight * (r ^ 2) / 2.0
+	�ӂ̒�����a, b�̒����` : weight * ((a ^ 2) + (b ^ 2)) / 12.0
 
-	のような値を目安に設定してください。
+	�̂悤�Ȓl��ڈ��ɐݒ肵�Ă��������B
 
-	qdamper num,damper,friction		吸振などのパラメーターを設定
+	qdamper num,damper,friction		�z�U�Ȃǂ̃p�����[�^�[��ݒ�
 
-		num(0) : オブジェクトID
-		damper(0.7)    : 吸振
-		friction(1.0)  : 摩擦抵抗値
+		num(0) : �I�u�W�F�N�gID
+		damper(0.7)    : �z�U
+		friction(1.0)  : ���C��R�l
 
-	damper(吸振)は、接触した際のゆれを抑える力を示しています。
-	0.0から1.0までの値を設定するようにしてください。
-	(範囲チェックは行なわれません)
-	friction(摩擦)は、物体同士が接触した時に減衰する力の係数になります。
-	接触する物体のfrictionと乗算した値が参照され計算されます。
-	0.0から1.0までの値を設定するようにしてください。
-	(範囲チェックは行なわれません)
+	damper(�z�U)�́A�ڐG�����ۂ̂���}����͂������Ă��܂��B
+	0.0����1.0�܂ł̒l��ݒ肷��悤�ɂ��Ă��������B
+	(�͈̓`�F�b�N�͍s�Ȃ��܂���)
+	friction(���C)�́A���̓��m���ڐG�������Ɍ�������͂̌W���ɂȂ�܂��B
+	�ڐG���镨�̂�friction�Ə�Z�����l���Q�Ƃ���v�Z����܂��B
+	0.0����1.0�܂ł̒l��ݒ肷��悤�ɂ��Ă��������B
+	(�͈̓`�F�b�N�͍s�Ȃ��܂���)
 
-	qinertia num,inertia,gravity		惰性などのパラメーターを設定
+	qinertia num,inertia,gravity		�Đ��Ȃǂ̃p�����[�^�[��ݒ�
 
-		num(0) : オブジェクトID
-		inertia(0.999) : 惰性パラメーター値
-		gravity(1.0)   : オブジェクトの重力値
+		num(0) : �I�u�W�F�N�gID
+		inertia(0.999) : �Đ��p�����[�^�[�l
+		gravity(1.0)   : �I�u�W�F�N�g�̏d�͒l
 
-	inertia(惰性)は、0.0に近づくほど抵抗が発生してねっとりした動きに
-	なります。0.0から1.0までの値を設定するようにしてください。
-	(範囲チェックは行なわれません)
-	gravity(オブジェクトの重力)は、空間に設定されている重力に乗算される形で
-	オブジェクトのみに反映されます。
-	特定のオブジェクトだけに、異なる重力を与える場合に使用します。
-	現実にはありえない形で、特定のオブジェクトだけに無重力や反重力を与える
-	ため、ゲームなどのキャラクター制御に有効です。
+	inertia(�Đ�)�́A0.0�ɋ߂Â��قǒ�R���������Ă˂��Ƃ肵��������
+	�Ȃ�܂��B0.0����1.0�܂ł̒l��ݒ肷��悤�ɂ��Ă��������B
+	(�͈̓`�F�b�N�͍s�Ȃ��܂���)
+	gravity(�I�u�W�F�N�g�̏d��)�́A��Ԃɐݒ肳��Ă���d�͂ɏ�Z�����`��
+	�I�u�W�F�N�g�݂̂ɔ��f����܂��B
+	����̃I�u�W�F�N�g�����ɁA�قȂ�d�͂�^����ꍇ�Ɏg�p���܂��B
+	�����ɂ͂��肦�Ȃ��`�ŁA����̃I�u�W�F�N�g�����ɖ��d�͂┽�d�͂�^����
+	���߁A�Q�[���Ȃǂ̃L�����N�^�[����ɗL���ł��B
 
-	以下の命令は、qdraw命令でオブジェクトの描画を行なう際の表示方法を
-	設定します。
+	�ȉ��̖��߂́Aqdraw���߂ŃI�u�W�F�N�g�̕`����s�Ȃ��ۂ̕\�����@��
+	�ݒ肵�܂��B
 
-	qmat				マテリアルパラメーターを設定
-	qmat2				マテリアル詳細パラメーターを設定
-	qmat3				マテリアル表示パラメーターを設定
+	qmat				�}�e���A���p�����[�^�[��ݒ�
+	qmat2				�}�e���A���ڍ׃p�����[�^�[��ݒ�
+	qmat3				�}�e���A���\���p�����[�^�[��ݒ�
 
-	以下の命令は、オブジェクトそれぞれのユーザーが任意の数値を保存する
-	ためのものです。quser命令では整数値を3つ、quser2命令では
-	実数値を3つ、合計6つの値を１つのオブジェクトに保存することが可能です。
-	何に使用するかは、ユーザーが自由に決めることができます。
+	�ȉ��̖��߂́A�I�u�W�F�N�g���ꂼ��̃��[�U�[���C�ӂ̐��l��ۑ�����
+	���߂̂��̂ł��Bquser���߂ł͐����l��3�Aquser2���߂ł�
+	�����l��3�A���v6�̒l���P�̃I�u�W�F�N�g�ɕۑ����邱�Ƃ��\�ł��B
+	���Ɏg�p���邩�́A���[�U�[�����R�Ɍ��߂邱�Ƃ��ł��܂��B
 
-	quser				ユーザー定義データを設定
-	quser2				ユーザー定義データを設定2
+	quser				���[�U�[��`�f�[�^��ݒ�
+	quser2				���[�U�[��`�f�[�^��ݒ�2
 
-	以上が、基本的な使い方になります。
-
-
-・現バージョンの制限
-
-	現在のバージョンでは、使用にあたって以下の制限があります。
-	これらの値をオーバーした際の動作は保障されませんのでご注意ください。
-
-	オブジェクトの最大数 : 最大512個
-	すべてのオブジェクトが保有する、形状データの頂点数の合計 : 16384まで
-	1つのオブジェクトに内包できるカスタム形状の数 : 8まで
+	�ȏオ�A��{�I�Ȏg�����ɂȂ�܂��B
 
 
-・表示上の注意点
+�E���o�[�W�����̐���
 
-	スプライト表示による画像の回転・拡大・縮小は、高速化のため精度が低い
-	ものとなっています。ワイヤーフレームの輪郭と厳密な一致が起こらない場合が
-	あるのでご了承ください。より高精度な回転などが必要な場合は、DirectX
-	を使用するなどの対応が必要になります。
-	ワイヤー、スプライトの表示ともに、WindowsのシステムAPI(GDI)を
-	使用した描画のため、1ドットより小さい単位での動きが切り捨てられて
-	しまいます。これにより、物体がぶれたり、安定しないことがあります。
-	こういった部分が気になる場合は、必要に応じて、表示側でぶれを吸収する
-	などの対処を行なうようにしてください。
+	���݂̃o�[�W�����ł́A�g�p�ɂ������Ĉȉ��̐���������܂��B
+	�����̒l���I�[�o�[�����ۂ̓���͕ۏႳ��܂���̂ł����ӂ��������B
+
+	�I�u�W�F�N�g�̍ő吔 : �ő�512��
+	���ׂẴI�u�W�F�N�g���ۗL����A�`��f�[�^�̒��_���̍��v : 16384�܂�
+	1�̃I�u�W�F�N�g�ɓ���ł���J�X�^���`��̐� : 8�܂�
 
 
-・OBAQ Model Editorについて
+�E�\����̒��ӓ_
 
-	OBAQ Model Editorは、qaddmodel命令で使用可能な自由形状を編集するための
-	簡易的なツールです。
-	sample/obaqフォルダ内にある、obaqme.hspをスクリプトエディタで
-	読み込み、実行することができます。
-	詳しい使用方法は、マニュアル(obaqme.txt)を参照してください。
-
-
-・HGIMG3でのサポート
-
-	HGIMG3のver3.21から、OBAQオブジェクトをDirectXにより表示させるための
-	機能が搭載されています。ユーザーがOBAQプラグインに対して記述する
-	スクリプトはそのままで、DirectX表示に変更することが可能です。
-	これにより、大量のオブジェクト表示、高画質なスプライトの回転縮小などに
-	加えて描画速度の向上も実現することができます。
+	�X�v���C�g�\���ɂ��摜�̉�]�E�g��E�k���́A�������̂��ߐ��x���Ⴂ
+	���̂ƂȂ��Ă��܂��B���C���[�t���[���̗֊s�ƌ����Ȉ�v���N����Ȃ��ꍇ��
+	����̂ł��������������B��荂���x�ȉ�]�Ȃǂ��K�v�ȏꍇ�́ADirectX
+	���g�p����Ȃǂ̑Ή����K�v�ɂȂ�܂��B
+	���C���[�A�X�v���C�g�̕\���Ƃ��ɁAWindows�̃V�X�e��API(GDI)��
+	�g�p�����`��̂��߁A1�h�b�g��菬�����P�ʂł̓������؂�̂Ă���
+	���܂��܂��B����ɂ��A���̂��Ԃꂽ��A���肵�Ȃ����Ƃ�����܂��B
+	�����������������C�ɂȂ�ꍇ�́A�K�v�ɉ����āA�\�����łԂ���z������
+	�Ȃǂ̑Ώ����s�Ȃ��悤�ɂ��Ă��������B
 
 
-・命令一覧
+�EOBAQ Model Editor�ɂ���
 
-	OBAQ.DLLは、HSPに以下の命令を追加して利用可能にします。
-	それぞれの命令の使用方法は、ヘルプ(F1キーによる命令リファレンス)を参照
-	してください。
-
-	qreset				OBAQ初期化
-	qterm				OBAQ終了処理
-	qexec				OBAQフレーム処理
-	qdraw				OBAQ描画処理
-	qview				ビュー設定
-	qsetreq				システムリクエスト設定
-	qgetreq				システムリクエスト取得
-	qgetptr				システムポインタ値取得
-	qborder				外壁を設定
-	qgravity			重力を設定
-	qcnvaxis			内部座標を表示座標に変換
-	qgetaxis			内部座標を取得
-	qdel				オブジェクト削除
-	qfind				オブジェクト検索
-	qnext				オブジェクト検索結果取得
-	qcollision			コリジョン取得開始
-	qgetcol				コリジョン取得
-	qgetcol2			コリジョン詳細情報取得
-	qgetcol3			コリジョン詳細情報取得2
-	qaddpoly			多角形オブジェクト追加
-	qaddmodel			自由設定オブジェクト追加
-	qpos				位置、角度パラメーターを設定
-	qgetpos				位置、角度パラメーターを取得
-	qweight				重さなどのパラメーターを設定
-	qgetweight			重さなどのパラメーターを取得
-	qspeed				加速パラメーターを設定
-	qgetspeed			加速パラメーターを取得
-	qgroup				グループパラメーターを設定
-	qgetgroup			グループパラメーターを取得
-	qtype				typeパラメーターを設定
-	qgettype			typeパラメーターを取得
-	qstat				statパラメーターを設定
-	qgetstat			statパラメーターを取得
-	qmat				マテリアルパラメーターを設定
-	qgetmat				マテリアルパラメーターを取得
-	qmat2				マテリアル詳細パラメーターを設定
-	qgetmat2			マテリアル詳細パラメーターを取得
-	qmat3				マテリアル表示パラメーターを設定
-	qgetmat3			マテリアル表示パラメーターを取得
-	quser				ユーザー定義データを設定
-	qgetuser			ユーザー定義データを取得
-	quser2				ユーザー定義データを設定2
-	qgetuser2			ユーザー定義データを取得2
-	qdamper				吸振などのパラメーターを設定
-	qgetdamper			吸振などのパラメーターを取得
-	qinertia			惰性などのパラメーターを設定
-	qgetinertia			惰性などのパラメーターを取得
-	qpush				任意の場所に力を与える
-	qblast				任意の場所から放射状に力を与える
-	qgetversion			バージョン情報を取得
+	OBAQ Model Editor�́Aqaddmodel���߂Ŏg�p�\�Ȏ��R�`���ҏW���邽�߂�
+	�ȈՓI�ȃc�[���ł��B
+	sample/obaq�t�H���_���ɂ���Aobaqme.hsp���X�N���v�g�G�f�B�^��
+	�ǂݍ��݁A���s���邱�Ƃ��ł��܂��B
+	�ڂ����g�p���@�́A�}�j���A��(obaqme.txt)���Q�Ƃ��Ă��������B
 
 
-・注意点
+�EHGIMG3�ł̃T�|�[�g
 
-	OBAQ.DLLは、HSP3.EXEと同時に使用されるプラグインファイルです。
-	使用するHSPは、ver3.3以上をお使い下さい。ver2.61やそれ以前のHSPには
-	対応していませんのでご注意下さい。
-	EXEファイルを作成した場合でも、OBAQ.DLLをEXEファイルと同じディレクトリ
-	に置かないと動作しません。また、packfileにDLLを追加することはできません。
+	HGIMG3��ver3.21����AOBAQ�I�u�W�F�N�g��DirectX�ɂ��\�������邽�߂�
+	�@�\�����ڂ���Ă��܂��B���[�U�[��OBAQ�v���O�C���ɑ΂��ċL�q����
+	�X�N���v�g�͂��̂܂܂ŁADirectX�\���ɕύX���邱�Ƃ��\�ł��B
+	����ɂ��A��ʂ̃I�u�W�F�N�g�\���A���掿�ȃX�v���C�g�̉�]�k���Ȃǂ�
+	�����ĕ`�摬�x�̌�����������邱�Ƃ��ł��܂��B
 
 
-・更新履歴
+�E���߈ꗗ
 
-	2014/04/24 ver3.4β4
+	OBAQ.DLL�́AHSP�Ɉȉ��̖��߂�ǉ����ė��p�\�ɂ��܂��B
+	���ꂼ��̖��߂̎g�p���@�́A�w���v(F1�L�[�ɂ�閽�߃��t�@�����X)���Q��
+	���Ă��������B
 
-		qspeed命令のoptionパラメーター値に2を追加しました。
-		いままで、optionパラメーターに1を指定していた場合に、
-		指定した値の２倍が設定されていました。
-		このため、互換性を考慮して、option値で2を指定した場合に、
-		指定した値が正しく設定される仕様を追加しました。
+	qreset				OBAQ������
+	qterm				OBAQ�I������
+	qexec				OBAQ�t���[������
+	qdraw				OBAQ�`�揈��
+	qview				�r���[�ݒ�
+	qsetreq				�V�X�e�����N�G�X�g�ݒ�
+	qgetreq				�V�X�e�����N�G�X�g�擾
+	qgetptr				�V�X�e���|�C���^�l�擾
+	qborder				�O�ǂ�ݒ�
+	qgravity			�d�͂�ݒ�
+	qcnvaxis			�������W��\�����W�ɕϊ�
+	qgetaxis			�������W���擾
+	qdel				�I�u�W�F�N�g�폜
+	qfind				�I�u�W�F�N�g����
+	qnext				�I�u�W�F�N�g�������ʎ擾
+	qcollision			�R���W�����擾�J�n
+	qgetcol				�R���W�����擾
+	qgetcol2			�R���W�����ڍ׏��擾
+	qgetcol3			�R���W�����ڍ׏��擾2
+	qaddpoly			���p�`�I�u�W�F�N�g�ǉ�
+	qaddmodel			���R�ݒ�I�u�W�F�N�g�ǉ�
+	qpos				�ʒu�A�p�x�p�����[�^�[��ݒ�
+	qgetpos				�ʒu�A�p�x�p�����[�^�[���擾
+	qweight				�d���Ȃǂ̃p�����[�^�[��ݒ�
+	qgetweight			�d���Ȃǂ̃p�����[�^�[���擾
+	qspeed				�����p�����[�^�[��ݒ�
+	qgetspeed			�����p�����[�^�[���擾
+	qgroup				�O���[�v�p�����[�^�[��ݒ�
+	qgetgroup			�O���[�v�p�����[�^�[���擾
+	qtype				type�p�����[�^�[��ݒ�
+	qgettype			type�p�����[�^�[���擾
+	qstat				stat�p�����[�^�[��ݒ�
+	qgetstat			stat�p�����[�^�[���擾
+	qmat				�}�e���A���p�����[�^�[��ݒ�
+	qgetmat				�}�e���A���p�����[�^�[���擾
+	qmat2				�}�e���A���ڍ׃p�����[�^�[��ݒ�
+	qgetmat2			�}�e���A���ڍ׃p�����[�^�[���擾
+	qmat3				�}�e���A���\���p�����[�^�[��ݒ�
+	qgetmat3			�}�e���A���\���p�����[�^�[���擾
+	quser				���[�U�[��`�f�[�^��ݒ�
+	qgetuser			���[�U�[��`�f�[�^���擾
+	quser2				���[�U�[��`�f�[�^��ݒ�2
+	qgetuser2			���[�U�[��`�f�[�^���擾2
+	qdamper				�z�U�Ȃǂ̃p�����[�^�[��ݒ�
+	qgetdamper			�z�U�Ȃǂ̃p�����[�^�[���擾
+	qinertia			�Đ��Ȃǂ̃p�����[�^�[��ݒ�
+	qgetinertia			�Đ��Ȃǂ̃p�����[�^�[���擾
+	qpush				�C�ӂ̏ꏊ�ɗ͂�^����
+	qblast				�C�ӂ̏ꏊ������ˏ�ɗ͂�^����
+	qgetversion			�o�[�W���������擾
+
+
+�E���ӓ_
+
+	OBAQ.DLL�́AHSP3.EXE�Ɠ����Ɏg�p�����v���O�C���t�@�C���ł��B
+	�g�p����HSP�́Aver3.3�ȏ�����g���������Bver2.61�₻��ȑO��HSP�ɂ�
+	�Ή����Ă��܂���̂ł����Ӊ������B
+	EXE�t�@�C�����쐬�����ꍇ�ł��AOBAQ.DLL��EXE�t�@�C���Ɠ����f�B���N�g��
+	�ɒu���Ȃ��Ɠ��삵�܂���B�܂��Apackfile��DLL��ǉ����邱�Ƃ͂ł��܂���B
+
+
+�E�X�V����
+
+	2014/04/24 ver3.4��4
+
+		qspeed���߂�option�p�����[�^�[�l��2��ǉ����܂����B
+		���܂܂ŁAoption�p�����[�^�[��1���w�肵�Ă����ꍇ�ɁA
+		�w�肵���l�̂Q�{���ݒ肳��Ă��܂����B
+		���̂��߁A�݊������l�����āAoption�l��2���w�肵���ꍇ�ɁA
+		�w�肵���l���������ݒ肳���d�l��ǉ����܂����B
 
 	2010/01/28 ver3.21
 
-		obaqme(簡易モデル作成ツール)とサンプルを追加。
-		タイプ値、type_autowipeを追加。
-		HGIMG3でのOBAQサポート用にqgetptr命令を追加。
-		著作権とライセンス文書を一部修正。
+		obaqme(�ȈՃ��f���쐬�c�[��)�ƃT���v����ǉ��B
+		�^�C�v�l�Atype_autowipe��ǉ��B
+		HGIMG3�ł�OBAQ�T�|�[�g�p��qgetptr���߂�ǉ��B
+		���쌠�ƃ��C�Z���X�������ꕔ�C���B
 
 	2009/10/19 ver3.2a
 
-		サンプルスクリプトを一部修正。
+		�T���v���X�N���v�g���ꕔ�C���B
 
 	2009/8/1 ver3.2
 
-		サンプルにミニロゴとサムネイルを追加。
+		�T���v���Ƀ~�j���S�ƃT���l�C����ǉ��B
 
 	2009/7/24 ver3.2rc1
 
-		qtypeでtype_innerを正しく設定できなかった不具合を修正。
-		qaddployでloggroupが反映されていなかった不具合を修正。
-		qmatで指定する色コードが$RRGGBBになっていなかった不具合を修正。
-		新規サンプルゲーム、tof2.hspを追加。
+		qtype��type_inner�𐳂����ݒ�ł��Ȃ������s����C���B
+		qaddploy��loggroup�����f����Ă��Ȃ������s����C���B
+		qmat�Ŏw�肷��F�R�[�h��$RRGGBB�ɂȂ��Ă��Ȃ������s����C���B
+		�V�K�T���v���Q�[���Atof2.hsp��ǉ��B
 
 	2009/7/9 ver3.2beta4
 
-		最初のバージョン。
+		�ŏ��̃o�[�W�����B
 
 
-・クレジット
+�E�N���W�b�g
 
-	OBAQは、Zener Works, Inc./kuni/onitamaにより共同で開発された物理エンジンです。
-	物理法則を使ったゲームや、ちょっとした動きに現実感を与える手伝ができれば
-	嬉しいと思います。
-	是非とも、OBAQで新しいものを生み出して我々を驚かせてください。
+	OBAQ�́AZener Works, Inc./kuni/onitama�ɂ�苤���ŊJ�����ꂽ�����G���W���ł��B
+	�����@�����g�����Q�[����A������Ƃ��������Ɍ�������^�����`���ł����
+	�������Ǝv���܂��B
+	����Ƃ��AOBAQ�ŐV�������̂𐶂ݏo���ĉ�X���������Ă��������B
 
 	Zener Works, Inc.
 	http://www.zener.co.jp/
@@ -434,35 +434,35 @@ OBAQ for HSP ver3.4 REFERENCE MANUAL                HSP : Hot Soup Processor
 	http://www.onionsoft.net/
 
 
-・著作権とライセンス
+�E���쌠�ƃ��C�Z���X
 
-	OBAQ.DLLの著作権はZener Works, Inc/kuni/onitamaにあります。
-	ユーザーが作成したオリジナルのソフトウェア(実行ファイル)に
-	OBAQ.DLLを添付して配布する場合は、以下の条件に従ってください。
+	OBAQ.DLL�̒��쌠��Zener Works, Inc/kuni/onitama�ɂ���܂��B
+	���[�U�[���쐬�����I���W�i���̃\�t�g�E�F�A(���s�t�@�C��)��
+	OBAQ.DLL��Y�t���Ĕz�z����ꍇ�́A�ȉ��̏����ɏ]���Ă��������B
 
-	・無償(フリーソフト)として配布する場合
+	�E����(�t���[�\�t�g)�Ƃ��Ĕz�z����ꍇ
 
-	OBAQ.DLLを自由に添付してお使い頂けます。
-	使用する際の報告や問い合わせの必要なく、ライセンスされます。
-	DLLの著作権表示、及びOBAQロゴの明示は、してもしなくても構いません。
+	OBAQ.DLL�����R�ɓY�t���Ă��g�������܂��B
+	�g�p����ۂ̕񍐂�₢���킹�̕K�v�Ȃ��A���C�Z���X����܂��B
+	DLL�̒��쌠�\���A�y��OBAQ���S�̖����́A���Ă����Ȃ��Ă��\���܂���B
 
-	・有償(市販、シェアウエア)として配布する場合
+	�E�L��(�s�́A�V�F�A�E�G�A)�Ƃ��Ĕz�z����ꍇ
 
-	OBAQ.DLLを使用したソフトにより、税務申告が必要な利益が発生する場合には、
-	有償ライセンスの取得が必要です。
-	ただし、少数の配布、最低限の必要経費(メディア代金等)のみで配布する
-	場合は無償と考えますので、有償ライセンスの取得は必要ありません。
-	有償ライセンスの取得には、必ず費用がかかるわけではありません。
-	販売数に応じて、定められたライセンス契約を個別に締結させて頂きます。
-	詳しくは、info@hsp.tvまでメールにてお問い合わせください。
+	OBAQ.DLL���g�p�����\�t�g�ɂ��A�Ŗ��\�����K�v�ȗ��v����������ꍇ�ɂ́A
+	�L�����C�Z���X�̎擾���K�v�ł��B
+	�������A�����̔z�z�A�Œ���̕K�v�o��(���f�B�A�����)�݂̂Ŕz�z����
+	�ꍇ�͖����ƍl���܂��̂ŁA�L�����C�Z���X�̎擾�͕K�v����܂���B
+	�L�����C�Z���X�̎擾�ɂ́A�K����p��������킯�ł͂���܂���B
+	�̔����ɉ����āA��߂�ꂽ���C�Z���X�_����ʂɒ��������Ē����܂��B
+	�ڂ����́Ainfo@hsp.tv�܂Ń��[���ɂĂ��₢���킹���������B
 
-	・無償/有償の共通事項
+	�E����/�L���̋��ʎ���
 
-	本プログラムによって生じた、いかなる損害についても保証いたしません。
-	自己の責任の範囲で使用してください。
-	また、付属のサンプルスクリプトは自由に改変、公開していただいて構いません。
-	尚、ライセンス形態に関わりなく、サンプルに付属するOBAQロゴ
-	(obaqlogo.bmp)は自由に組み込んで頂いて結構です。
+	�{�v���O�����ɂ���Đ������A�����Ȃ鑹�Q�ɂ��Ă��ۏ؂������܂���B
+	���Ȃ̐ӔC�͈̔͂Ŏg�p���Ă��������B
+	�܂��A�t���̃T���v���X�N���v�g�͎��R�ɉ��ρA���J���Ă��������č\���܂���B
+	���A���C�Z���X�`�ԂɊւ��Ȃ��A�T���v���ɕt������OBAQ���S
+	(obaqlogo.bmp)�͎��R�ɑg�ݍ���Œ����Č��\�ł��B
 
 -------------------------------------------------------------------------------
                                                 HSP users manual / end of file 

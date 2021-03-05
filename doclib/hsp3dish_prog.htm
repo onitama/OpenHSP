@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Language" content="ja">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
-	<meta name="author" content="OpenHSP3 Project（http://dev.onionsoft.net/trac/wiki）">
+	<meta name="author" content="OpenHSP3 Project（https://dev.onionsoft.net/trac/wiki）">
 	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSP3Dish">
 	<meta name="description" content="HSP3Dishに関する情報を掲載">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
@@ -14,7 +14,7 @@
 <body>
 	<div id="CONTAINER">
 	<!-- ヘッダー -->
-	<p id="COPY">HSP : HSP3Dish / onion software 2020(c)</p>
+	<p id="COPY">HSP : HSP3Dish / onion software 2021(c)</p>
 	<img src="hsp3dish.jpg" width="640" height="200" alt="タイトル">
 	<h1>HSP3Dish プログラミングマニュアル</h1>
 
@@ -63,13 +63,13 @@
 	</p>
 	<p>
 	特殊な利用を想定したHSP3DishですがWindows上で使用する上では、
-	DirectXを使用した高速描画や、アルファチャンネルやPNG形式の標準サポートなど、
+	DirectX/OpenGLを使用した高速描画や、アルファチャンネルやPNG形式の標準サポートなど、
 	通常のHSP3にはないメリットも持ちあわせています。<br>
 	さらに、3D機能や高度な物理演算をサポートする<a href="hgimg4.html">HGIMG4ランタイム</a>も、HSP3Dishから派生する形で提供されています。<br>
 	</p>
 	<p>
-	Linux及び小型デバイスRaspberry Pi上で動作する、<a href="http://hsp.tv/make/hsp3linux_pi.html" target="_blank">HSP3 for Linux/Raspberry Pi</a>は、別途パッケージ版を配布しています。詳しくは、
-	<a href="http://hsp.tv/make/hsp3linux_pi.html" target="_blank">HSP3 for Linux/Raspberry Pi</a>のページをご覧ください。
+	Linux及び小型デバイスRaspberry Pi上で動作する、<a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank">HSP3 for Linux/Raspberry Pi</a>は、別途パッケージ版を配布しています。詳しくは、
+	<a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank">HSP3 for Linux/Raspberry Pi</a>のページをご覧ください。
 	</p>
 	<p>
 	HSP3Dishは、新しいHSP3の流れとして今後も進化を続ける予定です。どうぞご期待ください。
@@ -79,11 +79,11 @@
 	HSP3Dishについての最新情報や、ユーザー作品や資料など役立つ情報が集められていますので、ぜひご覧ください。
 	</p>
 	<ul><p>
-	<a href="http://hsp.tv/make/hsp3dish.html" target="_blank">HSP3Dishサポートページ<br>http://hsp.tv/make/hsp3dish.html</a><br>
+	<a href="https://hsp.tv/make/hsp3dish.html" target="_blank">HSP3Dishサポートページ<br>https://hsp.tv/make/hsp3dish.html</a><br>
 	</p><p>
-	<a href="http://hsp.tv/make/hsp3linux_pi.html" target="_blank">HSP3 for Linux/Raspberry Pi<br>http://hsp.tv/make/hsp3linux_pi.html</a><br>
+	<a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank">HSP3 for Linux/Raspberry Pi<br>https://hsp.tv/make/hsp3linux_pi.html</a><br>
 	</p><p>
-	<a href="http://hsp.tv/make/hgimg4.html" target="_blank">HGIMG4 development<br>http://hsp.tv/make/hgimg4.html</a><br>
+	<a href="https://hsp.tv/make/hgimg4.html" target="_blank">HGIMG4 development<br>https://hsp.tv/make/hgimg4.html</a><br>
 	</p></ul>
 
 	<h2 id="DISHUSE">HSP3Dishの使用方法</h2>
@@ -125,6 +125,8 @@
 	<li>デバイス間での完全なフォントの統一が取れません
 	　(日本語の文字フォントについては機種依存になります)</li>
 	<li>notesave、bsave命令などデバイスへの書き出しに制限があります</li>
+	<li>buttonを除く配置オブジェクトの一部がサポートされていません。
+	　(chkbox、inputは限定的にサポートしています)</li>
 	</ul>
 	<p>
 	HSP3Dishでは、多くの命令や関数などを通常のHSP3と同様に使用できますが、
@@ -206,7 +208,6 @@
 	標準のオブジェクトと以下の点が異なっているので注意してください。
 	</p>
 	<pre>
-	・buttonの文字サイズ・色などは固定です
 	・標準でbuttonの背景はグレーのグラデーションが使用されます
 	・objimage命令によりbutton背景の画像を変更することが可能です
 	・キーボードによるボタン操作、フォーカス移動はサポートしていません
@@ -736,7 +737,7 @@
 		<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
 		<li><a href="../index.htm">インデックスに戻る</a></li>
 	</ul>
-	<a href="http://www.onionsoft.net/">
+	<a href="https://www.onionsoft.net/">
 		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
 	</a>
 </div><!-- container -->

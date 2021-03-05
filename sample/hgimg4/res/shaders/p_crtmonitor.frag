@@ -1,5 +1,4 @@
 #if defined(OPENGL_ES) || defined(GL_ES)
-#extension GL_OES_standard_derivatives : enable
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -13,7 +12,7 @@ uniform sampler2D u_texture;
 
 uniform float u_curvex;
 uniform float u_curvey;
-#define SCANLINE 448.0		// ƒXƒLƒƒƒ“ƒ‰ƒCƒ“
+#define SCANLINE 448.0		// ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³
 
 ///////////////////////////////////////////////////////////
 // Varyings

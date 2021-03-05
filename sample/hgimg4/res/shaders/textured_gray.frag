@@ -1,5 +1,4 @@
 #if defined(OPENGL_ES) || defined(GL_ES)
-#extension GL_OES_standard_derivatives : enable
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -130,11 +129,6 @@ void main()
     _baseColor = vec4(gray, gray, gray,texture2D(u_diffuseTexture, v_texCoord).a);
     gl_FragColor.a = _baseColor.a;
 
-    #if defined(TEXTURE_DISCARD_ALPHA)
-    if (gl_FragColor.a < 0.5)
-        discard;
-    #endif
-
     #if defined(LIGHTING)
 
     gl_FragColor.rgb = getLitPixel();
@@ -149,6 +143,10 @@ void main()
 
     #if defined(MODULATE_COLOR)
     gl_FragColor *= u_modulateColor;
+    #endif
+
+    #if !defined(TEXTURE_NODISCARD_ALPHA)
+    if (gl_FragColor.a < 0.005) discard;
     #endif
 
     #if defined(MODULATE_ALPHA)

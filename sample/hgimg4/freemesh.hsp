@@ -1,0 +1,89 @@
+#include "hgimg4.as"
+
+title "HGIMG4 Test"
+
+	;	自由な形状(Mesh)を表示する
+	;
+	;	gpboxと同様の立方体を作成します(24頂点・4角形6面)
+	;	1つの頂点を( X,Y,Z, NX,NY,NZ, U,V )というグループで登録して、
+	;	そのインデックスを組み合わせてポリゴン(3角形or4角形)を登録します
+	;
+	gpreset
+
+	gptexmat id_texmat, "res/qbox.png"	; テクスチャマテリアルを作成
+
+	gpmeshclear			; 登録をクリアする
+	a=0.5				; サイズ
+
+	;	座標の登録 ( X,Y,Z, NX,NY,NZ, U,V )
+	gpmeshadd p1, -a, -a,  a,    0.0,  0.0,  1.0,   0.0, 0.0
+	gpmeshadd p2,  a, -a,  a,    0.0,  0.0,  1.0,   1.0, 0.0
+	gpmeshadd p3, -a,  a,  a,    0.0,  0.0,  1.0,   0.0, 1.0
+	gpmeshadd p4,  a,  a,  a,    0.0,  0.0,  1.0,   1.0, 1.0
+	;	ポリゴンの登録
+	gpmeshpolygon p1,p2,p3,p4
+
+	;	座標の登録 ( X,Y,Z, NX,NY,NZ, U,V )
+	gpmeshadd p1, -a,  a,  a,    0.0,  1.0,  0.0,   0.0, 0.0
+	gpmeshadd p2,  a,  a,  a,    0.0,  1.0,  0.0,   1.0, 0.0
+	gpmeshadd p3, -a,  a, -a,    0.0,  1.0,  0.0,   0.0, 1.0
+	gpmeshadd p4,  a,  a, -a,    0.0,  1.0,  0.0,   1.0, 1.0
+	;	ポリゴンの登録
+	gpmeshpolygon p1,p2,p3,p4
+
+	;	座標の登録 ( X,Y,Z, NX,NY,NZ, U,V )
+	gpmeshadd p1, -a,  a, -a,    0.0,  0.0, -1.0,   0.0, 0.0
+	gpmeshadd p2,  a,  a, -a,    0.0,  0.0, -1.0,   1.0, 0.0
+	gpmeshadd p3, -a, -a, -a,    0.0,  0.0, -1.0,   0.0, 1.0
+	gpmeshadd p4,  a, -a, -a,    0.0,  0.0, -1.0,   1.0, 1.0
+	;	ポリゴンの登録
+	gpmeshpolygon p1,p2,p3,p4
+
+	;	座標の登録 ( X,Y,Z, NX,NY,NZ, U,V )
+	gpmeshadd p1, -a, -a, -a,    0.0, -1.0,  0.0,   0.0, 0.0
+	gpmeshadd p2,  a, -a, -a,    0.0, -1.0,  0.0,   1.0, 0.0
+	gpmeshadd p3, -a, -a,  a,    0.0, -1.0,  0.0,   0.0, 1.0
+	gpmeshadd p4,  a, -a,  a,    0.0, -1.0,  0.0,   1.0, 1.0
+	;	ポリゴンの登録
+	gpmeshpolygon p1,p2,p3,p4
+
+	;	座標の登録 ( X,Y,Z, NX,NY,NZ, U,V )
+	gpmeshadd p1,  a, -a,  a,    1.0,  0.0,  0.0,   0.0, 0.0
+	gpmeshadd p2,  a, -a, -a,    1.0,  0.0,  0.0,   1.0, 0.0
+	gpmeshadd p3,  a,  a,  a,    1.0,  0.0,  0.0,   0.0, 1.0
+	gpmeshadd p4,  a,  a, -a,    1.0,  0.0,  0.0,   1.0, 1.0
+	;	ポリゴンの登録
+	gpmeshpolygon p1,p2,p3,p4
+
+	;	座標の登録 ( X,Y,Z, NX,NY,NZ, U,V )
+	gpmeshadd p1, -a, -a, -a,   -1.0,  0.0,  0.0,   0.0, 0.0
+	gpmeshadd p2, -a, -a,  a,   -1.0,  0.0,  0.0,   1.0, 0.0
+	gpmeshadd p3, -a,  a, -a,   -1.0,  0.0,  0.0,   0.0, 1.0
+	gpmeshadd p4, -a,  a,  a,   -1.0,  0.0,  0.0,   1.0, 1.0
+	;	ポリゴンの登録
+	gpmeshpolygon p1,p2,p3,p4
+
+	gpmesh id_model,,id_texmat		; メッシュノードを追加
+	setpos id_model,0,5,0
+	setangr id_model,50,50
+	gppbind id_model, 1, GPPBIND_MESH	; メッシュ形状を物理設定する
+
+	gpfloor id_floor, 40,40, $008080	; 床ノードを追加
+	gppbind id_floor, 0
+
+	setpos GPOBJ_CAMERA, 0,2,10		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, 0,0,0		; カメラから指定した座標を見る
+
+repeat
+	redraw 0			; 描画開始
+	rgbcolor $00ccdd:boxf		; 背景をクリア
+	gpdraw				; シーンの描画
+
+	color 255,255,255
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+
