@@ -10,7 +10,7 @@
 
 // The encoder version number should be incremented when a feature is added to the encoder.
 // The encoder version is not the same as the GPB version.
-#define ENCODER_VERSION "3.1.0 hsp3gp"
+#define ENCODER_VERSION "3.6.0 hsp3gp"
 #define HEIGHTMAP_SIZE_MAX 2049
 
 namespace gameplay

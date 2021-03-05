@@ -138,6 +138,7 @@ void Model::setSkin(MeshSkin* skin)
 
 void Model::setMaterial(Material* material, int partIndex)
 {
+	//printf("#%s Material set.\n",_mesh->getId().c_str());
     if (partIndex < 0)
     {
         _material = material;

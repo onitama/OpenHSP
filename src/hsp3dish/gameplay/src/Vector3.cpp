@@ -100,9 +100,16 @@ float Vector3::angle(const Vector3& v1, const Vector3& v2)
 
 void Vector3::add(const Vector3& v)
 {
-    x += v.x;
-    y += v.y;
-    z += v.z;
+	x += v.x;
+	y += v.y;
+	z += v.z;
+}
+
+void Vector3::mul(const Vector3& v)
+{
+	x *= v.x;
+	y *= v.y;
+	z *= v.z;
 }
 
 void Vector3::add(const Vector3& v1, const Vector3& v2, Vector3* dst)

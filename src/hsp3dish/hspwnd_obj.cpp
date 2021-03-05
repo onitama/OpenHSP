@@ -433,7 +433,7 @@ static int Object_InputBoxApplyFuncKey(HSPOBJINFO *info, int code)
 		break;
 	}
 */
-	Alertf("FUNC");
+//	Alertf("FUNC");
 	return 0;
 }
 
@@ -654,7 +654,7 @@ static void Object_LayerDelete(HSPOBJINFO *info)
 	info->hspctx->iparam = info->owsize;
 	info->hspctx->wparam = info->owid;
 	info->hspctx->lparam = HSPOBJ_LAYER_CMD_TERM;
-	code_call((unsigned short *)info->hCld);
+	code_callback((unsigned short *)info->hCld);
 }
 
 static void Object_LayerNotice(HSPOBJINFO *info, int wparam)
@@ -662,7 +662,7 @@ static void Object_LayerNotice(HSPOBJINFO *info, int wparam)
 	info->hspctx->iparam = info->exinfo2;
 	info->hspctx->wparam = info->owid;
 	info->hspctx->lparam = wparam;
-	code_call((unsigned short *)info->hCld);
+	code_callback((unsigned short *)info->hCld);
 	info->exinfo2++;
 }
 
@@ -689,7 +689,7 @@ static void Object_SetLayerObject(HSPOBJINFO *info, int type, void *ptr)
 	info->hspctx->iparam = iparam;
 	info->hspctx->wparam = info->owid;
 	info->hspctx->lparam = ptype;
-	code_call((unsigned short *)info->hCld);
+	code_callback((unsigned short *)info->hCld);
 }
 
 
@@ -1029,7 +1029,7 @@ int Bmscr::AddHSPObjectLayer(int sizex, int sizey, int layer, int val, int mode,
 	obj->hspctx->iparam = val;
 	obj->hspctx->wparam = id;
 	obj->hspctx->lparam = HSPOBJ_LAYER_CMD_INIT;
-	code_call((unsigned short *)callptr);
+	code_callback((unsigned short *)callptr);
 
 	return id;
 }

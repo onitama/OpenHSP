@@ -64,7 +64,7 @@ Effect* Effect::createFromFile(const char* vshPath, const char* fshPath, const c
         return itr->second;
     }
 
-    // Read source from file.
+	// Read source from file.
     char* vshSource = FileSystem::readAll(vshPath);
     if (vshSource == NULL)
     {

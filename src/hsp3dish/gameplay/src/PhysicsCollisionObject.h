@@ -167,7 +167,10 @@ public:
      */
     Node* getNode() const;
 
-    /**
+	void setUserPtr(void *ptr) { _userPtr = ptr; }
+	void *getUserPtr(void) { return _userPtr; }
+	
+	/**
      * Returns the collision shape.
      *
      * @return The collision shape.
@@ -262,6 +265,10 @@ public:
      */
     bool collidesWith(PhysicsCollisionObject* object) const;
 
+	/**
+	 * Sets the center of mass offset for the associated collision shape.
+	 */
+	void setCenterOfMassOffset(const Vector3& centerOfMassOffset) { _motionState->setCenterOfMassOffset(centerOfMassOffset); }
 
 protected:
 
@@ -334,10 +341,10 @@ protected:
      */
     bool _enabled;
 
-    /**
-     * The list of script listeners.
-     */
-    std::vector<ScriptListener*>* _scriptListeners;
+	/**
+	 * The list of script listeners.
+	 */
+	std::vector<ScriptListener*>* _scriptListeners;
 
 private:
 
@@ -404,6 +411,13 @@ private:
      */
     int _group;
     int _mask;
+
+	/**
+	 * User pointer.
+	 */
+	void *_userPtr;
+
+
 };
 
 }

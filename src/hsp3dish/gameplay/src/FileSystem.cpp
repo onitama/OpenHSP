@@ -27,6 +27,12 @@
 extern AAssetManager* __assetManager;
 #endif
 
+#ifdef HSPDISH
+#ifdef WIN32
+#include "../../../hsp3/dpmread.h"
+#endif
+#endif
+
 namespace gameplay
 {
 
@@ -427,7 +433,28 @@ char* FileSystem::readAll(const char* filePath, int* fileSize)
 {
     GP_ASSERT(filePath);
 
-    // Open file for reading.
+#ifdef HSPDISH
+#ifdef WIN32
+	{
+		size_t size = (size_t)dpm_exist((char *)filePath);
+		if (size < 0) {
+			GP_ERROR("Failed to load file: %s", filePath);
+			return NULL;
+		}
+		char* buffer = new char[size + 1];
+		dpm_read((char *)filePath, buffer, size, 0);
+		// Force the character buffer to be NULL-terminated.
+		buffer[size] = '\0';
+		if (fileSize)
+		{
+			*fileSize = (int)size;
+		}
+		return buffer;
+	}
+#endif
+#endif
+
+	// Open file for reading.
     std::unique_ptr<Stream> stream(open(filePath));
     if (stream.get() == NULL)
     {

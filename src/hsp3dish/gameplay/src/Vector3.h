@@ -145,14 +145,21 @@ public:
     static float angle(const Vector3& v1, const Vector3& v2);
 
 
-    /**
-     * Adds the elements of the specified vector to this one.
-     *
-     * @param v The vector to add.
-     */
-    void add(const Vector3& v);
+	/**
+	 * Adds the elements of the specified vector to this one.
+	 *
+	 * @param v The vector to add.
+	 */
+	void add(const Vector3& v);
 
-    /**
+	/**
+	 * Multiply the elements of the specified vector to this one.
+	 *
+	 * @param v The vector to mul.
+	 */
+	void mul(const Vector3& v);
+
+	/**
      * Adds the specified vectors and stores the result in dst.
      *
      * @param v1 The first vector.

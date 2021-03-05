@@ -31,7 +31,7 @@ Camera::Camera(float zoomX, float zoomY, float aspectRatio, float nearPlane, flo
 	_bits(CAMERA_DIRTY_ALL), _node(NULL), _listeners(NULL)
 {
     // Orthographic camera.
-    _zoom[0] = zoomX;
+    _zoom[0] = (1.0f / aspectRatio) * zoomX;
     _zoom[1] = zoomY;
 }
 

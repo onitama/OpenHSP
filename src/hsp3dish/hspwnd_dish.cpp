@@ -391,6 +391,7 @@ void Bmscr::Cls( int mode )
 	keybuf_index = 0;
 	prevtime = 0;
 	passed_time = 0;
+	filtermode = HGIO_FILTER_TYPE_NONE;
 
 	//		CEL initalize
 	//

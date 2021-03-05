@@ -540,6 +540,7 @@ public:
 	HSPOBJINFO *cur_mo_obj;				// Mouse over focus object
 	int		prevtime;					// previous frame time
 	int		passed_time;				// Passed millisecond from previous frame
+	int		filtermode;					// filter mode value
 private:
 //	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
 //	void CnvRGB16( PTRIVERTEX target, DWORD src );
@@ -721,6 +722,7 @@ typedef struct BMSCR
 	HSPOBJINFO *cur_mo_obj;				// Mouse over focus object
 	int		prevtime;					// previous frame time
 	int		passed_time;				// Passed millisecond from previous frame
+	int		filtermode;					// filter mode value
 } BMSCR;
 
 #endif

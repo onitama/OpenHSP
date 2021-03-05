@@ -31,8 +31,8 @@ public:
 	int setParameter(char *name, const Matrix *value, int count);
 	int setParameter(char *name, char *fname, int matopt);
 	int setState(char *name, char *value);
-	void setFilter( Texture::Filter value );
 	int updateTex32(char* ptr, int mode);
+	void applyFilterMode(int mode);
 
 	short _flag;						// 存在フラグ
 	short _mark;						// マーク処理用
@@ -47,11 +47,14 @@ public:
 	int _target_material_id;			// レンダリング対象のマテリアルID保存用
 	int _matopt;						// マテリアルオプション保存用
 	int _matcolor;						// マテリアルカラー保存用
+	int _filtermode;					// フィルターモード
 
 protected:
 	/**
 	* Internal use
 	*/
+	void setFilter(Texture::Filter value);
+
 	gamehsp *_owner;					// 生成元のgamehsp
 
 };

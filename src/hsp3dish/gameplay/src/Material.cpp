@@ -65,7 +65,7 @@ Material* Material::create(Properties* materialProperties, PassCallback callback
 
     // Create new material from the file passed in.
     Material* material = new Material();
-	//GP_WARN("NewMaterial[%s]", materialProperties->getNamespace());
+	//GP_WARN("NewMaterial[%s][%s][%x]", materialProperties->getNamespace(), materialProperties->getId(),callback);
 
     // Load uniform value parameters for this material.
     loadRenderState(material, materialProperties);
@@ -269,7 +269,7 @@ bool Material::loadPass(Technique* technique, Properties* passProperties, PassCa
     std::string allDefines = passDefines ? passDefines : "";
     if (callback)
     {
-        std::string customDefines = callback(pass, cookie);
+        std::string customDefines = callback(pass, cookie, allDefines.c_str());
         if (customDefines.length() > 0)
         {
             if (allDefines.length() > 0)
@@ -277,8 +277,9 @@ bool Material::loadPass(Technique* technique, Properties* passProperties, PassCa
             allDefines += customDefines;
         }
     }
-
-    // Initialize/compile the effect with the full set of defines
+	//GP_WARN("NewPass[%s][%s]CB:%x", technique->getId(), allDefines.c_str(), callback);
+	
+	// Initialize/compile the effect with the full set of defines
     if (!pass->initialize(vertexShaderPath, fragmentShaderPath, allDefines.c_str()))
     {
         GP_WARN("Failed to create pass for technique.");

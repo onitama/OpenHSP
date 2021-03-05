@@ -45,7 +45,7 @@ public:
      * @return The loaded scene, or NULL if the scene could not be loaded.
      * @script{create}
      */
-    Scene* loadScene(const char* id = NULL);
+    Scene* loadScene(const char* id = NULL, Material::PassCallback callback = NULL);
 
     /**
      * Loads a node with the specified ID from the bundle.
@@ -465,6 +465,8 @@ private:
 
     std::vector<MeshSkinData*> _meshSkins;
     std::map<std::string, Node*>* _trackedNodes;
+
+	Material::PassCallback _callback;
 };
 
 }

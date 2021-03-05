@@ -499,6 +499,7 @@ int hgio_render_start( void )
 #endif
 	//シーンレンダー開始
 	if (game) {
+		game->setCurrentFilterMode(0);					// フィルターモードをリセットする
 		if (gselbm == mainbm) {
 			// メイン画面の場合
 			game->frame();
@@ -522,6 +523,7 @@ int hgio_gsel(BMSCR *bm)
 	//
 	hgio_render_end();
 	gselbm = bm;
+	game->setCurrentFilterMode(gselbm->filtermode);
 
 	// プロジェクションの初期化
 	int id = gselbm->texid;
@@ -1531,19 +1533,15 @@ void hgio_setfilter( int type, int opt )
 	int curid;
 	if (gselbm == NULL) return;
 
+	gselbm->filtermode = type;
+	game->setCurrentFilterMode( type );
+
 	curid = gselbm->texid;
 	if (curid < 0) return;
 	gpmat *mat = game->getMat(curid);
 	if (mat == NULL) return;
-	switch( type ) {
-	case HGIO_FILTER_TYPE_LINEAR:
-	case HGIO_FILTER_TYPE_LINEAR2:
-		mat->setFilter(Texture::Filter::LINEAR);
-		break;
-	default:
-		mat->setFilter(Texture::Filter::NEAREST);
-		break;
-	}
+
+	mat->applyFilterMode(type);
 }
 
 

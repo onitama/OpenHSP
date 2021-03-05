@@ -341,6 +341,21 @@ public:
      */
     bool sweepTest(PhysicsCollisionObject* object, const Vector3& endPosition, PhysicsController::HitResult* result = NULL, PhysicsController::HitFilter* filter = NULL);
 
+
+	/**
+	 * Performs a simple contact test of the given collision object on the physics world.
+	 *
+	 * @param object The collision object to test.
+	 *
+	 * @return True if the object intersects any other physics objects, false otherwise.
+	 */
+	bool execContactTest(PhysicsCollisionObject* object, btCollisionWorld::ContactResultCallback *callback);
+	void noticeContact(void);
+
+	// Gets the corresponding GamePlay object for the given Bullet object.
+	PhysicsCollisionObject* getCollisionObject(const btCollisionObject* collisionObject) const;
+
+
 private:
 
     /**
@@ -354,7 +369,8 @@ private:
          * 
          * @param pc The physics controller that owns the callback.
          */
-        CollisionCallback(PhysicsController* pc) : _pc(pc) {}
+        CollisionCallback(PhysicsController* pc) : _pc(pc) {
+		}
 
     protected:
         /**
@@ -428,9 +444,6 @@ private:
     // Removes the given collision object from the simulated physics world.
     void removeCollisionObject(PhysicsCollisionObject* object, bool removeListeners);
     
-    // Gets the corresponding GamePlay object for the given Bullet object.
-    PhysicsCollisionObject* getCollisionObject(const btCollisionObject* collisionObject) const;
-
     // Creates a collision shape for the given node and gameplay shape definition.
     // Populates 'centerOfMassOffset' with the correct calculated center of mass offset.
     PhysicsCollisionShape* createShape(Node* node, const PhysicsCollisionShape::Definition& shape, Vector3* centerOfMassOffset, bool dynamic);
@@ -557,6 +570,7 @@ private:
     Vector3 _gravity;
     std::map<PhysicsCollisionObject::CollisionPair, CollisionInfo> _collisionStatus;
     CollisionCallback* _collisionCallback;
+
 };
 
 }

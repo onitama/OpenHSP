@@ -44,6 +44,9 @@ PhysicsRigidBody::PhysicsRigidBody(Node* node, const PhysicsCollisionShape::Defi
     // Set motion state after rigid body assignment, since bullet will callback on the motion state interface to query
     // the initial transform and it will need to access to rigid body (_body).
     _body->setMotionState(_motionState);
+	btTransform trans;
+	_motionState->getWorldTransform(trans);
+	_body->setInterpolationWorldTransform(trans);
 
     // Set other initially defined properties.
     setKinematic(parameters.kinematic);

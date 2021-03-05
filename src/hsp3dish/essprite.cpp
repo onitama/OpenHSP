@@ -389,7 +389,7 @@ int essprite::put(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, i
 	if ((x + vx) <= 0) return -1;
 	if (x > main_sx) return -1;
 	if ((y + vy) <= 0) return -1;
-	if (y > main_sx) return -1;
+	if (y > main_sy) return -1;
 
 	Bmscr* src = hspwnd->GetBmscrSafe(chr->wid);
 	if (src == NULL) return -1;
@@ -836,7 +836,7 @@ int essprite::draw(int start, int num, int mode, int start_pri, int end_pri)
 						ctx->iparam = spr->info;
 						ctx->wparam = sp->type;
 						ctx->lparam = sp->chr;
-						code_call(sp->sbr);
+						code_callback(sp->sbr);
 					}
 				}
 			}

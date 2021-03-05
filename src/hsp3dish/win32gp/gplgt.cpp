@@ -72,16 +72,64 @@ int gamehsp::makeNewLgt( int id, int lgtopt, float range, float inner, float out
 }
 
 
-int gamehsp::selectLight( int lightid )
+int gamehsp::selectLight( int lightid, int index )
 {
+	Light *light;
+	int opt;
+
 	if ( lightid >= 0 ) {
-		Light *light;
 		light = getLight( lightid );
 		if ( light == NULL ) return -1;
+		if ((index < 0) || (index >= BUFSIZE_MULTILIGHT)) {
+			return -1;
+		}
+		opt = light->getLightType();
+		switch (opt) {
+		case gameplay::Light::DIRECTIONAL:
+			if (index < _max_dlight) {
+				_dir_light[index] = lightid;
+			}
+			break;
+		case gameplay::Light::POINT:
+			if (index < _max_plight) {
+				_point_light[index] = lightid;
+			}
+			break;
+		case gameplay::Light::SPOT:
+			if (index < _max_slight) {
+				_spot_light[index] = lightid;
+			}
+			break;
+		default:
+			return -1;
+		}
 	}
-	_curlight = lightid;
 	return 0;
 }
+
+
+int gamehsp::getSelectLight(int index, int opt)
+{
+	int res = _deflight;
+	if ((index < 0)||(index >= BUFSIZE_MULTILIGHT)) {
+		return res;
+	}
+	switch (opt) {
+	case LIGHT_OPT_NORMAL:
+		res = _dir_light[index];
+		break;
+	case LIGHT_OPT_POINT:
+		res = _point_light[index];
+		break;
+	case LIGHT_OPT_SPOT:
+		res = _spot_light[index];
+		break;
+	default:
+		break;
+	}
+	return res;
+}
+
 
 void gamehsp::updateLightVector( gpobj *obj, int moc )
 {

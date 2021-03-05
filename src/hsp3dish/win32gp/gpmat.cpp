@@ -48,6 +48,7 @@ void gpmat::reset( gamehsp *owner, int id )
 	_target_material_id = -1;
 	_matopt = 0;
 	_matcolor = -1;
+	_filtermode = 1;
 }
 
 
@@ -120,6 +121,19 @@ void gpmat::setFilter(Texture::Filter value)
 	Texture::Sampler *sampler = mprm->getSampler();
 	if (sampler == NULL) return;
 	sampler->setFilterMode(value, value);
+}
+
+void gpmat::applyFilterMode(int mode)
+{
+	if (mode == _filtermode) return;
+	_filtermode = mode;
+
+	if (mode == 0) {
+		setFilter(Texture::Filter::NEAREST);
+	}
+	else {
+		setFilter(Texture::Filter::LINEAR);
+	}
 }
 
 int gpmat::updateTex32(char* ptr, int mode)
@@ -287,24 +301,113 @@ Material *gamehsp::getMaterial( int matid )
 	return mat->_material;
 }
 
-void gamehsp::setMaterialDefaultBinding( Material* material, int icolor, int matopt )
+
+void gamehsp::setLightMaterialParameter(Material* material)
+{
+	gpobj *lgt;
+	Node *light_node;
+
+	//	ディレクショナルライト
+	for (int i = 0; i < _max_dlight; i++) {
+		lgt = getObj(_dir_light[i]);
+		light_node = lgt->_node;
+		if (light_node) {
+			// ライトの方向設定
+			lightname_direction[28] = '0' + i;	// "u_directionalLightDirection[0]"
+			if (hasParameter(material, lightname_direction)) {
+				material->getParameter(lightname_direction)->bindValue(light_node, &Node::getForwardVectorView);
+			}
+			// ライトの色設定
+			lightname_color[24] = '0' + i;	// "u_directionalLightColor[0]"
+			if (hasParameter(material, lightname_color)) {
+				material->getParameter(lightname_color)->bindValue(light_node, &Node::getLightColor);
+				//material->getParameter(lightname_color)->setValue(light_node->getLight()->getColor());
+			}
+		}
+	}
+	//	ポイントライト
+	for (int i = 0; i < _max_plight; i++) {
+		lgt = getObj(_point_light[i]);
+		light_node = lgt->_node;
+		if (light_node) {
+			Light *lg = light_node->getLight();
+			if (lg->getLightType() == gameplay::Light::POINT) {
+				// ライトの方向設定
+				lightname_pointposition[21] = '0' + i;	// "u_pointLightPosition[0]"
+				if (hasParameter(material, lightname_pointposition)) {
+					material->getParameter(lightname_pointposition)->bindValue(light_node, &Node::getTranslationView);
+				}
+				// ライトの色設定
+				lightname_pointcolor[18] = '0' + i;	// "u_pointLightColor[0]"
+				if (hasParameter(material, lightname_pointcolor)) {
+					material->getParameter(lightname_pointcolor)->bindValue(light_node, &Node::getLightColor);
+					//material->getParameter(lightname_pointcolor)->setValue(lg->getColor());
+				}
+				// ライトの範囲
+				lightname_pointrange[25] = '0' + i;	// "u_pointLightRangeInverse[0]"
+				if (hasParameter(material, lightname_pointrange)) {
+					material->getParameter(lightname_pointrange)->setValue(lg->getRangeInverse());
+				}
+			}
+		}
+	}
+	//	スポットライト
+	for (int i = 0; i < _max_slight; i++) {
+		lgt = getObj(_spot_light[i]);
+		light_node = lgt->_node;
+		if (light_node) {
+			Light *lg = light_node->getLight();
+			if (lg->getLightType() == gameplay::Light::SPOT) {
+				// ライトの方向設定
+				lightname_spotposition[20] = '0' + i;	// "u_spotLightPosition[0]"
+				if (hasParameter(material, lightname_spotposition)) {
+					material->getParameter(lightname_spotposition)->bindValue(light_node, &Node::getTranslationView);
+				}
+				lightname_spotdirection[21] = '0' + i;	// "u_spotLightDirection[0]"
+				if (hasParameter(material, lightname_spotdirection)) {
+					material->getParameter(lightname_spotdirection)->bindValue(light_node, &Node::getForwardVectorView);
+				}
+				// ライトの色設定
+				lightname_spotcolor[17] = '0' + i;	// "u_spotLightColor[0]"
+				if (hasParameter(material, lightname_spotcolor)) {
+					material->getParameter(lightname_spotcolor)->bindValue(light_node, &Node::getLightColor);
+					//material->getParameter(lightname_spotcolor)->setValue(lg->getColor());
+				}
+				// ライトの範囲
+				lightname_spotrange[24] = '0' + i;	// "u_spotLightRangeInverse[0]"
+				if (hasParameter(material, lightname_spotrange)) {
+					material->getParameter(lightname_spotrange)->setValue(lg->getRangeInverse());
+				}
+				lightname_spotinner[25] = '0' + i;	// "u_spotLightInnerAngleCos[0]"
+				if (hasParameter(material, lightname_spotinner)) {
+					material->getParameter(lightname_spotinner)->setValue(lg->getInnerAngleCos());
+				}
+				lightname_spotouter[25] = '0' + i;	// "u_spotLightOuterAngleCos[0]"
+				if (hasParameter(material, lightname_spotouter)) {
+					material->getParameter(lightname_spotouter)->setValue(lg->getOuterAngleCos());
+				}
+			}
+		}
+	}
+
+	Vector3 *vambient;
+	lgt = getObj(_dir_light[0]);
+	vambient = (Vector3 *)&lgt->_vec[GPOBJ_USERVEC_DIR];
+	if (hasParameter(material, lightname_ambient))
+		material->getParameter(lightname_ambient)->setValue(vambient);
+}
+
+
+void gamehsp::setMaterialDefaultBinding(Material* material)
 {
 	// These parameters are normally set in a .material file but this example sets them programmatically.
-    // Bind the uniform "u_worldViewProjectionMatrix" to use the WORLD_VIEW_PROJECTION_MATRIX from the scene's active camera and the node that the model belongs to.
+	// Bind the uniform "u_worldViewProjectionMatrix" to use the WORLD_VIEW_PROJECTION_MATRIX from the scene's active camera and the node that the model belongs to.
 
-//	material->getParameter("u_worldViewProjectionMatrix")->setValue( _camera->getWorldViewProjectionMatrix() );
-//	material->getParameter("u_inverseTransposeWorldViewMatrix")->setValue( _camera->getInverseTransposeWorldViewMatrix() );
-//	material->getParameter("u_cameraPosition")->setValue( _camera->getTranslation() );
-
-//	material->getParameter("u_worldViewProjectionMatrix")->bindValue( _camera, &Node::getWorldViewProjectionMatrix );
-//	material->getParameter("u_inverseTransposeWorldViewMatrix")->bindValue( _camera, &Node::getInverseTransposeWorldViewMatrix );
-//	material->getParameter("u_cameraPosition")->bindValue( _camera, &Node::getTranslation );
-
-	if ( hasParameter( material, "u_cameraPosition" ) )
+	if (hasParameter(material, "u_cameraPosition"))
 		material->setParameterAutoBinding("u_cameraPosition", "CAMERA_WORLD_POSITION");
-	if ( hasParameter( material, "u_worldViewProjectionMatrix" ) )
+	if (hasParameter(material, "u_worldViewProjectionMatrix"))
 		material->setParameterAutoBinding("u_worldViewProjectionMatrix", "WORLD_VIEW_PROJECTION_MATRIX");
-	if ( hasParameter( material, "u_inverseTransposeWorldViewMatrix" ) )
+	if (hasParameter(material, "u_inverseTransposeWorldViewMatrix"))
 		material->setParameterAutoBinding("u_inverseTransposeWorldViewMatrix", "INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX");
 	if (hasParameter(material, "u_worldViewMatrix"))
 		material->setParameterAutoBinding("u_worldViewMatrix", "WORLD_VIEW_MATRIX");
@@ -316,29 +419,18 @@ void gamehsp::setMaterialDefaultBinding( Material* material, int icolor, int mat
 		material->setParameterAutoBinding("u_viewMatrix", "VIEW_MATRIX");
 	if (hasParameter(material, "u_worldMatrix"))
 		material->setParameterAutoBinding("u_worldMatrix", "WORLD_MATRIX");
+}
 
+
+void gamehsp::setMaterialDefaultBinding( Material* material, int icolor, int matopt )
+{
 	Vector4 color;
-	Node *light_node;
+
+	//	シェーダーに必要なパラメーターを反映させる
+	setMaterialDefaultBinding(material);
 
 	//	カレントライトを反映させる
-	gpobj *lgt;
-	lgt = getObj(_curlight);
-	light_node = lgt->_node;
-	// ライトの方向設定
-	if (hasParameter(material, "u_directionalLightDirection[0]"))
-		material->getParameter("u_directionalLightDirection[0]")->bindValue(light_node, &Node::getForwardVectorView);
-	// ライトの色設定
-	// (リアルタイムに変更を反映させる場合は再設定が必要。現在は未対応)
-	Vector3 *vambient;
-	vambient = (Vector3 *)&lgt->_vec[GPOBJ_USERVEC_DIR];
-	if (hasParameter(material, "u_directionalLightColor[0]"))
-		material->getParameter("u_directionalLightColor[0]")->setValue(light_node->getLight()->getColor());
-	if (hasParameter(material, "u_ambientColor"))
-		material->getParameter("u_ambientColor")->setValue(vambient);
-
-	//material->setParameterAutoBinding("u_ambientColor", "SCENE_AMBIENT_COLOR");
-	//material->setParameterAutoBinding("u_lightDirection", "SCENE_LIGHT_DIRECTION");
-	//material->setParameterAutoBinding("u_lightColor", "SCENE_LIGHT_COLOR");
+	setLightMaterialParameter(material);
 
 	colorVector3( icolor, color );
 	if ( hasParameter( material, "u_diffuseColor" ) )
@@ -424,6 +516,7 @@ int gamehsp::makeNewMat( Material* material, int mode, int color, int matopt )
 	mat->_mode = mode;
 	mat->_matcolor = color;
 	mat->_matopt = matopt;
+	mat->applyFilterMode(1);
 	return mat->_id;
 }
 
@@ -483,6 +576,7 @@ int gamehsp::makeNewMat2D( char *fname, int matopt )
 	mat->_target_material_id = -1;
 	mat->_matcolor = -1;
 	mat->_matopt = matopt;
+	mat->applyFilterMode(0);
 
 	return mat->_id;
 }
@@ -550,35 +644,27 @@ Material *gamehsp::makeMaterialFromShader(char *vshd, char *fshd, char *defs)
 
 void gamehsp::setupDefines(void)
 {
-	//	シェーダー用のdefine定義を作成
-	//
-	char tmp[8];
-	light_defines = "MODULATE_ALPHA";
-	nolight_defines = "MODULATE_ALPHA";
-	if (_max_dlight) {
-		light_defines += ";DIRECTIONAL_LIGHT_COUNT ";
-		sprintf(tmp,"%d",_max_dlight);
-		//itoa(_max_dlight,tmp,10);
-		light_defines += tmp;// std::to_string(_max_dlight);
-	}
-	if (_max_plight) {
-		light_defines += ";POINT_LIGHT_COUNT ";
-		sprintf(tmp,"%d",_max_plight);
-		//itoa(_max_plight, tmp, 10);
-		light_defines += tmp;// std::to_string(_max_plight);
-	}
-	if (_max_slight) {
-		light_defines += ";SPOT_LIGHT_COUNT ";
-		sprintf(tmp,"%d",_max_slight);
-		//itoa(_max_slight, tmp, 10);
-		light_defines += tmp;// std::to_string(_max_slight);
-	}
-	splight_defines = light_defines + ";SPECULAR";
-
 	// カスタムシェーダーの初期化
 	user_vsh = SPRITE_VSH;
 	user_fsh = SPRITE_FSH;
 	user_defines = "";
+
+	// ライトのシェーダーパラメーター
+	strcpy(lightname_ambient, PARAMNAME_LIGHT_AMBIENT);
+	strcpy(lightname_color, PARAMNAME_LIGHT_COLOR);
+	strcpy(lightname_direction, PARAMNAME_LIGHT_DIRECTION);
+
+	strcpy(lightname_pointcolor, PARAMNAME_LIGHT_POINTCOLOR);
+	strcpy(lightname_pointposition, PARAMNAME_LIGHT_POINTPOSITION);
+	strcpy(lightname_pointrange, PARAMNAME_LIGHT_POINTRANGE);
+
+	strcpy(lightname_spotcolor, PARAMNAME_LIGHT_SPOTCOLOR);
+	strcpy(lightname_spotposition, PARAMNAME_LIGHT_SPOTPOSITION);
+	strcpy(lightname_spotdirection, PARAMNAME_LIGHT_SPOTDIRECTION);
+	strcpy(lightname_spotrange, PARAMNAME_LIGHT_SPOTRANGE);
+	strcpy(lightname_spotinner, PARAMNAME_LIGHT_SPOTINNER);
+	strcpy(lightname_spotouter, PARAMNAME_LIGHT_SPOTOUTER);
+
 }
 
 
@@ -637,6 +723,11 @@ Material *gamehsp::makeMaterialTexture( char *fname, int matopt, Texture *opttex
 	if (matopt & GPOBJ_MATOPT_MIRROR) {
 		strcpy(extradefs,defs);
 		strcat(extradefs,";MIRRORTEX");
+		defs = extradefs;
+	}
+	if (matopt & GPOBJ_MATOPT_NODISCARD) {
+		strcpy(extradefs, defs);
+		strcat(extradefs, ";TEXTURE_NODISCARD_ALPHA");
 		defs = extradefs;
 	}
 

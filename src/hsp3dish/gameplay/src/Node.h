@@ -406,6 +406,13 @@ public:
     Vector3 getActiveCameraTranslationView() const;
 
     /**
+     * Returns the color vector of the Light node
+     *
+     * @return The color vector of the Light node
+     */
+    Vector3 getLightColor() const;
+
+    /**
      * Gets the first animation in the node hierarchy with the specified ID.
      *
      * @param id The ID of the animation to get. Returns the first animation if ID is NULL.
@@ -549,6 +556,7 @@ public:
      * @param url The URL pointing to the Properties object defining the physics collision object.
      */
     PhysicsCollisionObject* setCollisionObject(const char* url);
+	PhysicsCollisionObject* setCollisionObject(Properties* properties);
 
     /**
      * Gets the AI agent assigned to this node
@@ -606,11 +614,6 @@ public:
      * @script{create}
      */
     Node* clone() const;
-
-#ifdef HSPDISH
-	Node* getRefNode() const;
-	void setRefNode(Node *node);
-#endif
 
 protected:
 
@@ -683,7 +686,6 @@ private:
      */
     Node& operator=(const Node&);
 
-    PhysicsCollisionObject* setCollisionObject(Properties* properties);
 
 protected:
 
@@ -729,12 +731,6 @@ protected:
     mutable BoundingSphere _bounds;
     /** The dirty bits used for optimization. */
     mutable int _dirtyBits;
-
-#ifdef HSPDISH
-	/** Reference node for MeshDraw */
-	Node* _refnode;
-	mutable Matrix _worldref;
-#endif
 
 };
 

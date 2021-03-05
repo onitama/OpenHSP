@@ -69,7 +69,7 @@ Game::Game()
     : _initialized(false), _state(UNINITIALIZED), _pausedCount(0),
       _frameLastFPS(0), _frameCount(0), _frameRate(0), _width(0), _height(0),
       _clearDepth(1.0f), _clearStencil(0), _properties(NULL),
-      _animationController(NULL),
+      _animationController(NULL), _elapsedTime(0.0),
 #ifndef HSPDISH
 	  _audioController(NULL),
 #endif
@@ -141,7 +141,7 @@ double Game::getGameTime()
 		return _FixedTimeCount;
 	}
 #endif
-	return Platform::getAbsoluteTime() - _pausedTimeTotal;
+	return Platform::getAbsoluteTime();// -_pausedTimeTotal;
 }
 
 #ifdef HSPDISH
@@ -411,6 +411,18 @@ void Game::exit()
 }
 
 
+void Game::updateAnimation()
+{
+	// Update the scheduled and running animations.
+	_animationController->update(_elapsedTime);
+
+	// Update the physics.
+	_physicsController->update(_elapsedTime);
+
+	// Update AI.
+	_aiController->update(_elapsedTime);
+}
+
 void Game::frame()
 {
     if (!_initialized)
@@ -428,7 +440,6 @@ void Game::frame()
     }
 
 	static double lastFrameTime = Game::getGameTime();
-	float elapsedTime;
 	double frameTime = getGameTime();
 
     // Fire time events to scheduled TimeListeners
@@ -444,32 +455,23 @@ void Game::frame()
         GP_ASSERT(_aiController);
 
         // Update Time.
-		elapsedTime = (frameTime - lastFrameTime);
+		_elapsedTime = (frameTime - lastFrameTime);
 		lastFrameTime = frameTime;
 #ifdef HSPDISH
 		if (_FixedTimeMode) {
 			_FixedTimeCount += _FixedTimeRate;
-			elapsedTime = _FixedTimeRate;
+			_elapsedTime = _FixedTimeRate;
 		}
 #endif
 
-        // Update the scheduled and running animations.
-        _animationController->update(elapsedTime);
-
-        // Update the physics.
-        _physicsController->update(elapsedTime);
-
-        // Update AI.
-        _aiController->update(elapsedTime);
-
         // Update gamepads.
-        Gamepad::updateInternal(elapsedTime);
+        Gamepad::updateInternal(_elapsedTime);
 
         // Application Update.
-        update(elapsedTime);
+        update(_elapsedTime);
 
         // Update forms.
-        Form::updateInternal(elapsedTime);
+        Form::updateInternal(_elapsedTime);
 
         // Run script update.
 #ifndef HSPDISH
@@ -483,7 +485,7 @@ void Game::frame()
 #endif
 
         // Graphics Rendering.
-        render(elapsedTime);
+        render(_elapsedTime);
 
 #ifndef HSPDISH
         // Run script render.
@@ -507,7 +509,10 @@ void Game::frame()
 #endif
 	}
 	else if (_state == Game::PAUSED)
-    {
+	{
+		_elapsedTime = 0.0;
+		lastFrameTime = frameTime;
+
         // Update gamepads.
         Gamepad::updateInternal(0);
 

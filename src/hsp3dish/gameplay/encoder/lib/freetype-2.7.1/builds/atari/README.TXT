@@ -29,10 +29,10 @@ Compilieren von FreeType 2 mit PureC
 ====================================
 
 Um FreeType 2 als eine Bibliothek (library) zu compilieren, muss folgendes
-ge繝ｻdert werden:
+ge・dert werden:
 
-- Alle *.c-files m縲郭en mit einem GROSSBUCHSTABEN beginnen.
-  (Falls GEMSCRIPT zur Verf窶忖ng steht:
+- Alle *.c-files m《sen mit einem GROSSBUCHSTABEN beginnen.
+  (Falls GEMSCRIPT zur Verf“ung steht:
   Den kompletten Ordner freetype2 auf die Datei `FNames.SIC' draggen.)
 
 - In den Compiler-Optionen von PureC muss das INCLUDE directory auf INCLUDE
@@ -41,7 +41,7 @@ ge繝ｻdert werden:
     INCLUDE;E:\freetype2\include
 
 - In der Datei freetype2/include/Ft2build.h muss zu Beginn
-  ein #include "ATARI.H" wie folgt eingef窶徼 werden:
+  ein #include "ATARI.H" wie folgt eingef“t werden:
 
     #ifndef FT2_BUILD_GENERIC_H_
     #define FT2_BUILD_GENERIC_H_

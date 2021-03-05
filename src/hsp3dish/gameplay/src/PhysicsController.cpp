@@ -360,6 +360,7 @@ bool PhysicsController::sweepTest(PhysicsCollisionObject* object, const Vector3&
     return false;
 }
 
+
 btScalar PhysicsController::CollisionCallback::addSingleResult(btManifoldPoint& cp, const btCollisionObjectWrapper* a, int partIdA, int indexA, 
     const btCollisionObjectWrapper* b, int partIdB, int indexB)
 {
@@ -375,7 +376,7 @@ btScalar PhysicsController::CollisionCallback::addSingleResult(btManifoldPoint& 
     // new entry to the cache with the appropriate listeners and notify them.
     PhysicsCollisionObject::CollisionPair pair(objectA, objectB);
 
-    CollisionInfo* collisionInfo;
+	CollisionInfo* collisionInfo;
     if (_pc->_collisionStatus.count(pair) > 0)
     {
         collisionInfo = &_pc->_collisionStatus[pair];
@@ -430,7 +431,8 @@ btScalar PhysicsController::CollisionCallback::addSingleResult(btManifoldPoint& 
     // status is not reset to 'no collision' when the controller's update completes).
     collisionInfo->_status &= ~DIRTY;
     collisionInfo->_status |= COLLISION;
-    return 0.0f;
+	
+	return 0.0f;
 }
 
 void PhysicsController::initialize()
@@ -476,6 +478,21 @@ void PhysicsController::resume()
     // Unused
 }
 
+bool PhysicsController::execContactTest(PhysicsCollisionObject* object, btCollisionWorld::ContactResultCallback *callback)
+{
+	// Simple contact Test
+	btCollisionObjectArray arr = _world->getCollisionObjectArray();
+	for (int i = 0; i < _world->getNumCollisionObjects(); i++) {
+		btCollisionObject *obj = arr[i];
+		PhysicsCollisionObject *pco = (PhysicsCollisionObject *)obj->getUserPointer();
+		if (pco == object) {
+			_world->contactTest(obj, *callback);
+			return true;
+		}
+	}
+	return false;
+}
+
 void PhysicsController::update(float elapsedTime)
 {
     GP_ASSERT(_world);
@@ -488,6 +505,8 @@ void PhysicsController::update(float elapsedTime)
     // so we divide by 1000 to convert from milliseconds.
     _world->stepSimulation(elapsedTime * 0.001f, 10);
 
+
+#if 0
     // If we have status listeners, then check if our status has changed.
     if (_listeners || hasScriptListener(GP_GET_SCRIPT_EVENT(PhysicsController, statusEvent)))
     {
@@ -606,6 +625,7 @@ void PhysicsController::update(float elapsedTime)
             iter->second._status &= ~COLLISION;
         }
     }
+#endif
 
     _isUpdating = false;
 }

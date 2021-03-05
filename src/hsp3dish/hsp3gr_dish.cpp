@@ -1531,8 +1531,9 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x65:								// gppostefx
 		break;
 	case 0x66:								// gpuselight
-		p1 = code_getdi( 0 );
-		p2 = game->selectLight( p1 );
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p2 = game->selectLight( p1,p2 );
 		if (p2) throw HSPERR_ILLEGAL_FUNCTION;
 		break;
 	case 0x67:								// gpusecamera
@@ -1845,7 +1846,8 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( 0 );
 		fp1 = (float)code_getdd( 1.0 );
 		fp2 = (float)code_getdd( 0.5 );
-		ctx->stat = game->setObjectBindPhysics( p1, fp1, fp2 );
+		p2 = code_getdi(0);
+		ctx->stat = game->setObjectBindPhysics( p1, fp1, fp2, p2 );
 		break;
 	case 0x7e:								// gpcamera
 		p1 = code_getdi( 0 );
@@ -2203,34 +2205,33 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 	case 0xe5:								// fvdir
 		{
-/*
-		VECTOR v;
+		VECTOR *v;
 		VECTOR ang;
 		p_vec = code_getvvec();
-		code_getvec( &v );
+		code_getvec( &p_vec1);
+		v = (VECTOR *)&p_vec1;
 		p1 = code_getdi( 0 );
 		SetVector( &ang, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f );
 		InitMatrix();
 		switch( p1 ) {
-		case HGMODEL_ROTORDER_ZYX:
+		case 0:
 			RotZ( ang.z );
 			RotY( ang.y );
 			RotX( ang.x );
 			break;
-		case HGMODEL_ROTORDER_XYZ:
+		case 1:
 			RotX( ang.x );
 			RotY( ang.y );
 			RotZ( ang.z );
 			break;
-		case HGMODEL_ROTORDER_YXZ:
+		case 2:
 			RotY( ang.y );
 			RotX( ang.x );
 			RotZ( ang.z );
 			break;
 		}
-		ApplyMatrix( &ang, &v );
+		ApplyMatrix( &ang, v );
 		code_setvec( p_vec, &ang );
-*/
 		break;
 		}
 	case 0xe6:								// fvmin
@@ -2652,7 +2653,7 @@ static int cmdfunc_extcmd( int cmd )
 		p5 = code_getdi(255);
 		ctx->stat = game->AddParamEvent2(p1, p2, p3, p4, p5);
 		break;
-	case 0x10a:								// event_suicide
+	case 0x10a:								// event_suicide/objdel
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		ctx->stat = game->AddSuicideEvent(p1, p2);
@@ -2776,6 +2777,11 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x125:								// event_addcolor
 	case 0x126:								// event_addwork
 	case 0x127:								// event_addwork2
+	case 0x128:								// event_setaxang
+	case 0x129:								// event_setangx
+	case 0x12a:								// event_setangy
+	case 0x12b:								// event_setangz
+	case 0x12c:								// event_setangr
 		p1 = code_getdi(0);
 		dp1 = code_getdd(0.0);
 		dp2 = code_getdd(0.0);
@@ -2823,53 +2829,120 @@ static int cmdfunc_extcmd( int cmd )
 		ctx->stat = game->AddChangeEvent(p1, MOC_ANGX, (float)dp1, (float)dp2, (float)dp3, (float)dp4, (float)dp5, (float)dp6);
 		break;
 	}
-	case 0x150:								// gpmeshvertex
+	case 0x150:								// gpresetlight
 	{
-		PVal* pv1;
-		PVal* pv2;
-		PVal* pv3;
-		APTR aptr1;
-		APTR aptr2;
-		APTR aptr3;
-		aptr1 = code_getva(&pv1);
-		aptr2 = code_getva(&pv2);
-		aptr3 = code_getva(&pv3);
+		p1 = code_getdi(-1);
+		p2 = code_getdi(-1);
+		p3 = code_getdi(-1);
+		game->resetCurrentLight(p1,p2,p3);
 		break;
 	}
-	case 0x151:								// gpmeshnormal
+	case 0x151:								// setobjlight
 	{
-		PVal* pv1;
-		PVal* pv2;
-		PVal* pv3;
-		APTR aptr1;
-		APTR aptr2;
-		APTR aptr3;
-		aptr1 = code_getva(&pv1);
-		aptr2 = code_getva(&pv2);
-		aptr3 = code_getva(&pv3);
+		p1 = code_getdi(0);
+		ctx->stat = game->setObjLight(p1);
 		break;
 	}
-	case 0x152:								// gpmeshuv
+	case 0x152:								// gpmeshclear
 	{
-		PVal* pv1;
-		PVal* pv2;
-		APTR aptr1;
-		APTR aptr2;
-		aptr1 = code_getva(&pv1);
-		aptr2 = code_getva(&pv2);
+		game->clearFreeVertex();
 		break;
 	}
-	case 0x153:								// gpmesh
+	case 0x153:								// gpmeshpolygon
 	{
-		PVal* pv1;
-		PVal* pv2;
-		APTR aptr1;
-		APTR aptr2;
-		aptr1 = code_getva(&pv1);
-		aptr2 = code_getva(&pv2);
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
+		p4 = code_getdi(-1);
+		ctx->stat = game->addFreeVertexPolygon(p1,p2,p3,p4);
+		break;
+	}
+	case 0x154:								// gpmeshadd
+	{
+		PVal *p_pval;
+		APTR p_aptr;
+		double dp4, dp5, dp6, dp7, dp8;
+		p_aptr = code_getva(&p_pval);
+		dp1 = code_getdd(0.0);
+		dp2 = code_getdd(0.0);
+		dp3 = code_getdd(0.0);
+		dp4 = code_getdd(0.0);
+		dp5 = code_getdd(0.0);
+		dp6 = code_getdd(0.0);
+		dp7 = code_getdd(0.0);
+		dp8 = code_getdd(0.0);
+		p6 = game->addFreeVertex(dp1,dp2,dp3,dp4,dp5,dp6,dp7,dp8);
+		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p6);
+		break;
+	}
+	case 0x155:								// gpmesh
+	{
+		PVal *p_pval;
+		APTR p_aptr;
+		p_aptr = code_getva(&p_pval);
+		p1 = code_getdi(-1);
+		p2 = code_getdi(-1);
+		p6 = game->makeFreeVertexNode(p1, p2);
+		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p6);
+		break;
+	}
+	case 0x156:								// gppcontact
+	{
+		PVal* pv1;
+		APTR aptr1;
+		int res;
+		aptr1 = code_getva(&pv1);
+		p1 = code_getdi(0);
+		res = game->getPhysicsContact( p1 );
+		code_setva(pv1, aptr1, HSPVAR_FLAG_INT, &res);
+		break;
+	}
+	case 0x157:								// gppinfo
+	{
+		PVal* pv1;
+		APTR aptr1;
+		VECTOR pos;
+		gppinfo *info;
+		Vector3 *vec3;
+		int res = -1;
+		p_vec = code_getvvec();
+		aptr1 = code_getva(&pv1);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		info = game->getPhysicsContactInfo(p1, p2);
+		if (info) {
+			vec3 = &info->_pos;
+			SetVector(&pos, vec3->x, vec3->y, vec3->z, info->_force);
+			code_setvec(p_vec, &pos);
+			code_setva(pv1, aptr1, HSPVAR_FLAG_INT, &info->_objid);
+			res = 0;
+		}
+		ctx->stat = res;
+		break;
+	}
+	case 0x158:								// gppraytest
+	{
+		PVal* pv1;
+		APTR aptr1;
+		int res;
+		double dist;
+		aptr1 = code_getva(&pv1);
+		p1 = code_getdi(0);
+		dist = code_getdd(100.0);
+
+		Vector4 pos;
+		Vector4 ang;
+		p6 = game->getObjectVector(p1, MOC_POS, &pos);
+		if (p6 < 0) code_puterror(HSPERR_ILLEGAL_FUNCTION);
+		p6 = game->getObjectVector(p1, MOC_FORWARD, &ang);
+		if (p6 < 0) code_puterror(HSPERR_ILLEGAL_FUNCTION);
+
+		res = game->execPhysicsRayTest((Vector3 *)&pos, (Vector3 *)&ang, dist);
+		code_setva(pv1, aptr1, HSPVAR_FLAG_INT, &res);
+		if (res > 0) {
+			game->setObjectVector(p1, MOC_WORK, &pos);
+			game->setObjectVector(p1, MOC_WORK2, &ang);
+		}
 		break;
 	}
 

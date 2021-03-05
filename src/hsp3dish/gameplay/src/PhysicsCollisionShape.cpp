@@ -146,7 +146,7 @@ PhysicsCollisionShape::Definition PhysicsCollisionShape::Definition::create(Node
     float radius = -1.0f;
     float width = -1.0f;
     float height = -1.0f;
-    bool centerIsAbsolute = false;
+	bool centerIsAbsolute = false;
     const char* imagePath = NULL;
     float maxHeight = 0;
     float minHeight = 0;

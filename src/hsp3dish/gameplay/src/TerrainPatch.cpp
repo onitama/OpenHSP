@@ -474,7 +474,7 @@ bool TerrainPatch::setLayer(int index, const char* texturePath, const Vector2& t
     return true;
 }
 
-std::string TerrainPatch::passCallback(Pass* pass, void* cookie)
+std::string TerrainPatch::passCallback(Pass* pass, void* cookie, const char *defs)
 {
     TerrainPatch* patch = reinterpret_cast<TerrainPatch*>(cookie);
     GP_ASSERT(patch);

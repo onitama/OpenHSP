@@ -141,6 +141,11 @@ public:
      */
     unsigned int draw(bool wireframe = false );
 
+	/**
+	 * @see Drawable::setNode
+	 */
+	void setNode(Node* node);
+
 private:
 
     /**
@@ -163,11 +168,6 @@ private:
      */
     Model& operator=(const Model&);
     
-    /**
-     * @see Drawable::setNode
-     */
-    void setNode(Node* node);
-
     /**
      * @see Drawable::clone
      */

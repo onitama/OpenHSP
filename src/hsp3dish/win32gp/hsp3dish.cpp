@@ -60,6 +60,7 @@ static int drawflag;
 static	HWND m_hWnd;
 static	HWND m_hWndParent;
 static	HINSTANCE m_hInstance;
+static	WNDCLASSEX wndClass;
 
 #ifndef HSPDEBUG
 static int hsp_sscnt, hsp_ssx, hsp_ssy;
@@ -545,6 +546,7 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 	char* windowtitle = NULL;
 #endif
 
+#if 0
 	// Register the windows class
 	WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
 							LoadIcon( hInstance, MAKEINTRESOURCE(128) ),
@@ -552,6 +554,7 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 							(HBRUSH)GetStockObject(WHITE_BRUSH),
 							NULL, "HSP3DishWindow" };
 	RegisterClass( &wndClass );
+#endif
 
 	// Set the window's initial style
 	//DWORD m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
@@ -880,6 +883,8 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			delete platform;
 			if (m_hWnd != NULL) {
 				hgio_term();
+				// デバイスコンテキスト解放
+				//ReleaseDC(m_hWnd, __hdc);
 				DestroyWindow(m_hWnd);
 				m_hWnd = NULL;
 			}
@@ -1177,6 +1182,27 @@ int hsp3dish_reset(void)
 	//
 	drawflag = 0;
 	ctx->msgfunc = hsp3dish_msgfunc;
+
+	// Register the windows class
+	wndClass.cbSize = sizeof(WNDCLASSEX);
+	wndClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	wndClass.lpfnWndProc = WndProc;
+	wndClass.cbClsExtra = 0;
+	wndClass.cbWndExtra = 0;
+	wndClass.hInstance = m_hInstance;
+	wndClass.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(128));
+	wndClass.hIconSm = NULL;
+	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);  // No brush - we are going to paint our own background
+	wndClass.lpszMenuName = NULL;  // No default menu
+	wndClass.lpszClassName = "HSP3DishWindow";
+
+	if (!::RegisterClassEx(&wndClass))
+	{
+		hsp3dish_dialog("Failed to register window class.");
+		hsp3dish_savelog();
+		return 1;
+	}
 
 	//		Initalize Window
 	//

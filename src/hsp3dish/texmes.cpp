@@ -352,12 +352,14 @@ int texmesManager::texmesRegist(char* msg, texmesPos *info)
 		return texid;							// キャッシュがあった
 	}
 
+	//		ビットマップを作成
+	pImg = texmesGetFont(msg, &sx, &sy, &tsx, &tsy, info);
+	if (pImg == NULL) return -1;
+
 	//		キャッシュが存在しないので作成
 	tex = addTexmes();
 	if (tex == NULL) return -1;
 
-	//		ビットマップを作成
-	pImg = texmesGetFont(msg, &sx, &sy, &tsx, &tsy, info);
 	tex->reset(sx,sy,tsx,tsy,pImg);
 	_area_px = sx;
 	_area_py = sy;
@@ -381,6 +383,8 @@ unsigned char* texmesManager::texmesGetFont(char* msg, int* out_sx, int* out_sy,
 	}
 
 	hgio_fontsystem_exec(msg, NULL, 0, &sx, &sy, info);
+
+	if ((sx == 0) || (sy == 0)) return NULL;
 
 	tsx = Get2N(sx);
 	tsy = Get2N(sy);

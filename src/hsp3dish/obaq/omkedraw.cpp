@@ -33,7 +33,9 @@ void OmkeDrawSetBMSCR( void *bmscr )
 
 void OmkeDrawLineStart( int col )
 {
-	mem_bmscr->color = col;
+	Bmscr *bm = (Bmscr *)mem_bmscr;
+	bm->Setcolor(col);
+//	mem_bmscr->color = 0xff000000|col;
 	linecnt = 0;
 //	gb_color( (col>>16)&255, (col>>8)&255, col&255 );
 //	gb_lineStart();

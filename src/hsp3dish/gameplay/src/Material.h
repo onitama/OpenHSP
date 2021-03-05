@@ -33,7 +33,7 @@ public:
     /**
      * Pass creation callback function definition.
      */
-    typedef std::string(*PassCallback)(Pass*, void*);
+    typedef std::string(*PassCallback)(Pass*, void*, const char *);
 
     /**
      * Creates a material using the data from the Properties object defined at the specified URL, 

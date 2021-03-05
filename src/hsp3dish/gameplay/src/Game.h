@@ -154,15 +154,22 @@ public:
      */
     void exit();
 
-    /**
-     * Platform frame delegate.
-     *
-     * This is called every frame from the platform.
-     * This in turn calls back on the user implemented game methods: update() then render()
-     */
-    void frame();
+	/**
+	 * Platform frame delegate.
+	 *
+	 * This is called every frame from the platform.
+	 * This in turn calls back on the user implemented game methods: update() then render()
+	 */
+	void frame();
 
-    /**
+	/**
+	* Frame animation update
+	 *
+	* This is called every frame before the user render time.
+	*/
+	void updateAnimation();
+
+	/**
      * Gets the current frame rate.
      * 
      * @return The current frame rate.
@@ -758,8 +765,9 @@ private:
     State _state;                               // The game state.
     unsigned int _pausedCount;                  // Number of times pause() has been called.
     static double _pausedTimeLast;              // The last time paused.
-    static double _pausedTimeTotal;             // The total time paused.
-    double _frameLastFPS;                       // The last time the frame count was updated.
+	static double _pausedTimeTotal;             // The total time paused.
+	double _elapsedTime;			            // The frame elapsed time
+	double _frameLastFPS;                       // The last time the frame count was updated.
     unsigned int _frameCount;                   // The current frame count.
     unsigned int _frameRate;                    // The current frame rate.
     unsigned int _width;                        // The game's display width.

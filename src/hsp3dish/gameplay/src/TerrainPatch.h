@@ -50,7 +50,7 @@ public:
      *
      * @script{ignore}
      */
-    static std::string passCallback(Pass* pass, void* cookie);
+    static std::string passCallback(Pass* pass, void* cookie, const char *defs);
 
 private:
 

@@ -333,7 +333,7 @@ int generateHeightmapChunk(void* threadData)
 // 
 // Fast, Minimum Storage Ray-Triangle Intersection
 // 
-// Authors: Tomas M賴罵er, Ben Trumbore
+// Authors: Tomas Mler, Ben Trumbore
 // http://jgt.akpeters.com/papers/MollerTrumbore97
 //
 // Implementation of algorithm from Real-Time Rendering (vol 1), pg. 305.

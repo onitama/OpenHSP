@@ -28,10 +28,6 @@ Node::Node(const char* id)
     _drawable(NULL), _camera(NULL), _light(NULL), _audioSource(NULL), _collisionObject(NULL), _agent(NULL), _userObject(NULL),
       _dirtyBits(NODE_DIRTY_ALL)
 {
-#ifdef HSPDISH
-	_refnode = NULL;
-	_worldref.identity();
-#endif
 	GP_REGISTER_SCRIPT_EVENTS();
     if (id)
     {
@@ -209,18 +205,6 @@ Node* Node::getParent() const
 {
     return _parent;
 }
-
-#ifdef HSPDISH
-Node* Node::getRefNode() const
-{
-	return _refnode;
-}
-
-void Node::setRefNode( Node *node )
-{
-	_refnode = node;
-}
-#endif
 
 unsigned int Node::getChildCount() const
 {
@@ -465,13 +449,6 @@ const Matrix& Node::getWorldMatrix() const
             //}
 		}
     }
-#ifdef HSPDISH
-	if (_refnode) {
-		// Apply reference node matrix
-		Matrix::multiply(_world, _refnode->getWorldMatrix(), &_worldref);
-		return _worldref;
-	}
-#endif
 	return _world;
 }
 
@@ -655,6 +632,20 @@ Vector3 Node::getActiveCameraTranslationView() const
     }
     return Vector3::zero();
 }
+
+
+#ifdef HSPDISH
+Vector3 Node::getLightColor(void) const
+{
+    if (_light == NULL) {
+        return Vector3::zero();
+    }
+    Vector3 vector = _light->getColor();
+    return vector;
+}
+
+#endif
+
 
 void Node::hierarchyChanged()
 {

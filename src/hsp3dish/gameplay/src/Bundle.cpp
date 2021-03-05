@@ -36,7 +36,7 @@ namespace gameplay
 static std::vector<Bundle*> __bundleCache;
 
 Bundle::Bundle(const char* path) :
-    _path(path), _referenceCount(0), _references(NULL), _stream(NULL), _trackedNodes(NULL)
+    _path(path), _referenceCount(0), _references(NULL), _stream(NULL), _trackedNodes(NULL),	_callback(NULL)
 {
 }
 
@@ -279,6 +279,7 @@ void Bundle::clearLoadSession()
     }
     _meshSkins.clear();
 	_savedNode.clear();
+	_callback = NULL;
 }
 
 const char* Bundle::getIdFromOffset() const
@@ -390,9 +391,11 @@ bool Bundle::readMatrix(float* m)
     return _stream->read(m, sizeof(float), 16) == 16;
 }
 
-Scene* Bundle::loadScene(const char* id)
+Scene* Bundle::loadScene(const char* id, Material::PassCallback callback)
 {
     clearLoadSession();
+
+	_callback = callback;
 
     Reference* ref = NULL;
     if (id)
@@ -1024,7 +1027,7 @@ Model* Bundle::readModel(const char* nodeId)
 					{
 						materialPath.append("#");
 						materialPath.append(materialName);
-						Material* material = Material::create(materialPath.c_str());
+						Material* material = Material::create(materialPath.c_str(), _callback, NULL);
 						if (material)
 						{
 							int partIndex = model->getMesh()->getPartCount() > 0 ? i : -1;

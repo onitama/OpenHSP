@@ -51,6 +51,7 @@ using namespace gameplay;
 #define GPOBJ_SHAPE_BOX (1)
 #define GPOBJ_SHAPE_FLOOR (2)
 #define GPOBJ_SHAPE_PLATE (3)
+#define GPOBJ_SHAPE_MESH (4)
 #define GPOBJ_SHAPE_SPRITE (16)
 
 enum {
@@ -66,6 +67,7 @@ MOC_AXANG,
 MOC_ANGX,
 MOC_ANGY,
 MOC_ANGZ,
+MOC_FORWARD,
 MOC_MAX
 };
 
@@ -88,6 +90,7 @@ GPPSET_LINEAR_FACTOR,
 GPPSET_ANGULAR_FACTOR,
 GPPSET_ANGULAR_VELOCITY,
 GPPSET_LINEAR_VELOCITY,
+GPPSET_MASS_CENTER,
 GPPSET_MAX
 };
 
@@ -110,6 +113,7 @@ GPPSET_MAX
 #define GPOBJ_MATOPT_USERBUFFER (256)
 #define GPOBJ_MATOPT_MIRROR (512)
 #define GPOBJ_MATOPT_CUBEMAP (1024)
+#define GPOBJ_MATOPT_NODISCARD (2048)
 
 #define GPDRAW_OPT_OBJUPDATE (1)
 #define GPDRAW_OPT_DRAWSCENE (2)
@@ -151,6 +155,7 @@ public:
 	gpobj();
 	~gpobj();
 	void reset( int id );				// 初期化
+	bool isAlive(void) { return (_flag != 0); }				// 有効か調べる
 	bool isVisible( void );				// 表示できるか調べる
 	bool isVisible( bool lateflag );	// 表示できるか調べる(lateflagあり)
 	float getAlphaRate( void );			// Alpha値を取得する
@@ -186,6 +191,7 @@ public:
 	int _fade;							// フェード設定(0=なし/+-で増減)
 	int _rendergroup;					// レンダリンググループ
 	int _lightgroup;					// ライティンググループ
+	int _lighthash;						// ライティングハッシュ値
 
 	gpspr *_spr;						// 生成された2Dスプライト情報
 	gpphy *_phy;						// 生成されたコリジョン情報
@@ -207,9 +213,32 @@ public:
 
 #define BUFSIZE_POLYCOLOR 32
 #define BUFSIZE_POLYTEX 64
-#define BUFSIZE_MULTILIGHT 16
+#define BUFSIZE_MULTILIGHT 10
 
 #define DEFAULT_ANIM_CLIPNAME "_idle"
+
+#define PARAMNAME_LIGHT_MAXSIZE 32
+#define PARAMNAME_LIGHT_DIRECTION "u_directionalLightDirection[0]"
+#define PARAMNAME_LIGHT_COLOR "u_directionalLightColor[0]"
+#define PARAMNAME_LIGHT_AMBIENT "u_ambientColor"
+#define PARAMNAME_LIGHT_POINTCOLOR "u_pointLightColor[0]"
+#define PARAMNAME_LIGHT_POINTPOSITION "u_pointLightPosition[0]"
+#define PARAMNAME_LIGHT_POINTRANGE "u_pointLightRangeInverse[0]"
+
+#define PARAMNAME_LIGHT_SPOTCOLOR "u_spotLightColor[0]"
+#define PARAMNAME_LIGHT_SPOTPOSITION "u_spotLightPosition[0]"
+#define PARAMNAME_LIGHT_SPOTDIRECTION "u_spotLightDirection[0]"
+#define PARAMNAME_LIGHT_SPOTRANGE "u_spotLightRangeInverse[0]"
+#define PARAMNAME_LIGHT_SPOTINNER "u_spotLightInnerAngleCos[0]"
+#define PARAMNAME_LIGHT_SPOTOUTER "u_spotLightOuterAngleCos[0]"
+
+#define LIGHT_OPT_NORMAL (0)
+#define LIGHT_OPT_POINT (1)
+#define LIGHT_OPT_SPOT (2)
+
+#define DEFAULT_GPB_FILEEXT ".gpb"
+#define DEFAULT_MATERIAL_FILEEXT ".material"
+#define DEFAULT_PHYSISCS_FILEEXT ".physics"
 
 //	gamehsp Object
 class gamehsp: public Game
@@ -234,7 +263,40 @@ public:
 	/**
 	* for PassCallback
 	*/
-	static std::string passCallback(Pass* pass, void* cookie);
+	static std::string passCallback(Pass* pass, void* cookie, const char *defs);
+	class CollisionCallback : public btCollisionWorld::ContactResultCallback
+	{
+	public:
+		/**
+		 * Constructor.
+		 *
+		 * @param pc The physics controller that owns the callback.
+		 */
+		CollisionCallback(PhysicsController* pc) : _pc(pc) {
+		}
+
+	protected:
+		/**
+			* Internal function used for Bullet integration (do not use or override).
+			*/
+		btScalar addSingleResult(btManifoldPoint& cp, const btCollisionObjectWrapper* a, int partIdA, int indexA, const btCollisionObjectWrapper* b, int partIdB, int indexB);
+
+	private:
+		PhysicsController* _pc;
+	};
+
+	/**
+	* for free mesh vertex
+	*/
+	class FreeMeshVertex
+	{
+	public:
+		FreeMeshVertex();
+		~FreeMeshVertex();
+		float x, y, z;		// vertex
+		float nx, ny, nz;	// normal
+		float u, v;			// UV
+	};
 
 	/*
 		HSP Support Functions
@@ -256,11 +318,13 @@ public:
 	Node *getNode( int objid );
 	Light *getLight( int lgtid );
 	Camera *getCamera( int camid );
+	Drawable *getDrawable(Node *node);
 	int setObjName( int objid, char *name );
 	char *getObjName( int objid );
 	int *getObjectPrmPtr( int objid, int prmid );
 	int getObjectPrm( int objid, int prmid, int *outptr );
 	int setObjectPrm( int objid, int prmid, int value );
+	int setObjLight( int objid );
 
 	char *getAnimId(int objid, int index, int option);
 	int getAnimPrm(int objid, int index, int option, int *res);
@@ -309,7 +373,6 @@ public:
 	int drawSceneObject(gpobj *camobj);
 
 	int selectScene( int sceneid );
-	int selectLight( int lightid );
 	int selectCamera( int camid );
 
 	void makeNewModel( gpobj *obj, Mesh *mesh, Material *material );
@@ -322,6 +385,7 @@ public:
 	int makeModelNode( char *fname, char *idname, char *defs );
 
 	bool makeModelNodeSub(Node *node, int nest);
+	bool makeModelNodeMaterialSub(Node *node, int nest);
 
 	int makeCloneNode( int objid, int mode, int eventid );
 	int makeSpriteObj( int celid, int gmode, void *bmscr );
@@ -342,7 +406,8 @@ public:
 	Material *makeMaterialColor( int color, int lighting );
 	Material *makeMaterialTexture( char *fname, int matopt, Texture *opttex = NULL);
 	Material *makeMaterialFromShader( char *vshd, char *fshd, char *defs );
-	void setMaterialDefaultBinding( Material* material, int icolor, int matopt );
+	void setMaterialDefaultBinding(Material* material);
+	void setMaterialDefaultBinding(Material* material, int icolor, int matopt);
 	float setMaterialBlend( Material* material, int gmode, int gfrate );
 	Material *makeMaterialTex2D(Texture *texture, int matopt);
 	int getTextureWidth( void );
@@ -375,14 +440,21 @@ public:
 	int lookAtObject( int objid, Vector4 *prm );
 	void lookAtNode(Node* node, const Vector3& target );
 
+	// light
+	void resetCurrentLight( int lightmax=-1, int plightmax=-1, int slightmax=-1 );
+	void setLightMaterialParameter(Material* material);
+	int selectLight(int lightid, int index = 0);
+	int getSelectLight(int index = 0, int opt = 0);
 	void updateLightVector( gpobj *obj, int moc );
-
 
 	// physics
 	gpphy *getPhy( int id );
-	int setObjectBindPhysics( int objid, float mass, float friction );
-	gpphy *setPhysicsObjectAuto( gpobj *obj, float mass, float friction );
+	int setObjectBindPhysics( int objid, float mass, float friction, int option=0 );
+	gpphy *setPhysicsObjectAuto( gpobj *obj, float mass, float friction, int option=0 );
 	int objectPhysicsApply( int objid, int type, Vector3 *prm );
+	int getPhysicsContact(int objid);
+	gppinfo *getPhysicsContactInfo(int objid,int index);
+	int execPhysicsRayTest(Vector3 *pos, Vector3 *direction, float distance);
 
 	// sprite
 	gpspr *getSpriteObj( int objid );
@@ -400,7 +472,8 @@ public:
 	float GetTimerFromFrame(int frame);
 	int convertAxis(Vector3 *res, Vector3 *pos, int mode);
 	void storeNextVector(gpevent *myevent);
-
+	int getCurrentFilterMode(void);
+	void setCurrentFilterMode(int mode);
 
 	// 2D draw function
 	float *startPolyTex2D( gpmat *mat, int material_id );
@@ -441,6 +514,13 @@ public:
 	void texmesProc(void);
 	void texmesDrawClip(void *bmscr, int x, int y, int psx, int psy, texmes *tex, int basex, int basey);
 	texmesManager *getTexmesManager(void) { return &tmes; };
+
+	//	free vertex function
+	void clearFreeVertex(void);
+	int addFreeVertex(float x, float y, float z, float nx, float ny, float nz, float u, float v);
+	int addFreeVertexPolygon(int id1, int id2, int id3, int id4=-1);
+	int makeFreeVertexNode(int color, int matid);
+
 
 protected:
     /**
@@ -508,10 +588,15 @@ private:
 	int _maxevent;
 	gpevent *_gpevent;
 
+	// physics
+	CollisionCallback *_collision_callback;
+	std::vector<FreeMeshVertex> _freevertex;	// FreeMeshVertex配列
+	std::vector<short> _freeindex;				// FreeMeshVertex配列のindex
+	float _fv_maxradius;						// FreeMeshVertex radius
+	float _fv_minradius;						// FreeMeshVertex radius
 
 	// default scene
 	int _curscene;
-	int _curlight;
 	int _deflight;
 	int _curcamera;
 	int _defcamera;
@@ -523,6 +608,7 @@ private:
 	FrameBuffer* _previousFrameBuffer;
 	int _render_numobj;
 	int _render_numpoly;
+	int _filtermode;
 
 	Node *testNode;
 
@@ -533,6 +619,7 @@ private:
 	int _dir_light[BUFSIZE_MULTILIGHT];
 	int _point_light[BUFSIZE_MULTILIGHT];
 	int _spot_light[BUFSIZE_MULTILIGHT];
+	int _curlight_hash;
 
 	// Obj support value
 	Vector3 border1;		// BORDER座標1
@@ -560,6 +647,22 @@ private:
 	std::string	nolight_defines;
 	std::string	splight_defines;
 
+	char lightname_ambient[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_color[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_direction[PARAMNAME_LIGHT_MAXSIZE];
+
+	char lightname_pointcolor[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_pointposition[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_pointrange[PARAMNAME_LIGHT_MAXSIZE];
+
+	char lightname_spotcolor[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_spotposition[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_spotdirection[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_spotrange[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_spotinner[PARAMNAME_LIGHT_MAXSIZE];
+	char lightname_spotouter[PARAMNAME_LIGHT_MAXSIZE];
+
+	// preset user defines
 	std::string	user_vsh;
 	std::string	user_fsh;
 	std::string	user_defines;
