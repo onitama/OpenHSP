@@ -780,17 +780,6 @@ static void hsp3dish_bye_sub( void )
 {
 	//		クリーンアップ
 	//
-#ifdef HSPERR_HANDLE
-	try {
-#endif
-		hsp->Dispose();
-#ifdef HSPERR_HANDLE
-	}
-	catch (HSPERROR code) {						// HSPエラー例外処理
-		hsp->hspctx.err = code;
-		hsp3dish_error();
-	}
-#endif
 
 	//		Window関連の解放
 	//
@@ -822,6 +811,19 @@ static void hsp3dish_bye( void )
 		hsp3dish_savelog();
 	}
 #endif
+
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+		hsp->Dispose();
+#ifdef HSPERR_HANDLE
+	}
+	catch (HSPERROR code) {						// HSPエラー例外処理
+		hsp->hspctx.err = code;
+		hsp3dish_error();
+	}
+#endif
+
 	hsp3dish_bye_sub();
 	SDL_Quit();
 
@@ -950,6 +952,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			if ( hsp3dish_init_sub(hsp_wx,hsp_wy,0) ) {
 				return;
 			}
+			hsp3excmd_rebuild_window();
 #ifdef USE_OBAQ
 			HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF );
 			hsp3typeinit_dw_restart( tinfo );
