@@ -28,10 +28,12 @@
 	;		結果は、ih_optに代入されます。
 	;
 
-*ihelp_init
+*ihelp_boot
 	;
 	;	hsファイルライブラリ初期化
 	;	(参照用グローバル変数)
+	;
+	ih_file="hsphelp.idx"			; indexファイル
 	;
 	sdim ih_ansbuf,$8000			; 検索候補バッファ
 	sdim ih_info,$8000				; メッセージ表示バッファ(32K)
@@ -49,8 +51,158 @@
 
 	ih_htmopt = 0					; html出力 ON/OFF flag
 
+	sdim cb_group,512
+	cb_group={"命令概要
+プリプロセッサ命令
+代入命令
+特殊代入命令
+プログラム制御命令
+プログラム制御マクロ
+基本入出力制御命令
+拡張入出力制御命令
+オブジェクト制御命令
+画面制御命令
+拡張画面制御命令
+文字列操作命令
+メモリ管理命令
+マルチメディア制御命令
+ファイル操作命令
+拡張ファイル操作命令
+通信制御命令
+OSシステム制御命令
+HSPシステム制御命令
+その他の命令
+"}
+
+
+
 
 #module "ihelp"
+#deffunc ihelp_init var _p1
+	;
+	;	hsphelpライブラリ初期化
+	;
+	ih_msg="Init HSPhelp.\n"
+	fname2=ih_file@				; 書き出しファイル
+	exist fname2
+	if strsize<0 {
+		gosub *mkidx
+	}
+
+	fname2=ih_file@				; idxファイル名
+	exist fname2
+	if strsize<1 : dialog "idxファイルがありません.\n" : return -1
+	;
+	sdim wrt,strsize+4			; idxバッファを確保
+	notesel wrt
+	noteload fname2
+	maxkw=notemax/2
+	ih_msg+="Total "+maxkw+" keywords.\n"
+	_p1=ih_msg
+	return 1
+
+*mkidx
+	;	idxファイル再構築main
+	;
+	ih_msg="idxファイルの更新中...\n"
+
+	fname2=ih_file@				; 書き出しファイル
+	sdim tidx1,$10000			; idx一時バッファ(64K)
+	sdim tidx2,$10000			; idx一時バッファ(64K)
+	sdim wrt,$18000				; idx書き出しバッファ(96K)
+	sdim fl,$4000
+
+	dirlist fl,"*.hs",1
+	notesel fl
+	flmax=notemax 
+	if flmax=0 : goto *main2x
+	flnum=0
+
+*lp2
+	;	"*.hs"をすべて解析
+	;
+	notesel fl
+	noteget fname1,flnum
+	gosub *docstart
+
+	flnum++
+	if flnum<flmax : goto *lp2
+
+	;	tidxをソートしてwrtを作成
+	;
+	sdim ln,256
+	sortnote tidx1
+	;
+	notesel tidx1
+	i=notemax
+	c=0
+	wrt=""
+	repeat i
+	  notesel tidx1
+	  noteget ln,cnt
+	  c=peek(ln,0)
+	  if c=0 : goto *tchkov
+	  wrt+=ln+"\n"
+	  sortget c,cnt
+	  notesel tidx2
+	  noteget ln,c
+	  wrt+=ln+"\n"
+*tchkov
+	loop
+
+	;	idxファイルをセーブ
+	;
+	notesel wrt
+	notesave fname2
+	ih_msg+="["+fname2+"] セーブしました.\n"
+
+*main2x
+	ih_msg+=fname2+"を再構築しました.\n"
+	return
+
+
+*docstart
+	;	hsファイルを解析してidxを作成
+	;
+	exist fname1
+	if strsize<0 : dialog "fatal error" : end
+	sdim buf,strsize+4			; hs読み込みバッファ
+
+	sdim a,256
+	sdim ln,256
+	sdim dllname,64
+
+	ih_msg+="file ["+fname1+"] を読み込みます.\n"
+	bload fname1,buf
+	bufmax=strlen(buf)
+
+	i=0:idn=0
+	c=0
+*doc1
+	idn=i					; 行IDを保存
+	getstr ln,buf,i,0:i+=strsize
+	c=peek(ln,0)
+	if c!=$25 : goto *doc2			; '%' check
+	;
+	a=strmid(ln,1,64)
+	if a="dll" : goto *doc3			; "%dll" check
+	if a!="index" : goto *doc2		; "%index" check
+	;
+	getstr a,buf,i,0:i+=strsize		; 次の行を取得
+	getstr ln,buf,i,0:i+=strsize		; その次の行を取得
+	if i>=bufmax : goto *doc2		; error check
+	;
+	tidx1+=a+"\n"
+	tidx2+=""+idn+","+fname1+","+dllname+","+ln+"\n"
+*doc2
+	if i<bufmax : goto *doc1
+	return
+*doc3
+	getstr dllname,buf,i,0:i+=strsize	; 次の行を取得
+	if dllname="none" : dllname=""
+	goto *doc2
+
+
 #deffunc ihelp_open int _p1
 *gethelp
 	;	hsファイル読み込み
@@ -90,8 +242,6 @@
 	ih_opt@+=ln
 	goto *gnlp0
 *gnlp1
-
-
 	;	Help本文を取得
 	;
 	sdim buf,$8000				; hs読み込みバッファ
@@ -105,7 +255,7 @@
 	sdim refsel,$4000			; リファレンス情報2(16K)
 	;
 	noteget tmp,0
-	if tmp!="%index" : dialog "Helpデータが異常です\nindexを再構築してください" : lnidx=-1 : return
+	if tmp!="%index" : lnidx=-1 : return 1
 	;
 	c=0
 	a=""
@@ -183,7 +333,7 @@
 	ih_refsel@="関連"+i+"項目\n"
 	ih_refsel@+=refsel
 	;
-	return
+	return 0
 
 
 *getref
@@ -309,13 +459,6 @@
 	;
 	mref _stat,64
 	a=_p1					; 変数a = パラメータ1
-	;
-	fname2="hsphelp.idx"			; idxファイル名
-	exist fname2
-	if strsize<1 : dialog "idxファイルがありません.\n「index作成」でインデックスファイルを作成してください。" : return
-	;
-	sdim wrt,strsize+4			; idxバッファを確保
-	bload fname2,wrt
 	;
 	dim ansln,$1000				; サーチ結果lineバッファ(4096)
 	sdim ansbuf,$8000			; サーチ結果バッファ

@@ -1,0 +1,44 @@
+
+	;
+	;	HSP help script
+	;		onitama/onion software 1999,2021
+	;
+	#include "hsp3cl.as"
+	#include "mod_hs.as"
+	#packopt name "mkindex"
+	;
+	;
+	ihelp_init msg			;index build
+	;
+	s1=dir_cmdline
+	if s1!="" {
+		getstr s2,s1,0,32
+		i=strsize
+		getstr s2,s1,i,32
+		s1=s2
+	}
+
+	if s1="" {
+		mes msg
+		mes "Usage : helpmes [keyword]"
+		end
+	}
+
+	ihelp_find s1
+	if stat=0 {
+		mes "Keyword not found ["+s1+"]."
+		end
+	}
+
+	ihelp_open 0
+
+	mes ih_ans_key+" "+ih_fncprm+"     ["+ih_ans_title+"]"
+	mes ih_prminf
+	mes ih_info
+
+	mes "Group:"+ih_group
+	mes "Module:"+ih_ans_dll
+	mes "Reference:"
+	mes ih_refinf
+
+	end
