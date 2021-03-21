@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <string>
 #include "hsp3cl.h"
 #include "../hsp3config.h"
 
@@ -21,10 +22,14 @@ int main( int argc, char *argv[] )
 
 #ifdef HSPDEBUG
 	char a1,a2,a3;
-	int b,st;
+	int b,st,index;
+	char *cl;
+	std::string clopt;
 
 	p = "";
+	cl = "";
 	st = 0;
+	index = 0;
 	for (b=1;b<argc;b++) {
 		a1=*argv[b];a2=tolower(*(argv[b]+1));
 #ifdef HSPLINUX
@@ -32,7 +37,13 @@ int main( int argc, char *argv[] )
 #else
 		if ((a1!='/')&&(a1!='-')) {
 #endif
-			p = argv[b];
+			if ( index == 0 ) {
+				p = argv[b];
+			} else {
+				if ( index > 1 ) clopt+=" ";
+				clopt += argv[b];
+			}
+			index++;
 		} else {
 			switch (a2) {
 			case 'r':
@@ -49,6 +60,8 @@ int main( int argc, char *argv[] )
 	p = NULL;
 #endif
 
+	cl = (char *)clopt.c_str();
+	hsp3cl_cmdline(cl);
 	res = hsp3cl_init( p );
 	if ( res ) return res;
 	hsp3cl_option( st );

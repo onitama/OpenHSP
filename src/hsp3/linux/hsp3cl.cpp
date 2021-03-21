@@ -30,6 +30,7 @@ static char optmes[] = "HSPHED~~\0_1_________2_________3______";
 
 static int hsp_wd;
 static int cl_option;
+static char *cl_cmdline = "";
 static FILE *cl_fp;
 
 #define HSP3CL_RESFILE ".hspres"
@@ -190,8 +191,7 @@ int hsp3cl_init( char *startfile )
 	ctx = &hsp->hspctx;
 
 	//		コマンドライン関連
-	ss = "";								// コマンドラインパラメーターを入れる
-	sbStrCopy( &ctx->cmdline, ss );			// コマンドラインパラメーターを保存
+	sbStrCopy( &ctx->cmdline, cl_cmdline );			// コマンドラインパラメーターを保存
 
 	//		Register Type
 	//
@@ -230,6 +230,14 @@ void hsp3cl_option( int opt )
 	//		HSP3CLオプション設定
 	//
 	cl_option = opt;
+}
+
+
+void hsp3cl_cmdline( char *cmdline )
+{
+	//		HSP3CLオプション設定
+	//
+	cl_cmdline = cmdline;						// コマンドラインパラメーターを入れる
 }
 
 
