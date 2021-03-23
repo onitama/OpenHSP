@@ -69,6 +69,10 @@ static int hsp_limit_step_per_frame;
 static std::string syncdir;
 static bool fs_initialized = false;
 
+static int cl_option;
+static char *cl_cmdline = "";
+static char *cl_modname = "";
+
 //static	HWND m_hWnd;
 
 #ifndef HSPDEBUG
@@ -591,8 +595,8 @@ int hsp3dish_init_sub( int sx, int sy, int autoscale )
 	res = hsp3dish_initwindow( NULL, sx, sy, autoscale, "HSPDish ver" hspver );
 	if (res) return res;
 
-//	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
-//	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
+	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
 
 #ifdef HSPDISHGP
 	//		Initalize gameplay
@@ -695,6 +699,13 @@ int hsp3dish_init( char *startfile )
 //#endif
 	ctx = &hsp->hspctx;
 
+	//		コマンドライン関連
+	hsp->SetCommandLinePrm( cl_cmdline );		// コマンドラインパラメーターを保存
+	hsp->SetModuleFilePrm( cl_modname );			// モジュール名を保存
+
+	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
+
 	// Slightly different SDL initialization
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
 		hsp3dish_dialog("Unable to initialize SDL");
@@ -714,9 +725,6 @@ int hsp3dish_init( char *startfile )
 	//
 	hsp3typeinit_extcmd( code_gettypeinfo( TYPE_EXTCMD ) );
 	hsp3typeinit_extfunc( code_gettypeinfo( TYPE_EXTSYSVAR ) );
-
-	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
-	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
 
 	exinfo = ctx->exinfo2;
 
@@ -966,5 +974,32 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 		}
 	}
 }
+
+
+void hsp3dish_option( int opt )
+{
+	//		HSP3オプション設定
+	//
+	cl_option = opt;
+}
+
+
+void hsp3dish_cmdline( char *cmdline )
+{
+	//		HSP3オプション設定
+	//
+	cl_cmdline = cmdline;						// コマンドラインパラメーターを入れる
+}
+
+
+void hsp3dish_modname( char *modname )
+{
+	//		HSP3オプション設定
+	//
+	cl_modname = modname;						// arg[0]パラメーターを入れる
+}
+
+
+
 
 

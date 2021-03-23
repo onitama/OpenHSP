@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
+#include <locale.h>
 
 #include "../hsp3config.h"
 #include "../hsp3code.h"
@@ -22,6 +24,7 @@ static int *type;
 static int *val;
 static int *exflg;
 static int reffunc_intfunc_ivalue;
+static int reset_flag = 0;
 
 /*------------------------------------------------------------*/
 /*
@@ -32,7 +35,38 @@ static int reffunc_intfunc_ivalue;
 static void InitSystemInformation(void)
 {
 	//		コマンドライン & システムフォルダ関連
+	char *cl;
+	char dir_hsp[HSP_MAX_PATH+1];
+	int p,i;
+	char a1,a2;
 
+	if (reset_flag) return;
+
+	cl = hspctx->modfilename;
+	strcpy( dir_hsp, cl );
+	p = 0; i = 0;
+	while(dir_hsp[i]){
+		if(dir_hsp[i]=='/' || dir_hsp[i]=='\\') p=i;
+		i++;
+	}
+	dir_hsp[p]=0;
+	sbStrCopy(&(hspctx->modfilename), dir_hsp);
+	strcat( dir_hsp, "/hsptv/" );
+	sbStrCopy(&(hspctx->tvfoldername), dir_hsp);
+	sbStrCopy(&(hspctx->homefoldername), getenv("HOME") );
+
+	//		Locale set
+	setlocale(LC_ALL,"");
+	cl = setlocale(LC_ALL,NULL);
+	a1 = (char)tolower(cl[0]);
+	a2 = (char)tolower(cl[1]);
+	hspctx->langcode[0] = a1;
+	hspctx->langcode[1] = a2;
+	if ((a1=='j')&&(a2=='a')) {
+		hspctx->language = HSPCTX_LANGUAGE_JP;
+	}
+
+	reset_flag = 1;
 }
 
 
@@ -96,8 +130,6 @@ static int termfunc_dllcmd( int option )
 
 void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 {
-	InitSystemInformation();
-
 	hspctx = info->hspctx;
 	exinfo = info->hspexinfo;
 	type = exinfo->nptype;
@@ -108,6 +140,7 @@ void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 	info->reffunc = reffunc_dllcmd;
 	info->termfunc = termfunc_dllcmd;
 
+	InitSystemInformation();
 }
 
 void hsp3typeinit_dllctrl( HSP3TYPEINFO *info )
@@ -242,64 +275,4 @@ void hsp3ext_execfile(char* msg, char* option, int mode)
 }
 
 
-#if 0
-static	char dir_hsp[HSP_MAX_PATH+1];
-static	char dir_cmdline[HSP_MAX_PATH+1];
-
-void hgio_setmainarg( char *hsp_mainpath, char *cmdprm )
-{
-	int p,i;
-	strcpy( dir_hsp, hsp_mainpath );
-
-	p = 0; i = 0;
-	while(dir_hsp[i]){
-		if(dir_hsp[i]=='/' || dir_hsp[i]=='\\') p=i;
-		i++;
-	}
-	dir_hsp[p]=0;
-
-	strcpy( dir_cmdline, cmdprm );
-	//Alertf( "Init:hgio_setmainarg(%s,%s)",dir_hsp,dir_cmdline );
-}
-
-char *hgio_getdir( int id )
-{
-	//		dirinfo命令の内容を設定する
-	//
-	char dirtmp[HSP_MAX_PATH+1];
-	char *p;
-	
-	*dirtmp = 0;
-	p = dirtmp;
-
-#if defined(HSPLINUX)
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-		getcwd( p, HSP_MAX_PATH );
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		p = dir_hsp;
-		break;
-	case 2:				//    Windowsディレクトリ
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-		break;
-	case 4:				//    コマンドライン文字列
-		p = dir_cmdline;
-		break;
-	case 5:				//    HSPTV素材があるディレクトリ
-		strcpy( p, dir_hsp );
-		strcat( p, "/hsptv" );
-		break;
-	default:
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-#endif
-
-	return p;
-}
-#endif
-
-/*-------------------------------------------------------------------------------*/
 

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 #include <string>
 #include "hsp3cl.h"
 #include "../hsp3config.h"
@@ -23,13 +24,18 @@ int main( int argc, char *argv[] )
 #ifdef HSPDEBUG
 	char a1,a2,a3;
 	int b,st,index;
-	char *cl;
+	char mydir[1024];
 	std::string clopt;
+	std::string clmod;
 
 	p = "";
-	cl = "";
 	st = 0;
 	index = 0;
+	getcwd( mydir, 1024 );
+	clmod = mydir;
+	clmod += "/";
+	clmod += argv[0];
+
 	for (b=1;b<argc;b++) {
 		a1=*argv[b];a2=tolower(*(argv[b]+1));
 #ifdef HSPLINUX
@@ -60,8 +66,9 @@ int main( int argc, char *argv[] )
 	p = NULL;
 #endif
 
-	cl = (char *)clopt.c_str();
-	hsp3cl_cmdline(cl);
+	hsp3cl_cmdline((char *)clopt.c_str());
+	hsp3cl_modname((char *)clmod.c_str());
+
 	res = hsp3cl_init( p );
 	if ( res ) return res;
 	hsp3cl_option( st );

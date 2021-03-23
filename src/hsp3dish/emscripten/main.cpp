@@ -4,28 +4,73 @@
 									  1997/7  onitama
 									  1999/8  onitama
 									  2003/4  onitama
-									  2011/5  onitama
   --------------------------------------------------------*/
 
 #include <stdio.h>
-
+#include <string.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <string>
 #include "hsp3dish.h"
 
 /*----------------------------------------------------------*/
-
-char *hsp_mainpath;
 
 int main( int argc, char *argv[] )
 {
 	int res;
 	char *p;
 
-	hsp_mainpath = argv[ 0 ];
-	if ( argc > 1 ) p = argv[ 1 ]; else p = "";
+#ifdef HSPDEBUG
+	char a1,a2,a3;
+	int b,st,index;
+	char mydir[1024];
+	std::string clopt;
+	std::string clmod;
+
+	p = "";
+	st = 0;
+	index = 0;
+	getcwd( mydir, 1024 );
+	clmod = mydir;
+	clmod += "/";
+	clmod += argv[0];
+
+	for (b=1;b<argc;b++) {
+		a1=*argv[b];a2=tolower(*(argv[b]+1));
+#ifdef HSPLINUX
+		if (a1!='-') {
+#else
+		if ((a1!='/')&&(a1!='-')) {
+#endif
+			if ( index == 0 ) {
+				p = argv[b];
+			} else {
+				if ( index > 1 ) clopt+=" ";
+				clopt += argv[b];
+			}
+			index++;
+		} else {
+			switch (a2) {
+			default:
+				printf("Illegal switch selected.\n");
+				break;
+			}
+		}
+	}
+#else
+	p = NULL;
+#endif
+
+	hsp3dish_cmdline((char *)clopt.c_str());
+	hsp3dish_modname((char *)clmod.c_str());
 
 	res = hsp3dish_init( p );
-	if ( res == 0 ) {
-		res = hsp3dish_exec();
-	}
+	if ( res ) return res;
+	hsp3dish_option( st );
+	res = hsp3dish_exec();
+
 	return res;
 }
+
+
+
