@@ -21,6 +21,7 @@
 #include "../sysreq.h"
 //#include "../hsp3ext.h"
 #include "../../hsp3/strnote.h"
+#include "../../hsp3/hsp3ext.h"
 #include "../../hsp3/linux/hsp3ext_sock.h"
 
 struct engine;
@@ -716,6 +717,9 @@ int hsp3dish_init( char *startfile )
 	//
 	hsp3typeinit_extcmd( code_gettypeinfo( TYPE_EXTCMD ) );
 	hsp3typeinit_extfunc( code_gettypeinfo( TYPE_EXTSYSVAR ) );
+
+	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
 
 	exinfo = ctx->exinfo2;
 

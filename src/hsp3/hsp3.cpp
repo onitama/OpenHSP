@@ -10,6 +10,7 @@
 #include "hsp3config.h"
 #include "hsp3debug.h"
 #include "dpmread.h"
+#include "strbuf.h"
 #include "supio.h"
 
 #ifdef HSP3IMP
@@ -39,6 +40,24 @@ Hsp3::Hsp3()
 	hspctx.mem_mcs = NULL;
 	axfile = NULL;
 	axname = NULL;
+
+	//		文字列バッファの初期化
+	//
+	hspctx.refstr = sbAlloc(HSPCTX_REFSTR_MAX);
+	hspctx.fnbuffer = sbAlloc(HSP_MAX_PATH);
+	hspctx.stmp = sbAlloc(HSPCTX_REFSTR_MAX);
+	hspctx.cmdline = sbAlloc(HSPCTX_CMDLINE_MAX);
+	hspctx.modfilename = sbAlloc(HSPCTX_PATH_MAX);
+	hspctx.tvfoldername = sbAlloc(HSPCTX_PATH_MAX);
+	hspctx.homefoldername = sbAlloc(HSPCTX_PATH_MAX);
+
+	//		language setup
+	hspctx.language = HSPCTX_LANGUAGE_EN;				// Default Language
+
+	hspctx.langcode[0] = 'e';
+	hspctx.langcode[1] = 'n';
+	hspctx.langcode[2] = 0;
+	hspctx.langcode[3] = 0;
 }
 
 Hsp3::~Hsp3()
@@ -257,9 +276,6 @@ int Hsp3::Reset( int mode )
 		}
 	}
 
-	//		language setup
-	hspctx.language = HSPCTX_LANGUAGE_EN;				// Default Language
-
 	//		debug
 	//Alertf( "#HSP objcode initalized.(CS=%d/DS=%d/OT=%d/VAR=%d)\n",hsphed->max_cs, hsphed->max_ds, hsphed->max_ot, hsphed->max_val );
 	code_setpc( hspctx.mem_mcs );
@@ -272,6 +288,34 @@ void Hsp3::SetPackValue( int sum, int dec )
 {
 	hsp_sum = sum;
 	hsp_dec = dec;
+}
+
+
+void Hsp3::SetCommandLinePrm(char *prm)
+{
+	// コマンドライン文字列を指定する
+	sbStrCopy(&hspctx.cmdline, prm);
+}
+
+
+void Hsp3::SetModuleFilePrm(char *prm)
+{
+	// モジュールファイル名文字列を指定する
+	sbStrCopy(&hspctx.modfilename, prm);
+}
+
+
+void Hsp3::SetHSPTVFolderPrm(char *prm)
+{
+	// HSPTVフォルダ名文字列を指定する
+	sbStrCopy(&hspctx.tvfoldername, prm);
+}
+
+
+void Hsp3::SetHomeFolderPrm(char *prm)
+{
+	// システムフォルダ名文字列を指定する
+	sbStrCopy(&hspctx.homefoldername, prm);
 }
 
 

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <tchar.h>
 #include <direct.h>
 #include <shlobj.h>
 
@@ -23,6 +24,11 @@
 #include "../win32gui/filedlg.h"
 
 #include "hsp3gr_win.h"
+#include "../win32gui/hsp3ext_win.h"
+
+#ifdef HSPUTF8
+#pragma execution_character_set("utf-8")
+#endif
 
 /*------------------------------------------------------------*/
 /*
@@ -45,188 +51,18 @@ extern int resY0, resY1;
 //					HSP system support
 /*----------------------------------------------------------*/
 
-void ExecFile( char *stmp, char *ps, int mode )
-{
-	int i,j;
-	j=SW_SHOWDEFAULT;if (p1&2) j=SW_SHOWMINIMIZED;
-
-	if ( *ps != 0 ) {
-		SHELLEXECUTEINFO exinfo;
-		memset( &exinfo, 0, sizeof(SHELLEXECUTEINFO) );
-		exinfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		exinfo.fMask = SEE_MASK_INVOKEIDLIST;
-		exinfo.hwnd = NULL;
-		exinfo.lpVerb = ps;
-		exinfo.lpFile = stmp;
-		exinfo.nShow = SW_SHOWNORMAL;
-		if ( ShellExecuteEx( &exinfo ) == false ) throw HSPERR_EXTERNAL_EXECUTE;
-		return;
-	}
-		
-	if ( mode&16 ) {
-		i = (int)((INT_PTR)ShellExecute( NULL,NULL,stmp,"","",j ));
-	}
-	else if ( mode&32 ) {
-		i = (int)((INT_PTR)ShellExecute( NULL,"print",stmp,"","",j ));
-	}
-	else {
-		i=WinExec( stmp,j );
-	}
-	if (i<32) throw HSPERR_EXTERNAL_EXECUTE;
-}
-
-
-/*
-#define CSIDL_DESKTOP                   0x0000
-#define CSIDL_INTERNET                  0x0001
-#define CSIDL_PROGRAMS                  0x0002
-#define CSIDL_CONTROLS                  0x0003
-#define CSIDL_PRINTERS                  0x0004
-#define CSIDL_PERSONAL                  0x0005
-#define CSIDL_FAVORITES                 0x0006
-#define CSIDL_STARTUP                   0x0007
-#define CSIDL_RECENT                    0x0008
-#define CSIDL_SENDTO                    0x0009
-#define CSIDL_BITBUCKET                 0x000a
-#define CSIDL_STARTMENU                 0x000b
-#define CSIDL_DESKTOPDIRECTORY          0x0010
-#define CSIDL_DRIVES                    0x0011
-#define CSIDL_NETWORK                   0x0012
-#define CSIDL_NETHOOD                   0x0013
-#define CSIDL_FONTS                     0x0014
-#define CSIDL_TEMPLATES                 0x0015
-#define CSIDL_COMMON_STARTMENU          0x0016
-#define CSIDL_COMMON_PROGRAMS           0X0017
-#define CSIDL_COMMON_STARTUP            0x0018
-#define CSIDL_COMMON_DESKTOPDIRECTORY   0x0019
-#define CSIDL_APPDATA                   0x001a
-#define CSIDL_PRINTHOOD                 0x001b
-#define CSIDL_ALTSTARTUP                0x001d         // DBCS
-#define CSIDL_COMMON_ALTSTARTUP         0x001e         // DBCS
-#define CSIDL_COMMON_FAVORITES          0x001f
-#define CSIDL_INTERNET_CACHE            0x0020
-#define CSIDL_COOKIES                   0x0021
-#define CSIDL_HISTORY                   0x0022
-*/
-
-static char *getdir( int id )
-{
-	//		dirinfo命令の内容をstmpに設定する
-	//
-	char *p;
-	char *ss;
-	char fname[_MAX_PATH+1];
-	p = ctx->stmp;
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-		_getcwd( p, _MAX_PATH );
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		GetModuleFileName( NULL,fname,_MAX_PATH );
-		getpath( fname, p, 32 );
-		break;
-	case 2:				//    Windowsディレクトリ
-		GetWindowsDirectory( p, _MAX_PATH );
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-		GetSystemDirectory( p, _MAX_PATH );
-		break;
-	case 4:				//    コマンドライン文字列
-		ss = GetCommandLine();
-		ss = strsp_cmds( ss );
-#ifdef HSPDEBUG
-		ss = strsp_cmds( ss );
-#endif
-		sbStrCopy( &(ctx->stmp), ss );
-		p = ctx->stmp;
-		return p;
-	case 5:				//    HSPTV素材があるディレクトリ
-#if defined(HSPDEBUG)||defined(HSP3IMP)
-		GetModuleFileName( NULL,fname,_MAX_PATH );
-		getpath( fname, p, 32 );
-		CutLastChr( p, '\\' );
-		strcat( p, "\\hsptv\\" );
-		return p;
-#else
-		*p = 0;
-		return p;
-#endif
-		break;
-	default:
-		if ( id & 0x10000 ) {
-			SHGetSpecialFolderPath( NULL, p, id & 0xffff, FALSE );
-			break;
-		}
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-
-	//		最後の'\\'を取り除く
-	//
-	CutLastChr( p, '\\' );
-	return p;
-}
-
-
-static int sysinfo( int p2 )
+static int sysinfo(int p2)
 {
 	//		System strings get
 	//
 	int fl;
-	char pp[128];
-	char *p1;
-	BOOL success;
-	DWORD version;
-	DWORD size;
-	DWORD *mss;
-	SYSTEM_INFO si;
-	MEMORYSTATUS ms;
+	char* p1;
 
-	fl = HSPVAR_FLAG_INT;
-	p1 = ctx->stmp;
-	size = _MAX_PATH;
-
-	if (p2&16) {
-		GetSystemInfo(&si);
-	}
-	if (p2&32) {
-		GlobalMemoryStatus(&ms);
-		mss=(DWORD *)&ms;
-		*(int *)p1 = (int)mss[p2&15];
-		return fl;
-	}
-
-	switch(p2) {
-	case 0:
-		strcpy(p1,"Windows");
-		version = GetVersion();
-		if ((version & 0x80000000) == 0) strcat(p1,"NT");
-									else strcat(p1,"9X");
-/*
-	rev 43
-	mingw : warning : 仮引数int 実引数long unsigned
-	に対処
-*/
-		sprintf( pp," ver%d.%d", static_cast< int >( version&0xff ), static_cast< int >( (version&0xff00)>>8 ) );
-		strcat( p1, pp );
-		fl=HSPVAR_FLAG_STR;
-		break;
-	case 1:
-		success = GetUserName( p1,&size );
-		fl = HSPVAR_FLAG_STR;
-		break;
-	case 2:
-		success = GetComputerName(p1, &size );
-		fl = HSPVAR_FLAG_STR;
-		break;
-	case 16:
-		*(int *)p1 = (int)si.dwProcessorType;
-		break;
-	case 17:
-		*(int *)p1 = (int)si.dwNumberOfProcessors;
-		break;
-	default:
-		throw HSPERR_ILLEGAL_FUNCTION;
+	p1 = hsp3ext_sysinfo(p2, &fl, ctx->stmp);
+	if (p1 == NULL) {
+		p1 = ctx->stmp;
+		*p1 = 0;
+		return HSPVAR_FLAG_INT;
 	}
 	return fl;
 }
@@ -317,7 +153,7 @@ static int cmdfunc_extcmd( int cmd )
 		strncpy( fname, code_gets(), _MAX_PATH-1 );
 		p1 = code_getdi( 0 );
 		ps = code_getds( "" );
-		ExecFile( fname, ps, p1 );
+		hsp3ext_execfile( fname, ps, p1 );
 		break;
 		}
 
@@ -435,13 +271,13 @@ static void *reffunc_function( int *type_res, int arg )
 
 	case 0x002:								// dirinfo
 		p1 = code_geti();
-		ptr = getdir( p1 );
+		ptr = hsp3ext_getdir(p1);
 		*type_res = HSPVAR_FLAG_STR;
 		break;
 
 	case 0x003:								// sysinfo
 		p1 = code_geti();
-		*type_res = sysinfo( p1 );
+		*type_res = sysinfo(p1);
 		ptr = ctx->stmp;
 		break;
 
@@ -503,7 +339,7 @@ void hsp3gr_dbg_gui( void )
 {
 	//		デバッグウインドゥ用情報
 	//
-	code_adddbg( "ディレクトリ", getdir(0) );
-	code_adddbg( "コマンドライン", getdir(4) );
+	code_adddbg( "ディレクトリ", hsp3ext_getdir(0) );
+	code_adddbg( "コマンドライン", hsp3ext_getdir(4) );
 }
 #endif

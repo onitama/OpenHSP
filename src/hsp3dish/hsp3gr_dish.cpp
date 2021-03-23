@@ -45,6 +45,7 @@ char *hsp3dish_getlog(void);		// for gameplay3d log
 #include "supio.h"
 #include "sysreq.h"
 #include "webtask.h"
+#include "hsp3ext.h"
 
 #ifdef HSPWIN
 #include "win32/dxsnd.h"
@@ -143,82 +144,11 @@ static int select_objmoc;
 static void ExecFile( char *stmp, char *ps, int mode )
 {
 	//	外部ファイル実行
-	hgio_exec( stmp, ps, mode );
-}
-
-static char *getdir( int id )
-{
-	//		dirinfo命令の内容をstmpに設定する
-	//
-	char *p;
 #ifdef HSPWIN
-	char *ss;
-	char fname[HSP_MAX_PATH+1];
-#endif
-	p = ctx->stmp;
-
-	*p = 0;
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-#ifdef HSPWIN
-		_getcwd( p, _MAX_PATH );
-#endif
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-#ifdef HSPWIN
-		GetModuleFileName( NULL,fname,_MAX_PATH );
-		getpath( fname, p, 32 );
-#endif
-		break;
-	case 2:				//    Windowsディレクトリ
-#ifdef HSPWIN
-		GetWindowsDirectory( p, _MAX_PATH );
-#endif
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-#ifdef HSPWIN
-		GetSystemDirectory( p, _MAX_PATH );
-#endif
-		break;
-	case 4:				//    コマンドライン文字列
-#ifdef HSPWIN
-		ss = ctx->cmdline;
-		sbStrCopy( &(ctx->stmp), ss );
-		p = ctx->stmp;
-		return p;
-#endif
-		break;
-	case 5:				//    HSPTV素材があるディレクトリ
-#ifdef HSPWIN
-#if defined(HSPDEBUG)||defined(HSP3IMP)
-		GetModuleFileName( NULL,fname,_MAX_PATH );
-		getpath( fname, p, 32 );
-		CutLastChr( p, '\\' );
-		strcat( p, "\\hsptv\\" );
-		return p;
+	hsp3ext_execfile(stmp, ps, mode);
 #else
-		*p = 0;
-		return p;
+	hgio_exec( stmp, ps, mode );
 #endif
-#endif
-		break;
-	default:
-#ifdef HSPWIN
-		if ( id & 0x10000 ) {
-			SHGetSpecialFolderPath( NULL, p, id & 0xffff, FALSE );
-			break;
-		}
-#endif
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-
-#ifdef HSPWIN
-	//		最後の'\\'を取り除く
-	//
-	CutLastChr( p, '\\' );
-#endif
-	return p;
 }
 
 
@@ -229,7 +159,11 @@ static int sysinfo( int p2 )
 	int fl;
 	char *p1;
 
-	p1 = hgio_sysinfo( p2, &fl, ctx->stmp );
+#ifdef HSPWIN
+	p1 = hsp3ext_sysinfo(p2, &fl, ctx->stmp);
+#else
+	p1 = hgio_sysinfo(p2, &fl, ctx->stmp);
+#endif
 	if ( p1 == NULL ) {
 		p1 = ctx->stmp;
 		*p1 = 0;
@@ -3809,10 +3743,10 @@ static void *reffunc_function( int *type_res, int arg )
 
 	case 0x002:								// dirinfo
 		p1 = code_geti();
-#if defined(HSPLINUX)
-		ptr = hgio_getdir( p1 );
+#ifdef HSPWIN
+		ptr = hsp3ext_getdir( p1 );
 #else
-		ptr = getdir( p1 );
+		ptr = hgio_getdir( p1 );
 #endif
 		*type_res = HSPVAR_FLAG_STR;
 		break;

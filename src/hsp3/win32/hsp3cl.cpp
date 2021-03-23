@@ -270,7 +270,7 @@ int hsp3cl_init( char *startfile )
 	hsp->SetFileName( fname );
 
 	if ( i == 0 ) {
-		printf( "OpenHSP CL ver%s / onion software 1997-2009\n", hspver );
+		printf( "OpenHSP CL ver%s / onion software 1997-2021\n", hspver );
 		return -1;
 	}
 #else
@@ -314,13 +314,15 @@ int hsp3cl_init( char *startfile )
 	ctx = &hsp->hspctx;
 
 	{
-	//		コマンドライン関連
-	ss = GetCommandLine();
-	ss = strsp_cmds( ss );
+		//		コマンドライン関連
+		LPTSTR cl;
+		cl = GetCommandLine();
+		cl = strsp_cmdsW(cl);
 #ifdef HSPDEBUG
-	ss = strsp_cmds( ss );
+		cl = strsp_cmdsW(cl);
 #endif
-	sbStrCopy( &ctx->cmdline, ss );					// コマンドラインパラメーターを保存
+		apichartohspchar(cl, &ss);
+		sbStrCopy(&ctx->cmdline, ss);					// コマンドラインパラメーターを保存
 	}
 
 	//		Register Type

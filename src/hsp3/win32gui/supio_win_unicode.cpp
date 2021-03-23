@@ -590,7 +590,15 @@ char *strsp_cmds( char *srcstr )
 		a1=*cmdchk;
 		if (a1==0) break;
 		cmdchk++;
-		if (a1==32) if (spmode==0) break;
+		if (a1 == 32) if (spmode == 0) {
+			while (1) {
+				a1 = *cmdchk;
+				if (a1 == 0) break;
+				if (a1 != 32) break;
+				cmdchk++;
+			}
+			break;
+		}
 		if (a1==0x22) spmode^=1;
 	}
 	return cmdchk;
@@ -609,7 +617,15 @@ wchar_t *strsp_cmdsW( wchar_t *srcstr )
 		a1=*cmdchk;
 		if (a1==0) break;
 		cmdchk++;
-		if (a1==32) if (spmode==0) break;
+		if (a1 == 32) if (spmode == 0) {
+			while (1) {
+				a1 = *cmdchk;
+				if (a1 == 0) break;
+				if (a1 != 32) break;
+				cmdchk++;
+			}
+			break;
+		}
 		if (a1==0x22) spmode^=1;
 	}
 	return cmdchk;

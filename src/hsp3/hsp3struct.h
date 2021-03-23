@@ -565,7 +565,7 @@ struct HSPCTX
 	void (*msgfunc) (HSPCTX *);			// Message Callback Proc.
 	void *wnd_parent;					// Parent Window Handle
 	double refdval;						// sysvar 'refdval'
-	char *cmdline;						// Command Line Parameters
+	char *cmdline;						// Command Line Parameters (HSPAPI)
 
 	HSPEXINFO *exinfo2;					// HSP function data(3.1)
 
@@ -574,10 +574,15 @@ struct HSPCTX
 	int dsindex_size;					// DSBuffer index size (3.6)
 	int language;						// HSPCTX_LANGUAGE_* flag (3.6)
 	int callback_flag;					// Callback flag (3.6)
+	char *modfilename;					// Module File Name Parameters (HSPAPI)
+	char *tvfoldername;					// HSPTV Folder Name Parameters (HSPAPI)
+	char *homefoldername;				// System Folder Name Parameters (HSPAPI)
+	char langcode[4];					// Language country code (2byte ansi)
 };
 
 #define HSPCTX_REFSTR_MAX 4096
-#define HSPCTX_CMDLINE_MAX 1024
+#define HSPCTX_CMDLINE_MAX 256
+#define HSPCTX_PATH_MAX 64
 
 #define HSPSTAT_NORMAL 0
 #define HSPSTAT_DEBUG 1

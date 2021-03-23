@@ -2919,13 +2919,6 @@ void code_init( void )
 	//
 	tinfo_cur = HSP3_TYPE_USER;
 
-	//		文字列バッファの初期化
-	//
-	hspctx->refstr = sbAlloc( HSPCTX_REFSTR_MAX );
-	hspctx->fnbuffer = sbAlloc( HSP_MAX_PATH );
-	hspctx->stmp = sbAlloc( HSPCTX_REFSTR_MAX );
-	hspctx->cmdline = sbAlloc( HSPCTX_CMDLINE_MAX );
-
 #ifdef HSPDEBUG
 	//		デバッグ情報の初期化
 	//
@@ -3003,11 +2996,6 @@ void code_bye( void )
 	//		コード用のメモリを解放する
 	//
 	if ( hspctx->mem_irq != NULL ) sbFree( hspctx->mem_irq );
-
-	sbFree( hspctx->cmdline );
-	sbFree( hspctx->stmp );
-	sbFree( hspctx->fnbuffer );
-	sbFree( hspctx->refstr );
 
 	sbFree( hsp3tinfo );
 	StackTerm();
@@ -3253,7 +3241,7 @@ int code_event( int event, int prm1, int prm2, void *prm3 )
 
 	case HSPEVENT_FNAME:
 		// set FNAME (n/a,n/a,nameptr)
-		strncpy( hspctx->fnbuffer, (char *)prm3, HSP_MAX_PATH-1 );
+		sbStrCopy(&hspctx->fnbuffer, (char *)prm3);
 #ifdef HSP3IMP
 		//	HSP3IMP用セキュリティ対応
 		if ( SecurityCheck( hspctx->fnbuffer ) ) throw HSPERR_FILE_IO;

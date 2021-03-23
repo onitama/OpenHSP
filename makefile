@@ -28,6 +28,7 @@ OBJS = \
 	src/hsp3/strbuf.do \
 	src/hsp3/strnote.do \
 	src/hsp3/linux/hsp3ext_sock.do \
+	src/hsp3/linux/hsp3ext_linux.do \
 	src/hsp3/linux/devctrl_io.do \
 	src/hsp3dish/essprite.do \
 	src/hsp3dish/texmes.do \
@@ -110,6 +111,7 @@ OBJS_GP = \
 	src/hsp3/strbuf.gpo \
 	src/hsp3/strnote.gpo \
 	src/hsp3/linux/hsp3ext_sock.gpo \
+	src/hsp3/linux/hsp3ext_linux.gpo \
 	src/hsp3/linux/devctrl_io.gpo \
 	src/hsp3dish/essprite.gpo \
 	src/hsp3dish/texmes.gpo \

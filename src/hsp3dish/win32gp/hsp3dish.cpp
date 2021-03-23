@@ -1132,52 +1132,6 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 
 int hsp3dish_reset(void)
 {
-	char *ss;
-
-#ifndef HSP3DLL
-	{
-	//		コマンドライン関連
-	ss = GetCommandLine();
-	ss = strsp_cmds( ss );
-#ifdef HSPDEBUG
-	ss = strsp_cmds( ss );
-#endif
-	}
-#else
-	ss = "";
-#endif
-	sbStrCopy(&ctx->cmdline, ss);					// コマンドラインパラメーターを保存
-
-	//		SSaver proc
-	//
-#if 0
-	if ( hsp_ss ) {
-		ss = GetCommandLine();
-		ss = strsp_cmds( ss );
-		hsp_sscnt = 30;
-		a1=tolower(*(ss+1));
-		if( FindWindow("oniwndp",NULL) != NULL ) {
-			return 2;
-		}
-		if (a1=='p') {
-			HWND s_hwnd;
-			RECT rPic;
-			s_hwnd = (HWND)atoi( ss+3 );
-			GetWindowRect( s_hwnd, &rPic );
-			hsp_wx = rPic.right-rPic.left;
-			hsp_wy = rPic.bottom-rPic.top;
-			hsp_wd = 0x100;
-			ctx->wnd_parent = s_hwnd;
-		}
-		if (a1=='s') {
-			ShowCursor(FALSE);
-		} else {
-			hsp_ss = 0;								// スクリーンセーバー時以外はモードOFF
-		}
-		ctx->hspstat |= hsp_ss;
-	}
-#endif
-
 	//		Register Type
 	//
 	drawflag = 0;
@@ -1240,7 +1194,6 @@ int hsp3dish_reset(void)
 	gameplay::Logger::set(gameplay::Logger::LEVEL_WARN, logfunc);
 	gameplay::Logger::set(gameplay::Logger::LEVEL_ERROR, logfunc);
 
-//	platform = gameplay::Platform::create( game, NULL, hsp_wx, hsp_wy, false );
 	platform = gameplay::Platform::create( game, m_hWnd, hsp_wx, hsp_wy, false );
 	if ( platform == NULL ) {
 		//hsp3dish_dialog( (char *)gplog.c_str() );

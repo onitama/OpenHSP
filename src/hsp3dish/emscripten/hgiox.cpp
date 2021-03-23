@@ -1866,11 +1866,14 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	return 0;
 }
 
+
 char *hgio_sysinfo( int p2, int *res, char *outbuf )
 {
+	//		System strings get
+	//
 	int fl;
 	char *p1;
-	fl = HSPVAR_FLAG_STR;
+	fl = HSPVAR_FLAG_INT;
 	p1 = outbuf;
 	*p1=0;
 
@@ -1885,9 +1888,11 @@ char *hgio_sysinfo( int p2, int *res, char *outbuf )
 		}
 #endif
 #ifdef HSPIOS
-        gb_getSysVer( p1 );
+        //strcpy(p1, "iOS");
+        gpb_getSysVer( p1 );
 #endif
-        break;
+		fl=HSPVAR_FLAG_STR;
+		break;
 	case 1:
 		break;
 	case 2:
@@ -1897,6 +1902,10 @@ char *hgio_sysinfo( int p2, int *res, char *outbuf )
 #ifdef HSPIOS
         gb_getSysModel( p1 );
 #endif
+		fl = HSPVAR_FLAG_STR;
+		break;
+	case 3:
+		*(int*)p1 = hspctx->language;
 		break;
 	default:
 		return NULL;
@@ -1906,62 +1915,49 @@ char *hgio_sysinfo( int p2, int *res, char *outbuf )
 }
 
 
-/*-------------------------------------------------------------------------------*/
-
-static	char dir_hsp[HSP_MAX_PATH+1];
-static	char dir_cmdline[HSP_MAX_PATH+1];
-
-void hgio_setmainarg( char *hsp_mainpath, char *cmdprm )
-{
-	int p,i;
-	strcpy( dir_hsp, hsp_mainpath );
-
-	p = 0; i = 0;
-	while(dir_hsp[i]){
-		if(dir_hsp[i]=='/' || dir_hsp[i]=='\\') p=i;
-		i++;
-	}
-	dir_hsp[p]=0;
-
-	strcpy( dir_cmdline, cmdprm );
-	Alertf( "Init:hgio_setmainarg(%s,%s)",dir_hsp,dir_cmdline );
-}
-
 char *hgio_getdir( int id )
 {
 	//		dirinfo命令の内容を設定する
 	//
-	char dirtmp[HSP_MAX_PATH+1];
-	char *p;
-	
-	*dirtmp = 0;
-	p = dirtmp;
-
-#if defined(HSPLINUX)
+	p = hspctx->stmp;
+	*p = 0;
+	int cutlast = 0;
 
 	switch( id ) {
 	case 0:				//    カレント(現在の)ディレクトリ
+#if defined(HSPLINUX)||defined(HSPEMSCRIPTEN)
 		getcwd( p, HSP_MAX_PATH );
+		cutlast = 1;
+#endif
 		break;
 	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		p = dir_hsp;
+		p = hspctx->modfilename;
 		break;
 	case 2:				//    Windowsディレクトリ
 		break;
 	case 3:				//    Windowsのシステムディレクトリ
 		break;
 	case 4:				//    コマンドライン文字列
-		p = dir_cmdline;
+		p = hspctx->cmdline;
 		break;
 	case 5:				//    HSPTV素材があるディレクトリ
-		strcpy( p, dir_hsp );
-		strcat( p, "/hsptv" );
+		p = hspctx->tvfoldername;
+		break;
+	case 6:				//    ランゲージコード
+		p = hspctx->langcode;
+		break;
+	case 0x10005:			//    マイドキュメント
+		p = hspctx->homefoldername;
 		break;
 	default:
 		throw HSPERR_ILLEGAL_FUNCTION;
 	}
-#endif
 
+	//		最後の'/'を取り除く
+	//
+	if (cutlast) {
+		CutLastChr(p, '/');
+	}
 	return p;
 }
 

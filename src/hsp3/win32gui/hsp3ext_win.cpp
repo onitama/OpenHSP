@@ -3,11 +3,17 @@
 //	HSP3 External DLL manager
 //	onion software/onitama 2004/6
 //
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <tchar.h>
+#include <direct.h>
+#include <shlobj.h>
+
+#include <io.h>
+#include <fcntl.h>
 
 #include <ocidl.h>
 #include <locale.h>
@@ -71,6 +77,72 @@ static LPTSTR atxwndclass = NULL;
 
 /*------------------------------------------------------------*/
 /*
+		System Information initialization
+*/
+/*------------------------------------------------------------*/
+
+static void InitSystemInformation(void)
+{
+	//		コマンドライン & システムフォルダ関連
+	char *resp8;
+	LPTSTR cl;
+	HSPCTX* ctx = code_getctx();
+	cl = GetCommandLine();
+	cl = strsp_cmdsW(cl);
+#ifdef HSPDEBUG
+	cl = strsp_cmdsW(cl);
+#endif
+	apichartohspchar(cl, &resp8);
+	sbStrCopy(&(ctx->cmdline), resp8);
+	freehc(&resp8);
+
+	TCHAR pw[HSPCTX_REFSTR_MAX];
+	TCHAR fname[HSPCTX_REFSTR_MAX];
+	GetModuleFileName(NULL, fname, _MAX_PATH);
+	getpathW(fname, pw, 32);
+	apichartohspchar(pw, &resp8);
+	sbStrCopy(&(ctx->stmp), resp8);
+	CutLastChr(ctx->stmp, '\\');
+	sbStrCopy(&(ctx->modfilename), ctx->stmp);
+	strcat(ctx->stmp, "\\hsptv\\");
+	freehc(&resp8);
+	sbStrCopy(&(ctx->tvfoldername), ctx->stmp);
+}
+
+#ifdef UNICODE
+UINT WinExec(LPCTSTR lpCmdLine, UINT uCmdShow)
+{
+	STARTUPINFO sui = {
+		sizeof(STARTUPINFO),
+		NULL,
+		NULL,
+		NULL,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		STARTF_USESHOWWINDOW,
+		uCmdShow,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	};
+	PROCESS_INFORMATION pi = {
+		NULL, NULL, 0, 0
+	};
+	CreateProcess(NULL, (LPTSTR)lpCmdLine, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
+	return 32;
+}
+#endif
+
+
+/*------------------------------------------------------------*/
+/*
 		Language initialization
 */
 /*------------------------------------------------------------*/
@@ -91,6 +163,8 @@ static void InitLanguage(void)
 		//	Set Japanese language
 		HSPCTX* ctx = code_getctx();
 		ctx->language = HSPCTX_LANGUAGE_JP;
+		ctx->langcode[0] = 'j';
+		ctx->langcode[1] = 'a';
 		setlocale(LC_ALL, "Japanese");
 	}
 }
@@ -1287,6 +1361,8 @@ void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 	comres_pval = NULL;
 #endif	// !defined( HSP_COM_UNSUPPORTED )
 
+
+	InitSystemInformation();
 	InitLanguage();
 
 	hspctx = info->hspctx;
@@ -1307,4 +1383,242 @@ void hsp3typeinit_dllctrl( HSP3TYPEINFO *info )
 	info->cmdfunc = cmdfunc_ctrlcmd;
 	info->reffunc = reffunc_ctrlfunc;
 }
+
+/*------------------------------------------------------------*/
+/*
+		Sysinfo, getdir service
+*/
+/*------------------------------------------------------------*/
+
+char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
+{
+	//		System strings get
+	//
+	int fl;
+	TCHAR pp[128];
+	char* p1;
+	BOOL success;
+	DWORD version;
+	DWORD size;
+	DWORD* mss;
+	SYSTEM_INFO si;
+	MEMORYSTATUS ms;
+	int plen;
+	char *p;
+
+	fl = HSPVAR_FLAG_INT;
+	p1 = outbuf;
+	size = HSP_MAX_PATH;
+
+	if (p2 & 16) {
+		GetSystemInfo(&si);
+	}
+	if (p2 & 32) {
+		GlobalMemoryStatus(&ms);
+		mss = (DWORD*)&ms;
+		*(int*)p1 = (int)mss[p2 & 15];
+		*res = fl;
+		return p1;
+	}
+
+	switch (p2) {
+	case 0:
+		_tcscpy((TCHAR*)p1, TEXT("Windows"));
+		version = GetVersion();
+		if ((version & 0x80000000) == 0) _tcscat((TCHAR*)p1, TEXT("NT"));
+		else _tcscat((TCHAR*)p1, TEXT("9X"));
+		/*
+			rev 43
+			mingw : warning : 仮引数int 実引数long unsigned
+			に対処
+		*/
+		_stprintf(pp, TEXT(" ver%d.%d"), static_cast<int>(version & 0xff), static_cast<int>((version & 0xff00) >> 8));
+		_tcscat((TCHAR*)p1, pp);
+		apichartohspchar((TCHAR*)p1, &p);
+		plen = strlen(p);
+		if (p1 != p) {
+			memcpy(p1, p, plen);
+			p1[plen] = '\0';
+		}
+		freehc(&p);
+		fl = HSPVAR_FLAG_STR;
+		break;
+	case 1:
+		success = GetUserName((TCHAR*)p1, &size);
+		apichartohspchar((TCHAR*)p1, &p);
+		plen = strlen(p);
+		if (p1 != p) {
+			memcpy(p1, p, plen);
+			p1[plen] = '\0';
+		}
+		freehc(&p);
+		fl = HSPVAR_FLAG_STR;
+		break;
+	case 2:
+		success = GetComputerName((TCHAR*)p1, &size);
+		apichartohspchar((TCHAR*)p1, &p);
+		plen = strlen(p);
+		if (p1 != p) {
+			memcpy(p1, p, plen);
+			p1[plen] = '\0';
+		}
+		freehc(&p);
+		fl = HSPVAR_FLAG_STR;
+		break;
+	case 3:
+		*(int*)p1 = hspctx->language;
+		break;
+	case 16:
+		*(int*)p1 = (int)si.dwProcessorType;
+		break;
+	case 17:
+		*(int*)p1 = (int)si.dwNumberOfProcessors;
+		break;
+	default:
+		return NULL;
+	}
+	*res = fl;
+	return p1;
+}
+
+
+/*
+#define CSIDL_DESKTOP                   0x0000
+#define CSIDL_INTERNET                  0x0001
+#define CSIDL_PROGRAMS                  0x0002
+#define CSIDL_CONTROLS                  0x0003
+#define CSIDL_PRINTERS                  0x0004
+#define CSIDL_PERSONAL                  0x0005
+#define CSIDL_FAVORITES                 0x0006
+#define CSIDL_STARTUP                   0x0007
+#define CSIDL_RECENT                    0x0008
+#define CSIDL_SENDTO                    0x0009
+#define CSIDL_BITBUCKET                 0x000a
+#define CSIDL_STARTMENU                 0x000b
+#define CSIDL_DESKTOPDIRECTORY          0x0010
+#define CSIDL_DRIVES                    0x0011
+#define CSIDL_NETWORK                   0x0012
+#define CSIDL_NETHOOD                   0x0013
+#define CSIDL_FONTS                     0x0014
+#define CSIDL_TEMPLATES                 0x0015
+#define CSIDL_COMMON_STARTMENU          0x0016
+#define CSIDL_COMMON_PROGRAMS           0X0017
+#define CSIDL_COMMON_STARTUP            0x0018
+#define CSIDL_COMMON_DESKTOPDIRECTORY   0x0019
+#define CSIDL_APPDATA                   0x001a
+#define CSIDL_PRINTHOOD                 0x001b
+#define CSIDL_ALTSTARTUP                0x001d         // DBCS
+#define CSIDL_COMMON_ALTSTARTUP         0x001e         // DBCS
+#define CSIDL_COMMON_FAVORITES          0x001f
+#define CSIDL_INTERNET_CACHE            0x0020
+#define CSIDL_COOKIES                   0x0021
+#define CSIDL_HISTORY                   0x0022
+*/
+char* hsp3ext_getdir(int id)
+{
+	//		dirinfo命令の内容をstmpに設定する
+	//
+	char *p;
+	TCHAR pw[HSPCTX_REFSTR_MAX];
+	char *resp8;
+	p = hspctx->stmp;
+	HSPCHAR *hctmp1 = 0;
+	int cutlast = 1;
+	int apiconv = 1;
+
+	*pw = 0;
+	switch (id) {
+	case 0:				//    カレント(現在の)ディレクトリ
+		_tgetcwd(pw, HSPCTX_REFSTR_MAX);
+		break;
+	case 1:				//    HSPの実行ファイルがあるディレクトリ
+		p = hspctx->modfilename;
+		cutlast = 0; apiconv = 0;
+		break;
+	case 2:				//    Windowsディレクトリ
+		GetWindowsDirectory(pw, HSPCTX_REFSTR_MAX);
+		break;
+	case 3:				//    Windowsのシステムディレクトリ
+		GetSystemDirectory(pw, HSPCTX_REFSTR_MAX);
+		break;
+	case 4:				//    コマンドライン文字列
+		p = hspctx->cmdline;
+		cutlast = 0; apiconv = 0;
+		break;
+	case 5:				//    HSPTV素材があるディレクトリ
+#if defined(HSPDEBUG)||defined(HSP3IMP)
+		p = hspctx->tvfoldername;
+#else
+		p = "";
+#endif
+		cutlast = 0; apiconv = 0;
+		break;
+	case 6:				//    ランゲージコード
+		p = hspctx->langcode;
+		cutlast = 0; apiconv = 0;
+		break;
+	default:
+		if (id & 0x10000) {
+			SHGetSpecialFolderPath(NULL, pw, id & 0xffff, FALSE);
+			break;
+		}
+		throw HSPERR_ILLEGAL_FUNCTION;
+	}
+
+	if (apiconv) {
+		apichartohspchar(pw, &resp8);
+		sbStrCopy(&(hspctx->stmp), resp8);
+		freehc(&resp8);
+		p = hspctx->stmp;
+	}
+	//		最後の'\\'を取り除く
+	//
+	if (cutlast) {
+		CutLastChr(p, '\\');
+	}
+	return p;
+}
+
+
+void hsp3ext_execfile(char* stmp, char* ps, int mode)
+{
+	int i, j;
+	HSPAPICHAR *hactmp1 = 0;
+	HSPAPICHAR *hactmp2 = 0;
+	j = SW_SHOWDEFAULT; if (mode & 2) j = SW_SHOWMINIMIZED;
+
+	if (*ps != 0) {
+		SHELLEXECUTEINFO exinfo;
+		memset(&exinfo, 0, sizeof(SHELLEXECUTEINFO));
+		exinfo.cbSize = sizeof(SHELLEXECUTEINFO);
+		exinfo.fMask = SEE_MASK_INVOKEIDLIST;
+		exinfo.hwnd = NULL;
+		exinfo.lpVerb = chartoapichar(ps, &hactmp1);
+		exinfo.lpFile = chartoapichar(stmp, &hactmp2);
+		exinfo.nShow = SW_SHOWNORMAL;
+		if (ShellExecuteEx(&exinfo) == false) {
+			freehac(&hactmp1);
+			freehac(&hactmp2);
+			throw HSPERR_EXTERNAL_EXECUTE;
+		}
+		freehac(&hactmp1);
+		freehac(&hactmp2);
+		return;
+	}
+
+	if (mode & 16) {
+		i = (int)(INT_PTR)ShellExecute(NULL, NULL, chartoapichar(stmp, &hactmp1), TEXT(""), TEXT(""), j);
+		freehac(&hactmp1);
+	}
+	else if (mode & 32) {
+		i = (int)(INT_PTR)ShellExecute(NULL, TEXT("print"), chartoapichar(stmp, &hactmp1), TEXT(""), TEXT(""), j);
+		freehac(&hactmp1);
+	}
+	else {
+		i = WinExec(chartoapichar(stmp, &hactmp1), j);
+		freehac(&hactmp1);
+	}
+	if (i < 32) throw HSPERR_EXTERNAL_EXECUTE;
+}
+
 

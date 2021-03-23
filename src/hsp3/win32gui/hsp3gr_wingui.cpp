@@ -21,6 +21,7 @@
 #include "../stack.h"
 #include "../strbuf.h"
 #include "fcpoly.h"
+#include "hsp3ext_win.h"
 
 #include "../hsp3gr.h"
 #include "../hsp3code.h"
@@ -53,266 +54,22 @@ extern int resY0, resY1;				// "fcpoly.h"のパラメーター
 #define GSQUARE_MODE_COLORFILL 1
 #define GSQUARE_MODE_GRADFILL 2
 
-
-#ifdef UNICODE
-UINT WinExec(LPCTSTR lpCmdLine, UINT uCmdShow)
-{
-	STARTUPINFO sui = {
-		sizeof(STARTUPINFO),
-		NULL,
-		NULL,
-		NULL,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		STARTF_USESHOWWINDOW,
-		uCmdShow,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	};
-	PROCESS_INFORMATION pi = {
-		NULL, NULL, 0, 0
-	};
-	CreateProcess(NULL, (LPTSTR)lpCmdLine, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
-	return 32;
-}
-#endif
 /*----------------------------------------------------------*/
 //					HSP system support
 /*----------------------------------------------------------*/
-
-void ExecFile( char *stmp, char *ps, int mode )
-{
-	int i,j;
-	HSPAPICHAR *hactmp1 = 0;
-	HSPAPICHAR *hactmp2 = 0;
-	j=SW_SHOWDEFAULT;if (mode&2) j=SW_SHOWMINIMIZED;
-
-	if ( *ps != 0 ) {
-		SHELLEXECUTEINFO exinfo;
-		memset( &exinfo, 0, sizeof(SHELLEXECUTEINFO) );
-		exinfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		exinfo.fMask = SEE_MASK_INVOKEIDLIST;
-		exinfo.hwnd = bmscr->hwnd;
-		exinfo.lpVerb = chartoapichar(ps,&hactmp1);
-		exinfo.lpFile = chartoapichar(stmp,&hactmp2);
-		exinfo.nShow = SW_SHOWNORMAL;
-		if ( ShellExecuteEx( &exinfo ) == false ) {
-					freehac(&hactmp1);
-					freehac(&hactmp2);
-					throw HSPERR_EXTERNAL_EXECUTE;
-		}
-		freehac(&hactmp1);
-		freehac(&hactmp2);
-		return;
-	}
-		
-	if ( mode&16 ) {
-		i = (int)(INT_PTR)ShellExecute( NULL,NULL,chartoapichar(stmp,&hactmp1),TEXT(""),TEXT(""),j );
-		freehac(&hactmp1);
-	}
-	else if ( mode&32 ) {
-		i = (int)(INT_PTR)ShellExecute( NULL,TEXT("print"),chartoapichar(stmp,&hactmp1),TEXT(""),TEXT(""),j );
-		freehac(&hactmp1);
-	}
-	else {
-		i = WinExec(chartoapichar(stmp, &hactmp1), j);
-		freehac(&hactmp1);		
-	}
-	if (i<32) throw HSPERR_EXTERNAL_EXECUTE;
-}
-
-
-
-/*
-#define CSIDL_DESKTOP                   0x0000
-#define CSIDL_INTERNET                  0x0001
-#define CSIDL_PROGRAMS                  0x0002
-#define CSIDL_CONTROLS                  0x0003
-#define CSIDL_PRINTERS                  0x0004
-#define CSIDL_PERSONAL                  0x0005
-#define CSIDL_FAVORITES                 0x0006
-#define CSIDL_STARTUP                   0x0007
-#define CSIDL_RECENT                    0x0008
-#define CSIDL_SENDTO                    0x0009
-#define CSIDL_BITBUCKET                 0x000a
-#define CSIDL_STARTMENU                 0x000b
-#define CSIDL_DESKTOPDIRECTORY          0x0010
-#define CSIDL_DRIVES                    0x0011
-#define CSIDL_NETWORK                   0x0012
-#define CSIDL_NETHOOD                   0x0013
-#define CSIDL_FONTS                     0x0014
-#define CSIDL_TEMPLATES                 0x0015
-#define CSIDL_COMMON_STARTMENU          0x0016
-#define CSIDL_COMMON_PROGRAMS           0X0017
-#define CSIDL_COMMON_STARTUP            0x0018
-#define CSIDL_COMMON_DESKTOPDIRECTORY   0x0019
-#define CSIDL_APPDATA                   0x001a
-#define CSIDL_PRINTHOOD                 0x001b
-#define CSIDL_ALTSTARTUP                0x001d         // DBCS
-#define CSIDL_COMMON_ALTSTARTUP         0x001e         // DBCS
-#define CSIDL_COMMON_FAVORITES          0x001f
-#define CSIDL_INTERNET_CACHE            0x0020
-#define CSIDL_COOKIES                   0x0021
-#define CSIDL_HISTORY                   0x0022
-*/
-
-static char *getdir( int id )
-{
-	//		dirinfo命令の内容をstmpに設定する
-	//
-	char *p;
-	TCHAR pw[_MAX_PATH+1];
-	char *ss;
-	TCHAR fname[_MAX_PATH+1];
-	char *resp8;
-	p = ctx->stmp;
-	HSPCHAR *hctmp1 = 0;
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-		_tgetcwd( pw, _MAX_PATH );
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		GetModuleFileName( NULL,fname,_MAX_PATH );
-		getpathW( fname, pw, 32 );
-		break;
-	case 2:				//    Windowsディレクトリ
-		GetWindowsDirectory( pw, _MAX_PATH );
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-		GetSystemDirectory( pw, _MAX_PATH );
-		break;
-	case 4:				//    コマンドライン文字列
-		ss = ctx->cmdline;
-		sbStrCopy( &(ctx->stmp), ss );
-		p = ctx->stmp;
-		return p;
-	case 5:				//    HSPTV素材があるディレクトリ
-#if defined(HSPDEBUG)||defined(HSP3IMP)
-		GetModuleFileName( NULL,fname,_MAX_PATH );
-		getpathW( fname, pw, 32 );
-		apichartohspchar(pw, &hctmp1);
-		strcpy(p, hctmp1);
-		freehc(&hctmp1);
-		CutLastChr( p, '\\' );
-		strcat( p, "\\hsptv\\" );
-		return p;
-#else
-		p[0] = '\0';
-		return p;
-#endif
-		break;
-	default:
-		if ( id & 0x10000 ) {
-			SHGetSpecialFolderPath( NULL, pw, id & 0xffff, FALSE );
-			break;
-		}
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-	apichartohspchar(pw,&resp8);
-	sbStrCopy( &(ctx->stmp),resp8);
-	freehc(&resp8);
-	p=ctx->stmp;
-	//		最後の'\\'を取り除く
-	//
-	CutLastChr( p, '\\' );
-	return p;
-}
-
 
 static int sysinfo( int p2 )
 {
 	//		System strings get
 	//
 	int fl;
-	TCHAR pp[128];
-	char *p3;
-	BOOL success;
-	DWORD version;
-	DWORD size;
-	DWORD *mss;
-	SYSTEM_INFO si;
-	MEMORYSTATUS ms;
-	int plen;
-	char *p;
+	char *p1;
 
-	fl = HSPVAR_FLAG_INT;
-	p3 = ctx->stmp;
-	size = _MAX_PATH;
-
-	if (p2&16) {
-		GetSystemInfo(&si);
-	}
-	if (p2&32) {
-		GlobalMemoryStatus(&ms);
-		mss=(DWORD *)&ms;
-		*(int *)p3 = (int)mss[p2&15];
-		return fl;
-	}
-
-	switch(p2) {
-	case 0:
-		_tcscpy((TCHAR*)p3,TEXT("Windows"));
-		version = GetVersion();
-		if ((version & 0x80000000) == 0) _tcscat((TCHAR*)p3,TEXT("NT"));
-									else _tcscat((TCHAR*)p3,TEXT("9X"));
-/*
-	rev 43
-	mingw : warning : 仮引数int 実引数long unsigned
-	に対処
-*/
-		_stprintf( pp,TEXT(" ver%d.%d"), static_cast< int >( version&0xff ), static_cast< int >( (version&0xff00)>>8 ) );
-		_tcscat( (TCHAR*)p3, pp );
-		apichartohspchar((TCHAR*)p3,&p);
-		plen = strlen(p);
-		if (p3 != p){
-			memcpy(p3, p, plen);
-			p3[plen] = '\0';
-		}
-		freehc(&p);
-		fl=HSPVAR_FLAG_STR;
-		break;
-	case 1:
-		success = GetUserName( (TCHAR*)p3,&size );
-		apichartohspchar((TCHAR*)p3,&p);
-		plen = strlen(p);
-		if (p3 != p){
-			memcpy(p3, p, plen);
-			p3[plen] = '\0';
-		}
-		freehc(&p);
-		fl = HSPVAR_FLAG_STR;
-		break;
-	case 2:
-		success = GetComputerName((TCHAR*)p3, &size );
-		apichartohspchar((TCHAR*)p3,&p);
-		plen = strlen(p);
-		if (p3 != p){
-			memcpy(p3, p, plen);
-			p3[plen] = '\0';
-		}
-		freehc(&p);
-		fl = HSPVAR_FLAG_STR;
-		break;
-	case 3:
-		*(int*)p3 = ctx->language;
-		break;
-	case 16:
-		*(int *)p3 = (int)si.dwProcessorType;
-		break;
-	case 17:
-		*(int *)p3 = (int)si.dwNumberOfProcessors;
-		break;
-	default:
-		throw HSPERR_ILLEGAL_FUNCTION;
+	p1 = hsp3ext_sysinfo(p2, &fl, ctx->stmp);
+	if (p1 == NULL) {
+		p1 = ctx->stmp;
+		*p1 = 0;
+		return HSPVAR_FLAG_INT;
 	}
 	return fl;
 }
@@ -751,7 +508,7 @@ static int cmdfunc_extcmd( int cmd )
 		fname = code_stmpstr( code_gets() );
 		p1 = code_getdi( 0 );
 		ps = code_getds( "" );
-		ExecFile( fname, ps, p1 );
+		hsp3ext_execfile( fname, ps, p1 );
 		break;
 		}
 
@@ -1686,7 +1443,7 @@ static void *reffunc_function( int *type_res, int arg )
 
 	case 0x002:								// dirinfo
 		p1 = code_geti();
-		ptr = getdir( p1 );
+		ptr = hsp3ext_getdir( p1 );
 		*type_res = HSPVAR_FLAG_STR;
 		break;
 
@@ -1947,8 +1704,8 @@ void hsp3gr_dbg_gui( void )
 {
 	//		デバッグウインドゥ用情報
 	//
-	code_adddbg( "ディレクトリ", getdir(0) );
-	code_adddbg( "コマンドライン", getdir(4) );
+	code_adddbg( "ディレクトリ", hsp3ext_getdir(0) );
+	code_adddbg( "コマンドライン", hsp3ext_getdir(4) );
 	code_adddbg( "ウインドゥ最大", wnd->GetBmscrMax() );
 	code_adddbg( "カレントウインドゥ", cur_window );
 }

@@ -710,8 +710,8 @@ int hsp3dish_init( char *startfile )
 #endif
 	}
 
-//	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
-//	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
+	//hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+	//hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
 
 #ifdef HSPDISHGP
 	//		Initalize gameplay

@@ -25,6 +25,10 @@ public:
 	int Reset( int mode );						// HSP axの初期化を行なう
 	void SetPackValue( int sum, int dec );		// packfile用の設定データを渡す
 	void SetFileName( char *name );				// axファイル名を指定する
+	void SetCommandLinePrm(char *prm);			// コマンドライン文字列を指定する
+	void SetModuleFilePrm(char *prm);			// モジュールファイル名文字列を指定する
+	void SetHSPTVFolderPrm(char *prm);			// HSPTVフォルダ名文字列を指定する
+	void SetHomeFolderPrm(char *prm);			// ホームフォルダ名文字列を指定する
 
 	//	Data
 	//

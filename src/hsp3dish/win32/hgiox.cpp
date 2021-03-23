@@ -1748,66 +1748,6 @@ void hgio_setinfo( int type, HSPREAL val )
 	}
 }
 
-char *hgio_sysinfo( int p2, int *res, char *outbuf )
-{
-	//		System strings get
-	//
-	int fl;
-	char pp[128];
-	char *p1;
-	BOOL success;
-	DWORD version;
-	DWORD size;
-	DWORD *mss;
-	SYSTEM_INFO si;
-	MEMORYSTATUS ms;
-
-	fl = HSPVAR_FLAG_INT;
-	p1 = outbuf;
-	size = HSP_MAX_PATH;
-
-	if (p2&16) {
-		GetSystemInfo(&si);
-	}
-	if (p2&32) {
-		GlobalMemoryStatus(&ms);
-		mss=(DWORD *)&ms;
-		*(int *)p1 = (int)mss[p2&15];
-		*res = fl;
-		return p1;
-	}
-
-	switch(p2) {
-	case 0:
-		strcpy(p1,"Windows");
-		version = GetVersion();
-		if ((version & 0x80000000) == 0) strcat(p1,"NT");
-									else strcat(p1,"9X");
-		sprintf( pp," ver%d.%d", static_cast< int >( version&0xff ), static_cast< int >( (version&0xff00)>>8 ) );
-		strcat( p1, pp );
-		fl=HSPVAR_FLAG_STR;
-		break;
-	case 1:
-		success = GetUserName( p1,&size );
-		fl = HSPVAR_FLAG_STR;
-		break;
-	case 2:
-		success = GetComputerName(p1, &size );
-		fl = HSPVAR_FLAG_STR;
-		break;
-	case 16:
-		*(int *)p1 = (int)si.dwProcessorType;
-		break;
-	case 17:
-		*(int *)p1 = (int)si.dwNumberOfProcessors;
-		break;
-	default:
-		return NULL;
-	}
-	*res = fl;
-	return p1;
-}
-
 HWND hgio_gethwnd( void )
 {
 	return master_wnd;
