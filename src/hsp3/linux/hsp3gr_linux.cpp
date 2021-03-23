@@ -17,6 +17,7 @@
 #include "../hsp3debug.h"
 #include "../supio.h"
 #include "../strbuf.h"
+#include "../hsp3ext.h"
 
 #include "hsp3gr_linux.h"
 
@@ -129,56 +130,21 @@ static int sockreadbyte(){
 //					HSP system support
 /*----------------------------------------------------------*/
 
-static void ExecFile( char *stmp, char *ps, int mode )
-{
-	//	外部ファイル実行
-	system(stmp);
-}
-		
-static char *getdir( int id )
-{
-	//		dirinfo命令の内容をstmpに設定する
-	//
-	char *p;
-	char *ss;
-	char fname[HSP_MAX_PATH+1];
-	p = ctx->stmp;
-
-	*p = 0;
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		break;
-	case 2:				//    Windowsディレクトリ
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-		break;
-	case 4:				//    コマンドライン文字列
-		break;
-	default:
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-
-	return p;
-}
-
-
-static int sysinfo( int p2 )
+static int sysinfo(int p2)
 {
 	//		System strings get
 	//
 	int fl;
-	char *p1;
+	char* p1;
 
-	fl = HSPVAR_FLAG_INT;
-	p1 = ctx->stmp;
-	*p1 = 0;
-
+	p1 = hsp3ext_sysinfo(p2, &fl, ctx->stmp);
+	if (p1 == NULL) {
+		p1 = ctx->stmp;
+		*p1 = 0;
+		return HSPVAR_FLAG_INT;
+	}
 	return fl;
 }
-
 
 void *ex_getbmscr( int wid )
 {
@@ -261,7 +227,7 @@ static int cmdfunc_extcmd( int cmd )
 		strncpy( fname, code_gets(), HSP_MAX_PATH-1 );
 		p1 = code_getdi( 0 );
 		ps = code_getds( "" );
-		ExecFile( fname, ps, p1 );
+		hsp3ext_execfile( fname, ps, p1 );
 		break;
 		}
 
@@ -480,7 +446,7 @@ static void *reffunc_function( int *type_res, int arg )
 
 	case 0x002:								// dirinfo
 		p1 = code_geti();
-		ptr = getdir( p1 );
+		ptr = hsp3ext_getdir( p1 );
 		*type_res = HSPVAR_FLAG_STR;
 		break;
 

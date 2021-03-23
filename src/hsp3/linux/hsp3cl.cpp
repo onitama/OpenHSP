@@ -14,6 +14,7 @@
 #include "../hsp3config.h"
 #include "../supio.h"
 #include "../hsp3gr.h"
+#include "../hsp3ext.h"
 
 #include "hsp3cl.h"
 #include "hsp3ext_sock.h"
@@ -156,7 +157,7 @@ int hsp3cl_init( char *startfile )
 #ifdef HSPDEBUG
 
 	if ( *startfile == 0 ) {
-		printf( "OpenHSP CL ver%s / onion software 1997-2019\n", hspver );
+		printf( "OpenHSP CL ver%s / onion software 1997-2021\n", hspver );
 		usage1();
 		return -1;
 	}

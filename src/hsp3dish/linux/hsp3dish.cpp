@@ -19,9 +19,8 @@
 #include "../supio.h"
 #include "../hgio.h"
 #include "../sysreq.h"
-//#include "../hsp3ext.h"
+#include "../hsp3ext.h"
 #include "../../hsp3/strnote.h"
-#include "../../hsp3/hsp3ext.h"
 #include "../../hsp3/linux/hsp3ext_sock.h"
 
 struct engine;
@@ -677,8 +676,6 @@ int hsp3dish_init( char *startfile )
 		hsp3dish_dialog( "Startup failed." );
 		return 1;
 	}
-
-	hgio_setmainarg( hsp_mainpath, startfile );
 
 	sx = 0; sy = 0; autoscale = 0;
 //#ifdef HSPDEBUG

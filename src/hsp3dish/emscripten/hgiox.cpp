@@ -113,6 +113,7 @@ extern SDL_Window *window;
 #include "../supio.h"
 #include "../sysreq.h"
 #include "../hgio.h"
+#include "../hsp3ext.h"
 
 #include "../texmes.h"
 
@@ -303,7 +304,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 
 	//TTF初期化
 	char fontpath[HSP_MAX_PATH+1];
-	strcpy( fontpath, hgio_getdir(1) );
+	strcpy( fontpath, hsp3ext_getdir(1) );
 	strcat( fontpath, TTF_FONTFILE );
 
 	if ( TTF_Init() ) {
@@ -1814,33 +1815,6 @@ int hgio_gettick( void )
 
 }
 
-int hgio_exec( char *msg, char *option, int mode )
-{
-#ifdef HSPNDK
-	j_callActivity( msg, option, mode );
-#endif
-#ifdef HSPIOS
-    gb_exec( mode, msg );
-#endif
-#ifdef HSPLINUX
-	system(msg);
-#endif
-
-#ifdef HSPEMSCRIPTEN
-	{
-	EM_ASM_({
-		if ($1>=16) {
-			window.open(UTF8ToString($0));
-		} else {
-			window.eval(UTF8ToString($0));
-		}
-	},msg,mode );
-	}
-#endif
-
-    return 0;
-}
-
 int hgio_dialog( int mode, char *str1, char *str2 )
 {
 #ifdef HSPNDK
@@ -1865,102 +1839,6 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 #endif
 	return 0;
 }
-
-
-char *hgio_sysinfo( int p2, int *res, char *outbuf )
-{
-	//		System strings get
-	//
-	int fl;
-	char *p1;
-	fl = HSPVAR_FLAG_INT;
-	p1 = outbuf;
-	*p1=0;
-
-	switch(p2) {
-	case 0:
-#ifdef HSPNDK
-		{
-		char tmp[256];
-		strcpy( tmp, j_getinfo( JAVAFUNC_INFO_VERSION ) );
-		strcpy( p1, "android " );
-		strcat( p1, tmp );
-		}
-#endif
-#ifdef HSPIOS
-        //strcpy(p1, "iOS");
-        gpb_getSysVer( p1 );
-#endif
-		fl=HSPVAR_FLAG_STR;
-		break;
-	case 1:
-		break;
-	case 2:
-#ifdef HSPNDK
-		j_getinfo( JAVAFUNC_INFO_DEVICE );
-#endif
-#ifdef HSPIOS
-        gb_getSysModel( p1 );
-#endif
-		fl = HSPVAR_FLAG_STR;
-		break;
-	case 3:
-		*(int*)p1 = hspctx->language;
-		break;
-	default:
-		return NULL;
-	}
-	*res = fl;
-	return p1;
-}
-
-
-char *hgio_getdir( int id )
-{
-	//		dirinfo命令の内容を設定する
-	//
-	p = hspctx->stmp;
-	*p = 0;
-	int cutlast = 0;
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-#if defined(HSPLINUX)||defined(HSPEMSCRIPTEN)
-		getcwd( p, HSP_MAX_PATH );
-		cutlast = 1;
-#endif
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		p = hspctx->modfilename;
-		break;
-	case 2:				//    Windowsディレクトリ
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-		break;
-	case 4:				//    コマンドライン文字列
-		p = hspctx->cmdline;
-		break;
-	case 5:				//    HSPTV素材があるディレクトリ
-		p = hspctx->tvfoldername;
-		break;
-	case 6:				//    ランゲージコード
-		p = hspctx->langcode;
-		break;
-	case 0x10005:			//    マイドキュメント
-		p = hspctx->homefoldername;
-		break;
-	default:
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-
-	//		最後の'/'を取り除く
-	//
-	if (cutlast) {
-		CutLastChr(p, '/');
-	}
-	return p;
-}
-
 
 /*-------------------------------------------------------------------------------*/
 

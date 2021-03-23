@@ -141,17 +141,6 @@ static int select_objmoc;
 //					HSP system support
 /*----------------------------------------------------------*/
 
-static void ExecFile( char *stmp, char *ps, int mode )
-{
-	//	外部ファイル実行
-#ifdef HSPWIN
-	hsp3ext_execfile(stmp, ps, mode);
-#else
-	hgio_exec( stmp, ps, mode );
-#endif
-}
-
-
 static int sysinfo( int p2 )
 {
 	//		System strings get
@@ -159,11 +148,7 @@ static int sysinfo( int p2 )
 	int fl;
 	char *p1;
 
-#ifdef HSPWIN
 	p1 = hsp3ext_sysinfo(p2, &fl, ctx->stmp);
-#else
-	p1 = hgio_sysinfo(p2, &fl, ctx->stmp);
-#endif
 	if ( p1 == NULL ) {
 		p1 = ctx->stmp;
 		*p1 = 0;
@@ -422,7 +407,7 @@ static int cmdfunc_extcmd( int cmd )
 		fname = code_stmpstr( code_gets() );
 		p1 = code_getdi( 0 );
 		ps = code_getds( "" );
-		ExecFile( fname, ps, p1 );
+		hsp3ext_execfile(fname, ps, p1);
 
         ctx->waitcount = 0;
         ctx->runmode = RUNMODE_WAIT;
@@ -3743,11 +3728,7 @@ static void *reffunc_function( int *type_res, int arg )
 
 	case 0x002:								// dirinfo
 		p1 = code_geti();
-#ifdef HSPWIN
 		ptr = hsp3ext_getdir( p1 );
-#else
-		ptr = hgio_getdir( p1 );
-#endif
 		*type_res = HSPVAR_FLAG_STR;
 		break;
 

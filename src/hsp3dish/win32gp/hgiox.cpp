@@ -75,6 +75,7 @@ extern SDL_Window *window;
 #include "../hgio.h"
 #include "../supio.h"
 #include "../sysreq.h"
+#include "../hsp3ext.h"
 
 #ifdef HSPWIN
 void hgio_fontsystem_win32_init(HWND wnd);
@@ -404,7 +405,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	//TTF初期化
 	char fontpath[HSP_MAX_PATH+1];
 	*fontpath = 0;
-	strcpy( fontpath, hgio_getdir(1) );
+	strcpy( fontpath, hsp3ext_getdir(1) );
 	strcat( fontpath, TTF_FONTFILE );
 
 	if ( TTF_Init() ) {
@@ -1679,34 +1680,6 @@ int hgio_gettick( void )
 
 }
 
-
-int hgio_exec( char *stmp, char *option, int mode )
-{
-#ifdef HSPNDK
-	j_callActivity( stmp, option, mode );
-#endif
-#ifdef HSPIOS
-    gpb_exec( mode, stmp );
-#endif
-#ifdef HSPLINUX
-	system(stmp);
-#endif
-
-#ifdef HSPEMSCRIPTEN
-	{
-	EM_ASM_({
-		if ($1>=16) {
-			window.open(UTF8ToString($0));
-		} else {
-			window.eval(UTF8ToString($0));
-		}
-	},stmp,mode );
-	}
-#endif
-	return 0;
-}
-
-
 HSPREAL hgio_getinfo( int type )
 {
 	int i;
@@ -1725,89 +1698,6 @@ void hgio_setinfo( int type, HSPREAL val )
 		infoval[i] = val;
 	}
 }
-
-char *hgio_sysinfo( int p2, int *res, char *outbuf )
-{
-	//		System strings get
-	//
-	int fl;
-	char *p1;
-	fl = HSPVAR_FLAG_INT;
-	p1 = outbuf;
-	*p1=0;
-
-	switch(p2) {
-	case 0:
-#ifdef HSPNDK
-		strcpy(p1, "Android");
-#endif
-#ifdef HSPIOS
-        //strcpy(p1, "iOS");
-        gpb_getSysVer( p1 );
-#endif
-		fl=HSPVAR_FLAG_STR;
-		break;
-	case 1:
-		break;
-	case 2:
-		break;
-	case 3:
-		*(int*)p1 = hspctx->language;
-		break;
-	default:
-		return NULL;
-	}
-	*res = fl;
-	return p1;
-}
-
-
-char *hgio_getdir( int id )
-{
-	//		dirinfo命令の内容を設定する
-	//
-	p = hspctx->stmp;
-	*p = 0;
-	int cutlast = 0;
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-#if defined(HSPLINUX)||defined(HSPEMSCRIPTEN)
-		getcwd( p, HSP_MAX_PATH );
-		cutlast = 1;
-#endif
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		p = hspctx->modfilename;
-		break;
-	case 2:				//    Windowsディレクトリ
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-		break;
-	case 4:				//    コマンドライン文字列
-		p = hspctx->cmdline;
-		break;
-	case 5:				//    HSPTV素材があるディレクトリ
-		p = hspctx->tvfoldername;
-		break;
-	case 6:				//    ランゲージコード
-		p = hspctx->langcode;
-		break;
-	case 0x10005:			//    マイドキュメント
-		p = hspctx->homefoldername;
-		break;
-	default:
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-
-	//		最後の'/'を取り除く
-	//
-	if (cutlast) {
-		CutLastChr(p, '/');
-	}
-	return p;
-}
-
 
 #ifdef HSPWIN
 HWND hgio_gethwnd( void )
@@ -2076,65 +1966,6 @@ void hgio_mtouchidf( int pointid, float xx, float yy, int button, int opt )
 }
 
 #endif
-
-
-/*-------------------------------------------------------------------------------*/
-
-//#if defined(HSPLINUX)
-
-static	char dir_hsp[HSP_MAX_PATH+1];
-static	char dir_cmdline[HSP_MAX_PATH+1];
-
-void hgio_setmainarg( char *hsp_mainpath, char *cmdprm )
-{
-	int p,i;
-	strcpy( dir_hsp, hsp_mainpath );
-
-	p = 0; i = 0;
-	while(dir_hsp[i]){
-		if(dir_hsp[i]=='/' || dir_hsp[i]=='\\') p=i;
-		i++;
-	}
-	dir_hsp[p]=0;
-
-	strcpy( dir_cmdline, cmdprm );
-}
-
-char *hgio_getdir( int id )
-{
-	//		dirinfo命令の内容を設定する
-	//
-	char dirtmp[HSP_MAX_PATH+1];
-	char *p;
-	
-	*dirtmp = 0;
-	p = dirtmp;
-
-	switch( id ) {
-	case 0:				//    カレント(現在の)ディレクトリ
-		getcwd( p, HSP_MAX_PATH );
-		break;
-	case 1:				//    HSPの実行ファイルがあるディレクトリ
-		p = dir_hsp;
-		break;
-	case 2:				//    Windowsディレクトリ
-		break;
-	case 3:				//    Windowsのシステムディレクトリ
-		break;
-	case 4:				//    コマンドライン文字列
-		p = dir_cmdline;
-		break;
-	case 5:				//    HSPTV素材があるディレクトリ
-		strcpy( p, dir_hsp );
-		strcat( p, "/hsptv" );
-		break;
-	default:
-		throw HSPERR_ILLEGAL_FUNCTION;
-	}
-	return p;
-}
-
-//#endif
 
 
 static int GetSurface(int x, int y, int sx, int sy, int px, int py, void *res, int mode)

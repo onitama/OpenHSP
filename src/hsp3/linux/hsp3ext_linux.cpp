@@ -6,6 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#include "../hsp3config.h"
+#include "../hsp3code.h"
+#include "../hsp3debug.h"
+#include "../supio.h"
+#include "../strbuf.h"
 
 #include "hsp3ext_linux.h"
 
@@ -36,7 +43,7 @@ static void InitSystemInformation(void)
 */
 /*------------------------------------------------------------*/
 
-static int cmdfunc_ctrlcmd( int cmd )
+static int cmdfunc_dllcmd( int cmd )
 {
 	//		cmdfunc : TYPE_DLLCTRL
 	//		(拡張DLLコントロールコマンド)
@@ -114,7 +121,128 @@ void hsp3typeinit_dllctrl( HSP3TYPEINFO *info )
 */
 /*------------------------------------------------------------*/
 
+char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
+{
+	//		System strings get
+	//
+	int fl;
+	char *p1;
+	fl = HSPVAR_FLAG_INT;
+	p1 = outbuf;
+	*p1=0;
 
+	switch(p2) {
+	case 0:
+#ifdef HSPNDK
+		{
+		char tmp[256];
+		strcpy( tmp, j_getinfo( JAVAFUNC_INFO_VERSION ) );
+		strcpy( p1, "android " );
+		strcat( p1, tmp );
+		}
+#endif
+#ifdef HSPIOS
+        //strcpy(p1, "iOS");
+        gpb_getSysVer( p1 );
+#endif
+		fl=HSPVAR_FLAG_STR;
+		break;
+	case 1:
+		break;
+	case 2:
+#ifdef HSPNDK
+		j_getinfo( JAVAFUNC_INFO_DEVICE );
+#endif
+#ifdef HSPIOS
+        gb_getSysModel( p1 );
+#endif
+		fl = HSPVAR_FLAG_STR;
+		break;
+	case 3:
+		*(int*)p1 = hspctx->language;
+		break;
+	default:
+		return NULL;
+	}
+	*res = fl;
+	return p1;
+}
+
+
+char* hsp3ext_getdir(int id)
+{
+	//		dirinfo命令の内容を設定する
+	//
+	char *p = hspctx->stmp;
+	*p = 0;
+	int cutlast = 0;
+
+	switch( id ) {
+	case 0:				//    カレント(現在の)ディレクトリ
+#if defined(HSPLINUX)||defined(HSPEMSCRIPTEN)
+		getcwd( p, HSP_MAX_PATH );
+		cutlast = 1;
+#endif
+		break;
+	case 1:				//    HSPの実行ファイルがあるディレクトリ
+		p = hspctx->modfilename;
+		break;
+	case 2:				//    Windowsディレクトリ
+		break;
+	case 3:				//    Windowsのシステムディレクトリ
+		break;
+	case 4:				//    コマンドライン文字列
+		p = hspctx->cmdline;
+		break;
+	case 5:				//    HSPTV素材があるディレクトリ
+		p = hspctx->tvfoldername;
+		break;
+	case 6:				//    ランゲージコード
+		p = hspctx->langcode;
+		break;
+	case 0x10005:			//    マイドキュメント
+		p = hspctx->homefoldername;
+		break;
+	default:
+		throw HSPERR_ILLEGAL_FUNCTION;
+	}
+
+	//		最後の'/'を取り除く
+	//
+	if (cutlast) {
+		CutLastChr(p, '/');
+	}
+	return p;
+}
+
+
+void hsp3ext_execfile(char* msg, char* option, int mode)
+{
+#ifdef HSPNDK
+	j_callActivity( msg, option, mode );
+#endif
+#ifdef HSPIOS
+    gb_exec( mode, msg );
+#endif
+#ifdef HSPLINUX
+	system(msg);
+#endif
+
+#ifdef HSPEMSCRIPTEN
+	{
+	EM_ASM_({
+		if ($1>=16) {
+			window.open(UTF8ToString($0));
+		} else {
+			window.eval(UTF8ToString($0));
+		}
+	},msg,mode );
+	}
+#endif
+}
+
+
+#if 0
 static	char dir_hsp[HSP_MAX_PATH+1];
 static	char dir_cmdline[HSP_MAX_PATH+1];
 
@@ -131,7 +259,7 @@ void hgio_setmainarg( char *hsp_mainpath, char *cmdprm )
 	dir_hsp[p]=0;
 
 	strcpy( dir_cmdline, cmdprm );
-	Alertf( "Init:hgio_setmainarg(%s,%s)",dir_hsp,dir_cmdline );
+	//Alertf( "Init:hgio_setmainarg(%s,%s)",dir_hsp,dir_cmdline );
 }
 
 char *hgio_getdir( int id )
@@ -171,7 +299,7 @@ char *hgio_getdir( int id )
 
 	return p;
 }
-
+#endif
 
 /*-------------------------------------------------------------------------------*/
 

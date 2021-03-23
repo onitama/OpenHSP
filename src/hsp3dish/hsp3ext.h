@@ -18,8 +18,11 @@
 #endif
 
 #ifdef HSPLINUX
-#include "linux/hsp3ext_linux.h"
+#include "../hsp3/linux/hsp3ext_linux.h"
 #endif
 
+#ifdef HSPEMSCRIPTEN
+#include "../hsp3/emscripten/hsp3ext_emscripten.h"
+#endif
 
 #endif
