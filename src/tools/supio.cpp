@@ -25,31 +25,6 @@
 #endif
 
 
-/*--------------------------------------------------------------------------------*/
-
-#define HSPDEBUG
-#define JPNMSG
-
-#include "../hsp3/hsp3debug.cpp"
-
-char *gethsperror( int error )
-{
-	if ((error<0)||(error>=HSPERR_MAX)) return err[0];
-	return err[error];
-}
-
-/*--------------------------------------------------------------------------------*/
-
-HSPCTX hspctx;
-
-HSPCTX *code_getctx(void)
-{
-	hspctx.language=0;
-	return &hspctx;
-}
-
-/*--------------------------------------------------------------------------------*/
-
 char *mem_ini( int size ) {
 	return (char *)calloc(size,1);
 }

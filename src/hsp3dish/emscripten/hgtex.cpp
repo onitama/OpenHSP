@@ -449,7 +449,7 @@ int RegistTexMem( unsigned char *ptr, int size )
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, sx, sy, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImg );
 		mem_bye(pImg);
 		texid = SetTex( -1, TEXMODE_NORMAL, 0, sx, sy, tsx, tsy, id );
-		Alertf( "Tex:ID%d (%d,%d)(%dx%d)",texid,sx,sy,tsx,tsy );
+		//Alertf( "Tex:ID%d (%d,%d)(%dx%d)",texid,sx,sy,tsx,tsy );
 		return texid;
 	}
 	Alertf( "Tex:failed(%d)",size );
@@ -467,7 +467,7 @@ int RegistTex( char *fname )
 	int id;
 
 	len = dpm_exist( fname );
-	Alertf( "Tex:read(%s)(%d)", fname, len );
+	//Alertf( "Tex:read(%s)(%d)", fname, len );
 	if ( len < 0 ) return -1;
 	ptr = mem_ini( len );
 	dpm_read( fname, ptr, len, 0 );

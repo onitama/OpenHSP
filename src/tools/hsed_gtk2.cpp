@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include <unistd.h>
 #include <termios.h>
@@ -41,11 +42,13 @@ static GdkColor colorText;
 #define HSED_INI ".hsedconf"
 
 static int event_timer;
-static int event_jump;			// 行ジャンプフラグ(-1=なし)
+static int event_jump;		// 行ジャンプフラグ(-1=なし)
 static int event_errflag;		// エラー発生フラグ(-1=no error)
+static std::string event_errmsg;	// Error Message
 
 #define STR_HSPERROR "#Error "		// ランタイムエラー識別用タグ
 #define STR_HSPERROR2 "in line "	// ランタイムエラー識別用タグ
+#define STR_HSPERROR3 "-->"		// ランタイムエラー識別用タグ
 
 /*--------------------------------------------------------------------------------*/
 
@@ -665,12 +668,7 @@ static gint update_edit( gpointer data )
 		printf("hsed: Jump line [%d].\n", current_line+1 );
 		if ( event_jump >= 0 ) cursor_move_line( edit, current_line );
 
-		if ( jpflag ) {
-			sprintf( msg,"#Error %d in line %d\n-->%s", event_errflag, current_line+1, gethsperror(event_errflag) );
-		} else {
-			sprintf( msg,"#Error %d in line %d", event_errflag, current_line+1 );
-		}
-
+		sprintf( msg,"#Error %d in line %d\n-->%s", event_errflag, current_line+1,  event_errmsg.c_str() );
 		dialog_open( "Error", msg );
 	}
 	return 0;
@@ -796,6 +794,7 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	//	HSPランタイム実行
 	p = 0;
+	event_errmsg.clear();
 
 	if ( needres == 0 ) {
 		//	プロセスから結果を取得
@@ -823,7 +822,7 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	if(p){
 		char *errinfo;
-		char str_errid[64];
+		char str_errid[1024];
 
 		errinfo = strstr2( complog, STR_HSPERROR );
 		if ( errinfo ) {
@@ -840,18 +839,19 @@ static void HSP_run(GtkWidget *w,int flag)
 				event_jump = atoi( str_errid );
 				current_line = event_jump - 1;
 			}
+			errinfo = strstr2( errinfo, STR_HSPERROR3 );
+			if ( errinfo ) {
+				errinfo += strlen(STR_HSPERROR3);
+				strsp_ini();
+				strsp_get( errinfo, str_errid, 0, 1023 );
+				event_errmsg = str_errid;
+			}
 
 			errinfo = strstr2( errinfo, TEMP_HSP );
 			if ( errinfo == NULL ) {
 				event_jump = -1;			// 異なるソースコードでエラーが出ている
 			}
-
-			if ( jpflag ) {
-				printf( "hsed: %s (エラー%d) %d行.\n", gethsperror(event_errflag), event_errflag, current_line+1 );
-			} else {
-				printf( "hsed: Runtime error %d line %d.\n", event_errflag, current_line+1 );
-			}
-
+			printf( "hsed: Runtime error %d line %d.\n", event_errflag, current_line+1 );
 		}
 	}
 
