@@ -191,7 +191,7 @@ int main( int argc, char *argv[] )
 			printf("Execute from %s runtime[%s](%d).\n",fname,oname,execobj);
 			sprintf(execmd,"%s./%s %s",syspath,oname,fname);
 			//sprintf(execmd,"%s./%s %s >%s.hspres",syspath,oname,fname,syspath);
-			
+
 			result = system(execmd);
 			if ( WIFEXITED(result) ) {
 				result = WEXITSTATUS(result);

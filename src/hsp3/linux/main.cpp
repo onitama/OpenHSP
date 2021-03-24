@@ -25,16 +25,23 @@ int main( int argc, char *argv[] )
 	char a1,a2,a3;
 	int b,st,index;
 	char mydir[1024];
+	char *cl;
 	std::string clopt;
 	std::string clmod;
 
 	p = "";
 	st = 0;
 	index = 0;
-	getcwd( mydir, 1024 );
-	clmod = mydir;
-	clmod += "/";
-	clmod += argv[0];
+
+	cl = argv[0];
+	if (*cl=='/') {
+		clmod = cl;
+	} else {
+		getcwd( mydir, 1024 );
+		clmod = mydir;
+		clmod += "/";
+		clmod += cl;
+	}
 
 	for (b=1;b<argc;b++) {
 		a1=*argv[b];a2=tolower(*(argv[b]+1));
