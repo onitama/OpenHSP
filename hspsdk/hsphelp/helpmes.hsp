@@ -5,7 +5,7 @@
 	;
 	#include "hsp3cl.as"
 	#include "mod_hs.as"
-	#packopt name "mkindex"
+	#packopt name "helpmes"
 	;
 	;
 	ihelp_init msg			;index build

@@ -1,0 +1,14 @@
+
+	;
+	;	HSP help script
+	;		onitama/onion software 1999,2021
+	;
+	#include "hsp3cl.as"
+	#include "mod_hs.as"
+	#packopt name "mkindex"
+	;
+	;
+	ihelp_init msg			;index build
+	mes msg
+
+	end

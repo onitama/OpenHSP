@@ -52,7 +52,9 @@
 	ih_htmopt = 0					; html出力 ON/OFF flag
 
 	sdim cb_group,512
-	cb_group={"命令概要
+
+	if sysinfo(3)=1 {
+		cb_group={"命令概要
 プリプロセッサ命令
 代入命令
 特殊代入命令
@@ -73,6 +75,29 @@ OSシステム制御命令
 HSPシステム制御命令
 その他の命令
 "}
+	} else {
+		cb_group={"Abstract
+Preprocess command
+Substitution command
+Special assignment command
+Program control command
+Program control macro
+Basic I/O control command
+Extended I/O control command
+Object control command
+Screen control command
+Extended screen control command
+String manipulation command
+Memory management command
+Multimedia control command
+File operation command
+Extended file operation command
+Communication control command
+OS system control command
+HSP system control command
+Other commands
+"}
+}
 
 
 
@@ -83,21 +108,59 @@ HSPシステム制御命令
 	;	hsphelpライブラリ初期化
 	;
 	ih_msg="Init HSPhelp.\n"
+
+	idxerror=0				; index構築エラーフラグ
+
+	sdim fl,$4000
+	dirlist fl,"*.hs",1
+	notesel fl
+	flmax=notemax 
+	if flmax=0 : goto *failidx
+
 	fname2=ih_file@				; 書き出しファイル
 	exist fname2
-	if strsize<0 {
-		gosub *mkidx
-	}
-
+	if strsize>0 : goto *loadidx
+*initidx
+	ih_msg+="Rebuild index.\n"
+	if idxerror>0 : goto *failidx
+	gosub *mkidx
+	idxerror++
+*loadidx
 	fname2=ih_file@				; idxファイル名
 	exist fname2
-	if strsize<1 : dialog "idxファイルがありません.\n" : return -1
+	if strsize<1 : goto *failidx
 	;
+	sdim tmp,$8000				; text一時バッファ(32K)
 	sdim wrt,strsize+4			; idxバッファを確保
+	sdim ln,256
+	hsfilemax=0
+	hsfileok=0
 	notesel wrt
 	noteload fname2
-	maxkw=notemax/2
+	repeat notemax
+		noteget ln,cnt
+		if peek(ln,0)!='@' : break
+		i=1
+		getstr fname1,ln,i,','
+		i+=strsize
+		getstr tmp,ln,i,','
+		flsize=0+tmp
+		exist fname1
+		if strsize!=flsize : hsfileok=1
+		hsfilemax++
+	loop
+	if hsfilemax!=flmax : hsfileok=2
+
+	if hsfileok>0 {
+		goto *initidx		; .HSファイルが更新されている
+	}
+	maxkw=(notemax-hsfilemax)/2
 	ih_msg+="Total "+maxkw+" keywords.\n"
+	_p1=ih_msg
+	return 0
+*failidx
+	sdim wrt,64
+	ih_msg+="No index file.\n"
 	_p1=ih_msg
 	return 1
 
@@ -109,13 +172,10 @@ HSPシステム制御命令
 	fname2=ih_file@				; 書き出しファイル
 	sdim tidx1,$10000			; idx一時バッファ(64K)
 	sdim tidx2,$10000			; idx一時バッファ(64K)
+	sdim hsidx,$10000			; hsidx一時バッファ(64K)
 	sdim wrt,$18000				; idx書き出しバッファ(96K)
-	sdim fl,$4000
 
-	dirlist fl,"*.hs",1
-	notesel fl
-	flmax=notemax 
-	if flmax=0 : goto *main2x
+	dim flsize,flmax
 	flnum=0
 
 *lp2
@@ -152,13 +212,12 @@ HSPシステム制御命令
 
 	;	idxファイルをセーブ
 	;
+	wrt = hsidx + wrt
+	;
 	notesel wrt
 	notesave fname2
-	ih_msg+="["+fname2+"] セーブしました.\n"
+	ih_msg+="["+fname2+"] saved.\n"
 
-*main2x
-	ih_msg+=fname2+"を再構築しました.\n"
-	return
 
 
 *docstart
@@ -166,7 +225,10 @@ HSPシステム制御命令
 	;
 	exist fname1
 	if strsize<0 : dialog "fatal error" : end
-	sdim buf,strsize+4			; hs読み込みバッファ
+	hsfsize=strsize
+	sdim buf,hsfsize+4			; hs読み込みバッファ
+	flsize(flnum)=hsfsize
+	hsidx+="@"+fname1+","+hsfsize+"\n"
 
 	sdim a,256
 	sdim ln,256
@@ -193,7 +255,7 @@ HSPシステム制御命令
 	if i>=bufmax : goto *doc2		; error check
 	;
 	tidx1+=a+"\n"
-	tidx2+=""+idn+","+fname1+","+dllname+","+ln+"\n"
+	tidx2+=""+idn+","+fname1+","+dllname+","+hsfsize+"\n"
 *doc2
 	if i<bufmax : goto *doc1
 	return
@@ -330,7 +392,7 @@ HSPシステム制御命令
 	ih_prminf@=strmid(ih_prminf@,strsize,4096)	; 残りをパラメータ説明とする
 	;
 	notesel refsel : i=notemax
-	ih_refsel@="関連"+i+"項目\n"
+	ih_refsel@="Related "+i+" keys.\n"
 	ih_refsel@+=refsel
 	;
 	return 0
@@ -406,7 +468,7 @@ HSPシステム制御命令
 	;
 	ih_opt=""
 	exist ans_name
-	if strsize<0 : dialog "ファイル["+ans_name+"]がありません." : return
+	if strsize<0 : dialog "No file ["+ans_name+"]." : return
 	;
 	sdim buf,strsize+4			; hs読み込みバッファ
 	sdim a,256
@@ -444,7 +506,7 @@ HSPシステム制御命令
 	goto *prlp1
 
 *prfin
-	ih_opt@="[種別] "+iopt.0+"\n[グループ]"+ih_group@+"[Version] "+iopt.1+"\n[作成日] "+iopt.2+"\n[作成者] "+iopt.3+"\n[URL]"+iopt.5+"\n[備考]\n"+iopt.4
+	ih_opt@="[Type] "+iopt.0+"\n[Group]"+ih_group@+"[Version] "+iopt.1+"\n[Date] "+iopt.2+"\n[Author] "+iopt.3+"\n[URL]"+iopt.5+"\n[misc]\n"+iopt.4
 	return
 
 
@@ -471,10 +533,15 @@ HSPシステム制御命令
 *idsrc
 	getstr ln,wrt,i				; lnidxを取得
 	if strsize=0 : goto *chkfin
+	if peek(ln,0)='@' {			; file情報行
+		i+=strsize
+		goto *idsrc
+	}
 	ln2=ln
 	poke ln2,c,0				; ln2をaと同じ長さに合わせる
 
 	if ln2=a : ansln.lnnum=i : ansbuf+=ln+"\n" : lnnum+
+
 	i+=strsize
 	getstr ln,wrt,i:i+=strsize		; 1行を読み飛ばす
 
