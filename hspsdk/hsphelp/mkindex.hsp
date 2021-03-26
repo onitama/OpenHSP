@@ -7,6 +7,11 @@
 	#include "mod_hs.as"
 	#packopt name "mkindex"
 	;
+	helpname="hsphelp"
+	if sysinfo(3)=0 : helpname+="_en"
+	helpdir=dir_exe+"/"+helpname
+
+	chdir helpdir
 	;
 	ihelp_init msg			;index build
 	mes msg

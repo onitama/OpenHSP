@@ -280,7 +280,7 @@ Other commands
 	ih_ans_dll@ = ans_dll
 	;
 	exist ans_name
-	if strsize<0 : dialog "ファイル["+ans_name+"]がありません." : lnidx=-1 : return
+	if strsize<0 : dialog "No file ["+ans_name+"]." : lnidx=-1 : return
 
 	;	Helpのnote項目を取得
 	;
@@ -318,6 +318,8 @@ Other commands
 	;
 	noteget tmp,0
 	if tmp!="%index" : lnidx=-1 : return 1
+	noteget ans_title,2
+	ih_ans_title@ = ans_title
 	;
 	c=0
 	a=""

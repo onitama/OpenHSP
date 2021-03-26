@@ -7,16 +7,15 @@
 	#include "mod_hs.as"
 	#packopt name "helpmes"
 	;
+	helpname="hsphelp"
+	if sysinfo(3)=0 : helpname+="_en"
+	helpdir=dir_exe+"/"+helpname
+
+	chdir helpdir
 	;
 	ihelp_init msg			;index build
 	;
 	s1=dir_cmdline
-	if s1!="" {
-		getstr s2,s1,0,32
-		i=strsize
-		getstr s2,s1,i,32
-		s1=s2
-	}
 
 	if s1="" {
 		mes msg
@@ -36,9 +35,11 @@
 	mes ih_prminf
 	mes ih_info
 
-	mes "Group:"+ih_group
 	mes "Module:"+ih_ans_dll
 	mes "Reference:"
 	mes ih_refinf
+
+	ihelp_info
+	mes ih_opt
 
 	end
