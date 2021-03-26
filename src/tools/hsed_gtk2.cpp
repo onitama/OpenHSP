@@ -22,7 +22,7 @@ static GtkWidget *status_bar;
 static char filename[1024];
 static char hspdir[1024];
 static char curdir[1024];
-static char complog[65535];
+static char complog[0x40000];
 static char barmsg[1024];
 static int	text_mod;
 static int	current_line;
@@ -34,10 +34,11 @@ static char langstr[8];
 static GdkColor colorBg;
 static GdkColor colorText;
 
-#define HSED_VER "ver.0.81"
+#define HSED_VER "ver.0.82"
 #define TEMP_HSP "__hsptmp.hsp"
 #define TEMP_AX "__hsptmp.ax"
 #define TEMP_HSPRES ".hspres"
+#define HELPMES_AX "helpmes.ax"
 
 #define HSED_INI ".hsedconf"
 
@@ -49,6 +50,8 @@ static std::string event_errmsg;	// Error Message
 #define STR_HSPERROR "#Error "		// ランタイムエラー識別用タグ
 #define STR_HSPERROR2 "in line "	// ランタイムエラー識別用タグ
 #define STR_HSPERROR3 "-->"		// ランタイムエラー識別用タグ
+
+static GtkWidget *log_window = NULL;
 
 /*--------------------------------------------------------------------------------*/
 
@@ -615,10 +618,15 @@ void HSP_view_log(){
 	GtkWidget *log;
 	//int i=0;
 
+	if (log_window) {
+		gtk_widget_destroy(GTK_WIDGET(log_window));
+		//gtk_close_window(log_window);
+	}
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_signal_connect (GTK_OBJECT(window), "destroy",
-			GTK_SIGNAL_FUNC(gtk_main_quit), NULL);
-	gtk_window_set_title (GTK_WINDOW(window), "HSP Compile log");
+	log_window = window;
+	//gtk_signal_connect (GTK_OBJECT(window), "destroy",
+	//		GTK_SIGNAL_FUNC(gtk_main_quit), NULL);
+	gtk_window_set_title (GTK_WINDOW(window), "HSP log window");
 	gtk_window_set_default_size(GTK_WINDOW(window),640,240);
 
 	vbox = gtk_vbox_new (FALSE, 1);
@@ -649,7 +657,7 @@ void HSP_view_log(){
 	gtk_widget_show(window);
 
 	//gtk_grab_add(GTK_WIDGET(window));
-	gtk_main();
+	//gtk_main();
 }
 static void HSP_complog(GtkWidget *w,gpointer data )
 {
@@ -868,6 +876,125 @@ static void HSP_run(GtkWidget *w,int flag)
 	event_timer=g_timeout_add( 500,(GSourceFunc)update_edit, NULL );
 }
 
+
+int getUTF8Offset( char *target, int offset )
+{
+	//		UTF8文字列のoffset位置の文字を取得する
+	//
+	unsigned char *p;
+	unsigned char *base;
+	unsigned char a1;
+	int left = offset;
+	p = (unsigned char *)target;
+	base = p;
+	while(1) {
+		if ( left<=0 ) break;
+		a1=*p;if ( a1==0 ) break;
+		p++;							// 検索位置を移動
+		if (a1>=128) {					// 多バイト文字チェック
+			if (a1>=192) p++;
+			if (a1>=224) p++;
+			if (a1>=240) p++;
+			if (a1>=248) p++;
+			if (a1>=252) p++;
+		}
+		left--;
+	}
+
+	a1=*p;
+	if (( a1>='0' )&&( a1<='9' )) {
+		return (int)a1;
+	}
+	if ( a1=='#' ) {
+		return (int)a1;
+	}
+	if (( a1<'@' )||( a1>'z' )) {
+		return 0;
+	}
+	return (int)a1;
+}
+
+void getKeywordFromBuffer( char *target, int offset, char *outbuf, int maxsize )
+{
+	//		offsetからキーワードを抽出する
+	//
+	int i=0;
+	int base = offset;
+	int a;
+	while(1) {
+		if ( i >= maxsize ) break;
+		a = getUTF8Offset( target, base++ );
+		if ( a == 0 ) break;
+		outbuf[i++] = (char)a;
+	}
+	outbuf[i++] = 0;
+}
+
+void getLineFromBuffer( char *target, int line, char *outbuf, int maxsize )
+{
+	//		指定された行を取得する
+	//
+	int left = line;
+	int a;
+	strsp_ini();
+	while(1) {
+		if ( left == 0 ) break;
+		a = strsp_get( target, outbuf, 0, maxsize );
+		if ( a == 0 ) break;
+		left--;
+	}
+	strsp_get( target, outbuf, 0, maxsize );
+}
+
+static void HSP_help(GtkWidget *w,int flag)
+{
+	GtkTextIter start;
+	GtkTextIter end;
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_get_start_iter(tbuf,&start);
+	gtk_text_buffer_get_end_iter(tbuf,&end);
+	char *buf = gtk_text_buffer_get_text(tbuf,&start,&end,TRUE);
+	char linebuf[1024];
+	char helpkw[1024];
+	char mydir[1024];
+	char cmd[1024];
+	FILE *fp;
+	int p;
+
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_mark(tbuf,
+	      &iter, gtk_text_buffer_get_insert(tbuf));
+	int offset = (int)gtk_text_iter_get_line_offset( &iter );
+	int line = (int)gtk_text_iter_get_line( &iter );
+	getLineFromBuffer(buf,line,linebuf,1024);
+	while(1) {
+		if ( offset == 0 ) break;
+		p = getUTF8Offset(linebuf,offset-1);
+		if ( p == 0 ) break;
+		offset--;
+	}
+	getKeywordFromBuffer( linebuf, offset, helpkw, 1023 );
+	//printf("Call help [%s]\r\n",helpkw);
+
+	getcwd(mydir,1024);
+	chdir(hspdir);
+
+	sprintf(cmd,"%s/hsp3cl %s \"%s\"",hspdir,HELPMES_AX,helpkw);
+
+	//	プロセスから結果を取得
+	p = 0;
+	fp=popen(cmd,"r");
+	while(feof(fp)==0){
+		p+=fread(complog+p,1,400,fp);
+	}
+	complog[p]='\0';
+	//printf(complog);
+	pclose(fp);
+	chdir(mydir);
+
+	HSP_view_log();
+}
+
 //	MENU
 //
 static GtkItemFactoryEntry menu_items[] = {
@@ -891,6 +1018,7 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/HSP/_Make start.ax",	NULL,		(GtkSignalFunc)HSP_run, 1, NULL },
 	{ "/HSP/_Compile log",	"F7",		(GtkSignalFunc)HSP_run, 2, NULL },
 	{ "/_Help",		NULL,		NULL, 0, "<Branch>" },
+	{ "/_Help/Keyword Help", "F1",	(GtkSignalFunc)HSP_help,		0, NULL },
 	{ "/_Help/About", NULL,	(GtkSignalFunc)hsed_about,		0, NULL },
 };
 
@@ -915,7 +1043,8 @@ static GtkItemFactoryEntry menu_items_ja[] = {
 	{ "/HSP/START.AXファイル作成",	NULL,		(GtkSignalFunc)HSP_run, 1, NULL },
 	{ "/HSP/コンパイルのみ",	"F7",		(GtkSignalFunc)HSP_run, 2, NULL },
 	{ "/_ヘルプ",		NULL,		NULL, 0, "<Branch>" },
-	{ "/_ヘルプ/バージョン情報...", NULL,	(GtkSignalFunc)hsed_about,		0, NULL },
+	{ "/ヘルプ/キーワード検索", "F1",	(GtkSignalFunc)HSP_help,		0, NULL },
+	{ "/ヘルプ/バージョン情報...", NULL,	(GtkSignalFunc)hsed_about,		0, NULL },
 };
 
 
