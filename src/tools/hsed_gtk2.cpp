@@ -52,6 +52,7 @@ static std::string event_errmsg;	// Error Message
 #define STR_HSPERROR3 "-->"		// ランタイムエラー識別用タグ
 
 static GtkWidget *log_window = NULL;
+static GtkWidget *log_edit;
 
 /*--------------------------------------------------------------------------------*/
 
@@ -244,7 +245,7 @@ static int status;
 static void hsed_about(GtkWidget *w,int d)
 {
 	int res;
-	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2020(C) onion software" );
+	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2021(C) onion software" );
 }
 
 void file_dlg_cancel(GtkWidget *widget,GtkWidget *dlg){
@@ -611,52 +612,63 @@ static void cursor_move_line(GtkWidget *w,int d)
 }
 
 /////////////////////////  HSP ///////////////////////////////
-void HSP_view_log(){
-	GtkWidget *window;
-	GtkWidget *vbox;
-	GtkWidget *scroll;
-	GtkWidget *log;
-	//int i=0;
-
+void HSP_log_quit(GtkWidget *widget,GtkWidget *dlg){
 	if (log_window) {
 		gtk_widget_destroy(GTK_WIDGET(log_window));
 		//gtk_close_window(log_window);
+		log_window = NULL;
+		log_edit = NULL;
 	}
-	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	log_window = window;
-	//gtk_signal_connect (GTK_OBJECT(window), "destroy",
-	//		GTK_SIGNAL_FUNC(gtk_main_quit), NULL);
-	gtk_window_set_title (GTK_WINDOW(window), "HSP log window");
-	gtk_window_set_default_size(GTK_WINDOW(window),640,240);
+}
 
-	vbox = gtk_vbox_new (FALSE, 1);
-	gtk_container_add(GTK_CONTAINER(window), vbox);
-	gtk_widget_show(vbox);
 
-	scroll=gtk_scrolled_window_new(NULL,NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
-	gtk_widget_show(scroll);
+void HSP_view_log(){
+	GtkWidget *vbox;
+	GtkWidget *scroll;
+	int update=0;
 
-	//log = gtk_text_new(0,0);
-	log = gtk_text_view_new();
-	gtk_container_add(GTK_CONTAINER(scroll), log);
-	//gtk_text_set_editable(GTK_TEXT(log),TRUE);
+	if (log_window == NULL) {
 
-	gdk_color_parse("#C0C0C0", &colorBg);
-	gdk_color_parse("#222222", &colorText);
+		log_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+		gtk_signal_connect (GTK_OBJECT(log_window), "destroy",
+				GTK_SIGNAL_FUNC(HSP_log_quit), NULL);
+		gtk_window_set_title (GTK_WINDOW(log_window), "HSP log window");
+		gtk_window_set_default_size(GTK_WINDOW(log_window),640,240);
 
-    gtk_widget_modify_base (log, GTK_STATE_NORMAL, &colorBg);
-    gtk_widget_modify_text (log, GTK_STATE_NORMAL, &colorText);
+		vbox = gtk_vbox_new (FALSE, 1);
+		gtk_container_add(GTK_CONTAINER(log_window), vbox);
+		gtk_widget_show(vbox);
 
-        GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(log));
-        gtk_text_buffer_set_text(tbuf,complog,strlen(complog));
+		scroll=gtk_scrolled_window_new(NULL,NULL);
+		gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+		gtk_widget_show(scroll);
 
-	gtk_widget_show(log);
-	//gtk_editable_insert_text(GTK_EDITABLE(log),complog,strlen(complog),&i);
+		log_edit = gtk_text_view_new();
+		gtk_container_add(GTK_CONTAINER(scroll), log_edit);
+		//gtk_text_set_editable(GTK_TEXT(log_edit),TRUE);
 
-	gtk_widget_show(window);
+		gdk_color_parse("#C0C0C0", &colorBg);
+		gdk_color_parse("#222222", &colorText);
 
-	//gtk_grab_add(GTK_WIDGET(window));
+	    gtk_widget_modify_base (log_edit, GTK_STATE_NORMAL, &colorBg);
+	    gtk_widget_modify_text (log_edit, GTK_STATE_NORMAL, &colorText);
+
+		update = 1;
+	}
+
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(log_edit));
+	gtk_text_buffer_set_text(tbuf,complog,strlen(complog));
+
+	if ( update ) {
+		gtk_widget_show(log_edit);
+		//gtk_editable_insert_text(GTK_EDITABLE(log_edit),complog,strlen(complog),&i);
+
+		gtk_widget_show(log_window);
+	} else {
+		gtk_window_present (GTK_WINDOW(log_window));
+	}
+
+	//gtk_grab_add(GTK_WIDGET(log_window));
 	//gtk_main();
 }
 static void HSP_complog(GtkWidget *w,gpointer data )
@@ -946,6 +958,24 @@ void getLineFromBuffer( char *target, int line, char *outbuf, int maxsize )
 	strsp_get( target, outbuf, 0, maxsize );
 }
 
+
+void getCommandResult( char *cmd )
+{
+	//	プロセスから結果を取得
+	int p;
+	FILE *fp;
+
+	p = 0;
+	fp=popen(cmd,"r");
+	while(feof(fp)==0){
+		p+=fread(complog+p,1,400,fp);
+	}
+	complog[p]='\0';
+	//printf(complog);
+	pclose(fp);
+}
+
+
 static void HSP_help(GtkWidget *w,int flag)
 {
 	GtkTextIter start;
@@ -958,7 +988,6 @@ static void HSP_help(GtkWidget *w,int flag)
 	char helpkw[1024];
 	char mydir[1024];
 	char cmd[1024];
-	FILE *fp;
 	int p;
 
 	GtkTextIter iter;
@@ -979,20 +1008,19 @@ static void HSP_help(GtkWidget *w,int flag)
 	getcwd(mydir,1024);
 	chdir(hspdir);
 
-	sprintf(cmd,"%s/hsp3cl %s \"%s\"",hspdir,HELPMES_AX,helpkw);
-
-	//	プロセスから結果を取得
-	p = 0;
-	fp=popen(cmd,"r");
-	while(feof(fp)==0){
-		p+=fread(complog+p,1,400,fp);
+	p = dpm_exist( HELPMES_AX );
+	if ( p <= 0 ) {
+		sprintf( cmd, "%s/hspcmp -i -u hspsdk/hsphelp/helpmes.hsp -o%s/%s", hspdir, hspdir,HELPMES_AX );
+		getCommandResult(cmd);
 	}
-	complog[p]='\0';
-	//printf(complog);
-	pclose(fp);
+
+	sprintf(cmd,"%s/hsp3cl %s \"%s\"",hspdir,HELPMES_AX,helpkw);
+	getCommandResult(cmd);
+
 	chdir(mydir);
 
 	HSP_view_log();
+	gtk_window_present (GTK_WINDOW(window));
 }
 
 //	MENU
@@ -1018,7 +1046,7 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/HSP/_Make start.ax",	NULL,		(GtkSignalFunc)HSP_run, 1, NULL },
 	{ "/HSP/_Compile log",	"F7",		(GtkSignalFunc)HSP_run, 2, NULL },
 	{ "/_Help",		NULL,		NULL, 0, "<Branch>" },
-	{ "/_Help/Keyword Help", "F1",	(GtkSignalFunc)HSP_help,		0, NULL },
+	{ "/_Help/Search Keyword", "F1",	(GtkSignalFunc)HSP_help,		0, NULL },
 	{ "/_Help/About", NULL,	(GtkSignalFunc)hsed_about,		0, NULL },
 };
 
