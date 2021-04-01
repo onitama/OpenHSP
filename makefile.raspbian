@@ -45,6 +45,7 @@ OBJS = \
 	src/hsp3dish/raspbian/hsp3dish.do \
 	src/hsp3dish/linux/webtask_linux.do \
 	src/hsp3/linux/hsp3ext_sock.do \
+	src/hsp3/linux/hsp3ext_linux.do \
 	src/hsp3/linux/devctrl_io.do \
 	src/hsp3dish/linux/supio_linux.do
 

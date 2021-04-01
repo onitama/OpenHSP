@@ -81,6 +81,10 @@ static int hsp_limit_step_per_frame;
 static std::string syncdir;
 static bool fs_initialized = false;
 
+static int cl_option;
+static char *cl_cmdline = "";
+static char *cl_modname = "";
+
 static engine	mem_engine;
 static DISPMANX_ELEMENT_HANDLE_T dispman_element;
 static DISPMANX_DISPLAY_HANDLE_T dispman_display;
@@ -165,8 +169,11 @@ static int	GetIniFileInt( char *keyword )
 
 /*----------------------------------------------------------*/
 
-static int mouseFd = -1;
-static int keyboardFd = -1;
+static const int dev_max = 16;
+static int devFd[dev_max];
+static int devMouseFg[dev_max];
+static int devIdx = 0;
+
 static int quit_flag = 0;
 static int mouse_x, mouse_y, mouse_btn1, mouse_btn2;
 
@@ -179,73 +186,87 @@ struct input_event ev[64];
 
 static void initKeyboard( void )
 {
-	DIR *dirp;
-	struct dirent *dp;
-	regex_t kbd,mouse;
+        DIR *dirp;
+        struct dirent *dp;
+        regex_t mouse;
+        regex_t kbd;
 
-	char fullPath[1024];
-	static char *dirName = "/dev/input/by-id";
-	int i;
+        char fullPath[1024];
+        static char *dirName = "/dev/input/by-id";
+        int i;
 
-	if(regcomp(&kbd,"event-kbd",0)!=0)
-	{
-	    printf("regcomp for kbd failed\n");
-	    return;
+        for (i = 0; i < dev_max; i++) {
+                devFd[i] = -1;
+                devMouseFg[i] = 0;
+        }
 
-	}
-	if(regcomp(&mouse,"event-mouse",0)!=0)
-	{
-	    printf("regcomp for mouse failed\n");
-	    return;
+        if(regcomp(&kbd,"event-kbd",0)!=0)
+        {
+            printf("regcomp for kbd failed\n");
+            return;
 
-	}
+        }
 
-	if ((dirp = opendir(dirName)) == NULL) {
-	    perror("couldn't open '/dev/input/by-id'");
-	    return;
-	}
+        if(regcomp(&mouse,"event-mouse",0)!=0)
+        {
+            printf("regcomp for mouse failed\n");
+            return;
 
-	// Find any files that match the regex for keyboard or mouse
+        }
 
-	do {
-	    errno = 0;
-	    if ((dp = readdir(dirp)) != NULL) 
-	    {
-		//printf("readdir (%s)\n",dp->d_name);
-		if(regexec (&kbd, dp->d_name, 0, NULL, 0) == 0)
-		{
-		    //printf("match for the kbd = %s\n",dp->d_name);
-		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
-		    keyboardFd = open(fullPath,O_RDONLY | O_NONBLOCK);
-		    //printf("%s Fd = %d\n",fullPath,keyboardFd);
+        if ((dirp = opendir(dirName)) == NULL) {
+            perror("couldn't open '/dev/input/by-id'");
+            return;
+        }
 
-		}
-		if(regexec (&mouse, dp->d_name, 0, NULL, 0) == 0)
-		{
-		    //printf("match for the kbd = %s\n",dp->d_name);
-		    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
-		    mouseFd = open(fullPath,O_RDONLY | O_NONBLOCK);
-		    //printf("%s Fd = %d\n",fullPath,mouseFd);
-		    //printf("Getting exclusive access: ");
-		    ioctl(mouseFd, EVIOCGRAB, 1);
-		    //printf("%s\n", (result == 0) ? "SUCCESS" : "FAILURE");
-		}
 
-	    }
-	} while (dp != NULL);
+        // Find any files that match the regex for keyboard and mouse
+        devIdx = 0;
+        do {
+            errno = 0;
+            if ((dp = readdir(dirp)) != NULL) 
+            {
+                //printf("readdir (%s)\n",dp->d_name);
+                if(regexec (&kbd, dp->d_name, 0, NULL, 0) == 0)
+                {
+                    int fd;
+                    sprintf(fullPath,"%s/%s", dirName, dp->d_name);
+                    fd = open(fullPath, O_RDONLY | O_NONBLOCK);
+                    devFd[devIdx] = fd;
+                    devIdx++;
+                    //printf("match kbd : %s , devFd : %d\n", fullPath, fd);
+                }
 
-	closedir(dirp);
+                if(regexec (&mouse, dp->d_name, 0, NULL, 0) == 0)
+                {
+                    int result;
+                    int fd;
+                    sprintf(fullPath,"%s/%s",dirName,dp->d_name);
+                    fd = open(fullPath, O_RDONLY | O_NONBLOCK);
+                    devFd[devIdx] = fd;
+                    devMouseFg[devIdx] = 1;
+                    devIdx++;
+                    //printf("match mouse : %s , devFd : %d\n", fullPath, fd);
 
-	regfree(&kbd);
-	regfree(&mouse);
+                    result = ioctl(fd, EVIOCGRAB, 1);
+                    //printf("Getting exclusive access: %s\n", ((result == 0) ? "SUCCESS" : "FAILURE"));
+                }
 
-	mouse_x = (int)mem_engine.width / 2;
-	mouse_y = (int)mem_engine.height / 2;
-	mouse_btn1 = 0;
-	mouse_btn2 = 0;
-	for(i=0;i<KEY_MAX;i++) {
-		key_map[i] = 0;
-	}
+            }
+        } while (dp != NULL && devIdx < dev_max);
+
+        closedir(dirp);
+
+        regfree(&mouse);
+        regfree(&kbd);
+
+        mouse_x = (int)mem_engine.width / 2;
+        mouse_y = (int)mem_engine.height / 2;
+        mouse_btn1 = 0;
+        mouse_btn2 = 0;
+        for(i=0;i<KEY_MAX;i++) {
+                key_map[i] = 0;
+        }
 
 }
 
@@ -253,70 +274,64 @@ static void updateKeyboard( void )
 {
     int rd;
     int sx,sy;
-	if((keyboardFd == -1) || (mouseFd == -1)) return;
+    if (devIdx <= 0) return;
 
-	sx = (int)mem_engine.width;
-	sy = (int)mem_engine.height;
+    sx = (int)mem_engine.width;
+    sy = (int)mem_engine.height;
 
-    // Read events from mouse
+    // Read events from keyboard or mouse
+    for (int idx = 0; idx < devIdx; idx ++) {
+        if (devFd[idx] == -1) continue;
 
-    rd = read(mouseFd,ev,sizeof(ev));
-    if(rd > 0) {
-		int count,n;
-		struct input_event *evp;
+        rd = read(devFd[idx], ev, sizeof(ev));
+        if (rd <= 0) continue;
 
-		count = rd / sizeof(struct input_event);
-		n = 0;
-		while(count--) {
-			evp = &ev[n++];
-			if(evp->type == 1) {
-				if(evp->code == BTN_LEFT)  {
-					//printf("Left button(%d)\n",evp->value);
-					mouse_btn1 = evp->value;
-			    }
-				if(evp->code == BTN_RIGHT)  {
-					//printf("Right button(%d)\n",evp->value);
-					mouse_btn2 = evp->value;
-			    }
-			}
-	
-			if(evp->code == 0) {
-			    // Mouse Left/Right
-			    //printf("Mouse moved left/right %d\n",evp->value);
-			    mouse_x += evp->value;
-			    if ( mouse_x < 0 ) mouse_x = 0;
-			    if ( mouse_x >= sx ) mouse_x = sx-1;
-			}
-		
-			if(evp->code == 1) {
-			    // Mouse Up/Down
-			    //printf("Mouse moved up/down %d\n",evp->value);
-			    mouse_y += evp->value;
-			    if ( mouse_y < 0 ) mouse_y = 0;
-			    if ( mouse_y >= sy ) mouse_y = sy-1;
-			}
-	    }
-	}
+        int count, n;
+        struct input_event *evp;
 
-    // Read events from keyboard
+        count = rd / sizeof(struct input_event);
+        n = 0;
+        while(count--) {
+            evp = &ev[n++];
+        
+            if(evp->type == 1) {
+                // check keyboard
+                if (( evp->code >= 0 )&&( evp->code < KEY_MAX )) {
+                    key_map[evp->code] = evp->value;
+                }
 
-    rd = read(keyboardFd,ev,sizeof(ev));
-    if(rd > 0) {
-		int count,n;
-		struct input_event *evp;
-		count = rd / sizeof(struct input_event);
-		n = 0;
-		while(count--) {
-		    evp = &ev[n++];
-		    if(evp->type == 1) {
-				if (( evp->code >= 0 )&&( evp->code < KEY_MAX )) {
-					key_map[evp->code] = evp->value;
-				}
-				if((evp->code == KEY_ESC) && (evp->value == 1)) {
-				    quit_flag = 1;
-				}
-			}
-		}
+                if((evp->code == KEY_ESC) && (evp->value == 1)) {
+                    quit_flag = 1;
+                }
+                
+                // check mouse button
+                if(evp->code == BTN_LEFT)  {
+                    //printf("Left button(%d)\n",evp->value);
+                    mouse_btn1 = evp->value;
+                }
+            
+                if(evp->code == BTN_RIGHT)  {
+                    //printf("Right button(%d)\n",evp->value);
+                    mouse_btn2 = evp->value;
+                }
+            }
+        
+            if(evp->code == 0) {
+                // Mouse move Left/Right
+                //printf("Mouse moved left/right %d\n",evp->value);
+                mouse_x += evp->value;
+                if ( mouse_x < 0 ) mouse_x = 0;
+                if ( mouse_x >= sx ) mouse_x = sx-1;
+            }
+                
+            if(evp->code == 1) {
+                // Mouse move Up/Down
+                //printf("Mouse moved up/down %d\n",evp->value);
+                mouse_y += evp->value;
+                if ( mouse_y < 0 ) mouse_y = 0;
+                if ( mouse_y >= sy ) mouse_y = sy-1;
+            }
+        }
     }
 
 }
@@ -324,11 +339,11 @@ static void updateKeyboard( void )
 
 static void doneKeyboard( void )
 {
-	if (keyboardFd!=-1) close(keyboardFd);
-	if (mouseFd!=-1) {
-	    ioctl(mouseFd, EVIOCGRAB, 0);
-		close(mouseFd);
-	}
+    for (int i = 0; i < dev_max; i++ ) {
+        if (devFd[i] == -1) continue;
+        if (devMouseFg[i] != 0) ioctl(devFd[i], EVIOCGRAB, 0);
+        close(devFd[i]);
+    }
 }
 
 
@@ -714,7 +729,14 @@ int hsp3dish_init( char *startfile )
 		return 1;
 	}
 
-	hgio_setmainarg( hsp_mainpath, startfile );
+	ctx = &hsp->hspctx;
+
+	//		コマンドライン関連
+	hsp->SetCommandLinePrm( cl_cmdline );		// コマンドラインパラメーターを保存
+	hsp->SetModuleFilePrm( cl_modname );			// モジュール名を保存
+
+	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
 
 	//		Initalize Window
 	//
@@ -724,6 +746,12 @@ int hsp3dish_init( char *startfile )
 	autoscale = 0;
 
 	initKeyboard();
+
+	//		Register Type
+	//
+	drawflag = 0;
+	ctx->msgfunc = hsp3dish_msgfunc;
+
 
 //#ifdef HSPDEBUG
 	if ( OpenIniFile( "hsp3dish.ini" ) == 0 ) {
@@ -740,14 +768,6 @@ int hsp3dish_init( char *startfile )
 	if ( sy == 0 ) sy = hsp_wy;
 
 //#endif
-
-	ctx = &hsp->hspctx;
-
-	//		Register Type
-	//
-	drawflag = 0;
-	ctx->msgfunc = hsp3dish_msgfunc;
-
 
 	if ( sx != hsp_wx || sy != hsp_wy ) {
 #ifndef HSPDISHGP
@@ -919,4 +939,32 @@ int hsp3dish_exec( void )
 	hsp3dish_bye();
 	return endcode;
 }
+
+
+void hsp3dish_option( int opt )
+{
+	//		HSP3オプション設定
+	//
+	cl_option = opt;
+}
+
+
+void hsp3dish_cmdline( char *cmdline )
+{
+	//		HSP3オプション設定
+	//
+	cl_cmdline = cmdline;						// コマンドラインパラメーターを入れる
+}
+
+
+void hsp3dish_modname( char *modname )
+{
+	//		HSP3オプション設定
+	//
+	cl_modname = modname;						// arg[0]パラメーターを入れる
+}
+
+
+
+
 
