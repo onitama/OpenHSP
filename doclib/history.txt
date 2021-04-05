@@ -5,6 +5,13 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
+	2021/03/16 3.6 beta6
+
+	実行ファイル作成時にコマンドライン引数に余計なスペースが入る不具合を修正
+	[hspinet] リクエストに関する文字列の長さ制限を撤廃
+	Windows版のHSP3,HSP3CL,HSP3Dishでdirinfo,sysinfoが同じ仕様になるように修正
+	Linux/RaspberryPi版のスクリプトエディタにF1キー(ワンキーヘルプ)の機能を追加
+
 	2021/03/03 3.6 beta5
 
 	hspextプラグインのcomputb命令が変数バッファサイズを少なく認識する不具合を修正

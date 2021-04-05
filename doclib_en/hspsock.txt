@@ -1,0 +1,344 @@
+------------------------------------------------------------------------------
+HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor  
+HSP Extension DLL Reference copyright 1999-2014 (c) onion software
+------------------------------------------------------------------------------
+
+・ Introduction
+
+This DLL can be used in various ways by using it with Hot Soup Processor ver3 or later.
+It is a plug-in module that can be expanded.
+By using this extension DLL, new instructions are added and TCP / IP socket communication
+Functions can be controlled from HSP.
+These instructions are for tools and utilities that cannot be realized by HSP alone.
+There are many things that are useful for creating, and it enables more advanced application development.
+
+
+・ Installation
+
+The extension plug-in file, HSPSOCK.DLL, has HSED3.EXE and HSP3.EXE.
+Place it in the same location as the directory.
+(If HSPSOCK.DLL is not in the same directory as the HSP3.EXE used for execution
+Will result in an error)
+Also, when creating a script, set HSPSOCK.AS to the same direction as the script.
+Put it in the bird and be sure to add the line "#include" hspsock.as "" at the beginning of the script
+please. With the above, the function of HSP has been expanded and explained in this reference.
+You will be able to use the instructions you are using.
+First of all, try running the included sample script.
+You should be able to see a simple usage example of the enhanced functionality.
+
+
+ツキimportant point
+
+HSPSOCK.DLL is a plug-in file that is used at the same time as HSP3.EXE.
+Even if you create an EXE file, put HSPSOCK.DLL in the same directory as the EXE file.
+It will not work unless it is placed in. Also, you cannot add DLLs to the packfile.
+
+
+繝サ Copyright and contact information
+
+Of the original software (executable file) created by the user using HSP
+The right belongs to the user who created it.
+HSPSOCK.DLL can be freely distributed regardless of whether it is paid or free of charge.
+There is no obligation to display the copyright.
+Onion software copyrights the original software created by the user
+I have no claim.
+
+The HSPSOCK plug-in is a copyrighted work of onion software.
+onion software is responsible for any damage caused by this program.
+We do not guarantee. Use at your own risk.
+HSPDB.DLL is compiled with Microsoft Visual C ++ 7.1.
+
+
+・ Instruction list
+
+sockopen p1, "url", p2 Initialize socket and connect
+sockclose p1 Disconnect socket
+sockput "message", send p1 data
+sockputc p1, p2 1 byte data transmission
+sockputb p1, p2, p3, p4 Send buffer data
+receive sockget p1, p2, p3 data
+sockgetc p1, p2 Receive 1 byte of data
+sockgetb p1, p2, p3, p4 Receive data in buffer
+sockmake p1, p2 Initialize socket as server
+sockwait p1, p2 Wait for incoming client
+sockcheck p1 Check data arrival
+ipget Get the IP address of the host
+
+
+-TCP / IP socket communication command
+
+An instruction set for communicating with the Internet via LAN or ppp.
+Sockets not only on the Internet but also on networks connected by the TCP / IP protocol
+You can access it using.
+This makes it possible to create clients such as HTTP, FTP, and TELNET.
+Asynchronous communication and server functionality are supported in the current version
+I don't.
+
+When performing TCP / IP communication, it is necessary to initialize it first.
+When initializing as a server, use the sockmake instruction as a client.
+To initialize, use the sockopen instruction.
+In either case, the sock close instruction must be used to disconnect after communication is complete.
+Also, sockets have IDs from 0 to 31, and you can use multiple sockets at the same time.
+I can do it.
+For details on TCP / IP communication and protocols, see specialized books and documents.
+please refer to.
+
+
+sockopen p1, "url", p2 Initialize socket and connect
+
+p1 = 0 to 31 (0): Socket ID number
+"url": URL specification string
+p2 = 0 to (0): Port number
+
+揃Description
+
+Initializes the socket so that it can be used.
+When performing TCP / IP communication, be sure to initialize it first and the other server
+Must be connected to.
+Specify the socket ID number with p1.
+Specify the URL of the connection destination as a character string with "url". This is "www.yahoo.co.jp"
+Directly a domain name such as "202.132.50.7" or an IP address such as "202.132.50.7"
+It doesn't matter which one you specify.
+Do not enter scheme names such as "http: //" or "ftp: //".
+In p2, specify the port number to connect to. What kind of server is this
+It depends on whether you connect to. If you want to create your own port
+Make sure to use 1024 or later.
+The result of executing the sockopen instruction is assigned to the system variable stat.
+If the result is an error, it will be a non-zero value. An error occurred during initialization
+In that case, communication is not possible.
+The details of the value of the system variable stat are as follows.
+
+stat error details
+		  --------------------------------
+1: TCP / IP is not installed on Windows
+2: Socket initialization failed
+3: Failed to get the server name of the URL
+4: Could not connect to the server
+
+sockclose p1 Disconnect socket
+
+p1 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+Disconnect the connected socket.
+Be sure to disconnect the initialized socket with the sockclose instruction.
+give me.
+
+sockput "message", send p1 data
+
+"message": Message to send
+p1 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+Sends data to the socket. The character string specified by "message" or
+Or send the contents of the string type variable as it is.
+If an error occurs during transmission, the system variable stat is non-zero.
+The value is assigned.
+
+sockputc p1, p2 1 byte data transmission
+
+p1 = 0 to 255 (0): Message to be sent (1 byte)
+p2 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+Sends data to the socket. Send 1 byte of the numerical value specified by p1
+To do. If an error occurs during transmission, the system variable stat
+A non-zero value is assigned.
+
+sockputb p1, p2, p3, p4 Send buffer data
+
+p1 = variable: variable name where the transmission contents are stored
+p2 = 0 to (0): Buffer offset (in bytes)
+p3 = 0 to (64): Transmission size (byte unit)
+p4 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+The contents of the variable buffer specified by p1 are stored in the socket as binary data.
+I will send.
+The variable specified by p1 can be either a string type or a numeric type.
+The contents of the memory allocated by the variable are sent directly.
+You can specify the variable buffer offset with p2.
+For example, if p2 is 100, the content from the 100th byte from the beginning is sent.
+It will be. If p2 is omitted, it will be 0.
+Specify the transmission size with p3.
+The transmission size is within the size reserved in the variable buffer in advance.
+Must be.
+If p3 is omitted or 0, 64 (byte) is specified.
+After the sockputb instruction was executed, it was actually sent to the system variable stat.
+The size (byte) is assigned. The content of the system variable stat was 0
+If it is sent at all with a communication error or timeout
+Indicates that it is not.
+(The contents of the variable buffer can be manipulated with the peek function, poke command, etc.
+Is possible. )
+
+receive sockget p1, p2, p3 data
+
+p1 = variable: variable name where the received contents are stored
+p2 = 0 to (64): Receive size (byte unit)
+p3 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+Receives data from the socket and puts it in a string type variable specified by p1
+Substitute the content. Specify the maximum reception size with p2.
+If an error occurs during reception, the system variable stat is non-zero.
+The value is assigned.
+
+sockgetc p1, p2 Receive 1 byte of data
+
+p1 = variable: variable name where the received contents are stored
+p3 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+Receives 1 byte of data from the socket and converts it to a numeric variable specified by p1.
+Substitute the content.
+If an error occurs during reception, the system variable stat is non-zero.
+The value is assigned.
+
+sockgetb p1, p2, p3, p4 Receive data in buffer
+
+p1 = variable: variable name where the received contents are stored
+p2 = 0 to (0): Buffer offset (in bytes)
+p3 = 0 to (64): Receive size (byte unit)
+p4 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+Receives data from the socket and puts it in the variable buffer specified by p1
+Stores the contents as binary data.
+The variable specified by p1 can be either a string type or a numeric type.
+The received contents are read directly into the memory allocated by the variable.
+
+With p2, you can specify the offset of the buffer to be stored.
+For example, if p2 is 100, the received data will be received from the 100th byte from the beginning.
+It will be stored. If p2 is omitted, it will be 0.
+Specify the maximum reception size with p3.
+When specifying the receive size, store the specified size in the variable buffer.
+As much memory as possible must be reserved in advance.
+If p3 is omitted or 0, 64 (byte) is specified.
+After the sockgetb instruction was executed, it was actually received in the system variable stat.
+The size (byte) is assigned. The content of the system variable stat was 0
+If it is received at all with a communication error or timeout
+Indicates that it is not.
+(The contents of the variable buffer can be manipulated with the peek instruction, poke instruction, etc.
+Is possible. )
+
+sockmake p1, p2 Initialize socket as server
+
+p1 = 0 to 31 (0): Socket ID number
+p2 = 0 to (0): Port number
+
+揃Description
+
+Initializes the socket so that it can be used as a server.
+Specify the socket ID number with p1.
+Specify the port number on p2. Sockets already reserved in the system
+Numbers cannot be used. If you want to define your own protocol, 1024 or later
+It's a good idea to use numbers.
+When the sockmake instruction is executed, it is ready as a server.
+After this, in order to actually connect to the client, use the sockwait instruction.
+You need to wait for the client connection to complete.
+
+If the result is an error, it will be a non-zero value. An error occurred during initialization
+In that case, communication is not possible.
+The details of the value of the system variable stat are as follows.
+
+stat error details
+		  --------------------------------
+1: TCP / IP is not installed on Windows
+2: Socket initialization failed
+3: Socket binding failed
+
+
+sockwait p1, p2 Wait for incoming client
+
+p1 = 0 to 31 (0): Socket ID number
+p2 = 0 to 31 (0): Alternate socket ID number
+
+揃Description
+
+A socket prepared as a server with the sockmake instruction, a client
+Wait for an incoming call. The sockwait instruction always completes the sockmake instruction normally.
+Must be run after.
+
+The sockwait instruction causes an error or when there is no incoming call from the client.
+If so, it returns a non-zero value to the system variable stat.
+Only when 0 is assigned to the system variable stat with the client
+Successful connection and communication such as sockget command and sockput command
+You will be able to do it.
+
+When waiting for an incoming call as a server, use the sockmake instruction to make a socket.
+After initializing as a server, the system variable stat is set by the sockwait instruction.
+Please loop and wait until it reaches 0. In that case, be sure to be in the loop
+It is necessary to insert a wait or await instruction to leave a gap.
+Otherwise, the task won't go to other Windows applications
+It will be.
+
+If p2 is 0 or omitted, through the socket ID number specified in p1
+It is possible to communicate with the client.
+If you specify a value other than 0 for p2, communication with the incoming client is performed.
+This can be done through the alternate socket ID specified on p2.
+In this case, with the socket ID number specified in p1, continue with the sockmake instruction.
+It is possible to perform server operation.
+When accepting multiple client incoming calls on the same port,
+Be sure to use an alternate socket ID number.
+
+If the result is an error, it will be a non-zero value. An error has occurred
+In that case, communication is not possible.
+The details of the value of the system variable stat are as follows.
+
+stat error details
+		  --------------------------------
+1: No connection request from the client
+2: The server is not ready with the sockmake instruction
+3: Socket is not in the receiving state
+4: Failed to put Socket in receive state
+5: Failed to connect to the client
+
+
+ipget Get the IP address of the host
+
+揃Description
+
+Get the IP address of the host and assign it to the system variable refstr.
+If an error occurs when getting the IP address, the system variable stat
+1 is assigned. If the IP address can be obtained normally, the system
+The value of the variable stat will be 0.
+
+
+sockcheck p1 Check the arrival of data
+
+p1 = 0 to 31 (0): Socket ID number
+
+揃Description
+
+Data that can be acquired by sockget type instructions arrives at the specified socket
+Find out if you are.
+If there is data that can be received, 0 is assigned to the system variable stat.
+I will. If no data has arrived, the system variable stat is set to 1.
+Become.
+
+If a communication error occurs, set the system variable stat to a value of 2 or more.
+Become. If an error occurs, communication will not be possible.
+
+The details of the value of the system variable stat are as follows.
+
+stat contents
+		  --------------------------------
+0: Received data has arrived
+1: Received data has not arrived (timeout)
+2: An error occurred during communication
+
+sockcheck only checks the arrival of data. Actual data
+To get it, receive it with instructions such as sockget, sockgetc, sockgetb
+need to do it.
+
+
+-------------------------------------------------------------------------------
+                                                HSP users manual / end of file 
+-------------------------------------------------------------------------------

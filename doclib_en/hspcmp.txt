@@ -1,0 +1,490 @@
+------------------------------------------------------------------------------
+HSPCMP ver3.6                                       HSP : Hot Soup Processor  
+HSP Extension DLL Reference copyright 1999-2020 (c) onion software
+------------------------------------------------------------------------------
+
+・ Introduction
+
+This tool is used in HSP script editor etc. of Hot Soup Processor ver3 or later
+A possible HSP code compiler.
+The DLL version for Windows is provided as hspcmp3.dll.
+(This DLL is used by script editors as well as features from HSP scripts.
+It is also possible to call. When using as an extension plug-in for HSP
+It must be located in the same directory as HSP3.EXE and HSED3.EXE. )
+
+Hspcmp.exe (hspcmp for Linux) is available as a command line version.
+
+
+-Call from the command line
+
+From the command prompt (or shell), hspcmp.exe (hspcmp for Linux)
+You can do it.
+
+The format of the call is as follows.
+
+	hspcmp [options] [filename]
+
+Option list
+
+-o ??? Specify the name of the output object file (.ax) in ???
+-d Generate an object file containing debug information
+-p do preprocess only
+-c Compile in HSP2.55 compatibility mode
+-i Load UTF-8 format script
+-u Output string data in UTF-8 format
+-w Set debug window display flag
+-s Output string data file (strmap)
+-e0, e1, r0, r1 Execute the object file
+                                   (e0 and r0 display only the runtime name)
+                                   (In the case of r, r1, with error code confirmation)
+--syspath = ??? Specify the HSP system folder at runtime
+--compath = ??? Specify the path of the common folder
+
+HSP script from the command line by using the hspcmp tool
+You can compile and execute it.
+
+Example:
+		hspcmp -d -oout.ax test1.hsp
+
+Compiled test1.hsp and included debug information
+Output the object file as out.ax.
+
+Example:
+		hspcmp -e test1.ax
+
+Run the object file test1.ax at HSP runtime.
+
+
+-Call from script
+
+To call the DLL from an HSP script, add the following line to the beginning of the script
+please do it.
+
+	#include "hspcmp.as"
+
+After that, instructions will be added to use the features of the HSP code compiler.
+
+
+・ Instruction details
+
+	hsc_ini "filename"
+
+Initializes HSPCMP.DLL.
+If you want to use the features of HSPCMP.DLL, you need to initialize it first.
+The file specified by "filename" is to be compiled.
+Specify the file name including the extension (it does not have to be as).
+
+	hsc_refname "filename"
+
+Specifies the source script file name displayed in the error message.
+This is because, for example, the name "test.as" is temporarily renamed to "hsptmp".
+Even when saving and compiling, the error message is a "test.as" file
+It is for displaying that an error has occurred inside.
+Change the source script file name from the file specified by hsc_ini
+If you don't need it, you don't have to specify it.
+
+	hsc_objname "filename"
+
+Specify the output object file name.
+
+	hsc_compath "pathname"
+
+Specify the common directory searched by #include.
+"pathname" must always be a string ending in "\\".
+If hsc_compath is not specified, the EXE using hspcmp.dll
+The "common" directory below is referenced.
+
+	hsc_comp p1,p2,p3
+
+Compile the source file with the HSP code compiler and object
+Create a file.
+Whether to output debug information to an object file with the parameter of p1
+Can be specified. Error line if p1 is 0 or omitted
+Debug information required for display etc. is not added to the object file.
+If p1 is 1, debug information is added.
+If p1 is 2, only preprocess processing is performed.
+If p1 is 4, the character string data is converted to UTF-8 code and output.
+If p1 is 8, the character string data file (strmap) used is output.
+If p2 is 0, compile with the "__hsp30__" macro defined.
+If p2 is 1, no macro is defined. This is the script editor
+It is for passing the "Use HSP extension macro" flag to the compiler.
+When the value of p2 is +4 (bit2), the executable file included in the source is automatically created.
+Create a packfile based on the instructions (#pack, #epack, #packopt).
+If p3 is non-zero, object a flag to display the debug window
+Embed in a file.
+In order to execute the hsc_comp instruction, be sure to initialize and file with the hsc_ini instruction.
+Must be specified.
+Also, if necessary, change the object file name output by hsc_objname.
+Specify. (The output file name is specified by hdc_ini by default.
+The extension of the file name will be ".ax")
+If necessary, execute the hsc_refname instruction in advance.
+Please. As a compilation procedure,
+
+1. "hsc_ini"
+↓
+2. "hsc_refname" (optional)
+↓
+3. "hsc_objname" (optional)
+↓
+4. "hsc_comp"
+
+It looks like.
+
+	hsc_getmes p1
+
+HSPCMP.DLL output an error etc. to the character string type variable specified by p1
+Assign a message.
+
+	hsc_clrmes
+
+Clears all message data output by the compiler.
+
+	hsc_ver
+
+HSP code compiler version information in the system variable refstr
+Returns as a string.
+
+	hsc_bye
+
+Performs the termination processing of the HSP code compiler.
+This instruction is executed automatically and is not normally used.
+
+	pack_ini "filename"
+
+Initializes the PACKFILE manager.
+When performing a PACKFILE operation (instruction starting with "pack_"), first
+It needs to be initialized.
+The target of the operation is the file specified by "filename".
+Specify a file name without an extension.
+
+	pack_view
+
+Display the content list with the file specified by pack_ini as a DPM file
+To do. Get the result of pack_view with the hsc_getmes instruction.
+
+	pack_make p1,p2
+
+p1 = 0 = for standard EXE files / 1 = for external DPM files
+p2: Encryption key (0 = use standard key / others = encryption key)
+
+Creates a DPM file with the file name specified in pack_ini.
+In p1, you need to specify whether it is a standard EXE file or a DPM file for external reading.
+Also, when creating a DPM file, you can set the encryption key with p2.
+If you specify 0 for p2, a standard encrypted DPM file (2.61 compatible) is created.
+If you specify a value other than 0 for p2, encryption using that value as the key is performed.
+In this case, if the key with the same value must be specified by the chdpm instruction on the script side when reading DPM,
+Please note that it will not be decrypted as a correct file.
+The files to be included in the DPM file are in the current directory.
+It will be the file specified by the text in "PACK FILE".
+
+	pack_exe p1
+
+p1 = 0 = standard / 1 = full screen mode / 2 = screen saver
+
+Creates an EXE file with the file name specified in pack_ini.
+3 modes with p1 (standard, full screen, screen saver)
+Can be specified.
+The files to be included in the EXE file are in the current directory.
+It will be the file specified by the text in "PACK FILE".
+Also, the HSP runtime file (hsprt) is in the appropriate directory
+Must be placed.
+
+	pack_opt p1,p2,p3
+
+p1 = screen X size (0 or default = 640)
+p2 = screen Y size (0 or default = 480)
+p3 = Operation switch at startup
+
+Options for creating an EXE file with the pack_exe command
+Specify. Specify before executing the pack_exe command
+is needed.
+You can set a special startup operation by specifying the following values for the operation switch at startup specified by p3.
+
+1 = Hide initial window
+2 = No directory move
+
+The operation switch can select the function at the same time by adding.
+Specify 0 if no special operation is required.
+
+	pack_rt "filename"
+
+Referenced when creating an EXE file with the pack_exe instruction
+Specify the full path name of the HSP runtime file (hsprt).
+If the HSP runtime file is not in the current directory
+Please specify.
+(Example: pack_rt "c: \\ hsp \\ hsprt")
+
+	pack_get "filename"
+
+Stores the file name specified in pack_ini as a DPM file
+Extract the file that has been created.
+The file specified by "filename" is fetched and put in the current directory.
+It will be saved.
+
+	hsc3_getsym
+
+Outputs the symbol name used by HSP to the message buffer of the compiler.
+The output will be in the format "symbol name, sys [| var / func / macro] [| 1/2]".
+
+	hsc3_messize val
+
+The size of the entire message obtained by hsc_getmes is set to the variable specified by val.
+Substitute.
+
+	hsc3_make "path"
+
+Automatically creates an executable file.
+For "path", specify the full path where the HSP runtime library is located.
+Create an executable file according to the packfile options.
+Use hsc_comp to create a packfile with options.
+
+	hsc3_getruntime val, "objfile"
+
+Required by the object file specified by "objfile"
+Gets the runtime file name in the variable specified by val.
+The variable of val must be initialized as a string type.
+If the runtime file name is empty (""), the default
+Indicates that you are using the runtime (hsp3.exe).
+
+	hsc3_run "string"
+
+Treats the contents of "string" as a command line for runtime execution.
+For "string", "runtime name" and "object file name"
+Specify each "boot option" separated by a space
+is needed.
+
+
+揃important point
+
+HSPCMP.DLL is a plug-in file that is used at the same time as HSP3.2 and above.
+Even if you create an EXE file, put HSPCMP.DLL in the same directory as the EXE file.
+It will not work unless it is placed in. Also, you cannot add DLLs to the packfile.
+
+If you have any notices or comments about this version,
+Please send it to the mail or the bulletin board of HSP.
+
+
+・ Copyright and license
+
+HSPCMP.DLL is copyrighted by onion software.
+onion software is responsible for any damage caused by this program.
+We do not guarantee. Use at your own risk.
+
+HSPCMP.DLL can be freely attached, duplicated, reorganized and redistributed.
+However, in that case, HSP license notation (hsplicense.txt)
+Please be sure to specify.
+(For explicit license notation, include hsplicense.txt in the distribution or
+Or make sure to include the same content as hsplicense.txt in the document. )
+
+Please refer to the HSP system documentation for licensing details.
+
+
+---------------------------------------------------------------------------
+Appendix: How to compile a script from HSP
+---------------------------------------------------------------------------
+
+Here is a sample that calls HSPCMP.DLL from an HSP script.
+The following works the same as "Compile + Execute" in the script editor.
+
+	#include "hspcmp.as"
+
+	;
+Compile and run the HSP3 source script
+	;
+	sdim mesbuf,$10000
+	sdim rtname,256
+
+fname = "test1.as"; script file name
+objname = "obj"; object file name
+debug_mode = 0; debug window display flag
+
+	hsc_ini fname
+	hsc_objname objname
+	hsc_comp 0,2,debug_mode
+	res=stat:if res!=0 : dialog "ERROR" : goto *goerror
+
+delete fname + ".i"; Delete intermediate files
+
+	hsc3_getruntime rtname, objname
+	if rtname="" : rtname="hsp3.exe"
+
+	cmdexe = "\""+dir_exe+"\\"+rtname+"\" "+objname
+	hsc3_run cmdexe
+
+*goerror
+	hsc_getmes mesbuf
+
+	objmode 1
+flg = 1; 0 = not editable / 1 = editable
+	mesbox mesbuf,636,446,flg+4
+
+	stop
+
+
+---------------------------------------------------------------------------
+Appendix: How to call HSP extension plug-in from C program
+---------------------------------------------------------------------------
+
+This section describes how to call HSPCMP.DLL from a C program.
+Other extension plugins can be accessed in basically the same way.
+The example list is used in Visual C ++.
+
+
+・ Caller
+
+The list below is where HSPCMP.DLL is linked to define the function.
+I define and use a function of type DLLFUNC.
+The argument is (int, int, int, int), but there are 4 different types
+Any call parameter (size is 4 bytes) will do.
+In the example below, each function starting with hsc_ can be used by calling dll_ini.
+Now, you can release it by calling dll_bye. (Here, at the time of opening,
+It is supposed to call hsc_bye)
+
+/*
+		DLL support routines
+*/
+
+typedef BOOL (CALLBACK *DLLFUNC)(int,int,int,int);
+
+DLLFUNC hsc_ini;
+DLLFUNC hsc_refname;
+DLLFUNC hsc_objname;
+DLLFUNC hsc_comp;
+DLLFUNC hsc_getmes;
+DLLFUNC hsc_clrmes;
+DLLFUNC hsc_ver;
+DLLFUNC hsc_bye;
+DLLFUNC pack_ini;
+DLLFUNC pack_make;
+DLLFUNC pack_exe;
+DLLFUNC pack_opt;
+DLLFUNC pack_rt;
+DLLFUNC hsc3_getsym;
+DLLFUNC hsc3_make;
+DLLFUNC hsc3_getruntime; // Added for 3.0
+DLLFUNC hsc3_run; // Addition for 3.0
+
+static	int dllflg=0;			// DLL uses flag
+static	HINSTANCE hDLL;			// Handle to DLL
+
+static char *SetDllFunc( char *name )
+{
+// Assign DLL function
+	//
+	char *ent;
+	char fncname[128];
+	fncname[0]='_';
+	strcpy( fncname+1,name );
+	strcat( fncname,"@16" );
+	ent = (char *)GetProcAddress( hDLL, fncname );
+	if (ent==NULL) dllflg=-1;				// error flag
+	return ent;
+}
+
+
+int dll_ini( char *libname )
+{
+	//		Initalize DLL entry
+	//			(result:1=ok)
+	//
+	hDLL = LoadLibrary( libname );
+	if ( hDLL==NULL ) return 0;
+
+	dllflg=1;
+	hsc_ini = (DLLFUNC)SetDllFunc("hsc_ini");
+	hsc_refname = (DLLFUNC)SetDllFunc("hsc_refname");
+	hsc_objname = (DLLFUNC)SetDllFunc("hsc_objname");
+	hsc_comp = (DLLFUNC)SetDllFunc("hsc_comp");
+	hsc_getmes = (DLLFUNC)SetDllFunc("hsc_getmes");
+	hsc_clrmes = (DLLFUNC)SetDllFunc("hsc_clrmes");
+	hsc_ver = (DLLFUNC)SetDllFunc("hsc_ver");
+	hsc_bye = (DLLFUNC)SetDllFunc("hsc_bye");
+	pack_ini = (DLLFUNC)SetDllFunc("pack_ini");
+	pack_make = (DLLFUNC)SetDllFunc("pack_make");
+	pack_exe = (DLLFUNC)SetDllFunc("pack_exe");
+	pack_opt = (DLLFUNC)SetDllFunc("pack_opt");
+	pack_rt = (DLLFUNC)SetDllFunc("pack_rt");
+	hsc3_getsym = (DLLFUNC)SetDllFunc("hsc3_getsym");
+	hsc3_make = (DLLFUNC)SetDllFunc("hsc3_make");
+hsc3_getruntime = (DLLFUNC) SetDllFunc ("hsc3_getruntime"); // Added for 3.0
+hsc3_run = (DLLFUNC) SetDllFunc ("hsc3_run"); // Added for 3.0
+
+	return dllflg;
+}
+
+
+void dll_bye( void )
+{
+	//		Release DLL entry
+	//
+	if (dllflg==0) return;
+	if (dllflg==1) {
+hsc_bye (0,0,0,0); // Clean up routine
+	}
+	FreeLibrary( hDLL );
+	dllflg=0;
+}
+
+
+
+-Compiling and executing files using HSPCMP.DLL
+
+The following example is an example of compiling and executing a file.
+See the instruction reference for more information on instructions that start with hsc_.
+The general flow is to specify the source script in hsc_ini and then
+Specify the object file output by hsc_objname.
+The file is then compiled with hsc_comp.
+If there is an error, retrieve the message data with hsc_getmes
+can do.
+If there are no errors, call the runtime to run it.
+In the example below, the directory is not specified, but it is actually
+The path including the directory where the runtime is located, the path of the source script, etc.
+It is a good idea to specify the name including it.
+
+	/*
+			HSP compile support routines
+	*/
+
+char hsp_file [128]; // Source script file name
+char objname [128]; // Object file name
+char errbuf [32000]; // Error message storage area
+char cfname [_MAX_PATH]; // Runtime file name
+char execmd [2048]; // Execution string
+	int a,i;
+
+	//		Compile as file
+	//
+	strcat( hsp_file,"test.as" );
+	strcat( objname,"test.ax" );
+	hsc_ini( 0,(int)hsp_file, 0,0 );
+	hsc_objname( 0,(int)objname, 0,0 );
+	a=hsc_comp( 1,0,0,0 );
+	if (a) {
+hsc_getmes ((int) errbuf, 0,0,0); // get the error
+	}
+
+	//		execute HSP3 process
+	//
+	*cfname = 0;
+hsc3_getruntime ((int) cfname, (int) objname, 0, 0); // Get the runtime
+	if ( *cfname == 0 ) {
+		wsprintf( execmd,"%s ", "hsp3.exe" );
+	} else {
+		wsprintf( execmd,"%s ", cfname );
+	}
+
+	strcat( execmd,objname );
+	if (hsp_cmdopt[0]!=0) {
+		strcat( execmd," " );
+strcat (execmd, hsp_cmdopt); // If you have command line options
+	}
+
+	i = hsc3_run( (int)execmd, 0, 0, 0 );
+	if ( i ) {
+// Error "Runtime file not found for execution"
+	}
+
+
+-------------------------------------------------------------------------------
+                                                HSP users manual / end of file 
+-------------------------------------------------------------------------------

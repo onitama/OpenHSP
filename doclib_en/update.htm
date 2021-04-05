@@ -1,0 +1,507 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+<meta name = "keywords" content = "HSP, HSP3, HotSoupProcessor, update information, update">
+<meta name = "description" content = "HSP update information posted">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+<title> HSP3 Update Guide </title>
+</head>
+<body>
+	<div id="CONTAINER">
+<!-Header->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+<h1> HSP3 Update Guide </h1>
+
+<!-Table of Contents->
+		<ol>
+<li> <a href="#INTRO"> Introduction </a> </li>
+<li> <a href="#HSP3UPDATE"> Overview of HSP3 update </a> </li>
+<li> <a href="#LINUX"> About the provision of Linux version </a> </li>
+<li> <a href="#HSPOBSOLETE"> About the end of packaging </a> </li>
+<li> <a href="#DIFF2"> Differences from HSP2 </a> </li>
+<li> <a href="#SUMMARY"> Overview of HSP3 </a>
+				<ol>
+<li> <a href="#SUMMARY_ENV"> Operating environment </a> </li>
+<li> <a href="#SUMMARY_CMD"> Add instruction </a> </li>
+<li> <a href="#SUMMARY_FUNC"> Function support </a> </li>
+<li> <a href="#SUMMARY_DOUBLE"> Real number support </a> </li>
+<li> <a href="#SUMMARY_PLUGIN"> Plugin </a> </li>
+<li> <a href="#SUMMARY_MODULE"> Module </a> </li>
+<li> <a href="#SUMMARY_LABELVAR"> Label variable support </a> </li>
+<li> <a href="#SUMMARY_DLL"> DLL call </a> </li>
+<li> <a href="#SUMMARY_COM"> COM call </a> </li>
+<li> <a href="#SUMMARY_EDITOR"> Script Editor </a> </li>
+<li> <a href="#SUMMARY_PEAS"> peas editor </a> </li>
+<li> <a href="#SUMMARY_TVBLOWSER"> HSPTV browser </a> </li>
+				</ol>
+			</li>
+<li> <a href="#FROM2"> Script migration from ver2.x </a>
+				<ol>
+<li> <a href="#FROM2_CALC"> Change calculation order </a> </li>
+<li> <a href="#FROM2_FUNC"> Instruction functionalization </a> </li>
+<li> <a href="#FROM2_CMD"> Change instructions and system variables </a> </li>
+<li> <a href="#FROM2_MODULE"> Module function specification change </a> </li>
+<li> <a href="#FROM2_PLUGIN"> Plugin specification changes </a> </li>
+<li> <a href="#FROM2_ARRAY"> Array changes </a> </li>
+<li> <a href="#FROM2_MEMBUF"> Changes to the memory buffer </a> </li>
+<li> <a href="#FROM2_PEEK"> Change peek instruction </a> </li>
+<li> <a href="#FROM2_DIFF"> Is HSP3 difficult? (About macros compatible with HSP2) </a> </li>
+				</ol>
+			</li>
+		</ol>
+		
+<!-Body->
+<h2 id = "INTRO"> Introduction </h2>
+		<p>
+HSP3.6 is a new version that replaces HSP3.5.
+There are no major changes in specifications, and various functions have been added so that it operates as upward compatibility.
+		</p>
+		<p>
+Here, about the difference between HSP3.6 and HSP3.5.
+Then, I will explain the differences between HSP2.x and HSP3 in general.
+		</p>
+
+
+<h2 id = "HSP3UPDATE"> Overview of HSP3 update </h2>
+		<p>
+HSP3.6 can be used in the same way as the previous HSP3 without being aware of any changes. <br>
+For more information on the features added in HSP3.6, see <a href="update36.htm" target="_blank"> HSP3.6 New Feature Highlights </a>.
+Also, for the detailed update history of HSP3, refer to <a href="history.txt" target="_blank"> "HSP3 update history" </a>.
+		</p>
+		<dl>
+<dt> HSP3.6 New Feature Highlights </dt>
+			<dd><p><a href="update36.htm" target="_blank">update36.htm</a></p></dd>
+<dt> HSP3 update history </dt>
+			<dd><p><a href="history.txt" target="_blank">history.txt</a></p></dd>
+		</dl>
+		<p>
+A sample script that allows you to easily try out the new features added in HSP3.6 is included in the "sample / new36" folder.
+Please try the operation with the new sample by actually executing it.
+		</p>
+
+
+<h2 id = "LINUX"> About the provision of Linux version </h2>
+		<p>
+For the version that runs on Linux GUI environment (X Window System) and Raspberry Pi (Raspbian)
+The latest version is available on github.
+		</p>
+		<pre>
+	git clone https://github.com/onitama/OpenHSP
+		</pre>
+		<p>
+Please get it in the form of.
+For details, please see the following page.
+It also explains how to get the latest version and how to install it.
+		</p>
+		<pre>
+	HSP3 for Linux/Raspberry Pi
+	<a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank">https://hsp.tv/make/hsp3linux_pi.html</a>
+		</pre>
+
+
+<h2 id = "HSPOBSOLETE"> About the end of packaging </h2>
+		<p>
+The llmod3, HGIMG / HGIMGX (3D drawing plug-in) / HSP3MT (runtime) / HSPLet packages that were included in the previous full set are not included.
+You can continue to use the runtime included in the old package, but it is treated as deprecated and no documentation or help is provided.
+		</p>
+		<UL>
+<LI> llmod3-> Please use various modules compatible with HSP3-
+<LI> HGIMG / HGIMGX (3D drawing plug-in)-> Please use HGIMG3 / HGIMG4
+<LI> HSPDX (2D drawing plug-in)-> Please use HSP3DISH
+<LI> HSP3MT runtime-> Please use hsp3utf or hsp3_64
+<LI> HSPLet runtime-> Please use HSP3Dish (html5)
+		</UL>
+		<p>
+These plug-in modules have outdated code and are not guaranteed to work on current Windows.
+Compiling and executing existing code is supported, but may not be supported in future versions.
+		</p><p>
+Since the HSPDX plug-in has many old users and can be executed on the current system, the plug-in file itself is included, but it is not recommended to use it newly.
+		</p><p>
+The HSP3MT runtime and libraries were created for older systems and are designed for older systems.
+New runtimes such as hsp3utf and hsp3_64 can be substituted.
+Also, since the source is released as OpenHSP, the library itself can be distributed.
+We have determined that it is no longer necessary.
+		</p>
+
+
+<h2 id = "DIFF2"> Difference from HSP2 </h2>
+		<p>
+HSP3 is the latest version of HSP3, which has undergone a major overhaul of specifications and programs up to HSP2.
+While inheriting the assets such as friendliness, ease of learning, and simplicity cultivated up to ver2.61
+It has been developed to provide an environment with a wider range of applications and versatility.
+		</p>
+		<p>
+It will be a scripting language that can be widely used by beginners to advanced users, including migration from previous versions.
+I hope that.
+		</p>
+		<p>
+HSP3 is built around a completely newly designed core system.
+This core system allows for a platform-independent scripting engine and free extension.
+Has an architecture.
+Expanded components for various platforms under a simple and powerful core system
+We are aiming for a system that is prepared and realizes stable portability and productivity.
+		</p>
+		<p>
+By inheriting the features of the existing formats and rules and reviewing unnecessary specifications, abundant materials and past assets can be effectively utilized.
+It can be utilized and the threshold for moving to the next version is low.
+		</p>
+		<p>
+HSP3 inherits the format and rules up to ver2.61, but it is not completely compatible. <br>
+Even if you install HSP3 newly, HSP2.x is not deleted and can be used independently.
+		</p>
+		<p>
+In order to migrate the source script up to ver2.61 to ver3.0, please refer to the notes.
+Be sure to change the incompatible parts.
+		</p>
+		<p>
+In addition, even after ver3.0 is officially released, distribution and maintenance of ver2.x will continue for a while.
+We would like to make an effort so that all existing users can easily migrate to ver3.0.
+		</p>
+
+
+<h2 id = "SUMMARY"> Overview of HSP3 </h2>
+		<p>
+For users who have used HSP2, we will introduce an overview of HSP3.
+		</p>
+<h3 id = "SUMMARY_ENV"> Operating environment </h3>
+		<p>
+The HSP3 core system runs on WIN32.
+HSP2.x supported Windows 95 or later versions, but HSP3 uses Windows 98 or later as the operating environment.
+(However, it can be operated in the environment of Windows95 + InternetExplorer4 or later.)
+		</p>
+
+<h3 id = "SUMMARY_CMD"> Add instruction </h3>
+		<p>
+In HSP2.x, image-related instructions, which were plug-in instructions, are provided as standard.
+Grotate, grect, gsquare commands to enlarge and rotate the image,
+Circle command to draw a circle, hsvcolor command to specify color by HSV, etc.
+Many features are supported.
+		</p>
+
+<h3 id = "SUMMARY_FUNC"> Function support </h3>
+		<p>
+You can now include functions in expressions.
+This replaces some instructions and system variables with functions.
+		</p>
+
+<h3 id = "SUMMARY_DOUBLE"> Real number support </h3>
+		<p>
+Supports real number calculation with 64-bit floating point numbers.
+Equipped with mathematical functions such as trigonometric functions and square roots
+You can perform highly accurate calculations.
+		</p>
+		
+<h3 id = "SUMMARY_PLUGIN"> Plugin </h3>
+		<p>
+The specifications of the extension plug-in have been greatly expanded from 3.0.
+By creating a plugin exclusively for 3.0, you can extend the type and draw system,
+Allows significant system expansion, such as event management.
+		</p>
+		<p>
+Almost all plug-ins up to HSP2.61 can be used as they are due to the compatibility function.
+In addition, all the extension plug-ins that came standard with HSP2.61 are included with the same name.
+		</p>
+		<p>
+In HSP3, in addition to this, HSPINET, which specializes in HTTP and FTP network access, and
+Includes HGIM G3, which supports advanced 3D processing.
+A plug-in HSPCV specialized for more advanced image processing is included.
+		</p>
+
+<h3 id = "SUMMARY_MODULE"> Module </h3>
+		<p>
+The module function is to make the namespace of the script and the area of ​​variables independent.
+You can improve the reusability and maintainability of scripts.
+Creating user-defined instructions and module variables,
+It is an advanced mechanism linked to the definition of local variables.
+For details, see "<a href="module.htm"> Module Function Guide </a>".
+		</p>
+
+<h3 id = "SUMMARY_LABELVAR"> Support for label variables </h3>
+		<p>
+A label type variable is a mechanism for storing arbitrary position information of a script in a variable.
+By storing label information in variables, the possibilities of scripting are further expanded.
+		</p>
+
+<h3 id = "SUMMARY_DLL"> DLL call </h3>
+		<p>
+It is possible to easily define and call an external DLL such as WIN32API.
+HSP2.61 loadlib related instructions and instructions included in llmod are not supported by HSP3.
+		</p>
+
+<h3 id = "SUMMARY_COM"> COM call </h3>
+		<p>
+Supports Windows COM component calls.
+You can easily use advanced technologies such as COM automation and COM events.
+This allows you to search and replace IE components, XML parsers, regular expressions, get RSS, etc.
+You can easily call the latest technology from a script.
+		</p>
+
+<h3 id = "SUMMARY_EDITOR"> Script Editor </h3>
+		<p>
+Includes a new script editor.
+By removing the edit size limit, coloring keywords, adopting tabs, etc.
+It is highly functional. (Previous versions are also included as HSED3LE.EXE.)
+Peripheral tools (help browser, etc.) called from the script editor
+The upgraded version is included.
+		</p>
+
+<h3 id = "SUMMARY_PEAS"> peas editor </h3>
+		<p>
+With the peas editor, all you have to do is decide on the template (template) parts and the parameters and options.
+It provides a simple programming environment that automatically generates scripts.
+Users can write scripts in the editor as before, or just operate the mouse.
+You will be able to create a program.
+		</p>
+
+<h3 id = "SUMMARY_TVBLOWSER"> HSPTV Browser </h3>
+		<p>
+The HSPTV browser is included as standard.
+This is a content viewer that is updated over the network.
+You can easily download and enjoy HSP information and the latest software online.
+		</p>
+
+
+<h2 id = "FROM2"> Script migration from ver2.x </h2>
+		<p>
+Here, for those who have already used ver2.x and those who want to migrate scripts
+We will inform you of changes and notes.
+		</p>
+<h3 id = "FROM2_CALC"> Change calculation order </h3>
+		<p>
+In HSP3, the formulas prioritize each operator.
+As with many languages, "*" and "/" are calculated before "+" and "-".
+Due to this, the calculation formula up to ver2.x (processed from the left) and the result may differ.
+See the Language Specification Guide for more information on priorities.
+		</p>
+		
+<h3 id = "FROM2_FUNC"> Instruction functionalization </h3>
+		<p>
+Some instructions are implemented as functions.
+Therefore, some of the instructions used in ver2.x can no longer be used as they are.
+The main functionalized instructions are:
+		</p>
+		<ul>
+			<li>int</li><li>str</li><li>rnd</li><li>strlen</li><li>peek</li><li>wpeek</li>
+			<li>instr</li><li>strmid</li><li>getpath</li><li>ginfo</li><li>sysinfo</li>
+		</ul>
+		<p>
+For example, <code> rnd a, 10 </code> has the format <code> a = rnd (10) </code>.
+		</p>
+
+<h3 id = "FROM2_CMD"> Change instructions and system variables </h3>
+		<p>
+The following keywords that existed in HSP 2.x have changed in 3.0.
+In most cases, alternative instructions allow for equivalent operation.
+Also, by using a macro (hsp261cmp.as) that works compatible with 2.x
+You will be able to have some degree of compatibility.
+		</p>
+<table class = "keywordlist" summary = "list of instructions changed in HSP3">
+<caption> Modified instructions </caption>
+<tr> <th> Command name </th> <th> Changes </th> </tr>
+<tr> <td> rnd </td> <td> rnd () format function now </td> </tr>
+<tr> <td> gettime </td> <td> gettime () format function now </td> </tr>
+<tr> <td> peek </td> <td> peek () format function now </td> </tr>
+<tr> <td> wpeek </td> <td> wpeek () format function now </td> </tr>
+<tr> <td> notemax </td> <td> It became a system variable (macro) called notemax </td> </tr>
+<tr> <td> strlen </td> <td> strlen () format function now </td> </tr>
+<tr> <td> sysinfo </td> <td> The function is now in the format sysinfo () </td> </tr>
+<tr> <td> getpath </td> <td> getpath () format function now </td> </tr>
+<tr> <td> strmid </td> <td> strmid () format function now </td> </tr>
+<tr> <td> instr </td> <td> instr () format function now </td> </tr>
+<tr> <td> ginfo </td> <td> ginfo () format function now </td> </tr>
+
+<tr> <td> sndload </td> <td> Renamed to mmload instruction </td> </tr>
+<tr> <td> snd </td> <td> renamed to mmplay instruction </td> </tr>
+<tr> <td> sndoff </td> <td> Renamed to mmstop instruction </td> </tr>
+
+<tr> <td> skipperr </td> <td> Use interrupt by onerror instruction </td> </tr>
+<tr> <td> objsend </td> <td> An alternative sendmsg instruction is available </td> </tr>
+<tr> <td> palfade </td> <td> No alternative instructions available </td> </tr>
+<tr> <td> palcopy </td> <td> No alternative instructions available </td> </tr>
+<tr> <td> getpal </td> <td> Same function as palcolor </td> </tr>
+<tr> <td> text </td> <td> The "hsp3util.as" module provides text and emes instructions </td> </tr>
+		</table>
+<table class = "keywordlist" summary = "list of system variables changed in HSP3">
+<caption> Changed system variables </caption>
+<tr> <th> System variable name </th> <th> Changes </th> </tr>
+<tr> <td> csrx </td> <td> Renamed to ginfo_cx macro </td> </tr>
+<tr> <td> csry </td> <td> Renamed to ginfo_cy macro </td> </tr>
+<tr> <td> paluse </td> <td> Renamed to ginfo_paluse macro </td> </tr>
+<tr> <td> dispx </td> <td> Renamed to ginfo_dispx macro </td> </tr>
+<tr> <td> dispy </td> <td> renamed to ginfo_dispy macro </td> </tr>
+<tr> <td> rval </td> <td> renamed to ginfo_r macro </td> </tr>
+<tr> <td> gval </td> <td> renamed to ginfo_g macro </td> </tr>
+<tr> <td> bval </td> <td> renamed to ginfo_b macro </td> </tr>
+<tr> <td> winx </td> <td> Renamed to ginfo_winx macro </td> </tr>
+<tr> <td> winy </td> <td> Renamed to ginfo_winy macro </td> </tr>
+<tr> <td> cmdline </td> <td> Renamed to dir_cmdline macro </td> </tr>
+<tr> <td> windir </td> <td> renamed to dir_win macro </td> </tr>
+<tr> <td> curdir </td> <td> Renamed to dir_cur macro </td> </tr>
+<tr> <td> exedir </td> <td> renamed to dir_exe macro </td> </tr>
+<tr> <td> sysdir </td> <td> Renamed to dir_sys macro </td> </tr>
+<tr> <td> prmx </td> <td> It is no longer necessary due to the specification change of the ginfo instruction </td> </tr>
+<tr> <td> prmy </td> <td> It is no longer necessary due to the specification change of the ginfo instruction </td> </tr>
+		</table>
+		<p>
+The loadlib related instructions are DLL calls using #uselib and #func, or
+Or it is inherited by an external call by the callfunc function.
+The following instructions are not supported by HSP3.
+(ll_poke, ll_peek, etc. can be replaced by "dupptr instruction + poke instruction / peek function".)
+		</p>
+		<ul>
+			<li>ll_ret</li>
+			<li>ll_retset</li>
+			<li>ll_getptr</li>
+			<li>ll_peek</li>
+			<li>ll_peek1</li>
+			<li>ll_peek2</li>
+			<li>ll_peek4</li>
+			<li>ll_poke</li>
+			<li>ll_callfunc</li>
+			<li>ll_n</li>
+			<li>ll_poke1</li>
+			<li>ll_poke2</li>
+			<li>ll_poke4</li>
+			<li>ll_libfree</li>
+			<li>ll_callfnv</li>
+			<li>ll_call</li>
+			<li>ll_free</li>
+			<li>ll_s</li>
+			<li>ll_p</li>
+			<li>ll_str</li>
+			<li>ll_dll</li>
+			<li>ll_func</li>
+			<li>ll_type</li>
+			<li>ll_z</li>
+			<li>ll_libload</li>
+			<li>ll_getproc</li>
+			<li>ll_bin</li>
+		</ul>
+
+<h3 id = "FROM2_MODULE"> Module function specification change </h3>
+		<p>
+The specifications of the module function have been changed.
+If you want to pass non-numeric parameters to a user-defined instruction, you need to modify the script.
+Also, please note that there are some functional changes for the mref instruction.
+See the Language Specification Guide for more information.
+		</p>
+		
+<h3 id = "FROM2_PLUGIN"> Plugin specification change </h3>
+		<p>
+It supports all plug-in rules of HSP2.5 or later, but
+Please note that there are some restrictions due to changes in the internal specifications of HSP3.
+		</p>
+		<ul>
+The <li> BMSCR structure can only reference fields from flag to color. </li>
+<li> In the flag field (type type value) and len field (array information) of the PVal structure
+It cannot be rewritten on the DLL side. </li>
+You cannot access string type array variables from the <li> PVal structure. </li>
+		</ul>
+		<p>
+In other respects, the same information as HSP ver2.61 will be passed.
+Please note that HSP2.61 compatible plug-ins have the following restrictions.
+In addition, the compatibility function of the plug-in does not guarantee the operation of all HSP 2.x plug-ins.
+		</p>
+		<p>
+When assigning a value to a variable from a plugin, the buffer is not automatically expanded.
+Be careful not to cause a buffer overflow.
+		</p>
+		<p>
+For the full set archive, among the plug-ins included in ver2.61, hspda, hspdb, hspdx,
+Contains hspext, hspsock, hgimg (x) and header files.
+These plugins are exactly the same DLLs that are included in ver2.61.
+The file is working with the 3.0 plugin compatibility feature.
+(Compatibility of user-created plug-ins not included with HSP depends on each specification.)
+		</p>
+		<p>
+For hspdx.dll, in palette mode due to the picload specification change of HSP3.0
+The palette of imported images is not reflected. Therefore, from the image file
+A collection of modules that define bmppalette instructions for retrieving palette data,
+"Hsp3util.as" is provided.
+See the hspdx sample script for a use case.
+		</p>
+
+<h3 id = "FROM2_ARRAY"> Changes to arrays </h3>
+		<p>
+The handling of array variables has changed significantly from ver3.0.
+In ver2.x, it was used after securing the maximum number of arrays by dim or sdim instruction.
+In ver3.0, it is possible to assign to an array variable without securing an array.
+(However, referencing the contents of an unassigned array will result in an error)
+		</p>
+		<p>
+In ver2.x, arrays from 0 to 15 (in the case of numeric variables) were available by default, but
+There is no default reservation in ver3.0 (0 only).
+This difference can cause some scripts to fail while referencing the array.
+		</p>
+		
+<h3 id = "FROM2_MEMBUF"> Changes to the memory buffer </h3>
+		<p>
+From HSP3, string type variables will be handled with free size data by automatic expansion.
+Therefore, if you create a string type array variable, multiple variable length variable buffers will be created.
+It will no longer be managed in a continuous memory space like up to ver2.x.
+As a result, when a command that directly manipulates memory such as bsave, bload, etc. is executed for a character string type array variable,
+I was able to access all dimensions in ver2.x,
+From ver3.0, it will be accessed in units of specific array elements.
+		</p>
+		<p>
+I don't think there are many scripts that actually do that,
+Be careful when manipulating memory on string-type array variables.
+		</p>
+
+<h3 id = "FROM2_PEEK"> Change peek instruction </h3>
+		<p>
+The peek instruction has become a peek function, but at the same time, the character string reading function supported by ver2.x has been abolished.
+To perform the same processing, use the getstr instruction to set the delimited character code to 0.
+		</p>
+
+<h3 id = "FROM2_DIFF"> Is HSP3 difficult? </h3>
+		<p>
+Among the users who have used HSP2 so far, there are a lot of new elements in HSP3.
+Many people think that it has become difficult because it was introduced.
+		</p>
+		<p>
+HSP3 is designed to be migrated and used by all users who have used HSP2.
+The major change in HSP3 is the introduction of functions, which used to be instructions.
+It is something that can be described in the calculation formula, and the function has not changed.
+Many other added functions are mechanisms for extending HSP, such as module functions and
+General users can easily add new functions such as external API calls (corresponding to loadlib related instructions).
+It is made to be usable.
+		</p>
+		<p>
+With HSP3, you can write more flexibly, but each person's style is different.
+Since it is, you can write it in the same way as HSP2, and you do not need to use functions that you do not need.
+If you're used to HSP2, add a line like this to the beginning of your script:
+Most of the major instructions can now be executed in the same way as HSP2.
+		</p>
+<pre> #include "hsp261cmp.as"; ver2.61 Enable compatibility </pre>
+		<p>
+This is defined in "hsp261cmp.as" which exists in the common folder
+It is converted to an appropriate instruction so that it works with 3.0 or later by the ver2.61 compatible macro.
+However, the current ver2.61 compatible macro is a beta version and supports all descriptions.
+Not at all. Also, the priority of the calculation formula is not changed.
+Although it is not perfect, if it is a script to some extent, it will be 3.0 as it is
+It is possible to operate.
+		</p>
+		<p>
+After setting the ver2.61 compatible macro, the instructions and definition files dedicated to ver3.x are provided.
+Please be careful not to put it.
+		</p>
+
+<!-Footer->
+		<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

@@ -1,0 +1,1132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+<meta name = "keywords" content = "HSP3, HotSoupProcessor3, Programming Manual">
+<meta name = "description" content = "Information about HSPTV">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+<title> List of extension plug-ins and modules </title>
+</head>
+<!--
+	2010/02/16
+-Added description of bundled modules
+	2009/05/19
+-Added description of bundled modules
+	2008/02/01
+-Corrected the description of hgimg3. (DLL-> hrt, etc.)
+-->
+<body>
+
+	<div id="CONTAINER">
+<!-Header->
+		<p id="COPY"><a id="top" class="head">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</a></p>
+<img src = "hsp3ttl.jpg" alt = "Title" width = "640" height = "200">
+<h1> List of extension plug-in modules </h1>
+
+<!-Table of Contents->
+		<ol>
+<li> <a href="#FIRST"> Introduction </a> </li>
+<li> <a href="#EX_PLUGIN"> Extension plugin </a>
+				<ol>
+					<li><a href="#HSPEXT">HSPEXT.DLL</a></li>
+					<li><a href="#HSPINET">HSPINET.DLL</a></li>
+					<li><a href="#HGIMG3">HGIMG3.hrt</a></li>
+					<li><a href="#HSP3DISH">HSP3Dish</a></li>
+					<li><a href="#HGIMG4">HGIMG4.hrt</a></li>
+					<li><a href="#OBAQ">OBAQ.DLL</a></li>
+					<li><a href="#HSPCV">HSPCV.DLL</a></li>
+					<li><a href="#HSPDB">HSPDB.DLL</a></li>
+					<li><a href="#HSPDA">HSPDA.DLL</a></li>
+					<li><a href="#HSPCMP">HSPCMP.DLL</a></li>
+					<li><a href="#HSP3IMP">HSP3IMP.DLL</a></li>
+					<li><a href="#HSPOGG">HSPOGG.DLL</a></li>
+					<li><a href="#HSPSOCK">HSPSOCK.DLL</a></li>
+					<li><a href="#HSPUSBIO">HSPUSBIO.DLL</a></li>
+					<li><a href="#HSP3IMP">HSP3IMP.DLL</a></li>
+					<li><a href="#HSPPRINT">HSPPRINT.DLL</a></li>
+					<li><a href="#HSPSW">HSPSW.DLL</a></li>
+					<li><a href="#HSPMUCOM">HSPMUCOM.DLL</a></li>
+					<li><a href="#HSPZLIB">ZLibWrap.dll</a></li>
+				</ol>
+			</li>
+<li> <a href="#MODULE"> Module </a>
+				<ol>
+					<li><a href="#D3MODULE">d3module</a></li>
+					<li><a href="#Artlet2D">Artlet2D</a></li>
+					<li><a href="#HSP3DISH">HSP3DISH.hrt</a></li>
+					<li><a href="#SQLele">SQLele</a></li>
+					<li><a href="#hsp3util">hsp3util.as</a></li>
+					<li><a href="#hsp261cmp">hsp261cmp.as</a></li>
+					<li><a href="#form_decode">form_decode.as</a></li>
+					<li><a href="#mod_getenv">mod_getenv.as</a></li>
+					<li><a href="#mod_img">mod_img.as</a></li>
+					<li><a href="#hspmath">hspmath.as</a></li>
+					<li><a href="#mod_fontdlg">mod_fontdlg.as</a></li>
+					<li><a href="#mod_aht">mod_aht.as</a></li>
+					<li><a href="#mod_joystick">mod_joystick.as</a></li>
+					<li><a href="#mod_menu">mod_menu.as</a></li>
+					<li><a href="#mod_picfont">mod_picfont.as</a></li>
+					<li><a href="#mod_rss">mod_rss.as</a></li>
+					<li><a href="#mod_stbar">mod_stbar.as</a></li>
+					<li><a href="#modclbk">modclbk3.hsp</a></li>
+					<li><a href="#dmxusb">mod_dmxusb.as</a></li>
+<li> <a href="#winapi"> Win32 API definition </a> </li>
+				</ol>
+			</li>
+<li> <a href="#OTHER_PLUGIN"> Other extension plugins </a> </li>
+<li> <a href="#SHIYOU"> Extension plug-in specifications </a> </li>
+		</ol>
+
+<h2 id = "FIRST"> Introduction </h2>
+		<p>
+With HSP, it is possible to add functions in the form of extension plug-ins and modules.
+This makes it possible to perform processing that cannot be achieved with the HSP itself.
+		</p>
+		<p>
+HSP extension plug-ins are standard files with DLL or HPI extensions.
+This file must be in the same directory as the HSP itself (HSP3.EXE)
+It will not be.
+Also, when creating an EXE file, you can put it in a PACKFILE to make one EXE file.
+can not. If you created an EXE file that uses the extension plug-in,
+Put the extension plugin in the same directory.
+		</p>
+		<p>
+Modules are files for adding functionality like extension plugins,
+It is used by adding it to the source script.
+Unlike HSP extension plugins, modules are in the same directory as the EXE file
+You don't need to put the file.
+		</p>
+		<p>
+The following extension plug-ins are included as standard.
+Please refer to the separate text for details on how to use each plugin.
+		</p>
+ <h2 id = "EX_PLUGIN"> Extension plugin </h2>
+ 		<h3 id="HSPEXT">HSPEXT.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPEXT." Class = "pluginlist">
+<caption> Introduction of HSPEXT.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPEXT.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+An extension plug-in that supports a wide range of non-standard functions.
+By using this extension DLL, more than 40 new instructions have been added.
+Registry operations, simple mathematical functions, serial communication, extended image operations,
+Many functions such as extended file access can be controlled from HSP.
+					</p>
+					<p>
+Furthermore, by installing application capture instructions, applications other than HSP can be used.
+You will be able to control it.
+					</p>
+					<p>
+These instructions are for tools and utilities that cannot be realized by HSP alone.
+There are many things that are useful for creating, and it enables more advanced application development.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspext.txt"> hspext.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPINET">HSPINET.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPINET." Class = "pluginlist">
+<caption> Introduction of HSPINET.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPINET.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A plugin for internet access.
+You can easily access the http and ftp servers.
+					</p>
+					<p>
+Not only can you get the data on the specified page, but you can also access it via a proxy server.
+There are many options such as getting the update date and time.
+When connecting via ftp, you can perform detailed operations from the directory list to sending the ftp command.
+In addition, it is equipped with instructions to acquire the CRC42 and MD5 values ​​of the file.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspinet.txt"> hspinet.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HGIMG3">HGIMG3.hrt</h3>
+<table summary = "Introduction to the extended runtime HGIMG3." class = "pluginlist">
+<caption> Introduction of HGIMG3.hrt </caption>
+			<tr>
+<th width = "20%"> Extended Runtime </th>
+				<th width="30%">HGIMG3.hrt</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A runtime with high-performance 2D / 3D image processing functions.
+This is a DirectX-only function that supports 2D / 3D graphic display.
+					</p>
+					<p>
+Wide range from 2D games using sprites to full-scale software using 3D models
+You can use it.
+The main functions added by HSP3HG.hrt are as follows.
+					</p>
+					<ul>
+<li> DirectX, advanced drawing system for full color mode </li>
+<li> Drawing engine that can set 2D sprites, 3D polygons, etc. with common commands </li>
+<li> 2D sprite rotation enlargement / reduction, α composition, transparent color removal processing, tiling (BG display) </li>
+<li> World management that can mix 2D sprites and 3D polygons on 3D coordinates </li>
+<li> Polygon model with 3D hierarchical structure can be managed </li>
+<li> Animation display of 3D one-skin model using bones is possible </li>
+<li> Animation-like rendering (toon shading) display is possible </li>
+<li> BMP, JPG, GIF, PNG, DDS, TGA, TIFF format texture support </li>
+<li> Japanese font texture rendering function including antialiasing </li>
+<li> Support for texture images with alpha channel </li>
+<li> Sprite display, movement management and collision detection </li>
+<li> HSP3 compatible floating point geometry calculation </li>
+<li> Event list registration function enables highly flexible autonomous processing </li>
+<li> Equipped with easy-to-use direct drawing commands </li>
+<li> Equipped with sound functions including stream playback </li>
+					</ul>
+					<p>
+For details, refer to the separate document "<a href="hgimg3.txt"> hgimg3.txt </a>".
+This runtime is currently in development. Please use the successor HGIM G4.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSP3DISH">hsp3dish.hrt</h3>
+<table summary = "Introduction to the extended runtime HSP3Dish." Class = "pluginlist">
+<caption> Introduction of HSP3 Dish </caption>
+			<tr>
+<th width = "20%"> Extended Runtime </th>
+				<th width="30%">hsp3dish.hrt</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a runtime equipped with high-speed 2D drawing function and sound function.
+It can be operated not only on Windows but also on android, iOS, Linux, RaspberryPi, html5 (WebGL) without modifying the source code.
+					</p>
+					<p>
+It includes standard sprites compatible with HSPDX plug-ins, OBAQ plug-ins, and simple network communication functions, and can be widely used from 2D games to full-scale software. In addition, the HGIMG4 runtime with 3D capabilities includes all the functionality of HSP3Dish as a subset.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hsp3dish_prog.htm"> hsp3dish_prog.htm </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HGIMG4">HGIMG4.hrt</h3>
+<table summary = "Introduction to the extended runtime HGIMG4." Class = "pluginlist">
+<caption> Introduction of HGIMG4.hrt </caption>
+			<tr>
+<th width = "20%"> Extended Runtime </th>
+				<th width="30%">HGIMG4.hrt</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A runtime with high-performance 2D / 3D image processing functions.
+It is an OpenGL / DirectX 9 function that supports advanced 2D / 3D graphic display.
+					</p>
+					<p>
+Wide range from 2D games using sprites to full-scale software using 3D models
+You can use it.
+The main functions added in HGIM G4 are as follows.
+					</p>
+					<ul>
+<li> OpenGL / ES or DirectX 9 drawing, shader language support
+<li> Physics engine (Bullet) support integrated with scene management
+<li> FBX format model file reading, animation support
+<li> Supports multi-texture, bump map, heightmap, LOD
+<li> Font data (TTF) rendering support
+<li> Off-screen rendering and various post-effect support
+<li> Supports operation on iOS, Android, Linux, html5 (WebGL) as well as Windows
+<li> HSP and HSP3Dish same license terms, open source
+					</ul>
+					<p>
+For details, refer to the separate document "<a href="hgimg4.html"> hgimg4.html </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="OBAQ">OBAQ.DLL</h3>
+<table summary = "Introduction to the extension plugin OBAQ." Class = "pluginlist">
+<caption> Introduction of OBAQ for HSP3 </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">OBAQ for HSP3</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Zener Works, Inc./kuni/onitama </th>
+<th width = "20%"> <a href="http://www.zener.co.jp/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a plug-in that allows you to easily use the functions of the physics engine (OBAQ).
+By using OBAQ, it is possible to handle rigid body collisions and gravity simulations based on 2D.
+OBAQ specializes in 2D and has simple settings and instructions so that anyone can easily realize natural movements by physics.
+Think of it as a handy system for supporting games, demonstrations, etc., rather than highly accurate technical calculations.
+					</p>
+					<p>
+OBAQ has a built-in sprite manager, which makes it easy to draw sprites using only standard functions.
+In addition, by managing the display coordinates by the user, it is possible to support display systems using DirectX, etc.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="obaq.txt"> obaq.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPCV">HSPCV.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPCV." Class = "pluginlist">
+<caption> Introduction of HSPCV.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPCV.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+<abbr title = "Intel Open Source Computer Vision Library"> OpenCV </abbr>
+It is a plug-in that can be used easily.
+					</p>
+					<p>
+HSPCV allows you to handle advanced image processing and algorithms.
+Besides, reading and writing of various formats (PNG, JPEG, TIFF, etc.), and
+Movie (avi) file operations, reading capture devices such as USB cameras, etc.
+It provides many functions related to video.
+The main functions added by HSPCV.DLL are as follows.
+					</p>
+					<ul>
+<li> Image of arbitrary size Image manipulation (copy, addition, subtraction, multiplication, etc.) </Li>
+<li> High quality image resizing, smoothing, rotating </li>
+<li> Image Extraction, inversion, and color conversion by threshold from image </li>
+<li> Loading and saving image files that support various formats </li>
+<li> Image acquisition via capture device such as USB camera </li>
+<li> avi Load and save video files </li>
+<li> Image recognition such as face extraction </li>
+<li> Template matching to extract areas close to any image </li>
+					</ul>
+					<p>
+For details, refer to the separate document "<a href="hspcv.txt"> hspcv.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPDB">HSPDB.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPDB." Class = "pluginlist">
+<caption> Introduction of HSPDB.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPDB.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A plugin for database access.
+To various databases via <abbr title = "Open DataBase Connectivity"> ODBC </abbr>
+You will be able to access it.
+If there is a corresponding ODBC driver, Oracle, MS-SQL Server, dBase, Paradox, etc.
+You can access the database, control it with SQL, and pass data.
+					</p>
+					<p>
+To use HSPDB, Windows has ODBC and compatible drivers
+Must be installed.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspdb.txt"> hspdb.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPDA">HSPDA.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPDA." Class = "pluginlist">
+<caption> Introduction of HSPDA.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPDA.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a plug-in for various data access.
+					</p>
+					<p>
+It is very useful when managing a large amount of character strings and numerical values ​​together.
+In particular, the sorting function for numbers and character strings can sort even a large amount of data in a short time.
+Also, write some or all of the variable data used in the source script to a file,
+It has a function to read.
+In addition, there are functions such as converting CSV format files to arrays and searching, generating real random numbers, etc.
+It is prepared.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspda.txt"> hspda.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPCMP">HSPCMP.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPCMP." Class = "pluginlist">
+<caption> Introduction of HSPCMP.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPCMP.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a plug-in with HSP system function.
+					</p>
+					<p>
+HSP related functions (compile, execute, object creation, executable file creation) that the script editor has
+It is controllable. By controlling the system functions of HSP from HSP scripts,
+You can customize and batch process uniquely for each user.
+It also has a support function for AHT (extended template).
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspcmp.txt"> hspcmp.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSP3IMP">HSP3IMP.DLL</h3>
+<table summary = "Introduction of extension plugin HSP3IMP." Class = "pluginlist">
+<caption> Introduction of HSP3IMP.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSP3IMP.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a plug-in with HSP runtime function.
+					</p>
+					<p>
+Since the operation screen of HSP3IMP.DLL functions as a child window of the specified window,
+It is possible to use the screen of HSP3 in the same way as pasting parts.
+Also, not only for HSP, but also for applications written in general languages ​​such as C / C ++.
+HSP functions can be added.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hsp3imp.txt"> hsp3imp.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPOGG">HSPOGG.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPOGG." Class = "pluginlist">
+<caption> Introduction of HSPOGG.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPOGG.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a plug-in for sound playback that supports DirectSound.
+					</p>
+					<p>
+It has the same functions as the sound function commands (dmm ~) that can be used with HGIM G3.
+When you do not use the 3D function but want to use only the sound function,
+It can be used when you want to combine it with other drawing plug-ins.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspogg.txt"> hspogg.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPSOCK">HSPSOCK.DLL</h3>
+<table summary = "Introduction to the extension plugin HSP SOCK." Class = "pluginlist">
+<caption> Introduction of HSPSOCK.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPSOCK.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a plug-in for TCP / IP socket communication.
+					</p>
+					<p>
+By using this extension DLL, you can send and receive data via LAN or the Internet.
+It is now possible to create simple client / server software.
+For communication with other machines, for internet clients,
+It can be used in many situations such as online games.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspsock.txt"> hspsock.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="HSPUSBIO">HSPUSBIO.DLL</h3>
+<table summary = "Introduction of the extension plug-in HSPUSBIO." Class = "pluginlist">
+<caption> Introduction of HSPUSBIO.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPUSBIO.DLL</th>
+				<th width="5%">Ver0.30</th>
+<th width = "25%"> Author: K-K </th>
+<th width = "20%"> <a href="https://www.binzume.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a plug-in for using USB-IO from HSP.
+					</p>
+					<p>
+USB-IO is <a href="http://www.morphyplanning.co.jp/"> Morphy Planning </a>, <a href="http://www.technokit.biz/"> Techno You can use the ones sold by Kit-san </a> and <a href="http://km2net.com/"> Km2Net-san </a>.
+By using this extension DLL, it is possible to control various hardware via USB-IO.
+You will be able to use it from simple tests to full-scale operation.
+There is also "mod_usbio.as" implemented as a module instead of a DLL. Here, the same function as HSPUSBIO.DLL is realized only by the module.
+Please use it properly as needed.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspusbio/hspusbio.txt"> hspusbio.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="HSPPRINT">HSPPRINT.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPPRINT.DLL." class = "pluginlist">
+<caption> Introduction of HSPPRINT.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPPRINT.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+hspprint is a plug-in that enables image printing on printer devices connected to Windows.
+This extension DLL adds new instructions for printing.
+In order to use hspprint.dll, Windows 2000 or later system and valid
+You will need a printer device (local or network) with the driver installed.
+hspprint is a simple plugin for printing specified images.
+It does not support printing of characters using arbitrary fonts and printing of vector data.
+Please check the function of the plug-in before using it.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspprint.txt"> hspprint.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="HSPSW">HSPSW.DLL</h3>
+<table summary = "Introduction to the extension plugin HPSSW.DLL." class = "pluginlist">
+<caption> Introduction of HSPSW.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPSW.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+Enables the Steam integration function of the STEAMWORKS SDK.
+By using HSPSW, acquisition / cancellation / reset of STEAM achievements, acquisition / setting of STEAM status value, etc. are supported. <br>
+These features are available on Steam-delivered software.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspsw.txt"> hspsw.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPMUCOM">HSPMUCOM.DLL</h3>
+<table summary = "Introduction to the extension plugin HSPMUCOM.DLL." class = "pluginlist">
+<caption> Introduction of HSPMUCOM.DLL </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">HSPMUCOM.DLL</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A tool called MUCOM88 (MUSIC LALF), an FM sound source driver that was running on NEC's PC-8801 series, can be run on Windows.
+MUCOM88 HSP MUCOM is a DLL that summarizes the functions of Windows.
+With HSPMUCOM, you have a wide range of control from scripting languages, from simple music playback to MML interpretation.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="hspmucom.txt"> hspmucom.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPZLIB">ZLibWrap.dll</h3>
+<table summary = "Introduction to the extension plugin ZLibWrap.dll." class = "pluginlist">
+<caption> Introduction of ZLibWrap.dll </caption>
+			<tr>
+<th width = "20%"> Extension plugin </th>
+				<th width="30%">ZLibWrap.dll</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It provides a simple compression / decompression function for zip files.
+It can be used with two simple instructions, Zip Compress and Zip Extract.
+					</p>
+					<p>
+For details, please refer to the zipfile.as file and zipfile_test1.hsp and zipfile_test2.hsp in the sample folder.
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
+<h2 id = "MODULE"> Module </h2>
+		<h3 id="D3MODULE">d3module</h3>
+<table summary = "Introduction of extension module d3module." Class = "pluginlist">
+<caption> Introduction of d3module </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">d3module</th>
+				<th width="5%">Ver1.66</th>
+<th width = "25%"> Author: S.Programs </th>
+<th width = "20%"> <a href="http://spn.php.xdomain.jp/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+This module is for simple 3D display with HSP standard runtime. <br>
+Because it does not depend on DirectX or 3D accelerator, the same execution result can be obtained in many environments.
+It is very useful when you want to easily use a 3D display.
+Also, if you use d3module and HSPLet, you only need to know HSP.
+One of the benefits is that you can create 3D applets that run on your browser.
+					</p>
+					<p>
+This module is made by Mr. S. Programs and is included in the HSP main unit.
+Opinions and impressions about the module are not onion software, but
+Please give us your feedback to S. Programs.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="d3module/d3module.txt"> d3module.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
+		<h3 id="Artlet2D">Artlet2D</h3>
+<table summary = "Introduction of extension module Artlet2D." class = "pluginlist">
+<caption> Introduction to Artlet2D </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">Artlet2D</th>
+				<th width="5%">Ver1.01 R3</th>
+<th width = "25%"> Author: S.Programs </th>
+<th width = "20%"> <a href="http://spn.php.xdomain.jp/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+Artlet2D is a module for handling image data with alpha channel (transparency component) in HSP using GDI +.
+Apart from the HSP standard drawing commands, the following functions can be used.
+<li> Pixel format 32bit ARGB virtual image buffer </li>
+<li> Mutual image copy between HSP screen and Artlet2D virtual image </li>
+<li> Basic figures such as line segments, ellipses, and rectangles, free curve drawing function </li>
+<li> Anti-aliased smooth edge drawing </li>
+<li> color instruction with alpha value </li>
+<li> Gradient brush, texture brush </li>
+<li> Free pen width, various pen styles </li>
+<li> Text display that can be automatically folded and aligned vertically and horizontally within a rectangular area </li>
+<li> Smooth image enlargement / reduction copy </li>
+<li> Transparency of specified color range, gamma adjustment, brightness adjustment by color matrix, </li>
+<li> Copy mode such as translucent, sepia conversion </li>
+<li> Change drawing position and rotation angle by coordinate conversion matrix </li>
+<li> Reading and writing png files with alpha channel </li>
+					</p>
+					<p>
+This module is made by Mr. S. Programs and is included in the HSP main unit.
+Opinions and impressions about the module are not onion software, but
+Please give us your feedback to S. Programs.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="Artlet2D/Artlet2D.txt"> Artlet2D.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="SQLele">SQLele</h3>
+<table summary = "Introduction of extension module SQLele." Class = "pluginlist">
+<caption> Introduction of SQLele </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">SQLele</th>
+				<th width="5%">Ver1.16</th>
+<th width = "25%"> Author: S.Programs </th>
+<th width = "20%"> <a href="http://spn.php.xdomain.jp/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+SQLele is a module for easy handling of SQLite with HSP. <br>
+For example, media player file list, address book and calendar data, image processing software Undo / Redo management, character dialogue in the game, save data and high score. .. .. <br>
+In order to manage the data inside such applications, I have used HSP to some extent with the experience of designing data structures and manipulating them with string manipulation instructions and memory manipulation instructions, and writing routines for sorting and extraction. I think most users have it. <br>
+I think that it is enough for many apps in terms of function and performance, but if you want to efficiently develop apps that handle complex data, why not try using a free SQL database engine called SQLite? <br>
+With SQLite, you only need to add one DLL to your HSP app to use the SQL database in your application. There is no need to install a DB server or configure ODBC settings.
+					</p>
+					<p>
+This module is made by Mr. S. Programs and is included in the HSP main unit.
+Opinions and impressions about the module are not onion software, but
+Please give us your feedback to S. Programs.
+					</p>
+					<p>
+For details, refer to the separate document "<a href="SQLele/SQLele.txt"> SQLele.txt </a>".
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
+		<h3 id="hsp3util">hsp3util.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of hsp3util.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">hsp3util.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+Convenient instructions for use with HSP3 are defined.
+Text command, emes command, etc. that display and modify character strings character by character
+Gettimestr, getdatestr command, to get the date and time as a string
+A bmppalette instruction is added to retrieve the palette of BMP files.
+It is also equipped with instructions for converting between arrays and multi-line strings.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="hsp261cmp">hsp261cmp.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of hsp261cmp.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">hsp261cmp.as</th>
+				<th width="5%">Ver3.0</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+Defines an HSP2.61 compatible instruction set.
+Only the description close to HSP2.61 is possible, and some instructions and operations are
+Please note that it will not be fully compatible.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="form_decode">form_decode.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of form_decode.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">form_decode.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A form_decode instruction is added to restore the URL encoding sent by cgi to the original string.
+This is a convenient module when creating cgi using HSPCL.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_getenv">mod_getenv.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_getenv.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_getenv.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A getenv instruction is added to get the value of the environment variable into the variable.
+It can be used when you want to refer to the environment variables at runtime with cgi etc.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_img">mod_img.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_img.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_img.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+An imgload command for loading images is added.
+It can read BMP, JPEG, GIF, ICO and PNG formats.
+(However, please note that reading from packfile is not supported)
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="hspmath">hspmath.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of hspmath.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">hspmath.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+Constants and macros for performing advanced mathematical calculations are defined.
+Constants such as pi and functions such as radian-degree interconversion are added.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_fontdlg">mod_fontdlg.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_fontdlg.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_fontdlg.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+This module is not supported by default to display the font selection dialog.
+You can easily call the common dialog for font selection.
+					</p>
+					<p>
+See the module source script for more information.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_aht">mod_aht.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_aht.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_aht.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+This module is for parsing and supporting the AHT description of scripts.
+It is used to implement functions such as Peas editor and simple input.
+					</p>
+					<p>
+See the module source script for more information.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_joystick">mod_joystick.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_joystick.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_joystick.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: MIA </th>
+<th width = "20%"> <a href="http://taillove.jp/mia/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a module to get the status of the joystick connected to Windows.
+The jstick instruction, which can detect the analog state and can obtain the value compatible with the joyGetPosEx and stick instruction, is added.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_menu">mod_menu.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_menu.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_menu.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: HSPWiKi </th>
+<th width = "20%"> <a href="http://quasiquote.org/hspwiki/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a module to create a menu bar and support operations such as selection.
+You can use the basic functions of the menu bar supported by Windows.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_picfont">mod_picfont.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_picfont.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_picfont.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a module to have basic character fonts such as 0 to 9 and A to Z as images and display them.
+You can use it when you use your own character font.
+It also comes with a sample (mkfont.hsp) to convert existing fonts to images.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_rss">mod_rss.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_rss.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_rss.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A module for reading RSS using an XML parser (MSXML).
+You can get RSS by directly specifying the network URL.
+					</p>
+					<p>
+For details, refer to the module source script and instruction help.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_stbar">mod_stbar.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_stbar.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_stbar.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+A module for creating and configuring the status bar.
+					</p>
+					<p>
+See the module source script for more information.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="modclbk">modclbk3.hsp</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of modclbk3.hsp </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">modclbk3.hsp</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: tds12 </th>
+<th width = "20%"> <a href="https://twitter.com/lltds12"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+It is a module that can define the callback function used in API call on HSP.
+					</p>
+					<p>
+For more information, see Module source scripts and samples.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="dmxusb">mod_dmxusb.as</h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of mod_dmxusb.as </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+				<th width="30%">mod_dmxusb.as</th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+Controls DMX devices such as ENTTEC DMX US PRO connected via USB.
+See the module source script for more information.
+					</p>
+				</td>
+			</tr>
+		</table>
+<h3 id = "winapi"> Win32 API definition </h3>
+<table summary = "Introduction of extension modules." Class = "pluginlist">
+<caption> Introduction of Win32 API definition </caption>
+			<tr>
+<th width = "20%"> Extension module </th>
+<th width = "30%"> Win32 API definition </th>
+				<th width="5%">---</th>
+<th width = "25%"> Author: sakura / Onitama </th>
+<th width = "20%"> <a href="https://www.onionsoft.net/"> Author's page </a> </th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+Win32 API call definition file.
+By importing this file with the #include instruction, you can call system-defined functions.
+					<ul>
+<li> advapi32.as advapi32.dll definition
+<li> comctl32.as comctl32.dll definition
+<li> comdlg32.as comdlg32.dll definition
+<li> gdi32.as gdi32.dll definition
+<li> kernel32.as kernel32.dll definition
+<li> shell32.as shell32.dll definition
+<li> user32.as user32.dll definition
+<li> winmm.as winmm.dll definition
+					</ul>
+					</p>
+					<p>
+For details, refer to the module source script and Win32 API help.
+					</p>
+				</td>
+			</tr>
+		</table>
+
+<h2 id = "OTHER_PLUGI"> Other extension plugins </h2>
+		<p>
+The specifications of the HSP extension plug-in are open to the public, and the users created it.
+There are many plugins.
+Many plug-ins that greatly expand the possibilities of HSP are also introduced on the HSP official homepage.
+		</p>
+		<dl>
+<dt> Introduction of extension plug-in tools (HSPTV!) </Dt>
+			<dd><p><a href="https://hsp.tv/make/tool.html">https://hsp.tv/make/tool.html</a></p></dd>
+		</dl>
+
+<h2 id = "SHIYOU"> Extension plug-in specifications </h2>
+		<p>
+For detailed specifications for creating HSP extension plug-ins, please refer to the HSP Development Kit (HSPSDK) folder.
+		</p>
+
+<!-Footer->
+		<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSP3Dish,android,ndk,google">
+<meta name = "description" content = "Information about HSP3Dish HGIM G4 posted">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+<title> HGIMG4 Unity Cooperation Guide </title>
+</head>
+<body>
+	<div id="CONTAINER">
+<!-Header->
+	<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+	<img src="hsp3dish.jpg" width="640" height="200" alt="title">
+<h1> HGIMG4 Unity Cooperation Guide </h1>
+
+<!-Table of Contents->
+	<ol>
+<li> <a href="#ABOUT"> Introduction </a> </li>
+<li> <a href="#DEMO"> Professional student sample demo list </a> </li>
+<li> <a href="#FBXEXPORTER"> Output flow by Unity FBX Exporter </a> </li>
+<li> <a href="#ANIMATION"> Apply animation on Unity </a> </li>
+<li> <a href="#LICENCE"> Copyright and license </a> </li>
+	</ol>
+
+<h2 id = "ABOUT"> Introduction </h2>
+		<p><font size="-1">
+By linking HGIMG4 and Unity, you can apply more advanced motions and convert 3D models.
+You can check a sample of 3D character animation using HGIM G4 from the "Professional Student Demo" (sample / pronama3d) included as a sample. <br>
+This is a sample demo using the programming live character <a href="https://kei.pronama.jp/" target="_blank"> "Professional student" </a> material.
+		</p>
+		<p>
+		<img src="image/hgimg4_sample.jpg">
+		</p>
+
+<h2 id = "DEMO"> Professional student sample demo list </h2>
+
+		<li>pronama3.hsp</li>
+		<p>
+This is a sample for specular rendering with multipath. The background uses a cubemap skybox.
+		</p>
+
+		<p>
+		<a href="image/pn2.png" target="_blank"><img src="image/pn2.png" width="512"></a>
+		</p>
+
+		<li>pronama4.hsp</li>
+		<p>
+Every time you click or press the space key, the number of professional students will increase. This is a sample that displays a large number of character animations.
+		</p>
+
+		<p>
+		<a href="image/pn3.png" target="_blank"><img src="image/pn3.png" width="512"></a>
+		</p>
+
+		<li>pronama5.hsp</li>
+		<p>
+You can switch between various effects, such as a CRT TV-like display with post-processing.
+		</p>
+
+		<p>
+		<a href="image/pn1.png" target="_blank"><img src="image/pn1.png" width="512"></a>
+		</p>
+
+		<li>pronama_box.hsp</li>
+		<p>
+This is a sample of dropping a box using a physics engine. Each time you click or press the spacebar, a box will be created.
+		</p>
+
+		<p>
+		<a href="image/pn5.png" target="_blank"><img src="image/pn5.png" width="512"></a>
+		</p>
+
+<h2 id = "UNITYHSP"> Cooperation with Unity </h2>
+		<p>
+By using Unity, which is widely used as a 3D game engine and tool, as a hub, it has become easier to use various models. <br>
+By outputting the 3D model / animation data loaded on Unity as an FBX file that can be used from HGIMG4 by Unity FBX Exporter, you can utilize the assets on Unity, model data such as VRM, and animation. ..
+		</p>
+		<p>
+		<img src="image/hgimg4_unity.jpg">
+		</p>
+		<p>
+We are also developing a GUI tool "HSP3d" for managing material and model / animation data. <br>
+By managing and setting a wide variety of 3D data in an integrated manner, it is possible to use complex data in a simple form from HSP3. <br>
+		</p>
+
+
+<h2 id = "FBXEXPORTER"> Output flow by Unity FBX Exporter </h2>
+		<p>
+Create a new project in Unity (Unity 2017.3 or later) and prepare (copy) the materials to be used under the Asset folder.
+Select the FBX file included in the material to see a preview of the model in the Inspector.
+Here, I will use the normal version of Prosei-chan. If you want to output the animation, you need to set the animation type of the avatar to Generic.
+If the animation type is Humanoid, it's a good idea to duplicate the FBX before setting the Generic model. <br>
+Once you've set it up, place the model on the scene. Dropping the FBX into the Hierarchy window places the model in the scene.
+		</p>
+		<p>
+		<a href="image/p3.png" target="_blank"><img src="image/p3.png" width="512"></a>
+		</p>
+		<p>
+		
+		</p>
+		<p>
+Download <a href="https://assetstore.unity.com/packages/essentials/fbx-exporter-101408" target="_blank"> FBX Exporter </a> from the Asset Store and import it into your current project To do. FBX Exporter is a free asset officially distributed by Unity.
+		</p>
+		<p>
+		<a href="image/p4.png" target="_blank"><img src="image/p4.png" width="512"></a>
+		</p>
+		<p>
+* This article is based on Unity FBX Exporter ver.1.3.0f1. FBX Exporter works with Unity 2017.3 and later, but we do not guarantee it to work with all versions.
+		</p>
+		<p>
+By importing the assets, you will be able to select "Export to FBX ..." from the right-click menu of the model placed on the scene.
+		</p>
+
+		<p>
+		<a href="image/p5.jpg" target="_blank"><img src="image/p5.jpg" width="512"></a>
+		</p>
+		<p>
+Basically, you will open the FBX Exporter window from here and output the FBX file. <br>
+In the FBX Exporter window options, set "Export Format" to Binary.
+After that, the FBX file will be output to the specified folder by pressing the "Export" button.
+		</p>
+
+		<p>
+In order to use the output FBX file from HSP3 (HGIMG4), it is necessary to convert the model data to a .gpb file.
+Use the included GPB converter (gpbconv.exe) to convert to a .gpb file. From the tool, select the FBX file and press the "Convert" button to generate a .gpb file with the same name as the FBX file and a .material file.
+		</p>
+		<p>
+		<img src="image/gpbconvert.png">
+		</p>
+
+		<p>
+The .gpb file is only model data, so if you are using a texture (image) file, you need to prepare it separately. (HGIMG4 recommends .png format for the texture image used by the model.) <br>
+Copy all .gpb files, .material files, and texture image (.png) files output from the GPB converter to the res folder under the script to be used.
+		</p>
+
+		<p>
+If you want to output a model that includes animation, set the animation controller for the model in the scene so that the animation will be played when Unity is executed. <br>
+The FBX Exporter may give an error when outputting a model with a bone structure.
+This is often due to the RootBone in the model's Skinned Mesh Renderer settings being improperly set.
+By setting RootBone to a hierarchy close to the root of the bone structure, you should be able to output correctly.
+		</p>
+		<p>
+* In the current version, due to restrictions during model conversion of HGIMG4, if there is rotation or scaling in a layer with a skinned mesh renderer of the model, it may not be displayed correctly on HGIMG4. When outputting some model data such as professional student model, please set the rotation of the mesh hierarchy to 0 and the scale to 1. There are no particular restrictions on rotation or scaling in other layers.
+		</p>
+		<p>
+* Some parts such as spats and socks may flicker when outputting a professional student model. <br>
+This is because the replacement materials are displayed in an overlapping manner, and in order to display them correctly, the FBX material import must be set as follows.
+In the PronamaChan.fbx file inspector, you can set the material settings when importing the model.
+		</p>
+
+		<p>
+		<a href="image/pn_material.png" target="_blank"><img src="image/pn_material.png" width="720"></a>
+		</p>
+
+		<p>
+Assign a material file (.mat) under the Materials / Unlit folder to each material.
+For example, for "BODY_skin", assign the material of "skin".
+Since "BODY_skin.002", "BODY_skin.003", and "BODY_skin.004" do not need to be displayed as the replacement material, specify the "transparent" material. <br>
+The transparent material is not displayed on Unity, but when displayed on HGIMG4, the transparent material is displayed as white.
+Therefore, edit the .material file that sets the display material in HGIMG4.
+When the GPB converter converts the PronamaChan.fbx file, the material settings will be saved as PronamaChan.material. Open this file with a text editor and edit the "material transparent_187: colored" item.
+		</p>
+
+		<pre>
+		material transparent_187 : colored
+		{
+		    u_diffuseColor = 1, 1, 1, 1
+		    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+		    u_matrixPalette = MATRIX_PALETTE
+		    
+		    renderState
+		    {
+			depthFunc = NEVER
+		    }
+		
+		    technique
+		    {
+		        pass 
+		        {
+		            defines = SKINNING;SKINNING_JOINT_COUNT 187
+		        }
+		    }
+		}
+		</pre>
+
+		<p>
+By setting the renderState item, it is specified not to draw the material of transparent_187.
+It should now display correctly. If you do not use (hide) spats or socks, you must also specify the material for the spats or socks as transparent.
+		</p>
+
+<h2 id = "ANIMATION"> Apply animation on Unity </h2>
+
+		<p>
+		<a href="image/p7.png" target="_blank"><img src="image/p7.png" width="512"></a>
+		</p>
+
+		<p>
+There are several ways to apply animation to your model, but as a site where you can easily get animation data, <a href="https://www.mixamo.com/" target="_blank"> mixamo </a> > There is.
+<a href="https://www.mixamo.com/" target="_blank"> mixamo </a> is free to download as an FBX file with animation applied to various models. It is a highly licensed product.
+		</p>
+
+		<p>
+		<img src="image/mixamo.jpg">
+		</p>
+		<p>
+Even with assets on Unity, various motion data and tools for creating are available, so it is possible to do a considerable part for free. <br>
+Most animation data, including mixamo, is intended for humanoid rigs with an animation type of Humanoid.
+In order to output animation with FBX Exporter, it must be a Generic rig, and the standard Unity function cannot convert Humanoid and Generic. <br>
+However, some paid assets support this conversion, <a href="https://assetstore.unity.com/packages/tools/animation/umotion-pro-animation-editor-95991" target="_blank" > "UMotion Pro" </a> can be used as one of them.
+		</p>
+
+		<p>
+		<a href="image/p8.png" target="_blank"><img src="image/p8.png" width="512"></a>
+		</p>
+
+		<p>
+In this professional student sample demo, UMotion Pro is used to convert the animation data of mixamo.
+<a href="https://assetstore.unity.com/packages/tools/animation/umotion-pro-animation-editor-95991" target="_blank"> "UMotion Pro" </a> itself, animation data You can also create, so the range of utilization should be expanded.
+		</p>
+		<p>
+3D avatar file format, <a href="https://dwango.github.io/vrm/" target="_blank"> "VRM" </a> format, <a href="https: // You can also import it into Unity using github.com/dwango/UniVRM "target="_blank"> UnivVRM </a> and output it with FBX Exporter.
+		</p>
+
+		<p>
+		<img src="image/hgimg4_vrm.jpg">
+		</p>
+
+		<p>
+By using Unity as a hub, you can utilize a wide range of 3D models and animations.
+By controlling 3D from HSP3 scripts, expand the range of applications with your ideas, such as easy game creation and test applications.
+		</p>
+
+
+<h2 id = "LICENCE"> Copyright and license </h2>
+		<p>
+The runtime and script files included in the archive can be attached, duplicated, reorganized and redistributed under the same license as the HSP itself. <br>
+The data created by the user using the tool and the rights of the generated script belong to the user who created it. <br> Please refer to the following for the license of the 3D model (Professional student) used in the sample.
+		<pre>
+Kei Kurui (Professional student) 3D model
+Breath Pronama LLC
+* For details, <a href="https://kei.pronama.jp/" target="_blank"> https://kei.pronama.jp/ </a>
+		</pre>
+When using the material, be sure to read the usage guidelines of "Professional Student".
+		</p>
+		<pre>
+Professional student (Kei Kurui) usage guidelines
+		<a href="https://kei.pronama.jp/guideline/" target="_blank">https://kei.pronama.jp/guideline/</a>
+		</pre>
+
+
+<!-Footer->
+	<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to index </a> </li>
+	</ul>
+	<a href="https://www.onionsoft.net/">
+		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+	</a>
+</div><!-- container -->
+</body>
+</html>
+

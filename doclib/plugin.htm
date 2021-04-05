@@ -1,0 +1,1132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,プログラミングマニュアル">
+	<meta name="description" content="HSPTVに関する情報を掲載">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>拡張プラグイン・モジュール一覧</title>
+</head>
+<!--
+	2010/02/16
+		・ 同梱モジュールの説明を追加
+	2009/05/19
+		・ 同梱モジュールの説明を追加
+	2008/02/01
+		・ hgimg3の説明を修正。（DLL→hrtなど）
+-->
+<body>
+
+	<div id="CONTAINER">
+		<!-- ヘッダー -->
+		<p id="COPY"><a id="top" class="head">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</a></p>
+		<img src="hsp3ttl.jpg" alt="タイトル" width="640" height="200">
+		<h1>拡張プラグイン・モジュール一覧</h1>
+
+		<!-- 目次 -->
+		<ol>
+			<li><a href="#FIRST">はじめに</a></li>
+			<li><a href="#EX_PLUGIN">拡張プラグイン</a>
+				<ol>
+					<li><a href="#HSPEXT">HSPEXT.DLL</a></li>
+					<li><a href="#HSPINET">HSPINET.DLL</a></li>
+					<li><a href="#HGIMG3">HGIMG3.hrt</a></li>
+					<li><a href="#HSP3DISH">HSP3Dish</a></li>
+					<li><a href="#HGIMG4">HGIMG4.hrt</a></li>
+					<li><a href="#OBAQ">OBAQ.DLL</a></li>
+					<li><a href="#HSPCV">HSPCV.DLL</a></li>
+					<li><a href="#HSPDB">HSPDB.DLL</a></li>
+					<li><a href="#HSPDA">HSPDA.DLL</a></li>
+					<li><a href="#HSPCMP">HSPCMP.DLL</a></li>
+					<li><a href="#HSP3IMP">HSP3IMP.DLL</a></li>
+					<li><a href="#HSPOGG">HSPOGG.DLL</a></li>
+					<li><a href="#HSPSOCK">HSPSOCK.DLL</a></li>
+					<li><a href="#HSPUSBIO">HSPUSBIO.DLL</a></li>
+					<li><a href="#HSP3IMP">HSP3IMP.DLL</a></li>
+					<li><a href="#HSPPRINT">HSPPRINT.DLL</a></li>
+					<li><a href="#HSPSW">HSPSW.DLL</a></li>
+					<li><a href="#HSPMUCOM">HSPMUCOM.DLL</a></li>
+					<li><a href="#HSPZLIB">ZLibWrap.dll</a></li>
+				</ol>
+			</li>
+			<li><a href="#MODULE">モジュール</a>
+				<ol>
+					<li><a href="#D3MODULE">d3module</a></li>
+					<li><a href="#Artlet2D">Artlet2D</a></li>
+					<li><a href="#HSP3DISH">HSP3DISH.hrt</a></li>
+					<li><a href="#SQLele">SQLele</a></li>
+					<li><a href="#hsp3util">hsp3util.as</a></li>
+					<li><a href="#hsp261cmp">hsp261cmp.as</a></li>
+					<li><a href="#form_decode">form_decode.as</a></li>
+					<li><a href="#mod_getenv">mod_getenv.as</a></li>
+					<li><a href="#mod_img">mod_img.as</a></li>
+					<li><a href="#hspmath">hspmath.as</a></li>
+					<li><a href="#mod_fontdlg">mod_fontdlg.as</a></li>
+					<li><a href="#mod_aht">mod_aht.as</a></li>
+					<li><a href="#mod_joystick">mod_joystick.as</a></li>
+					<li><a href="#mod_menu">mod_menu.as</a></li>
+					<li><a href="#mod_picfont">mod_picfont.as</a></li>
+					<li><a href="#mod_rss">mod_rss.as</a></li>
+					<li><a href="#mod_stbar">mod_stbar.as</a></li>
+					<li><a href="#modclbk">modclbk3.hsp</a></li>
+					<li><a href="#dmxusb">mod_dmxusb.as</a></li>
+					<li><a href="#winapi">Win32API定義</a></li>
+				</ol>
+			</li>
+			<li><a href="#OTHER_PLUGIN">その他の拡張プラグイン</a></li>
+			<li><a href="#SHIYOU">拡張プラグインの仕様</a></li>
+		</ol>
+
+		<h2 id="FIRST">はじめに</h2>
+		<p>
+			HSPでは、拡張プラグイン及びモジュールという形で機能を追加していくことが可能です。
+			これにより、HSP本体だけでは実現できない処理が可能になります。
+		</p>
+		<p>
+			HSP拡張プラグインは、標準でDLLまたはHPIの拡張子を持つファイルとなっています。
+			このファイルは、必ずHSP本体(HSP3.EXE)と同じディレクトリに存在していなければ
+			なりません。
+			また、EXEファイル作成の際にPACKFILEに入れて、1つのEXEファイルにすることは
+			できません。拡張プラグインを使用するEXEファイルを作成した場合は、EXEファイルと
+			同じディレクトリに拡張プラグインを置いてください。
+		</p>
+		<p>
+			モジュールは、拡張プラグインと同様に機能を追加するためのファイルですが、
+			ソーススクリプトに追加する形で使用します。
+			HSP拡張プラグインと違い、モジュールの場合は、EXEファイルと同じディレクトリに
+			ファイルを置く必要はありません。
+		</p>
+		<p>
+			拡張プラグインは、標準で以下のものが同梱されています。
+			それぞれのプラグインについての使い方詳細は、別途テキストを参照してください。
+		</p>
+ 		<h2 id="EX_PLUGIN">拡張プラグイン</h2>
+ 		<h3 id="HSPEXT">HSPEXT.DLL</h3>
+		<table summary="拡張プラグインHSPEXTの紹介です。" class="pluginlist">
+			<caption>HSPEXT.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPEXT.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						標準の機能以外を幅広くサポートする、機能拡張プラグインです。
+						この拡張DLLを使用することにより、40種類以上の新規命令が追加され、
+						レジストリ操作、簡易数学関数、シリアル通信、拡張画像操作、
+						拡張ファイルアクセスなど多くの機能がHSPからコントロールできるようになります。
+					</p>
+					<p>
+						さらにアプリケーションキャプチャー命令の搭載により、HSP以外のアプリケーションを
+						コントロールすることが可能になります。
+					</p>
+					<p>
+						これらの命令は、HSP単体では実現できないようなツール、ユーティリティの
+						作成に役立つものが多く、さらに高度なアプリケーション開発が可能になります。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspext.txt">hspext.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPINET">HSPINET.DLL</h3>
+		<table summary="拡張プラグインHSPINETの紹介です。" class="pluginlist">
+			<caption>HSPINET.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPINET.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						インターネットアクセスのためのプラグインです。
+						http、ftpサーバーへ手軽にアクセスすることが可能になります。
+					</p>
+					<p>
+						指定したページにあるデータの取得はもちろん、プロキシサーバーを介してのアクセスや、
+						更新日時の取得など豊富なオプションが用意されています。
+						ftp接続時は、ディレクトリ一覧からftpコマンド送信まで細かい操作を行なうことができます。
+						また、他にもファイルのCRC42、MD5値を取得する命令などが装備されています。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspinet.txt">hspinet.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HGIMG3">HGIMG3.hrt</h3>
+		<table summary="拡張ランタイムHGIMG3の紹介です。" class="pluginlist">
+			<caption>HGIMG3.hrtの紹介</caption>
+			<tr>
+				<th width="20%">拡張ランタイム</th>
+				<th width="30%">HGIMG3.hrt</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						高機能2D・3D画像処理機能付きランタイムです。
+						2D・3Dグラフィック表示をサポートしたDirectX専用の機能になります。
+					</p>
+					<p>
+						スプライトを使用した2Dゲームから、3Dモデルを使った本格的なソフトまで幅広く
+						利用することができます。
+						HSP3HG.hrtで追加される主な機能は以下の通りです。
+					</p>
+					<ul>
+							<li>DirectX、フルカラーモードを対象とした高度な描画システム</li>
+							<li>2Dスプライト、3Dポリゴンなどを共通の命令で設定可能な描画エンジン</li>
+							<li>2Dスプライトの回転拡大縮小、α合成、透明色抜き処理、タイリング(BG表示)</li>
+							<li>3D座標上の2Dスプライトと3Dポリゴンを混在可能なワールド管理</li>
+							<li>3Dの階層構造を持ったポリゴンモデルの管理が可能</li>
+							<li>ボーンを用いた3Dワンスキンモデルのアニメーション表示が可能</li>
+							<li>アニメ風のレンダリング(トゥーンシェーディング)表示が可能</li>
+							<li>BMP、JPG、GIF、PNG、DDS、TGA、TIFF形式のテクスチャサポート</li>
+							<li>アンチエイリアスを含めた日本語フォントのテクスチャレンダリング機能</li>
+							<li>アルファチャンネルを含むテクスチャ画像のサポート</li>
+							<li>スプライトの表示、移動の管理および衝突判定機能</li>
+							<li>HSP3に対応した浮動小数によるジオメトリ演算</li>
+							<li>イベントリスト登録機能により自由度の高い自律処理を実現可能</li>
+							<li>使いやすい直接描画命令を装備</li>
+							<li>ストリーム再生を含むサウンド機能を装備</li>
+					</ul>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hgimg3.txt">hgimg3.txt</a>」を参照してください。
+						このランタイムは、現在開発を終了しています。後継となるHGIMG4をご使用ください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSP3DISH">hsp3dish.hrt</h3>
+		<table summary="拡張ランタイムHSP3Dishの紹介です。" class="pluginlist">
+			<caption>HSP3Dishの紹介</caption>
+			<tr>
+				<th width="20%">拡張ランタイム</th>
+				<th width="30%">hsp3dish.hrt</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						高速な2D描画機能、サウンド機能を搭載したランタイムです。
+						Windowsだけでなくandroid,iOS,Linux,RaspberryPi,html5(WebGL)上でソースコードに手を加えることなく動作させることができます。
+					</p>
+					<p>
+						HSPDXプラグインと互換性のある標準スプライト、OBAQプラグイン、簡易的なネットワーク通信機能を内包しており、2Dゲームから本格的なソフトまで幅広く利用することができます。また、3D機能を持つHGIMG4ランタイムは、サブセットとしてHSP3Dishの機能をすべて内包しています。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hsp3dish_prog.htm">hsp3dish_prog.htm</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HGIMG4">HGIMG4.hrt</h3>
+		<table summary="拡張ランタイムHGIMG4の紹介です。" class="pluginlist">
+			<caption>HGIMG4.hrtの紹介</caption>
+			<tr>
+				<th width="20%">拡張ランタイム</th>
+				<th width="30%">HGIMG4.hrt</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						高機能2D・3D画像処理機能付きランタイムです。
+						高度な2D・3Dグラフィック表示をサポートしたOpenGL/DirectX9の機能になります。
+					</p>
+					<p>
+						スプライトを使用した2Dゲームから、3Dモデルを使った本格的なソフトまで幅広く
+						利用することができます。
+						HGIMG4で追加される主な機能は以下の通りです。
+					</p>
+					<ul>
+							<li>OpenGL/ESまたはDirectX9による描画、シェーダー言語サポート
+							<li>シーン管理と統合化された物理エンジン(Bullet)サポート
+							<li>FBX形式のモデルファイル読み込み、アニメーションサポート
+							<li>マルチテクスチャ、バンプマップ、ハイトマップ、LODをサポート
+							<li>フォントデータ(TTF)のレンダリングサポート
+							<li>オフスクリーンレンダリング及び各種ポストエフェクトサポート
+							<li>WindowsだけでなくiOS,Android,Linux,html5(WebGL)上での動作をサポート
+							<li>HSP及びHSP3Dishと同様のライセンス規約、オープンソース 
+					</ul>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hgimg4.html">hgimg4.html</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="OBAQ">OBAQ.DLL</h3>
+		<table summary="拡張プラグインOBAQの紹介です。" class="pluginlist">
+			<caption>OBAQ for HSP3の紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">OBAQ for HSP3</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:Zener Works, Inc./kuni/onitama</th>
+				<th width="20%"><a href="http://www.zener.co.jp/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						物理エンジン(OBAQ)が持つ機能を手軽に利用することができるプラグインです。
+						OBAQを使用することにより、2Dベースによる剛体の衝突、重力シミューレーションを扱うことができます。
+						OBAQは誰にでも手軽に、物理演算による自然な動きを実現することができるよう、2Dに特化し、設定や命令もシンプルにまとめられています。
+						精度の高い技術計算というよりも、ゲームやデモンストレーション等をサポートするためのお手軽なシステムと考えてください。
+					</p>
+					<p>
+						OBAQには、スプライトマネージャーを内蔵しており、標準機能のみを使用したスプライト描画を手軽に行なうことができます。
+						また、表示座標をユーザーが管理することにより、DirectX等を使った表示システムにも対応可能です。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="obaq.txt">obaq.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPCV">HSPCV.DLL</h3>
+		<table summary="拡張プラグインHSPCVの紹介です。" class="pluginlist">
+			<caption>HSPCV.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPCV.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						<abbr title="Intel Open Source Computer Vision Library">OpenCV</abbr>が持つ機能を
+						手軽に利用することができるプラグインです。
+					</p>
+					<p>
+						HSPCVを使用することにより、高度な画像処理やアルゴリズムを扱うことができます。
+						他にも、各種フォーマット(PNG、JPEG、TIFF等)の読み書き、及び
+						ムービー(avi)ファイル操作やUSBカメラ等のキャプチャデバイス読み込みなど
+						映像に関する多くの機能を提供しています。
+						HSPCV.DLLで追加される主な機能は以下の通りです。
+					</p>
+					<ul>
+							<li>任意サイズの画像イメージ操作(コピー、加算、減算、乗算ほか)</li>
+							<li>画像イメージの高品質なリサイズ、スムージング、回転</li>
+							<li>画像イメージからの閾値による抽出、反転、色変換</li>
+							<li>各種フォーマットに対応した画像ファイルの読み込み、保存</li>
+							<li>USBカメラ等のキャプチャデバイス経由の画像取得</li>
+							<li>avi動画ファイルの読み込み、保存</li>
+							<li>顔抽出等の画像認識</li>
+							<li>任意の画像に近い領域を抽出するテンプレートマッチング</li>
+					</ul>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspcv.txt">hspcv.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPDB">HSPDB.DLL</h3>
+		<table summary="拡張プラグインHSPDBの紹介です。" class="pluginlist">
+			<caption>HSPDB.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPDB.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						データベースアクセスのためのプラグインです。
+						<abbr title="Open DataBase Connectivity">ODBC</abbr>を経由して各種データベースへ
+						アクセスすることが可能になります。
+						対応するODBCドライバがあれば、Oracle・MS-SQL Server・dBase・Paradoxなどの
+						データベースにアクセスして、SQLによるコントロール、データの受け渡しを行なうことができます。
+					</p>
+					<p>
+						HSPDBを使用するためには、WindowsにODBCおよび対応ドライバが
+						インストールされている必要があります。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspdb.txt">hspdb.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPDA">HSPDA.DLL</h3>
+		<table summary="拡張プラグインHSPDAの紹介です。" class="pluginlist">
+			<caption>HSPDA.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPDA.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						各種データアクセスのためのプラグインです。
+					</p>
+					<p>
+						大量の文字列や数値をまとめてデータ管理する場合に威力を発揮します。
+						特に数値や文字列のソート機能は、大量のデータでも短時間で並び替えが可能です。
+						また、ソーススクリプトで使用している変数データの一部またはすべてをファイルに書き出し、
+						読み込みを行なう機能を持っています。
+						その他にも、CSV形式のファイルを配列に変換したり検索する機能、実数の乱数発生などが
+						用意されています。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspda.txt">hspda.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPCMP">HSPCMP.DLL</h3>
+		<table summary="拡張プラグインHSPCMPの紹介です。" class="pluginlist">
+			<caption>HSPCMP.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPCMP.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						HSPシステム機能を持つプラグインです。
+					</p>
+					<p>
+						スクリプトエディタが持つHSP関連機能（コンパイル、実行、オブジェクト作成、実行ファイル作成）を
+						コントロール可能です。HSPのシステム機能をHSPのスクリプトから制御することで、
+						それぞれのユーザーに合った独自のカスタマイズやバッチ処理が可能になります。
+						AHT(拡張テンプレート)のためのサポート機能も持っています。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspcmp.txt">hspcmp.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSP3IMP">HSP3IMP.DLL</h3>
+		<table summary="拡張プラグインHSP3IMPの紹介です。" class="pluginlist">
+			<caption>HSP3IMP.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSP3IMP.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						HSPランタイム機能を持つプラグインです。
+					</p>
+					<p>
+						HSP3IMP.DLLの動作画面は、指定されたウィンドウの子ウィンドウとして機能するので、
+						パーツを貼り付ける要領で、HSP3の画面を利用することが可能です。
+						また、HSPだけでなく、C/C++といった一般的な言語で作成されたアプリケーションに
+						HSPの機能を付加することができます。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hsp3imp.txt">hsp3imp.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPOGG">HSPOGG.DLL</h3>
+		<table summary="拡張プラグインHSPOGGの紹介です。" class="pluginlist">
+			<caption>HSPOGG.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPOGG.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						DirectSoundに対応したサウンド再生のためのプラグインです。
+					</p>
+					<p>
+						HGIMG3で使用することができるサウンド機能命令(dmm～)と同等の機能を持っています。
+						3D機能などは使用しないが、サウンド機能のみ利用したい時や、
+						他の描画系プラグインと組み合わせたい時などに使用することができます。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspogg.txt">hspogg.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPSOCK">HSPSOCK.DLL</h3>
+		<table summary="拡張プラグインHSPSOCKの紹介です。" class="pluginlist">
+			<caption>HSPSOCK.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPSOCK.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						TCP/IPソケット通信用プラグインです。
+					</p>
+					<p>
+						この拡張DLLを使用することにより、LANやインターネットを通じてデータの送受信を行なうことが
+						可能になり、簡単なクライアント・サーバーソフトを作成することもできます。
+						他のマシンとのコミュニケーションに、インターネットのクライアントに、
+						ネット対応のゲームなど多くの場面に活用することができるでしょう。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspsock.txt">hspsock.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="HSPUSBIO">HSPUSBIO.DLL</h3>
+		<table summary="拡張プラグインHSPUSBIOの紹介です。" class="pluginlist">
+			<caption>HSPUSBIO.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPUSBIO.DLL</th>
+				<th width="5%">Ver0.30</th>
+				<th width="25%">作者:K-K</th>
+				<th width="20%"><a href="https://www.binzume.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						USB-IOをHSPから使うためのプラグインです。
+					</p>
+					<p>
+						USB-IOは、<a href="http://www.morphyplanning.co.jp/">モルフィー企画さん</a>、<a href="http://www.technokit.biz/">テクノキットさん</a>、<a href="http://km2net.com/">Km2Netさん</a>から販売されているものが使用できます。
+						この拡張DLLを使用することにより、USB-IO経由で様々なハードウェアの制御を行なうことが可能です。
+						簡単なテストから、本格的な稼働まで利用することができるようになります。
+						また、DLLではなくモジュールとして実装された「mod_usbio.as」も用意されています。こちらは、HSPUSBIO.DLLと同じ機能をモジュールだけで実現しています。
+						必要に応じて使い分けてみてください。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspusbio/hspusbio.txt">hspusbio.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="HSPPRINT">HSPPRINT.DLL</h3>
+		<table summary="拡張プラグインHSPPRINT.DLLの紹介です。" class="pluginlist">
+			<caption>HSPPRINT.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPPRINT.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					hspprintは、Windowsに接続されたプリンターデバイス上で画像印刷を可能にするためのプラグインです。
+					この拡張DLLを使用することにより、印刷に関する新規命令が追加されます。
+					hspprint.dllを使用するためには、Windows2000以降のシステム及び、有効な
+					ドライバーがインストールされたプリンタデバイス(ローカルまたはネットワーク)が必要になります。
+					hspprintは、指定された画像を印刷するためのシンプルなプラグインです。
+					任意フォントを使った文字の印刷、ベクターデータの印刷には対応していません。
+					プラグインの機能についてご確認の上、ご利用ください。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspprint.txt">hspprint.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="HSPSW">HSPSW.DLL</h3>
+		<table summary="拡張プラグインHSPSW.DLLの紹介です。" class="pluginlist">
+			<caption>HSPSW.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPSW.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					STEAMWORKS SDKが持つSteam連携機能を利用可能にします。
+					HSPSWを使用することにより、STEAM実績の取得・解除・再設定、STEAMステータス値の取得・設定などがサポートされます。<br>
+					これらの機能は、Steamで配信されたソフトウェア上で使用することが可能です。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspsw.txt">hspsw.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPMUCOM">HSPMUCOM.DLL</h3>
+		<table summary="拡張プラグインHSPMUCOM.DLLの紹介です。" class="pluginlist">
+			<caption>HSPMUCOM.DLLの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">HSPMUCOM.DLL</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					NECのパソコンPC-8801シリーズで動作していた、FM音源のドライバー、MUCOM88(MUSIC LALF)というツールをWindows上で動作させることができる
+					MUCOM88 Windowsの機能をDLLにまとめたものが、HSPMUCOMです。
+					HSPMUCOMを使用することにより、単純な音楽の再生から、MMLの解釈までスクリプト言語から幅広く制御することができます。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="hspmucom.txt">hspmucom.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="HSPZLIB">ZLibWrap.dll</h3>
+		<table summary="拡張プラグインZLibWrap.dllの紹介です。" class="pluginlist">
+			<caption>ZLibWrap.dllの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">ZLibWrap.dll</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					zipファイルに関する手軽な圧縮・解凍機能を提供します。
+					シンプルなZipCompress、ZipExtractの2つの命令により使用できます。
+					</p>
+					<p>
+						詳しくは、zipfile.asファイル及び、sampleフォルダのzipfile_test1.hsp、zipfile_test2.hspを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
+		<h2 id="MODULE">モジュール</h2>
+		<h3 id="D3MODULE">d3module</h3>
+		<table summary="拡張モジュールd3moduleの紹介です。" class="pluginlist">
+			<caption>d3moduleの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">d3module</th>
+				<th width="5%">Ver1.66</th>
+				<th width="25%">作者:S.Programs</th>
+				<th width="20%"><a href="http://spn.php.xdomain.jp/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+						HSPの標準ランタイムで簡易3D表示を行なうためのモジュールです。<br>
+						DirectXや3Dアクセラレータに依存せず、多くの環境で同じ実行結果を得ることができるため、
+						手軽に3D的な表示を利用したい時などに威力を発揮します。
+						また、d3module と HSPLetを使用すれば、HSPの知識だけで
+						ブラウザ上で動作する3Dアプレットを作成できるのもメリットの1つです。
+					</p>
+					<p>
+						このモジュールは、S.Programs氏が製作したものをHSP本体に同梱しています。
+						モジュールについてのご意見や感想などは、onion softwareではなく、
+						S.Programs氏にフィードバックされるようお願いします。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="d3module/d3module.txt">d3module.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
+		<h3 id="Artlet2D">Artlet2D</h3>
+		<table summary="拡張モジュールArtlet2Dの紹介です。" class="pluginlist">
+			<caption>Artlet2Dの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">Artlet2D</th>
+				<th width="5%">Ver1.01 R3</th>
+				<th width="25%">作者:S.Programs</th>
+				<th width="20%"><a href="http://spn.php.xdomain.jp/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					Artlet2D は、GDI+ を利用して、HSP でアルファチャネル (透明度成分) 付きの画像データを扱うためのモジュールです。
+					HSP 標準の描画命令とは別に、以下のような機能が使えるようになります。
+					<li>ピクセルフォーマット 32bit ARGB の仮想イメージバッファ</li>
+					<li>HSP スクリーンと Artlet2D 仮想イメージ間の相互画像コピー</li>
+					<li>線分、楕円、矩形などの基礎図形、自由曲線の描画機能</li>
+					<li>アンチエイリアシングされた滑らかなエッジの描画</li>
+					<li>アルファ値付き color 命令</li>
+					<li>グラデーションブラシ、テクスチャブラシ</li>
+					<li>自由なペン幅、さまざまなペンスタイル</li>
+					<li>矩形領域内で自動折り返し可能・縦横アラインメント可能なテキスト表示</li>
+					<li>スムーズな画像拡大・縮小コピー</li>
+					<li>指定カラー範囲の透明化、ガンマ調整、カラーマトリックスによる明度調整、</li>
+					<li> 半透明、セピア変換などのコピーモード</li>
+					<li>座標変換マトリクスによる描画位置や回転角度の変更</li>
+					<li>アルファチャネル付き png ファイルの読み書き</li>
+					</p>
+					<p>
+						このモジュールは、S.Programs氏が製作したものをHSP本体に同梱しています。
+						モジュールについてのご意見や感想などは、onion softwareではなく、
+						S.Programs氏にフィードバックされるようお願いします。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="Artlet2D/Artlet2D.txt">Artlet2D.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h3 id="SQLele">SQLele</h3>
+		<table summary="拡張モジュールSQLeleの紹介です。" class="pluginlist">
+			<caption>SQLeleの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">SQLele</th>
+				<th width="5%">Ver1.16</th>
+				<th width="25%">作者:S.Programs</th>
+				<th width="20%"><a href="http://spn.php.xdomain.jp/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					SQLele (ｽｸﾚﾚ) は、HSP で SQLite を簡単に扱うためのモジュールです。<br>
+					たとえば、メディアプレイヤーのファイルリストや、アドレス帳やカレンダーのデータ、画像処理ソフトの Undo/Redo 管理、ゲームの中のキャラの台詞、セーブデータやハイスコア．．．<br>
+					そういったアプリケーション内部のデータを管理するために、データ構造を設計して文字列操作命令やメモリ操作命令で操作したり、ソートや抽出のためのルーチンを書いた経験を、HSP をある程度使ったことがあるほとんどのユーザーが持っているのではないでしょうか。<br>
+					多くのアプリでは機能・性能ともそれで十分と思いますが、もし複雑なデータを扱うアプリを効率的に開発したいならば、SQLite というフリーの SQL データベースエンジンを使ってみてはどうでしょう?<br>
+					SQLite を使えば、HSP アプリに DLL ひとつ追加するだけで、アプリケーション内で SQL データベースを利用できるようになります。DB サーバーをインストールしたり、ODBC 設定を行う必要はありません。
+					</p>
+					<p>
+						このモジュールは、S.Programs氏が製作したものをHSP本体に同梱しています。
+						モジュールについてのご意見や感想などは、onion softwareではなく、
+						S.Programs氏にフィードバックされるようお願いします。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="SQLele/SQLele.txt">SQLele.txt</a>」を参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
+		<h3 id="hsp3util">hsp3util.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>hsp3util.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">hsp3util.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					HSP3で使用するための便利な命令が定義されています。
+					文字列を１文字づつ表示したり、修飾を行なうtext命令、emes命令や、
+					日付や時刻を文字列で取得するgettimestr、getdatestr命令、
+					BMPファイルのパレットを取り出すbmppalette命令が追加されます。
+					また、配列と複数行文字列を相互変換するための命令も装備されています。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="hsp261cmp">hsp261cmp.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>hsp261cmp.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">hsp261cmp.as</th>
+				<th width="5%">Ver3.0</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					HSP2.61互換の命令セットを定義します。
+					あくまでも、HSP2.61に近い記述が可能になるだけで、一部の命令や動作は
+					完全な互換にはならないので、ご注意下さい。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="form_decode">form_decode.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>form_decode.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">form_decode.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					cgiで送信されたURLエンコードを元の文字列に戻すためのform_decode命令が追加されます。
+					HSPCLを使用してcgiを作成する時に便利なモジュールです。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_getenv">mod_getenv.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_getenv.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_getenv.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					環境変数の値を変数に取得するためのgetenv命令が追加されます。
+					cgiなどで実行時の環境変数を参照したい時に利用することができます。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_img">mod_img.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_img.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_img.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					画像を読み込むためのimgload命令が追加されます。
+					BMP,JPEG,GIF,ICO,PNGフォーマットを読み込むことが可能です。
+					(ただし、packfileからの読み込みはサポートしていないので注意してください)
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="hspmath">hspmath.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>hspmath.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">hspmath.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					高度な数学計算を行なうための定数やマクロが定義されています。
+					円周率πなどの定数や、ラジアン・度の相互変換などの関数が追加されます。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_fontdlg">mod_fontdlg.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_fontdlg.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_fontdlg.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					標準でサポートされていない、フォント選択ダイアログを表示するためのモジュールです。
+					手軽にフォント選択のコモンダイアログを呼び出すことができます。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプトを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_aht">mod_aht.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_aht.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_aht.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					スクリプトのAHT記述の解析及びサポートを行なうためのモジュールです。
+					Peasエディタや、かんたん入力などの機能を実装するために使用しています。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプトを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_joystick">mod_joystick.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_joystick.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_joystick.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:MIA</th>
+				<th width="20%"><a href="http://taillove.jp/mia/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					Windowsに接続されたジョイスティックの状態を取得するためのモジュールです。
+					アナログ状態の検出が可能な、joyGetPosEx及びstick命令互換の値を取得可能な、jstick命令が追加されます。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_menu">mod_menu.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_menu.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_menu.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:HSPWiKi</th>
+				<th width="20%"><a href="http://quasiquote.org/hspwiki/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					メニューバーを作成し、選択などの動作をサポートするためのモジュールです。
+					Windowsがサポートするメニューバーの基本的な機能を利用することができます。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_picfont">mod_picfont.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_picfont.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_picfont.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					0～9、A～Zなどの基本的な文字フォントを画像で持ち、それを表示するためのモジュールです。
+					自作の文字フォントを利用する際に使用することができます。
+					また、既存のフォントを画像に変換するサンプル(mkfont.hsp)も付属しています。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_rss">mod_rss.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_rss.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_rss.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					XMLパーサー(MSXML)を使用してRSSを読み込むためのモジュールです。
+					ネットワークURLを直接指定してRSSを取得することができます。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_stbar">mod_stbar.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_stbar.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_stbar.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					ステータスバーを作成し設定するためのモジュールです。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプトを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="modclbk">modclbk3.hsp</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>modclbk3.hspの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">modclbk3.hsp</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:tds12</th>
+				<th width="20%"><a href="https://twitter.com/lltds12">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					API呼び出しで使用するコールバック関数をHSP上で定義することのできるモジュールです。
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプトとサンプルを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="dmxusb">mod_dmxusb.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_dmxusb.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_dmxusb.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					USB接続されたENTTEC DMX US PRO等のDMX機器をコントロールします。
+					詳しくは、モジュールのソーススクリプトを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="winapi">Win32API定義</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>Win32API定義の紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">Win32API定義</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:sakura/おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					Win32APIの呼び出し定義ファイルです。
+					このファイルを#include命令により取り込むことで、システム定義の関数を呼び出すことができるようになります。
+					<ul>
+					<li>advapi32.as	advapi32.dll定義
+					<li>comctl32.as	comctl32.dll定義
+					<li>comdlg32.as	comdlg32.dll定義
+					<li>gdi32.as	gdi32.dll定義
+					<li>kernel32.as	kernel32.dll定義
+					<li>shell32.as	shell32.dll定義
+					<li>user32.as	user32.dll定義
+					<li>winmm.as	winmm.dll定義
+					</ul>
+					</p>
+					<p>
+					詳しくは、モジュールのソーススクリプト及びWin32APIヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		<h2 id="OTHER_PLUGI">その他の拡張プラグイン</h2>
+		<p>
+			HSP拡張プラグインは、仕様が公開されていて、ユーザーの方たちが制作した
+			多くのプラグインが存在します。
+			HSPの可能性を大きく広げるプラグインが、HSPオフィシャルホームページでも多数紹介されています。
+		</p>
+		<dl>
+			<dt>拡張プラグイン・ツールの紹介（HSPTV!）</dt>
+			<dd><p><a href="https://hsp.tv/make/tool.html">https://hsp.tv/make/tool.html</a></p></dd>
+		</dl>
+
+		<h2 id="SHIYOU">拡張プラグインの仕様</h2>
+		<p>
+			HSP拡張プラグインを作成するための詳細な仕様については、HSP開発キット(HSPSDK)フォルダを参照してください。
+		</p>
+
+		<!-- フッター -->
+		<ul id="FOOTER">
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="../index.htm">ドキュメントの一覧に戻る</a></li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

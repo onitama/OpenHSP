@@ -1,759 +1,759 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="ja">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta http-equiv="Content-Language" content="ja">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
-	<meta name="author" content="OpenHSP3 Project�ihttp://dev.onionsoft.net/trac/wiki�j">
-	<meta name="keywords" content="HSP,HSP3,Hot Soup Processor,�X�V���,�A�b�v�f�[�g">
-	<meta name="description" content="HSP�̍X�V�����f��">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP,HSP3,Hot Soup Processor,更新情報,アップデート">
+	<meta name="description" content="HSPの更新情報を掲載">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
-	<title>HSP3.6 �V�@�\�n�C���C�g</title>
+	<title>HSP3.6 新機能ハイライト</title>
 </head>
 <body>
 	<div id="CONTAINER">
-		<!-- �w�b�_�[ -->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2020(c)</p>
-		<img src="hsp3ttl.jpg" alt="�^�C�g��" width="640" height="200">
-		<h1>HSP3.6 �V�@�\�n�C���C�g</h1>
+		<!-- ヘッダー -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+		<h1>HSP3.6 新機能ハイライト</h1>
 
-		<!-- �ڎ� -->
+		<!-- 目次 -->
 		<ol>
-			<li><a href="#HSP3UPDATE">HSP3.6�A�b�v�f�[�g�T�v</a></li>
-			<li><a href="#MES">mes(print)���߂̋@�\�g���ɂ���</a></li>
-			<li><a href="#DISHOBJ">HSP3Dish�̔z�u�I�u�W�F�N�g�ɂ���</a></li>
-			<li><a href="#LAYEROBJ">���C���[�I�u�W�F�N�g�ɂ���</a></li>
-			<li><a href="#SPRITE">�W���X�v���C�g�ɂ���</a></li>
-			<li><a href="#CALLBACK">�R�[���o�b�N���[�`���ɂ���</a></li>
-			<li><a href="#OBJCOLOR">objcolor���߂ɂ���</a></li>
-			<li><a href="#RGBCOLOR">rgbcolor���߂ɂ���</a></li>
-			<li><a href="#STICK">stick���߂Ŏ擾�����L�[�̒ǉ�</a></li>
-			<li><a href="#STREXCHANGE">strexchange���߂ɂ�镶����u�������ɂ���</a></li>
-			<li><a href="#ZLIBWRAP">zip�t�@�C���̈��k�𓀃T�|�[�g�ɂ���</a></li>
-			<li><a href="#MUCOM88">MUCOM88�v���O�C���ɂ���</a></li>
-			<li><a href="#HSPSW">hspsw�v���O�C���ɂ���</a></li>
-			<li><a href="#HSPINET">hspinet�v���O�C���̍X�V�ɂ���</a></li>
-			<li><a href="#HSP64">64bit(x64)�Ń����^�C���ɂ���</a></li>
-			<li><a href="#HSPTVSOZAI">HSPTV�t�H���_�f�ނɂ���</a></li>
-			<li><a href="#HSPENG">�p��ŃC���^�[�t�F�[�X�̑Ή��ɂ���</a></li>
-			<li><a href="#HSP3DISH">HSP3Dish�̃X�N���[���T�C�Y�ύX�ɂ���</a></li>
-			<li><a href="#VIEWCALC">viewcalc���߂ɂ����W�ϊ��ɂ���</a></li>
-			<li><a href="#CELBITMAP">celbitmap���߂ɂ��摜�f�[�^����ɂ���</a></li>
-			<li><a href="#HSPIOSAND">HSP3Dish��iOS,android�ōX�V�ɂ���</a></li>
-			<li><a href="#HGIMG4">HGIMG4�̍X�V�ɂ���</a></li>
+			<li><a href="#HSP3UPDATE">HSP3.6アップデート概要</a></li>
+			<li><a href="#MES">mes(print)命令の機能拡張について</a></li>
+			<li><a href="#DISHOBJ">HSP3Dishの配置オブジェクトについて</a></li>
+			<li><a href="#LAYEROBJ">レイヤーオブジェクトについて</a></li>
+			<li><a href="#SPRITE">標準スプライトについて</a></li>
+			<li><a href="#CALLBACK">コールバックルーチンについて</a></li>
+			<li><a href="#OBJCOLOR">objcolor命令について</a></li>
+			<li><a href="#RGBCOLOR">rgbcolor命令について</a></li>
+			<li><a href="#STICK">stick命令で取得されるキーの追加</a></li>
+			<li><a href="#STREXCHANGE">strexchange命令による文字列置き換えについて</a></li>
+			<li><a href="#ZLIBWRAP">zipファイルの圧縮解凍サポートについて</a></li>
+			<li><a href="#MUCOM88">MUCOM88プラグインについて</a></li>
+			<li><a href="#HSPSW">hspswプラグインについて</a></li>
+			<li><a href="#HSPINET">hspinetプラグインの更新について</a></li>
+			<li><a href="#HSP64">64bit(x64)版ランタイムについて</a></li>
+			<li><a href="#HSPTVSOZAI">HSPTVフォルダ素材について</a></li>
+			<li><a href="#HSPENG">英語版インターフェースの対応について</a></li>
+			<li><a href="#HSP3DISH">HSP3Dishのスクリーンサイズ変更について</a></li>
+			<li><a href="#VIEWCALC">viewcalc命令による座標変換について</a></li>
+			<li><a href="#CELBITMAP">celbitmap命令による画像データ制御について</a></li>
+			<li><a href="#HSPIOSAND">HSP3DishのiOS,android版更新について</a></li>
+			<li><a href="#HGIMG4">HGIMG4の更新について</a></li>
 		</ol>
 		
-		<!-- �{�� -->
-	<h2 id="HSP3UPDATE">HSP3.6�̃A�b�v�f�[�g�T�v</h2>
+		<!-- 本文 -->
+	<h2 id="HSP3UPDATE">HSP3.6のアップデート概要</h2>
 		<p>
-		HSP3.6�́A���ɕύX���ӎ����邱�ƂȂ��AHSP3.5�Ɠ��l�ɂ��g�������܂��B
-		HSP3.6�ŕύX���ꂽ���ڂ̊T�v�́A�ȉ��̒ʂ�ł��B
+		HSP3.6は、特に変更を意識することなく、HSP3.5と同様にお使い頂けます。
+		HSP3.6で変更された項目の概要は、以下の通りです。
 		</p>
 
 		<dl>
 			<dt>
-			�W�����߂̊g�[
+			標準命令の拡充
 			</dt><br>
 			<dd>
 			<p>
-			mes,print���߂ŉe�����A�����Ȃǂ̏C�����ł���I�v�V�������ǉ�����Ă��܂��B
-			�z�u�I�u�W�F�N�g�̔z�F���w�肷�邽�߂�objcolor���߁A���[�U�[��`�ɂ��z�u�I�u�W�F�N�g���`���邽�߂�objlayer���߂��ǉ�����Ă��܂��B
-			���ɂ�<a href="hspprog.htm#CALLBACK">�R�[���o�b�N���[�`��</a>�̌��i����A24bit�J���[�R�[�h���w�肷�邽�߂�rgbcolor���߂ȂǑ����̐V�@�\�𓋍ڂ��Ă��܂��B<br>
-			�܂��AUnicode������W���Ŏg�p����V���������^�C���Ahsp3utf�Ahsp3_64�Ȃǂ��A�b�v�f�[�g����Ă��܂��B
-			���܂܂ł̋@�\�͂��̂܂܂ɁA�Q�[�������łȂ��A�c�[��������y�ȃv���g�^�C�s���O�ɖ𗧂@�\���g�[���Ă��܂��B
+			mes,print命令で影文字、縁取りなどの修飾ができるオプションが追加されています。
+			配置オブジェクトの配色を指定するためのobjcolor命令、ユーザー定義による配置オブジェクトを定義するためのobjlayer命令が追加されています。
+			他にも<a href="hspprog.htm#CALLBACK">コールバックルーチン</a>の厳格化や、24bitカラーコードを指定するためのrgbcolor命令など多くの新機能を搭載しています。<br>
+			また、Unicode文字を標準で使用する新しいランタイム、hsp3utf、hsp3_64などもアップデートされています。
+			いままでの機能はそのままに、ゲームだけでなく、ツール製作や手軽なプロトタイピングに役立つ機能を拡充しています。
 			</p>
 			</dd>
 
 			<dt>
-			�v���O�C���@�\�g�[
+			プラグイン機能拡充
 			</dt><br>
 			<dd>
 			<p>
-			�V�K�ǉ��v���O�C���uhspsw�v(Steam�v���b�g�t�H�[���A�gAPI)�A�uhspmucom�v
-			(MML�L�q�ɂ��FM�����y�ȍĐ��v���O�C��)�A�uZLibWrap.dll�v(zip�t�@�C���̈��k��)�Ȃ�
-			���x�ȋ@�\�g���𓯍����Ă���A�����ɗ��p�\�ł��B
+			新規追加プラグイン「hspsw」(Steamプラットフォーム連携API)、「hspmucom」
+			(MML記述によるFM音源楽曲再生プラグイン)、「ZLibWrap.dll」(zipファイルの圧縮解凍)など
+			高度な機能拡張を同梱しており、すぐに利用可能です。
 			</p>
 			</dd>
 
 			<dt>
-			HSP3Dish�̋@�\�g�[
+			HSP3Dishの機能拡充
 			</dt><br>
 			<dd>
 			<p>
-			Windows/iOS/android/Linux/html5(WebGL)��ł̎��s���T�|�[�g����<a href="hsp3dish_prog.htm">HSP3Dish</a>�̊e��@�\���g�[���Ă��܂��B<br>
-			������̕`���傫���������A���ׂẴv���b�g�t�H�[���œ��{����܂ޕ�����̕\���A�����������ɑΉ����Ă��܂��B
-			�܂��A�V�����z�u�I�u�W�F�N�g�Ƃ��ă`�F�b�N�{�b�N�X�A���̓{�b�N�X���T�|�[�g���Ă��܂��B
-			Windows/Linux�v���b�g�t�H�[���ł́Ascreen�Abgscr���߂ɂ��E�C���h�E�T�C�Y�̕ύX�A�t���X�N���[���\���ɑΉ����Ă��܂��B
-			���ɂ��A�ŐV�̒[���ɑΉ��ł���V����SDK�ւ̑Ή���A�e��Z���T�[���̎擾�A�l�b�g���[�N�A�N�Z�X�A�X�v���C�g�`��Ȃǂ̋@�\���g�[���Ă��܂��B
-			web�u���E�U�œ��삷��hsp3js�́A�V����WebAssembly�`���̏o�͂��\�ł��B
-			���L���f�o�C�X�ւ̕ϊ����T�|�[�g����HSP3Dish Helper�c�[�����A���֗��Ŏ�y�ɗ��p�ł��悤�ɂȂ�܂����B
+			Windows/iOS/android/Linux/html5(WebGL)上での実行をサポートする<a href="hsp3dish_prog.htm">HSP3Dish</a>の各種機能を拡充しています。<br>
+			文字列の描画を大きく見直し、すべてのプラットフォームで日本語を含む文字列の表示、半透明合成に対応しています。
+			また、新しい配置オブジェクトとしてチェックボックス、入力ボックスをサポートしています。
+			Windows/Linuxプラットフォームでは、screen、bgscr命令によるウインドウサイズの変更、フルスクリーン表示に対応しています。
+			他にも、最新の端末に対応できる新しいSDKへの対応や、各種センサー情報の取得、ネットワークアクセス、スプライト描画などの機能も拡充しています。
+			webブラウザで動作するhsp3jsは、新たにWebAssembly形式の出力が可能です。HGIMG4描画の速度も大幅に向上し実用性がアップしました。
+			幅広いデバイスへの変換をサポートするHSP3Dish Helperツールも、より便利で手軽に利用できようになりました。
 			</p>
 			</dd>
 
 			<dt>
-			HGIMG4�v���O�C���̍X�V
+			HGIMG4プラグインの更新
 			</dt><br>
 			<dd>
 			<p>
-			�n�C���x����3D�\�����\�ɂ���<a href="hgimg4.html">HGIMG4�v���O�C��</a>��啝�ɍX�V���Ă��܂��B
-			�V�X�e���̈������̂ق��AFBX���f���ϊ����̐���A�������̐���ȂǍׂ����g�����肪���サ�Ă��܂��B�܂��AUnity���烂�f����A�j���[�V�������C���|�[�g������@�Ȃǂ��h�L�������g�ŉ�����Ă��܂��B<br>
-			�܂��A�V����HGIMG4�c�[���ɂ��Afbx�t�@�C����ϊ��������3D�f�[�^�����ڍׂɊm�F�A�ҏW�ł���悤�ɂȂ�܂����B
-			�}�e���A��(.material)�t�@�C����GUI�ɂ��ڍׂɊm�F���邱�Ƃ��\�ɂȂ��Ă��܂��B
+			ハイレベルな3D表現を可能にする<a href="hgimg4.html">HGIMG4プラグイン</a>を大幅に更新しています。
+			システムの安定向上や高速化のほか、ライティング機能、ポストエフェクトに関する機能を充実させています。また、FBXモデル変換時の制約、複製時の制約など細かい使い勝手が向上しています。<br>
+			新しいHGIMG4ツールでは、fbxファイルを変換した後の3Dデータをより詳細に確認、編集できるようになりました。
+			マテリアル(.material)ファイルをGUIにより詳細に確認することが可能になっています。
 			</p>
 			</dd>
 
 			<dt>
-			�V����HSPTV�f��
+			新しいHSPTV素材
 			</dt><br>
 			<dd>
 			<p>
-			���R�Ɏg����f�ނƂ��āAHSPTV�t�H���_�ɑ����̑f�ނ��g�[����Ă��܂��B
-			HSP3�I�t�B�V�����L�����N�^�[ "�쉹�i���܂ˁj"���n�߂Ƃ��āA�v���������R���{�f�ނȂ�
-			�Q�[���𒆐S�ɕ��L�����p���邱�Ƃ��ł��܂��B
-			�V���ȃT���v���X�N���v�g���������A�I���W�i���̍�i���̂��߁A���R�Ɋ��p���邱�Ƃ��ł��܂��B
+			自由に使える素材として、HSPTVフォルダに多くの素材が拡充されています。
+			HSP3オフィシャルキャラクター "珠音（たまね）"を始めとして、プロ生ちゃんコラボ素材など
+			ゲームを中心に幅広く活用することができます。
+			新たなサンプルスクリプトも同梱し、オリジナルの作品作りのため、自由に活用することができます。
 			</p>
 			</dd>
 
 		</dl>
 
 		<p>
-		HSP3.6�Œǉ����ꂽ�V�@�\����y�Ɏ������Ƃ��ł���T���v���X�N���v�g���A�usample/new36�v�t�H���_�Ɋ܂܂�Ă��܂��B
-		���АV�����T���v���ł̓�����A���ۂɎ��s���Ă��������������B
+		HSP3.6で追加された新機能を手軽に試すことができるサンプルスクリプトが、「sample/new36」フォルダに含まれています。
+		ぜひ新しいサンプルでの動作を、実際に実行してお試しください。
 		</p>
 
 
-	<h2 id="MES">mes(print)���߂̋@�\�g���ɂ���</h2>
+	<h2 id="MES">mes(print)命令の機能拡張について</h2>
 		<p>
-		mes(print)���߂��@�\�g������A�����̏C���Ȃǂ��ł���悤�ɂȂ��Ă��܂��B<br>
-		mes���߂̃p�����[�^�[�͈ȉ��̒ʂ�ł��B
+		mes(print)命令が機能拡張され、文字の修飾などができるようになっています。<br>
+		mes命令のパラメーターは以下の通りです。
 		</p>
 		<pre>
 		mes "strings",sw
-		"strings" : �\�����郁�b�Z�[�W�܂��͕ϐ�
-		sw(0)     : �I�v�V����</pre>
+		"strings" : 表示するメッセージまたは変数
+		sw(0)     : オプション</pre>
 		<p>
-		mes���߂̍ŏ��̃p�����[�^�[�́A������܂��͕ϐ������w�肷�邱�Ƃ��ł��܂��B�ϐ������w�肵���ꍇ�́A�ϐ��ɑ������Ă�����e��\�����܂��B<br>
-		2�Ԗڂ̃I�v�V�����p�����[�^�[�ɂ���ĕ����̏C���Ɠ���̐ݒ���s�����Ƃ��\�ł��B
+		mes命令の最初のパラメーターは、文字列または変数名を指定することができます。変数名を指定した場合は、変数に代入されている内容を表示します。<br>
+		2番目のオプションパラメーターによって文字の修飾と動作の設定を行うことが可能です。
 		</p>
 		<pre>
-			   �l  : �}�N����       : ����
+			   値  : マクロ名       : 動作
 			 -----------------------------------------------------
-			   1   : mesopt_nocr    : �Ō�ɉ��s���Ȃ�
-			   2   : mesopt_shadow  : �e�t��������`�悷��
-			   4   : mesopt_outline : ����蕶����`�悷��
-			   8   : mesopt_light   : �e�t��/�������ȈՕ`�悷��
-			   16  : mesopt_gmode   : gmode�̐ݒ�𔽉f����(HSP3Dish�̂�)</pre>
+			   1   : mesopt_nocr    : 最後に改行しない
+			   2   : mesopt_shadow  : 影付き文字を描画する
+			   4   : mesopt_outline : 縁取り文字を描画する
+			   8   : mesopt_light   : 影付き/縁取りを簡易描画する
+			   16  : mesopt_gmode   : gmodeの設定を反映する(HSP3Dishのみ)</pre>
 		<p>
-			�I�v�V������2�܂���mesopt_shadow���w�肵���ꍇ�́A�e�̕t����������`�悵�܂��B
-			�I�v�V������4�܂���mesopt_outline���w�肵���ꍇ�́A�����̕t����������`�悵�܂��B
-			�e�Ɖ����́Aobjcolor���߂Ŏw�肳�ꂽ�F���g�p����܂��B
-			�܂��A�e�Ɖ����̕���font���߂̑�4�p�����[�^�[�Ŏw�肷�邱�Ƃ��ł��܂��B
+			オプションに2またはmesopt_shadowを指定した場合は、影の付いた文字を描画します。
+			オプションに4またはmesopt_outlineを指定した場合は、縁取りの付いた文字を描画します。
+			影と縁取りは、objcolor命令で指定された色が使用されます。
+			また、影と縁取りの幅はfont命令の第4パラメーターで指定することができます。
 		</p>
 		<p><center><img src="img/s_mesopt.png"></center></p>
 		<p>
-		��̗�ł́A�����e�t�������A����������蕶���A�E���ʏ�̕����ɂȂ�܂��B
-		�I�v�V������16�܂���mesopt_gmode���w�肵���ꍇ�́Agmode�Ŏw�肵���������A�F���Z�Ȃǂ̐ݒ�𔽉f�����`����s���܂��B
-		(���̃I�v�V�����́AHSP3Dish�y��HGIMG4�ł̂ݗL���ł��B�ʏ��HSP3�����^�C���ł͖�������܂�)<br>
-		�I�v�V�����l�͉��Z���邱�Ƃŕ����𓯎��Ɏw�肷�邱�Ƃ��ł��܂��B
-		�umesopt_nocr+mesopt_shadow�v���w�肵���ꍇ�́A�e�t���ŉ��s���Ȃ��\���ƂȂ�܂��B
+		上の例では、左が影付き文字、中央が縁取り文字、右が通常の文字になります。
+		オプションに16またはmesopt_gmodeを指定した場合は、gmodeで指定した半透明、色加算などの設定を反映した描画を行います。
+		(このオプションは、HSP3Dish及びHGIMG4でのみ有効です。通常のHSP3ランタイムでは無視されます)<br>
+		オプション値は加算することで複数を同時に指定することができます。
+		「mesopt_nocr+mesopt_shadow」を指定した場合は、影付きで改行しない表示となります。
 		</p>
 
 
-	<h2 id="DISHOBJ">HSP3Dish�̔z�u�I�u�W�F�N�g�ɂ���</h2>
+	<h2 id="DISHOBJ">HSP3Dishの配置オブジェクトについて</h2>
 		<p>
-		HSP3Dish�y��HGIMG4�����^�C���ɂ����āA�`�F�b�N�{�b�N�X�A���̓{�b�N�X��
-		�T�|�[�g���ǉ�����܂����B(���̓{�b�N�X��Windows/Linux�̂�)<br>
-		chkbox�Ainput���߂�HSP3�Ɠ��l�Ɏg�p�ł��܂��B�܂��Aobjcolor�Aobjmode���߂ȂǂŐݒ肳���w�i�F�A�t�H���g�̕ύX�ɂ��Ή����Ă��܂��B<br>
-		������GUI�p�[�c��OS���񋟂��镔�i�ł͂Ȃ��AHSP3Dish���Ǝ��Ɏ������s�������̂ł��B
-		OS���񋟂���O�ςƈقȂ�ꍇ������܂����A�قȂ�v���b�g�t�H�[���Ԃœ��ꂳ�ꂽ�O�ς�񋟂��邱�Ƃ��ł��܂��B
-		HSP3Dish�̔z�u�I�u�W�F�N�g�́A�����HSP3�Ɠ��l�̃p�[�c���g�[���Ă����\��ł��B
+		HSP3Dish及びHGIMG4ランタイムにおいて、チェックボックス、入力ボックスの
+		サポートが追加されました。(入力ボックスはWindows/Linuxのみ)<br>
+		chkbox、input命令をHSP3と同様に使用できます。また、objcolor、objmode命令などで設定される背景色、フォントの変更にも対応しています。<br>
+		これらのGUIパーツはOSが提供する部品ではなく、HSP3Dishが独自に実装を行ったものです。
+		OSが提供する外観と異なる場合がありますが、異なるプラットフォーム間で統一された外観を提供することができます。
+		HSP3Dishの配置オブジェクトは、今後もHSP3と同様のパーツを拡充していく予定です。
 		</p>
 
-	<h2 id="LAYEROBJ">���C���[�I�u�W�F�N�g�ɂ���</h2>
+	<h2 id="LAYEROBJ">レイヤーオブジェクトについて</h2>
 		<p>
-		���C���[�I�u�W�F�N�g�́A�V�����񋟂��ꂽ���[�U�[�ɂ���Ē�`�����z�u�I�u�W�F�N�g�ł��B
-		���炩���߉�ʏ�̕`����s���T�u���[�`����o�^���Ă������ƂŁA�w�肵���^�C�~���O(���C���[)�ŕ`������s�����邱�Ƃ��ł��܂��B
+		レイヤーオブジェクトは、新しく提供されたユーザーによって定義される配置オブジェクトです。
+		あらかじめ画面上の描画を行うサブルーチンを登録しておくことで、指定したタイミング(レイヤー)で描画を実行させることができます。
 		</p>
 		<PRE>
 			layerobj p1,p2,p3,*label,p4
-			p1,p2     ; ���C���[�I�u�W�F�N�g��XY�T�C�Y�i�h�b�g�P�ʁj
-			p3(0)     : ���C���[ID
-			*label    : ���C���[�I�u�W�F�N�g�̏����T�u���[�`��
-			p4=0�`(0) : �I�v�V�����l
+			p1,p2     ; レイヤーオブジェクトのXYサイズ（ドット単位）
+			p3(0)     : レイヤーID
+			*label    : レイヤーオブジェクトの処理サブルーチン
+			p4=0～(0) : オプション値
 
-		�@�� :
+		　例 :
 				layerobj 320,240,objlayer_normal,*laysub,100
 				stop
 			*laysub
 				return
 		</PRE>
 		<p>
-		���C���[�I�u�W�F�N�g�͂��ꎩ�̂ł͉��̋@�\�������܂���B
-		��ʓ��̓���̃G���A�����C���[�I�u�W�F�N�g�Ƃ��ĊǗ����A�`��̃^�C�~���O���ƂɃ��[�U�[�̃v���O����(�R�[���o�b�N���[�`��)���Ăяo���܂��B
-		�g�����͐F�X����܂����A�ォ��ǉ�����郂�W���[���Ȃǂŕ`�敔��������Ɨ����ĊǗ����邱�Ƃ��ł��܂��B<br>
-		�܂��Aobjprm���߂Ńp�����[�^�[���󂯎�邱�Ƃ��ł��A�Ǝ��̔z�u�I�u�W�F�N�g��ݒu������A�쐬���邱�Ƃ��\�ł��B<br>
-		���C���[�I�u�W�F�N�g�̏ڍׂ́A�v���O���~���O�E�}�j���A����<a href="hspprog.htm#LAYER_OBJECT">�u���C���[�I�u�W�F�N�g�v</a>�̍��ڂ��Q�Ƃ��Ă��������B
+		レイヤーオブジェクトはそれ自体では何の機能も持ちません。
+		画面内の特定のエリアをレイヤーオブジェクトとして管理し、描画のタイミングごとにユーザーのプログラム(コールバックルーチン)を呼び出します。
+		使い方は色々ありますが、後から追加されるモジュールなどで描画部分だけを独立して管理することができます。<br>
+		また、objprm命令でパラメーターを受け取ることができ、独自の配置オブジェクトを設置したり、作成することも可能です。<br>
+		レイヤーオブジェクトの詳細は、プログラミング・マニュアルの<a href="hspprog.htm#LAYER_OBJECT">「レイヤーオブジェクト」</a>の項目を参照してください。
 		</p>
 
 
-	<h2 id="SPRITE">�W���X�v���C�g�ɂ���</h2>
+	<h2 id="SPRITE">標準スプライトについて</h2>
 		<p>
-		HSP3Dish�AHGIMG4�����^�C���ł́A��y�Ɏg�p�ł���<a href="sprite.html">�W���X�v���C�g</a>���T�|�[�g���܂����B<br>
-		�W���X�v���C�g�̖��߂́Ahspdx�v���O�C���Ƃ��Ēǉ�����Ă������߂ƌ݊�������A2D�`�����y�Ɉ������Ƃ��\�ł��B
+		HSP3Dish、HGIMG4ランタイムでは、手軽に使用できる<a href="sprite.html">標準スプライト</a>をサポートしました。<br>
+		標準スプライトの命令は、hspdxプラグインとして追加されていた命令と互換があり、2D描画を手軽に扱うことが可能です。
 		<p>
 		<p><img src="hsp3dish/es_test5.jpg"></p>
 		<p>
-		HSP3��2D�`����s���ۂɁA�X�v���C�g(��`�̉摜)�𗘗p���邽�߂̎�i�͂������p�ӂ���Ă��܂����B
+		HSP3で2D描画を行う際に、スプライト(矩形の画像)を利用するための手段はいくつか用意されていました。
 		</p>
 		<pre class="quote">
-		�EHSPDX�v���O�C��
-		�EHGIMG/HGIMGX�v���O�C��
-		�EHGIMG3�v���O�C��
-		�EHGIMG4�v���O�C��
-		�Emod_sprite���W���[��</pre>
+		・HSPDXプラグイン
+		・HGIMG/HGIMGXプラグイン
+		・HGIMG3プラグイン
+		・HGIMG4プラグイン
+		・mod_spriteモジュール</pre>
 		<p>
-		���̒��ŁAHSPDX�AHGIMG�AHGIMGX�܂ł̃v���O�C����HSP2����̂��̂ŁA���łɊJ�����I�����Ă���A
-		���݂�OS����œ��삳���邱�Ƃ�����ɂȂ��Ă��܂��B<br>
-		HGIMG3/HGIMG4�v���O�C���ɂ́A3D�@�\�ƂƂ��ɍ��@�\��2D�X�v���C�g�Ƃ��Ă�
-		�@�\�������Ă��܂����A���W�����ׂĎ����ŊǗ����A�@�\�����������
-		�K��������e�������Ď�y�ɂ͈������炢��������܂����B<br>
-		����A�ł��������j������A�����̃��[�U�[���g�p���Ă���HSPDX�v���O�C����
-		���߂����ƂɁA��y�ň����₷��2D��p�̃X�v���C�g���߂��g�[���܂����B<br>
-		�V���v���Ȗ��߂ŃX�v���C�g��\���ł��A�X�v���C�g�̉摜�����R�ɓo�^�ł���
-		�_��ȃV�X�e���𓋍ڂ��Ă��܂��B�܂��A�X�v���C�g�R�[���o�b�N��}�b�v�`��Ȃ�
-		���j�[�N�Ȏd�g�݂���������A����HSPDX�v���O�C���������֐����サ�Ă��܂��B<br>
-		���W�������ŊǗ�����Ă���A2D�Q�[����UI�\���Ȃǂň����₷�����̂ɂȂ��Ă��܂��B
-		�������C�x���g���X�g�ɂ�鎩���ړ���3D�Ƃ̘A�g�ɂ��ẮA�]���̃v���O�C���𗘗p���邱�Ƃ��ł��܂��B<br>
-		�W���X�v���C�g�́AHSP3Dish�AHGIMG4���T�|�[�g����S�v���b�g�t�H�[���œ��삷��ق��A
-		HSP3�W�������^�C���ł��T�|�[�g���邱�Ƃ�\�肵�Ă��܂��B<br>
-		�W���X�v���C�g�̏ڍׂ́A<a href="sprite.html">�u�W���X�v���C�g�v���O���~���O�K�C�h�v</a>���Q�Ƃ��Ă��������B
+		この中で、HSPDX、HGIMG、HGIMGXまでのプラグインはHSP2時代のもので、すでに開発が終了しており、
+		現在のOSや環境で動作させることが困難になっています。<br>
+		HGIMG3/HGIMG4プラグインには、3D機能とともに高機能な2Dスプライトとしての
+		機能も持っていますが、座標をすべて実数で管理し、機能が多い代わりに
+		習得する内容も増えて手軽には扱いずらい所がありました。<br>
+		今回、最も長い歴史があり、多くのユーザーが使用してきたHSPDXプラグインの
+		命令をもとに、手軽で扱いやすい2D専用のスプライト命令を拡充しました。<br>
+		シンプルな命令でスプライトを表示でき、スプライトの画像を自由に登録できる
+		柔軟なシステムを搭載しています。また、スプライトコールバックやマップ描画など
+		ユニークな仕組みも導入され、元のHSPDXプラグインよりも利便性向上しています。<br>
+		座標も整数で管理されており、2DゲームやUI表示などで扱いやすいものになっています。
+		もちろんイベントリストによる自律移動や3Dとの連携については、従来のプラグインを利用することもできます。<br>
+		標準スプライトは、HSP3Dish、HGIMG4がサポートする全プラットフォームで動作するほか、
+		HSP3標準ランタイムでもサポートすることを予定しています。<br>
+		標準スプライトの詳細は、<a href="sprite.html">「標準スプライトプログラミングガイド」</a>を参照してください。
 		</p>
 
 
-	<h2 id="CALLBACK">�R�[���o�b�N���[�`���ɂ���</h2>
+	<h2 id="CALLBACK">コールバックルーチンについて</h2>
 		<p>
-		���܂܂ŁAHSP3�̒��Ŕ������Ă������荞�݁A���W���[���^�ϐ��̃R���X�g���N�^�A�f�X�g���N�^�Ȃǂ𑍏̂���
-		�u�R�[���o�b�N���[�`���v�ƒ�`���A�]���������i�ɊǗ�����܂��B<br>
-		�R�[���o�b�N���[�`���Ăяo�����͌��肳�ꂽ�󋵂ŁA������return���߂ɂ�菈�����I��������K�v������܂��B<br>
-		�ȉ��̏󋵂ŌĂяo����郉�x���A�܂��̓��[�U�[��`���߂̓R�[���o�b�N���[�`���Ƃ��Ĉ����܂��B
+		いままで、HSP3の中で発生していた割り込み、モジュール型変数のコンストラクタ、デストラクタなどを総称して
+		「コールバックルーチン」と定義し、従来よりも厳格に管理されます。<br>
+		コールバックルーチン呼び出し時は限定された状況で、すぐにreturn命令により処理を終了させる必要があります。<br>
+		以下の状況で呼び出されるラベル、またはユーザー定義命令はコールバックルーチンとして扱われます。
 		</p>
 		<pre class="quote">
-	�E#deffunc���߂Œ�`�����N���[���A�b�v���߂̎��s��
-	�E���W���[���^�ϐ��̃R���X�g���N�^�A�f�X�g���N�^���s��
-	�E�z�u�I�u�W�F�N�g(objlayer)�ɂ�郆�[�U�[���荞��
-	�Ees_setgosub���߂ɂ��X�v���C�g�\�����荞��(HSP3Dish)</pre>
+	・#deffunc命令で定義されるクリーンアップ命令の実行時
+	・モジュール型変数のコンストラクタ、デストラクタ実行時
+	・配置オブジェクト(objlayer)によるユーザー割り込み
+	・es_setgosub命令によるスプライト表示割り込み(HSP3Dish)</pre>
 		<p>
-		�R�[���o�b�N���[�`���́A�ʏ�̃T�u���[�`���Ɠ��l�ɖ��߂��L�q���邱�Ƃ��ł��܂����A
-		wait,await,stop���߂Ȃǎ��ԑ҂����~�������邱�Ƃ��ł��܂���B<br>
-		�����A�R�[���o�b�N���[�`���̎��s���Ɏg�p�ł��Ȃ����߂��������ꍇ�́A
-		�G���[42(�R�[���o�b�N���Ŏg�p�ł��Ȃ����߂ł�)�Ƃ����G���[���������܂��B<br>
-		�R�[���o�b�N���[�`���̏ڍׂ́A�v���O���~���O�E�}�j���A����<a href="hspprog.htm#CALLBACK">�u�R�[���o�b�N���[�`���v</a>�̍��ڂ��Q�Ƃ��Ă��������B
+		コールバックルーチンは、通常のサブルーチンと同様に命令を記述することができますが、
+		wait,await,stop命令など時間待ちや停止をさせることができません。<br>
+		もし、コールバックルーチンの実行中に使用できない命令があった場合は、
+		エラー42(コールバック内で使用できない命令です)というエラーが発生します。<br>
+		コールバックルーチンの詳細は、プログラミング・マニュアルの<a href="hspprog.htm#CALLBACK">「コールバックルーチン」</a>の項目を参照してください。
 		</p>
 
 
-	<h2 id="OBJCOLOR">objcolor���߂ɂ���</h2>
+	<h2 id="OBJCOLOR">objcolor命令について</h2>
 
 		<p><img src="img/hsp36_objcolor.png"></p>
 
 		<p>
-		�z�u�I�u�W�F�N�g�̔z�F���w�肷�邽�߂�objcolor���߂��V�K�ɒǉ�����Ă��܂��B
+		配置オブジェクトの配色を指定するためのobjcolor命令が新規に追加されています。
 		</p><pre>
-	objcolor p1,p2,p3	�z�u�I�u�W�F�N�g�̔z�F���w�肷��
+	objcolor p1,p2,p3	配置オブジェクトの配色を指定する
 
-		p1,p2,p3=0�`255(0) : �F�R�[�h�iR,G,B�̋P�x�j
+		p1,p2,p3=0～255(0) : 色コード（R,G,Bの輝度）
 		</pre><p>
-		objcolor���߂ɂ��A���̓{�b�N�X���̔z�F��ݒ肷�邱�Ƃ��ł��܂��B<br>
-		objcolor���߂ɂ��z�F��L���ɂ��邽�߂ɂ́A���炩����objmode���߂̃I�v�V������
-		�uobjmode_usecolor�v���w�肷��K�v������܂��B
+		objcolor命令により、入力ボックス等の配色を設定することができます。<br>
+		objcolor命令による配色を有効にするためには、あらかじめobjmode命令のオプションで
+		「objmode_usecolor」を指定する必要があります。
 		</p><pre>
 	objmode objmode_usecolor
 		</pre><p>
-		mesbox�Ainput���߂ɂ����̓{�b�N�X�́Argbcolor�Ŏw�肵�������F�Acolor���߂Ŏw�肵��
-		�w�i�F���K�p����܂��B<br>
-		�܂��Amesbox�ɂ��e�L�X�g���̓{�b�N�X�́A[ctrl]+[A]�L�[�ɂ��S�I���ł���悤
-		�C������Ă��܂��B
+		mesbox、input命令による入力ボックスは、rgbcolorで指定した文字色、color命令で指定した
+		背景色が適用されます。<br>
+		また、mesboxによるテキスト入力ボックスは、[ctrl]+[A]キーにより全選択できるよう
+		修正されています。
 		</p>
 
 
-	<h2 id="RGBCOLOR">rgbcolor���߂ɂ���</h2>
+	<h2 id="RGBCOLOR">rgbcolor命令について</h2>
 		<p>
-		24bit�J���[�R�[�h���w�肷�邽�߂�rgbcolor���߂��ǉ�����Ă��܂��B<br>
-		�]���ARGB���ꂼ����ucolor 1,2,3�v�̂悤�ɕ����ăp�����[�^�[���L�q���Ă������̂�
-		�urgbcolor $010203�v�̂悤�Ȍ`�ŋL�q���邱�Ƃ��ł��܂��B<br>
-		Web(html)���Ŏg�p����u#112233�v�̂悤��RGB�R�[�h�Ɛe�a���̍����w����@�ł��B<br>
-		���s�������e�́Acolor���߂��Argbcolor���߂��ς��܂���B�F�̃R�[�h���L�q������@���قȂ�݂̂ɂȂ�܂��B
+		24bitカラーコードを指定するためのrgbcolor命令が追加されています。<br>
+		従来、RGBそれぞれを「color 1,2,3」のように分けてパラメーターを記述していたものを
+		「rgbcolor $010203」のような形で記述することができます。<br>
+		Web(html)等で使用する「#112233」のようなRGBコードと親和性の高い指定方法です。<br>
+		実行される内容は、color命令も、rgbcolor命令も変わりません。色のコードを記述する方法が異なるのみになります。
 		</p>
 
 
-	<h2 id="STICK">stick���߂Ŏ擾�����L�[�̒ǉ�</h2>
+	<h2 id="STICK">stick命令で取得されるキーの追加</h2>
 		<p>
-		�J�[�\���L�[���n�߂Ƃ��āA�Q�[���ȂǂŎg�p�����L�[�̏����܂Ƃ߂Ď擾����stick���߂ŁA�V����[Z][X][C]�A�y��[A][W][D][S]�̃L�[��񂪒ǉ�����Ă��܂��B<br>
-		�ǉ����ꂽ���́A�ȉ��̐��l�Ƃ��Ċi�[����܂��B<br>
+		カーソルキーを始めとして、ゲームなどで使用されるキーの情報をまとめて取得するstick命令で、新しく[Z][X][C]、及び[A][W][D][S]のキー情報が追加されています。<br>
+		追加された情報は、以下の数値として格納されます。<br>
 		<br><table border="1">
-		<tr><td>�l(10�i)</td><td>�l(16�i)</td><td>�L�[</td></tr>
-		<tr><td>     1  </td><td> $00001 </td><td> �J�[�\���L�[��(��)</td></tr>
-		<tr><td>     2  </td><td> $00002 </td><td> �J�[�\���L�[��(��)</td></tr>
-		<tr><td>     4  </td><td> $00004 </td><td> �J�[�\���L�[�E(��)</td></tr>
-		<tr><td>     8  </td><td> $00008 </td><td> �J�[�\���L�[��(��)</td></tr>
-		<tr><td>    16  </td><td> $00010 </td><td> �X�y�[�X�L�[</td></tr>
-		<tr><td>    32  </td><td> $00020 </td><td> Enter�L�[</td></tr>
-		<tr><td>    64  </td><td> $00040 </td><td> Ctrl�L�[</td></tr>
-		<tr><td>   128  </td><td> $00080 </td><td> ESC�L�[</td></tr>
-		<tr><td>   256  </td><td> $00100 </td><td> �}�E�X�̍��{�^��</td></tr>
-		<tr><td>   512  </td><td> $00200 </td><td> �}�E�X�̉E�{�^��</td></tr>
-		<tr><td>  1024  </td><td> $00400 </td><td> TAB�L�[</td></tr>
-		<tr><td>  2048  </td><td> $00800 </td><td> [Z]�L�[</td></tr>
-		<tr><td>  4096  </td><td> $01000 </td><td> [X]�L�[</td></tr>
-		<tr><td>  8192  </td><td> $02000 </td><td> [C]�L�[</td></tr>
-		<tr><td> 16384  </td><td> $04000 </td><td> [A]�L�[</td></tr>
-		<tr><td> 32768  </td><td> $08000 </td><td> [W]�L�[</td></tr>
-		<tr><td> 65536  </td><td> $10000 </td><td> [D]�L�[</td></tr>
-		<tr><td>131072  </td><td> $20000 </td><td> [S]�L�[</td></tr>
+		<tr><td>値(10進)</td><td>値(16進)</td><td>キー</td></tr>
+		<tr><td>     1  </td><td> $00001 </td><td> カーソルキー左(←)</td></tr>
+		<tr><td>     2  </td><td> $00002 </td><td> カーソルキー上(↑)</td></tr>
+		<tr><td>     4  </td><td> $00004 </td><td> カーソルキー右(→)</td></tr>
+		<tr><td>     8  </td><td> $00008 </td><td> カーソルキー下(↓)</td></tr>
+		<tr><td>    16  </td><td> $00010 </td><td> スペースキー</td></tr>
+		<tr><td>    32  </td><td> $00020 </td><td> Enterキー</td></tr>
+		<tr><td>    64  </td><td> $00040 </td><td> Ctrlキー</td></tr>
+		<tr><td>   128  </td><td> $00080 </td><td> ESCキー</td></tr>
+		<tr><td>   256  </td><td> $00100 </td><td> マウスの左ボタン</td></tr>
+		<tr><td>   512  </td><td> $00200 </td><td> マウスの右ボタン</td></tr>
+		<tr><td>  1024  </td><td> $00400 </td><td> TABキー</td></tr>
+		<tr><td>  2048  </td><td> $00800 </td><td> [Z]キー</td></tr>
+		<tr><td>  4096  </td><td> $01000 </td><td> [X]キー</td></tr>
+		<tr><td>  8192  </td><td> $02000 </td><td> [C]キー</td></tr>
+		<tr><td> 16384  </td><td> $04000 </td><td> [A]キー</td></tr>
+		<tr><td> 32768  </td><td> $08000 </td><td> [W]キー</td></tr>
+		<tr><td> 65536  </td><td> $10000 </td><td> [D]キー</td></tr>
+		<tr><td>131072  </td><td> $20000 </td><td> [S]キー</td></tr>
 		</table>
-		HSP3Dish���܂ނ��ׂẴv���b�g�t�H�[���ŃL�[��񂪒ǉ�����܂��B
-		�]���̃L�[���̒l�ɕύX�͂���܂���B��ʌ݊��Ƃ��Ďg�p���邱�Ƃ��\�ł��B
+		HSP3Dishを含むすべてのプラットフォームでキー情報が追加されます。
+		従来のキー情報の値に変更はありません。上位互換として使用することが可能です。
 		</p>
 
 
-	<h2 id="STREXCHANGE">strexchange���߂ɂ�镶����u�������ɂ���</h2>
+	<h2 id="STREXCHANGE">strexchange命令による文字列置き換えについて</h2>
 		<p>
-		�V�K�ɒǉ����ꂽ�Astrexchange���߂̓X�N���v�g�Ɋ܂܂�镶����f�[�^�����ׂĂ܂Ƃ߂Ēu��������@�\�������Ă��܂��B
-		����ɂ��A�X�N���v�g���Ŏg�p���镶�����ʂȌ���ɖ|�󂵂���A�o�[�W�����ɂ���ă��b�Z�[�W�������ւ���Ȃǂ̏������e�ՂɂȂ�܂��B<br>
-		������u�������́A3�̃X�e�b�v�Ŏ�������܂��B
+		新規に追加された、strexchange命令はスクリプトに含まれる文字列データをすべてまとめて置き換える機能を持っています。
+		これにより、スクリプト内で使用する文字列を別な言語に翻訳したり、バージョンによってメッセージを差し替えるなどの処理が容易になります。<br>
+		文字列置き換えは、3つのステップで実現されます。
 		<UL>
-		<LI>������f�[�^�̍쐬</LI>
-		<LI>�u������������f�[�^�̍쐬</LI>
-		<LI>�X�N���v�g����̒u������</LI>
+		<LI>文字列データの作成</LI>
+		<LI>置き換え文字列データの作成</LI>
+		<LI>スクリプトからの置き換え</LI>
 		</UL>
-		���ۂ̃T���v�����usample/new36/strex_test1.hsp�v�usample/new36/strex_test2.hsp�v�Ƃ��ē�������Ă��܂��B
-		�ŏ��̃X�e�b�v�́A������f�[�^�̍쐬�ł��Bstrex_test1.hsp�̃X�N���v�g�́Astrex_test2.hsp�Ɋ܂܂�镶����𕶎���f�[�^�Ƃ��āAstrex_test2.strmap�t�@�C���ɏ����o���܂��B
-		���̃t�@�C���́A�g�p����Ă��镶����Ƃ��̊Ǘ����(�X�N���v�g���Ŏg�p����Ă���ʒu�������Ă��܂�)�ō\������Ă��܂��B<br>
-		�e�L�X�g�G�f�B�^����strex_test2.strmap�t�@�C����ҏW���A���̒�����u��������K�v�����镶��������������܂��B
-		���Ƃ��΁A�u***����ɂ���***�v�Ƃ�����������u***Hello***�v�ɏ��������邱�Ƃ��ł��܂��B������̒����͕ς���Ă���肠��܂���B���ۂɏ����������f�[�^�ustrex_test2en.strmap�v���T���v���t�H���_�ɓ�������Ă��܂��B<br>
-		�Ō�ɁAstrex_test2.hsp�X�N���v�g�̒��ŁA�������g�̕������u�������܂��Bstrexchange���߂ŕ������ҏW�����A�ustrex_test2en.strmap�v�t�@�C�����w�肷�邱�ƂŁA�X�N���v�g���̕����񂪎����I�ɂ��ׂĒu�������܂��B
+		実際のサンプルが「sample/new36/strex_test1.hsp」「sample/new36/strex_test2.hsp」として同梱されています。
+		最初のステップは、文字列データの作成です。strex_test1.hspのスクリプトは、strex_test2.hspに含まれる文字列を文字列データとして、strex_test2.strmapファイルに書き出します。
+		このファイルは、使用されている文字列とその管理情報(スクリプト内で使用されている位置を示しています)で構成されています。<br>
+		テキストエディタ等でstrex_test2.strmapファイルを編集し、この中から置き換える必要がある文字列を書き換えます。
+		たとえば、「***こんにちは***」という文字列を「***Hello***」に書き換えることができます。文字列の長さは変わっても問題ありません。実際に書き換えたデータ「strex_test2en.strmap」もサンプルフォルダに同梱されています。<br>
+		最後に、strex_test2.hspスクリプトの中で、自分自身の文字列を置き換えます。strexchange命令で文字列を編集した、「strex_test2en.strmap」ファイルを指定することで、スクリプト内の文字列が自動的にすべて置き換わります。
 		</p><pre>
 	strexchange "strex_test2en.strmap"
 		</pre><p>
-		����ɂ��A�X�N���v�g���̕�����Ɏ�������邱�ƂȂ��A�ʂȓ��e�ɒu���������\�ł��B�u�������̂��߂̃t�@�C�����A�����p�ӂ��邱�Ƃɂ�葽����ɒu�������邱�Ƃ��ł��܂��B<br>
-		������̒u��������K�p�����A�X�N���v�g���̕�����ɖ߂��ꍇ�́A
+		これにより、スクリプト内の文字列に手を加えることなく、別な内容に置き換えが可能です。置き換えのためのファイルを、複数用意することにより多国語に置き換えることもできます。<br>
+		文字列の置き換えを適用せず、スクリプト内の文字列に戻す場合は、
 		</p><pre>
 	strexchange ""
 		</pre><p>
-		�̂悤�ɋ�̕�������w�肵�Ă��������B
-		�u������������f�[�^�̃t�@�C���ɂ́A���̕�������������l(�n�b�V���R�[�h)���܂܂�Ă��܂��B���̃R�[�h�ƁA�X�N���v�g���̕�������}�b�`���O�����āA�u���������s���Ă��܂��B
-		�ł�����A����������͓���̃n�b�V���Ƃ��Ă܂Ƃ߂��Ă��܂��܂��̂Œ��ӂ��Ă��������B<br>
-		�܂��A�����܂ł��X�N���v�g���̕����񂪑ΏۂƂȂ��Ă��邽�߁A�O���̃e�L�X�g�t�@�C����ǂݍ��񂾂�A�����R�[�h���當����𐶐����Ă���ꍇ�ɂ͓K�p����܂���B<br>
-		�F�X�ȏ�ʂŁA�|���J�X�^�}�C�Y�ɈЗ͂𔭊����܂��B���Ђ����p���������B
+		のように空の文字列を指定してください。
+		置き換え文字列データのファイルには、元の文字列を示す数値(ハッシュコード)が含まれています。このコードと、スクリプト内の文字列をマッチングさせて、置き換えを行っています。
+		ですから、同じ文字列は同一のハッシュとしてまとめられてしまいますので注意してください。<br>
+		また、あくまでもスクリプト内の文字列が対象となっているため、外部のテキストファイルを読み込んだり、文字コードから文字列を生成している場合には適用されません。<br>
+		色々な場面で、翻訳やカスタマイズに威力を発揮します。ぜひご活用ください。
 		</p>
 
 
-	<h2 id="ZLIBWRAP">zip�t�@�C���̈��k�𓀃T�|�[�g�ɂ���</h2>
+	<h2 id="ZLIBWRAP">zipファイルの圧縮解凍サポートについて</h2>
 		<p>
-		ZLibWrap.dll���C�u�������g�p����zip�t�@�C�����k�𓀂��T�|�[�g���܂����B<br>
-		�V���v����2�̖��߂ŁA�X�N���v�g����t�@�C���̈��k�A�𓀂��s�����Ƃ��\�ł��B
+		ZLibWrap.dllライブラリを使用したzipファイル圧縮解凍をサポートしました。<br>
+		シンプルな2つの命令で、スクリプトからファイルの圧縮、解凍を行うことが可能です。
 		</p><pre>
 	#include "zipfile.as"
 		</pre><p>
-		���L�q���邱�ƂŁA�ȉ��̖��߂��g�p���邱�Ƃ��ł��܂��B
-		(���s�̍ۂɂ́AZLibWrap.dll�t�@�C�����K�v�ƂȂ�܂��B)
+		を記述することで、以下の命令を使用することができます。
+		(実行の際には、ZLibWrap.dllファイルが必要となります。)
 		</p><pre>
 	ZipCompress "srcfiles", "zipfile"
 
-		"srcfiles"�Ŏw�肵���t�@�C��(���C���h�J�[�h�g�p��)��
-		"zipfile"�Ŏw�肵���t�@�C���Ɉ��k���ĕۑ����܂��B
+		"srcfiles"で指定したファイル(ワイルドカード使用可)を
+		"zipfile"で指定したファイルに圧縮して保存します。
 
 	ZipExtract "zipfile", "path"
 
-		"zipfile"�Ŏw�肵�����k�t�@�C�����A"path"�Ŏw�肵���t�H���_�ɉ𓀂��܂��B
+		"zipfile"で指定した圧縮ファイルを、"path"で指定したフォルダに解凍します。
 		</pre><p>
-		�ڂ����́A���ꂼ��̖��߃w���v�A�T���v�����Q�Ƃ��Ă�������
+		詳しくは、それぞれの命令ヘルプ、サンプルを参照してください
 		</p>
 
 
-	<h2 id="MUCOM88">MUCOM88�v���O�C���ɂ���</h2>
+	<h2 id="MUCOM88">MUCOM88プラグインについて</h2>
 		<p><img src="img/hsp36_mucom88.png"></p>
 
 		<p>
-		HSP3.6�ł́AMML�L�q�ɂ��FM�����Đ����T�|�[�g����MUCOM88�v���O�C����W���œ������Ă��܂��B<br>
-		NEC�̃p�\�R��PC-8801�V���[�Y�œ��삵�Ă����AFM�����̃h���C�o�[���Č�����MUCOM88 Windows�����@�\��
-		�R���g���[�����邱�Ƃ��ł��܂��B<br>
-		MUCOM88�v���O�C�����g�p���邱�Ƃɂ��A�P���ȉ��y�̍Đ�����AMML�̉��߂܂ŃX�N���v�g���ꂩ��
-		���L�����䂷�邱�Ƃ��ł��܂��B<br>
-		FM����(OPNA)6��+PSG����(3��)+���Y������+PCM�����̍��v11�`�����l����MML����ɂ��L�q�ł��܂��B
-		Windows�̃T�E���h�Đ������́ADirectX8�ȍ~��DirectSound���g�p���AWindows XP�ȍ~�̊��ŁA
-		�ǉ��̃R���|�[�l���g��p�ӂ��邱�ƂȂ����삳���邱�Ƃ��ł��܂��B<br>
-		MUCOM88�v���O�C���̏ڍׂ́A�t���̃}�j���A��(docs/hspmucom.txt)���ꂼ��̖��߃w���v�A
-		�T���v��(samples/mucom88)���Q�Ƃ��Ă��������B<br><br>
-		HSPMUCOM�́AOpen MUCOM88�v���W�F�N�g�̈ꕔ�Ƃ��Č��J����Ă��܂��B
-		Open MUCOM88�v���W�F�N�g�ɂ��ẮA�ȉ����Q�Ƃ��Ă��������B
+		HSP3.6では、MML記述によるFM音源再生をサポートするMUCOM88プラグインを標準で同梱しています。<br>
+		NECのパソコンPC-8801シリーズで動作していた、FM音源のドライバーを再現したMUCOM88 Windowsが持つ機能を
+		コントロールすることができます。<br>
+		MUCOM88プラグインを使用することにより、単純な音楽の再生から、MMLの解釈までスクリプト言語から
+		幅広く制御することができます。<br>
+		FM音源(OPNA)6音+PSG音源(3声)+リズム音源+PCM音源の合計11チャンネルをMML言語により記述できます。
+		Windowsのサウンド再生処理は、DirectX8以降のDirectSoundを使用し、Windows XP以降の環境で、
+		追加のコンポーネントを用意することなく動作させることができます。<br>
+		MUCOM88プラグインの詳細は、付属のマニュアル(docs/hspmucom.txt)それぞれの命令ヘルプ、
+		サンプル(samples/mucom88)を参照してください。<br><br>
+		HSPMUCOMは、Open MUCOM88プロジェクトの一部として公開されています。
+		Open MUCOM88プロジェクトについては、以下を参照してください。
 		</p><pre>
 	Open MUCOM88
 		<a href="https://onitama.tv/mucom88/" target="_blank">https://onitama.tv/mucom88/</a>
 		</pre><p>
-	Windows��œ��삷��MUCOM88 Windows�c�[���y�уT���v��MML�����J����Ă��܂��B<br>
-	HSPMUCOM.DLL�y�у\�[�X�R�[�h�́A����(��c��)�ł������͎��R�ɏЉ�A
-	�����A�Ĕz�z���邱�Ƃ��ł��܂��B���̍ۂɂ͕K���h�L�������g��
-	���C�Z���X�\�L���܂߂�悤�ɂ��Ă��������B
+	Windows上で動作するMUCOM88 Windowsツール及びサンプルMMLが公開されています。<br>
+	HSPMUCOM.DLL及びソースコードは、無償(非営利)である限りは自由に紹介、
+	複製、再配布することができます。その際には必ずドキュメントと
+	ライセンス表記も含めるようにしてください。
 		<UL>
-		<LI>Portable Z80 emulation��� Yasuo Kuwahara��<br>
+		<LI>Portable Z80 emulation作者 Yasuo Kuwahara氏<br>
 		  <a href="http://www.geocities.jp/kwhr0/" target="_blank">http://www.geocities.jp/kwhr0/</a>
-		<LI>fmgen��� cisc��<br>
+		<LI>fmgen作者 cisc氏<br>
 		  <a href="http://www.retropc.net/cisc/" target="_blank">http://www.retropc.net/cisc/</a>
-		<LI>MUCOM88��� �Ñ�S�O��<br>
+		<LI>MUCOM88作者 古代祐三氏<br>
 		  <a href="https://twitter.com/yuzokoshiro" target="_blank">https://twitter.com/yuzokoshiro</a>
-		<LI>HSPMUCOM��� ���ɂ���(ONION software)<br>
+		<LI>HSPMUCOM作者 おにたま(ONION software)<br>
 		  <a href="https://www.onionsoft.net/" target="_blank">https://www.onionsoft.net/</a>
 		</UL>
 		</p>
 
 
-	<h2 id="HSPSW">hspsw�v���O�C���ɂ���</h2>
+	<h2 id="HSPSW">hspswプラグインについて</h2>
 		<p>
-		HSP3.6�ł́ASteam�v���b�g�t�H�[���p��API���Ăяo�����߂�hspsw�v���O�C����W���œ������Ă��܂��B<br>
-		PC�Q�[���APC�\�t�g�E�F�A���_�E�����[�h�̔�����Steam�v���b�g�t�H�[���Ŕz�M����A�v����ŁA
-		�����L���O�����(�g���t�B�[)�A�X�e�[�^�X�̓ǂݏ����Ƃ������@�\���T�|�[�g���邱�Ƃ��ł��܂��B<br>
-		hspsw�v���O�C���̏ڍׂ́A�t���̃}�j���A��(doclib/hspsw.txt)�A�T���v��(samples/hspsw)��
-		�Q�Ƃ��Ă��������B
+		HSP3.6では、Steamプラットフォーム用のAPIを呼び出すためのhspswプラグインを標準で同梱しています。<br>
+		PCゲーム、PCソフトウェアをダウンロード販売するSteamプラットフォームで配信するアプリ上で、
+		ランキングや実績(トロフィー)、ステータスの読み書きといった機能をサポートすることができます。<br>
+		hspswプラグインの詳細は、付属のマニュアル(doclib/hspsw.txt)、サンプル(samples/hspsw)を
+		参照してください。
 		</p><pre>
-	HSPSW�v���O�C���}�j���A��
+	HSPSWプラグインマニュアル
 		<a href="hspsw.txt" target="_blank">doclib/hspsw.txt</a>
 		</pre>
 
 
-	<h2 id="HSPINET">hspinet�v���O�C���̍X�V�ɂ���</h2>
+	<h2 id="HSPINET">hspinetプラグインの更新について</h2>
 		<p>
-		hspinet�v���O�C����http/https���N�G�X�g�ŁA
-		PUT/DELETE���\�b�h�ɑΉ�����netrequest_put�Anetrequest_delete��
-		���߂��ǉ�����Ă��܂��B
-		����ɂ��A��葽����WebAPI�𗘗p���邱�Ƃ��\�ɂȂ�܂��B
+		hspinetプラグインのhttp/httpsリクエストで、
+		PUT/DELETEメソッドに対応したnetrequest_put、netrequest_deleteの
+		命令が追加されています。
+		これにより、より多くのWebAPIを利用することが可能になります。
 		</p><pre>
-	hspinet�v���O�C���}�j���A��
+	hspinetプラグインマニュアル
 		<a href="hspinet.txt" target="_blank">doclib/hspinet.txt</a>
 		</pre>
 
 
-	<h2 id="HSP64">64bit(x64)�Ń����^�C���ɂ���</h2>
+	<h2 id="HSP64">64bit(x64)版ランタイムについて</h2>
 		<p>
-		64bit(x64)�A�v���Ƃ��ē��삷��HSP3�W�������^�C��(hsp3_64.exe)�́A
-		�W����unicode(UTF-8)�����x�[�X�œ��삷����̂ɕύX����܂����B
-		�g�p����ꍇ�́A�X�N���v�g�̐擪�Ɉȉ��̍s���w�肵�Ă��������B
+		64bit(x64)アプリとして動作するHSP3標準ランタイム(hsp3_64.exe)は、
+		標準でunicode(UTF-8)文字ベースで動作するものに変更されました。
+		使用する場合は、スクリプトの先頭に以下の行を指定してください。
 		</p><pre>
 	#include "hsp3_64.as"
 		</pre><p>
-		����̎d�l�́AHSP3UTF(UTF-8)�Ń����^�C���Ɠ��l�ɂȂ��Ă��܂��B
-		64bit(x64)�����^�C���́A64bit�ł�Windows��(Windows 7�ȍ~)�ł̂ݓ��삵�܂��B
+		動作の仕様は、HSP3UTF(UTF-8)版ランタイムと同様になっています。
+		64bit(x64)ランタイムは、64bit版のWindows上(Windows 7以降)でのみ動作します。
 		</p>
 
 
-	<h2 id="HSPTVSOZAI">HSPTV�t�H���_�f�ނɂ���</h2>
+	<h2 id="HSPTVSOZAI">HSPTVフォルダ素材について</h2>
 		<p><img src="img/hsp36_rpgmap.png"></p>
 
 		<p>
-		��i�𔭕\����ۂɎ��R�Ɏg�p���邱�Ƃ̂ł���摜�Ɖ��̃f�[�^�t�@�C���Ƃ��āA
-		HSPTV�t�H���_�f�ނ�啝�Ɋg�[���Ă��܂��B
-		��y�ȃ��C�Z���X�ŁAHSP�ȊO�̍�i�ł��g�p���邱�Ƃ��\�ł��B 
-		�܂��AWeb���HSP�̃X�N���v�g�����J�ł���A�uWebDish�T�[�r�X�v�ł����R�ɎQ�Ƃ��邱�Ƃ��ł��܂��B
-		�uHSPTV�t�H���_�f�ށv�uWebDish�f�ށv�����p���āA�����̍�i������邱�Ƃ�����Ă��܂��B
+		作品を発表する際に自由に使用することのできる画像と音のデータファイルとして、
+		HSPTVフォルダ素材を大幅に拡充しています。
+		手軽なライセンスで、HSP以外の作品でも使用することが可能です。 
+		また、Web上でHSPのスクリプトを公開できる、「WebDishサービス」でも自由に参照することができます。
+		「HSPTVフォルダ素材」「WebDish素材」を活用して、多くの作品が作られることを願っています。
 		</p><pre>
-		HSP3.6 WebDish�f�ރf�[�^
+		HSP3.6 WebDish素材データ
 		<a href="https://dev.onionsoft.net/seed/webdish_res.html" target="_blank">https://dev.onionsoft.net/seed/webdish_res.html</a>
 		</pre><p>
 
-	<h2 id="HSPENG">�p��ŃC���^�[�t�F�[�X�̑Ή��ɂ���</h2>
+	<h2 id="HSPENG">英語版インターフェースの対応について</h2>
 		<p>
-		Windows�A�y��Linux���HSP�����^�C�����s���̃G���[���b�Z�[�W�́AOS���̕����R�[�h�����Ƃɓ��{��E�p���؂�ւ��ĕ\�����܂��B<br>
-		�܂��AHSP�C���X�g�[���t�H���_�ɁA�p��ŃX�N���v�g�G�f�B�^��V�K�ɓ������Ă��܂��B<br>
-		�uhsed3_en.exe�v���N�����邱�ƂŁA���j���[���̑��̃C���^�[�t�F�[�X���p��ɂȂ�܂��B
-		HSP3�{�̂̋@�\���̂ɕύX�͂���܂��񂪁A�p��ł̊��ŗ��p���������͂��������������B<br>
-		������AHSP�J�����̍��ۉ��Ɍ����ď�����i�߂Ă��������ƍl���Ă��܂��B
+		Windows、及びLinux上のHSPランタイム実行時のエラーメッセージは、OS環境の文字コードをもとに日本語・英語を切り替えて表示します。<br>
+		また、HSPインストールフォルダに、英語版スクリプトエディタを新規に同梱しています。<br>
+		「hsed3_en.exe」を起動することで、メニューその他のインターフェースが英語になります。
+		HSP3本体の機能自体に変更はありませんが、英語版の環境で利用したい方はお試しください。<br>
+		今後も、HSP開発環境の国際化に向けて準備を進めていきたいと考えています。
 		</p>
 
 
-	<h2 id="HSP3DISH">HSP3Dish�̃X�N���[���T�C�Y�ύX�ɂ���</h2>
+	<h2 id="HSP3DISH">HSP3Dishのスクリーンサイズ変更について</h2>
 		<p>
-		HSP3Dish�AHGIMG4��Windows/Linux�łɂ����āA�X�N���[��(�E�C���h�E)�T�C�Y�̓��I�ȕύX�ɑΉ����܂����B<br>
-		���܂܂ł́Ahsp3dish.ini�t�@�C���ɋL�^���ꂽ�T�C�Y�ɏ]���ċN�����ɃT�C�Y���Œ肳��Ă��܂������A
-		�����̕�����T�C�Y�̕ύX�ƃt���X�N���[���Ή��̗v�]�𒸂��A�C���v���܂����B
-		HSP3.6���Ascreen����,bgscr���߂ɂ��X�N���[��(�E�C���h�E)�T�C�Y��ύX�ł��܂��B
+		HSP3Dish、HGIMG4のWindows/Linux版において、スクリーン(ウインドウ)サイズの動的な変更に対応しました。<br>
+		いままでは、hsp3dish.iniファイルに記録されたサイズに従って起動時にサイズが固定されていましたが、
+		多くの方からサイズの変更とフルスクリーン対応の要望を頂き、修正致しました。
+		HSP3.6より、screen命令,bgscr命令によりスクリーン(ウインドウ)サイズを変更できます。
 		</p><pre>
 	screen p1,p2,p3,p4,p5,p6
 
-	p1=0�`(0) : �E�B���h�EID
-	p2=1�`(640): �����������ʃT�C�YX�i1�h�b�g�P�ʁj
-	p3=1�`(480): �����������ʃT�C�YY�i1�h�b�g�P�ʁj
-	p4=0�`1(0) : �����������ʃ��[�h
-	p5=0�`(-1) : �E�B���h�E�̔z�uX�i1�h�b�g�P�ʁj
-	p6=0�`(-1) : �E�B���h�E�̔z�uY�i1�h�b�g�P�ʁj
+	p1=0～(0) : ウィンドウID
+	p2=1～(640): 初期化する画面サイズX（1ドット単位）
+	p3=1～(480): 初期化する画面サイズY（1ドット単位）
+	p4=0～1(0) : 初期化する画面モード
+	p5=0～(-1) : ウィンドウの配置X（1ドット単位）
+	p6=0～(-1) : ウィンドウの配置Y（1ドット単位）
 		</pre><p>
-		p1�̃E�C���h�EID�́A0�݂̂ƂȂ�܂��B
-		p4�̏��������[�h�́A�ȉ��̒l���w�肷�邱�Ƃ��ł��܂��B
+		p1のウインドウIDは、0のみとなります。
+		p4の初期化モードは、以下の値を指定することができます。
 		</p><pre>
-	  +4(screen_fixedsize) : �T�C�Y�Œ�E�B���h�E
-	  +8(screen_tool)      : �c�[���E�B���h�E
-	 +16(screen_frame)     : �[�����̂���E�B���h�E
-	 +256                  : �t���X�N���[��
+	  +4(screen_fixedsize) : サイズ固定ウィンドウ
+	  +8(screen_tool)      : ツールウィンドウ
+	 +16(screen_frame)     : 深い縁のあるウィンドウ
+	 +256                  : フルスクリーン
 		</pre><p>
-		p4��256���w�肵���ꍇ�́A�w�肳�ꂽ�𑜓x�̃t���X�N���[���Ƃ��ď���������܂��B<br>
-		�܂��A�X�N���[���T�C�Y�ύX���́A�ʏ탉���^�C���Ƃ͈قȂ�A����܂łɓǂݍ��񂾂��ׂẲ摜�o�b�t�@�͎����܂��̂Œ��ӂ��Ă��������B
+		p4に256を指定した場合は、指定された解像度のフルスクリーンとして初期化されます。<br>
+		また、スクリーンサイズ変更時は、通常ランタイムとは異なり、それまでに読み込んだすべての画像バッファは失われますので注意してください。
 		</p>
 
 
-	<h2 id="VIEWCALC">viewcalc���߂ɂ����W�ϊ��ɂ���</h2>
+	<h2 id="VIEWCALC">viewcalc命令による座標変換について</h2>
 		<p><img src="img/hsp36_viewcalc.png"></p>
 		<p>
-		HSP3Dish�AHGIMG4�ɂ����āA�`�掞�̍��W�ϊ���ݒ肷��viewcalc���߂�ǉ����܂����B<br>
-		viewcalc���߂́A2D�`�掞��X,Y���W�ɔC�ӂ̌v�Z��K�p���邱�Ƃ��ł��鋭�͂ȋ@�\�ł��B
-		�`�悳���\�����S�̂̃X�P�[�����O��ړ��A��]�Ȃǂ��s�����Ƃ��ł��܂��B
+		HSP3Dish、HGIMG4において、描画時の座標変換を設定するviewcalc命令を追加しました。<br>
+		viewcalc命令は、2D描画時のX,Y座標に任意の計算を適用することができる強力な機能です。
+		描画される表示物全体のスケーリングや移動、回転などを行うことができます。
 		</p><pre>
 	viewcalc p1,p2,p3,p4,p5
 
-	p1(0)   : �ݒ胂�[�h
-	p2(0.0) : �p�����[�^�[1(����)
-	p3(0.0) : �p�����[�^�[2(����)
-	p4(0.0) : �p�����[�^�[3(����)
-	p5(0.0) : �p�����[�^�[4(����)
+	p1(0)   : 設定モード
+	p2(0.0) : パラメーター1(実数)
+	p3(0.0) : パラメーター2(実数)
+	p4(0.0) : パラメーター3(実数)
+	p5(0.0) : パラメーター4(実数)
 		</pre><p>
-		p1�Ŏw�肷��ݒ胂�[�h�ɂ́A�������̎�ނ����葽�ʂȕϊ����s�����Ƃ��\�ł��B
+		p1で指定する設定モードには、いくつかの種類があり多彩な変換を行うことが可能です。
 		</p><pre>
-	�}�N����            �l   ���e
+	マクロ名            値   内容
 	-----------------------------------------------------
-	vptype_off           0   ���W�ϊ��Ȃ�(�f�t�H���g)
-	vptype_translate     1   �ړ��p�����[�^�[���w��
-	vptype_rotate        2   ��]�p�����[�^�[���w��
-	vptype_scale         3   �X�P�[���p�����[�^�[���w��
-	vptype_3dmatrix      4   4�~4�}�g���N�X�ɂ����W�ϊ�
-	vptype_2d            5   2D���W�ϊ���ݒ�
-	vptype_3d            6   3D���W�ϊ���ݒ�
+	vptype_off           0   座標変換なし(デフォルト)
+	vptype_translate     1   移動パラメーターを指定
+	vptype_rotate        2   回転パラメーターを指定
+	vptype_scale         3   スケールパラメーターを指定
+	vptype_3dmatrix      4   4×4マトリクスによる座標変換
+	vptype_2d            5   2D座標変換を設定
+	vptype_3d            6   3D座標変換を設定
 		</pre><p>
-		vptype_2d�́A��{�I��2D���W�ϊ���K�p���郂�[�h�ɂȂ��Ă��܂��B
-		�p�����[�^�[1�`3�ŁAX,Y�̃X�P�[��(�{��)�A��]�p�x(���W�A���P��)��ݒ肷�邱�Ƃ��ł��܂��B
+		vptype_2dは、基本的な2D座標変換を適用するモードになっています。
+		パラメーター1～3で、X,Yのスケール(倍率)、回転角度(ラジアン単位)を設定することができます。
 		</p><pre>
 	viewcalc vptype_2d, 2.0, 2.0, 0.0
 		</pre><p>
-		�̂悤�Ɏw�肵���ꍇ�́AX,Y������2�{�̃X�P�[���ŕ\���A�p�x��0�ƂȂ�܂��B<br>
-		���ɂ��F�X�ȃp�����[�^�[���w��ł��܂��B�ڂ����́Aviewcalc���߂̃w���v���Q�Ƃ��Ă��������B
+		のように指定した場合は、X,Y方向に2倍のスケールで表示、角度は0となります。<br>
+		他にも色々なパラメーターを指定できます。詳しくは、viewcalc命令のヘルプを参照してください。
 		</p>
 
 
-	<h2 id="CELBITMAP">celbitmap���߂ɂ��摜�f�[�^����ɂ���</h2>
+	<h2 id="CELBITMAP">celbitmap命令による画像データ制御について</h2>
 		<p>
-		HSP3Dish�AHGIMG4�ɂ����āA�ϐ��o�b�t�@�̓��e���摜�f�[�^�Ƃ��Ĉ������߂�celbitmap���߂�ǉ����܂����B<br>
-		����܂ŁAHSP3Dish�ł̓h�b�g�P�ʂ̉摜�f�[�^�ɒ��ڃA�N�Z�X���邱�Ƃ��ł��܂���ł������A���̖��߂ɂ�胁�����̓��e���摜�f�[�^�Ƃ��ēǂݏ����ł���悤�ɂȂ�܂��B
+		HSP3Dish、HGIMG4において、変数バッファの内容を画像データとして扱うためのcelbitmap命令を追加しました。<br>
+		これまで、HSP3Dishではドット単位の画像データに直接アクセスすることができませんでしたが、この命令によりメモリの内容を画像データとして読み書きできるようになります。
 		</p><pre>
 	celbitmap p1,var,p2
 
-	p1(0)   : �E�C���h�EID
-	var     : �C���[�W��u�������邽�߂̔z��ϐ�
-	p2(0)   : ����I�v�V����
+	p1(0)   : ウインドウID
+	var     : イメージを置き換えるための配列変数
+	p2(0)   : 動作オプション
 		</pre><p>
-		celbitmap���߂��g�p����ۂɂ́A���炩����buffer���߂ɂ��쐬�����I�t�X�N���[���o�b�t�@�ƁA�u�������邽�߂̕ϐ��o�b�t�@������������K�v������܂��B<br>
-		�I�t�X�N���[���o�b�t�@�́Abuffer���߂�screen_offscreen�̃I�v�V�������w�肵�č쐬���Ă��������B
+		celbitmap命令を使用する際には、あらかじめbuffer命令により作成したオフスクリーンバッファと、置き換えるための変数バッファを初期化する必要があります。<br>
+		オフスクリーンバッファは、buffer命令でscreen_offscreenのオプションを指定して作成してください。
 		</p><pre>
 	buffer 2,256,256,screen_offscreen
 		</pre><p>
-		���̌�A�o�b�t�@��u�������邽�߂̕ϐ��o�b�t�@���쐬���܂��B<br>
-		dim���߂ɂ��A�P�����z������������č쐬���Ă��������B�쐬����T�C�Y�́A�I�t�X�N���[���o�b�t�@��X�T�C�Y�~Y�T�C�Y�ɂȂ�܂��B
+		その後、バッファを置き換えるための変数バッファを作成します。<br>
+		dim命令により、１次元配列を初期化して作成してください。作成するサイズは、オフスクリーンバッファのXサイズ×Yサイズになります。
 		</p><pre>
 	dim bitmap, 256*256
 		</pre><p>
-		����ŁAcelbitmap���߂��g�p���鏀���������܂����B<br>
-		celbitmap���߂ɂ��A�I�t�X�N���[���o�b�t�@��ID�Ɣz��ϐ����w�肷�邱�ƂŁA�ϐ��o�b�t�@�̓��e�����̂܂܉摜�C���[�W�Ƃ��ēK�p����܂��B<br>
-		�ϐ��o�b�t�@�́A1�v�f������1�h�b�g�ƂȂ�܂��B1�h�b�g�́A32bit�̗v�f��R,G,B,A���ꂼ��8bit�P�ʂŊi�[�����RGB�`���̃f�[�^�ƂȂ�܂��B(3.6��2�ł�3.6��3�ł�RGB�̕��я����ύX�ɂȂ��Ă��܂��B�����ӂ�������)<br>
-		���Ƃ��΁A�u$ff204080�v(16�i��)���w�肵���ꍇ�́AA=$ff(255)�AB=$20(32)�AG=$40(64)�AR=$80(128)�ƂȂ�܂��B(�J�b�R����10�i��)<br>
-		�摜�f�[�^�̒u�������́A�R�X�g�̍��������ɂȂ邽�߁A�傫�ȃT�C�Y�̃C���[�W��u��������ꍇ�A�t���[�����[�g�������邱�Ƃ�����܂��̂Œ��ӂ��Ă��������B<br>
-		p2�p�����[�^�[�ɂ��A�u�������̌`���⓮����w�肷�邱�Ƃ��ł��܂��B
+		これで、celbitmap命令を使用する準備が整いました。<br>
+		celbitmap命令により、オフスクリーンバッファのIDと配列変数を指定することで、変数バッファの内容がそのまま画像イメージとして適用されます。<br>
+		変数バッファは、1要素あたり1ドットとなります。1ドットは、32bitの要素をR,G,B,Aそれぞれ8bit単位で格納されるRGB形式のデータとなります。(3.6β2版と3.6β3版でRGBの並び順が変更になっています。ご注意ください)<br>
+		たとえば、「$ff204080」(16進数)を指定した場合は、A=$ff(255)、B=$20(32)、G=$40(64)、R=$80(128)となります。(カッコ内は10進数)<br>
+		画像データの置き換えは、コストの高い処理になるため、大きなサイズのイメージを置き換える場合、フレームレートが下がることがありますので注意してください。<br>
+		p2パラメーターにより、置き換えの形式や動作を指定することができます。
 		</p><pre>
-	 �l  �}�N��             ����
+	 値  マクロ             動作
 	---------------------------------------------------------
-	  0  celbitmap_rgb      $aabbggrr�`���Ńf�[�^��ێ�����
-	  1  celbitmap_bgr      $aarrggbb�`���Ńf�[�^��ێ�����
-	  16 celbitmap_capture  �`���ʂ̓��e��ϐ��ɓǂݏo��
+	  0  celbitmap_rgb      $aabbggrr形式でデータを保持する
+	  1  celbitmap_bgr      $aarrggbb形式でデータを保持する
+	  16 celbitmap_capture  描画画面の内容を変数に読み出す
 		</pre><p>
-		�ʏ�́AOpenGL�̕W���ɍ��킹��celbitmap_rgb�̌`�����g�p����܂��B�I�v�V������celbitmap_bgr���w�肵���ꍇ�́ADirectX�W���ɍ��킹��ARGB�̕��тɂȂ�܂��B<br>
-		celbitmap_capture���w�肵���ꍇ�́A�`���̉�ʏ�̃f�[�^��z��ϐ��ɓǂݏo���܂��B(�ǂݏo���̃T�C�Y�̓I�t�X�N���[���o�b�t�@�̃T�C�Y�ɂȂ�܂�)<br>
-		��celbitmap_capture�I�v�V�����́A�����I�Ȏ����ł��B���݂́AWindows(DirectX��HGIMG4������)�ALinux�łł̂ݎg�p�ł��܂��̂ł��������������B
+		通常は、OpenGLの標準に合わせたcelbitmap_rgbの形式が使用されます。オプションにcelbitmap_bgrを指定した場合は、DirectX標準に合わせたARGBの並びになります。<br>
+		celbitmap_captureを指定した場合は、描画先の画面上のデータを配列変数に読み出します。(読み出しのサイズはオフスクリーンバッファのサイズになります)<br>
+		※celbitmap_captureオプションは、実験的な実装です。現在は、Windows(DirectX版HGIMG4を除く)、Linux版でのみ使用できますのでご了承ください。
 		</p>
 
 
-	<h2 id="HSPIOSAND">HSP3Dish��iOS,android�ōX�V�ɂ���</h2>
+	<h2 id="HSPIOSAND">HSP3DishのiOS,android版更新について</h2>
 		<p>
-		HSP3Dish��iOS,android�ł́A���ꂼ��̐V����SDK�ɑΉ����Ă��܂��B
+		HSP3DishのiOS,android版は、それぞれの新しいSDKに対応しています。
 		</p><pre>
-	iOS��	  : XCode9�ȍ~�p iOS13,64bit�Ή�
-	android�� : Android SDK 7.0 (API 24),64bit�Ή��A
-	            SDKr25�ANDK r12�ȍ~�AAdMob(Google Firebase)�Ή�
+	iOS版	  : XCode9以降用 iOS13,64bit対応
+	android版 : Android SDK 7.0 (API 24),64bit対応、
+	            SDKr25、NDK r12以降、AdMob(Google Firebase)対応
 		</pre><p>
-		iOS�Aandroid�łƂ���64bit�o�C�i���̏o�͂ɑΉ����Ă��܂��B
-		���ꂼ��Ή������o�[�W������SDK��J�������K�v�ƂȂ�܂��̂ŁA
-		�ڂ����́A�}�j���A�����Q�Ƃ��Ă��������B
+		iOS、android版ともに64bitバイナリの出力に対応しています。
+		それぞれ対応したバージョンのSDKや開発環境が必要となりますので、
+		詳しくは、マニュアルを参照してください。
 		</p><pre>
-	HSP3Dish�}�j���A���C���f�b�N�X
+	HSP3Dishマニュアルインデックス
 		<a href="../hsp3dish.htm" target="_blank">hsp3dish.htm</a>
 		</pre>
-		�����̃v���W�F�N�g���������r���h�ł��Ȃ��Ȃ�\�������邽�߁A
-		�����̃v���W�F�N�g�́A�ēx�쐬���������Ƃ𐄏����܂��B
+		既存のプロジェクトが正しくビルドできなくなる可能性があるため、
+		既存のプロジェクトは、再度作成し直すことを推奨します。
 		</p>
 
 
-	<h2 id="HGIMG4">HGIMG4�̍X�V�ɂ���</h2>
+	<h2 id="HGIMG4">HGIMG4の更新について</h2>
 		<p><img src="image/pn4.png" width="640"></p>
 
 		<p>
-		HSP3.6�ł́A����܂ł�HGIMG4����傫���C�����s�Ȃ��Ă��܂��B
-		��苭�͂Ŏg���₷���Ȃ�悤�A�e��@�\���������܂����B
-		�ȑO�̃o�[�W��������̏�ʌ݊��œ��삷��悤�݌v����Ă��܂����A
-		�ꕔ�̋@�\�œ��삪�قȂ�ꍇ������܂��̂ŁA�ߋ��ɍ쐬�����X�N���v�g��
-		���삳����ۂɂ͂����ӂ��������B
-		�ڂ����g�����́AHGIMG4�v���O���~���O�K�C�h���������������B
+		HSP3.6では、それまでのHGIMG4から大きく修正を行なっています。
+		より強力で使いやすくなるよう、各種機能を見直しました。
+		以前のバージョンからの上位互換で動作するよう設計されていますが、
+		一部の機能で動作が異なる場合がありますので、過去に作成したスクリプトを
+		動作させる際にはご注意ください。
+		詳しく使い方は、HGIMG4プログラミングガイドをご覧ください。
 		</p><pre>
-	HGIMG4�v���O���~���O�K�C�h
+	HGIMG4プログラミングガイド
 		<a href="hgimg4.html" target="_blank">doclib/hgimg4.html</a>
 		</pre><p>
-		�ǉ��ύX���ꂽ���ڂ̊T�v�͈ȉ��̒ʂ�ł��B
+		追加変更された項目の概要は以下の通りです。
 		</p>
 		<UL>
-		<LI>FBX���f���ϊ��̍X�V
+		<LI>FBXモデル変換の更新
 		<br><br>
-		���G��FBX���f����ϊ�����ۂɃG���[���o�邱�Ƃ�������������啝�ɏC�����܂����B
-		�{�[�����܂ރ��f�����A�j���[�V�������܂߂Đ������ϊ����邱�Ƃ��ł��܂��B
-		�V�����AHGIMG4 Unity�A�g�K�C�h�𓯍����܂����B
-		3D�c�[���uUnity�v�ƘA�g���ă��f���f�[�^��A�j���[�V�����̕ϊ����s�����@��������Ă��܂��B
+		複雑なFBXモデルを変換する際にエラーが出ることがあった処理を大幅に修正しました。
+		ボーンを含むモデルをアニメーションも含めて正しく変換することができます。
+		新しく、HGIMG4 Unity連携ガイドを同梱しました。
+		3Dツール「Unity」と連携してモデルデータやアニメーションの変換を行う方法を解説しています。
 		</p><pre>
-	HGIMG4 Unity�A�g�K�C�h
+	HGIMG4 Unity連携ガイド
 	<a href="hgimg4_unity.html" target="_blank">doclib/hgimg4_unity.html</a>
 		</pre><p>
-		���̘A�g�𗘗p���č��ꂽ�A�u�v���������f���v(sample/pronama3d)��
-		�T���v���Ƃ��ē�������Ă��܂��B
+		この連携を利用して作られた、「プロ生ちゃんデモ」(sample/pronama3d)も
+		サンプルとして同梱されています。
 		</p>
 		<br>
-		<LI>�V�X�e���̈��艻�ƃG���[���O�擾
+		<LI>システムの安定化とエラーログ取得
 		<br><br>
-		�G���[�����������ۂ̌�����m�邽�߂̃��O�o�͂��������܂����B
-		3D���f���̃��[�h����A�A�j���[�V�����K�p���A�V�F�[�_�[�R���p�C�����Ȃǂ�
-		�ڍׂȃG���[�����O�Ƃ��ďo�͂���܂��B
-		�܂��A���O�̏o�͂�On/Off���邽�߂̃X�C�b�`��sysreq(�V�X�e�����N�G�X�g)���ڂ�
-		�ǉ�����Ă��܂��B
+		エラーが発生した際の原因を知るためのログ出力を強化しました。
+		3Dモデルのロード時や、アニメーション適用時、シェーダーコンパイル時などの
+		詳細なエラーがログとして出力されます。
+		また、ログの出力をOn/Offするためのスイッチをsysreq(システムリクエスト)項目に
+		追加されています。
 		</p><pre>
-	setreq SYSREQ_LOGWRITE,0	; ���O�o�͂�}��
+	setreq SYSREQ_LOGWRITE,0	; ログ出力を抑制
 		</pre>
-		<LI>getang�Agetangr���߂̒ǉ�
+		<LI>getang、getangr命令の追加
 		<br><br>
-		�I�u�W�F�N�g�̎p������XYZ�̉�]�p�x�Ŏ擾���邽�߂�getang,getangr���߂��ǉ�����Ă��܂��B
-		�N�H�[�^�j�I���`���ɂ���]�����A��y�Ɉ������Ƃ��ł���悤�ɂȂ��Ă��܂��B
-		�܂��A��]�p�x���w�肷��setang�Aevent_ang�Aevent_setang�̖��߂��ꂼ��ɉ�]���Ԃ��قȂ閽�߂�
-		�p�ӂ��Ă��܂��B
+		オブジェクトの姿勢情報をXYZの回転角度で取得するためのgetang,getangr命令が追加されています。
+		クォータニオン形式による回転情報より、手軽に扱うことができるようになっています。
+		また、回転角度を指定するsetang、event_ang、event_setangの命令それぞれに回転順番が異なる命令を
+		用意しています。
 		</p><pre>
-	setang (X->Y->Z�̏��Ԃɂ���]�p�x�̐ݒ�)
-	setangy (Y->X->Z�̏��Ԃɂ���]�p�x�̐ݒ�)
-	setangz (Z->Y->X�̏��Ԃɂ���]�p�x�̐ݒ�)
-	event_ang (X->Y->Z�̏��Ԃɂ���]�p�x�̃C�x���g�ω�)
-	event_angy (Y->X->Z�̏��Ԃɂ���]�p�x�̃C�x���g�ω�)
-	event_angz (Z->Y->X�̏��Ԃɂ���]�p�x�̃C�x���g�ω�)
-	event_setang (X->Y->Z�̏��Ԃɂ���]�p�x�̃C�x���g�ݒ�)
-	event_setangy (Y->X->Z�̏��Ԃɂ���]�p�x�̃C�x���g�ݒ�)
-	event_setangz (Z->Y->X�̏��Ԃɂ���]�p�x�̃C�x���g�ݒ�)
+	setang (X->Y->Zの順番による回転角度の設定)
+	setangy (Y->X->Zの順番による回転角度の設定)
+	setangz (Z->Y->Xの順番による回転角度の設定)
+	event_ang (X->Y->Zの順番による回転角度のイベント変化)
+	event_angy (Y->X->Zの順番による回転角度のイベント変化)
+	event_angz (Z->Y->Xの順番による回転角度のイベント変化)
+	event_setang (X->Y->Zの順番による回転角度のイベント設定)
+	event_setangy (Y->X->Zの順番による回転角度のイベント設定)
+	event_setangz (Z->Y->Xの順番による回転角度のイベント設定)
 		</pre>
-		<LI>gpscrmat���߂̒ǉ�
+		<LI>gpscrmat命令の追加
 		<br><br>
-		gpscrmat���߂��ǉ�����Ă��܂��B����ɂ��A�I�t�X�N���[���e�N�X�`���o�b�t�@���Q�Ƃ���
-		�}�e���A���𐶐����܂��B�}�e���A����Ǝ��ɐ������邱�Ƃɂ��A�I�t�X�N���[���Ƀ����_�����O���ꂽ
-		�摜�C���[�W���e�N�X�`���Ƃ��ăV�F�[�_�[����ė��p���邱�Ƃ��\�ɂȂ�܂��B
+		gpscrmat命令が追加されています。これにより、オフスクリーンテクスチャバッファを参照する
+		マテリアルを生成します。マテリアルを独自に生成することにより、オフスクリーンにレンダリングされた
+		画像イメージをテクスチャとしてシェーダーから再利用することが可能になります。
 
-		�I�t�X�N���[���ɕ`�悵�����e���e�N�X�`���Ƃ��čė��p���邱�ƂŁA�ڍׂȋ��ʔ���(�f�荞��)�A
-		�e�̐����Ȃǂɉ��p���邱�Ƃ��ł��܂��B<br>
-		(���I�t�X�N���[���e�N�X�`���o�b�t�@��Windows,Linux,android�v���b�g�t�H�[���̂݃T�|�[�g����Ă��܂�)
+		オフスクリーンに描画した内容をテクスチャとして再利用することで、詳細な鏡面反射(映り込み)、
+		影の生成などに応用することができます。<br>
+		(※オフスクリーンテクスチャバッファはWindows,Linux,androidプラットフォームのみサポートされています)
 		<br>
 		<br>
-		<LI>gpcamera���߂ɕ��s���e�J�����̃I�v�V������ǉ�
+		<LI>gpcamera命令に平行投影カメラのオプションを追加
 		<br><br>
-		�J�����𐶐�����gpcamera���߂ɃJ�����^�C�v�̃p�����[�^�[�I�v�V������ǉ����Ă��܂��B
-		�J�����^�C�v�l��1���w�肷�邱�ƂŁA���s���e(Orthographic)���s���J������ݒ肷�邱�Ƃ��\�ł��B
+		カメラを生成するgpcamera命令にカメラタイプのパラメーターオプションを追加しています。
+		カメラタイプ値に1を指定することで、平行投影(Orthographic)を行うカメラを設定することが可能です。
 		<br>
 		<br>
-		<LI>�L���[�u�}�b�v�e�N�X�`���̃T�|�[�g
+		<LI>キューブマップテクスチャのサポート
 		<br><br>
-		�}�e���A���̃I�v�V�����p�����[�^�[�ɁAGPOBJ_MATOPT_CUBEMAP���ǉ�����Ă��܂��B
-		�L���[�u�}�b�v�́A6�ʕ����̉摜���܂Ƃ߂�����Ȍ`���Ŋ��}�b�v��X�J�C�{�b�N�X�Ȃǂ�
-		���p���邱�Ƃ��ł��܂��B
-		(�L���[�u�}�b�v�摜�́A+X,-X,+Y,-Y,+Z,-Z������6�摜���c�ɘA������1����.PNG�`�����g�p����
-		�K�v������܂��B)
+		マテリアルのオプションパラメーターに、GPOBJ_MATOPT_CUBEMAPが追加されています。
+		キューブマップは、6面方向の画像をまとめた特殊な形式で環境マップやスカイボックスなどに
+		利用することができます。
+		(キューブマップ画像は、+X,-X,+Y,-Y,+Z,-Z放送の6画像を縦に連結した1枚の.PNG形式を使用する
+		必要があります。)
 		<br>
 		<br>
-		<LI>�J�������Ƃ̃����_�����O�O���[�v�ݒ�
+		<LI>カメラごとのレンダリンググループ設定
 		<br><br>
-		�I�u�W�F�N�g�̃����_�����O�O���[�v��ݒ肷��Asetobjrender���߂��ǉ�����Ă��܂��B
-		����ɂ��A�J�������Ƃɕ\������/���Ȃ��Ƃ����ݒ���I�u�W�F�N�g�ɗ^���邱�Ƃ��ł��܂��B
-		�܂��A���C�e�B���O�̃O���[�v���ݒ肷�邱�Ƃ��ł��A�I�u�W�F�N�g���ƂɃ��C�g�̔��f��
-		�R���g���[�����邱�Ƃ��ł��܂��B
+		オブジェクトのレンダリンググループを設定する、setobjrender命令が追加されています。
+		これにより、カメラごとに表示する/しないという設定をオブジェクトに与えることができます。
+		また、ライティングのグループも設定することができ、オブジェクトごとにライトの反映を
+		コントロールすることができます。
 		</p><pre>
 	setobjrender id,rendergroup,lightgroup
 
-		id(0) : �I�u�W�F�N�gID
-		 rendergroup(1) : �����_�����O�O���[�v�l
-		lightgroup(1) : ���C�e�B���O�O���[�v�l
+		id(0) : オブジェクトID
+		 rendergroup(1) : レンダリンググループ値
+		lightgroup(1) : ライティンググループ値
 		</pre><p>
-		�����_�����O�O���[�v�l�́A�J�����⃉�C�g���������_�����O�O���[�v�l�Ɠ���ł���ꍇ�́A
-		�L���ƂȂ�܂��B
-		�ʏ�́A�I�u�W�F�N�g�A�J�����Ƃ��ɃO���[�v1���ݒ肳��Ă��܂��B����̃J��������̕\���̂�
-		�\���𖳌��ɂ������ꍇ�Ȃǂɗ��p�ł��܂��B
-		���C�e�B���O�O���[�v�l�́A����̃��C�g�ɑ΂��ėL��/������؂�ւ�����̂ł��B
-		���C�g�������C�e�B���O�O���[�v�l�ƈقȂ�ꍇ�́A���C�g�������ƂȂ�܂��B
-		���ꂼ��̃O���[�v�l�́A1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768�̒�����
-		�C�ӂ̃r�b�g��g�ݍ��킹�Ďw��\�ł��B
+		レンダリンググループ値は、カメラやライトが持つレンダリンググループ値と同一である場合は、
+		有効となります。
+		通常は、オブジェクト、カメラともにグループ1が設定されています。特定のカメラからの表示のみ
+		表示を無効にしたい場合などに利用できます。
+		ライティンググループ値は、特定のライトに対して有効/無効を切り替えるものです。
+		ライトが持つライティンググループ値と異なる場合は、ライトが無効となります。
+		それぞれのグループ値は、1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768の中から
+		任意のビットを組み合わせて指定可能です。
 		<br>
 		<br>
-		<LI>TTF�t�H���g�̃T�|�[�g
+		<LI>TTFフォントのサポート
 		<br><br>
-		������(�t�H���g)�̕\�����@���������A���ׂẴv���b�g�t�H�[����TTF�t�H���g�ɂ����{��\�����T�|�[�g���܂����B
-		�]���̃o�[�W�����ł́Ares/font.gpb �t�@�C�����K�{�ł������A���̃t�@�C���͕K�v�Ȃ��Ȃ�܂����B
-		�������A�v���b�g�t�H�[���ɂ��A�ʓr�t�H���g�t�@�C�����K�v�ȏꍇ������܂��B
+		文字列(フォント)の表示方法を見直し、すべてのプラットフォームでTTFフォントによる日本語表示をサポートしました。
+		従来のバージョンでは、res/font.gpb ファイルが必須でしたが、このファイルは必要なくなりました。
+		ただし、プラットフォームにより、別途フォントファイルが必要な場合があります。
 		<table border="1">
-		<tr><td>�v���b�g�t�H�[��</td><td>�����R�[�h</td><td>�t�H���g�t�@�C��</td></tr>
-		<tr><td>Windows</td><td>SJIS</td><td>�s�v</td></tr>
-		<tr><td>Linux/RaspberryPi</td><td>UTF-8</td><td>ipaexg.ttf�t�@�C�����K�v</td></tr>
-		<tr><td>html5(Emscripten)</td><td>UTF-8</td><td>�s�v</td></tr>
-		<tr><td>android</td><td>UTF-8</td><td>�s�v</td></tr>
-		<tr><td>iOS</td><td>UTF-8</td><td>�s�v</td></tr>
+		<tr><td>プラットフォーム</td><td>文字コード</td><td>フォントファイル</td></tr>
+		<tr><td>Windows</td><td>SJIS</td><td>不要</td></tr>
+		<tr><td>Linux/RaspberryPi</td><td>UTF-8</td><td>ipaexg.ttfファイルが必要</td></tr>
+		<tr><td>html5(Emscripten)</td><td>UTF-8</td><td>不要</td></tr>
+		<tr><td>android</td><td>UTF-8</td><td>不要</td></tr>
+		<tr><td>iOS</td><td>UTF-8</td><td>不要</td></tr>
 		</table>
-		�v���b�g�t�H�[���ɂ���ăT�|�[�g�����t�H���g�̎�ށA�i���Ȃǂ��قȂ�ꍇ������܂��̂ł����ӂ��������B
+		プラットフォームによってサポートされるフォントの種類、品質などが異なる場合がありますのでご注意ください。
 		<br>
-		TTF�t�H���g�\���́AHSP3Dish�Ɠ��l�Ƀt�H���g��������e�N�X�`���ɕ`�悵�ăL���b�V������`�ɂȂ��Ă��܂��B
-		���̕��@�́A���R�ȃt�H���g�ƕ������g���闘�_������܂����A�قȂ���e���L�͈͂ɕ\������ꍇ��CPU�⃁�������ׂ��傫���Ȃ�܂��B
-		���t���[�����Ƃɕω�����l����e��\�����Ă���ƃt���[�����Ƃ̕��ׂ����債�Ă��܂��̂ŁA���̓_�͈ȑO�Ƃ͑傫���قȂ�܂��B
-		�܂��A�t�H���g�T�C�Y���傫��������A��ʓ��ɑ�ʂ̃e�L�X�g��\������悤�ȏꍇ�����ׂ��傫���Ȃ�܂��B<br>
-		TTF�t�H���g�ɂ��`�悪�K�v�Ȃ��ꍇ�́A�]���̕`��`���ɂ��\�����V�X�e�����N�G�X�g�Ő؂�ւ��邱�Ƃ��\�ł��B
+		TTFフォント表示は、HSP3Dishと同様にフォント文字列をテクスチャに描画してキャッシュする形になっています。
+		この方法は、自由なフォントと文字を使える利点がありますが、異なる内容を広範囲に表示する場合はCPUやメモリ負荷が大きくなります。
+		毎フレームごとに変化する値や内容を表示しているとフレームごとの負荷が増大してしまうので、この点は以前とは大きく異なります。
+		また、フォントサイズが大きかったり、画面内に大量のテキストを表示するような場合も負荷が大きくなります。<br>
+		TTFフォントによる描画が必要ない場合は、従来の描画形式による表示をシステムリクエストで切り替えることが可能です。
 		</p><pre>
 	setreq SYSREQ_USEGPBFONT,1
 		</pre><p>
-		��̂悤�ɁA�V�X�e�����N�G�X�g��SYSREQ_USEGPBFONT��1��ݒ肷�邱�Ƃŏ]���̃t�H���g�\���ɐ؂�ւ��邱�Ƃ��ł��܂��B(�ures/font.gpb�v�t�@�C����p�ӂ���K�v������܂�)<br>
-		�V�X�e�����N�G�X�g�ɂ��t�H���g�`��̐؂�ւ��́A�C�ӂ̃^�C�~���O�ōs�����Ƃ��\�ł��B
+		上のように、システムリクエストでSYSREQ_USEGPBFONTに1を設定することで従来のフォント表示に切り替えることができます。(「res/font.gpb」ファイルを用意する必要があります)<br>
+		システムリクエストによるフォント描画の切り替えは、任意のタイミングで行うことが可能です。
 		<br>
 		<br>
-		<LI>2D�`��V�F�[�_�[�̓���
+		<LI>2D描画シェーダーの内蔵
 		<br><br>
-		�]���̃o�[�W�����ł́A�N�����Ɂures/shaders�v���ɂ���2D�`��̂��߂̃V�F�[�_�[�t�@�C����ǂݍ���Ŏg�p���Ă��܂������A
-		�V�����o�[�W�����ł́A2D�p�̃V�F�[�_�[��������O���̃t�@�C����s�v�ƂȂ�܂����B
-		2D�`��݂̗̂��p�ł���΁A�ures/shaders�v���̃t�@�C����p�ӂ���K�v�͂���܂���B
-		3D�`�掞�́A���������O���̃V�F�[�_�[�t�@�C�����K�v�ƂȂ�܂��B
+		従来のバージョンでは、起動時に「res/shaders」内にある2D描画のためのシェーダーファイルを読み込んで使用していましたが、
+		新しいバージョンでは、2D用のシェーダーを内蔵し外部のファイルを不要となりました。
+		2D描画のみの利用であれば、「res/shaders」内のファイルを用意する必要はありません。
+		3D描画時は、引き続き外部のシェーダーファイルが必要となります。
 		<br>
 		<br>
-		<LI>HGIMG4�c�[���̍X�V
+		<LI>HGIMG4ツールの更新
 		<br><br>
 		<img src="img/hsp36_material.png" width="480"><br>
-		�X�N���v�g�G�f�B�^����N���ł���HGIMG4�c�[��(gpbconv.exe)�ɁA�V�����@�\���ǉ�����Ă��܂��B<br>
-		fbx�t�@�C����ϊ��������3D�f�[�^�����ڍׂɊm�F�A�ҏW�ł���}�e���A��(.material)GUI�G�f�B�^��ǉ����Ă��܂��B
-		�}�e���A�����Ƃׂ̍����`��ݒ��ύX�ł���ق��A�e�N�X�`���t�@�C���̊m�F��A���C�e�B���O�ݒ�Ȃǂ��ォ��ҏW���邱�Ƃ��\�ł��B
+		スクリプトエディタから起動できるHGIMG4ツール(gpbconv.exe)に、新しい機能が追加されています。<br>
+		fbxファイルを変換した後の3Dデータをより詳細に確認、編集できるマテリアル(.material)GUIエディタを追加しています。
+		マテリアルごとの細かい描画設定を変更できるほか、テクスチャファイルの確認や、ライティング設定なども後から編集することが可能です。
 		</p>
 		</UL>
 
-		<!-- �t�b�^�[ -->
+		<!-- フッター -->
 		<ul id="FOOTER">
-			<li><a href="#CONTAINER">���̃y�[�W��1�ԏ�ɖ߂�</a></li>
-			<li><a href="../index.htm">�h�L�������g�̈ꗗ�ɖ߂�</a></li>
-			<li><a href="http://hsp.tv/">Go to HSPTV page</a></li>
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="../index.htm">ドキュメントの一覧に戻る</a></li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
 		</ul>
-		<a href="http://www.onionsoft.net/hsp/">
+		<a href="https://www.onionsoft.net/hsp/">
 			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
 		</a>
 	</div><!-- container -->

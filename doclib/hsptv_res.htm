@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSPTV">
+	<meta name="description" content="HSPTVに関する情報を掲載">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HSPTVフォルダ素材一覧</title>
+</head>
+<body>
+	<div id="CONTAINER">
+		<!-- ヘッダー -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<h1>HSPTVフォルダ素材一覧</h1>
+
+		<h2 id="ABOUT">素材について</h2>
+		<p>
+「HSPTVフォルダ素材」は、作品を発表する際に自由に使用することのできる画像と音のデータファイルです。手軽なライセンスで、HSP以外の作品でも使用することが可能です。 <br>
+また、Web上でHSPのスクリプトを公開できる、<a href="webdish.html">「WebDishサービス」</a>で自由に参照することができます。
+		「HSPTVフォルダ素材」「WebDish素材」を活用して、多くの作品が作られることを願っています。
+		</p>
+		<pre>
+		HSP3.6 WebDish素材データ
+		<a href="https://dev.onionsoft.net/seed/webdish_res.html" target="_blank">https://dev.onionsoft.net/seed/webdish_res.html</a>
+		</pre>
+
+		<h2 id="USEAGE">素材の参照</h2>
+		<p>
+		HSPスクリプトから、手軽に素材を参照することができます。
+		</p>
+		<pre>
+			picload dir_tv+"bg01.jpg"
+		</pre>
+		<p>
+		「dir_tv+」に続けてファイル名を記述することで、HSPTVフォルダが参照されます。
+		(HSP3Dishでは、dir_tvを入れなくても標準でHSPTVフォルダ内の素材が検索されます。)<br>
+		実行ファイルを作成して配布する場合は、必要な素材だけを#packまたは#epack命令で
+		リソースとして追加する必要がありますので注意してください。<br>
+		HSP3.6β3以降では、リソースをまとめて読み込むためのモジュールが用意されています。
+		</p>
+		<pre>
+			#include "hsptv_res.as"
+		</pre>
+		<p>
+		スクリプトの最初で上のような記述を行うことで、以下の命令が追加されます。
+		</p>
+		<pre>
+		hsptv_se _p1		効果音をまとめて読み込む
+			_p1 : 1=シンプル効果音(SE01～SE15)
+			_p1 : 2=リアル効果音(SND01～SND19)
+		(以降は mmplay SE01 などで再生できます)
+
+		hsptv_tamadot _p1	珠音ちゃん2Dドット絵素材を読み込む
+			_p1 : 0=64×64 1=32×32
+		( tamadot に画面バッファIDが代入されます )
+		( ceput tamadot,番号 で表示できるようになります )
+
+		hsptv_tamane _p1	珠音ちゃん2D立ち絵素材を読み込む
+			_p1 : 0=256×512ドット、1～8=512×1024ドット
+		( tamas に画面バッファIDが代入されます )
+		( ceput tamas,番号 で表示できるようになります )
+
+		hsptv_tamasc _p1	珠音ちゃん制服素材を読み込む
+			_p1 : 1～5(バリエーション)
+		( tamasc に画面バッファIDが代入されます )
+
+		hsptv_keisc _p1		プロ生ちゃん制服素材を読み込む
+			_p1 : 1～5(バリエーション)
+		( keisc に画面バッファIDが代入されます )
+
+		hsptv_tamawiz _p1	珠音ちゃん魔法使い素材を読み込む
+			_p1 : 1～10(バリエーション)
+		( tamawiz に画面バッファIDが代入されます )
+
+		hsptv_keiknight _p1	プロ生ちゃん騎士使い素材を読み込む
+			_p1 : 1～10(バリエーション)
+		( keiknight に画面バッファIDが代入されます )
+		</pre>
+
+		<h2 id="GRAPHICS">画像一覧</h2>
+		<pre>
+
+	<a href="../hsptv/baku.png">baku.png</a>
+	<a href="../hsptv/ball64.png">ball64.png</a>
+	<a href="../hsptv/bg.png">bg.png</a>
+	<a href="../hsptv/bg01.jpg">bg01.jpg</a>
+	<a href="../hsptv/bg02.jpg">bg02.jpg</a>
+	<a href="../hsptv/bg03.jpg">bg03.jpg</a>
+	<a href="../hsptv/bg04.jpg">bg04.jpg</a>
+	<a href="../hsptv/bg05.jpg">bg05.jpg</a>
+	<a href="../hsptv/bg06.jpg">bg06.jpg</a>
+	<a href="../hsptv/bg07.jpg">bg07.jpg</a>
+	<a href="../hsptv/bg08.jpg">bg08.jpg</a>
+	<a href="../hsptv/bg09.jpg">bg09.jpg</a>
+	<a href="../hsptv/bg10.jpg">bg10.jpg</a>
+	<a href="../hsptv/bgpeas.png">bgpeas.png</a>
+	<a href="../hsptv/bgsmoke.png">bgsmoke.png</a>
+	<a href="../hsptv/bgtex.png">bgtex.png</a>
+	<a href="../hsptv/bom.png">bom.png</a>
+	<a href="../hsptv/btn_hard.png">btn_hard.png</a>
+	<a href="../hsptv/btn_hsptv.png">btn_hsptv.png</a>
+	<a href="../hsptv/chr.png">chr.png</a>
+	<a href="../hsptv/cookgirl.png">cookgirl.png</a>
+	<a href="../hsptv/dankun.png">dankun.png</a>
+	<a href="../hsptv/efx.png">efx.png</a>
+	<a href="../hsptv/efx2.png">efx2.png</a>
+	<a href="../hsptv/face1.png">face1.png</a>
+	<a href="../hsptv/face2.png">face2.png</a>
+	<a href="../hsptv/fontchr.png">fontchr.png</a>
+	<a href="../hsptv/gamechr.png">gamechr.png</a>
+	<a href="../hsptv/hsp3dish.png">hsp3dish.png</a>
+	<a href="../hsptv/hsp3scr.jpg">hsp3scr.jpg</a>
+	<a href="../hsptv/hsptv_img.png">hsptv_img.png</a>
+	<a href="../hsptv/janbg.png">janbg.png</a>
+	<a href="../hsptv/janpai.png">janpai.png</a>
+	<a href="../hsptv/jp6girl.png">jp6girl.png</a>
+	<a href="../hsptv/jpchr.png">jpchr.png</a>
+	<a href="../hsptv/kei_knight1_1.png">kei_knight1_1.png</a>
+	<a href="../hsptv/kei_knight1_2.png">kei_knight1_2.png</a>
+	<a href="../hsptv/kei_knight1_3.png">kei_knight1_3.png</a>
+	<a href="../hsptv/kei_knight1_4.png">kei_knight1_4.png</a>
+	<a href="../hsptv/kei_knight1_5.png">kei_knight1_5.png</a>
+	<a href="../hsptv/kei_knight2_1.png">kei_knight2_1.png</a>
+	<a href="../hsptv/kei_knight2_2.png">kei_knight2_2.png</a>
+	<a href="../hsptv/kei_knight2_3.png">kei_knight2_3.png</a>
+	<a href="../hsptv/kei_knight2_4.png">kei_knight2_4.png</a>
+	<a href="../hsptv/kei_knight2_5.png">kei_knight2_5.png</a>
+	<a href="../hsptv/kei_school1_1.png">kei_school1_1.png</a>
+	<a href="../hsptv/kei_school1_2.png">kei_school1_2.png</a>
+	<a href="../hsptv/kei_school1_3.png">kei_school1_3.png</a>
+	<a href="../hsptv/kei_school1_4.png">kei_school1_4.png</a>
+	<a href="../hsptv/kei_school1_5.png">kei_school1_5.png</a>
+	<a href="../hsptv/king_knight.png">king_knight.png</a>
+	<a href="../hsptv/koma.png">koma.png</a>
+	<a href="../hsptv/logop.png">logop.png</a>
+	<a href="../hsptv/mapbg.png">mapbg.png</a>
+	<a href="../hsptv/mini_kei.png">mini_kei.png</a>
+	<a href="../hsptv/mini_tamane.png">mini_tamane.png</a>
+	<a href="../hsptv/onibtn.png">onibtn.png</a>
+	<a href="../hsptv/parts.png">parts.png</a>
+	<a href="../hsptv/pronama.png">pronama.png</a>
+	<a href="../hsptv/punichr.png">punichr.png</a>
+	<a href="../hsptv/runner.png">runner.png</a>
+	<a href="../hsptv/sozai1.jpg">sozai1.jpg</a>
+	<a href="../hsptv/sozai10.jpg">sozai10.jpg</a>
+	<a href="../hsptv/sozai11.jpg">sozai11.jpg</a>
+	<a href="../hsptv/sozai12.jpg">sozai12.jpg</a>
+	<a href="../hsptv/sozai13.jpg">sozai13.jpg</a>
+	<a href="../hsptv/sozai14.jpg">sozai14.jpg</a>
+	<a href="../hsptv/sozai15.jpg">sozai15.jpg</a>
+	<a href="../hsptv/sozai2.jpg">sozai2.jpg</a>
+	<a href="../hsptv/sozai3.jpg">sozai3.jpg</a>
+	<a href="../hsptv/sozai4.jpg">sozai4.jpg</a>
+	<a href="../hsptv/sozai5.jpg">sozai5.jpg</a>
+	<a href="../hsptv/sozai6.jpg">sozai6.jpg</a>
+	<a href="../hsptv/sozai7.jpg">sozai7.jpg</a>
+	<a href="../hsptv/sozai8.jpg">sozai8.jpg</a>
+	<a href="../hsptv/sozai9.jpg">sozai9.jpg</a>
+	<a href="../hsptv/tamadot.png">tamadot.png</a>
+	<a href="../hsptv/tamaface.png">tamaface.png</a>
+	<a href="../hsptv/tamane_b.png">tamane_b.png</a>
+	<a href="../hsptv/tamane_b1.png">tamane_b1.png</a>
+	<a href="../hsptv/tamane_b2.png">tamane_b2.png</a>
+	<a href="../hsptv/tamane_b3.png">tamane_b3.png</a>
+	<a href="../hsptv/tamane_b4.png">tamane_b4.png</a>
+	<a href="../hsptv/tamane_b5.png">tamane_b5.png</a>
+	<a href="../hsptv/tamane_b6.png">tamane_b6.png</a>
+	<a href="../hsptv/tamane_b7.png">tamane_b7.png</a>
+	<a href="../hsptv/tamane_b8.png">tamane_b8.png</a>
+	<a href="../hsptv/tamane_s.png">tamane_s.png</a>
+	<a href="../hsptv/tamane_s1.png">tamane_s1.png</a>
+	<a href="../hsptv/tamane_s2.png">tamane_s2.png</a>
+	<a href="../hsptv/tamane_s3.png">tamane_s3.png</a>
+	<a href="../hsptv/tamane_s4.png">tamane_s4.png</a>
+	<a href="../hsptv/tamane_s5.png">tamane_s5.png</a>
+	<a href="../hsptv/tamane_s6.png">tamane_s6.png</a>
+	<a href="../hsptv/tamane_s7.png">tamane_s7.png</a>
+	<a href="../hsptv/tamane_s8.png">tamane_s8.png</a>
+	<a href="../hsptv/tamane_school1_1.png">tamane_school1_1.png</a>
+	<a href="../hsptv/tamane_school1_2.png">tamane_school1_2.png</a>
+	<a href="../hsptv/tamane_school1_3.png">tamane_school1_3.png</a>
+	<a href="../hsptv/tamane_school1_4.png">tamane_school1_4.png</a>
+	<a href="../hsptv/tamane_school1_5.png">tamane_school1_5.png</a>
+	<a href="../hsptv/tamane_wizard1_1.png">tamane_wizard1_1.png</a>
+	<a href="../hsptv/tamane_wizard1_2.png">tamane_wizard1_2.png</a>
+	<a href="../hsptv/tamane_wizard1_3.png">tamane_wizard1_3.png</a>
+	<a href="../hsptv/tamane_wizard1_4.png">tamane_wizard1_4.png</a>
+	<a href="../hsptv/tamane_wizard1_5.png">tamane_wizard1_5.png</a>
+	<a href="../hsptv/tamane_wizard2_1.png">tamane_wizard2_1.png</a>
+	<a href="../hsptv/tamane_wizard2_2.png">tamane_wizard2_2.png</a>
+	<a href="../hsptv/tamane_wizard2_3.png">tamane_wizard2_3.png</a>
+	<a href="../hsptv/tamane_wizard2_4.png">tamane_wizard2_4.png</a>
+	<a href="../hsptv/tamane_wizard2_5.png">tamane_wizard2_5.png</a>
+	<a href="../hsptv/tamane_y1.png">tamane_y1.png</a>
+	<a href="../hsptv/tamane_y2.png">tamane_y2.png</a>
+	<a href="../hsptv/tcard.png">tcard.png</a>
+	<a href="../hsptv/textile.png">textile.png</a>
+	<a href="../hsptv/treeset.png">treeset.png</a>
+	<a href="../hsptv/trump.png">trump.png</a>
+	<a href="../hsptv/typegirl.png">typegirl.png</a>
+	<a href="../hsptv/yama.jpg">yama.jpg</a>
+	<a href="../hsptv/yama2.jpg">yama2.jpg</a>
+		</pre>
+
+		<h2 id="SOUND">サウンド一覧</h2>
+		<pre>
+
+	<a href="../hsptv/bgm04.mid">bgm04.mid</a>
+	<a href="../hsptv/bgm06.mid">bgm06.mid</a>
+	<a href="../hsptv/bgm1.mid">bgm1.mid</a>
+	<a href="../hsptv/bgm10.mid">bgm10.mid</a>
+	<a href="../hsptv/bgm11.mid">bgm11.mid</a>
+	<a href="../hsptv/bgm12.mid">bgm12.mid</a>
+	<a href="../hsptv/bgm13.mid">bgm13.mid</a>
+	<a href="../hsptv/bgm14.mid">bgm14.mid</a>
+	<a href="../hsptv/bgm15.mid">bgm15.mid</a>
+	<a href="../hsptv/bgm16.mid">bgm16.mid</a>
+	<a href="../hsptv/bgm17.mid">bgm17.mid</a>
+	<a href="../hsptv/bgm18.mid">bgm18.mid</a>
+	<a href="../hsptv/bgm19.mid">bgm19.mid</a>
+	<a href="../hsptv/bgm2.mid">bgm2.mid</a>
+	<a href="../hsptv/bgm20.mid">bgm20.mid</a>
+	<a href="../hsptv/bgm3.mid">bgm3.mid</a>
+	<a href="../hsptv/bgm5.mid">bgm5.mid</a>
+	<a href="../hsptv/bgm7.mid">bgm7.mid</a>
+	<a href="../hsptv/bgm8.mid">bgm8.mid</a>
+	<a href="../hsptv/bgm9.mid">bgm9.mid</a>
+	<a href="../hsptv/explos.wav">explos.wav</a>
+	<a href="../hsptv/inject.wav">inject.wav</a>
+	<a href="../hsptv/jp_dead.wav">jp_dead.wav</a>
+	<a href="../hsptv/jp_jump.wav">jp_jump.wav</a>
+	<a href="../hsptv/se01.wav">se01.wav</a>
+	<a href="../hsptv/se02.wav">se02.wav</a>
+	<a href="../hsptv/se03.wav">se03.wav</a>
+	<a href="../hsptv/se04.wav">se04.wav</a>
+	<a href="../hsptv/se05.wav">se05.wav</a>
+	<a href="../hsptv/se06.wav">se06.wav</a>
+	<a href="../hsptv/se07.wav">se07.wav</a>
+	<a href="../hsptv/se08.wav">se08.wav</a>
+	<a href="../hsptv/se09.wav">se09.wav</a>
+	<a href="../hsptv/se10.wav">se10.wav</a>
+	<a href="../hsptv/se11.wav">se11.wav</a>
+	<a href="../hsptv/se12.wav">se12.wav</a>
+	<a href="../hsptv/se13.wav">se13.wav</a>
+	<a href="../hsptv/se14.wav">se14.wav</a>
+	<a href="../hsptv/se15.wav">se15.wav</a>
+	<a href="../hsptv/se_aaa.wav">se_aaa.wav</a>
+	<a href="../hsptv/se_block2.wav">se_block2.wav</a>
+	<a href="../hsptv/se_bom.wav">se_bom.wav</a>
+	<a href="../hsptv/se_break.wav">se_break.wav</a>
+	<a href="../hsptv/se_break2.wav">se_break2.wav</a>
+	<a href="../hsptv/se_break3.wav">se_break3.wav</a>
+	<a href="../hsptv/se_click.wav">se_click.wav</a>
+	<a href="../hsptv/se_foot.wav">se_foot.wav</a>
+	<a href="../hsptv/se_jump.wav">se_jump.wav</a>
+	<a href="../hsptv/se_jump2.wav">se_jump2.wav</a>
+	<a href="../hsptv/se_puyo.wav">se_puyo.wav</a>
+	<a href="../hsptv/se_shot.wav">se_shot.wav</a>
+	<a href="../hsptv/se_shot2.wav">se_shot2.wav</a>
+	<a href="../hsptv/se_tyuiin.wav">se_tyuiin.wav</a>
+	<a href="../hsptv/sel.wav">sel.wav</a>
+
+		</pre>
+
+
+		<h2 id="LICENCE">著作権とライセンス</h2>
+		<p>
+
+		<p>
+		HSPTVフォルダ素材は、HSP(Hot Soup Procrssor)フルセットの一部として提供され、onion softwareが著作権を持っています。
+		</p>
+		<p>
+		HSPTVフォルダ素材は、ユーザーがソフトを作成する際に、自由に使用・改変・配布することができます。
+		著作権表記をする場合は、以下のように掲載ください。
+		</p>
+		<pre>
+		HSP3.6 WebDish素材データ
+		https://dev.onionsoft.net/seed/webdish_res.html
+		</pre>
+		<p>
+		プロ生ちゃん、及びプロ生ちゃんコラボ素材は、プロ生ちゃん利用ガイドラインに従って配布されています。
+		</p>
+		<pre>
+		https://kei.pronama.jp/guideline/
+		(C) Pronama LLC
+		</pre>
+		<p>
+		HSPTVフォルダ素材を使用しても著作権表記を行なう義務はありません。
+		ただし、商用利用・素材そのものを販売する場合は、著作者(onion software)までご連絡をお願い致します。
+		一部のデータを除いて、商用利用であってもご利用を制限することはありませんので、
+		個別にライセンスの提供についてご案内させて頂きます。
+		</p>
+
+
+		<!-- フッター -->
+		<ul id="FOOTER">
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="../index.htm">ドキュメントの一覧に戻る</a></li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

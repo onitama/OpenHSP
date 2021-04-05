@@ -1,0 +1,745 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSP3Dish">
+<meta name = "description" content = "Information about HSP3Dish">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+<title> HSP3Dish Programming Manual / Basic Specification Guide </title>
+</head>
+<body>
+	<div id="CONTAINER">
+<!-Header->
+	<p id="COPY">HSP : HSP3Dish / onion software 2021(c)</p>
+	<img src="hsp3dish.jpg" width="640" height="200" alt="title">
+<h1> HSP3Dish Programming Manual </h1>
+
+<!-Table of Contents->
+	<ol>
+<li> <a href="#ABOUT"> What is HSP3Dish </a> </li>
+<li> <a href="#DISHUSE"> How to use HSP3Dish </a> </li>
+<li> <a href="#DRAWDIFF"> Difference from HSP3 </a> </li>
+<li> <a href="#BUTTON"> About placement objects </a> <span class = "new"> (New!) </Span> </li>
+<li> <a href="#SPRITE"> About standard sprites </a> <span class = "new"> (New!) </Span> </li>
+<li> <a href="#SCREEN"> About screen resizing </a> <span class = "new"> (New!) </Span> </li>
+<li> <a href="#VIEWCALC"> Coordinate transformation by viewcalc command </a> <span class = "new"> (New!) </Span> </li>
+<li> <a href="#CELBITMAP"> Image data control by celbitmap command </a> <span class = "new"> (New!) </Span> </li>
+<li> <a href="#GMODE"> About the gmode instruction </a> </li>
+<li> <a href="#GMULCOLOR"> About the gmulcolor instruction </a> </li>
+<li> <a href="#GFILTER"> About the gfilter instruction </a> </li>
+<li> <a href="#SYSREQ"> About setreq and getreq instructions </a> </li>
+<li> <a href="#MTOUCH"> Acquisition of multi-touch information </a> </li>
+<li> <a href="#SOUND"> Sound function </a> </li>
+<li> <a href="#HTTP"> http communication function </a> </li>
+<li> <a href="#SAMPLE"> Sample script </a> </li>
+<li> <a href="#CMDLIST"> HSP3Dish command list </a> </li>
+<li> <a href="#WINHRT"> Creating an executable file on Windows </a> </li>
+<li> <a href="#INIFILE"> About the startup configuration file </a> </li>
+<li> <a href="#OBAQ"> Support for physics engine OBAQ </a> </li>
+<li> <a href="#EXCHANGE"> Conversion to other platforms </a> <span class = "new"> (New!) </Span> </li>
+<li> <a href="#PLUGIN"> Support for extension plugins and external DLLs </a> </li>
+<li> <a href="#INPUT"> Support for various inputs and outputs </a> </li>
+<li> <a href="#KNOWNBUG"> Known bugs </a> </li>
+<li> <a href="#LICENCE"> Copyright and license </a> </li>
+<li> <a href="#CONTACT"> Contact </a> </li>
+	</ol>
+
+<h2 id = "ABOUT"> What is HSP3Dish? </H2>
+	<p>
+HSP3Dish is for building the operating environment of HSP3 on various devices.
+It is an additional set. Scripts developed on Windows on another OS
+It provides a mechanism to make it work.
+	</p>
+	<p>
+The HSP3 Dish runtime running on Windows has limited functionality compared to the regular version of HSP3.
+Some special features have been added.
+The same function as this HSP3Dish runtime, such as iPhone / iPad or android
+Scripts that run on the Windows version can be reused by implementing them on different systems.
+It is a mechanism.
+	</p>
+	<p>
+HSP3Dish is intended for special use, but when used on Windows,
+High-speed drawing using DirectX / OpenGL, standard support for alpha channel and PNG format, etc.
+It also has advantages that ordinary HSP3 does not have. <br>
+In addition, the <a href="hgimg4.html"> HGIMG4 runtime </a>, which supports 3D functionality and advanced physics, is also provided as a derivative of HSP3Dish. <br>
+	</p>
+	<p>
+<a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank"> HSP3 for Linux / Raspberry Pi </a>, which runs on Linux and the small device Raspberry Pi, is a separate package. We are distributing the edition. For more information,
+Please see the <a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank"> HSP3 for Linux / Raspberry Pi </a> page.
+	</p>
+	<p>
+HSP3Dish will continue to evolve as a new HSP3 trend. Please look forward to it.
+	</p>
+	<p>
+An introduction page about HSP3 Dish is available on the official website HSPTV !.
+Please take a look at the latest information about HSP3Dish and useful information such as user works and materials.
+	</p>
+	<ul><p>
+<a href="https://hsp.tv/make/hsp3dish.html" target="_blank"> HSP3Dish support page <br> https://hsp.tv/make/hsp3dish.html </a> <br >
+	</p><p>
+	<a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank">HSP3 for Linux/Raspberry Pi<br>https://hsp.tv/make/hsp3linux_pi.html</a><br>
+	</p><p>
+	<a href="https://hsp.tv/make/hgimg4.html" target="_blank">HGIMG4 development<br>https://hsp.tv/make/hgimg4.html</a><br>
+	</p></ul>
+
+<h2 id = "DISHUSE"> How to use HSP3Dish </h2>
+	<p>
+With HSP3Dish, development is performed using the normal HSP environment such as the HSP3 script editor that runs on Windows.
+If possible, please use the latest version of HSP. <br>
+If you want to create a script that works in the HSP3Dish environment
+You need to add the following code to the first line:
+	</p>
+	<pre>
+	#include "hsp3dish.as"
+	</pre>
+	<p>
+After that, you can write the source like a normal HSP3 script.
+However, in order to operate on multiple platforms, the following functions are
+There is a restriction that it cannot be used.
+As long as you use it on Windows platforms only, you don't have these restrictions.
+	</p>
+	<ul>
+<li> Extension plugin instructions are not supported </li>
+<li> COM object operation, COM type / Variant type variables are not supported </li>
+<li> External DLL calling function is not supported </li>
+<li> Functions related to module variables are not supported (module functions themselves are supported) </li>
+	</ul>
+	<p>
+These use features that cannot be reproduced on platforms other than Windows.
+Please use the function according to the platform support.
+	</p>
+	<p>
+It also reflects smartphone memory and security constraints.
+The following features are limited.
+	</p>
+	<ul>
+<li> Output is limited to a single screen (ID # 0) only
+(Multiple window display is not supported) </li>
+Cannot process the image buffer created by the <li> buffer command.
+(Images can be assigned, but drawing commands cannot be used.
+However, the HGIM G4 runtime has limited support) </li>
+<li> Unable to completely unify fonts between devices
+(Japanese character fonts are model-dependent) </li>
+<li> There are restrictions on writing to devices such as notesave and bsave instructions </li>
+Some placement objects except the <li> button are not supported.
+(Chkbox and input are limitedly supported) </li>
+	</ul>
+	<p>
+In HSP3Dish, many instructions and functions can be used in the same way as normal HSP3,
+Limited functionality to absorb differences in the environment and familiar with the Windows version
+People may have some troublesome parts. In future versions
+Applying to a wide range of environments without being aware of the difference from the Windows version
+I have a goal.
+	</p>
+	<p>
+Some restrictions are for generating native code
+It is occurring through the HSP3 source converter.
+For more information, please refer to the HSP3 Source Converter Manual (hsp3cnv.txt).
+Please refer to.
+	</p>
+
+<h2 id = "DRAWDIFF"> Difference from HSP3 </h2>
+	<p>
+HSP3Dish assumes high-speed drawing and multi-platform
+It has been created. It differs from normal HSP3 in the following points.
+	</p>
+	<ul>
+<li> The screen needs to be refreshed by the redraw command </li>
+	<p>
+For the source related to screen rewriting, use redraw 0 to notify the start of drawing,
+Make sure to use redraw 1 to notify the end of drawing.
+As a result, various drawing commands are executed efficiently. <br>
+Unlike normal HSP3, by specifying "redraw 0", the screen will be displayed.
+Since it will be cleared once, the contents drawn up to that point will not remain.
+Be aware that you need to draw what you want to see every time.
+	</p>
+	<pre>
+redraw 0; Start drawing (clear screen)
+~ Write the drawing command here ~
+redraw 1; Complete drawing (screen refreshed)
+await 1000/60; wait for a while (wait in 1/60 seconds)
+	</pre>
+	<p>
+Be sure to write "redraw 0" and "redraw 1", and draw a drawing command between them.
+Must be described. HSP3 is similar, but in the loop, wait time
+Must be included. Adjust the timing with the await or wait instruction.
+	</p>
+
+<li> Alpha channel handling </li>
+	<p>
+Image file including alpha channel by picload and celload instructions
+It can be read. (The recommended image format is a PNG file)
+With instructions such as celput and gcopy, the copy including the alpha channel is
+It will be executed. Therefore, there are some differences in the specification by gmode.
+For details, refer to the item "About the gmode instruction".
+	</p>
+
+<li> Improved drawing speed </li>
+	<p>
+In normal HSP3, drawing acceleration was limited,
+With HSP3Dish and HGIMG4, take full advantage of the features of your graphics card
+High-speed drawing and high-quality rotation / enlargement / reduction are performed.
+The difference is noticeable with the use of translucency and alpha channels.
+	</p>
+
+<li> Strict timer management </li>
+	<p>
+Weights are managed by a timer that is more accurate than normal HSP.
+The wait time for wait / await instructions may be slightly different from normal HSP.
+	</p>
+
+<li> Not supported for video playback </li>
+	<p>
+On platforms other than Windows version, avi / mpg / wmv format by mmload / mmplay command
+Video playback is not supported.
+It is possible to use wav for sound effects and mp3 for BGM (sound),
+Different platforms may support different formats.
+	</p>
+	</ul>
+
+<h2 id = "BUTTON"> About placement objects </h2>
+	<p>
+Placement objects currently supported on all platforms are
+It is only a button by the button command.
+Please note that the following points are different from the standard object.
+	</p>
+	<pre>
+-By default, the background of the button uses a gray gradation.
+-It is possible to change the button background image with the objimage command.
+-Keyboard button operation and focus movement are not supported.
+-The button is drawn when the image is updated by redraw.
+	</pre>
+	<p>
+The following deployment objects are supported on Windows / Linux platforms.
+	</p>
+	<pre>
+・ Check box (chkbox)
+・ Input box (input)
+	</pre>
+	<p>
+We plan to support a wide range of placement objects on many platforms in the future.
+	</p>
+
+
+<h2 id = "SPRITE"> About standard sprites </h2>
+		<p>
+HSP3Dish and HGIMG4 runtimes now support easy-to-use <a href="sprite.html"> standard sprites </a>. <br>
+The standard sprite instructions are compatible with the instructions added as the hspdx plugin, making it easy to handle 2D drawing.
+		<p>
+		<p><img src="hsp3dish/es_test5.jpg"></p>
+		<p>
+There were several ways to use sprites (rectangular images) when drawing in 2D with HSP3.
+		</p>
+		<pre class="quote">
+・ HSPDX plug-in
+・ HGIMG / HGIM GX plug-in
+・ HGIM G3 plug-in
+・ HGIM G4 plug-in
+・ Mod_sprite module </pre>
+		<p>
+Among them, the plug-ins up to HSPDX, HGIMG, and HGIMGX are from the HSP2 era, and development has already been completed.
+It is difficult to operate with the current OS and environment. <br>
+The HGIMG3 / HGIMG4 plug-in has 3D functionality as well as a highly functional 2D sprite.
+It also has functions, but instead of managing all coordinates with real numbers and having many functions
+There was a lot of content to learn and it was difficult to handle easily. <br>
+This time, the HSPDX plug-in that has the longest history and has been used by many users
+Based on the commands, we have expanded the easy and easy-to-use 2D-only sprite commands. <br>
+Sprites can be displayed with simple commands, and sprite images can be freely registered.
+It is equipped with a flexible system. Also, sprite callbacks, map drawing, etc.
+A unique mechanism has also been introduced, making it more convenient than the original HSPDX plugin. <br>
+Coordinates are also managed by integers, making it easy to handle in 2D games and UI displays.
+Of course, you can also use the conventional plug-in for autonomous movement by event list and cooperation with 3D. <br>
+Standard sprites work on all platforms supported by HSP3Dish and HGIMG4, as well as
+We plan to support it in the HSP3 standard runtime as well. <br>
+For more information on standard sprites, see <a href="sprite.html"> Standard Sprite Programming Guide </a>.
+		</p>
+
+
+<h2 id = "SCREEN"> Screen resizing </h2>
+		<p>
+Supports dynamic change of screen (window) size in Windows / Linux version of HSP3Dish and HGIMG4. (HSP3.6β2 or later) <br>
+Previously, the size was fixed at startup according to the size recorded in the hsp3dish.ini file,
+We have received requests from many people to change the size and support full screen, and have corrected it.
+From HSP3.6, the screen (window) size can be changed by the screen command and bgscr command.
+		</p><pre>
+	screen p1,p2,p3,p4,p5,p6
+
+p1 = 0 to (0): Window ID
+p2 = 1 to (640): Screen size X to be initialized (in 1-dot units)
+p3 = 1 to (480): Screen size Y to initialize (1 dot unit)
+p4 = 0 to 1 (0): Screen mode to initialize
+p5 = 0 to (-1): Window layout X (1 dot unit)
+p6 = 0 to (-1): Window layout Y (1 dot unit)
+		</pre><p>
+The window ID of p1 is 0 only.
+The following values ​​can be specified for the initialization mode of p4.
+		</p><pre>
++4 (screen_fixedsize): Fixed size window
++8 (screen_tool): Tool window
++16 (screen_frame): Window with deep edges
++256: Full screen
+		</pre><p>
+If you specify 256 for p4, it will be initialized as full screen with the specified resolution. <br>
+Also note that when resizing the screen, unlike the normal runtime, all image buffers loaded up to that point will be lost.
+		</p>
+
+
+<h2 id = "VIEWCALC"> Coordinate transformation by viewcalc command </h2>
+		<p><img src="img/hsp36_viewcalc.png"></p>
+		<p>
+In HSP3Dish and HGIMG4, the viewcalc instruction that sets the coordinate transformation at the time of drawing has been added. <br>
+The viewcalc instruction is a powerful function that allows you to apply arbitrary calculations to the X and Y coordinates when drawing in 2D.
+You can scale, move, and rotate the entire rendered display.
+		</p><pre>
+	viewcalc p1,p2,p3,p4,p5
+
+p1 (0): Setting mode
+p2 (0.0): Parameter 1 (real number)
+p3 (0.0): Parameter 2 (real number)
+p4 (0.0): Parameter 3 (real number)
+p5 (0.0): Parameter 4 (real number)
+		</pre><p>
+There are several types of setting modes specified by p1, and various conversions can be performed.
+		</p><pre>
+Macro name value Content
+	-----------------------------------------------------
+vptype_off 0 No coordinate transformation (default)
+vptype_translate 1 Specify movement parameters
+vptype_rotate 2 Specify rotation parameter
+vptype_scale 3 Specify scale parameters
+vptype_3dmatrix 4 Coordinate transformation by 4 × 4 matrix
+vptype_2d 5 Set 2D coordinate transformation
+vptype_3d 6 Set 3D coordinate transformation
+		</pre><p>
+vptype_2d is in a mode to apply basic 2D coordinate transformations.
+Parameters 1 to 3 allow you to set the X and Y scales (magnification) and rotation angle (in radians).
+		</p><pre>
+	viewcalc vptype_2d, 2.0, 2.0, 0.0
+		</pre><p>
+If you specify as, it will be displayed on a double scale in the X and Y directions, and the angle will be 0. <br>
+You can specify various other parameters. See the viewcalc instruction help for more information.
+		</p>
+
+
+<h2 id = "CELBITMAP"> Image data control by celbitmap command </h2>
+		<p>
+In HSP3Dish and HGIMG4, the celbitmap instruction for handling the contents of the variable buffer as image data has been added. <br>
+Until now, HSP3Dish could not directly access the image data in dot units, but this command makes it possible to read and write the contents of the memory as image data.
+		</p><pre>
+	celbitmap p1,var,p2
+
+p1 (0): Window ID
+var: Array variable to replace the image
+p2 (0): Operation option
+		</pre><p>
+When using the celbitmap instruction, it is necessary to initialize the offscreen buffer created by the buffer instruction in advance and the variable buffer to replace it. <br>
+Create an offscreen buffer by specifying the screen_offscreen option with the buffer instruction.
+		</p><pre>
+	buffer 2,256,256,screen_offscreen
+		</pre><p>
+Then create a variable buffer to replace the buffer. <br>
+Initialize the one-dimensional array with the dim instruction and create it. The size to be created is X size x Y size of the offscreen buffer.
+		</p><pre>
+	dim bitmap, 256*256
+		</pre><p>
+Now you are ready to use the celbitmap instruction. <br>
+By specifying the ID of the offscreen buffer and the array variable with the celbitmap instruction, the contents of the variable buffer are applied as they are as an image. <br>
+The variable buffer is 1 dot per element. One dot is RGB format data in which 32-bit elements are stored in 8-bit units for each of R, G, B, and A. (Please note that the order of RGB has changed between 3.6β2 version and 3.6β3 version.) <br>
+For example, if you specify "$ ff204080" (hexagon), then A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses) <br>
+Please note that replacing image data is a costly process and may reduce the frame rate when replacing large size images. <br>
+The p2 parameter allows you to specify the replacement format and behavior.
+		</p><pre>
+Value macro behavior
+	---------------------------------------------------------
+0 Hold data in celbitmap_rgb $ aabbggrr format
+1 Hold data in celbitmap_bgr $ aarrggbb format
+16 celbitmap_capture Read the contents of the drawing screen into a variable
+		</pre><p>
+Normally, the format of celbitmap_rgb that conforms to the OpenGL standard is used. If celbitmap_bgr is specified as an option, the ARGB sequence will be in accordance with the DirectX standard. <br>
+When celbitmap_capture is specified, the data on the drawing destination screen is read into the array variable. (The read size will be the size of the offscreen buffer) <br>
+* The celbitmap_capture option is an experimental implementation. Currently, it can be used only on Windows (excluding DirectX version HGIMG4) and Linux version.
+		</p>
+
+
+<h2 id = "GMODE"> About the gmode instruction </h2>
+	<p>
+In hsp3dish, the alpha channel is included in the image copy command such as celput and gcopy.
+The copy will be executed. Therefore, there are some differences in specifying the copy mode by gmode.
+	</p>
+	<pre>
+gmode 0,1: No alpha channel (ignored)
+gmode 2: Alpha channel enabled, translucent rate disabled
+gmode 3,4: Alpha channel enabled, translucent rate enabled
+gmode 5: Color addition / alpha channel enabled, translucent rate enabled
+gmode 6: Color subtraction / alpha channel enabled, translucent rate enabled
+	</pre>
+	<p>
+The alpha channel is information added to image data such as PNG format.
+Please note that you cannot select the mode that is transparent when RGB is 0 in a normal HSP, or the mode that is transparent when a specific color code is transmitted. <br>
+<b> Please note that the current version does not support gmode 6 (color subtraction) in the android (NDK) runtime. </b>
+	</p>
+	<p>
+In copy mode 2 or higher, you can set "texture multiplication" to multiply the image by a specific value.
+For details, refer to the item "About the gmulcolor instruction".
+	</p>
+
+<h2 id = "GMULCOLOR"> About the gmulcolor command </h2>
+	<p>
+From hsp3dish ver3.5b3, the gmulcolor instruction for setting the texture multiplication value has been added.
+	</p>
+	<pre>
+		gmulcolor p1,p2,p3
+		-----------------------------------------------
+p1, p2, p3 = 0 to 255 (255): Color code (brightness of R, G, B)
+	</pre>
+	<p>
+p1, p2, and p3 are the brightness of R, G, and B, respectively. The specified R, G, B values ​​are multiplied by the image copied by the gcopy, gzoom, celput, grottate command, etc.
+The initial value is 255 for each of RGB. You can change the color of the original image by setting the texture multiplication value.
+Note that when copying an image, if the copy mode specified by the gmode instruction is 0 or 1 (does not reflect the alpha channel), the texture multiplication value will be invalid.
+The texture multiplication value is not reflected in the drawing of characters by the mes command and the drawing of the gsquare command. Also, it is not reflected in single color drawing such as boxf and line commands. (Including single color drawing of grottate instruction)
+	</p>
+
+<h2 id = "GFILTER"> About the gfilter instruction </h2>
+	<p>
+Set filtering (texture interpolation) from hsp3dish ver3.3a2
+A gfilter instruction has been added for this.
+	</p>
+	<pre>
+Macro name value Content
+	-------------------------------------------
+FILTER_NONE 0 No interpolation (NEAREST)
+FILTER_LINEAR 1 Linear interpolation (LINEAR)
+FILTER_LINEAR2 2 Area interpolation (advanced interpolation processing)
+	</pre>
+	<p>
+By setting filtering, you can change the dot interpolation method when enlarging / reducing the image.
+You can choose. No interpolation (near rest) by specifying FILTER_NONE
+It will be in the state of. FILTER_LINEAR is linear interpolation, FILTER_LINEAR2 is
+Select a more advanced interpolation method (such as bilinear).
+The settings of the gfilter instruction apply to all subsequent drawing instructions.
+Also, when the screen is cleared by "redraw 0", the filtering setting is set.
+It will be reset to FILTER_NONE.
+	</p>
+
+<h2 id = "SYSREQ"> About setreq and getreq instructions </h2>
+	<p>
+From hsp3dish ver3.3a6, setreq and getreq instructions for making various system settings
+Has been added. <br>
+	</p>
+	<pre>
+setreq type, val write system request settings
+
+type: Setting type (SYSREQ_???)
+val: Value to set
+
+getreq var, type Read system request settings
+
+var: variable name to which the result is assigned
+type: Setting type (SYSREQ_???)
+	</pre>
+	<pre>
+Setting type name Read / write (*) Contents
+	-------------------------------------------
+SYSREQ_CLSMODE RW Background clear flag
+SYSREQ_CLSCOLOR RW background clear color
+SYSREQ_TIMER R Timer value in milliseconds
+Platform running SYSREQ_PLATFORM R HSP3Dish
+
+(*) Whether reading (R) or writing (W) is possible differs depending on the item.
+	</pre>
+<li> SYSREQ_CLSMODE, SYSREQ_CLSCOLOR </li>
+	<p>
+Set whether to clear the screen when drawing by redraw 0 starts.
+If SYSREQ_CLSMODE is set to 1, it is cleared, and if it is 0, it is not cleared.
+If you are clearing the screen in the script, it is better not to clear the background on the system side
+This will lead to an improvement in processing speed.
+You can set the color code for clearing with SYSREQ_CLSCOLOR.
+The color code is set with a single RGB 24bit ($ rrggbb).
+	</p>
+	<li>SYSREQ_TIMER</li>
+	<p>
+Returns a timer value in milliseconds.
+The value returned will vary from platform to platform, but will be incremented by 1 per millisecond.
+	</p>
+	<li>SYSREQ_PLATFORM</li>
+	<p>
+Returns the following HSP3Dish platform values.
+	</p>
+	<pre>
+Macro name value Content
+	-------------------------------------------
+PLATFORM_WINDOWS 0 Windows version
+PLATFORM_IOS 1 iOS version
+PLATFORM_ANDROID 2 android version
+PLATFORM_WEBGL 3 hsp3dish.js (WebGL / JavaScript) version
+PLATFORM_LINUX 4 Linux version
+PLATFORM_RASPBIAN 5 Raspberry Pi (raspbian) version
+	</pre>
+
+
+<h2 id = "MTOUCH"> Acquisition of multi-touch information </h2>
+	<p>
+From hsp3dish ver3.4b1, mtlist and mtinfo instructions for acquiring multi-touch information have been added.
+This makes it possible to obtain information that is touched by multiple points on the smartphone.
+Even on Windows, Linux, and html5 (browser), multiple touch information can be acquired when a multi-touch device is connected.
+	</p>
+	<pre>
+mtlist var Point ID list acquisition
+
+var: variable name to which the result is assigned
+
+mtinfo var, id Touch information acquisition
+
+var: variable name to which the result is assigned
+id: Point ID
+	</pre>
+	<p>
+First, get the point ID list currently touched by the mtlist instruction.
+An integer value called the point ID is assigned to the variable specified by the mtlist instruction.
+If multiple points are touched, the array variables are var (0), var (1), var (2), and so on.
+Multiple point IDs will be assigned.
+The number of point IDs assigned to the array is returned in the system variable stat.
+If the system variable stat is 0, it means that nothing has been touched. <br>
+After obtaining the value of the point ID, it is possible to obtain the detailed information corresponding to the point ID by the mtinfo instruction.
+For example, "mtinfo a, 1" assigns the information of point ID 1 to the variable a.
+The variable a specified here is initialized as an integer type array variable and the following contents are assigned.
+	<pre>
+a (0): Touch state (1 = ON / 0 = OFF)
+a (1): Touched X coordinate
+a (2): Touched Y coordinate
+a (3): Touch identification ID
+	</pre>
+	<p>
+Based on this information, you can manage multiple points.
+The value of the touch identification ID itself has no meaning, and a value different from the others is assigned among multiple touches.
+Please note that the touch identification ID value differs for each device. <br> <br>
+<b> When acquiring multi-touch information on iOS, it is necessary to include a setting that allows multi-touch input.
+For more information, see <a href="hsp3dish_ios.htm"> iOS Programming Guide </a>. </b>
+	<br><br>
+Even on Windows that does not support multi-touch, information is acquired as information where only one point is touched.
+	</p>
+
+
+<h2 id = "SOUND"> Sound function </h2>
+	<p>
+HSP3Dish has a media playback function that is upward compatible with standard HSP.
+However, the mci instruction, which is a Windows-specific feature, is not supported on other devices.
+Also, video and audio files in avi / mpg / wma / wmv format are not supported.
+The formats supported on all devices, including iOS and Android, are:
+It will be .wav as SE (sound effect) and .mp3 for BGM (music).
+	</p>
+	<pre>
+mmload (wav, mp3 format recommended)
+mmplay (similar to HSP standard instructions)
+mmstop (ID to stop can be specified, upward compatible with HSP standard instructions)
+mmvol (HSP3Dish only, volume setting)
+mmpan (HSP3Dish only, panning settings)
+mmstat (HSP3Dish only, get information)
+	</pre>
+	<p>
+Unlike HSP standard instructions, wav format waveform playback allows multiple sounds to be played multiple times.
+Long audio playback (.mp3 format) cannot be played multiple times to reduce the load.
+	<br>
+For details of each instruction, refer to the instruction help provided by HSP Document Library.
+	</p>
+
+
+<h2 id = "HTTP"> http communication function </h2>
+	<p>
+HSP3Dish has a simple http communication function. <br>
+This makes it possible to access the web (HTTP) server via the network and acquire data.
+It only supports basic http communication functions and does not guarantee communication with all web servers. <br>
+<b> The current version only supports Windows, Emscripten (WebGL), android platforms. Other platforms will be supported in future versions. </b>
+	</p>
+	<pre>
+httpload (start HTTP communication)
+httpinfo (Get HTTP communication information)
+	</pre>
+	<p>
+With the above command, it is possible to make a request to the web (HTTP) server by the standard GET and POST methods.
+It can be used for purposes such as acquiring web pages and calling CGI and WEB API.
+	<br>
+For details of each instruction, refer to the instruction help provided by HSP Document Library.
+	</p>
+
+
+<h2 id = "SAMPLE"> Sample script </h2>
+	<p>
+Sample scripts are included in the HSP full set sample directory hsp3dish.
+Please refer to it as an example using HSP3Dish.
+	</p>
+
+<h2 id = "CMDLIST"> HSP3Dish command list </h2>
+	<p>
+For compatibility of each instruction / function, refer to the separate file <a href="support_cmds.txt"> "support_cmds.txt" </a>.
+Some instructions have not been implemented, but will be expanded in the future.
+	</p>
+
+<h2 id = "WINHRT"> Creating an executable file on Windows </h2>
+	<p>
+Using the HSP3Dish runtime file (hsp3dish.hrt),
+It is possible to create a program that can be executed on Windows.
+Since there are merits that normal HSP3 does not have, software compatible with Windows
+You can also use it for making.
+	</p>
+	<p>
+The Windows version of HSP3Dish runtime is for Windows98, Me, 2000, XP or later.
+It works in the environment where DirectX8 is installed.
+(Because it is included as standard in Windows XP or later (Windows Vista, 8, 10)
+No additional DirectX installation required) <br>
+In addition, the Windows version of HGIMG4 uses OpenGL and DirectX9.
+For the operating environment, refer to the HGIMG4 manual separately.
+	</p>
+
+<h2 id = "INIFILE"> About the startup configuration file </h2>
+	<p>
+At normal startup, the screen size is fixed at 320x480.
+This is the size that fits the iPhone (3G), but the startup configuration file
+You can change the screen size by preparing it.
+(For HSP3Dish, the screen size is determined at startup and cannot be changed with the screen and width instructions.)
+	</p>
+	<p>
+The startup setting file is a script with the file name "hsp3dish.ini"
+It will be reflected if they are placed in the same folder.
+The following is a description example of the configuration file.
+	</p>
+	<pre>
+	; hsp3dish settings
+	wx=320
+	wy=480
+	</pre>
+	<p>
+It will be reflected by writing "wx = horizontal size" and "wy = vertical size" from the beginning of the line.
+Lines starting with ";" are considered comments.
+If you want to operate on different devices, use the startup configuration file.
+Please prepare and execute.
+	</p>
+	<p>
+It is possible to use HSP3Dish to create an executable file for Windows,
+The startup configuration file is not applied to the created executable file.
+If you want to create an executable file for Windows with the HSP3Dish runtime,
+Make sure to set the screen size with the #packopt instruction.
+	</p>
+	<pre>
+#packopt name "filename"
+#packopt xsize 320; Horizontal size
+#packopt ysize 480; Vertical size
+	</pre>
+
+<h2 id = "OBAQ"> Support for physics engine OBAQ </h2>
+	<p>
+HSP3Dish supports the functionality of the physics engine OBAQ.
+Functions equivalent to the instructions of the OBAQ plug-in can be used on the HSP3 Dish. <br>
+The function of the physics engine OBAQ becomes effective after executing the qreset instruction.
+If you do not use the OBAQ plug-in instructions, you will not use any extra memory or CPU resources. <br>
+For detailed usage, refer to the physics engine <a href="obaq.txt"> OBAQ manual </a>.
+	</p>
+	<p><b>
+* The physics engine OBAQ is operated under a different license from the HSP3 Dish.
+If the software using OBAQ generates profits that require tax filing (if the profits from paid apps are large), you need to obtain a paid license. However, if you want to distribute a small number of items or distribute them with only the minimum necessary expenses (media price, etc.), it is considered free of charge, so you do not need to obtain a paid license.
+Of course, in the case of a free app, you do not need to obtain a license.
+	</b></p>
+
+
+<h2 id = "EXCHANGE"> Conversion to other platforms </h2>
+	<p>
+HSP3Dish supports conversion to other platforms.
+The mechanism of operation is as follows.
+	</p>
+	<ol>
+<li> Create a script on HSP3Dish on Windows </li>
+<li> Convert the created script to C source
+(Uses HSP3 source converter, source is output as UTF-8) </li>
+<li> Compile C source in development environment for another platform
+(Library for each platform is provided separately) </li>
+<li> Application conversion complete
+(Except for html5 version, it is executed as native code instead of sequential execution (interpreter)) </li>
+	</ol>
+	<p>
+The "HSP3Dish Helper" application is provided as a tool to support script conversion and so on.
+"HSP3Dish Helper" can be started from the "Tools"-> "HSP3Dish / C Source Conversion" menu of the HSP Script Editor.
+	</p>
+		<p><img src="hsp3dish/s_js1.jpg"></p>
+	<p>
+For details, refer to the manual provided for each platform.
+	</p>
+	<ul>
+<li> <a href="hsp3dish_js.htm"> WebGL / JavaScript version (hsp3dish.js) Programming Guide (hsp3dish_js.htm) </a> </li>
+<li> <a href="hsp3dish_ios.htm"> iOS Programming Guide (hsp3dish_ios.htm) </a> </li>
+<li> <a href="hsp3dish_ndk.htm"> android (NDK) version programming guide (hsp3dish_ndk.htm) </a> </li>
+<li> <a href="hsp3cnv.txt"> HSP3 Source Converter Manual (hsp3cnv.txt) </a> </li>
+	</ul>
+
+
+<h2 id = "PLUGIN"> Support for extension plugins and external DLLs </h2>
+	<p>
+HSP3Dish on Windows supports extension plug-ins and external DLL calls. (COM objects and ActiveX related functions are not supported)
+However, please note that some plugins may not be available on the HSP3Dish system.
+	</p>
+	<ul>
+<li> Plugins that draw to HSP windows (hgimg, hspdx, etc.) are not available </li>
+<li> Plugins that extend HSP placement objects (buttons and input boxes) are not available </li>
+<li> Other plugins that refer to HSP window information (BMSCR structure) may not work properly </li>
+	</ul>
+	<p><b>
+In either case, the extension plug-in / external DLL calling function is supported only on Windows, so it will not be converted on other platforms (iOS, android, WebGL, etc.). </b>
+Please understand that one of the purposes of HSP3Dish, multi-platform, will not be possible before using it.
+	</p>
+
+
+<h2 id = "INPUT"> Support for various inputs and outputs </h2>
+	<p>
+The devcontrol instruction and its related instructions support the unique functions of a specific device and the acquisition of special input from the device.
+For more information, see the section for each device control.
+For those that do not work on Windows, we are considering creating a system that can be tested in a simulated manner.
+	</p>
+
+<h2 id = "KNOWNBUG"> Known bugs </h2>
+	<p>
+It has been reported that when calling a user-defined function with multiple parameters by <li> #defcfunc, it is not executed correctly when the parameters are omitted.
+Please avoid using <li> #defcfunc because an error (40) will occur if you execute an instruction such as await, wait, or stop that puts the task in a stopped state in the call of the user-defined function.
+The <li> split instruction is currently not working properly. Please substitute with getstr command etc.
+<li> Images that can be displayed on Windows may not be displayed on iOS and android due to differences in PNG decoders.
+It has been reported that when the gosub instruction is used in the user-defined call destination by the <li> #defcfunc and #deffunc instructions, the argument cannot be accessed in the called subroutine.
+	</p>
+
+<h2 id = "LICENCE"> Copyright and license </h2>
+	<p><b>
+The rights of the original software (executable file) created by the user using HSP3Dish belong to the user who created it. <br>
+It can be used in any form, commercial or non-commercial. Also, no license fee is required.
+	</b></p>
+	<p>
+The software created by the user is not obliged to display the copyright notice of onion software or the fact that it uses HSP.
+Onion software does not claim copyright to the original software.
+For secondary development systems (game creation system, etc.) created using HSP, please operate at the responsibility of the creator who created the system.
+	</p>
+	<p>
+HSP3Dish is part of the interpreted language Hot Soup Processor (HSP) and is copyrighted by onion software.
+onion software does not guarantee any damage caused by this program.
+Use at your own risk.
+	</p>
+	<p>
+HSP3Dish is a derivative of OpenHSP technology.
+Files and source code included in HSP3Dish and OpenHSP can be freely attached, duplicated, reorganized, and redistributed under the BSD license.
+I can do it. In that case, please specify <a href="License_j.txt"> license notation (License_j.txt) </a>.
+	</p>
+	<p>
+Those who are considering operating the produced software for commercial use and who wish to receive support for a fee
+Please contact us by email at info@hsp.tv. We will inform you about the details.
+	</p>
+
+<!-Footer->
+	<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to index </a> </li>
+	</ul>
+	<a href="https://www.onionsoft.net/">
+		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+	</a>
+</div><!-- container -->
+</body>
+</html>

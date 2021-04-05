@@ -1,0 +1,198 @@
+------------------------------------------------------------------------------
+HSP3CNV: HSP3 Source Converter HSP: Hot Soup Processor
+Hot soup processor copyright 2017 (c) onion software
+------------------------------------------------------------------------------
+
+繝サ Introduction
+
+HSP3 Source Converter is a tool for converting HSP3 code to other sources,
+And the library.
+HSP3 Source Converter can transfer HSP source scripts on other systems as much as possible.
+It is a conversion for operation, and all HSP source scripts are converted.
+There is no guarantee.
+
+
+ツキhow to use
+
+The HSP3 source converter uses the HSP3 Dish helper (hsp3dh) or
+You can use it by calling hsp3cnv.exe directly from the command line (prompt).
+When converting with GUI, select "Tools"-> "Convert specified file to C source" menu of HSP script editor.
+Select and call HSP3Dish helper.
+After that, specify the conversion source script and press the "Convert" button.
+A C language source with the extension of the source script "cpp" is generated.
+At this time, by turning on the check of "Convert output source to UTF-8",
+You can generate a source whose character code is in UTF-8 format.
+This is required when transferring sources to platforms other than Windows.
+If you compile it on Windows, you don't need to convert it to UTF-8.
+
+
+・ About hsp3cnv.exe
+
+A command line application that converts HSP3 object files (ax) to C source.
+
+hsp3cnv filename
+
+Run it on the command line (prompt), like.
+For example, if you want to convert test.ax
+
+	hsp3cnv test
+
+It is OK if you specify as.
+If successful, it will output a test.cpp file based on the test.ax file.
+* Even if you do not use the command line, you can use the ax file (object file) icon.
+If you drop it on hsp3cnv, a cpp file will be created in the same folder.
+
+The output file is compiled on the test project (hsp3rtest)
+It is possible to.
+
+hsp3cnv -d filename
+
+If is specified, the HSP3Dish source conversion mode is set.
+HSP3Dish source conversion mode is for checking instructions of external plug-ins, etc.
+Check for compatibility with other platforms.
+
+
+・ About the test project
+
+A library is provided for linking with the source output by hsp3cnv.
+
+hspsdk\hsp3cnv\hsp3rtest.zip
+
+By unzipping, the hsp3rtest project and the hsp3 project provided by OpenHSP will be generated.
+It works on Windows by opening hsp3rtest.vcproj with VC ++ and building it.
+Create an exe file.
+This project file is for VC ++ 2005, but you can use it in 2008 and Express as well.
+The source output by hsp3cnv is registered in the project as test.cpp.
+If you want to use the user-generated cpp source, rename it to test.cpp or
+You need to re-register the file in the project.
+
+
+・ About performance
+
+Currently, it is about 2 to 5 times faster than the interpreter (normal) version of HSP3.
+(Please note that if you keep the Debug build, it will be significantly slower)
+Further speedup by using VC ++'s PGO (Profile-Guided Optimization)
+You can plan.
+
+In addition, OpenHSP is equipped with a JIT compiler that uses llvm by zakki.
+A version has also been created. This is compiled directly from the ax file
+It runs at the same speed.
+
+	peppermint.jp
+	http://peppermint.jp/
+
+
+揃 Supported features
+
+This version is a preview version, and its operation is limited to the following contents.
+
+-Basic instructions, basic functions, and system variables supported by HSP3
+-Variables of type int, double, str, label
+-Module functions other than module variables (#module, #global)
+-User-defined instructions and functions (#deffunc, #defcfunc)
+-DLL and plug-in call (temporary support)
+
+The following features are not yet supported.
+
+-Expansion of variable type and command type by plug-in
+-COM object operation, COM type-Variant type variable
+-Module variable
+-Dll function pointer acquisition function by varptr function
+
+The following features are not planned to be supported on this system.
+
+繝サ Run command
+
+
+繝サ Future plans
+
+HSP3 Source Converter converts HSP3 source code to other platforms and
+It is a system for converting to other language sources.
+First of all, I am aiming to convert to C source code, but other things such as ActionScript
+We have prepared a library that can be used for general purposes with the environment in mind.
+
+
+ツキlicense
+
+The license for the HSP3 source converter is treated as a derivative of OpenHSP and is treated as a derivative of OpenHSP.
+The license is also OpenHSP compliant.
+
+Copyright (C) 1997-2017, Onion Software/onitama.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
+Neither the name of the Onion Software nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+ツキChange log
+
+	2012/06/25 3.31β2
+
+Integrate version with HSP3.31
+Supports conversion of button instructions
+
+	2012/01/26 0.6(HSP3.3a4)
+
+Fixed to include hsp3cnv version information in output source
+Fixed conversion format for continuous variable assignment (a = 1,2,3)
+Fixed a bug that array element is not passed in var argument of user-defined instruction
+Fixed a bug that array variables may not be expanded correctly
+Modified to convert line feed string to CR + LF similar to HSP
+
+	2011/12/16 0.5(HSP3.3a3)
+
+Fixed so that hsp3cnv.exe can be executed without VC ++ runtime required
+
+	2011/11/15 0.5(HSP3.3a3)
+
+Fixed a bug that conversion is not correct when using foreach
+Fixed a bug that it is not converted correctly when using an argument for continue
+Fixed to add parameter conversion error to output source
+
+	2011/09/13 0.4(HSP3.3)
+
+Fixed to convert character strings including line breaks to formatted character strings such as "\\ n"
+
+	2011/07/25 0.3(HSP3.3RC1)
+
+Documents prepared for HSP3.3RC1
+Added a tool (cnvsrc) to call functions with GUI from HSP script editor
+
+	2011/03/04 0.3
+
+Supports modules and user-defined instructions
+Temporary support for plug-ins and DLLs
+
+	2011/01/17 0.2
+
+Supports HSP3.3 intermediate code
+
+	2008/10/01 0.1a
+
+Modified to output the initialization function
+
+	2008/9/24 0.1
+
+First version.
+A preview version that supports basic functions such as parameters and variables.
+
+
+揃contact information
+
+If you have any problems, opinions, or suggestions, please email or ML.
+Please note that it may take some time to reply to the email.
+hsp3cnv is compiled by Microsoft Visual Studio 2005.
+
+        Homepage: http://www.onionsoft.net/openhsp/
+                  http://hsp.tv/
+        e-mail  : onitama@onionsoft.net
+
+
+------------------------------------------------------------------------------
+                                                     README.TXT / end of file 
+------------------------------------------------------------------------------

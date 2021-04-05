@@ -1,0 +1,761 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+<meta name = "keywords" content = "HSP, HSP3, Hot Soup Processor, Updates, Updates">
+<meta name = "description" content = "HSP update information posted">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+<title> HSP3.6 New Feature Highlights </title>
+</head>
+<body>
+	<div id="CONTAINER">
+<!-Header->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+<h1> HSP3.6 New Feature Highlights </h1>
+
+<!-Table of Contents->
+		<ol>
+<li> <a href="#HSP3UPDATE"> HSP3.6 Update Overview </a> </li>
+<li> <a href="#MES"> Extension of mes (print) instruction </a> </li>
+<li> <a href="#DISHOBJ"> About HSP3Dish placement objects </a> </li>
+<li> <a href="#LAYEROBJ"> About layer objects </a> </li>
+<li> <a href="#SPRITE"> About standard sprites </a> </li>
+<li> <a href="#CALLBACK"> About callback routines </a> </li>
+<li> <a href="#OBJCOLOR"> About the objcolor instruction </a> </li>
+<li> <a href="#RGBCOLOR"> About the rgbcolor instruction </a> </li>
+<li> <a href="#STICK"> Add key obtained by stick instruction </a> </li>
+<li> <a href="#STREXCHANGE"> About character string replacement by strexchange command </a> </li>
+<li> <a href="#ZLIBWRAP"> Zip file compression / decompression support </a> </li>
+<li> <a href="#MUCOM88"> About the MUCOM88 plugin </a> </li>
+<li> <a href="#HSPSW"> About the hspsw plugin </a> </li>
+<li> <a href="#HSPINET"> About updating the hspinet plugin </a> </li>
+<li> <a href="#HSP64"> About the 64-bit (x64) version runtime </a> </li>
+<li> <a href="#HSPTVSOZAI"> About HSPTV folder material </a> </li>
+<li> <a href="#HSPENG"> Support for English interface </a> </li>
+<li> <a href="#HSP3DISH"> HSP3Dish screen resizing </a> </li>
+<li> <a href="#VIEWCALC"> Coordinate transformation by viewcalc instruction </a> </li>
+<li> <a href="#CELBITMAP"> Image data control by celbitmap command </a> </li>
+<li> <a href="#HSPIOSAND"> About updating the iOS and android version of HSP3Dish </a> </li>
+<li> <a href="#HGIMG4"> About updating HGIMG4 </a> </li>
+		</ol>
+		
+<!-Body->
+<h2 id = "HSP3UPDATE"> Overview of HSP3.6 update </h2>
+		<p>
+HSP3.6 can be used in the same way as HSP3.5 without being aware of any changes.
+The outline of the items changed in HSP3.6 is as follows.
+		</p>
+
+		<dl>
+			<dt>
+Expansion of standard instructions
+			</dt><br>
+			<dd>
+			<p>
+An option has been added that allows you to modify shadow characters, borders, etc. with the mes and print commands.
+The objcolor command to specify the color scheme of the placement object and the objlayer command to define the placement object by user definition have been added.
+In addition, many new functions such as stricter <a href="hspprog.htm#CALLBACK"> callback routine </a> and rgbcolor instruction for specifying a 24-bit color code are installed. <br>
+We've also updated new runtimes that use Unicode characters as standard, such as hsp3utf and hsp3_64.
+We have expanded the functions that are useful not only for games but also for tool production and easy prototyping, while keeping the existing functions.
+			</p>
+			</dd>
+
+			<dt>
+Expansion of plug-in functions
+			</dt><br>
+			<dd>
+			<p>
+Newly added plugin "hspsw" (Steam platform integration API), "hspmucom"
+(FM sound source music playback plug-in by MML description), "ZLibWrap.dll" (compression and decompression of zip file), etc.
+It comes with advanced enhancements and is ready to go.
+			</p>
+			</dd>
+
+			<dt>
+Expanded functions of HSP3Dish
+			</dt><br>
+			<dd>
+			<p>
+Various functions of <a href="hsp3dish_prog.htm"> HSP3Dish </a> that support execution on Windows / iOS / android / Linux / html5 (WebGL) have been expanded. <br>
+The drawing of character strings has been greatly revised, and all platforms support the display of character strings including Japanese and translucent composition.
+It also supports checkboxes and input boxes as new placement objects.
+On Windows / Linux platforms, screen, window size change by bgscr instruction, and full screen display are supported.
+In addition, we are expanding the functions such as support for new SDK compatible with the latest terminals, acquisition of various sensor information, network access, and sprite drawing.
+Hsp3js, which runs on a web browser, can newly output in WebAssembly format. The speed of drawing HGIM G4 has also been greatly improved, improving its practicality.
+The HSP3Dish Helper tool, which supports conversion to a wide range of devices, is also now more convenient and convenient to use.
+			</p>
+			</dd>
+
+			<dt>
+HGIM G4 Plugin Update
+			</dt><br>
+			<dd>
+			<p>
+The <a href="hgimg4.html"> HGIMG4 plugin </a> that enables high-level 3D representation has been significantly updated.
+In addition to improving the stability and speed of the system, the lighting function and post-effect related functions have been enhanced. In addition, detailed usability has been improved, such as restrictions on FBX model conversion and restrictions on duplication. <br>
+With the new HGIMG4 tool, you can now see and edit the 3D data after converting the fbx file in more detail.
+It is possible to check the material (.material) file in detail by GUI.
+			</p>
+			</dd>
+
+			<dt>
+New HSPTV material
+			</dt><br>
+			<dd>
+			<p>
+Many materials have been expanded in the HSPTV folder as freely usable materials.
+HSP3 official character "Tamane", professional student collaboration materials, etc.
+It can be widely used mainly for games.
+A new sample script is also included, and you can freely use it to create your own original work.
+			</p>
+			</dd>
+
+		</dl>
+
+		<p>
+A sample script that allows you to easily try out the new features added in HSP3.6 is included in the "sample / new36" folder.
+Please try the operation with the new sample by actually executing it.
+		</p>
+
+
+<h2 id = "MES"> Extension of mes (print) instruction </h2>
+		<p>
+The mes (print) instruction has been enhanced to allow character decoration and so on. <br>
+The parameters of the mes instruction are as follows.
+		</p>
+		<pre>
+		mes "strings",sw
+"strings": Messages or variables to display
+sw (0): Optional </pre>
+		<p>
+The first parameter of the mes instruction can be a string or a variable name. If you specify a variable name, the contents assigned to the variable are displayed. <br>
+The second optional parameter allows you to qualify characters and set behavior.
+		</p>
+		<pre>
+Value: Macro name: Behavior
+			 -----------------------------------------------------
+1: mesopt_nocr: No line break at the end
+2: mesopt_shadow: Draw shadowed characters
+4: mesopt_outline: Draw border characters
+8: mesopt_light: Simple drawing of shadows / borders
+16: mesopt_gmode: Reflect the gmode setting (HSP3Dish only) </pre>
+		<p>
+If 2 or mesopt_shadow is specified for the option, the shadowed characters will be drawn.
+If 4 or mesopt_outline is specified for the option, the bordered characters will be drawn.
+For shadows and borders, the color specified by the objcolor command is used.
+Also, the width of the shadow and border can be specified by the 4th parameter of the font instruction.
+		</p>
+		<p><center><img src="img/s_mesopt.png"></center></p>
+		<p>
+In the above example, the left is the shaded character, the center is the border character, and the right is the normal character.
+When 16 or mesopt_gmode is specified as an option, drawing that reflects the settings such as translucency and color addition specified in gmode is performed.
+(This option is only valid for HSP3Dish and HGIMG4, ignored by normal HSP3 runtime) <br>
+Multiple option values ​​can be specified at the same time by adding them.
+If "mesopt_nocr + mesopt_shadow" is specified, the display will be shaded and will not break.
+		</p>
+
+
+<h2 id = "DISHOBJ"> About the placement object of HSP3Dish </h2>
+		<p>
+In HSP3Dish and HGIM G4 runtimes, checkboxes, input boxes
+Support has been added. (Input box is Windows / Linux only) <br>
+You can use chkbox and input instructions in the same way as HSP3. It also supports changing the background color and font set by the objcolor and objmode commands. <br>
+These GUI parts are not parts provided by the OS, but are implemented independently by HSP3Dish.
+It may differ from the look provided by the OS, but it can provide a unified look across different platforms.
+As for the placement objects of HSP3Dish, we plan to expand the same parts as HSP3 in the future.
+		</p>
+
+<h2 id = "LAYEROBJ"> About layer objects </h2>
+		<p>
+Layer objects are newly provided user-defined placement objects.
+By registering a subroutine that draws on the screen in advance, drawing can be executed at the specified timing (layer).
+		</p>
+		<PRE>
+			layerobj p1,p2,p3,*label,p4
+p1, p2; XY size of layer object (in dots)
+p3 (0): Layer ID
+* label: Layer object processing subroutine
+p4 = 0 to (0): Option value
+
+Example:
+				layerobj 320,240,objlayer_normal,*laysub,100
+				stop
+			*laysub
+				return
+		</PRE>
+		<p>
+Layer objects have no function on their own.
+A specific area on the screen is managed as a layer object, and the user's program (callback routine) is called at each drawing timing.
+There are various ways to use it, but you can manage only the drawing part independently with modules that will be added later. <br>
+In addition, parameters can be received with the objprm instruction, and it is also possible to set or create your own placement object. <br>
+For more information on layer objects, see the <a href="hspprog.htm#LAYER_OBJECT"> Layer Objects </a> section of the programming manual.
+		</p>
+
+
+<h2 id = "SPRITE"> About standard sprites </h2>
+		<p>
+HSP3Dish and HGIMG4 runtimes now support easy-to-use <a href="sprite.html"> standard sprites </a>. <br>
+The standard sprite instructions are compatible with the instructions added as the hspdx plugin, making it easy to handle 2D drawing.
+		<p>
+		<p><img src="hsp3dish/es_test5.jpg"></p>
+		<p>
+There were several ways to use sprites (rectangular images) when drawing in 2D with HSP3.
+		</p>
+		<pre class="quote">
+・ HSPDX plug-in
+・ HGIMG / HGIM GX plug-in
+・ HGIM G3 plug-in
+・ HGIM G4 plug-in
+・ Mod_sprite module </pre>
+		<p>
+Among them, the plug-ins up to HSPDX, HGIMG, and HGIMGX are from the HSP2 era, and development has already been completed.
+It is difficult to operate with the current OS and environment. <br>
+The HGIMG3 / HGIMG4 plug-in has 3D functionality as well as a highly functional 2D sprite.
+It also has functions, but instead of managing all coordinates with real numbers and having many functions
+There was a lot of content to learn and it was difficult to handle easily. <br>
+This time, the HSPDX plug-in that has the longest history and has been used by many users
+Based on the commands, we have expanded the easy and easy-to-use 2D-only sprite commands. <br>
+Sprites can be displayed with simple commands, and sprite images can be freely registered.
+It is equipped with a flexible system. Also, sprite callbacks, map drawing, etc.
+A unique mechanism has also been introduced, making it more convenient than the original HSPDX plugin. <br>
+Coordinates are also managed by integers, making it easy to handle in 2D games and UI displays.
+Of course, you can also use the conventional plug-in for autonomous movement by event list and cooperation with 3D. <br>
+Standard sprites work on all platforms supported by HSP3Dish and HGIMG4, as well as
+We plan to support it in the HSP3 standard runtime as well. <br>
+For more information on standard sprites, see <a href="sprite.html"> Standard Sprite Programming Guide </a>.
+		</p>
+
+
+<h2 id = "CALLBACK"> About callback routines </h2>
+		<p>
+A generic term for interrupts, modular variable constructors, destructors, etc. that have occurred in HSP3 until now.
+It is defined as a "callback routine" and is managed more strictly than before. <br>
+When calling the callback routine, the processing must be terminated immediately by the return instruction in a limited situation. <br>
+Labels or user-defined instructions that are called in the following situations are treated as callback routines.
+		</p>
+		<pre class="quote">
+-When executing the cleanup instruction defined by the #deffunc instruction
+-When executing modular variable constructors and destructors
+-User interrupt by placement object (objlayer)
+-Sprite display interrupt by es_setgosub instruction (HSP3Dish) </pre>
+		<p>
+Callback routines allow you to write instructions just like regular subroutines,
+Wait, await, stop instructions, etc. cannot be waited for or stopped. <br>
+If there are instructions that cannot be used during the execution of the callback routine,
+I get the error 42 (instruction not available in the callback). <br>
+For more information on callback routines, see the <a href="hspprog.htm#CALLBACK"> Callback Routines </a> section of the programming manual.
+		</p>
+
+
+<h2 id = "OBJCOLOR"> About the objcolor command </h2>
+
+		<p><img src="img/hsp36_objcolor.png"></p>
+
+		<p>
+A new objcolor instruction has been added to specify the color scheme of the placement object.
+		</p><pre>
+objcolor p1, p2, p3 Specify the color scheme of the placement object
+
+p1, p2, p3 = 0 to 255 (0): Color code (brightness of R, G, B)
+		</pre><p>
+With the objcolor command, you can set the color scheme of the input box, etc. <br>
+To enable the color scheme by the objcolor instruction, use the option of the objmode instruction in advance.
+You must specify "objmode_usecolor".
+		</p><pre>
+	objmode objmode_usecolor
+		</pre><p>
+The input box by mesbox and input command is specified by the character color specified by rgbcolor and the color command.
+The background color is applied. <br>
+Also, the text input box by mesbox can be fully selected by pressing [ctrl] + [A] keys.
+It has been fixed.
+		</p>
+
+
+<h2 id = "RGBCOLOR"> About the rgbcolor command </h2>
+		<p>
+The rgbcolor instruction for specifying the 24-bit color code has been added. <br>
+In the past, each RGB was divided into "color 1, 2, 3" and the parameters were described.
+It can be written in the form of "rgb color $ 010203". <br>
+It is a specification method that has a high affinity with RGB codes such as "# 112233" used on the Web (html). <br>
+The content to be executed is the same for both the color command and the rgbcolor command. The only difference is the way you write the color code.
+		</p>
+
+
+<h2 id = "STICK"> Add key obtained by stick instruction </h2>
+		<p>
+A stick command that collectively acquires information on keys used in games, including cursor keys, and new [Z] [X] [C] and [A] [W] [D] [S] keys. Information has been added. <br>
+The added information is stored as the following numbers: <br>
+		<br><table border="1">
+<tr> <td> Value (decimal) </td> <td> Value (hexadecimal) </td> <td> Key </td> </tr>
+<tr> <td> 1 </td> <td> $ 00001 </td> <td> Cursor key left (<-) </td> </tr>
+<tr> <td> 2 </td> <td> $ 00002 </td> <td> On the cursor keys (↑) </td> </tr>
+<tr> <td> 4 </td> <td> $ 0004 </td> <td> Cursor key right (->) </td> </tr>
+<tr> <td> 8 </td> <td> $ 00008 </td> <td> Cursor down (↓) </td> </tr>
+<tr> <td> 16 </td> <td> $ 00010 </td> <td> Spacebar </td> </tr>
+<tr> <td> 32 </td> <td> $ 00020 </td> <td> Enter key </td> </tr>
+<tr> <td> 64 </td> <td> $ 00040 </td> <td> Ctrl key </td> </tr>
+<tr> <td> 128 </td> <td> $ 00080 </td> <td> ESC key </td> </tr>
+<tr> <td> 256 </td> <td> $ 00100 </td> <td> Left mouse button </td> </tr>
+<tr> <td> 512 </td> <td> $ 002.0 </td> <td> Right mouse button </td> </tr>
+<tr> <td> 1024 </td> <td> $ 004000 </td> <td> TAB key </td> </tr>
+<tr> <td> 2048 </td> <td> $ 000080 </td> <td> [Z] key </td> </tr>
+<tr> <td> 4096 </td> <td> $ 01000 </td> <td> [X] key </td> </tr>
+<tr> <td> 8192 </td> <td> $ 02000 </td> <td> [C] key </td> </tr>
+<tr> <td> 16384 </td> <td> $ 04000 </td> <td> [A] key </td> </tr>
+<tr> <td> 32768 </td> <td> $ 08000 </td> <td> [W] key </td> </tr>
+<tr> <td> 65536 </td> <td> $ 10000 </td> <td> [D] key </td> </tr>
+<tr> <td> 131072 </td> <td> $ 20000 </td> <td> [S] key </td> </tr>
+		</table>
+Key information is added on all platforms, including HSP3Dish.
+There is no change in the value of the conventional key information. It can be used as upward compatibility.
+		</p>
+
+
+<h2 id = "STREXCHANGE"> About character string replacement by strexchange command </h2>
+		<p>
+The newly added strexchange instruction has a function to replace all the character string data contained in the script at once.
+This makes it easier to translate the strings used in the script into another language, replace messages depending on the version, and so on. <br>
+String replacement is achieved in three steps.
+		<UL>
+<LI> Creating string data </​​LI>
+<LI> Creation of replacement string data </​​LI>
+<LI> Replacement from script </LI>
+		</UL>
+The actual sample is included as "sample / new36 / strex_test1.hsp" and "sample / new36 / strex_test2.hsp".
+The first step is to create the string data. The script of strex_test1.hsp writes the character string contained in strex_test2.hsp as character string data to the strex_test2.strmap file.
+This file consists of the strings used and their management information (indicating the location used in the script). <br>
+Edit the strex_test2.strmap file with a text editor, etc., and rewrite the character string that needs to be replaced from this file.
+For example, you can rewrite the character string "*** Hello ***" to "*** Hello ***". It doesn't matter if the length of the string changes. The actually rewritten data "strex_test2en.strmap" is also included in the sample folder. <br>
+Finally, in the strex_test2.hsp script, replace your own string. By specifying the "strex_test2en.strmap" file, which is the edited character string with the strexchange command, all the character strings in the script are automatically replaced.
+		</p><pre>
+	strexchange "strex_test2en.strmap"
+		</pre><p>
+This allows you to replace the string in the script with something else without modifying it. It is also possible to replace with multiple languages ​​by preparing multiple files for replacement. <br>
+If you want to revert to the string in the script without applying the string replacement,
+		</p><pre>
+	strexchange ""
+		</pre><p>
+Please specify an empty string as in.
+The replacement string data file contains a number (hash code) that indicates the original string. This code is matched with the character string in the script to replace it.
+Therefore, please note that the same string will be grouped together as the same hash. <br>
+Also, since the target is the character string in the script, it does not apply when reading an external text file or generating a character string from the character code. <br>
+It is very useful for translation and customization in various situations. Please use all means.
+		</p>
+
+
+<h2 id = "ZLIBWRAP"> About zip file compression / decompression support </h2>
+		<p>
+Added support for zip file compression and decompression using the ZLibWrap.dll library. <br>
+It is possible to compress and decompress files from a script with two simple instructions.
+		</p><pre>
+	#include "zipfile.as"
+		</pre><p>
+You can use the following instructions by writing.
+(The ZLibWrap.dll file is required for execution.)
+		</p><pre>
+	ZipCompress "srcfiles", "zipfile"
+
+Files specified in "srcfiles" (wildcards can be used)
+Compress and save to the file specified by "zipfile".
+
+	ZipExtract "zipfile", "path"
+
+Decompress the compressed file specified by "zipfile" to the folder specified by "path".
+		</pre><p>
+For details, refer to each instruction help and sample.
+		</p>
+
+
+<h2 id = "MUCOM88"> About the MUCOM88 plug-in </h2>
+		<p><img src="img/hsp36_mucom88.png"></p>
+
+		<p>
+In HSP3.6, the MUCOM 88 plug-in that supports FM sound source playback by MML description is included as standard. <br>
+MUCOM 88 Windows that reproduces the FM sound source driver that was operating on NEC's PC-8801 series
+You can control it. <br>
+From simple music playback to MML interpretation from scripting languages ​​by using the MUCOM88 plug-in
+You can control a wide range. <br>
+A total of 11 channels of FM sound source (OPNA) 6 sounds + PSG sound source (3 voices) + rhythm sound source + PCM sound source can be described in MML language.
+For Windows sound playback processing, use DirectSound of DirectX 8 or later, and in the environment of Windows XP or later,
+It can be operated without any additional components. <br>
+For details on the MUCOM88 plug-in, refer to the attached manual (docs / hspmucom.txt) for instruction help,
+See samples (samples / mucom88). <br> <br>
+HSPMUCOM is published as part of the Open MUCOM88 project.
+See below for the Open MUCOM88 project.
+		</p><pre>
+	Open MUCOM88
+		<a href="https://onitama.tv/mucom88/" target="_blank">https://onitama.tv/mucom88/</a>
+		</pre><p>
+MUCOM 88 Windows tools and sample MML that run on Windows are available. <br>
+HSPMUCOM.DLL and source code are freely introduced as long as they are free (non-profit).
+It can be duplicated and redistributed. In that case, be sure to document
+Be sure to include the license notation as well.
+		<UL>
+<LI> Portable Z80 emulation Author Yasuo Kuwahara <br>
+		  <a href="http://www.geocities.jp/kwhr0/" target="_blank">http://www.geocities.jp/kwhr0/</a>
+<LI> fmgen author cisc <br>
+		  <a href="http://www.retropc.net/cisc/" target="_blank">http://www.retropc.net/cisc/</a>
+<LI> MUCOM88 Author Yuzo Koshiro <br>
+		  <a href="https://twitter.com/yuzokoshiro" target="_blank">https://twitter.com/yuzokoshiro</a>
+<LI> HSPMUCOM Author Onitama (ONION software) <br>
+		  <a href="https://www.onionsoft.net/" target="_blank">https://www.onionsoft.net/</a>
+		</UL>
+		</p>
+
+
+<h2 id = "HSPSW"> About the hspsw plugin </h2>
+		<p>
+HSP3.6 comes standard with the hspsw plugin for calling APIs for the Steam platform. <br>
+On the app distributed on the Steam platform that downloads and sells PC games and PC software,
+It can support features such as rankings, achievements (trophy), and reading and writing status. <br>
+For details on the hspsw plugin, refer to the attached manual (doclib / hspsw.txt) and samples (samples / hspsw).
+please refer to.
+		</p><pre>
+HSPSW Plugin Manual
+		<a href="hspsw.txt" target="_blank">doclib/hspsw.txt</a>
+		</pre>
+
+
+<h2 id = "HSPINET"> About updating the hspinet plugin </h2>
+		<p>
+In the hspinet plugin http / https request
+Netrequest_put and netrequest_delete corresponding to PUT / DELETE method
+Instructions have been added.
+This makes it possible to use more Web APIs.
+		</p><pre>
+hspinet plugin manual
+		<a href="hspinet.txt" target="_blank">doclib/hspinet.txt</a>
+		</pre>
+
+
+<h2 id = "HSP64"> About the 64-bit (x64) version runtime </h2>
+		<p>
+The HSP3 standard runtime (hsp3_64.exe) that runs as a 64-bit (x64) app is
+Changed to work on a unicode (UTF-8) character basis by default.
+If you want to use it, specify the following line at the beginning of the script.
+		</p><pre>
+	#include "hsp3_64.as"
+		</pre><p>
+The operation specifications are the same as the HSP3UTF (UTF-8) version runtime.
+The 64-bit (x64) runtime only works on 64-bit versions of Windows (Windows 7 and above).
+		</p>
+
+
+<h2 id = "HSPTVSOZAI"> About HSPTV folder material </h2>
+		<p><img src="img/hsp36_rpgmap.png"></p>
+
+		<p>
+As an image and sound data file that can be freely used when presenting a work
+The HSPTV folder material has been greatly expanded.
+With a simple license, it can be used for works other than HSP.
+You can also freely refer to the "WebDish service", which allows you to publish HSP scripts on the Web.
+I hope that many works will be created by utilizing "HSPTV folder material" and "WebDish material".
+		</p><pre>
+HSP3.6 WebDish material data
+		<a href="https://dev.onionsoft.net/seed/webdish_res.html" target="_blank">https://dev.onionsoft.net/seed/webdish_res.html</a>
+		</pre><p>
+
+<h2 id = "HSPENG"> Support for English interface </h2>
+		<p>
+Error messages when running HSP runtime on Windows and Linux are displayed by switching between Japanese and English based on the character code of the OS environment. <br>
+In addition, an English version of the script editor is newly included in the HSP installation folder. <br>
+By starting "hsed3_en.exe", the menu and other interfaces will be in English.
+There is no change in the function of the HSP3 main unit, but if you want to use it in the English version environment, please try it. <br>
+We will continue to prepare for the internationalization of the HSP development environment.
+		</p>
+
+
+<h2 id = "HSP3DISH"> About screen resizing of HSP3 Dish </h2>
+		<p>
+Supports dynamic change of screen (window) size in Windows / Linux version of HSP3Dish and HGIMG4. <br>
+Previously, the size was fixed at startup according to the size recorded in the hsp3dish.ini file,
+We have received requests from many people to change the size and support full screen, and have corrected it.
+From HSP3.6, the screen (window) size can be changed by the screen command and bgscr command.
+		</p><pre>
+	screen p1,p2,p3,p4,p5,p6
+
+p1 = 0 to (0): Window ID
+p2 = 1 to (640): Screen size X to be initialized (in 1-dot units)
+p3 = 1 to (480): Screen size Y to initialize (1 dot unit)
+p4 = 0 to 1 (0): Screen mode to initialize
+p5 = 0 to (-1): Window layout X (1 dot unit)
+p6 = 0 to (-1): Window layout Y (1 dot unit)
+		</pre><p>
+The window ID of p1 is 0 only.
+The following values ​​can be specified for the initialization mode of p4.
+		</p><pre>
++4 (screen_fixedsize): Fixed size window
++8 (screen_tool): Tool window
++16 (screen_frame): Window with deep edges
++256: Full screen
+		</pre><p>
+If you specify 256 for p4, it will be initialized as full screen with the specified resolution. <br>
+Also note that when resizing the screen, unlike the normal runtime, all image buffers loaded up to that point will be lost.
+		</p>
+
+
+<h2 id = "VIEWCALC"> Coordinate transformation by viewcalc command </h2>
+		<p><img src="img/hsp36_viewcalc.png"></p>
+		<p>
+In HSP3Dish and HGIMG4, the viewcalc instruction that sets the coordinate transformation at the time of drawing has been added. <br>
+The viewcalc instruction is a powerful function that allows you to apply arbitrary calculations to the X and Y coordinates when drawing in 2D.
+You can scale, move, and rotate the entire rendered display.
+		</p><pre>
+	viewcalc p1,p2,p3,p4,p5
+
+p1 (0): Setting mode
+p2 (0.0): Parameter 1 (real number)
+p3 (0.0): Parameter 2 (real number)
+p4 (0.0): Parameter 3 (real number)
+p5 (0.0): Parameter 4 (real number)
+		</pre><p>
+There are several types of setting modes specified by p1, and various conversions can be performed.
+		</p><pre>
+Macro name value Content
+	-----------------------------------------------------
+vptype_off 0 No coordinate transformation (default)
+vptype_translate 1 Specify movement parameters
+vptype_rotate 2 Specify rotation parameter
+vptype_scale 3 Specify scale parameters
+vptype_3dmatrix 4 Coordinate transformation by 4 × 4 matrix
+vptype_2d 5 Set 2D coordinate transformation
+vptype_3d 6 Set 3D coordinate transformation
+		</pre><p>
+vptype_2d is in a mode to apply basic 2D coordinate transformations.
+Parameters 1 to 3 allow you to set the X and Y scales (magnification) and rotation angle (in radians).
+		</p><pre>
+	viewcalc vptype_2d, 2.0, 2.0, 0.0
+		</pre><p>
+If you specify as, it will be displayed on a double scale in the X and Y directions, and the angle will be 0. <br>
+You can specify various other parameters. See the viewcalc instruction help for more information.
+		</p>
+
+
+<h2 id = "CELBITMAP"> Image data control by celbitmap command </h2>
+		<p>
+In HSP3Dish and HGIMG4, the celbitmap instruction for handling the contents of the variable buffer as image data has been added. <br>
+Until now, HSP3Dish could not directly access the image data in dot units, but this command makes it possible to read and write the contents of the memory as image data.
+		</p><pre>
+	celbitmap p1,var,p2
+
+p1 (0): Window ID
+var: Array variable to replace the image
+p2 (0): Operation option
+		</pre><p>
+When using the celbitmap instruction, it is necessary to initialize the offscreen buffer created by the buffer instruction in advance and the variable buffer to replace it. <br>
+Create an offscreen buffer by specifying the screen_offscreen option with the buffer instruction.
+		</p><pre>
+	buffer 2,256,256,screen_offscreen
+		</pre><p>
+Then create a variable buffer to replace the buffer. <br>
+Initialize the one-dimensional array with the dim instruction and create it. The size to be created is X size x Y size of the offscreen buffer.
+		</p><pre>
+	dim bitmap, 256*256
+		</pre><p>
+Now you are ready to use the celbitmap instruction. <br>
+By specifying the ID of the offscreen buffer and the array variable with the celbitmap instruction, the contents of the variable buffer are applied as they are as an image. <br>
+The variable buffer is 1 dot per element. One dot is RGB format data in which 32-bit elements are stored in 8-bit units for each of R, G, B, and A. (Please note that the order of RGB has changed between 3.6β2 version and 3.6β3 version.) <br>
+For example, if you specify "$ ff204080" (hexagon), then A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses) <br>
+Please note that replacing image data is a costly process and may reduce the frame rate when replacing large size images. <br>
+The p2 parameter allows you to specify the replacement format and behavior.
+		</p><pre>
+Value macro behavior
+	---------------------------------------------------------
+0 Hold data in celbitmap_rgb $ aabbggrr format
+1 Hold data in celbitmap_bgr $ aarrggbb format
+16 celbitmap_capture Read the contents of the drawing screen into a variable
+		</pre><p>
+Normally, the format of celbitmap_rgb that conforms to the OpenGL standard is used. If celbitmap_bgr is specified as an option, the ARGB sequence will be in accordance with the DirectX standard. <br>
+When celbitmap_capture is specified, the data on the drawing destination screen is read into the array variable. (The read size will be the size of the offscreen buffer) <br>
+* The celbitmap_capture option is an experimental implementation. Currently, it can be used only on Windows (excluding DirectX version HGIMG4) and Linux version.
+		</p>
+
+
+<h2 id = "HSPIOSAND"> About updating iOS and android version of HSP3 Dish </h2>
+		<p>
+The iOS and android versions of HSP3Dish are compatible with their new SDKs.
+		</p><pre>
+iOS version: For XCode 9 or later iOS 13, 64bit compatible
+android version: Android SDK 7.0 (API 24), 64bit compatible,
+SDK r25, NDK r12 or later, AdMob (Google Firebase) compatible
+		</pre><p>
+Both iOS and android versions support 64-bit binary output.
+Since the SDK and development environment of the corresponding version are required,
+See the manual for more information.
+		</p><pre>
+HSP3Dish Manual Index
+		<a href="../hsp3dish.htm" target="_blank">hsp3dish.htm</a>
+		</pre>
+Existing projects may not build properly, so
+We recommend that you recreate the existing project.
+		</p>
+
+
+<h2 id = "HGIMG4"> About updating HGIMG4 </h2>
+		<p><img src="image/pn4.png" width="640"></p>
+
+		<p>
+HSP3.6 is a major modification from the previous HGIMG4.
+We have reviewed various functions to make it more powerful and easier to use.
+Designed to work upwards compatible with previous versions,
+Since some functions may behave differently, please use the script created in the past.
+Please be careful when operating it.
+For details on how to use it, refer to the HGIM G4 Programming Guide.
+		</p><pre>
+HGIM G4 Programming Guide
+		<a href="hgimg4.html" target="_blank">doclib/hgimg4.html</a>
+		</pre><p>
+The outline of the added and changed items is as follows.
+		</p>
+		<UL>
+<LI> FBX model conversion update
+		<br><br>
+A major fix to the process that could cause an error when converting a complex FBX model.
+Models containing bones can be converted correctly, including animations.
+A new HGIMG4 Unity integration guide is included.
+Explains how to convert model data and animation in cooperation with the 3D tool "Unity".
+		</p><pre>
+HGIMG4 Unity Cooperation Guide
+	<a href="hgimg4_unity.html" target="_blank">doclib/hgimg4_unity.html</a>
+		</pre><p>
+"Professional student demo" (sample / pronama3d) made using this cooperation
+It is included as a sample.
+		</p>
+		<br>
+<LI> System stabilization and error log acquisition
+		<br><br>
+Enhanced log output to know the cause when an error occurs.
+When loading a 3D model, applying animation, compiling shaders, etc.
+Detailed errors are output as a log.
+Also, a switch for turning log output on / off is set in the sysreq (system request) item.
+Has been added.
+		</p><pre>
+setreq SYSREQ_LOGWRITE,0; Suppress log output
+		</pre>
+<LI> Getang, add getangr instruction
+		<br><br>
+The getang and getangr instructions have been added to get the attitude information of the object at the rotation angle of XYZ.
+It is easier to handle than the rotation information in quaternion format.
+In addition, commands with different rotation orders are given to each of the setang, event_ang, and event_setang commands that specify the rotation angle.
+I am preparing.
+		</p><pre>
+setang (setting the rotation angle by the order of X-> Y-> Z)
+setangy (setting the rotation angle by the order of Y-> X-> Z)
+setangz (setting the rotation angle by the order of Z-> Y-> X)
+event_ang (event change of rotation angle according to the order of X-> Y-> Z)
+event_angy (event change of rotation angle according to the order of Y-> X-> Z)
+event_angz (Event change of rotation angle according to the order of Z-> Y-> X)
+event_setang (Event setting of rotation angle according to the order of X-> Y-> Z)
+event_setangy (event setting of rotation angle according to the order of Y-> X-> Z)
+event_setangz (Event setting of rotation angle according to the order of Z-> Y-> X)
+		</pre>
+<LI> Addition of gpscrmat instruction
+		<br><br>
+The gpscrmat instruction has been added. This will reference the offscreen texture buffer
+Generate material. Rendered offscreen by generating your own material
+Images Images can be reused as textures from shaders.
+
+By reusing the contents drawn on the off-screen as a texture, detailed specular reflection (reflection),
+It can be applied to the generation of shadows. <br>
+(* Off-screen texture buffer is only supported on Windows, Linux and android platforms)
+		<br>
+		<br>
+<LI> Added parallel projection camera option to gpcamera instruction
+		<br><br>
+A camera type parameter option has been added to the gpcamera instruction to generate a camera.
+By specifying 1 for the camera type value, it is possible to set the camera that performs parallel projection (Orthographic).
+		<br>
+		<br>
+<LI> Cubemap texture support
+		<br><br>
+GPOBJ_MATOPT_CUBEMAP has been added to the material's optional parameters.
+Cubemaps can be used as environmental maps, skyboxes, etc. in a special format that summarizes images in six directions.
+You can use it.
+(For the cubemap image, use one .PNG format in which 6 images of + X, -X, + Y, -Y, + Z, -Z broadcast are connected vertically.
+is needed. )
+		<br>
+		<br>
+<LI> Rendering group settings for each camera
+		<br><br>
+A setobjrender instruction has been added to set the rendering group for an object.
+This allows you to give objects a setting to show / hide for each camera.
+You can also set lighting groups to reflect the lights on each object.
+You can control it.
+		</p><pre>
+	setobjrender id,rendergroup,lightgroup
+
+id (0): Object ID
+rendergroup (1): Rendering group value
+lightgroup (1): Lighting group value
+		</pre><p>
+If the render group value is the same as the render group value of the camera or light,
+It will be valid.
+Normally, group 1 is set for both objects and cameras. Display from a specific camera only
+It can be used when you want to disable the display.
+Lighting group values ​​enable / disable for specific lights.
+If it is different from the lighting group value of the light, the light will be disabled.
+Each group value is from 1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768
+Any combination of bits can be specified.
+		<br>
+		<br>
+<LI> TTF font support
+		<br><br>
+We reviewed the display method of character strings (fonts) and supported Japanese display with TTF fonts on all platforms.
+In previous versions, the res / font.gpb file was required, but this file is no longer needed.
+However, depending on the platform, a separate font file may be required.
+		<table border="1">
+<tr> <td> Platform </td> <td> Character code </td> <td> Font file </td> </tr>
+<tr> <td> Windows </td> <td> SJIS </td> <td> Not required </td> </tr>
+<tr> <td> Linux / RaspberryPi </td> <td> UTF-8 </td> <td> ipaexg.ttf file required </td> </tr>
+<tr> <td> html5 (Emscripten) </td> <td> UTF-8 </td> <td> unnecessary </td> </tr>
+<tr> <td> android </td> <td> UTF-8 </td> <td> unnecessary </td> </tr>
+<tr> <td> iOS </td> <td> UTF-8 </td> <td> unnecessary </td> </tr>
+		</table>
+Please note that the supported font types, qualities, etc. may vary depending on the platform.
+		<br>
+Similar to HSP3Dish, TTF font display draws a font character string on a texture and caches it.
+This method has the advantage of using free fonts and characters, but it is CPU- and memory-intensive when displaying different content over a wide area.
+Displaying values ​​and contents that change every frame increases the load for each frame, so this point is very different from before.
+It also increases the load when the font size is large or when a large amount of text is displayed on the screen. <br>
+If you do not need to draw in TTF font, you can switch the display in the conventional drawing format by system request.
+		</p><pre>
+	setreq SYSREQ_USEGPBFONT,1
+		</pre><p>
+As shown above, you can switch to the traditional font display by setting SYSREQ_USEGPBFONT to 1 in the system request. (You need to prepare the "res / font.gpb" file) <br>
+Font drawing can be switched at any time by system request.
+		<br>
+		<br>
+<LI> Built-in 2D drawing shader
+		<br><br>
+In the previous version, the shader file for 2D drawing in "res / shaders" was read and used at startup, but
+The new version has a built-in shader for 2D and no longer requires external files.
+If you use only 2D drawing, you do not need to prepare the file in "res / shaders".
+When drawing in 3D, an external shader file is still required.
+		<br>
+		<br>
+<LI> Update of HGIM G4 tool
+		<br><br>
+		<img src="img/hsp36_material.png" width="480"><br>
+A new feature has been added to the HGIMG4 tool (gpbconv.exe) that can be launched from the script editor. <br>
+We have added a material (.material) GUI editor that allows you to check and edit the 3D data after converting the fbx file in more detail.
+In addition to changing detailed drawing settings for each material, you can check the texture file and edit the lighting settings later.
+		</p>
+		</UL>
+
+<!-Footer->
+		<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

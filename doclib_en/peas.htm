@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta name = "author" content = "OpenHSP3 Project (http://dev.onionsoft.net/trac/wiki)">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor3,HSPTV">
+<meta name = "description" content = "Peas information posted">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+<title> Peas Editor Manual </title>
+</head>
+<body>
+	<div id="CONTAINER">
+<!-Header->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+<h1> Peas Editor Manual </h1>
+
+<!-Table of Contents->
+		<ol>
+<li> <a href="#ABOUT"> What is the Peas Editor </a> </li>
+<li> <a href="#SET_PART"> Parts placement </a> </li>
+<li> <a href="#EXEC_SHORT"> Easy program execution </a> </li>
+<li> <a href="#PARTS_CTRL"> Parts management </a> </li>
+<li> <a href="#LABEL"> Label parts </a> </li>
+<li> <a href="#VAR"> Variable parts </a> </li>
+<li> <a href="#CAN"> What the Peas editor can do </a> </li>
+<li> <a href="#MAKE_PARTS"> About creating parts </a> </li>
+<li> <a href="#LICENCE"> Copyright and license </a> </li>
+		</ol>
+
+<h2 id = "ABOUT"> What is the Peas editor? </H2>
+		<img src="img/s_peas.jpg" width="320" height="249" alt="Peas editor" style="float:right;">
+		<p>
+"Peas Editor" visually arranges the elements (parts) that are the basis of the program,
+It is a tool for automatically generating HSP scripts.
+		</p>
+		<p>
+Start it from the shortcut icon of "Peas", or select "ahtman.exe" in the folder where HSP3 is installed.
+You can use the Peas editor by starting it.
+		</p>
+		<p>
+The "Peas Editor" makes the basic script flow visually understandable, as well as
+You can modify only certain elements without using a script editor,
+It's a new option for those who haven't touched programming before or for beginners.
+		</p>
+
+
+<h2 id = "SET_PART"> Parts placement </h2>
+		<img src="img/s_peas_parts2.jpg" alt="parts" width="320" height="205" style="float:right;">
+		<p>
+In the Peas editor, the program is created according to the parts placed on the screen.
+Press the "Add" button to place the part on the screen.
+The parts list screen that can be placed is displayed.
+If you right-click and select a part from this, it will be placed on the main screen.
+		</p>
+		<p>
+Placed parts can be moved by dragging while holding down the left mouse button.
+It doesn't matter where the parts are placed.
+		</p>
+		<p>
+There are several types of parts.
+The uneven jigsaw puzzle-like parts are used for the flow of the program.
+You can connect the parts with a line. The contents of the parts connected by the line are executed in order.
+For details, refer to "Program flow".
+		</p>
+		<p>
+Clean parts with no irregularities are called resource parts and cannot be connected by lines.
+Instead, resource parts are always available from other parts.
+For example, by arranging music resource parts, you can specify it from the program at any time.
+You will be able to play music. It 窶冱 like reserving the materials used in the program.
+It's a good idea to think about it.
+		</p>
+
+<h2 id = "EXEC_SHORT"> Running a simple program </h2>
+		<img src="img/s_peas_prop1.jpg" alt="home" width="336" height="189" style="float:right;">
+		<p>
+Let's actually create a simple program and run it.
+First, use the "Add" button to place the "Home" parts.
+The "home" part is the starting point for starting the program.
+Must be placed first.
+When you open the "Home" part, you will see a "property edit window" that looks like a screen.
+This is a screen for editing the contents related to the "Home" part.
+You can change it to suit what you want to make.
+For example, changing the "Title Name" changes the title displayed in the title bar on the window.
+When you have finished editing the content, press "OK" to confirm the edited content.
+Please note that other operations cannot be performed on the main screen while the "property edit window" is displayed.
+		</p>
+		<p>
+Then press the "Save As" button to save the project.
+If you want the program to work, you need to name and save the project.
+The Peas editor uses the "My Documents" folder by default.
+Here, save the project with a name such as "Test" on "My Documents" for easy understanding.
+		</p>
+		<img src="img/s_peas_prop2.jpg" alt="parts select" width="336" height="189" style="float:right;">
+		<p>
+Next, let's put a picture on the screen.
+Place the image file in bmp or jpeg format in the "My Documents" folder where you saved the project in advance.
+Please make a copy of one.
+Here, as an example, "back.jpg" in the peas sample folder of HSP3.1 is used.
+		</p>
+		<p>
+Select the "Image display" part with the main "Add" button.
+The "Image Display" part is placed so that it is connected to the "Home" that has already been placed.
+The "Properties Edit Window" will appear, and you should see an item for entering an image to display.
+Here, specify the image file prepared earlier.
+You can specify the file in the file selection dialog by pressing the "Select" button.
+Once you have made your selection, press "OK" to confirm.
+		</p>
+		<p>
+This completes the flow of the program that displays the image.
+Make sure that the placed "Home" and "Image display" are connected by a line.
+This indicates that the "image display" will be executed after the home, which is the starting point of the program.
+You can move the parts placed on the screen to any position you like.
+You can freely move it to a shape that is easy for you to see.
+However, the connecting line will come out of the protrusion on the right side of the part and connect to the left side of the next part.
+In other words, please note that it is basic to arrange the parts so that they flow from left to right.
+		</p>
+		<p>
+At this point, you can actually run the program with the main "Run" button.
+If the window with the title you specified is displayed and the image file you specified appears in it, it is successful.
+		</p>
+		<p>
+If you want to change or check the contents, click the part to select it and then press the "Edit" button.
+At any time, the "Property Edit Window" will appear and you can modify the contents.
+		</p>
+		<p>
+The style of "Peas Editor" is to complete your program by repeating this process.
+You can save all the positions and contents of the parts you placed in the project file and recall them at any time.
+I can do it. Also, if you press the "Run" button, it will be in the same folder as the project file.
+A script file with the same name as the project file and the extension ".hsp" will be generated.
+This file is an HSP script converted from the content edited with "Peas Editor".
+You can run it directly from the HSP script editor or create an executable file.
+		</p>
+		<p>
+There are also some project files in the HSP3.1 peas sample folder (sample / peas)
+It is prepared as a sample, so please refer to it.
+		</p>
+
+<h2 id = "PARTS_CTRL"> Parts management </h2>
+		<p>
+You can freely change the state of the parts placed on the screen.
+Any number of parts can be placed on the screen with the "Add" button,
+You can delete the selected part with the "Delete" button.
+		</p>
+		<p>
+The screen to be placed is page-managed. "Page 1/3" displayed in the upper right
+Shows page information. For page information, "current page number / maximum page number"
+It is displayed in the form of.
+The content and execution of the part has nothing to do with the page.
+It just changes where the parts are placed.
+		</p>
+		<p>
+Pages can be moved with the main "<-" and "->" buttons, and the number of pages can be specified.
+You can also jump directly by pressing the "Page" button.
+(The maximum number of pages can be increased by directly specifying the number of pages.)
+You can also return to page 0 at any time with the "Home" button.
+		</p>
+		<p>
+You can connect and disconnect parts at any time.
+Basically, the parts connected by a line are executed in order and stop at the place where the line breaks.
+If you press the "Disconnect" button with a part selected, the connection with the next part will be disconnected.
+Also, with the unconnected parts selected, press the "Connect" button to
+When the dialog "Connect the selected parts. Are you sure?" Is displayed.
+Select the part you want to connect again and press "OK" to connect the two parts.
+		</p>
+			
+<h2 id = "LABEL"> Label parts </h2>
+		<p>
+The "label" part is like a marker used to indicate the location of a program.
+By placing the "Label" part from the "Add" button,
+You can make a mark when jumping from another place.
+		</p>
+		<p>
+"Label" parts include "jump" parts and parts such as "conditional branch" or "button".
+Can be specified.
+If a jump is made at run time, execution will continue from the specified label.
+		</p>
+		<p>
+The "subroutine" part has a function similar to the label part.
+This part can be named and marked like a "label",
+As a subroutine to return to the caller after finishing the execution of the part connected to this part
+You can make it work.
+(When branching or jumping, by setting the type to "Subroutine call", the "Subroutine" part can be changed.
+You can call it. )
+		</p>
+
+<h2 id = "VAR"> Variable parts </h2>
+		<p>
+The "variable" part is a "container" whose contents can be changed in the program.
+By selecting the "Resources" category from Add Parts and selecting "Variables",
+You can place "variable" parts on the screen.
+		</p>
+		<p>
+Variable parts hold numbers, strings, etc. during program execution
+The contents can be changed by parts such as "variable assignment".
+In addition, "conditional branching" and "variable display" that perform processing based on the contents held by the variable are provided.
+		</p>
+
+<h2 id = "CAN"> What the Peas editor can do </h2>
+		<p>
+The Peas editor allows you to visually place parts and generate scripts, while
+For those who enter scripts directly with HSP script editor etc., there may be some parts that may be troublesome.
+		</p>
+		<p>
+The Peas editor is intended to assist the HSP scripting environment.
+We do not expect to do all the work in the Peas editor.
+However, routine work, creating very simple scripts, learning programs, etc.
+I think that there are many situations where the Peas editor is used effectively.
+		</p>
+		<p>
+Changing the source of an HSP script that is already running to an AHT file that supports the Peas editor is not possible.
+It's not that difficult.
+For example, an adventure game script that allows you to edit user-modifiable parts
+Publish as an AHT file and create a mechanism for the general public to create a game using only the Peas editor
+It is also possible to provide.
+		</p>
+		<p>
+Those who can build HSP scripts will provide it in the form of AHT, which makes it easier to modify the content.
+If you can't write an HSP script, you can start from this editor and level up.
+Building such an environment is the goal of the Peas editor, and we will continue to update for it.
+It's a schedule.
+		</p>
+
+<h2 id = "MAKE_PARTS"> About creating parts </h2>
+		<p>
+Parts that can be added with the Peas editor can be freely created by the user according to the specifications of the AHT file.
+Parts are searched under the "AHT" folder in the same location as ahtman.exe.
+By adding the aht file to this folder, it will be recognized as an additional part.
+		</p>
+		<p>
+AHT files are basically in the same format as HSP source script files.
+By matching the comment description to the aht specifications, it is possible to set parameter editing items.
+For more information on AHT files, see <a href="aht.txt"> AHT Manual (aht.txt) </a>.
+		</p>
+
+
+<h2 id = "LICENCE"> Copyright and license </h2>
+		<p>
+The Peas editor is copyrighted by onion software.
+		</p>
+		<p>
+"Peas Editor" is distributed in the form of being bundled with "HSP3".
+The rules for redistribution are the same as for "HSP3". As long as it is done free of charge, you are free to do it.
+		</p>
+		<p>
+The source script for the "Peas Editor" is included in the HSPSDK
+Anyone can freely modify, reorganize, and redistribute it.
+Redistribution can be in the form of a source script or an executable file.
+		</p>
+
+<!-Footer->
+		<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

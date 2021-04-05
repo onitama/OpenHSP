@@ -1,106 +1,106 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="ja">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta http-equiv="Content-Language" content="ja">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
-	<meta name="author" content="OpenHSP3 Project�ihttp://dev.onionsoft.net/trac/wiki�j">
-	<meta name="keywords" content="HSP3,HotSoupProcessor3,module,���W���[��">
-	<meta name="description" content="HSP3�ɂ����郂�W���[���@�\�̐���">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor3,module,モジュール">
+	<meta name="description" content="HSP3におけるモジュール機能の説明">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
 	<link href="../single.css" rel="stylesheet" type="text/css" media="all">
-	<title>HSP3 ���W���[���@�\�K�C�h</title>
+	<title>HSP3 モジュール機能ガイド</title>
 </head>
 <body>
 	<div id="CONTAINER">
-		<!-- �w�b�_�[ -->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2019(c)</p>
-		<img src="hsp3ttl.jpg" alt="�^�C�g��" width="640" height="200">
-		<h1>HSP3 ���W���[���@�\�K�C�h</h1>
+		<!-- ヘッダー -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+		<h1>HSP3 モジュール機能ガイド</h1>
 
-		<!-- �ڎ� -->
+		<!-- 目次 -->
 		<ol>
-			<li><a href="#ABOUT">HSP���W���[���@�\�ɂ���</a></li>
-			<li><a href="#USERDEF">���[�U�[��`���߂ɂ���</a></li>
-			<li><a href="#BASIC">���W���[���̎g����(��{)</a></li>
-			<li><a href="#APP">���W���[���̎g����(���p)</a></li>
-			<li><a href="#MODDEF">���W���[����`����</a></li>
-			<li><a href="#CLEANUP">���W���[���̃N���[���A�b�v�@�\�ɂ���</a></li>
-			<li><a href="#MODNAME">�W���L�[���[�h�Ɓu@hsp�v���W���[�����ɂ���</a></li>
+			<li><a href="#ABOUT">HSPモジュール機能について</a></li>
+			<li><a href="#USERDEF">ユーザー定義命令について</a></li>
+			<li><a href="#BASIC">モジュールの使い方(基本)</a></li>
+			<li><a href="#APP">モジュールの使い方(応用)</a></li>
+			<li><a href="#MODDEF">モジュール定義命令</a></li>
+			<li><a href="#CLEANUP">モジュールのクリーンアップ機能について</a></li>
+			<li><a href="#MODNAME">標準キーワードと「@hsp」モジュール名について</a></li>
 		</ol>
 
 		<p>
-			���̃e�L�X�g�ɂ́AHot Soup Processor ver3.0�ȍ~�ŃT�|�[�g����Ă���
-			���W���[���@�\�ɂ��Ă̐������܂܂�Ă��܂��B
+			このテキストには、Hot Soup Processor ver3.0以降でサポートされている
+			モジュール機能についての説明が含まれています。
 		</p>
 		<p>
-			���W���[���@�\�́AHSP�����[�����x�Ɏg�������Ƃ������̂��߂�
-			�g���@�\�ł��B�������A���̋@�\�͂��ׂĂ̐l�ɕK�v�Ȃ��̂ł͂���܂���B
-			���S�҂̕���A���ꂩ��HSP���g�����́A�܂����W���[���ɂ��Ă̏K����
-			���Ȃ��Ă����v�ł��B�������A�����҈ȏ�̕��͂������I�Ƀ\�[�X��
-			�ė��p���\�ɂȂ�d�v�ȗv�f�ł��̂ŁA����}�X�^�[���Ă��������B
+			モジュール機能は、HSPをより深く高度に使いたいという方のための
+			拡張機能です。しかし、この機能はすべての人に必要なものではありません。
+			初心者の方や、これからHSPを使う方は、まだモジュールについての習得は
+			しなくても大丈夫です。しかし、中級者以上の方はより効率的にソースの
+			再利用が可能になる重要な要素ですので、是非マスターしてください。
 		</p>
 		<p>
-			�܂��A�㋉�҂́A����ɍ��x�ȃ��W���[���ϐ��@�\�𗘗p���邱�Ƃ��\�ł��B
-			���W���[���ϐ��ɂ��Ă̏ڍׂ́A���̃K�C�h�ł͐������Ă��܂���̂ŁA
-			�ڂ����́A�v���O���~���O�K�C�h���Q�Ƃ��Ă��������B
+			また、上級者は、さらに高度なモジュール変数機能を利用することが可能です。
+			モジュール変数についての詳細は、このガイドでは説明していませんので、
+			詳しくは、プログラミングガイドを参照してください。
 		</p>
 
-		<h2 id="ABOUT">HSP���W���[���@�\�ɂ���</h2>
+		<h2 id="ABOUT">HSPモジュール機能について</h2>
 		<p>
-			���W���[���@�\�́A�����̃X�N���v�g�����x������ϐ����̏Փ˂��C�ɂ���
-			�������邽�߂̎d�g�݂ł��B
+			モジュール機能は、複数のスクリプトをラベル名や変数名の衝突を気にせず
+			結合するための仕組みです。
 		</p>
 		<p>
-			���̋@�\�́A�傫�ȃT�C�Y�̃X�N���v�g����鎞��A���ʂ̕ϐ������Ǘ�
-			����ꍇ�ɗL���ł��B���W���[���@�\�����p���邱�Ƃɂ��A
-			���ėp���̍����X�N���v�g��g�ނ��Ƃ��ł���悤�ɂȂ�܂��B
+			この機能は、大きなサイズのスクリプトを作る時や、多量の変数名を管理
+			する場合に有効です。モジュール機能を活用することにより、
+			より汎用性の高いスクリプトを組むことができるようになります。
 		</p>
 		<p>
-			�܂��A���W���[���@�\���g��Ȃ��l�ł����Ă��A���̐l�����W���[���@�\��
-			�g���Ēǉ������V�������߂��g�����Ƃ��\�ł��B����́ADLL�ɂ��
-			�g���v���O�C���̎d�g�݂ƕς��܂���B
+			また、モジュール機能を使わない人であっても、他の人がモジュール機能を
+			使って追加した新しい命令を使うことが可能です。これは、DLLによる
+			拡張プラグインの仕組みと変わりません。
 		</p>
 		<p>
-			�܂��A���W���[���ɂ��Đ������Ă݂܂��傤�B
-			���Ƃ��΁A�utest1.as�v�Ƃ����\�[�X�X�N���v�g���������Ƃ��܂��傤�B
-			���̃\�[�X�X�N���v�g�ɂ́A�ϐ�a�ƕϐ�b���g���Ă���Ƃ��܂��B
-			�ʂȐl���A�utest2.as�v�Ƃ����\�[�X�X�N���v�g��������Ƃ��āA������
-			�ƂĂ��֗��ȃT�u���[�`�����������Ƃ�����A�ǂ��Ȃ�ł��傤�B
-			�utest2.as�v�ŕϐ�a�ƕϐ�b�Ƃ������O���g���Ă��Ȃ���Ζ��Ȃ��A
-			���̂܂܃T�u���[�`�������������Ă��邱�Ƃ��ł��邩������܂���B
-			�������A�����utest2.as�v�ł��ϐ�a�ƕϐ�b��ʂȗp�r�Ŏg���Ă����Ƃ�����
-			�ƂĂ���������ł��B
+			まず、モジュールについて説明してみましょう。
+			たとえば、「test1.as」というソーススクリプトがあったとしましょう。
+			このソーススクリプトには、変数aと変数bを使っているとします。
+			別な人が、「test2.as」というソーススクリプトを作ったとして、そこに
+			とても便利なサブルーチンがあったとしたら、どうなるでしょう。
+			「test2.as」で変数aと変数bという名前を使っていなければ問題なく、
+			そのままサブルーチンだけを持ってくることができるかもしれません。
+			しかし、もし「test2.as」でも変数aと変数bを別な用途で使っていたとしたら
+			とてもやっかいです。
 		</p>
 		<p>
-			HSP���W���[���@�\���g���ƁA�utest1.as�v����utest2.as�v�̃X�N���v�g��
-			�Ăяo�����Ƃ��\�ɂȂ�܂����A�utest1.as�v�Ɓutest2.as�v�Ŏg����
-			����ϐ���(���Ƃ����O�������ł����Ă�)�Ɨ��������̂Ƃ��Ĉ����܂��B
-			�܂��A���̓Ɨ������X�N���v�g���̃T�u���[�`�����A�V�K���߂Ƃ��ēo�^
-			���邱�Ƃ��ł��A�p�����[�^��n������A�󂯎�����肷�邱�Ƃ��\�ł��B
+			HSPモジュール機能を使うと、「test1.as」から「test2.as」のスクリプトを
+			呼び出すことが可能になりますが、「test1.as」と「test2.as」で使われて
+			いる変数は(たとえ名前が同じであっても)独立したものとして扱われます。
+			また、この独立したスクリプト内のサブルーチンを、新規命令として登録
+			することができ、パラメータを渡したり、受け取ったりすることが可能です。
 		</p>
 		<p>
-			�ߋ��ɍ�������W���[�����ė��p������A�l�Ɏg���Ă��炤���߂Ɍ��J������A
-			�N�����̐l����������W���[�����g���ȂǁAHSP�X�N���v�g�����L�����p
-			���邱�Ƃ��\�ɂȂ�܂��B
+			過去に作ったモジュールを再利用したり、人に使ってもらうために公開したり、
+			誰か他の人が作ったモジュールを使うなど、HSPスクリプトをより広く応用
+			することが可能になります。
 		</p>
 		<p>
-			HSP���W���[�����g�����Ȃ����߂ɂ́A���[�U�[�g�����߁A���W���[���C��
-			�|�[�g���߂Ȃǂ��g���K�v������܂��B�����́A�P�̂ł��֗���
-			�@�\��񋟂��閽�߂ł��B��x�Ɋo���悤�Ƃ��Ȃ��ŁA�킩��Ƃ��납��1��
-			1�}�X�^�[���Ă����܂��傤�B
+			HSPモジュールを使いこなすためには、ユーザー拡張命令、モジュールイン
+			ポート命令などを使う必要があります。これらは、単体でも便利な
+			機能を提供する命令です。一度に覚えようとしないで、わかるところから1つ
+			1つマスターしていきましょう。
 		</p>
 		
-		<h2 id="USERDEF">���[�U�[��`���߂ɂ���</h2>
+		<h2 id="USERDEF">ユーザー定義命令について</h2>
 		<p>
-			���[�U�[��`���߂́AHSP���W���[���@�\�ƂƂ��ɒǉ����ꂽ���߂�1�ŁA
-			�V�������O�̖��߂����[�U�[���C�ӂɒǉ��ł���Ƃ������̂ł��B
-			����́AHSP���W���[���@�\�Ƃ͕ʂɒP�̂Ŏg���Ă����ɋ��͂Ȃ��̂�
-			�Ȃ�ł��傤�B
+			ユーザー定義命令は、HSPモジュール機能とともに追加された命令の1つで、
+			新しい名前の命令をユーザーが任意に追加できるというものです。
+			これは、HSPモジュール機能とは別に単体で使っても非常に強力なものと
+			なるでしょう。
 		</p>
 		<p>
-			���[�U�[��`���߂́A�ȉ��̂悤�Ɏg���܂��B
+			ユーザー定義命令は、以下のように使います。
 		</p>
 		<pre>    goto *main
 
@@ -112,17 +112,17 @@
     routine
     stop</pre>
 		<p>
-			HSP�̖��߂ɂ́uroutine�v�͂���܂��񂩂�A���܂܂łȂ�G���[�ɂȂ���
-			���܂��Ƃ���ł����A���ۂɂ��̃X�N���v�g�����s����ƁA�usub-routine�v
-			�Ƃ����\��������āA�uroutine�v�Ƃ������߂����s����܂��B
+			HSPの命令には「routine」はありませんから、いままでならエラーになって
+			しまうところですが、実際にこのスクリプトを実行すると、「sub-routine」
+			という表示がされて、「routine」という命令が実行されます。
 		</p>
 		<p>
-			���[�U�[��`���߂́A�u#deffunc�v�Ƃ������߂ɂ���Ē�`�ł��܂��B
-			<code>#deffunc ���߂̖��O</code>
-			�ŁA�V�������O�̖��߂��ǉ�����܂��B
-			����ȍ~�A�V�������߂��o�Ă����ꍇ�ɂ́A�u#deffunc�v�̂���ꏊ��
-			�T�u���[�`���W�����v���܂��B
-			�܂�A
+			ユーザー定義命令は、「#deffunc」という命令によって定義できます。
+			<code>#deffunc 命令の名前</code>
+			で、新しい名前の命令が追加されます。
+			これ以降、新しい命令が出てきた場合には、「#deffunc」のある場所に
+			サブルーチンジャンプします。
+			つまり、
 		</p>
 		<pre>    goto *main
 
@@ -133,7 +133,7 @@
 *main
     gosub *routine</pre>
 		<p>
-			�̂悤�ȃX�N���v�g�ł��A
+			のようなスクリプトでも、
 		</p>
 		<pre>    goto *main
 
@@ -144,247 +144,247 @@
 *main
     routine</pre>
 		<p>
-			�ł������Ƃ������Ƃł��B
+			でも同じということです。
 		</p>
 		<p>
-			�܂����[�U�[��`���߂́A�T�u���[�`���Ƀp�����[�^��n�����Ƃ�
-			�\�ɂ��Ă��܂��B
+			またユーザー定義命令は、サブルーチンにパラメータを渡すことを
+			可能にしています。
 		</p>
 		<pre>    goto *main
 
 #deffunc routine int prm1, int prm2
-    mes "�p�����[�^1�́A"+prm1+"�ł��B"
-    mes "�p�����[�^2�́A"+prm2+"�ł��B"
+    mes "パラメータ1は、"+prm1+"です。"
+    mes "パラメータ2は、"+prm2+"です。"
     return
 
 *main
     routine 10,20</pre>
 		<p>
-			���܂܂ł�gosub���߂ł́A�l���T�u���[�`���ɓn�����ɂ́A���炩����
-			���߂�ꂽ�ϐ��ɒl�����āA�Ăяo����������܂���ł����B
-			���[�U�[��`���߂ł́A����ɑ����ăX�}�[�g�ȕ��@�Œl��n�����Ƃ�
-			�\�ɂ��Ă��܂��B
+			いままでのgosub命令では、値をサブルーチンに渡す時には、あらかじめ
+			決められた変数に値を入れて、呼び出すしかありませんでした。
+			ユーザー定義命令では、それに代わってスマートな方法で値を渡すことを
+			可能にしています。
 		</p>
 		<p>
-			�܂��A�n���p�����[�^�͐��l�����łȂ��A������A�ϐ�(�z��)�Ȃ�
-			�������̃o���G�[�V����������܂��B�܂��A�T�u���[�`������߂�ۂ�
-			�V�X�e���ϐ�stat�ɒl����������A�p�����[�^�Ƃ��Ďw�肵���ϐ���
-			�l�������߂����Ƃ��\�ł��B
+			また、渡すパラメータは数値だけでなく、文字列、変数(配列)など
+			いくつものバリエーションがあります。また、サブルーチンから戻る際に
+			システム変数statに値を代入したり、パラメータとして指定した変数に
+			値を書き戻すことも可能です。
 		</p>
 		<p>
-			���̃p�����[�^�[�́A�G�C���A�X�Ƃ��Ă΂�Ă��āA#deffunc���߂ɂ��
-			�V�K���߂��`����ۂɐݒ肷�邱�Ƃ��ł��܂��B
+			このパラメーターは、エイリアスとも呼ばれていて、#deffunc命令により
+			新規命令を定義する際に設定することができます。
 		</p>
-		<pre>#deffunc ���ߖ� �p�����[�^�[�^ �G�C���A�X��,�c</pre>
+		<pre>#deffunc 命令名 パラメーター型 エイリアス名,…</pre>
 		<p>
-			�̂悤�ɋL�q���邱�ƂŁA�w�肳�ꂽ�p�����[�^�[�^���擾���āA
-			�G�C���A�X���ŎQ�Ƃ��邱�Ƃ��ł���悤�ɂȂ�܂��B
-			�ڂ����́A�u#deffunc���ߏڍׁv���Q�Ƃ��Ă��������B
+			のように記述することで、指定されたパラメーター型を取得して、
+			エイリアス名で参照することができるようになります。
+			詳しくは、「#deffunc命令詳細」を参照してください。
 		</p>
 		<p>
-			�܂��AHSP3.0����́A#defcfunc���߂ɂ�胆�[�U�[���֐����`���邱�Ƃ�
-			�\�ɂȂ��Ă��܂��B������A#deffunc���߂Ɠ��l�̎w��ŁA�ȒP�Ɋ֐���
-			�ǉ����邱�Ƃ��ł��܂��B
+			また、HSP3.0からは、#defcfunc命令によりユーザーが関数を定義することが
+			可能になっています。これも、#deffunc命令と同様の指定で、簡単に関数を
+			追加することができます。
 		</p>
 
-		<h2 id="BASIC">���W���[���̎g����(��{)</h2>
+		<h2 id="BASIC">モジュールの使い方(基本)</h2>
 		<p>
-			���W���[���́A�ϐ����⃉�x�������Ɨ����Ĉ�����\�[�X�̒P�ʂ��w���܂��B
-			���������ł��ȒP�ȃ��W���[���̎g�����́A���W���[��������1��
-			�\�[�X�X�N���v�g�t�@�C��(as�t�@�C��)�ɂ��Ă����A�ʂȃt�@�C������
-			���W���[���Ƃ��ČĂяo�����Ƃł��B
-			���Ƃ��΁Atest1.as�Ƃ����t�@�C���Ƀ��W���[���ƂȂ�\�[�X�������܂��B
+			モジュールは、変数名やラベル名が独立して扱えるソースの単位を指します。
+			推奨される最も簡単なモジュールの使い方は、モジュール部分を1つの
+			ソーススクリプトファイル(asファイル)にしておき、別なファイルから
+			モジュールとして呼び出すことです。
+			たとえば、test1.asというファイルにモジュールとなるソースを書きます。
 		</p>
-		<pre>// test1.as�̓��e
+		<pre>// test1.asの内容
 
 #module
 #deffunc test1
-    mes "test1.as�ŕ\�����Ă��܂��B"
+    mes "test1.asで表示しています。"
     return
 #global</pre>
 		<p>
-			���W���[���́A�K���u#module�v�Ŏn�܂�u#global�v���Ō�ɏ����̂�
-			���񑩂��Ǝv���ĉ������B
+			モジュールは、必ず「#module」で始まり「#global」を最後に書くのが
+			お約束だと思って下さい。
 		</p>
 		<p>
-			���̂悤�ɋL�q����ƁA���W���[�����Ɂutest1�v�Ƃ������߂ŌĂяo��
-			���Ƃ̂ł���T�u���[�`�����ł�������܂��B
-			���ɁA������Ăяo�����߂̃\�[�X���utest2.as�v�Ƃ����t�@�C����
-			�����Ă݂܂��傤�B
+			このように記述すると、モジュール内に「test1」という命令で呼び出す
+			ことのできるサブルーチンができあがります。
+			次に、これを呼び出すためのソースを「test2.as」というファイルに
+			書いてみましょう。
 		</p>
-		<pre>// test2.as�̓��e
+		<pre>// test2.asの内容
 
 #include "test1.as"
-    mes "test2.as�ł��B"
+    mes "test2.asです。"
     test1
     stop</pre>
 		<p>
-			�u#include�v���߂Ń��W���[����o�^���邽�߂̃\�[�X�utest1.as�v��
-			�ǂݍ���ł��܂��B
+			「#include」命令でモジュールを登録するためのソース「test1.as」を
+			読み込んでいます。
 		</p>
 		<p>
-			���̌�A�utest1�v�Ƃ������߂������ꂽ�s���o�Ă��܂��B
-			����̓��[�U�[��`���߂Ȃ̂�(�ڂ����́u���[�U�[��`���߂ɂ��āv
-			���Q��)�A�utest1.as�v�̃T�u���[�`�����Ăяo����܂��B
-			���ۂɂ��̃X�N���v�g�����s����ƁA
+			この後、「test1」という命令が書かれた行が出てきます。
+			これはユーザー定義命令なので(詳しくは「ユーザー定義命令について」
+			を参照)、「test1.as」のサブルーチンが呼び出されます。
+			実際にこのスクリプトを実行すると、
 		</p>
-		<pre>test2.as�ł��B
-test1.as�ŕ\�����Ă��܂��B</pre>
+		<pre>test2.asです。
+test1.asで表示しています。</pre>
 		<p>
-			�Ƃ���2�̍s�������Atest2.as����test1.as�̃��W���[�����Ăяo���ꂽ
-			���Ƃ��킩��܂��B
+			という2つの行が現われ、test2.asからtest1.asのモジュールが呼び出された
+			ことがわかります。
 		</p>
 		<p>
-			���̊�{�I�ȗ�ł́A���b�Z�[�W��\�����Ă��邾���Ȃ̂ŁAgosub���߂ɂ��
-			�T�u���[�`���Ăяo���ƁA���܂�ς���Ă��炸�A���W���[���Ƃ��Ă̈З͂�
-			��������Ă��܂���B
-			�ł́A���̗�ł͂ǂ��ł��傤���B
+			この基本的な例では、メッセージを表示しているだけなので、gosub命令による
+			サブルーチン呼び出しと、あまり変わっておらず、モジュールとしての威力は
+			発揮されていません。
+			では、次の例ではどうでしょうか。
 		</p>
-		<pre>// test1.as�̓��e
+		<pre>// test1.asの内容
 
 #module
 #deffunc test1
     a=456
-    mes "test1�ł́A"
-    mes "A="+a+"�ł��B"
+    mes "test1では、"
+    mes "A="+a+"です。"
     return
 #global</pre>
-		<pre>// test2.as�̓��e
+		<pre>// test2.asの内容
 
 #include "test1.as"
     a=123
     test1
-    mes "test2�ł́A"
-    mes "A="+a+"�ł��B"
+    mes "test2では、"
+    mes "A="+a+"です。"
     stop</pre>
 		<p>
-			����Łutest2.as�v�����s���Ă݂�ƁA
+			これで「test2.as」を実行してみると、
 		</p>
-		<pre>test1�ł́A
-A=456�ł��B
-test2�ł́A
-A=123�ł��B</pre>
+		<pre>test1では、
+A=456です。
+test2では、
+A=123です。</pre>
 		<p>
-			�ƂȂ�܂��B���ʂȂ�΁A��Ɂutest1.as�v���ŕϐ�a��456����������
-			����̂ŁA�utest2.as�v�ł������l�ɂȂ�Ƃ���ł����A���W���[����
-			���ƊO�ł͖��O���Ɨ����Ă���̂ŁA�����ϐ�a�ł��A�utest1.as�v�ƁA
-			�utest2.as�v�ł͕ʁX�̓��e��ێ����Ă��܂��B
-		</p>
-		<p>
-			���̂悤�ɁA<em>�ϐ��⃉�x���̖��O���d�����Ă��Ă��A�܂��������Ȃ�
-			���ꂼ��̃X�N���v�g�����삷��</em>�Ƃ����_���A���W���[���̊�{�I�ȊT�O
-			�ł��B
+			となります。普通ならば、先に「test1.as」側で変数aに456が代入されて
+			いるので、「test2.as」でも同じ値になるところですが、モジュールの
+			中と外では名前が独立しているので、同じ変数aでも、「test1.as」と、
+			「test2.as」では別々の内容を保持しています。
 		</p>
 		<p>
-			�������A�ϐ����Ɨ����Ă���ƍ��镔��������܂��B���W���[�����Ăяo����
-			���炩�̌��ʂ𓾂����ꍇ��A���W���[���ɒl��n���������Ƃ�����܂��B
+			このように、<em>変数やラベルの名前が重複していても、まったく問題なく
+			それぞれのスクリプトが動作する</em>という点が、モジュールの基本的な概念
+			です。
 		</p>
 		<p>
-			���́A���̂��߂̋@�\�����[�U�[��`���߂ɗp�ӂ���Ă��āA�ʂȃ��W
-			���[���Ƃ̃p�����[�^�̂����Ɏg�����Ƃ��ł��܂��B
+			しかし、変数が独立していると困る部分もあります。モジュールを呼び出して
+			何らかの結果を得たい場合や、モジュールに値を渡したいこともあります。
 		</p>
-		<pre>// test1.as�̓��e
+		<p>
+			実は、このための機能がユーザー定義命令に用意されていて、別なモジ
+			ュールとのパラメータのやり取りに使うことができます。
+		</p>
+		<pre>// test1.asの内容
 
 #module
 #deffunc test1 int prm1
-    mes "�p�����[�^�́A"+prm1+"�ł��B"
+    mes "パラメータは、"+prm1+"です。"
     return 1
 #global</pre>
 
-		<pre>// test2.as�̓��e
+		<pre>// test2.asの内容
 
 #include "test1.as"
     a=543
     test1 a
-    mes "STAT�́A"+stat+"�ł��B"
+    mes "STATは、"+stat+"です。"
     stop</pre>
 		<p>
-			��̗�ł́A���[�U�[��`����test1�̌Ăяo���ŁA�utest1 a�v�Ƃ���
-			�p�����[�^�t���̋L�q�ŁA�ϐ�a�̓��e�A543�Ƃ����l��n���Ă��܂��B
-			�utest1.as�v�ł́A���̓n���ꂽ�l���Aprm1�Ƃ����G�C���A�X���ɂ����
-			���o���A����ɁA�V�X�e���ϐ�stat�ɒl1�������ďI�����܂��B
+			上の例では、ユーザー定義命令test1の呼び出しで、「test1 a」という
+			パラメータ付きの記述で、変数aの内容、543という値を渡しています。
+			「test1.as」では、この渡された値を、prm1というエイリアス名によって
+			取り出し、さらに、システム変数statに値1を代入して終了します。
 		</p>
 		<p>
-			�d�v�Ȃ��Ƃ́A�utest2.as�v�ł́utest1.as�v�Ŏg���Ă���ϐ���
-			�Ȃǂ͋C�ɂ���K�v���Ȃ����Ƃł��B
-			���l�ɁA�utest1.as�v������Ăяo�����Ƃ̕ϐ������d�Ȃ邱�Ƃ�
-			�C�ɂ���K�v������܂���B
-			�Ɨ������@�\���������T�u���[�`�����A���S�ɕ������Ă��܂����Ƃ�
-			HSP���W���[���@�\�Ȃ̂ł��B
+			重要なことは、「test2.as」では「test1.as」で使われている変数名
+			などは気にする必要がないことです。
+			同様に、「test1.as」からも呼び出す側との変数名が重なることを
+			気にする必要がありません。
+			独立した機能を持ったサブルーチンを、完全に分離してしまうことが
+			HSPモジュール機能なのです。
 		</p>
 		<p>
-			�ȏオ��{�I�ȃ��W���[���̎g�����ł��B
-			����Ȃ鉞�p�ɂ��ẮA���̍������Ă��������B
+			以上が基本的なモジュールの使い方です。
+			さらなる応用については、次の項を見てください。
 		</p>
 
-		<h2 id="APP">���W���[���̎g����(���p)</h2>
+		<h2 id="APP">モジュールの使い方(応用)</h2>
 <p>
-	��{�̐����ł́A1�̃��W���[����1�̖��߂������`���Ă��܂������A
-	1�̃��W���[���̒��ɁA�����̃��[�U�[��`���߂���邱�Ƃ��ł��܂��B
+	基本の説明では、1つのモジュールに1つの命令だけを定義していましたが、
+	1つのモジュールの中に、複数のユーザー定義命令を作ることもできます。
 </p>
-<pre>// test1.as�̓��e
+<pre>// test1.asの内容
 
 #module
 #deffunc test1
-    mes "test1�ŕ\�����Ă��܂��B"
+    mes "test1で表示しています。"
     return
 
 #deffunc test2
-    mes "test2�ŕ\�����Ă��܂��B"
+    mes "test2で表示しています。"
     return
 #global</pre>
 <p>
-	��̗�ł́A�utest1�v�Ɓutest2�v�Ƃ������߂��V���ɒǉ�����܂��B
-	���̏ꍇ�A�utest1�v�Ɓutest2�v�̊Ԃł͕ϐ����⃉�x�����͓������̂�
-	�Ȃ�܂��B
+	上の例では、「test1」と「test2」という命令が新たに追加されます。
+	この場合、「test1」と「test2」の間では変数名やラベル名は同じものに
+	なります。
 </p>
 <p>
-	�utest1�v�Ɓutest2�v�ł�͂�Ɨ������ϐ����⃉�x�������g�������ꍇ�́A
+	「test1」と「test2」でやはり独立した変数名やラベル名を使いたい場合は、
 </p>
 <pre>#module
 #deffunc test1
-    mes "test1�ŕ\�����Ă��܂��B"
+    mes "test1で表示しています。"
     return
 #global
 
 #module
 #deffunc test2
-    mes "test2�ŕ\�����Ă��܂��B"
+    mes "test2で表示しています。"
     return
 #global</pre>
 		<p>
-			���̂悤�ɋL�q���邱�ƂŎ����ł��܂��B
-			�܂胂�W���[���Ƃ́A�u#module�v�`�u#global�v�ŋ�؂�ꂽ��Ԃ�
-			����ȊO�̋�Ԃ��܂������ʂȐ��E�ƍl����悤�Ɏw�����o���Ă���
-			���ƂȂ̂ł��B
+			このように記述することで実現できます。
+			つまりモジュールとは、「#module」～「#global」で区切られた区間と
+			それ以外の区間をまったく別な世界と考えるように指示を出している
+			ことなのです。
 		</p>
 		<p>
-			��{�̐����ł́A�utest1.as�v�Ɓutest2.as�v�Ƃ���2�̃t�@�C����
-			���W���[���ƁA�����łȂ�����(�O���[�o���̈�)�𕪂��Đ�������
-			���܂����B���ۂ̂Ƃ���utest1.as�v���C���N���[�h���邱�ƂȂ�
-			1�̃t�@�C�����ł����W���[�����ǂ�ǂ����Ă������Ƃ��\�ł����A
-			�Ȃ�ׂ�1�̃t�@�C���ɂ�1�̃��W���[���݂̂ɂ��āA1�̃\�[�X
-			�X�N���v�g�ł͕ϐ����ƃ��x�����𓝈ꂵ�����������ł��傤�B
-			���Ƀ��x�����́A1�̃\�[�X�X�N���v�g���ɓ������x����������
-			����ƍ����������܂��B
+			基本の説明では、「test1.as」と「test2.as」という2つのファイルに
+			モジュールと、そうでない部分(グローバル領域)を分けて説明して
+			いました。実際のところ「test1.as」をインクルードすることなく
+			1つのファイル内でもモジュールをどんどん作っていくことも可能ですが、
+			なるべく1つのファイルには1つのモジュールのみにして、1つのソース
+			スクリプトでは変数名とラベル名を統一した方がいいでしょう。
+			特にラベル名は、1つのソーススクリプト内に同じラベルがいくつも
+			あると混乱を招きます。
 		</p>
 		<p>
-			���W���[�����̕ϐ��́A��{�I�ɂ��ׂĐÓI(static)�ɋ��L����Ă��܂��B
-			�܂��x�ݒ肳�ꂽ�ϐ��́A���̒l���������Ȃ�����A���e������
-			���Ƃ͂���܂���B���̂��߁A�ċA�Ăяo��(�������g���Ăяo������)
-			���s�Ȃ��ꍇ�ɂ͒��ӂ��K�v�ł��B
+			モジュール内の変数は、基本的にすべて静的(static)に共有されています。
+			つまり一度設定された変数は、他の値が代入されない限り、内容を失う
+			ことはありません。このため、再帰呼び出し(自分自身を呼び出すこと)
+			を行なう場合には注意が必要です。
 		</p>
 		<p>
-			���ꂼ��̒�`���ߓ��ł́Alocal�錾�ɂ�薾���I�Ƀ��[�J���ȕϐ���
-			�쐬���邱�Ƃ��ł��܂��B�ċA�Ăяo�����s�Ȃ��ꍇ�ɂ́A�K��������
-			�g�p����ϐ������[�J���ɂ���悤�ɂ��Ă��������B
-			(���[�J���錾���s�Ȃ��ƁA�ϐ��̐����Ɣj���̂��߂ɒʏ����
-			���s�R�X�g�������邱�Ƃ����ӂ��Ă����Ă��������B)
+			それぞれの定義命令内では、local宣言により明示的にローカルな変数を
+			作成することができます。再帰呼び出しを行なう場合には、必ず内部で
+			使用する変数をローカルにするようにしてください。
+			(ローカル宣言を行なうと、変数の生成と破棄のために通常よりも
+			実行コストがかかることも留意しておいてください。)
 		</p>
 		
-		<h2 id="MODDEF">���W���[����`����</h2>
+		<h2 id="MODDEF">モジュール定義命令</h2>
 		<p>
-			HSP3�ł̓��W���[����`���߂Ƃ��āA�ȉ��̃v���v���Z�b�T���߂��p�ӂ���Ă��܂��B
+			HSP3ではモジュール定義命令として、以下のプリプロセッサ命令が用意されています。
 		</p>
 		<ul>
 			<li>#module</li>
@@ -393,80 +393,80 @@ A=123�ł��B</pre>
 			<li>#defcfunc</li>
 		</ul>
 		<p>
-			�e���߂̎g�����̓w���v�u���E�U����m�F���Ă��������B
+			各命令の使い方はヘルプブラウザから確認してください。
 		</p>
 		<!--
-			OpenHSP Project�����R�����g�F
-				���̐߂̂ݑ啝�ȕύX�������Ă��܂��B
-				�قڂ��ׂ�hs�t�@�C���Ɠ����̓��e���������߁A��������Q�Ƃ���悤�U�����Ă��܂��B
+			OpenHSP Project向けコメント：
+				この節のみ大幅な変更を加えています。
+				ほぼすべてhsファイルと同等の内容だったため、そちらを参照するよう誘導しています。
 				2008.01.23 eller
-				�������̕�����\�肵�Ă��܂��B
+				説明文の復活を予定しています。
 				2008.03.28 eller
 		-->
 
-		<h2 id="CLEANUP">���W���[���̃N���[���A�b�v�@�\�ɂ���</h2>
+		<h2 id="CLEANUP">モジュールのクリーンアップ機能について</h2>
 		<p>
-			�N���[���A�b�v�@�\�́AHSP�v���O�������I�����钼�O�Ƀ��W���[�����̃X�N���v�g��
-			�����I�ɌĂяo�������̂ŁA���W���[���ɂ���ċ@�\���g�������ꍇ�Ȃǂɂ��̌�n���A
-			�V�X�e���⃁�����̉���Ȃǂ��s�Ȃ���悤�ɂ������̂ł��B������N���[���A�b�v�@�\��
-			�Ă�ł��܂��B���̋@�\���g���ɂ́A���W���[�����ł̃��[�U�[��`���ߐ錾���ɁA
+			クリーンアップ機能は、HSPプログラムが終了する直前にモジュール内のスクリプトが
+			自動的に呼び出されるもので、モジュールによって機能を拡張した場合などにその後始末、
+			システムやメモリの解放などが行なえるようにしたものです。これをクリーンアップ機能と
+			呼んでいます。この機能を使うには、モジュール内でのユーザー定義命令宣言時に、
 		</p>
-		<pre>#deffunc ���O onexit</pre>
+		<pre>#deffunc 名前 onexit</pre>
 		<p>
-			�̂悤�ɁA�������L�q���镔���Ɂuonexit�v�����Ă����Ă��������B
-			HSP�̃v���O�������I�������ꍇ�ɁA���̖��߂������I�Ɏ��s����܂��B
-			�������A���̖��ߓ��ł͈ȉ��̓_�ɒ��ӂ��Ă��������B
+			のように、引数を記述する部分に「onexit」を入れておいてください。
+			HSPのプログラムが終了した場合に、その命令が自動的に実行されます。
+			ただし、この命令内では以下の点に注意してください。
 		</p>
 		<ul>
-			<li>end�Astop�Await�Aawait�Adialog�Ȃǎ��ԑ҂����N���閽�߂͎g�p�ł��܂���</li>
-			<li>mes�Ȃǉ�ʂɏo�͂��閽�߂͋@�\���܂���</li>
+			<li>end、stop、wait、await、dialogなど時間待ちが起こる命令は使用できません</li>
+			<li>mesなど画面に出力する命令は機能しません</li>
 		</ul>
 		<p>
-			�܂�Œ���̃����������O��DLL�̌Ăяo���ȂǍŏI�I�ɍs�Ȃ����Ƃ�����
-			�L�q������̂ƍl���ĉ������B
-			���l�̓����������̂�onexit���߂�����܂����A�V�X�e���̏����Ƃ��Ă�
+			つまり最低限のメモリ解放や外部DLLの呼び出しなど最終的に行なわれる作業だけを
+			記述するものと考えて下さい。
+			同様の動作をするものにonexit命令がありますが、システムの処理としては
 		</p>
 		<ol>
-			<li>[HSP�̃v���O�����𒆒f]</li>
-			<li>[onexit���߂̔�ѐ�����s]</li>
-			<li>[���W���[���̃N���[���A�b�v������s]</li>
-			<li>[HSP���\�[�X�̊��S�Ȕj��]</li>
+			<li>[HSPのプログラムを中断]</li>
+			<li>[onexit命令の飛び先を実行]</li>
+			<li>[モジュールのクリーンアップ先を実行]</li>
+			<li>[HSPリソースの完全な破棄]</li>
 		</ol>
 		<p>
-			�Ƃ������ԂɂȂ��Ă��܂��B
-			onexit���߂̔�ѐ�ł́A�v���O�����𒆒f���邱�Ǝ��̂𒆎~���邱�Ƃ�
-			�\�ł����A�N���[���A�b�v�@�\�̏ꍇ�͒��f�͂ł��܂���B
-			�܂��A�����̃��W���[����A�����̃N���[���A�b�v���߂��o�^���ꂽ�ꍇ�ɂ́A
-			�o�^���ꂽ���ԂƂ͋t���ɒH���Ď��X�Ɏ��s����Ă����܂��B
+			という順番になっています。
+			onexit命令の飛び先では、プログラムを中断すること自体を中止することも
+			可能ですが、クリーンアップ機能の場合は中断はできません。
+			また、複数のモジュールや、複数のクリーンアップ命令が登録された場合には、
+			登録された順番とは逆順に辿って次々に実行されていきます。
 		</p>
 
-		<h2 id="MODNAME">�W���L�[���[�h�Ɓu@hsp�v���W���[�����ɂ���</h2>
+		<h2 id="MODNAME">標準キーワードと「@hsp」モジュール名について</h2>
 		<p>
-			�W���L�[���[�h�́u@hsp�v�Ƃ������W���[�����̋�ԂɊ��蓖�Ă��Ă��܂��B
-			����́A���Ƃ���mes���߂ł���΁A�umes@hsp�v�Ƃ������O�������Ȗ��̂ł��邱�Ƃ��Ӗ����܂��B
-			�������A�ʏ�̃O���[�o���ȋ�Ԃł��g�p�ł���悤�Ɂu@hsp�v���Ȃ����̂��ʖ��Ƃ��ēo�^����Ă���̂ŁA
-			���܂܂Œʂ�̖��ߖ��ł��̂܂܎g�p���邱�Ƃ��ł��܂��B
+			標準キーワードは「@hsp」というモジュール名の空間に割り当てられています。
+			これは、たとえばmes命令であれば、「mes@hsp」という名前が正式な名称であることを意味します。
+			ただし、通常のグローバルな空間でも使用できるように「@hsp」がない名称も別名として登録されているので、
+			いままで通りの命令名でそのまま使用することができます。
 		</p>
 		<p>
-			���Ƃ��΁Ames���߂ł���΁u#define global mes mes@hsp�v���ŏ������`����Ă���̂Ɠ����ł��B
-			(�v���v���Z�b�T������ɁA�W���L�[���[�h�́u@hsp�v���t����ꂽ���K�̖��̂ɓW�J����܂��B
-			�ݒ�ɂ���ăR���p�C�����ɏo�͂ł���uhsptmp.i�v���J���Ă݂�Ƃ킩��Ǝv���܂��B)
+			たとえば、mes命令であれば「#define global mes mes@hsp」が最初から定義されているのと同じです。
+			(プリプロセッサ処理後に、標準キーワードは「@hsp」が付けられた正規の名称に展開されます。
+			設定によってコンパイル時に出力できる「hsptmp.i」を開いてみるとわかると思います。)
 		</p>
 		<p>
-			����ɂ��A�W���L�[���[�h�Ƃ��ēo�^����Ă��閼�̂��̂��̂�ʖ��ɂ�����A
-			���[�U�[����`���������Ƃ��\�ɂȂ�܂��B
-			�ȉ��́Ames���߂��}�N���ɂ��u�������Ă����ł��B
+			これにより、標準キーワードとして登録されている名称そのものを別名にしたり、
+			ユーザーが定義し直すことが可能になります。
+			以下は、mes命令をマクロにより置き換えている例です。
 		</p>
 		<pre>#undef mes
 #define mes(%1) mes@hsp "MES-&gt;"+%1
-    mes "���b�Z�[�W�ł��B"  // �uMES-&gt;���b�Z�[�W�ł��B�v�ƕ\��
+    mes "メッセージです。"  // 「MES-&gt;メッセージです。」と表示
     stop</pre>
 		<p>
-			�umes�v�Ƃ����L�[���[�h���A#undef���߂ɂ�����������A�Ē�`���Ă��܂��B
-			HSP�Ŏg�p�����W���L�[���[�h���ׂẮA���l�Ɏ������A�Ē�`���邱�Ƃ��\�ł��B
+			「mes」というキーワードを、#undef命令により取り消した後、再定義しています。
+			HSPで使用される標準キーワードすべては、同様に取り消し、再定義することが可能です。
 		</p>
 		<p>
-			�ȉ��́Ames���߂����[�U�[��`���߂ɒu�������Ă����ł��B
+			以下は、mes命令をユーザー定義命令に置き換えている例です。
 		</p>
 	<pre>#undef mes
 #module
@@ -482,18 +482,18 @@ A=123�ł��B</pre>
     mes@hsp _p1
     return
 #global
-    mes "mes���߂��e�����ɂ��Ă݂܂����B"</pre>
+    mes "mes命令を影文字にしてみました。"</pre>
 		<p>
-			�W���L�[���[�h�̍Ē�`�́A����ȍ~�̃L�[���[�h���ׂĂɉe�������邽�ߒ��ӂ��Ďg�p���Ă��������B
+			標準キーワードの再定義は、それ以降のキーワードすべてに影響があるため注意して使用してください。
 		</p>
 
-		<!-- �t�b�^�[ -->
+		<!-- フッター -->
 		<ul id="FOOTER">
-			<li><a href="#CONTAINER">���̃y�[�W��1�ԏ�ɖ߂�</a></li>
-			<li><a href="../index.htm">�h�L�������g�̈ꗗ�ɖ߂�</a></li>
-			<li><a href="http://hsp.tv/">Go to HSPTV page</a></li>
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="../index.htm">ドキュメントの一覧に戻る</a></li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
 		</ul>
-		<a href="http://www.onionsoft.net/hsp/">
+		<a href="https://www.onionsoft.net/hsp/">
 			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
 		</a>
 	</div><!-- container -->

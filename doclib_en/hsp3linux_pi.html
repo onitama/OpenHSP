@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP3,HotSoupProcessor,Linux,Raspberry Pi">
+<meta name = "description" content = "List of documents about HSP3">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HSP3 for Linux/Raspberry Pi</title>
+</head>
+<body>
+	<div id="CONTAINER">
+<!-Header->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<h1>HSP3 for Linux/Raspberry Pi</h1>
+		
+<!-Body->
+
+<h2 id = "BRIEF"> Introduction </h2>
+		<p>
+HSP3 for Linux / Raspberry Pi is a development environment for Hot Soup Processor (HSP) that runs on Linux GUI environment (X Window System) and Raspberry Pi (Raspbian). <br>
+Development is proceeding with the aim of supporting the development environment of HSP3 on Linux, which is inexpensive and has a wide range of environments.
+<a href="https://www.raspberrypi.org/" target="_blank"> Raspberry Pi </a> is attracting attention in the fields of IoT and programming education as a very compact and inexpensive device. I am. <br>
+Even now, we have prepared the execution environment for Android, iOS, WebGL (html5), etc. through the runtime <a href="hsp3dish.html" target="_blank"> HSP3Dish </a> as well as Windows. ,
+We will newly improve it so that it can be used in Linux and Raspbian (OS on Raspberry Pi) environment.
+		<br>
+		<br><img src="image/hsp_pi.jpg"><br><br>
+As the first version, we have released a preview version that includes a simple script editor and the HSP3Dish / HGIMG4 execution environment.
+We plan to expand support with HSP3 for Windows, so please look forward to it.
+		<br>
+		<br>
+The latest version is available on github with the source code. <BR>
+If you are using Raspberry Pi, please go to <a href="https://junji.jp/hsp/" target="_blank"> JBOYSOFT's "Introduction to Beginners HSP Programming Raspberry Pi Version" page </a> The introduction is explained.
+		<br>
+		<br>
+		</p>
+
+								<table>
+									<tr>
+										<td><img src="image/btn_next.gif" alt="" height="29" width="29" border="0"></td>
+<td> <font size = "-1"> <a href="https://junji.jp/hsp/" target="_blank"> Introduction to beginners HSP programming Raspberry Pi version by JBOYSOFT </a> </font> > </td>
+									</tr>
+								</table>
+								<br clear="all">
+
+<h2 id = "DATA"> Linux installation </h2>
+		<p>
+It works in the Linux GUI environment (X Window System). Some features work using OpenGL and SDL libraries.
+If you can connect to the network, get the repository directly with the git command.
+		</p><pre>
+	git clone http://github.com/onitama/OpenHSP
+		</pre><p>
+If you have an archive, extract the contents to any directory and compile the source. To compile, you need an environment where you can run gcc and make.
+The following libraries are required when compiling, so please check in advance.
+		</p><pre>
+OpenGL ES2.0 or later / EGL
+	SDL1.2
+	gtk+-2
+		</pre><p>
+For Debian (Ubuntu), you can install the library from the package manager as follows.
+		</p><pre>
+	sudo apt-get update
+	sudo apt-get install libgtk2.0-dev
+	sudo apt-get install libglew-dev
+	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
+	sudo apt-get install libgles2-mesa-dev libegl1-mesa-dev
+		</pre><p>
+The repository contains only the source, so you need to compile it with make.
+(If it doesn't compile correctly depending on your Linux version or distribution, you'll need to fix it.)
+		</p><pre>
+	cd OpenHSP
+	make
+		</pre><p>
+The necessary tools have been compiled and HSP3 is ready for use.
+		</p>
+
+
+<h2 id = "DATA"> Raspberry Pi installation </h2>
+		<p>
+		<img src="image/hsp_pi2.jpg" align="right">
+It runs on Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi4, Raspberry Pi zeo. <br>
+It runs on Raspbian OS. (Recommended version is September 2017 Kernel version 4.9 or later) <br>
+Please use it with Raspbian running and a keyboard and mouse connected in advance.
+		<br>
+hsp3dish, hsp3gp (HGIMG4) and hsed (script editor) only work in GUI environment. <br>
+Extract the latest version from github to any directory and compile the source. To compile, you need an environment where you can run gcc and make.
+		</p><pre>
+	git clone http://github.com/onitama/OpenHSP
+	cd OpenHSP
+		</pre><p>
+Additional libraries are required when compiling. Setup is executed by executing the following command while connected to the network.
+		</p><pre>
+	./pisetup.sh
+		</pre><p>
+The archive contains only the sources and must be compiled by make.
+(If it doesn't compile correctly depending on the version or distribution of Raspbian, you need to fix it.)
+		</p><pre>
+	make -f makefile.raspbian
+		</pre><p>
+Execute the make command in the directory where the contents of the archive are expanded.
+The necessary tools have been compiled and HSP3 is ready for use. <br>
+		</p><pre>
+* For Raspberry Pi 4, please install with make in the same way as Linux.
+* Raspberry Pi 4 does not support full-screen execution
+		</pre>
+
+<h2 id = "DATA"> Usage </h2>
+		<p>
+After installation, the following command will be generated.
+		</p><pre>
+hsed script editor (simplified version)
+hspcmp HSP3 code compiler
+hsp3cl HSP3 command line runtime
+hsp3dish HSP3Dish runtime
+hsp3gp HGIM G4 runtime
+		</pre><p>
+Script Editor (Simplified Version) is a GUI application that allows you to write and execute HSP3 scripts.
+It has basic script editing and load / save functions.
+You can start it with the following command.
+		</p><pre>
+	./hsed
+		</pre><p>
+You can run the script you are editing by pressing the [F5] key or selecting "Run" from the "HSP" menu.
+The current version uses hsp3dish as the standard runtime.
+The sample code corresponding to HSP3Dish is included in the sample folder, so please try it.
+The character code of the script is treated as UTF-8. Please note that it is different from the character code (SJIS) used by Windows.
+		<br><br>
+If you want to execute the script from the command line, you need to create an HSP object file with hspcmp.
+		</p><pre>
+	./hspcmp -d -i -u test.hsp
+		</pre><p>
+In the above example, the object file "test.ax" is generated from the "test.hsp" file.
+Pass the generated object file to the runtime for execution.
+		</p><pre>
+	./hsp3cl test.ax
+		</pre><p>
+In the above example, "test.ax" is run at the HSP3 command line runtime.
+Similarly, you can execute scripts tailored to the runtime such as "hsp3dish" and "hsp3gp".
+(A GUI environment is required to execute "hsp3dish" and "hsp3gp".)
+		<br><br>
+The Raspberry Pi version runs in full screen. To interrupt the execution, press [ctrl] + [C] or [esc]. Please note that you may not be able to interrupt if the keyboard is not recognized correctly. In addition to the GUI editor, it is also possible to execute in the form of "./hsp3dish ****. Ax" from the command line.
+		</p>
+		<table>
+				<tr>
+					<td><img src="image/btn_next.gif" alt="" height="29" width="29" border="0"></td>
+<td> <font size = "-1"> <a href="hsp3dish.html"> Go to the HSP3Dish page </a> </font> </td>
+				</tr>
+				<tr>
+					<td><img src="image/btn_next.gif" alt="" height="29" width="29" border="0"></td>
+<td> <font size = "-1"> <a href="http://www.onionsoft.net/hsp/v36/hsp3dish.htm"> HSP3Dish Online Manual </a> </font> </td >
+				</tr>
+			</table>
+		<br clear="all">
+
+
+<h2 id = "DATA"> About exec and devprm instructions </h2>
+		<p>
+Both the Linux version and the Raspberry Pi version can call shell commands with the exec command. It is also possible to output a character string to a device on the file system with the devprm instruction.
+		</p><pre>
+	devprm "/sys/class/gpio/export", "2"
+		</pre><p>
+If you write like, "2" will be output to "/ sys / class / gpio / export". It works the same as running "echo 2> / sys / class / gpio / export" from the shell.
+		</p>
+
+
+<h2 id = "DATA"> GPIO input / output of Raspberry Pi </h2>
+		<p>
+In Raspberry Pi version, GPIO input / output is extended by devcontrol (gpio) instruction. <br>
+To control GPIO output, write as follows.
+		</p><pre>
+devcontrol "gpio", port number, output value
+(It can also be described as "gpio port number, output value")
+		</pre><p>
+For the port number, specify the GPIO port numerically.
+For the output value, specify 1 (ON) or 0 (OFF) as a numerical value to control the output of the digital port.
+When inputting, describe as follows.
+		</p><pre>
+devcontrol "gpioin", port number
+(It is also possible to write "gpioin (port number)" as a function)
+		</pre><p>
+The system variable stat is assigned 0 or 1 after the instruction is executed.
+(If an error occurs, a negative value will be assigned.) <br>
+GPIO input / output can be used not only from hsp3dish but also from hsp3cl.
+		</p>
+
+
+<h2 id = "DATA"> Raspberry Pi I2C input / output </h2>
+		<p>
+In the Raspberry Pi version, the extension to input / output with the I2C device is done by the devcontrol (i2c ~) instruction. <br>
+For I2C control, I2C must be enabled in the Raspberry Pi option settings. (If I2C control is not performed, no setting is required.) When I2C control is performed, describe as follows.
+		</p><pre>
+devcontrol "i2copen", slave address, channel
+(It can also be described as "i2copen slave address, channel")
+
+"Channel" is a number that identifies when multiple devices are specified at the same time. (Integer value from 0 to 31)
+It can be omitted (0) when controlling a single device.
+i2copen will be able to control the device at the specified address.
+The result is returned in the system variable stat. If it is 0, it will be successful, otherwise it will be an error.
+		</pre><p>
+To output the data, write as follows.
+		</p><pre>
+devcontrol "i2cwrite", data value, data size, channel
+(It can also be described as "i2c write data value, data size, channel")
+
+The data value is a 32-bit integer value handled by HSP.
+If the data size is 0 or omitted, only 8bit (1byte) is output.
+The data size can be 1,2,3,4. The size of 1 to 4 bytes is output for each.
+		</pre><p>
+When entering the data, write as follows.
+		</p><pre>
+devcontrol "i2cread", channel
+(It is also possible to write "i2cread (channel)" as a function)
+
+devcontrol "i2creadw", channel
+(It is also possible to write "i2creadw (channel)" as a function)
+		</pre><p>
+The result is assigned to the system variable stat after the instruction is executed. i2cread gets the value of 8bit (1byte), and i2creadw gets the value of 16bit (2byte). (If an error occurs, a negative value will be assigned.) I2C control can be used not only from hsp3dish but also from hsp3cl.
+		</p>
+
+
+<h2 id = "COPYRIGHT"> Copyright and license </h2>
+		<p>
+HSP3 for Linux / Raspberry Pi is treated as a derivative of OpenHSP, and the license is also a modified BSD license compliant with OpenHSP / HSP3.
+		</p>
+		<pre>
+-------------------------------------------------------------------------------
+Hot Soup Processor (HSP)
+Copyright (C) 1997-2021, Onion Software/onitama, all rights reserved.
+Made with base technology of OpenHSP.
+
+OpenHSP
+Copyright (C) 1997-2021, Onion Software/onitama, all rights reserved.
+
+These softwares are provided by the copyright holders and contributors "as is" and
+any express or implied warranties, including, but not limited to, the implied
+warranties of merchantability and fitness for a particular purpose are disclaimed.
+		</pre>
+
+
+<!-Footer->
+		<ul id="FOOTER">
+			<a href="https://www.onionsoft.net/" target="_blank" align="right"><img src="image/onimark64.png"></a><br>
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+			<li><a href="https://hsp.tv/" target="_blank">Go to HSPTV page</a></li>
+		</ul>
+	</div><!-- container -->
+</body>
+
+</html>

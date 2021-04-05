@@ -1,13 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="ja">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta http-equiv="Content-Language" content="ja">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
-	<meta name="author" content="OpenHSP3 Project�ihttp://dev.onionsoft.net/trac/wiki�j">
-	<meta name="keywords" content="HSP3,HotSoupProcessor3,FAQ">
-	<meta name="description" content="HSPTV�f���ɂ悭�񂹂��鎿��Ƃ��̉�">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,HSP3Dish,FAQ">
+	<meta name="description" content="HSPTV掲示板によく寄せられる質問とその回答">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
 	<style type="text/css"><!-- 
 		ul {
@@ -18,81 +18,81 @@
 	<title>HSP3 FAQ</title>
 </head>
 <!--
-	BBS�ɗǂ��񂹂��鎿��ɂ��炩���߉񓚂��邱�ƂŁA���p�҂̗��֐������߂邱�Ƃ�ڎw�����̂ł��B
-	��{�I�ɂ͉���ӏ��ւ̃����N�W�ƂȂ�ł��傤�B
+	BBSに良く寄せられる質問にあらかじめ回答することで、利用者の利便性を高めることを目指すものです。
+	基本的には解説箇所へのリンク集となるでしょう。
 -->
 <body>
 	<div id="CONTAINER">
-		<!-- �w�b�_�[ -->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2019(c)</p>
-		<img src="hsp3ttl.jpg" alt="�^�C�g��" width="640" height="200">
+		<!-- ヘッダー -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
 		<h1>HSP3 Frequently Asked Questions</h1>
 		<p>
-			���̃y�[�W��HSPTV!�f���Ɋ񂹂��鎿��̂����A�p�ɂɊ񂹂��鎿��⑽���̏��S�҂̂��߂ɂȂ�Ǝv����
-			������W�߂Ĉꗗ�ɂ������̂ł��B�}�j���A���̌�����w���v�u���E�U�̌����ƍ��킹�ė��p���Ă��������B
-			�܂��AHSPWiKi�́u<a href="http://quasiquote.org/hspwiki/HSP%e3%81%aeFAQ">HSP��FAQ</a>�v���Q�Ƃ��Ă��������B
+			このページはHSPTV!掲示板に寄せられる質問のうち、頻繁に寄せられる質問や多くの初心者のためになると思われる
+			質問を集めて一覧にしたものです。マニュアルの検索やヘルプブラウザの検索と合わせて利用してください。
+			また、HSPWiKiの「<a href="http://quasiquote.org/hspwiki/HSP%e3%81%aeFAQ">HSPのFAQ</a>」も参照してください。
 		</p>
 
-		<!-- �ڎ� -->
+		<!-- 目次 -->
 		<ol>
-			<li><a href="#ERROR_ON_RUNNING">�v���O�������s���̕s�</a></li>
-			<li><a href="#RELEASE">�쐬�����v���O�����̌��J�Ɋւ���</a></li>
-			<li><a href="#OTHER">���̑�</a></li>
+			<li><a href="#ERROR_ON_RUNNING">プログラム実行時の不具合</a></li>
+			<li><a href="#RELEASE">作成したプログラムの公開に関して</a></li>
+			<li><a href="#OTHER">その他</a></li>
 		</ol>
 
-		<!-- �{�� -->
-		<h2 id="ERROR_ON_RUNNING">�v���O�������s���̕s�</h2>
+		<!-- 本文 -->
+		<h2 id="ERROR_ON_RUNNING">プログラム実行時の不具合</h2>
 		<dl>
-			<dt>�悭������Ȃ��G���[����������</dt>
-			<dd><p>�G���[�R�[�h����G���[�̌������킩��܂��B�G���[�̔����ʒu���s�ԍ����琄�����\�ł��B</p>
+			<dt>よく分からないエラーが発生する</dt>
+			<dd><p>エラーコードからエラーの原因がわかります。エラーの発生位置も行番号から推測が可能です。</p>
 			<ul>
-				<li>��<a href="hspprog.htm#ERR_MSG">�G���[���b�Z�[�W</a></li>
-				<li>��<a href="http://quasiquote.org/hspwiki/HSP3%e3%81%aeFAQ%3a%e3%82%a8%e3%83%a9%e3%83%bc%e3%83%a1%e3%83%83%e3%82%bb%e3%83%bc%e3%82%b8%e3%81%ae%e6%84%8f%e5%91%b3%e3%81%a8%e5%af%be%e5%87%a6%e6%b3%95%e3%81%8c%e5%88%86%e3%81%8b%e3%82%89%e3%81%aa%e3%81%84">HSP3��FAQ:�G���[���b�Z�[�W�̈Ӗ��ƑΏ��@��������Ȃ��iHSPWiki�j</a></li>
+				<li>→<a href="error.htm">エラーメッセージ</a></li>
+				<li>→<a href="http://quasiquote.org/hspwiki/HSP3%e3%81%aeFAQ%3a%e3%82%a8%e3%83%a9%e3%83%bc%e3%83%a1%e3%83%83%e3%82%bb%e3%83%bc%e3%82%b8%e3%81%ae%e6%84%8f%e5%91%b3%e3%81%a8%e5%af%be%e5%87%a6%e6%b3%95%e3%81%8c%e5%88%86%e3%81%8b%e3%82%89%e3%81%aa%e3%81%84">HSP3のFAQ:エラーメッセージの意味と対処法が分からない（HSPWiki）</a></li>
 			</ul></dd>
 			
-			<dt>�X�N���v�g�G�f�B�^����N�����������͖��Ȃ��̂ɁA�A�v���P�[�V�����ɂ���Ɠ����G���[����������</dt>
+			<dt>スクリプトエディタから起動させた時は問題ないのに、アプリケーションにすると内部エラーが発生する</dt>
 			<dd>
-				<p>�쐬�����A�v���P�[�V�����Ɠ����f�B���N�g����DLL��摜�t�@�C�����R�s�[���Ă��������B</p>
-				<ul><li>��<a href="hspprog.htm#HSPEX_PLUGIN">HSP�g���v���O�C���E���W���[��</a></li></ul>
+				<p>作成したアプリケーションと同じディレクトリにDLLや画像ファイルをコピーしてください。</p>
+				<ul><li>→<a href="hspprog.htm#HSPEX_PLUGIN">HSP拡張プラグイン・モジュール</a></li></ul>
 			</dd>
 			
-			<dt>�E�F�u�T�C�g�ɍڂ��Ă����X�N���v�g�������Ȃ�</dt>
+			<dt>ウェブサイトに載っていたスクリプトが動かない</dt>
 			<dd><p>
-				HSP2�p�̃X�N���v�g��HSP3�œ������Ƃ��ɏC�����K�v�ȏꍇ������܂��B
-				�����悤�ɁAHSP3�p�̃X�N���v�g��HSP2�œ������Ƃ��ɏC�����K�v�ȏꍇ������܂��B
-				�E�F�u�T�C�g�ɍڂ��Ă����X�N���v�g�����삷��o�[�W�������m�F���Ă��������B
+				HSP2用のスクリプトをHSP3で動かすときに修正が必要な場合があります。
+				同じように、HSP3用のスクリプトをHSP2で動かすときに修正が必要な場合もあります。
+				ウェブサイトに載っていたスクリプトが動作するバージョンを確認してください。
 			</p></dd>
 		</dl>
 
-		<h2 id="RELEASE">�쐬�����v���O�����̌��J�Ɋւ���</h2>
+		<h2 id="RELEASE">作成したプログラムの公開に関して</h2>
 		<dl>
-			<dt>�A�C�R���������ς��Ă��ǂ����H</dt>
+			<dt>アイコンを書き変えても良いか？</dt>
 			<dd>
-				<p>�\�ł��B</p>
-				<ul><li>��<a href="hspprog.htm#ICONINS">���s�t�@�C���̃A�C�R����������</a></li></ul>
+				<p>可能です。</p>
+				<ul><li>→<a href="hspprog.htm#ICONINS">実行ファイルのアイコン書き換え</a></li></ul>
 			</dd>
-			<dt>DLL�͎���v���O�����ƈꏏ�ɔz���ėǂ����H</dt>
-			<dd><p>DLL�̐�������ǂ݁A�w���ɏ]���Ă��������B</p></dd>
+			<dt>DLLは自作プログラムと一緒に配って良いか？</dt>
+			<dd><p>DLLの説明書を読み、指示に従ってください。</p></dd>
 		</dl>
 
-		<h2 id="OTHER">���̑�</h2>
+		<h2 id="OTHER">その他</h2>
 		<dl>
-			<dt>��ʂ�������������</dt>
+			<dt>画面がちかちかする</dt>
 			<dd>
-				<p>redraw���߂��g���Ă݂Ă��������B���̎��A��ʂ̏�����cls���߂��g��Ȃ��悤�ɂ��Ă��������B</p>
-				<ul><li>��<a href="hspprog.htm#SCR_AND_WND">��ʂƃE�B���h�E</a></li></ul>
+				<p>redraw命令を使ってみてください。この時、画面の消去にcls命令を使わないようにしてください。</p>
+				<ul><li>→<a href="hspprog.htm#SCR_AND_WND">画面とウィンドウ</a></li></ul>
 			</dd>
-			<dt>�L�[�{�[�h�̃L�[�𕡐������ɉ����ƔF�����Ȃ����Ƃ�����</dt>
-			<dd><p>���̃L�[�{�[�h�͓����ɔF���ł���L�[�����܂��Ă��܂��B�\�t�g�E�F�A����͉��s�\�Ȗ��ł��B</p></dd>
+			<dt>キーボードのキーを複数同時に押すと認識しないことがある</dt>
+			<dd><p>大抵のキーボードは同時に認識できるキーが決まっています。ソフトウェアからは回避不可能な問題です。</p></dd>
 		</dl>
 
-		<!-- �t�b�^�[ -->
+		<!-- フッター -->
 		<ul id="FOOTER">
-			<li><a href="#CONTAINER">���̃y�[�W��1�ԏ�ɖ߂�</a></li>
-			<li><a href="../index.htm">�h�L�������g�̈ꗗ�ɖ߂�</a></li>
-			<li><a href="http://hsp.tv/">Go to HSPTV page</a></li>
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="../index.htm">ドキュメントの一覧に戻る</a></li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
 		</ul>
-		<a href="http://www.onionsoft.net/hsp/">
+		<a href="https://www.onionsoft.net/hsp/">
 			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
 		</a>
 	</div><!-- container -->

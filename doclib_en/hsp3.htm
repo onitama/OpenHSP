@@ -1,0 +1,614 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,HSP3Dish">
+<meta name = "description" content = "Overview of HSP3">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+<title> HSP3 Overview </title>
+</head>
+<body>
+	<div id="CONTAINER">
+<!-Header->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+<h1> Overview of HSP3 </h1>
+
+<!-Table of Contents->
+		<ol>
+<li> <a href="#ABOUT_HSP"> What is HSP? </a> </li>
+<li> <a href="#DOUSA_ENV"> Operating environment </a> </li>
+<li> <a href="#SUPPORT"> HSP support </a> </li>
+<li> <a href="#RECENT"> About the latest version </a> </li>
+<li> <a href="#ROADMAP"> Future plans </a> </li>
+<li> <a href="#USERCOM"> HSP User Community </a> </li>
+<li> <a href="#LICENCE"> About the license of software made by HSP </a> </li>
+<li> <a href="#PRONAMA"> Professional student collaboration material </a> </li>
+<li> <a href="#COPYRIGHT"> Copyright and license </a> </li>
+<li> <a href="#LANG_SPEC"> Language specification management </a> </li>
+<li> <a href="#EDUCATION"> Use for educational purposes </a> </li>
+<li> <a href="#MESSAGE"> From the author </a> </li>
+<li> <a href="#THANKS"> Acknowledgments </a> </li>
+		</ol>
+
+<h2 id = "ABOUT_HSP"> What is HSP? </H2>
+		<p>
+<abbr title = "Hot Soup Processor"> HSP </abbr> is a scripting language system that anyone can easily use.
+You can easily build applications such as game programs, screen savers, tools and practical software using images just by writing a text script.
+		</p>
+		<p>
+HSP has the following features.
+		</p>
+		<ul>
+<li> Get started right away in a free development environment </li>
+<li> Easy-to-remember instruction set makes it easy for beginners to handle </li>
+<li> The created program can be converted into an executable file and redistributed freely, and no license fee is required </li>
+<li> Many functions such as 3D display and communication can be added by the extension plug-in module </li>
+<li> We have many user assets and usage records for over 30 years </li>
+<li> Equipped with detailed manual and reference help system </li>
+<li> A wealth of books and materials as a purely domestic tool </li>
+<li> Software created by the conversion function of HSP3Dish can be run on android, iOS, Linux, WEB browser (html5) </li>
+<li> Includes libraries for hardware control such as USB-IO and Arduino </li>
+<li> Interpreter operating specifications are released as open source </li>
+		</ul>
+		<p>
+HSP can be used in various situations depending on your idea.
+		</p>
+		<ul>
+<li> For creating games of various genres from visual novels to full-scale 3D shooting </li>
+<li> For creating desktop accessories and screen savers </li>
+<li> For instant tools such as screen layout trials and image data conversion </li>
+<li> For media browsers such as program launchers, menus, CG collections, music collections, etc. </Li>
+<li> Other full-scale applications can be developed </li>
+		</ul>
+
+<h2 id = "DOUSA_ENV"> Operating environment </h2>
+		<p>
+HSP3 can run the development environment on <b> Microsoft Windows, Linux / Raspberry Pi </b>.
+For detailed installation and usage, refer to the manual for each platform.
+		</p>
+		<dl>
+<dt> <a href="hsp3win.html"> HSP3 Windows Manual </a> </dt>
+<dt> <a href="hsp3linux_pi.html"> HSP3 Linux / Raspberry Pi version manual </a> </dt>
+		</dl>
+		<p>
+See the <a href="hspprog.htm"> programming manual </a> for HSP3 grammar and programming rules.
+		</p>
+		<p>
+The only development environment that supports the full functionality of HSP3 is the Windows version. The Linux / Raspberry Pi version only supports the command line version and HSP3Dish. <br>
+Source code created in these development environments can be run on <b> android, iOS, html5 (WebGL) </b>. (There are some restrictions for each platform)
+For more information on multi-platform, see <a href="hsp3dish_prog.htm"> HSP3Dish Programming Manual </a>.
+		</p>
+
+
+<h2 id = "SUPPORT"> HSP support </h2>
+		<p>
+This software is supported on the homepage on the Internet.
+The official page is the following URL.
+You can get the latest information about HSP, samples, bulletin boards, FAQs and much more.
+Please try to access it.
+		</p>
+		<dl>
+<dt> HSPTV (information about HSP, user support, etc.) </dt>
+			<dd><p><a href="https://hsp.tv/" target="_blank">https://hsp.tv/</a></p></dd>
+<dt> HSP related book page (introduction of reference books available at bookstores) </dt>
+			<dd><p><a href="https://hsp.tv/make/hspbook.html" target="_blank">https://hsp.tv/make/hspbook.html</a></p></dd>
+<dt> hsp3info Twitter (HSP official information account) </dt>
+			<dd><p><a href="https://twitter.com/hsp3info" target="_blank">https://twitter.com/hsp3info</a></p></dd>
+<dt> ONION software (HSP developer) </dt>
+			<dd><p><a href="https://www.onionsoft.net/" target="_blank">https://www.onionsoft.net/</a></p></dd>
+		</dl>
+		<p>
+We are always looking forward to your opinions, bug information and requests regarding HSP.
+If possible, please send e-mail to the following address on the Internet.
+		</p>
+		<p>
+I have read all the emails I received, but regarding replies and reflection of requests, etc.
+Please note that the author may not be able to respond immediately.
+		</p>
+		<p>
+For general questions about HSP and questions about how to write scripts,
+Information is also provided in FAQs and books on the Internet, so it is recommended that you check it first.
+		</p>
+		<p><dl>Twitter  : <a href="https://twitter.com/hsp3info" target="_blank">https://twitter.com/hsp3info</a></dl></p>
+		<p><dl>e-mail  : <address>hsp@onionsoft.net</address></dl></p>
+
+<h2 id = "RECENT"> About the latest version </h2>
+		<p>
+Please check the official site <a href="https://hsp.tv/" target="_blank"> HSPTV! </a> for the announcement of the stable version and beta test version.
+The latest beta version of Windows under development is also available on OneDrive at any time.
+You can get the entire archive from "Download". <br>
+The Windows version of the source code is mastered by the OpenHSP Subversion repository. The Linux / Raspberry Pi version will be updated from time to time in the github repository. <br>
+The beta version is a test version for verifying new features and fixes. Please note that there is a possibility of unexpected problems.
+If something goes wrong or the operation is not stable, it is recommended to revert to the previous version and use it.
+		</p>
+		<dl>
+<dt> HSP β version (OneDrive) </dt>
+			<dd>
+				<p><a href="https://onedrive.live.com/embed?cid=EC425522ED849DA7&resid=EC425522ED849DA7%211229&authkey=AB-pNztAqBp6BcU" target="_blank">https://onedrive.live.com/embed?cid=EC425522ED849DA7&resid=EC425522ED849DA7%211229&authkey=AB-pNztAqBp6BcU</a></p>
+			</dd>
+<dt> OpenHSP Subversion repository </dt>
+			<dd>
+				<p><a href="https://dev.onionsoft.net/trac/openhsp" target="_blank">https://dev.onionsoft.net/trac/openhsp</a></p>
+			</dd>
+<dt> OpenHSP github repository </dt>
+			<dd>
+				<p><a href="https://github.com/onitama/OpenHSP" target="_blank">https://github.com/onitama/OpenHSP</a></p>
+			</dd>
+		</dl>
+
+
+<h2 id = "ROADMAP"> Future plans </h2>
+		<p>
+We will continue to develop HSP3 with the aim of creating an environment where ideas can be realized more easily and in a short time. <br>
+From the many requests and bug reports, we would like to gradually incorporate the ones that can be implemented.
+Future plans and future considerations are as follows.
+		</p>
+		<dl>
+			<dt>HSP3.6</dt>
+			<dd>
+			<p>
+We will continue to update the updated version for the functions that could not be introduced in HSP3.51.
+The functions that are being considered for introduction in the future are as follows. (It does not mean that it is done in this order.)
+			</p>
+			<dl>
+<li> Renewal of packfile, review of encryption function
+<li> Modification of HSP script editor and expansion of input / debug support
+<li> Organize and expand module functions
+<li> 32bit support and speedup of HSP drawing buffer
+<li> Sharing code and materials using internet connection, community support
+			</dl>
+			</dd>
+			<dt>HSP4</dt>
+			<dd>
+			<p>
+HSP2 first appeared in 1997, and HSP3 eight years later, but I hope to be able to connect to the next generation as the times change.
+The situation required for programming is also changing. While inheriting the convenience of HSP, I would like to announce a roadmap that is easy to use with some compatibility cut. <br>
+Currently, we are considering full UTF-8, 64-bit support, automatic code analysis and learning function, VM renewal (llvm etc.), native compilation (JIT) and so on.
+			</p>
+			</dd>
+		</dl>
+
+
+<h2 id = "USERCOM"> HSP User Community </h2>
+		<p>
+HSP users are actively exchanging opinions and information, and providing support.
+Many homepages are introduced by related links on the HSP official page.
+In addition, various information is also provided on the following pages.
+		</p>
+		<dl>
+<dt> HSP Center (Various information for beginners, lectures, etc.) </dt>
+			<dd>
+				<p><a href="http://hspcenter.com" target="_blank">http://hspcenter.com</a></p>
+			</dd>
+<dt> HSP bug track (report bug, check progress, etc.) </dt>
+			<dd>
+				<p><a href="https://dev.onionsoft.net/mantis/" target="_blank">https://dev.onionsoft.net/mantis/</a></p>
+			</dd>
+<dt> OpenHSP github repository </dt>
+			<dd>
+				<p><a href="https://github.com/onitama/OpenHSP" target="_blank">https://github.com/onitama/OpenHSP</a></p>
+			</dd>
+<dt> HSPWiKi (WiKi about HSP that anyone can write) </dt>
+			<dd>
+				<p><a href="http://quasiquote.org/hspwiki/" target="_blank">http://quasiquote.org/hspwiki/</a></p>
+			</dd>
+<dt> HSP development WiKi </dt>
+			<dd>
+				<p><a href="https://wiki.hsp.moe/" target="_blank">https://wiki.hsp.moe/</a></p>
+			</dd>
+		</dl>
+
+<h2 id = "LICENCE"> About the license of software made by HSP </h2>
+		<p>
+<em> The rights of the original software (executable file) created by the user using HSP are
+It belongs to the user who created it. </em>
+		</p>
+		<p>
+<em> The original software (executable file) created by the user using HSP is
+You are free to display, distribute, and sell at communication, spot sales, and stores. Also, no license fee is required. </em>
+(It can be used in any form regardless of commercial, non-commercial, or douujin software.
+However, please do not use it for illegal activities. )
+		</p>
+		<p>
+<em> When attaching, duplicating or reorganizing files other than the executable file generated by HSP,
+Please follow the conditions of "Copyright and license". </em>
+		</p>
+		<p>
+The software created by the user has both the copyright notice of onion software and the obligation to indicate that it uses HSP.
+There is none.
+Onion software does not claim copyright to the original software.
+		</p>
+		<p>
+Regarding secondary development systems (game creation systems, etc.) created using HSP,
+Please operate at the responsibility of the author who created the system.
+		</p>
+		<p>
+Those who are considering operating the produced software for commercial use and who wish to receive support for a fee
+Please contact us by email at info@hsp.tv. We will inform you about the details.
+		</p>
+
+<h2 id = "PRONAMA"> About professional student collaboration material </h2>
+		<p>
+The HSP3.6 full set includes materials related to Tamane-chan and Prosei-chan, created in collaboration with the live programming character "Professional Student" and the HSP3 mascot character "Tamane-chan". <br>
+The recorded material is the same as "HSP3.6 Pro Student Edition". <br>
+The HSP3.6 full set has the same specifications as the main body, except for the background material of the script editor and the 3D material of the professional student from the HSP3.6 professional student edition.
+		</p>
+
+		<p>
+The following files are provided as professional student collaboration materials.
+		</p>
+		<pre>
+	<a href="../hsptv/mini_kei.png">mini_kei.png</a>
+	<a href="../hsptv/mini_tamane.png">mini_tamane.png</a>
+
+	<a href="../hsptv/kei_knight1_1.png">kei_knight1_1.png</a>
+	<a href="../hsptv/kei_knight1_2.png">kei_knight1_2.png</a>
+	<a href="../hsptv/kei_knight1_3.png">kei_knight1_3.png</a>
+	<a href="../hsptv/kei_knight1_4.png">kei_knight1_4.png</a>
+	<a href="../hsptv/kei_knight1_5.png">kei_knight1_5.png</a>
+	<a href="../hsptv/kei_knight2_1.png">kei_knight2_1.png</a>
+	<a href="../hsptv/kei_knight2_2.png">kei_knight2_2.png</a>
+	<a href="../hsptv/kei_knight2_3.png">kei_knight2_3.png</a>
+	<a href="../hsptv/kei_knight2_4.png">kei_knight2_4.png</a>
+	<a href="../hsptv/kei_knight2_5.png">kei_knight2_5.png</a>
+	<a href="../hsptv/kei_school1_1.png">kei_school1_1.png</a>
+	<a href="../hsptv/kei_school1_2.png">kei_school1_2.png</a>
+	<a href="../hsptv/kei_school1_3.png">kei_school1_3.png</a>
+	<a href="../hsptv/kei_school1_4.png">kei_school1_4.png</a>
+	<a href="../hsptv/kei_school1_5.png">kei_school1_5.png</a>
+
+	<a href="../hsptv/tamane_wizard1_1.png">tamane_wizard1_1.png</a>
+	<a href="../hsptv/tamane_wizard1_2.png">tamane_wizard1_2.png</a>
+	<a href="../hsptv/tamane_wizard1_3.png">tamane_wizard1_3.png</a>
+	<a href="../hsptv/tamane_wizard1_4.png">tamane_wizard1_4.png</a>
+	<a href="../hsptv/tamane_wizard1_5.png">tamane_wizard1_5.png</a>
+	<a href="../hsptv/tamane_wizard2_1.png">tamane_wizard2_1.png</a>
+	<a href="../hsptv/tamane_wizard2_2.png">tamane_wizard2_2.png</a>
+	<a href="../hsptv/tamane_wizard2_3.png">tamane_wizard2_3.png</a>
+	<a href="../hsptv/tamane_wizard2_4.png">tamane_wizard2_4.png</a>
+	<a href="../hsptv/tamane_wizard2_5.png">tamane_wizard2_5.png</a>
+	<a href="../hsptv/tamane_school1_1.png">tamane_school1_1.png</a>
+	<a href="../hsptv/tamane_school1_2.png">tamane_school1_2.png</a>
+	<a href="../hsptv/tamane_school1_3.png">tamane_school1_3.png</a>
+	<a href="../hsptv/tamane_school1_4.png">tamane_school1_4.png</a>
+	<a href="../hsptv/tamane_school1_5.png">tamane_school1_5.png</a>
+
+	<a href="../hsptv/pronama.bmp">pronama.bmp</a>
+		</pre>
+
+		<p>
+Professional student collaboration materials can be freely used and distributed by users with the same license as HSP, following the guidelines.
+(There is no obligation to write the copyright even if you use the data. Also, you can use it in any form, not limited to HSP3.) <br>
+When using the material, be sure to read the usage guidelines for "Professional Student" and "Tamane-chan".
+		</p>
+		<pre>
+		<p>
+Professional student (Kei Kurui) usage guidelines
+		<a href="https://kei.pronama.jp/guideline/" target="_blank">https://kei.pronama.jp/guideline/</a>
+
+Tamane-chan usage guidelines
+		<a href="http://hsp.tv/make/tamane2d.html" target="_blank">http://hsp.tv/make/tamane2d.html</a>
+		</pre>
+		</p>
+
+
+<h2 id = "COPYRIGHT"> Copyright and license </h2>
+		<p>
+The HSP3 full set is a composite package consisting of "HSP development system" and "additional components".
+The HSP development system is a central element of development and refers to the following items.
+		</p>
+		<ul>
+<li> HSP Script Editor (hsed) </li>
+<li> Debug execution runtime (hsp3, hsp3cl, hsp3debug) </li>
+<li> HSP Extended Runtime (hsprt etc.) </li>
+<li> HSP Code Compiler (hspcmp) </li>
+<li> HSP3Dish system (hsp3dish, hsp3gp) </li>
+		</ul>
+		<p>
+Files included in the HSP development system can be freely attached, duplicated, reorganized, and redistributed under the <em> BSD license.
+I can do it. In that case, please specify <a href="hsplicense.txt"> HSP license notation (hsplicense.txt) </a>. </em>
+		</p>
+		<p>
+(This license does not apply to executable files created using HSP.
+It is applied only when the files included in the HSP development system are published as they are.
+For licenses related to the original software created by the user
+Please refer to the item "<a href="#LICENCE"> About the license of software made by HSP </a>". )
+		</p>
+		<p>
+(Certification of license notation should include hsplicense.txt in the distribution or in the documentation
+Make sure to include the same content as hsplicense.txt. Use in companies and schools
+You can treat it as free of charge. )
+		</p>
+		<p>
+The HSP development system is basically provided without warranty, but support for commercial use etc. is provided.
+If you contact onion software (onitama@onionsoft.net) by email,
+I will consider it.
+		</p>
+		<p>
+The copyright of the HSP development system belongs to onion software.
+onion software does not guarantee any damage caused by this program.
+Use at your own risk.
+		</p>
+
+
+<h2 id = "LANG_SPEC"> About managing language specifications </h2>
+		<p>
+The language specifications of Hot Soup Processor including HSP2 and HSP3 are
+Onion Software / onitama is in charge of maintenance.
+		</p>
+		<p>
+For HSP language specification changes and requests for reorganization, please contact the developer community and bulletin boards.
+We accept HSP3 WishList, HSP Wiki, etc. and are considering it.
+		</p>
+		<p>
+The processing system that plays a central role in HSP interpreter code generation and execution is as OpenHSP.
+Published by open source.
+By publishing the source related to HSP3 with open specifications, it is possible to support more environments and reliability.
+We would like to improve maintainability.
+		</p>
+		<dl>
+			<dt>OpenHSP Development</dt>
+			<dd>
+				<p>
+					<a href="https://www.onionsoft.net/hsp/openhsp/" target="_blank">https://www.onionsoft.net/hsp/openhsp/</a>
+				</p>
+			</dd>
+<dt> OpenHSP Project Portal </dt>
+			<dd>
+				<p>
+					<a href="https://dev.onionsoft.net/trac/openhsp" target="_blank">https://dev.onionsoft.net/trac/openhsp</a>
+				</p>
+			</dd>
+		</dl>
+
+
+<h2 id = "EDUCATION"> Use for educational purposes </h2>
+		<p>
+Onion software is continuing activities to popularize it while proposing the use of IT basic education through HSP.
+		</p>
+		<p>
+Please use it for elementary school, junior high school, high school classes, club activities, etc.
+Of course, the HSP itself can be used free of charge, and the attached manuals, documents, etc.
+You can freely quote, reorganize, and redistribute texts such as help data.
+In addition, many reference books are on sale in Japan, and a lot of information is available even if you study by yourself.
+		</p>
+		<p>
+Lectures have already been given in some computer classrooms, and even in the "IT Craftsmanship Project" supported by the Ministry of Economy, Trade and Industry,
+Education using HSP was practiced.
+		</p>
+		<p>
+HSP is considered to have many advantages for beginners and beginners.
+Beginners and beginners think that it is necessary to create an environment where they can enjoy learning more than anything else, and the pictures move and the sounds come out.
+            We emphasize elements that allow you to continue learning without losing interest, such as reacting.
+		</p>
+		<p>
+The following pages provide information about educational uses.
+		</p>
+		<dl>
+<dt> Information page for HSP school officials </dt>
+			<dd>
+				<p>
+					<a href="https://www.onionsoft.net/hsp/education/index.html" target="_blank">https://www.onionsoft.net/hsp/education/index.html</a>
+				</p>
+			</dd>
+<dt> HSP school center (page for school staff) </dt>
+			<dd>
+				<p>
+					<a href="http://www.hspcenter.com/school/index.html" target="_blank">http://www.hspcenter.com/school/index.html</a>
+				</p>
+			</dd>
+		</dl>
+
+<h2 id = "MESSAGE"> From the author </h2>
+		<p>
+HSP is not particularly compatible with other languages ​​(although it is mostly BASIC),
+Nor does it have a new language system.
+		</p>
+		<p>
+The aim of HSP is an old-style personal computer system.
+		</p>
+		<p>
+Older computers are overwhelmingly poorer in memory and CPU speed than current ones,
+I turned it on and it was ready to use, and I could see the result immediately by typing RUN in BASIC.
+I feel that such an easy and easy system is being lost in today's personal computers.
+		</p>
+		<p>
+There are no advanced language specifications such as object-oriented here,
+It's easy to write in the order you want.
+And I think that is also one way for small-scale development and beginner programming learning.
+		</p>
+		<p>
+HSP is by no means a versatile system. If you want to do more advanced things or large-scale development with an interpreter,
+Languages ​​such as C #, Python, and Java are better suited.
+I wish HSP could make a small turn for a little processing that does not need to use such a high-class language.
+		</p>
+		<p>
+(Onitama)
+		</p>
+
+
+<h2 id = "THANKS"> Acknowledgments </h2>
+		
+		<p>
+HSP3 and HSPTV design work was created by Mr. Sencha and Mr. Yuka Yume Yume.
+		</p>
+		<p>
+The HSP script editor (hsed3.exe) was created with the help of Lonely Wolf, Shark ++, inovia, and Tetr @ pod. From HSP3.51, the extension function of the modified version HSP3 script editor (implemented by inovia and Tetr @ pod) is incorporated.
+		</p>
+		<p>
+I am using HyperPageProject's Football library as the editor engine of the HSP script editor (hsed3.exe).
+		</p>
+		<p>
+The source for calling COM objects and processing events is created with the cooperation of Mr. Chokuto.
+		</p>
+		<p>
+HSP Docs Library, d3module, Artlet2D, SQLele are included by S.Programs.
+		</p>
+		<p>
+hsp3dish.js (Emscripten version) was implemented based on the one produced by zakki and K-s.
+		</p>
+		<p>
+HSPLet was provided by Mr. Yuki Yamada.
+		</p>
+		<p>
+The HSPUSBIO plug-in is included with the one made by Mr. K-K (jarring hall).
+		</p>
+		<p>
+The USBIO operation DLL, hidmon.dll, has been created and published by iruka and senshu.
+		</p>
+		<p>
+For the llmod3 module, we used the one developed by tom and Shibayan.
+		</p>
+		<p>
+For the mod_regexp module, I used the one developed by monolith.
+		</p>
+		<p>
+For the standard macro related to switch, I used the one created by Mr. USK and Mr. NGND001.
+		</p>
+		<p>
+For the standard macros, _continue and _break, I used the ones created by test.
+		</p>
+		<p>
+We would like to thank yoshis, naka, JET, and eller for their cooperation in creating instruction help and documents.
+		</p>
+		<p>
+Definition files related to WIN32API (advapi32.as, comctl32.as, comdlg32.as, gdi32.as, kernel32.as, shell32.as,
+user32.as, winmm.as) is included with the one made by Mr. Sakura.
+On the page of Mr. Sakura (HSP-NEXT), there are many other useful information such as materials for HSP3 and TIPS.
+		</p>
+		<p>
+The cgi-related samples and headers are those produced by Mr. Yuguro.
+		</p>
+		<p>
+Tom gave me some helpful advice on loadlib / llmod and WIN32API.
+		</p>
+		<p>
+Mathematics related macros (hspmath.as) are included in the ones published on HSP WiKi.
+		</p>
+		<p>
+The HSP3 utility macro (hsp3util.as) is included with HSPWiKi and the one created by Puma-san.
+		</p>
+		<p>
+Mr. arue gave me some advice on HGIMG3 and documentation. Also, I had you create an icon (hspscr_icon) for HSP3 script.
+		</p>
+		<p>
+For the call stack display of the debug window, I used the one developed by mjhd_otsuka.
+		</p>
+		<p>
+hsp3utf and modclbk3.hsp are included based on the ones created and published by tds12.
+		</p>
+		<p>
+The Linux version of hsp3 and the script editor have been implemented based on the ones created and published by Mr. K-K (Jarringdo).
+		</p>
+		<p>
+The iconins tool has been created and published by Kpan, Tetr @ pod, and inovia.
+		</p>
+		<p>
+<a href="https://github.com/StreamletStudio/ZLibWrap" target="_blank"> ZLibWrap.dll </a> is included in the package created and published by StreamletStudio.
+		</p>
+		<p>
+The free materials in the HSPTV folder are included with permission from Y-Jinn, NAO / Graphics / Lab', and everyone else.
+		</p>
+		<p>
+We would like to thank everyone who has made many corrections and advice on OpenHSP, especially fujidig, Shark ++, naznyark, tds12, ue_dai, kurogoma, inovia, Madotsuki Lala, Drip, and zakki.
+		</p>
+		<p>
+In addition, HSP peripheral tool developer ML (HSPDev-ML), beta version test report,
+We would like to thank the many people who gave us their opinions.
+		</p>
+		<dl>
+<dt> Chokuto-san </dt>
+			<dd>
+				<p>
+		<a href="https://chokuto.ifdef.jp/" target="_blank">https://chokuto.ifdef.jp/</a>
+				</p>
+			</dd>
+<dt> S.Programs NET (S.Programs) </dt>
+			<dd>
+				<p>
+		<a href="http://spn.php.xdomain.jp/" target="_blank">http://spn.php.xdomain.jp/</a>
+				</p>
+			</dd>
+<dt> HSP Center </dt>
+			<dd>
+				<p>
+		<a href="http://hspcenter.com/" target="_blank">http://hspcenter.com/</a>
+				</p>
+			</dd>
+<dt> Yuguro Kanji-san </dt>
+			<dd>
+				<p>
+		<a href="https://turnipworks.blogspot.com/" target="_blank">https://turnipworks.blogspot.com/</a>
+				</p>
+			</dd>
+<dt> fujidig </dt>
+			<dd>
+				<p>
+		<a href="https://fujidig.hatenablog.com/" target="_blank">https://fujidig.hatenablog.com/</a>
+				</p>
+			</dd>
+<dt> Shark ++ </dt>
+			<dd>
+				<p>
+		<a href="https://www.sharkpp.net/" target="_blank">https://www.sharkpp.net/</a>
+				</p>
+			</dd>
+<dt> K-K (jarring hall) </dt>
+			<dd>
+				<p>
+		<a href="https://www.binzume.net/" target="_blank">https://www.binzume.net/</a>
+				</p>
+			</dd>
+<dt> Crystal light stage (arue) </dt>
+			<dd>
+				<p>
+		<a href="https://hp.vector.co.jp/authors/VA029904/" target="_blank">https://hp.vector.co.jp/authors/VA029904/</a>
+				</p>
+			</dd>
+<dt> zakki-san </dt>
+			<dd>
+				<p>
+		<a href="https://twitter.com/k_matsuzaki" target="_blank">https://twitter.com/k_matsuzaki</a>
+				</p>
+			</dd>
+<dt> tds12 </dt>
+			<dd>
+				<p>
+		<a href="https://twitter.com/lltds12" target="_blank">https://twitter.com/lltds12</a>
+				</p>
+			</dd>
+<dt> ue_dai </dt>
+			<dd>
+				<p>
+		<a href="https://prograpark.ninja-web.net/" target="_blank">https://prograpark.ninja-web.net/</a>
+				</p>
+			</dd>
+			<dt>Let's HSP!</dt>
+			<dd>
+				<p>
+		<a href="https://lhsp.s206.xrea.com/" target="_blank">http://lhsp.s206.xrea.com/</a>
+				</p>
+<dt> inovia </dt>
+			<dd>
+				<p>
+		<a href="https://hsp.moe/" target="_blank">https://hsp.moe/</a>
+				</p>
+		</dl>
+
+<!-Footer->
+		<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="http://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

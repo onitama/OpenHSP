@@ -1,0 +1,198 @@
+------------------------------------------------------------------------------
+HSP3CNV : HSP3ソースコンバーター 	             HSP : Hot Soup Processor  
+ホットスーププロセッサ                     copyright 2017 (c) onion software  
+------------------------------------------------------------------------------
+
+・はじめに
+
+HSP3ソースコンバーターは、HSP3のコードを他のソースに変換するためのツール、
+及びライブラリで構成されています。
+HSP3ソースコンバーターは、できる限りHSPのソーススクリプトを他のシステムで
+運用できるよう変換を行なうもので、すべてのHSPソーススクリプトの変換を
+保証するものではありません。
+
+
+・使用方法
+
+HSP3ソースコンバーターは、HSP3Dish helper(hsp3dh)を使用するか、
+コマンドライン(プロンプト)上から直接hsp3cnv.exeを呼び出して使用することができます。
+GUIで変換を行なう場合には、HSPスクリプトエディタの「ツール」→「指定ファイルをCソースに変換」メニューを
+選択して、HSP3Dish helperを呼び出してください。
+後は、変換元のスクリプトを指定して、「変換」ボタンを押すことで、
+ソーススクリプトの拡張子が「cpp」になったC言語ソースが生成されます。
+この時、「出力ソースをUTF-8に変換」のチェックをONにすることで、
+文字コードがUTF-8形式のソースを生成することができます。
+これは、Windows以外のプラットフォームにソースを転送する際に必要となります。
+Windows上でコンパイルさせる場合には、UTF-8に変換する必要はありません。
+
+
+・hsp3cnv.exeについて
+
+HSP3のオブジェクトファイル(ax)をCソースに変換するコマンドラインアプリケーションです。
+
+	hsp3cnv ファイル名
+
+のように、コマンドライン(プロンプト)上で実行します。
+たとえば、test.axを変換する場合は、
+
+	hsp3cnv test
+
+のように指定すればOKです。
+成功すると、test.axファイルをもとにtest.cppファイルを出力します。
+※コマンドラインを使用しなくても、axファイル(オブジェクトファイル)のアイコンを
+hsp3cnvにドロップすれば、同じフォルダにcppファイルが作成されます。
+
+出力されたファイルは、テスト用のプロジェクト(hsp3rtest)上でコンパイル
+することが可能です。
+
+	hsp3cnv -d ファイル名
+
+を指定すると、HSP3Dishソース変換モードとなります。
+HSP3Dishソース変換モードは、外部プラグインの命令チェックなど
+他のプラットフォームへの互換性がないかとチェックします。
+
+
+・テスト用のプロジェクトについて
+
+hsp3cnvが出力したソースとリンクするためのライブラリが用意されています。
+
+hspsdk\hsp3cnv\hsp3rtest.zip
+
+を解凍することで、hsp3rtestプロジェクト、及びOpenHSPが提供するhsp3プロジェクトが生成されます。
+VC++でhsp3rtest.vcprojを開き、ビルドすることで、Windows上で動作する
+exeファイルを作成します。
+このプロジェクトファイルは、VC++2005用ですが2008やExpressでも同様に使用できます。
+hsp3cnvが出力したソースは、test.cppとしてプロジェクトに登録されています。
+ユーザーが生成したcppソースを使用する場合は、test.cppにリネームするか、
+プロジェクトにファイルを登録し直す必要があります。
+
+
+・パフォーマンスについて
+
+現状で、インタプリタ(通常)版のHSP3から2～5倍程度の速度になっています。
+(Debugビルドのままだと、大幅に遅くなるので注意してください)
+VC++のPGO(Profile-Guided Optimization)を使用することで、さらに高速化を
+図ることができます。
+
+また、OpenHSPではzakkiさんによりllvmを使用したJITコンパイラを搭載した
+バージョンも作成されています。こちらは、axファイルから直接コンパイルと
+同等の速度での実行を行ないます。
+
+	peppermint.jp
+	http://peppermint.jp/
+
+
+・サポートされる機能
+
+このバージョンは、プレビュー版であり、動作は以下の内容に制限されています。
+
+	・HSP3がサポートする基本命令、基本関数、システム変数
+	・int,double,str,label型の変数
+	・モジュール変数以外のモジュール機能(#module、#global)
+	・ユーザー定義命令、関数(#deffunc、#defcfunc)
+	・DLL及び、プラグイン呼び出し(仮対応)
+
+以下の機能は、まだサポートしていません。
+
+	・プラグインによる変数型の拡張、コマンドタイプの拡張
+	・COMオブジェクト操作、COM型・Variant型変数
+	・モジュール変数
+	・varptr関数によるdll関数ポインタ取得機能
+
+以下の機能は、このシステム上でのサポート予定がありません。
+
+	・run命令
+
+
+・将来の予定
+
+HSP3ソースコンバーターは、HSP3のソースコードを他のプラットフォーム及び
+他言語ソースに変換するためのシステムです。
+まずは、Cソースコードへの変換を目指していますが、ActionScriptなど他の
+環境も視野に入れて、汎用的に使用可能なライブラリを用意しています。
+
+
+・ライセンス
+
+HSP3ソースコンバーターに関するライセンスは、OpenHSPの派生物として扱い、
+ライセンスもOpenHSPに準拠します。
+
+Copyright (C) 1997-2017, Onion Software/onitama.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
+Neither the name of the Onion Software nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+・更新履歴
+
+	2012/06/25 3.31β2
+
+		HSP3.31とバージョンを統合
+		button命令の変換に対応
+
+	2012/01/26 0.6(HSP3.3a4)
+
+		出力ソースにhsp3cnvのバージョン情報を含めるように修正
+		変数の連続代入(a=1,2,3)の変換フォーマットを修正
+		ユーザー定義命令のvar引数で配列要素が渡っていない不具合を修正
+		配列変数が正しく展開されないことがある不具合を修正
+		改行文字列をHSPと同様のCR+LFに変換するように修正
+
+	2011/12/16 0.5(HSP3.3a3)
+
+		VC++のランタイム不要でhsp3cnv.exeが実行できるように修正
+
+	2011/11/15 0.5(HSP3.3a3)
+
+		foreachを使用した場合に正しく変換されない不具合を修正
+		continueに引数を使用した場合に正しく変換されない不具合を修正
+		パラメーターの変換時エラーを出力ソースに付加するように修正
+
+	2011/09/13 0.4(HSP3.3)
+
+		改行を含む文字列などを「\n」のようなフォーマット済みの文字列に変換するように修正
+
+	2011/07/25 0.3(HSP3.3RC1)
+
+		HSP3.3RC1に向けてドキュメントを整備
+		HSPスクリプトエディタから、GUIで機能を呼び出すツール(cnvsrc)を追加
+
+	2011/03/04 0.3
+
+		モジュール、ユーザー定義命令に対応
+		プラグイン、DLLに仮対応
+
+	2011/01/17 0.2
+
+		HSP3.3中間コードに対応
+
+	2008/10/01 0.1a
+
+		初期化用の関数を出力するように修正
+
+	2008/9/24 0.1
+
+		最初のバージョン。
+		パラメーターや変数などの基本機能をサポートしたプレビュー版です
+
+
+・連絡先
+
+何か問題や、ご意見、提案などありましたらメールかMLの方でお願いします。
+メールの返信につきましては、時間がかかる場合がありますので予めご了承下さい。
+hsp3cnvは、Microsoft Visual Studio 2005によってコンパイルされています。 
+
+        Homepage: http://www.onionsoft.net/openhsp/
+                  http://hsp.tv/
+        e-mail  : onitama@onionsoft.net
+
+
+------------------------------------------------------------------------------
+                                                     README.TXT / end of file 
+------------------------------------------------------------------------------

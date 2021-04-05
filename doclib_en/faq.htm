@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,HSP3Dish,FAQ">
+<meta name = "description" content = "Frequently Asked Questions and Answers on the HSPTV Bulletin Board">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<style type="text/css"><!-- 
+		ul {
+			margin-top: -1em;
+			list-style-type: none;
+		}
+	 --></style>
+	<title>HSP3 FAQ</title>
+</head>
+<!--
+By answering frequently asked questions to BBS in advance, we aim to improve user convenience.
+Basically, it will be a collection of links to the commentary.
+-->
+<body>
+	<div id="CONTAINER">
+<!-Header->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+		<h1>HSP3 Frequently Asked Questions</h1>
+		<p>
+This page will be useful for frequently asked questions and many beginners among the questions asked on the HSPTV! Bulletin Board.
+It is a collection of questions and a list. Please use it together with the manual search and the help browser search.
+See also HSPWiKi's <a href="http://quasiquote.org/hspwiki/HSP%e3%81%aeFAQ"> HSP FAQ </a>".
+		</p>
+
+<!-Table of Contents->
+		<ol>
+<li> <a href="#ERROR_ON_RUNNING"> Problems during program execution </a> </li>
+<li> <a href="#RELEASE"> Regarding the release of the created program </a> </li>
+<li> <a href="#OTHER"> Other </a> </li>
+		</ol>
+
+<!-Body->
+<h2 id = "ERROR_ON_RUNNING"> Problems during program execution </h2>
+		<dl>
+<dt> I get an unknown error </dt>
+The <dd> <p> error code tells you the cause of the error. The location of the error can also be inferred from the line number. </p>
+			<ul>
+<li>-> <a href="error.htm"> Error message </a> </li>
+<li>-> <a href="http://quasiquote.org/hspwiki/HSP3%e3%81%aeFAQ%3a%e3%82%a8%e3%83%a9%e3%83%bc%e3% 83% a1% e3% 83% 83% e3% 82% bb% e3% 83% bc% e3% 82% b8% e3% 81% ae% e6% 84% 8f% e5% 91% b3% e3% 81% a8% e5% af% be% e5% 87% a6% e6% b3% 95% e3% 81% 8c% e5% 88% 86% e3% 81% 8b% e3% 82% 89% e3% 81% aa% e3% 81% 84 "> HSP3 FAQ: I don't understand the meaning of the error message and what to do about it (HSPWiki) </a> </li>
+			</ul></dd>
+			
+<dt> There is no problem when started from the script editor, but an internal error occurs when using the application </dt>
+			<dd>
+<p> Copy the DLL or image file to the same directory as the created application. </p>
+<ul> <li>-> <a href="hspprog.htm#HSPEX_PLUGIN"> HSP Extension Plug-in Module </a> </li> </ul>
+			</dd>
+			
+<dt> The script on the website doesn't work </dt>
+			<dd><p>
+You may need to modify the script for HSP2 when running it on HSP3.
+Similarly, you may need to modify the script for HSP3 when running it on HSP2.
+Check the version of the script on the website that works.
+			</p></dd>
+		</dl>
+
+<h2 id = "RELEASE"> Regarding the release of the created program </h2>
+		<dl>
+Can I rewrite the <dt> icon? </dt>
+			<dd>
+<p> Yes, it is possible. </p>
+<ul> <li>-> <a href="hspprog.htm#ICONINS"> Rewrite the icon of the executable file </a> </li> </ul>
+			</dd>
+Is it okay to distribute the <dt> DLL with my own program? </dt>
+Read the <dd> <p> DLL documentation and follow the instructions. </p> </dd>
+		</dl>
+
+<h2 id = "OTHER"> Other </h2>
+		<dl>
+<dt> The screen flickers </dt>
+			<dd>
+Try using the <p> redraw instruction. At this time, do not use the cls command to clear the screen. </p>
+<ul> <li>-> <a href="hspprog.htm#SCR_AND_WND"> Screens and windows </a> </li> </ul>
+			</dd>
+<dt> It may not be recognized if you press multiple keys on the keyboard at the same time </dt>
+<dd> <p> Most keyboards have keys that can be recognized at the same time. This is an unavoidable problem from software. </p> </dd>
+		</dl>
+
+<!-Footer->
+		<ul id="FOOTER">
+<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
+<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

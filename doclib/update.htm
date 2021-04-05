@@ -1,0 +1,507 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,更新情報,アップデート">
+	<meta name="description" content="HSPの更新情報を掲載">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HSP3 アップデートガイド</title>
+</head>
+<body>
+	<div id="CONTAINER">
+		<!-- ヘッダー -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+		<h1>HSP3 アップデートガイド</h1>
+
+		<!-- 目次 -->
+		<ol>
+			<li><a href="#INTRO">イントロダクション</a></li>
+			<li><a href="#HSP3UPDATE">HSP3のアップデート概要</a></li>
+			<li><a href="#LINUX">Linux版の提供について</a></li>
+			<li><a href="#HSPOBSOLETE">パッケージの同梱終了について</a></li>
+			<li><a href="#DIFF2">HSP2との違いについて</a></li>
+			<li><a href="#SUMMARY">HSP3の概要</a>
+				<ol>
+					<li><a href="#SUMMARY_ENV">動作環境</a></li>
+					<li><a href="#SUMMARY_CMD">命令の追加</a></li>
+					<li><a href="#SUMMARY_FUNC">関数のサポート</a></li>
+					<li><a href="#SUMMARY_DOUBLE">実数のサポート</a></li>
+					<li><a href="#SUMMARY_PLUGIN">プラグイン</a></li>
+					<li><a href="#SUMMARY_MODULE">モジュール</a></li>
+					<li><a href="#SUMMARY_LABELVAR">ラベル型変数のサポート</a></li>
+					<li><a href="#SUMMARY_DLL">DLL呼び出し</a></li>
+					<li><a href="#SUMMARY_COM">COM呼び出し</a></li>
+					<li><a href="#SUMMARY_EDITOR">スクリプトエディタ</a></li>
+					<li><a href="#SUMMARY_PEAS">peasエディタ</a></li>
+					<li><a href="#SUMMARY_TVBLOWSER">HSPTVブラウザ</a></li>
+				</ol>
+			</li>
+			<li><a href="#FROM2">ver2.xからのスクリプト移行</a>
+				<ol>
+					<li><a href="#FROM2_CALC">計算順序の変更</a></li>
+					<li><a href="#FROM2_FUNC">命令の関数化</a></li>
+					<li><a href="#FROM2_CMD">命令及びシステム変数の変更</a></li>
+					<li><a href="#FROM2_MODULE">モジュール機能の仕様変更</a></li>
+					<li><a href="#FROM2_PLUGIN">プラグイン仕様の変更</a></li>
+					<li><a href="#FROM2_ARRAY">配列についての変更</a></li>
+					<li><a href="#FROM2_MEMBUF">メモリバッファについての変更</a></li>
+					<li><a href="#FROM2_PEEK">peek命令の変更</a></li>
+					<li><a href="#FROM2_DIFF">HSP3は難しい？（HSP2との互換マクロについて）</a></li>
+				</ol>
+			</li>
+		</ol>
+		
+		<!-- 本文 -->
+		<h2 id="INTRO">イントロダクション</h2>
+		<p>
+			HSP3.6は、HSP3.5に替わる新しいバージョンです。
+			大幅な仕様の変更はなく、あくまでも上位互換として動作する形で、各種機能が追加されています。
+		</p>
+		<p>
+			ここでは、HSP3.6とHSP3.5の違いについて。
+			そして、HSP2.xとHSP3全般の違いについて解説していきます。
+		</p>
+
+
+	<h2 id="HSP3UPDATE">HSP3のアップデート概要</h2>
+		<p>
+		HSP3.6は、特に変更を意識することなく、それまでのHSP3と同様にお使い頂けます。<br>
+		HSP3.6で追加された機能の詳細については、<a href="update36.htm" target="_blank">「HSP3.6新機能ハイライト」</a>を参照してください。
+		また、HSP3の詳細な更新履歴については、<a href="history.txt" target="_blank">「HSP3更新履歴」</a>を参照してください。
+		</p>
+		<dl>
+			<dt>HSP3.6新機能ハイライト</dt>
+			<dd><p><a href="update36.htm" target="_blank">update36.htm</a></p></dd>
+			<dt>HSP3更新履歴</dt>
+			<dd><p><a href="history.txt" target="_blank">history.txt</a></p></dd>
+		</dl>
+		<p>
+		HSP3.6で追加された新機能を手軽に試すことができるサンプルスクリプトが、「sample/new36」フォルダに含まれています。
+		ぜひ新しいサンプルでの動作を、実際に実行してお試しください。
+		</p>
+
+
+	<h2 id="LINUX">Linux版の提供について</h2>
+		<p>
+			LinuxのGUI環境(X Window System)及びRaspberry Pi(Raspbian)で動作するバージョンについては、
+			最新版をgithubにて公開しています。
+		</p>
+		<pre>
+	git clone https://github.com/onitama/OpenHSP
+		</pre>
+		<p>
+			のような形で取得してください。
+			詳しくは、以下のページをご覧ください。
+			最新版の入手及び、インストール方法についても説明されています。
+		</p>
+		<pre>
+	HSP3 for Linux/Raspberry Pi
+	<a href="https://hsp.tv/make/hsp3linux_pi.html" target="_blank">https://hsp.tv/make/hsp3linux_pi.html</a>
+		</pre>
+
+
+	<h2 id="HSPOBSOLETE">パッケージの同梱終了について</h2>
+		<p>
+		これまでのフルセットに同梱されていたllmod3、HGIMG / HGIMGX (3D描画用プラグイン)/HSP3MT(ランタイム)/HSPLetパッケージは、同梱されません。
+		古いパッケージに含まれているランタイムを引き続き使用することは可能ですが、非推奨として扱われているため、マニュアル及びヘルプは、提供されません。
+		</p>
+		<UL>
+		<LI>llmod3 -> HSP3に対応した各種モジュールをご使用ください
+		<LI>HGIMG / HGIMGX (3D描画用プラグイン) -> HGIMG3/HGIMG4をご使用ください
+		<LI>HSPDX (2D描画用プラグイン) -> HSP3DISHをご使用ください
+		<LI>HSP3MTランタイム -> hsp3utfやhsp3_64をご使用ください
+		<LI>HSPLetランタイム -> HSP3Dish(html5)をご使用ください
+		</UL>
+		<p>
+		これらのプラグイン・モジュールは、コードが古くなっており、現行のWindows上での動作が保証されません。
+		既存コードのコンパイル及び実行はサポートされますが、将来のバージョンでは対応されない可能性があります。
+		</p><p>
+		HSPDXプラグインは、古くからの利用者も多く現在のシステムでも実行可能なため、プラグインファイル自体は同梱されていますが、新規で使用することは推奨されません。
+		</p><p>
+		HSP3MTランタイム及びライブラリは、古いシステム向けに作成されたもので、
+		hsp3utfやhsp3_64などの新しいランタイムでも代用が可能です。
+		また、OpenHSPとしてソースが公開されているため、ライブラリそのものの配布も
+		必要がなくなったと判断しています。
+		</p>
+
+
+	<h2 id="DIFF2">HSP2との違いについて</h2>
+		<p>
+			HSP3は、HSP2までの仕様とプログラムを大幅に見直し、再構築したHSP3の最新バージョンです。
+			ver2.61までに培われた親しみやすさ、習得のしやすさ、シンプルさといった資産を継承しながら、
+			より幅広い応用と汎用性を持たせた環境を提供すべく開発されています。
+		</p>
+		<p>
+			以前のバージョンからの移行も含めて入門者から上級者まで幅広く使っていけるスクリプト言語となる
+			ことを願っています。
+		</p>
+		<p>
+			HSP3は、まったく新しく設計されたコアシステムを中心に構成されています。
+			このコアシステムは、プラットフォームに依存しないスクリプトエンジンと、自由に機能拡張を可能とする
+			アーキテクチャを持っています。
+			シンプルで強力なコアシステムのもとで、各種プラットフォームに対応した拡張コンポーネントを
+			用意し、安定した可搬性と生産性を実現するシステムを目指しています。
+		</p>
+		<p>
+			いままでの書式やルールの特長は継承し、不要な仕様を見直すことで豊富な資料や過去の資産を有効に
+			活用することができ、次期バージョンへ移行するための敷居も低くなっています。
+		</p>
+		<p>
+			HSP3は、ver2.61までの書式やルールを継承していますが、完全な互換性はありません。<br>
+			HSP3を新規にインストールした場合でも、HSP2.xは削除されず独立した形で使用することができます。
+		</p>
+		<p>
+			ver2.61までのソーススクリプトをver3.0に移行させるためには、注意点を参照した上で
+			互換性のない部分を変更するようにしてください。
+		</p>
+		<p>
+			また、ver3.0が正式にリリースされた後も、ver2.xの配布及びメンテナンスはしばらくの間継続される予定です。
+			既存のすべてのユーザーに、無理なくver3.0への移行ができるよう努力をしていきたいと考えています。
+		</p>
+
+
+		<h2 id="SUMMARY">HSP3の概要</h2>
+		<p>
+			HSP2を利用してきたユーザー向けに、HSP3の概要を紹介します。
+		</p>
+		<h3 id="SUMMARY_ENV">動作環境</h3>
+		<p>
+			HSP3のコアシステムは、WIN32上で動作します。
+			HSP2.xはWindows95以降のバージョンをサポートしていましたが、HSP3ではWindows98以降を動作環境としています。
+			(ただし、Windows95+InternetExplorer4以降の環境では動作可能です。)
+		</p>
+
+		<h3 id="SUMMARY_CMD">命令の追加</h3>
+		<p>
+			HSP2.xではプラグイン命令だった画像関連の命令が標準で装備されています。
+			画像の拡大や回転を行なうgrotate、grect、gsquare命令や、
+			円を描画するcircle命令、HSVによる色指定を行なうhsvcolor命令など
+			多くの機能がサポートされています。
+		</p>
+
+		<h3 id="SUMMARY_FUNC">関数のサポート</h3>
+		<p>
+			式の中に関数を含めることができるようになっています。
+			これにより、一部の命令やシステム変数が関数に置き換えられています。
+		</p>
+
+		<h3 id="SUMMARY_DOUBLE">実数のサポート</h3>
+		<p>
+			64bit浮動小数による実数計算をサポートしています。
+			三角関数や平方根などの数学関数を装備しており、
+			精度の高い計算を行なうことができます。
+		</p>
+		
+		<h3 id="SUMMARY_PLUGIN">プラグイン</h3>
+		<p>
+			拡張プラグインについては、3.0から大きく仕様が拡張されています。
+			3.0専用にプラグインを作成することにより、型の拡張や描画システム、
+			イベントの管理など、大幅なシステムの拡張を可能にします。
+		</p>
+		<p>
+			HSP2.61までのプラグインは、互換機能によりほぼすべてをそのまま使用することができます。
+			また、HSP2.61で標準添付されていた拡張プラグインはすべて同名のものを同梱しています。
+		</p>
+		<p>
+			HSP3では、これに加えてHTTPやFTPのネットワークアクセスに特化したHSPINETや、
+			高度な3D処理をサポートするHGIMG3を同梱しています。
+			さらに高度な画像処理に特化したプラグインHSPCVが同梱されています。
+		</p>
+
+		<h3 id="SUMMARY_MODULE">モジュール</h3>
+		<p>
+			モジュール機能はスクリプトの名前空間や、変数の領域を独立させることで、
+			スクリプトの再利用性とメンテナンス性を高めることができます。
+			ユーザー定義命令の作成やモジュール変数の作成、
+			ローカル変数の定義などにも結び付いた高度な仕組みです。
+			詳しくは「<a href="module.htm">モジュール機能ガイド</a>」をご覧ください。
+		</p>
+
+		<h3 id="SUMMARY_LABELVAR">ラベル型変数のサポート</h3>
+		<p>
+			ラベル型変数は、スクリプトの任意の位置情報を変数に格納するための仕組みです。
+			ラベル情報を変数に格納することにより、スクリプトの可能性がさらに広がります。
+		</p>
+
+		<h3 id="SUMMARY_DLL">DLL呼び出し</h3>
+		<p>
+			WIN32APIなど外部DLLを手軽に定義して呼び出すことが可能です。
+			HSP2.61のloadlib関連命令及びllmodに含まれる命令は、HSP3でサポートされません。
+		</p>
+
+		<h3 id="SUMMARY_COM">COM呼び出し</h3>
+		<p>
+			WindowsのCOMコンポーネント呼び出しをサポートしています。
+			COMオートメーション、COMイベントなどの高度な技術を手軽に利用することができます。
+			これにより、IEコンポーネント、XMLパーサー、正規表現による検索や置き換え、RSSの取得などの
+			最新テクノロジーをスクリプトから簡単に呼び出せます。
+		</p>
+
+		<h3 id="SUMMARY_EDITOR">スクリプトエディタ</h3>
+		<p>
+			新規のスクリプトエディタを同梱しています。
+			編集サイズ制限の撤廃と、キーワードの色付け、タブの採用などにより
+			高機能なものとなっています。(以前のバージョンもHSED3LE.EXEとして同梱されています。)
+			スクリプトエディタから呼び出される周辺ツール(ヘルプブラウザ等)も、
+			バージョンアップしたものを同梱しています。
+		</p>
+
+		<h3 id="SUMMARY_PEAS">peasエディタ</h3>
+		<p>
+			peasエディタは、テンプレート(ひな型)のパーツと、パラメーターやオプションを決めるだけで、
+			自動的にスクリプトを生成する簡易プログラミング環境を提供します。
+			ユーザーは、今まで通りにエディタでスクリプトを書くことはもちろん、マウス操作だけで
+			プログラムを作成することが可能になります。 
+		</p>
+
+		<h3 id="SUMMARY_TVBLOWSER">HSPTVブラウザ</h3>
+		<p>
+			HSPTVブラウザが標準で同梱されています。
+			これは、ネットワークを介してアップデートされるコンテンツビューアーです。
+			オンライン上のHSP情報、最新ソフトウェアを手軽にダウンロードして楽しむことができます。
+		</p>
+
+
+		<h2 id="FROM2">ver2.xからのスクリプト移行</h2>
+		<p>
+			ここでは、既にver2.xを使用していた方、スクリプトを移行したい方に向けての
+			変更点および注意点をお知らせします。
+		</p>
+		<h3 id="FROM2_CALC">計算順序の変更</h3>
+		<p>
+			HSP3では、計算式で演算子ごとの優先順位が付けられています。
+			多くの言語と同様に、「+」「-」よりも「*」「/」の方が先に計算されるようになっています。
+			これにより、ver2.xまでの計算式(左から処理)と結果が変わってくる場合があります。
+			優先順位の詳細については、「言語仕様ガイド」を参照してください。
+		</p>
+		
+		<h3 id="FROM2_FUNC">命令の関数化</h3>
+		<p>
+			一部の命令が関数として実装されています。
+			このため、ver2.xで使用していた命令の一部がそのままでは使用できなくなっています。
+			関数化された主な命令は、以下の通りです。
+		</p>
+		<ul>
+			<li>int</li><li>str</li><li>rnd</li><li>strlen</li><li>peek</li><li>wpeek</li>
+			<li>instr</li><li>strmid</li><li>getpath</li><li>ginfo</li><li>sysinfo</li>
+		</ul>
+		<p>
+			例えば<code>rnd a, 10</code>は<code>a = rnd(10)</code>という書式になります。
+		</p>
+
+		<h3 id="FROM2_CMD">命令及びシステム変数の変更</h3>
+		<p>
+			HSP 2.xに存在した以下のキーワードは3.0で変更されています。
+			ほとんどは代替の命令により同等の動作が可能になります。
+			また、2.xと互換で動作するマクロ(hsp261cmp.as)を利用することで
+			ある程度の互換を持たせることができるようになります。
+		</p>
+		<table class="keywordlist" summary="HSP3で変更された命令の一覧">
+			<caption>変更された命令</caption>
+			<tr><th>命令名</th><th>変更点</th></tr>
+			<tr><td>rnd</td><td>rnd()という書式の関数になりました</td></tr>
+			<tr><td>gettime</td><td>gettime()という書式の関数になりました</td></tr>
+			<tr><td>peek</td><td>peek()という書式の関数になりました</td></tr>
+			<tr><td>wpeek</td><td>wpeek()という書式の関数になりました</td></tr>
+			<tr><td>notemax</td><td>notemaxというシステム変数(マクロ)になりました</td></tr>
+			<tr><td>strlen</td><td>strlen()という書式の関数になりました</td></tr>
+			<tr><td>sysinfo</td><td>sysinfo()という書式の関数になりました</td></tr>
+			<tr><td>getpath</td><td>getpath()という書式の関数になりました</td></tr>
+			<tr><td>strmid</td><td>strmid()という書式の関数になりました</td></tr>
+			<tr><td>instr</td><td>instr()という書式の関数になりました</td></tr>
+			<tr><td>ginfo</td><td>ginfo()という書式の関数になりました</td></tr>
+
+			<tr><td>sndload</td><td>mmload命令という名称に変更されました</td></tr>
+			<tr><td>snd</td><td>mmplay命令という名称に変更されました</td></tr>
+			<tr><td>sndoff</td><td>mmstop命令という名称に変更されました</td></tr>
+
+			<tr><td>skiperr</td><td>onerror命令による割り込みをお使いください</td></tr>
+			<tr><td>objsend</td><td>代替としてsendmsg命令が用意されています</td></tr>
+			<tr><td>palfade</td><td>代替命令は用意されていません</td></tr>
+			<tr><td>palcopy</td><td>代替命令は用意されていません</td></tr>
+			<tr><td>getpal</td><td>palcolorと同機能になります</td></tr>
+			<tr><td>text</td><td>"hsp3util.as"モジュールにてtext,emes命令を提供しています</td></tr>
+		</table>
+		<table class="keywordlist" summary="HSP3で変更されたシステム変数の一覧">
+			<caption>変更されたシステム変数</caption>
+			<tr><th>システム変数名</th><th>変更点</th></tr>
+			<tr><td>csrx</td><td>ginfo_cxマクロに名称変更</td></tr>
+			<tr><td>csry</td><td>ginfo_cyマクロに名称変更</td></tr>
+			<tr><td>paluse</td><td>ginfo_paluseマクロに名称変更</td></tr>
+			<tr><td>dispx</td><td>ginfo_dispxマクロに名称変更</td></tr>
+			<tr><td>dispy</td><td>ginfo_dispyマクロに名称変更</td></tr>
+			<tr><td>rval</td><td>ginfo_rマクロに名称変更</td></tr>
+			<tr><td>gval</td><td>ginfo_gマクロに名称変更</td></tr>
+			<tr><td>bval</td><td>ginfo_bマクロに名称変更</td></tr>
+			<tr><td>winx</td><td>ginfo_winxマクロに名称変更</td></tr>
+			<tr><td>winy</td><td>ginfo_winyマクロに名称変更</td></tr>
+			<tr><td>cmdline</td><td>dir_cmdlineマクロに名称変更</td></tr>
+			<tr><td>windir</td><td>dir_winマクロに名称変更</td></tr>
+			<tr><td>curdir</td><td>dir_curマクロに名称変更</td></tr>
+			<tr><td>exedir</td><td>dir_exeマクロに名称変更</td></tr>
+			<tr><td>sysdir</td><td>dir_sysマクロに名称変更</td></tr>
+			<tr><td>prmx</td><td>ginfo命令の仕様変更により必要なくなりました</td></tr>
+			<tr><td>prmy</td><td>ginfo命令の仕様変更により必要なくなりました</td></tr>
+		</table>
+		<p>
+			loadlib関連命令は、#uselib・#funcを利用したDLL呼び出しか、
+			またはcallfunc関数による外部呼び出しに引き継がれます。
+			以下の命令は、HSP3ではサポートされていません。
+			(ll_poke、ll_peek等は、「dupptr命令+poke命令/peek関数」で代替が可能です。)
+		</p>
+		<ul>
+			<li>ll_ret</li>
+			<li>ll_retset</li>
+			<li>ll_getptr</li>
+			<li>ll_peek</li>
+			<li>ll_peek1</li>
+			<li>ll_peek2</li>
+			<li>ll_peek4</li>
+			<li>ll_poke</li>
+			<li>ll_callfunc</li>
+			<li>ll_n</li>
+			<li>ll_poke1</li>
+			<li>ll_poke2</li>
+			<li>ll_poke4</li>
+			<li>ll_libfree</li>
+			<li>ll_callfnv</li>
+			<li>ll_call</li>
+			<li>ll_free</li>
+			<li>ll_s</li>
+			<li>ll_p</li>
+			<li>ll_str</li>
+			<li>ll_dll</li>
+			<li>ll_func</li>
+			<li>ll_type</li>
+			<li>ll_z</li>
+			<li>ll_libload</li>
+			<li>ll_getproc</li>
+			<li>ll_bin</li>
+		</ul>
+
+		<h3 id="FROM2_MODULE">モジュール機能の仕様変更</h3>
+		<p>
+			モジュール機能の仕様が変更されています。
+			数値以外のパラメーターをユーザー定義命令に渡す場合には、スクリプトを変更する必要があります。
+			また、mref命令についても一部機能変更がありますので注意してください。
+			詳細については、「言語仕様ガイド」を参照してください。
+		</p>
+		
+		<h3 id="FROM2_PLUGIN">プラグイン仕様の変更</h3>
+		<p>
+			HSP2.5以降のすぺてのプラグイン規約に対応していますが、
+			HSP3の内部仕様変更による制限がいくつかあるので、注意が必要です。
+		</p>
+		<ul>
+			<li>BMSCR構造体は、flagからcolorまでのフィールドのみ参照できます。</li>
+			<li>PVal構造体のflagフィールド(型タイプ値)やlenフィールド(配列情報)を
+			DLL側で書き換えることはできません。</li>
+			<li>PVal構造体から文字列型の配列変数にアクセスすることはできません。</li>
+		</ul>
+		<p>
+			これ以外の点においては、HSP ver2.61と同等の情報が受け渡されます。
+			HSP2.61互換のプラグインでは、以下のような制限が発生しますので注意してください。
+			また、プラグインの互換機能はすべてのHSP2.xプラグインの動作を保障するものではありません。
+		</p>
+		<p>
+			プラグインから変数に値を代入する場合、バッファの自動拡張は行なわれません。
+			バッファオーバーフローが発生しないように注意してください。
+		</p>
+		<p>
+			フルセットのアーカイブには、ver2.61同梱プラグインのうち、hspda、hspdb、hspdx、
+			hspext、hspsock、hgimg(x)及びヘッダファイルが含まれています。
+			これらのプラグインは、ver2.61に同梱されているものとまったく同一のDLL
+			ファイルで、3.0のプラグイン互換機能により動作しています。
+			(HSP同梱でないユーザー作成プラグインの互換性については、それぞれの仕様により異なります。)
+		</p>
+		<p>
+			hspdx.dllについては、HSP3.0のpicload仕様変更によりパレットモード時に
+			読み込んだ画像のパレットが反映されません。このため、画像ファイルから
+			パレットデータを取り出すためのbmppalette命令を定義したモジュール集、
+			「hsp3util.as」を提供しています。
+			使用例については、hspdxのサンプルスクリプトを参照してください。
+		</p>
+
+		<h3 id="FROM2_ARRAY">配列についての変更</h3>
+		<p>
+			ver3.0からは配列変数の扱いが大きく変更されています。
+			ver2.xではdimまたはsdim命令によって、配列の最大数を確保してから使用する形になっていましたが、
+			ver3.0では配列の確保をすることなく配列変数に代入することが可能になっています。
+			(ただし、代入されていない配列の内容を参照するとエラーになります)
+		</p>
+		<p>
+			ver2.xではデフォルトで0～15までの配列(数値型変数の場合)を利用可能でしたが、
+			ver3.0ではデフォルトの確保はありません(0のみ)。
+			この違いによって一部のスクリプトが配列の参照中にエラーとなる場合があります。
+		</p>
+		
+		<h3 id="FROM2_MEMBUF">メモリバッファについての変更</h3>
+		<p>
+			HSP3から文字列型の変数は、自動拡張により自由なサイズのデータが扱われることになります。
+			このため、文字列型の配列変数を作成した場合には可変長の変数バッファが複数作成されることになり、
+			ver2.xまでのような連続したメモリ空間での管理ではなくなります。
+			これにより、文字列型の配列変数に対してbsave、bloadなどを始めとした直接メモリを操作する命令を実行した場合、
+			ver2.xではすべての次元にアクセスできましたが、
+			ver3.0からは特定の配列要素単位でのアクセスとなります。
+		</p>
+		<p>
+			実際にそのような操作を行なっているスクリプトは多くないと思われますが、
+			文字列型の配列変数に対するメモリ操作には注意が必要です。
+		</p>
+
+		<h3 id="FROM2_PEEK">peek命令の変更</h3>
+		<p>
+			peek命令はpeek関数になりましたが、同時にver2.xでサポートしていた文字列読み出しの機能は廃止されています。
+			同等の処理を行なう場合は、getstr命令で区切りキャラクターコードを0としてお使いください。
+		</p>
+
+		<h3 id="FROM2_DIFF">HSP3は難しい？</h3>
+		<p>
+			いままでHSP2を利用してきたユーザーの中には、HSP3になって新しい要素が大幅に
+			導入されたため、難しくなったと考えている方も多いと思います。
+		</p>
+		<p>
+			HSP3は、HSP2を使ってきたユーザーすべてに移行して使ってもらえるよう、設計されています。
+			HSP3で、大きく変わった点として関数の導入がありますが、これはいままで命令だったものを
+			計算式の中に記述できるようにしたもので、機能が変更されているわけではありません。
+			それ以外に追加された多くの機能は、HSPを拡張するための仕組みで、モジュール機能や
+			外部API呼び出し(loadlib関連命令にあたるもの)など、一般ユーザーが手軽に新しい機能を
+			使うことができるようにしたものです。
+		</p>
+		<p>
+			HSP3では、より柔軟な書き方ができるようになりましたが、人それぞれのスタイルが
+			あるものなので、HSP2と同じ書き方でも構いませんし、必要のない機能は使う必要はありません。
+			もしHSP2に慣れている場合は、スクリプトの先頭に次のような1行を追加してください。
+			主要な命令のほとんどがHSP2と同じ書き方で実行できるようになります。
+		</p>
+		<pre>#include "hsp261cmp.as"		;ver2.61互換を有効にする</pre>
+		<p>
+			これは、commonフォルダに存在する「hsp261cmp.as」で定義されている
+			ver2.61互換マクロにより、3.0以降で動作するよう適切な命令に変換するものです。
+			ただし、現状のver2.61互換マクロは、β版でありすべての記述をサポートして
+			いるわけではありません。また、計算式の優先順位変更も行なわれません。
+			完全ではないものの、ある程度までのスクリプトであれば、そのまま3.0で
+			動作させることが可能です。
+		</p>
+		<p>
+			ver2.61互換マクロの設定以降には、ver3.x専用の命令及び定義ファイルなどを
+			置かないように注意してください。
+		</p>
+
+		<!-- フッター -->
+		<ul id="FOOTER">
+			<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+			<li><a href="../index.htm">ドキュメントの一覧に戻る</a></li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

@@ -1,0 +1,113 @@
+------------------------------------------------------------------------------
+HSP3 official 2D / 3D material "Tamane"
+copyright 2014 (c) Ogawa Kosaku (Team GrisGris) / HSPTV!
+------------------------------------------------------------------------------
+
+■ HSP3 official 3D material "Tamane"
+
+HSP3 Official 3D Material "Tamane" is an official material that can be used with Hot Soup Processor (HSP).
+Contains all the data and scripts that can be displayed by HSP3, as well as the original data.
+The directory structure is as follows for each category.
+This data can be incorporated into your own software.
+See the Copyright and License section for more information.
+
+Check out the latest information on "Tamane" on the official page!
+http://hsp.tv/make/tamane3d.html
+
+
+■ HSP3 official 2D material "Tamane"
+
+2D material that can be displayed by HSP3 is recorded as standard.
+"Tamaface.bmp" and "tamaface.png" for cards of Tamane,
+Pixel art animation patterns ("tamadot.bmp" and "tamadot.png"), etc.
+Materials that can be widely used are provided.
+In addition, sample games such as "Jump Up of Tamane ♪", "Drop Puzzle", and "Card Battle" are also included.
+Check out the latest information on 2D materials on the official page!
+http://hsp.tv/make/tamane2d.html
+
+
+■ About sample execution
+
+When running the sample from HSP3, be sure to use the latest version (HSP3.4 or later).
+
+Information and downloads of Hot Soup Processor (HSP) are available on the official page below.
+http://hsp.tv/
+
+The folder structure is as follows.
+
++ --- hsptv 2D material data (BMP, PNG format)
++---sample
+        + --- hgimg3 HGIM G3 runtime data & scripts
+        |
+        + --- hgimg4 HGIM G4 runtime data & scripts
+              + --- fbx 3D data (FBX format)
+
+
+■ Copyright and license
+
+The 3D material "Tamane" is made by Mr. Kosaku Ogawa (Team GrisGris).
+It is published by onion software.
+onion software does not guarantee any damage caused by this data.
+Use at your own risk.
+
+The copyright of the 3D material "Tamane" belongs to Mr. Kosaku Ogawa (Team GrisGris).
+The data of the 3D material "Tamane" and the accompanying sample script data are available.
+It can be attached, duplicated, reorganized, or redistributed under a modified BSD license, whether for a fee or for free.
+No license fee is required.
+
+The rights of the original software (executable file) created by the user by incorporating the 3D material "Tamane" are
+It belongs to the user who created it.
+Notation regarding the copyright of material data is not mandatory.
+If you want to specify it in the document etc., please use the following format.
+------------------------------------------------------------------------------
+HSP3 official 3D material "Tamane"
+copyright 2014-2016 (c) Ogawa Kosaku (Team GrisGris)
+http://www.gris2.com/
+------------------------------------------------------------------------------
+
+
+■ fbx folder
+
+The original 3D data is recorded in FBX format.
+This data cannot be read directly from HSP3.
+
+high_school_girl ・ ・ ・ Normal body model
+high_school_girlSD ・ ・ Deformed model
+
+
+■ hgimg3 folder
+
+Contains data and scripts that run on the hgimg3 runtime.
+samples 1 to 4 are sample scripts.
+From a simple model display to a demo running around rugged terrain.
+The model files (.x format) that can be read are as follows.
+
+tamane_s.x "Tamane" Standby pose
+tamane_w.x "Tamane" walking pose
+tamane_r.x "Tamane" Running pose
+
+tamane2_s.x Deformed version "Tamane" Standby pose
+tamane2_w.x Deformed version "Tamane" walking pose
+tamane2_r.x Deformed version "Tamane" running pose
+
+
+■ hgimg4 folder
+
+Contains data and scripts that run on the hgimg4 runtime.
+(Even if you create an executable file, the data contained under the res folder is always required.)
+hgimg4 is a plugin under development and will be a preview version of the model display and animation.
+Future versions support finer animation control (motion blending, etc.)
+Will be done.
+The model files (.x format) that can be read are as follows.
+
+tamane.gpb "Tamane" Standby pose
+tamane2.gpb Deformed version "Tamane" Standby pose
+
+
+■ Acknowledgments
+
+We would like to thank Mr. Kosaku Ogawa (Team GrisGris) for creating a wonderful model.
+The site of Team GrisGris, represented by Mr. Kosaku Ogawa, is here.
+http://www.gris2.com/
+
+
