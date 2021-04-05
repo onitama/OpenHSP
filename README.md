@@ -92,6 +92,15 @@ Script Editor (Simplified Version) is a GUI application that allows you to write
 
 You can run the script you are editing by pressing the [F5] key or selecting "Run" from the "HSP" menu. The current version uses hsp3dish as the standard runtime. The sample code corresponding to HSP3Dish is included in the sample folder, so please try it. The character code of the script is treated as UTF-8. Please note that it is different from the character code (SJIS) used by Windows.
 
+For example, a simple script like this can be saved as "test.hsp" to check its behavior. This will display the text "Hello World".
+
+	#include "hsp3cl.as"
+	mes "Hello World."
+	stop
+
+If you want to know about the commands in the script, move the cursor to a word in the script editor ( for example "mes" ) and then press [F1]. Help about the instruction will be displayed.
+The sample folder contains samples to test various functions; try scripting with GUI, sprites, and 3D.
+
 If you want to execute the script from the command line, you need to create an HSP object file with hspcmp.
 
 	./hspcmp -d -i -u test.hsp
