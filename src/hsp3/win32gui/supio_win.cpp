@@ -172,7 +172,7 @@ char *strstr2( char *target, char *src )
 		}
 		p++;							// 検索位置を移動
 		if (a1>=129) {					// 全角文字チェック
-			if ((a1<=159)||(a1>=224)) p++;
+			if (((a1<=159)||(a1>=224))&&(*p!=0)) p++;
 		}
 	}
 	return NULL;
@@ -193,7 +193,7 @@ char *strchr2( char *target, char code )
 		if ( a1==code ) res=(char *)p;
 		p++;							// 検索位置を移動
 		if (a1>=129) {					// 全角文字チェック
-			if ((a1<=159)||(a1>=224)) p++;
+			if (((a1<=159)||(a1>=224))&&(*p!=0)) p++;
 		}
 	}
 	return res;
