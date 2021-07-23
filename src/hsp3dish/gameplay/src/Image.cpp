@@ -75,6 +75,8 @@ Image* Image::create(const char* path)
 		dstptr += pitch;
 	}
 	delete[] p;
+    stbi_image_free(pImg);
+
 
 #else
 	// Open the file.

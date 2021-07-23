@@ -45,6 +45,7 @@ using namespace gameplay;
 #define GPOBJ_ID_SCENE  (0x100001)
 #define GPOBJ_ID_CAMERA (0x100002)
 #define GPOBJ_ID_LIGHT  (0x100003)
+#define GPOBJ_ID_TOUCHNODE  (0x100004)
 
 #define GPOBJ_SHAPE_NONE (-1)
 #define GPOBJ_SHAPE_MODEL (0)
@@ -130,6 +131,14 @@ GPPSET_MAX
 #define GPANIM_OPT_SPEED (6)
 
 #define GPOBJ_MULTIEVENT_MAX 4
+
+#define GPNODEINFO_NODE (0)
+#define GPNODEINFO_MODEL (1)
+#define GPNODEINFO_NAME (0x100)
+#define GPNODEINFO_CHILD (0x101)
+#define GPNODEINFO_SIBLING (0x102)
+#define GPNODEINFO_SKINROOT (0x103)
+
 
 //  HGIMG4 Sprite Object
 class gpspr {
@@ -424,7 +433,8 @@ public:
 	int drawFont(void *bmscr, int x, int y, char* text, int* out_ysize);
 
 	int getObjectVector( int objid, int moc, Vector4 *prm );
-	void getNodeVector( gpobj *obj, Node *node, int moc, Vector4 *prm );
+	void getNodeVector(gpobj* obj, Node* node, int moc, Vector4* prm);
+	void getNodeVectorExternal(gpobj* obj, Node* node, int moc, Vector4* prm);
 	void getSpriteVector( gpobj *obj, int moc, Vector4 *prm );
 
 	int setObjectVector( int objid, int moc, Vector4 *prm );
@@ -474,6 +484,10 @@ public:
 	void storeNextVector(gpevent *myevent);
 	int getCurrentFilterMode(void);
 	void setCurrentFilterMode(int mode);
+	Node* getNodeFromName( int objid, char *name );
+	bool getNodeFromNameSub(Node* node, char *name, int deep);
+	int getNodeInfo(int objid, int option, char* name, int* result);
+	int getNodeInfoString(int objid, int option, char* name, std::string *res);
 
 	// 2D draw function
 	float *startPolyTex2D( gpmat *mat, int material_id );
@@ -610,7 +624,8 @@ private:
 	int _render_numpoly;
 	int _filtermode;
 
-	Node *testNode;
+	Node* touchNode;
+	Node* tempNode;
 
 	// Multi Light
 	int _max_dlight;
@@ -633,9 +648,9 @@ private:
 	MeshBatch* _meshBatch;						// MeshBatch for Polygon
 	MeshBatch* _meshBatch_line;					// MeshBatch for Line
 	MeshBatch* _meshBatch_font;					// MeshBatch for Font
-	Material* _fontMaterial;
 
 	Effect *_spriteEffect;
+	Effect *_spritecolEffect;
 	float _bufPolyColor[BUFSIZE_POLYCOLOR];
 	float _bufPolyTex[BUFSIZE_POLYTEX];
 

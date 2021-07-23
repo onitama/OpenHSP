@@ -899,30 +899,26 @@ static int cmdfunc_extcmd( int cmd )
 		POINT pt;
 		int setdef = 0;			// 既にマイナスの値か?
 		GetCursorPos(&pt);
-		if ((pt.x < 0) || (pt.x < 0)) {
-			if (msact >= 0) setdef = 1;
-		}
 		p1 = code_getdi( pt.x );
 		p2 = code_getdi( pt.y );
-		p3 = code_getdi( setdef );
+		p3 = code_getdi( 0 );
 		if (p3 == 0) {
-			if (msact >= 0) {
-				if ((p1 < 0) || (p2 < 0)) {
+			if ((p1 < 0) || (p2 < 0)) {
+				if (msact >= 0) {
 					msact = ShowCursor(0);
-					break;
 				}
+				break;
 			}
 		}
-
 		SetCursorPos(p1, p2);
-
+		if (p3 > 0) break;
 		if (p3 < 0) {
-			msact = ShowCursor(0);
+			if (msact >= 0) {
+				msact = ShowCursor(0);
+			}
 			break;
 		}
-		if (p3 > 0) {
-			if (msact < 0) { msact = ShowCursor(1); }
-		}
+		if (msact < 0) { msact = ShowCursor(1); }
 		break;
 		}
 
@@ -1536,7 +1532,7 @@ int ex_getobj( int wid, int id, void *inf )
 	Bmscr *bm;
 	HSPOBJINFO *obj;
 	bm = wnd->GetBmscrSafe( wid );
-	obj = bm->GetHSPObject( id );
+	obj = bm->GetHSPObjectSafe( id );
 	memcpy( inf, obj, sizeof(HSPOBJINFO) );
 	return 0;
 }
@@ -1546,7 +1542,7 @@ int ex_setobj( int wid, int id, const void *inf )
 	Bmscr *bm;
 	HSPOBJINFO *obj;
 	bm = wnd->GetBmscrSafe( wid );
-	obj = bm->GetHSPObject( id );
+	obj = bm->GetHSPObjectSafe( id );
 	memcpy( obj, inf, sizeof(HSPOBJINFO) );
 	return 0;
 }

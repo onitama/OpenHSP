@@ -669,6 +669,53 @@ int hsp3dish_debugopen( void )
 	return 0;
 }
 
+/*----------------------------------------------------------*/
+//		デバイスコントロール関連
+/*----------------------------------------------------------*/
+static HSP3DEVINFO *mem_devinfo;
+static int devinfo_dummy;
+
+static int hsp3dish_devprm(char *name, char *value)
+{
+	return -1;
+}
+
+static int hsp3dish_devcontrol(char *cmd, int p1, int p2, int p3)
+{
+	return -1;
+}
+
+static int *hsp3dish_devinfoi(char *name, int *size)
+{
+	devinfo_dummy = 0;
+	*size = -1;
+	return NULL;
+	//	return &devinfo_dummy;
+}
+
+static char *hsp3dish_devinfo(char *name)
+{
+	if (strcmp(name, "name") == 0) {
+		return mem_devinfo->devname;
+	}
+	if (strcmp(name, "error") == 0) {
+		return mem_devinfo->error;
+	}
+	return NULL;
+}
+
+static void hsp3dish_setdevinfo(HSP3DEVINFO *devinfo)
+{
+	//		Initalize DEVINFO
+	mem_devinfo = devinfo;
+	devinfo->devname = "win32dev";
+	devinfo->error = "";
+	devinfo->devprm = hsp3dish_devprm;
+	devinfo->devcontrol = hsp3dish_devcontrol;
+	devinfo->devinfo = hsp3dish_devinfo;
+	devinfo->devinfoi = hsp3dish_devinfoi;
+}
+
 
 static void hsp3dish_dispatch( MSG *msg )
 {
@@ -868,6 +915,8 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			hsp3dish_initwindow(m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle);
 			hsp3excmd_rebuild_window();
 			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+			HSP3DEVINFO *devinfo = hsp3extcmd_getdevinfo();
+			hsp3dish_setdevinfo(devinfo);
 #ifdef USE_OBAQ
 			hsp3typeinit_dw_restart(code_gettypeinfo(TYPE_USERDEF));
 #endif
@@ -884,53 +933,6 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 	}
 }
 
-
-/*----------------------------------------------------------*/
-//		デバイスコントロール関連
-/*----------------------------------------------------------*/
-static HSP3DEVINFO *mem_devinfo;
-static int devinfo_dummy;
-
-static int hsp3dish_devprm( char *name, char *value )
-{
-	return -1;
-}
-
-static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
-{
-	return -1;
-}
-
-static int *hsp3dish_devinfoi( char *name, int *size )
-{
-	devinfo_dummy = 0;
-	*size = -1;
-	return NULL;
-//	return &devinfo_dummy;
-}
-
-static char *hsp3dish_devinfo( char *name )
-{
-	if ( strcmp( name, "name" )==0 ) {
-		return mem_devinfo->devname;
-	}
-	if ( strcmp( name, "error" )==0 ) {
-		return mem_devinfo->error;
-	}
-	return NULL;
-}
-
-static void hsp3dish_setdevinfo( HSP3DEVINFO *devinfo )
-{
-	//		Initalize DEVINFO
-	mem_devinfo = devinfo;
-	devinfo->devname = "win32dev";
-	devinfo->error = "";
-	devinfo->devprm = hsp3dish_devprm;
-	devinfo->devcontrol = hsp3dish_devcontrol;
-	devinfo->devinfo = hsp3dish_devinfo;
-	devinfo->devinfoi = hsp3dish_devinfoi;
-}
 
 /*----------------------------------------------------------*/
 

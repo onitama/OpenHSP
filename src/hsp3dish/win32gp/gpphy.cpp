@@ -24,7 +24,7 @@ gpphy::~gpphy()
 
 void gpphy::reset( gpobj *parent )
 {
-	_mode = 0;
+	_option = 0;
 	_mark = 0;
 	_colObj = NULL;
 	_parent = parent;
@@ -219,6 +219,7 @@ gpphy *gamehsp::setPhysicsObjectAuto( gpobj *obj, float mass, float friction, in
 	phy = new gpphy;
 	if ( phy == NULL ) return NULL;
 	phy->reset( obj );
+	phy->_option = option;
 	
 	PhysicsRigidBody::Parameters rigParams;
 

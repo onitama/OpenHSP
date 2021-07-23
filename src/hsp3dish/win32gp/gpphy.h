@@ -43,7 +43,7 @@ public:
 
 	short _flag;						// 存在フラグ
 	short _mark;						// マーク処理用
-	int _mode;							// モード
+	int _option;						// 作成オプション
 	int _id;							// フィジックスオブジェクトID
 	PhysicsRigidBody *_colObj;			// コリジョンオブジェクト
 	gpobj *_parent;						// 親のgpobj

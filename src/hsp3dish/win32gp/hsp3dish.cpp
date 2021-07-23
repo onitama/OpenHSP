@@ -698,6 +698,58 @@ int hsp3dish_debugopen( void )
 }
 
 
+/*----------------------------------------------------------*/
+//		デバイスコントロール関連
+/*----------------------------------------------------------*/
+static HSP3DEVINFO *mem_devinfo;
+static int devinfo_dummy;
+
+static int hsp3dish_devprm(char *name, char *value)
+{
+	return -1;
+}
+
+static int hsp3dish_devcontrol(char *cmd, int p1, int p2, int p3)
+{
+	return -1;
+}
+
+static int *hsp3dish_devinfoi(char *name, int *size)
+{
+	devinfo_dummy = 0;
+	*size = -1;
+	return NULL;
+	//	return &devinfo_dummy;
+}
+
+static char *hsp3dish_devinfo(char *name)
+{
+	if (strcmp(name, "name") == 0) {
+		return mem_devinfo->devname;
+	}
+	if (strcmp(name, "error") == 0) {
+		return mem_devinfo->error;
+	}
+	return NULL;
+}
+
+static void hsp3dish_setdevinfo(HSP3DEVINFO *devinfo)
+{
+	//		Initalize DEVINFO
+	mem_devinfo = devinfo;
+#ifdef GP_USE_ANGLE
+	devinfo->devname = "win32dx9";
+#else
+	devinfo->devname = "win32opengl";
+#endif
+	devinfo->error = "";
+	devinfo->devprm = hsp3dish_devprm;
+	devinfo->devcontrol = hsp3dish_devcontrol;
+	devinfo->devinfo = hsp3dish_devinfo;
+	devinfo->devinfoi = hsp3dish_devinfoi;
+}
+
+
 static void hsp3dish_dispatch( MSG *msg )
 {
 	TranslateMessage( msg );
@@ -899,7 +951,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			gameplay::Logger::set(gameplay::Logger::LEVEL_WARN, logfunc);
 			gameplay::Logger::set(gameplay::Logger::LEVEL_ERROR, logfunc);
 
-			platform = gameplay::Platform::create( game, m_hWnd, hsp_wx, hsp_wy, hsp_fullscr!=0 );
+			platform = gameplay::Platform::create(game, m_hWnd, hsp_wx, hsp_wy, hsp_fullscr!=0);
 			if (platform == NULL) {
 				hsp3dish_dialog("OpenGL initalize failed.");
 			}
@@ -907,6 +959,8 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			game->frame();
 
 			hsp3excmd_rebuild_window();
+			HSP3DEVINFO *devinfo = hsp3extcmd_getdevinfo();
+			hsp3dish_setdevinfo(devinfo);
 			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
 
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
@@ -918,58 +972,6 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 		}
 
 	}
-}
-
-
-/*----------------------------------------------------------*/
-//		デバイスコントロール関連
-/*----------------------------------------------------------*/
-static HSP3DEVINFO *mem_devinfo;
-static int devinfo_dummy;
-
-static int hsp3dish_devprm( char *name, char *value )
-{
-	return -1;
-}
-
-static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
-{
-	return -1;
-}
-
-static int *hsp3dish_devinfoi( char *name, int *size )
-{
-	devinfo_dummy = 0;
-	*size = -1;
-	return NULL;
-//	return &devinfo_dummy;
-}
-
-static char *hsp3dish_devinfo( char *name )
-{
-	if ( strcmp( name, "name" )==0 ) {
-		return mem_devinfo->devname;
-	}
-	if ( strcmp( name, "error" )==0 ) {
-		return mem_devinfo->error;
-	}
-	return NULL;
-}
-
-static void hsp3dish_setdevinfo( HSP3DEVINFO *devinfo )
-{
-	//		Initalize DEVINFO
-	mem_devinfo = devinfo;
-#ifdef GP_USE_ANGLE
-	devinfo->devname = "win32dx9";
-#else
-	devinfo->devname = "win32opengl";
-#endif
-	devinfo->error = "";
-	devinfo->devprm = hsp3dish_devprm;
-	devinfo->devcontrol = hsp3dish_devcontrol;
-	devinfo->devinfo = hsp3dish_devinfo;
-	devinfo->devinfoi = hsp3dish_devinfoi;
 }
 
 /*----------------------------------------------------------*/
@@ -1130,6 +1132,13 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 	return 0;
 }
 
+
+void* hsp3dish_getinstance(void)
+{
+	return m_hInstance;
+}
+
+
 int hsp3dish_reset(void)
 {
 	//		Register Type
@@ -1144,7 +1153,7 @@ int hsp3dish_reset(void)
 	wndClass.cbClsExtra = 0;
 	wndClass.cbWndExtra = 0;
 	wndClass.hInstance = m_hInstance;
-	wndClass.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(128));
+	wndClass.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(128));
 	wndClass.hIconSm = NULL;
 	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);  // No brush - we are going to paint our own background
@@ -1296,6 +1305,10 @@ void hsp3dish_bye(void)
 	if (h_dbgwin != NULL) { FreeLibrary(h_dbgwin); h_dbgwin = NULL; }
 #endif
 
+	//		HSP関連の解放
+	//
+	if (hsp != NULL) { delete hsp; hsp = NULL; }
+
 	if (m_hWnd != NULL) {
 		hgio_term();
 		DestroyWindow(m_hWnd);
@@ -1318,9 +1331,6 @@ void hsp3dish_bye(void)
 	    delete game;
 	}
 
-	//		HSP関連の解放
-	//
-	if (hsp != NULL) { delete hsp; hsp = NULL; }
 	DllManager().free_all_library();
 }
 

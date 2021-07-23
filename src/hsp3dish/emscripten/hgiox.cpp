@@ -1298,6 +1298,7 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 }
 
 
+#if 0
 void hgio_fcopy( float distx, float disty, short xx, short yy, short srcsx, short srcsy, int texid, int color )
 {
 	//		画像コピー(フォント用)
@@ -1377,6 +1378,7 @@ void hgio_fcopy( float distx, float disty, short xx, short yy, short srcsx, shor
 	glDisable(GL_TEXTURE_2D);
 #endif
 }
+#endif
 
 
 void hgio_fontcopy( BMSCR *bm, float distx, float disty, float ratex, float ratey, int srcsx, int srcsy, int texid, int basex, int basey )
@@ -1423,20 +1425,45 @@ void hgio_fontcopy( BMSCR *bm, float distx, float disty, float ratex, float rate
     *flp++ = x2;
     *flp++ = y2;
 
+#if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+	glEnable(GL_TEXTURE_2D);
+#endif
+
 	ChangeTex( texid );
     glVertexPointer( 2, GL_FLOAT,0,vertf2D );
     glTexCoordPointer( 2,GL_FLOAT,0,uvf2D );
 
     //ブレンドモード設定
-	setBlendMode( 3 );
-	setColorTex_color(1.0f);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(4,GL_FLOAT,0,_panelColorsTex);
+    int mode;
+	if (GetSysReq(SYSREQ_FIXMESALPHA)) {
+		mode = 2;
+	} else {
+		mode = bm->gmode;
+	}
+	setBlendMode( mode );
+
+    if ( mode <= 1 ) {
+        glDisableClientState(GL_COLOR_ARRAY);
+	} else {
+		GLfloat alpha;
+	    if ( mode >= 3 ) {
+			alpha = FVAL_BYTE1*( bm->gfrate );
+		} else {
+			alpha = 1.0f;
+		}
+		setColorTex_color(alpha);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glColorPointer(4,GL_FLOAT,0,_panelColorsTex);
+    }
 
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,_filter); 
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,_filter); 
 
     glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+
+#if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+	glDisable(GL_TEXTURE_2D);
+#endif
 }
 
 

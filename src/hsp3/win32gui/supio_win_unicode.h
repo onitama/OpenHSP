@@ -50,7 +50,7 @@ void dirinfo( char *p, int id );
 void Alert( const char *mes );
 void AlertW( const HSPAPICHAR *mes );
 void AlertV( const char *mes, int val );
-void AlertfW( const HSPAPICHAR *format, ... );
+void Alertf( const HSPAPICHAR *format, ... );
 
 inline int issjisleadbyte( unsigned char c )
 {

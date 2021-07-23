@@ -968,7 +968,7 @@ void AlertV( const char *mes8, int val )
 	MessageBoxW( NULL, ss, TEXT("error"),MB_ICONINFORMATION | MB_OK );
 }
 
-void Alertf( const TCHAR *format, ... )
+void Alertf( const HSPAPICHAR *format, ... )
 {
 	TCHAR textbf[4096];
 	va_list args;

@@ -83,6 +83,20 @@ int HspWnd::GetActive( void )
 }
 
 
+void HspWnd::resetBuffers(void)
+{
+	int i;
+	Bmscr* bm;
+	for (i = 1; i < bmscr_max; i++) {
+		bm = mem_bm[i];
+		if (bm != NULL) {
+			delete bm;
+			mem_bm[i] = NULL;
+		}
+	}
+}
+
+
 void HspWnd::ExpandScreen( int id )
 {
 	int i;

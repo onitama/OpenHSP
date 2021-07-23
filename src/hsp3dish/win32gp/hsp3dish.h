@@ -17,4 +17,6 @@ void hsp3dish_bye(void);
 void hsp3dish_dialog( char *mes );
 char *hsp3dish_getlog(void);
 
+void* hsp3dish_getinstance(void);
+
 #endif

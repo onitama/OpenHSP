@@ -50,6 +50,7 @@ OBJS = \
 	../hsp3/stack.bc \
 	../hsp3/strbuf.bc \
 	../hsp3/strnote.bc \
+	../hsp3/emscripten/hsp3ext_emscripten.bc \
 	sysreq.bc \
 	texmes.bc \
 	essprite.bc \
@@ -89,6 +90,7 @@ OBJS_GP = \
 	../hsp3/stack.gp.bc \
 	../hsp3/strbuf.gp.bc \
 	../hsp3/strnote.gp.bc \
+	../hsp3/emscripten/hsp3ext_emscripten.gp.bc \
 	sysreq.gp.bc \
 	texmes.gp.bc \
 	essprite.gp.bc \

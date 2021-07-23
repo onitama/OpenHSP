@@ -704,7 +704,7 @@ void Bmscr::SetHSPObjectFont( int id )
 		if ( hw == NULL ) return;
 		if (a==1) hf=(HFONT)GetStockObject(17);
 		else {
-			plf=(PLOGFONT) &logfont;
+			plf=(PLOGFONT) logfont;
 			hf=CreateFontIndirect( plf );
 		}
 		PostMessage( hw,WM_SETFONT,(WPARAM)hf,TRUE );

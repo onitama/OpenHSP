@@ -260,7 +260,10 @@ public:
 	char	*prtmes;			// slow message ptr
 	int		focflg;				// focus set flag
 	int		objmode;			// object set mode
-	LOGFONT	logfont;			// logical font
+
+	LOGFONT	*logfont;			// logical font
+	int		logopt[14];			// dummy padding
+
 	int		style;				// extra window style
 	int		gfrate;				// halftone copy rate
 	int		tabmove;			// object TAB move mode
@@ -403,7 +406,10 @@ typedef struct BMSCR
 	char	*prtmes;			// slow message ptr
 	int		focflg;				// focus set flag
 	int		objmode;			// object set mode
-	LOGFONT	logfont;			// logical font
+
+	LOGFONT	*logfont;			// logical font
+	int		logopt[14];			// dummy padding
+
 	int		style;				// extra window style
 	int		gfrate;				// halftone copy rate
 	int		tabmove;			// object TAB move mode

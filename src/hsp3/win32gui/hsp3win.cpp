@@ -492,11 +492,10 @@ void hsp3win_bye( void )
 	if ( h_dbgwin != NULL ) { FreeLibrary( h_dbgwin ); h_dbgwin = NULL; }
 #endif
 
-	DllManager().free_all_library();
-
 	//		HSP関連の解放
 	//
 	if (hsp != NULL) { delete hsp; hsp = NULL; }
+	DllManager().free_all_library();
 
 	//		システム関連の解放
 	//

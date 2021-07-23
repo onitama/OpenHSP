@@ -370,6 +370,17 @@ static void InitVertexTemp( void )
 }
 
 
+static int Get2N(int val)
+{
+	int res = 1;
+	while (1) {
+		if (res >= val) break;
+		res <<= 1;
+	}
+	return res;
+}
+
+
 int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mode )
 {
 	//	VRAMの情報を取得する
@@ -377,33 +388,45 @@ int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mod
 	HRESULT hr;
 	IDirect3DSurface8 *pBackBuffer;
 	IDirect3DSurface8 *pTmp;
-	RECT area;
 	RECT tmparea;
 	D3DLOCKED_RECT rect;
 	BYTE *base;
 	BYTE *hspvram;
 	int *data;
 	int i,j,k,ofsx,xand;
+	int sx_fix, sy_fix;
 
 	//バックバッファを得る
-	area.left = x;
-	area.top = y;
-	area.right = x + sx - 1;
-	area.bottom = y + sy - 1;
+
+	hr = d3ddev->GetBackBuffer(0,D3DBACKBUFFER_TYPE_MONO,&pBackBuffer);
+	if ( FAILED(hr) ) return -1;
+
+	sx_fix = sx;
+	sy_fix = sy;
+	if (sx_fix > hgio_getWidth()) { sx_fix = hgio_getWidth(); }
+	if (sy_fix > hgio_getHeight()) { sy_fix = hgio_getHeight(); }
+
+	// ARGB用フォーマットのサーフェースをつくる
+	int main_sx = Get2N(hgio_getWidth());
+	int main_sy = Get2N(hgio_getHeight());
+	hr = d3ddev->CreateImageSurface(main_sx, main_sy, D3DFMT_A8R8G8B8, &pTmp);
+	if (FAILED(hr)) {
+		if (main_sx < main_sy) {
+			main_sx = main_sy;
+		}
+		else {
+			if (main_sx > main_sy) main_sy = main_sx;
+		}
+		hr = d3ddev->CreateImageSurface(main_sx, main_sy, D3DFMT_A8R8G8B8, &pTmp);
+		if (FAILED(hr)) return -5;
+	}
 
 	tmparea.left = 0;
 	tmparea.top = 0;
 	tmparea.right = sx - 1;
 	tmparea.bottom = sy - 1;
 
-	hr = d3ddev->GetBackBuffer(0,D3DBACKBUFFER_TYPE_MONO,&pBackBuffer);
-	if ( FAILED(hr) ) return -1;
-
-	// ARGB用フォーマットのサーフェースをつくる
-	hr = d3ddev->CreateImageSurface(sx, sy, D3DFMT_A8R8G8B8, &pTmp);
-	if( FAILED(hr) ) return -5;
-
-	hr = D3DXLoadSurfaceFromSurface( pTmp, NULL, &tmparea, pBackBuffer, NULL, &area, D3DX_FILTER_NONE, 0 );
+	hr = D3DXLoadSurfaceFromSurface( pTmp, NULL, &tmparea, pBackBuffer, NULL, NULL, D3DX_FILTER_NONE, 0 );
 	if ( FAILED(hr) ) return -4;
 
 	hr = pTmp->LockRect( &rect, NULL, 0 );
@@ -414,10 +437,10 @@ int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mod
 	switch( mode ) {
 	case 0:
 		//	HSP互換(RGBA)
-		for (j = 0; j < sy; j += py) {
+		for (j = 0; j < sy_fix; j += py) {
 			hspvram = ((BYTE *)res) + ((sx * 4) * j);
 			base = ((BYTE *)rect.pBits) + rect.Pitch * j;
-			for (i = 0; i < sx; i += px) {
+			for (i = 0; i < sx_fix; i += px) {
 				*hspvram++ = base[2];
 				*hspvram++ = base[1];
 				*hspvram++ = base[0];
@@ -428,10 +451,10 @@ int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mod
 		break;
 	case 1:
 		//	OpenGL互換(BGRA)
-		for (j = 0; j < sy; j += py) {
+		for (j = 0; j < sy_fix; j += py) {
 			hspvram = ((BYTE *)res) + ((sx * 4) * j);
 			base = ((BYTE *)rect.pBits) + rect.Pitch * j;
-			for (i = 0; i < sx; i += px) {
+			for (i = 0; i < sx_fix; i += px) {
 				*hspvram++ = base[0];
 				*hspvram++ = base[1];
 				*hspvram++ = base[2];

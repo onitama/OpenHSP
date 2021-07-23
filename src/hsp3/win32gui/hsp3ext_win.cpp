@@ -282,6 +282,7 @@ static int AddHSPObject( HWND handle, int mode, int addy )
 		obj.func_notice = NULL;
 		obj.func_objprm = NULL;
 		obj.func_delete = Object_WindowDelete;
+		obj.hspctx = NULL;
 
 		exinfo->HspFunc_setobj( wid, entry, &obj );
 

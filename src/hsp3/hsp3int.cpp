@@ -987,7 +987,8 @@ static int cmdfunc_intcmd( int cmd )
 		size = (int)strlen( ps ) + 8;
 		HspVarCoreAllocBlock( ctx->note_pval, (PDAT *)np, (int)strlen(np) + size );
 
-		tmp = code_stmpstr( ps );
+		tmp = code_stmp( size );
+		strcpy( tmp, ps );
 
 		p1 = code_getdi( -1 );
 		p2 = code_getdi( 0 );

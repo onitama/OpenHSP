@@ -274,7 +274,14 @@ int gamehsp::deleteMat( int id )
 		delete mat->_mesh;
 		mat->_mesh = NULL;
 	}
-    SAFE_RELEASE( mat->_material );
+
+	Material* material = mat->_material;
+	if (material) {
+		material->removeParameter("u_texture");
+		material->removeParameter("u_diffuseTexture");
+
+		SAFE_RELEASE(material);
+	}
 	return 0;
 }
 
@@ -747,6 +754,7 @@ Material *gamehsp::makeMaterialTexture( char *fname, int matopt, Texture *opttex
                 Texture::Sampler* sampler = Texture::Sampler::create(opttex);
                 if (sampler) {
                     mp->setValue(sampler);
+					SAFE_RELEASE(sampler);
                     return material;
                 }
             }
@@ -813,15 +821,7 @@ Material *gamehsp::makeMaterialTex2D(Texture *texture, int matopt)
 
 	sampler->setFilterMode(Texture::Filter::NEAREST, Texture::Filter::NEAREST);		// 2Dはデフォルトでフィルタなし
 	mesh_material->getParameter(samplerUniform->getName())->setValue(sampler);
-
-	/*
-	Material* mesh_material = Material::create( SPRITE_VSH, SPRITE_FSH, NULL );
-	if ( mesh_material == NULL ) {
-        GP_ERROR("2D initalize failed.");
-		return NULL;
-	}
-	mesh_material->getParameter("u_diffuseTexture")->setValue( fname, mipmap );
-	*/
+	SAFE_RELEASE(sampler);
 
 	update2DRenderProjection(mesh_material, &_projectionMatrix2D);
 

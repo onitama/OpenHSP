@@ -44,6 +44,9 @@ static POINT __mouseCapturePoint = { 0, 0 };
 static bool __multiSampling = false;
 static bool __cursorVisible = true;
 static unsigned int __gamepadsConnected = 0;
+static bool __tempWindowMode = false;
+
+void* hsp3dish_getinstance(void);               // for Windows Instance
 
 
 #ifdef GP_USE_GAMEPAD
@@ -568,6 +571,24 @@ extern int strcmpnocase(const char* s1, const char* s2)
 Platform::Platform(Game* game)
     : _game(game)
 {
+    __hinstance = ::GetModuleHandle(NULL);
+
+    // Register our window class.
+    WNDCLASSEX wc;
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    wc.lpfnWndProc = (WNDPROC)__WndProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = __hinstance;
+    wc.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(128));
+    wc.hIconSm = NULL;
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = NULL;  // No brush - we are going to paint our own background
+    wc.lpszMenuName = NULL;  // No default menu
+    wc.lpszClassName = "gameplay";
+
+    ::RegisterClassEx(&wc);
 }
 
 Platform::~Platform()
@@ -622,7 +643,10 @@ bool createWindow(WindowCreationParams* params, HWND* hwnd, HDC* hdc)
     AdjustWindowRectEx(&rect, style, FALSE, styleEx);
 
     // Create the native Windows window.
-    *hwnd = CreateWindowEx(styleEx, "HSP3DishWindow", windowName.c_str(), style, 0, 0, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, __hinstance, NULL);
+    char* wclass = "HSP3DishWindow";
+    if (__tempWindowMode) wclass = "gameplay";
+
+    *hwnd = CreateWindowEx(styleEx, wclass, windowName.c_str(), style, 0, 0, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, __hinstance, NULL);
     if (*hwnd == NULL)
     {
         GP_ERROR("Failed to create window.");
@@ -835,9 +859,11 @@ bool initializeGL(WindowCreationParams* params)
     HWND hwnd = NULL;
     HDC hdc = NULL;
 
-	if (!createWindow(params, &hwnd, &hdc))
-		return false;
-	
+    __tempWindowMode = true;
+    if (!createWindow(params, &hwnd, &hdc)) {
+        return false;
+    }
+
     PIXELFORMATDESCRIPTOR pfd;
     memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
     pfd.nSize  = sizeof(PIXELFORMATDESCRIPTOR);
@@ -935,7 +961,8 @@ bool initializeGL(WindowCreationParams* params)
         }
     }
 
-	DestroyWindow(hwnd);
+    //DestroyWindow(hwnd);
+    __tempWindowMode = false;
 
 	// Create new/final window if needed
     if (params)
@@ -950,6 +977,7 @@ bool initializeGL(WindowCreationParams* params)
         }
 	}
 	else {
+        //::MessageBox(NULL,"OK","Attach",0);
 		hwnd = __hwnd;
 		hdc = __hdc;
 	}
@@ -1037,7 +1065,9 @@ Platform* Platform::create(Game* game, void* attachToWindow, int sizex, int size
     Platform* platform = new Platform(game);
 
     // Get the application module handle.
-    __hinstance = ::GetModuleHandle(NULL);
+    //__hinstance = ::GetModuleHandle(NULL);
+    __hinstance = (HINSTANCE)hsp3dish_getinstance();
+
     __attachToWindow = (HWND)attachToWindow;
 
     // Read window settings from config.
@@ -1187,6 +1217,25 @@ Platform* Platform::create(Game* game, void* attachToWindow, int sizex, int size
     }
     else
     {
+        if (params.fullscreen)
+        {
+            DEVMODE dm;
+            memset(&dm, 0, sizeof(dm));
+            dm.dmSize = sizeof(dm);
+            dm.dmPelsWidth = width;
+            dm.dmPelsHeight = height;
+            dm.dmBitsPerPel = DEFAULT_COLOR_BUFFER_SIZE;
+            dm.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+            // Try to set selected mode and get results. NOTE: CDS_FULLSCREEN gets rid of start bar.
+            if (ChangeDisplaySettings(&dm, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+            {
+                params.fullscreen = false;
+                GP_ERROR("Failed to start game in full-screen mode with resolution %dx%d.", width, height);
+                goto error;
+            }
+        }
+
         // Attach to a previous windows
         __hwnd = (HWND)__attachToWindow;
         __hdc = GetDC(__hwnd);

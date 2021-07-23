@@ -282,12 +282,14 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 			HWND hCtrl = (HWND)lParam;
 			HSPOBJINFO *hspobj = bm->TrackHSPObject(hCtrl);
 			if ( hspobj != NULL ) {
-				HBRUSH brush_bg = hspobj->br_back;
-				if ( brush_bg != NULL ) {
-					SetBkMode(hDC, OPAQUE);
-					SetTextColor(hDC, hspobj->color_text);
-					SetBkColor(hDC,hspobj->color_back);
-					return (LRESULT)brush_bg;
+				if (hspobj->hspctx) {
+					HBRUSH brush_bg = hspobj->br_back;
+					if (brush_bg != NULL) {
+						SetBkMode(hDC, OPAQUE);
+						SetTextColor(hDC, hspobj->color_text);
+						SetBkColor(hDC, hspobj->color_back);
+						return (LRESULT)brush_bg;
+					}
 				}
 			}
 		}
@@ -754,6 +756,7 @@ Bmscr::Bmscr()
 	//		bmscr初期化
 	//
 	flag = BMSCR_FLAG_NOUSE;
+	logfont = NULL;
 }
 
 Bmscr::~Bmscr()
@@ -787,6 +790,13 @@ Bmscr::~Bmscr()
 		if ( hpal != NULL ) {
 			SelectPalette( hdc, holdpal, TRUE );
 			DeleteObject( hpal );
+		}
+
+		//		remove LOGFONT
+		//
+		if (logfont != NULL) {
+			mem_bye( logfont );
+			logfont = NULL;
 		}
 
 		//		remove DIB section
@@ -862,6 +872,8 @@ void Bmscr::Init( HANDLE instance, HWND p_hwnd, int p_sx, int p_sy, int palsw )
 	hfont=NULL;
 	fl_dispw = 0;
 	imgbtn = -1;
+
+	logfont = (LOGFONT *)mem_ini( sizeof(LOGFONT) );
 
 	Cls( 0 );
 
@@ -1067,7 +1079,7 @@ int Bmscr::Newfont( char *fonname, int fpts, int fopt, int angle )
 	HFONT hf_new;
 	HSPAPICHAR *hactmp1 = 0;
 
-	pLogFont=(PLOGFONT) &logfont;
+	pLogFont=(PLOGFONT) logfont;
 	_tcscpy( pLogFont->lfFaceName, chartoapichar(fonname,&hactmp1) );
 	freehac(&hactmp1);
 	pLogFont->lfHeight			= -fpts;

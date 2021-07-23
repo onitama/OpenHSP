@@ -606,6 +606,13 @@ static int cmdfunc_extcmd( int cmd )
 				bmscr->SetDefaultFont();	// フォントを元に戻す
 			}
 		}
+
+#ifdef USE_ESSPRITE
+		if ((p1 & 1) && (bmscr->wid==0)) {
+			sprite->updateFrame();						// sprite frame update
+		}
+#endif
+
 		break;
 		}
 
@@ -870,30 +877,26 @@ static int cmdfunc_extcmd( int cmd )
 		POINT pt;
 		int setdef = 0;			// 既にマイナスの値か?
 		GetCursorPos(&pt);
-		if ((pt.x < 0) || (pt.x < 0)) {
-			if (msact >= 0) setdef = 1;
-		}
-		p1 = code_getdi(pt.x);
-		p2 = code_getdi(pt.y);
-		p3 = code_getdi(setdef);
+		p1 = code_getdi( pt.x );
+		p2 = code_getdi( pt.y );
+		p3 = code_getdi( 0 );
 		if (p3 == 0) {
-			if (msact >= 0) {
-				if ((p1 < 0) || (p2 < 0)) {
+			if ((p1 < 0) || (p2 < 0)) {
+				if (msact >= 0) {
 					msact = ShowCursor(0);
-					break;
 				}
+				break;
 			}
 		}
-
 		SetCursorPos(p1, p2);
-
+		if (p3 > 0) break;
 		if (p3 < 0) {
-			msact = ShowCursor(0);
+			if (msact >= 0) {
+				msact = ShowCursor(0);
+			}
 			break;
 		}
-		if (p3 > 0) {
-			if (msact < 0) { msact = ShowCursor(1); }
-		}
+		if (msact < 0) { msact = ShowCursor(1); }
 #else
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
@@ -1407,7 +1410,8 @@ static int cmdfunc_extcmd( int cmd )
 #ifdef HSPDISHGP
 
 	case 0x60:								// gpreset
-		p1 = code_getdi( 0 );
+		p1 = code_getdi( -1 );
+		wnd->resetBuffers();
 		game->resetScreen( p1 );
 		break;
 	case 0x61:								// gpdraw
@@ -2864,6 +2868,30 @@ static int cmdfunc_extcmd( int cmd )
 		}
 		break;
 	}
+	case 0x159:								// gpnodeinfo
+	{
+		PVal* pv1;
+		APTR aptr1;
+		char* ps;
+		int res = -1;
+		int vdata = 0;
+		aptr1 = code_getva(&pv1);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		ps = code_getds("");
+		if (p2 < GPNODEINFO_NAME) {
+			res = game->getNodeInfo(p1, p2, ps, &vdata);
+			code_setva(pv1, aptr1, HSPVAR_FLAG_INT, &vdata);
+		}
+		else {
+			std::string sdata;
+			res = game->getNodeInfoString(p1, p2, ps, &sdata);
+			char* p = (char *)sdata.c_str();
+			code_setva(pv1, aptr1, HSPVAR_FLAG_STR, p);
+		}
+		ctx->stat = res;
+		break;
+	}
 
 
 #endif
@@ -3208,7 +3236,7 @@ static int cmdfunc_extcmd( int cmd )
 		p4 = code_getdi(-1);
 		p5 = code_getdi(-1);
 		if (sprite->sprite_enable) {
-			sprite->draw(p1, p2, p3, p4, p5);
+			ctx->stat = sprite->draw(p1, p2, p3, p4, p5);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
@@ -3238,8 +3266,8 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x21b:								// es_fade
 	{
 		p1 = code_getdi(0);
-		p2 = code_getdi(0);
-		p3 = code_getdi(0);
+		p2 = code_getdi(1);
+		p3 = code_getdi(30);
 		if (sprite->sprite_enable) {
 			ctx->stat = sprite->setSpriteFade(p1, p2, p3);
 		}
@@ -3534,6 +3562,20 @@ static int cmdfunc_extcmd( int cmd )
 		p6 = code_getdi(0);
 		if (sprite->sprite_enable) {
 			ctx->stat = sprite->modifySpriteAxis(p1, p2, p3, p4, p5, p6);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x22d:								// es_arot
+	{
+		//		Set Rot,Zoom adder (type0)
+		//		es_arot spno, addrot, addzoomx, addzoomy
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+		p4 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setSpriteAddRotZoom(p1, p2, p3, p4);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;

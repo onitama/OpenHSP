@@ -255,6 +255,7 @@ gamehsp::gamehsp()
 	_meshBatch_line = NULL;
 	_meshBatch_font = NULL;
 	_spriteEffect = NULL;
+	_spritecolEffect = NULL;
 	_collision_callback = NULL;
 }
 
@@ -318,6 +319,7 @@ void gamehsp::deleteAll( void )
 	}
 
 	SAFE_RELEASE(_spriteEffect);
+	SAFE_RELEASE(_spritecolEffect);
 
 	if (_scene) {
 		_scene->removeAllNodes();
@@ -547,12 +549,12 @@ void gamehsp::resetScreen( int opt )
 		return;
 	}
 	//texture->setData( (const unsigned char *)data );
+	Material* _fontMaterial;
 	_fontMaterial = makeMaterialTex2D(texture, GPOBJ_MATOPT_NOMIPMAP);
 	if (_fontMaterial == NULL) {
 		Alertf("ERR");
 		return;
 	}
-	SAFE_RELEASE(texture);
 
 	VertexFormat::Element elements[] =
 	{
@@ -566,6 +568,11 @@ void gamehsp::resetScreen( int opt )
 
 	PhysicsController *pc = Game::getInstance()->getPhysicsController();
 	_collision_callback = new CollisionCallback(pc);
+
+	SAFE_RELEASE(texture);
+	SAFE_RELEASE(_fontMaterial);
+
+	touchNode = NULL;
 }
 
 
@@ -660,26 +667,30 @@ bool gamehsp::init2DRender( void )
 
 	// スプライト用のshader
 	_spriteEffect = Effect::createFromSource(intshd_sprite_vert, intshd_sprite_frag);
-	//_spriteEffect = Effect::createFromFile(SPRITE_VSH, SPRITE_FSH);
 	if ( _spriteEffect == NULL ) {
         GP_ERROR("2D shader initalize failed.");
         return false;
 	}
+	_spritecolEffect = Effect::createFromSource(intshd_spritecol_vert, intshd_spritecol_frag);
+	if (_spritecolEffect == NULL) {
+		GP_ERROR("2D shader initalize failed.");
+		return false;
+	}
 
 	// MeshBatch for FlatPolygon Draw
-	Material* mesh_material = make2DMaterialForMesh();
     VertexFormat::Element elements[] =
     {
         VertexFormat::Element(VertexFormat::POSITION, 3),
         VertexFormat::Element(VertexFormat::COLOR, 4)
     };
-    unsigned int elementCount = sizeof(elements) / sizeof(VertexFormat::Element);
-    _meshBatch = MeshBatch::create(VertexFormat(elements, elementCount), Mesh::TRIANGLE_STRIP, mesh_material, true, 16, 16 );
-
+	unsigned int elementCount = sizeof(elements) / sizeof(VertexFormat::Element);
+	Material* mesh_material = make2DMaterialForMesh();
+	_meshBatch = MeshBatch::create(VertexFormat(elements, elementCount), Mesh::TRIANGLE_STRIP, mesh_material, true, 16, 16 );
 	SAFE_RELEASE(mesh_material);
 
 	mesh_material = make2DMaterialForMesh();
 	_meshBatch_line = MeshBatch::create(VertexFormat(elements, elementCount), Mesh::LINES, mesh_material, true, 4, 4 );
+	SAFE_RELEASE(mesh_material);
 
 	int i;
 	for(i=0;i<BUFSIZE_POLYCOLOR;i++) {
@@ -689,7 +700,6 @@ bool gamehsp::init2DRender( void )
 		_bufPolyTex[i] = 0.0f;
 	}
 
-	SAFE_RELEASE(mesh_material);
 	return true;
 }
 
@@ -717,7 +727,7 @@ void gamehsp::update2DRenderProjectionSystem(Matrix *mat)
 	//	2Dシステム用のプロジェクションを再設定する
 	if (_meshBatch) update2DRenderProjection(_meshBatch->getMaterial(), mat);
 	if (_meshBatch_line) update2DRenderProjection(_meshBatch_line->getMaterial(), mat);
-	if (_meshBatch_font) update2DRenderProjection(_fontMaterial, mat);
+	if (_meshBatch_font) update2DRenderProjection(_meshBatch_font->getMaterial(), mat);
 
 }
 
@@ -1129,12 +1139,71 @@ int gamehsp::setObjectVector( int objid, int moc, Vector4 *prm )
 	case GPOBJ_ID_LIGHT:
 		obj = getObj( _deflight );
 		break;
+	case GPOBJ_ID_TOUCHNODE:
+		if (touchNode == NULL) return -1;
+		setNodeVector(NULL, touchNode, moc, prm);
+		return 0;
 	default:
 		return -1;
 	}
 	if ( obj == NULL ) return -1;
 	setNodeVector( obj, obj->_node, moc, prm );
 	return 0;
+}
+
+
+
+void gamehsp::getNodeVectorExternal(gpobj* obj, Node* node, int moc, Vector4* prm)
+{
+	switch (moc) {
+	case MOC_POS:
+		if (node) {
+			*(Vector3*)prm = node->getTranslationView();
+			prm->w = 0.0f;
+		}
+		break;
+	case MOC_WORK:
+		if (node) {
+			*(Vector3*)prm = node->getTranslationWorld();
+			prm->w = 0.0f;
+		}
+		break;
+	case MOC_QUAT:
+		if (node) {
+			Quaternion quat;
+			quat = node->getRotation();
+			prm->x = quat.x;
+			prm->y = quat.y;
+			prm->z = quat.z;
+			prm->w = quat.w;
+		}
+		break;
+	case MOC_SCALE:
+		if (node) {
+			*(Vector3*)prm = node->getScale();
+			prm->w = 1.0f;
+		}
+		break;
+	case MOC_ANGX:
+		if (node) {
+			Quaternion quat;
+			double roll, pitch, yaw;
+			quat = node->getRotation();
+			QuaternionToEulerAngles(quat, roll, pitch, yaw);
+			prm->x = roll;
+			prm->y = pitch;
+			prm->z = yaw;
+			prm->w = 0.0f;
+		}
+		break;
+
+	case MOC_FORWARD:
+		if (node) {
+			*(Vector3*)prm = node->getForwardVector();
+			prm->w = 1.0f;
+		}
+		break;
+	}
 }
 
 
@@ -1258,6 +1327,17 @@ int gamehsp::getObjectVector( int objid, int moc, Vector4 *prm )
 			getSpriteVector( obj, moc, prm );
 			return 0;
 		}
+		if (obj->_phy) {
+			gpphy* phy = obj->_phy;
+			if (phy->_option & BIND_PHYSICS_MESH) {		// 物理Meshノードの場合は実際のNodeを参照する
+				Node* realnode = obj->_node;
+				if (realnode) realnode = realnode->getFirstChild();
+				if (realnode) {
+					getNodeVector(obj, realnode, moc, prm);
+					return 0;
+				}
+			}
+		}
 		getNodeVector( obj, obj->_node, moc, prm );
 		return 0;
 	}
@@ -1280,6 +1360,10 @@ int gamehsp::getObjectVector( int objid, int moc, Vector4 *prm )
 	case GPOBJ_ID_LIGHT:
 		obj = getObj(_deflight);
 		break;
+	case GPOBJ_ID_TOUCHNODE:
+		if (touchNode == NULL) return -1;
+		getNodeVectorExternal(NULL, touchNode, moc, prm);
+		return 0;
 	default:
 		return -1;
 	}
@@ -1326,14 +1410,19 @@ int gamehsp::drawSceneObject(gpobj *camobj)
 	int i,num;
 	gpobj *obj = _gpobj;
 
-	int target_group = 0;
-	if (camobj) target_group = camobj->_rendergroup;
+	int target_group = 1;
+	if (camobj) {
+		target_group = camobj->_rendergroup;
+	}
 
 	num = 0;
 	for (i = 0; i < _maxobj; i++) {
 		if (obj->isVisible(_scenedraw_lateflag)) {
 			if (target_group) {
-				if ((target_group & obj->_rendergroup) == 0) continue;
+				if ((target_group & obj->_rendergroup) == 0) {
+					obj++;
+					continue;
+				}
 			}
 			Node *node = obj->_node;
 			if (node) {
@@ -1430,7 +1519,7 @@ bool gamehsp::pickupNode(Node *node, int deep)
 	if (model)
 	{
 		unsigned int partCount = model->getMeshPartCount();
-		//GP_WARN( "#model %s (deep:%d)(part:%d)",node->getId(), deep, partCount);
+		GP_WARN( "#model %s (deep:%d)(part:%d)",node->getId(), deep, partCount);
 
 		Material *mat = model->getMaterial(0);
 		if (mat)
@@ -1448,8 +1537,11 @@ bool gamehsp::pickupNode(Node *node, int deep)
 		if (skin) {
 			Joint *joint = skin->getRootJoint();
 			Node* jointParent = joint->getParent();
-			//GP_WARN("#Skin Root:%s", joint->getId());
+			GP_WARN("#Skin Root:%s", joint->getId());
 		}
+	}
+	else {
+		GP_WARN("#node %s (deep:%d)", node->getId(), deep);
 	}
 
 	if (model) {
@@ -1657,6 +1749,10 @@ int gamehsp::addAnimId(int objid, char *name, int start, int end, int option)
 	}
 	else {
 		p_end = (unsigned long)end;
+	}
+	if ( p_start > p_end ) {
+		GP_WARN("Animation Range Invalid");
+		return -2;
 	}
 	clip = anim->createClip(name, p_start, p_end);
 	clip->setRepeatCount(AnimationClip::REPEAT_INDEFINITE);
@@ -2741,7 +2837,7 @@ void gamehsp::texmesDrawClip(void *bmscr, int x, int y, int psx, int psy, texmes
 		}
 	}
 
-	MaterialParameter* mp = _fontMaterial->getParameter(samplerUniform->getName());
+	MaterialParameter* mp = _meshBatch_font->getMaterial()->getParameter(samplerUniform->getName());
 	mp->setValue(tex->_texture);
 
 	tx0 = ((float)(basex));
@@ -3120,10 +3216,8 @@ Material* gamehsp::make2DMaterialForMesh( void )
 {
 	RenderState::StateBlock *state;
 	Material* mesh_material = NULL;
-	Effect* _spritecol = Effect::createFromSource(intshd_spritecol_vert, intshd_spritecol_frag);
-//	Effect* _spritecol = Effect::createFromFile(SPRITECOL_VSH, SPRITECOL_FSH);
-	if (_spritecol) {
-		mesh_material = Material::create(_spritecol);
+	if (_spritecolEffect) {
+		mesh_material = Material::create(_spritecolEffect);
 	}
 	//Material* mesh_material = Material::create(SPRITECOL_VSH, SPRITECOL_FSH, NULL);
 	if ( mesh_material == NULL ) {
@@ -3352,4 +3446,134 @@ int gamehsp::makeFreeVertexNode(int color, int matid)
 	return obj->_id;
 }
 
+
+bool gamehsp::getNodeFromNameSub(Node* node, char *name, int deep)
+{
+	if (tempNode != NULL) return true;
+	if (strcmp(node->getId(), name) == 0) {
+		tempNode = node;
+		return true;
+	}
+
+	Drawable* drawable = node->getDrawable();
+	Model* model = dynamic_cast<Model*>(drawable);
+	if (model) {
+		MeshSkin *skin = model->getSkin();
+		if (skin) {
+			Node *root = skin->getRootNode();
+			if (root) {
+				if (getNodeFromNameSub(root, name, deep + 1)) return true;
+			}
+		}
+	}
+
+	Node* pnode = node->getFirstChild();
+	while (1) {
+		if (pnode == NULL) break;
+		if (getNodeFromNameSub(pnode, name, deep + 1)) return true;
+		pnode = pnode->getNextSibling();
+	}
+
+	return false;
+}
+
+
+Node* gamehsp::getNodeFromName(int objid, char* name)
+{
+	gpobj* obj = getObj(objid);
+	if (obj == NULL) return NULL;
+	if (name == NULL) return NULL;
+
+	tempNode = NULL;
+
+	Node* node = obj->_node;
+	if (*name == 0) {
+		tempNode = node;
+		return tempNode;
+	}
+
+	while (1) {
+		if (node == NULL) break;
+		getNodeFromNameSub(node, name, 0);
+		if (tempNode != NULL) break;
+		node = node->getNextSibling();
+	}
+	return tempNode;
+}
+
+
+int gamehsp::getNodeInfo(int objid, int option, char* name, int *result)
+{
+	int res = 0;
+	Node* node = getNodeFromName(objid, name);
+	if (node == NULL) {
+		*result = -1;
+		return -1;
+	}
+	switch(option) {
+	case GPNODEINFO_NODE:
+		touchNode = node;
+		*result = GPOBJ_ID_TOUCHNODE;
+		break;
+	case GPNODEINFO_MODEL:
+	{
+		Drawable* drawable = node->getDrawable();
+		Model* model = dynamic_cast<Model*>(drawable);
+		if (model) {
+			touchNode = node;
+			*result = GPOBJ_ID_TOUCHNODE;
+		}
+		else {
+			*result = -1;
+		}
+		break;
+	}
+	default:
+		return -1;
+	}
+	return res;
+}
+
+
+int gamehsp::getNodeInfoString(int objid, int option, char* name, std::string* res)
+{
+	int result = 0;
+	Node* node = getNodeFromName(objid, name);
+	if (node == NULL) return -1;
+	switch (option) {
+	case GPNODEINFO_NAME:
+		*res = node->getId();
+		break;
+	case GPNODEINFO_CHILD:
+		node = node->getFirstChild();
+		if (node) {
+			*res = node->getId();
+		}
+		break;
+	case GPNODEINFO_SIBLING:
+		node = node->getNextSibling();
+		if (node) {
+			*res = node->getId();
+		}
+		break;
+	case GPNODEINFO_SKINROOT:
+	{
+		Drawable* drawable = node->getDrawable();
+		Model* model = dynamic_cast<Model*>(drawable);
+		if (model) {
+			MeshSkin *skin = model->getSkin();
+			if (skin) {
+				Node *root = skin->getRootNode();
+				if (root) {
+					*res = root->getId();
+				}
+			}
+		}
+		break;
+	}
+	default:
+		return -1;
+	}
+	return result;
+}
 

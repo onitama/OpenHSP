@@ -558,6 +558,7 @@ public:
 	HspWnd( void );
 	~HspWnd( void );
 	void Resume( void );
+	void resetBuffers( void );
 	void SetHSPCTX(HSPCTX *ctx) { hspctx = ctx; };
 	HSPCTX *GetHSPCTX(void) { return hspctx; };
 

@@ -140,6 +140,7 @@ int essprite::init(int maxsprite, int maxchr, int rotrate, int maxmap)
 	def_fspy = 0x100;
 	def_bound = 128;
 	def_boundflag = 3;
+	framecount = 0;
 
 	setOffset(0, 0);
 	sprite_enable = true;
@@ -174,6 +175,13 @@ void essprite::reset(void)
 	}
 
 }
+
+
+void essprite::updateFrame(void)
+{
+	framecount++;
+}
+
 
 SPOBJ *essprite::getObj(int id)
 {
@@ -530,21 +538,21 @@ int essprite::checkCollision(int spno, int chktype)
 }
 
 
-int essprite::getSpriteParentAxis(SPOBJ *sp, int* xx, int* yy, int depth)
+int essprite::getSpriteParentAxis(SPOBJ *sp, int& xx, int& yy, int depth)
 {
 	if (sp->fl & ESSPFLAG_SPLINK) {
 		int link = sp->splink;
 		if (link & ESSPLINK_BGMAP) {
 			BGMAP* bg = getMap(link & (ESSPLINK_BGMAP-1));
 			if (bg == NULL) return -1;
-			xx -= bg->viewx;
-			yy -= bg->viewy;
+			xx -= bg->viewx << dotshift;
+			yy -= bg->viewy << dotshift;
 			return 0;
 		}
 		SPOBJ* p = getObj(link);
 		if (p == NULL) return -1;
-		xx += p->xx;
-		yy += p->yy;
+		xx += p->xx << dotshift;
+		yy += p->yy << dotshift;
 		if (depth < 16) {		// Nest loop cancel
 			getSpriteParentAxis(sp, xx, yy, depth + 1);
 		}
@@ -605,6 +613,11 @@ int essprite::drawSubMove(SPOBJ *sp, int mode)
 		sp->xx += sp->px;
 		sp->yy += sp->py;
 	}
+	if (fl & ESSPFLAG_MOVEROT) {
+		sp->rotz += sp->protz;
+		sp->zoomx += sp->pzoomx;
+		sp->zoomy += sp->pzoomy;
+	}
 
 	prevxx = sp->xx;
 	prevyy = sp->yy;
@@ -617,7 +630,7 @@ int essprite::drawSubMove(SPOBJ *sp, int mode)
 	xx = sp->xx;
 	yy = sp->yy;
 
-	getSpriteParentAxis(sp, &xx, &yy, 0);
+	getSpriteParentAxis(sp, xx, yy, 0);
 
 	if (fl & ESSPFLAG_GRAVITY) {
 		//	なんだこりゃ・・・
@@ -704,16 +717,81 @@ int essprite::drawSubMove(SPOBJ *sp, int mode)
 		}
 	}
 
-	//		Flag blink check
+	//		Flag timer check
 	//
-	if (fl & 255) {
-		fl--;
-		if ((fl & 255) == 0) fl = 0;
-		if ((fl & 255) == 128) fl ^= 128;
-		sp->fl = fl;
+	if (sp->timer) {
+		if (fl & (ESSPFLAG_FADEIN | ESSPFLAG_FADEOUT)) {
+			execTimerFade(sp);
+		}
+		if (fl & (ESSPFLAG_EFADE | ESSPFLAG_EFADE2)) {
+			execTimerEndFade(sp);
+		}
+		if (sp->timer > 0) {
+			sp->timer--;
+			if (sp->timer == 0) {
+				if (fl & ESSPFLAG_TIMERWIPE) {
+					sp->fl = 0;
+				}
+				resetTimer(sp);
+			}
+		}
 	}
 
 	return res;
+}
+
+
+void essprite::execTimerFade(SPOBJ* sp)
+{
+	//		Execute timer fade event
+	//
+	int fl = sp->fl;
+	int tpmode = (sp->tpflag & 0xffffff00);
+	int timer = sp->timer;
+	int fadeprm = sp->fadeprm;
+	int res = 0;
+	bool fadedone = false;
+
+	if (timer <= 1) fadedone = true;
+
+	res = timer * fadeprm / sp->timer_base;
+	if (res < 0) res = 0;
+	if (res > fadeprm) res = fadedone;
+	if (fadedone) res = 0;
+
+	if (fl & ESSPFLAG_FADEIN) {
+		res = fadeprm - res;
+	}
+	sp->tpflag = res | tpmode;
+}
+
+
+void essprite::execTimerEndFade(SPOBJ* sp)
+{
+	//		Execute timer fade event
+	//
+	int fl = sp->fl & (ESSPFLAG_EFADE | ESSPFLAG_EFADE2);
+	int tpmode = (sp->tpflag & 0xffffff00);
+	int timer = sp->timer;
+	int fadeprm = sp->fadeprm;
+	int endstart,endframe;
+	int res = 0;
+
+	endstart = 2;
+	if (fl == ESSPFLAG_EFADE) {
+		endstart = 16;
+	}
+	if (fl == ESSPFLAG_EFADE2) {
+		endstart = 8;
+	}
+
+	endframe = fadeprm / endstart;
+	if (timer >= endframe) return;
+
+	res = timer * endstart;
+	if (res < 0) res = 0;
+	if (res > fadeprm) res = fadeprm;
+	sp->tpflag = res | tpmode;
 }
 
 
@@ -722,17 +800,23 @@ int essprite::drawSubPut(SPOBJ *sp, int mode)
 	//		1 sprite draw (on sp)
 	//
 	int res = 0;
-	int fl,x,y,xx,yy;
+	int fl,x,y,xx,yy,blink;
 	int next;
 
 	fl = sp->fl;
 	if (fl & ESSPFLAG_NODISP) return 0;
-	if ((fl & (ESSPFLAG_BLINK | 1)) == 1) return 0;
+	if ( fl & (ESSPFLAG_BLINK | ESSPFLAG_BLINK2)) {
+		int flbase = fl & (ESSPFLAG_BLINK | ESSPFLAG_BLINK2);
+		blink = 1;
+		if (flbase == ESSPFLAG_BLINK2) blink = 2;
+		if (flbase == (ESSPFLAG_BLINK | ESSPFLAG_BLINK2)) blink = 4;
+		if (framecount & blink) return 0;
+	}
 
 	xx = sp->xx;
 	yy = sp->yy;
 
-	getSpriteParentAxis(sp, &xx, &yy, 0);
+	getSpriteParentAxis(sp, xx, yy, 0);
 
 	x = xx >> dotshift; y = yy >> dotshift;
 
@@ -757,6 +841,12 @@ int essprite::drawSubPut(SPOBJ *sp, int mode)
 				sp->ani = chr->lktime;
 			}
 		}
+	}
+
+	if (fl & 255) {						// HSPDX互換のカウントダウンタイマー(互換維持用)
+		fl--;
+		if ((fl & 255) == 0) fl = 0;
+		sp->fl = fl;
 	}
 
 	return res;
@@ -847,7 +937,7 @@ int essprite::draw(int start, int num, int mode, int start_pri, int end_pri)
 		spr++;
 	}
 
-	delete selspr;
+	delete [] selspr;
 	return maxspr;
 }
 
@@ -1018,7 +1108,27 @@ int essprite::setSpriteAddPosRate(int spno, int xx, int yy, int rate)
 	int aa = rate;
 	int ax = (xx << dotshift) * aa / 100;
 	int ay = (yy << dotshift) * aa / 100;
-	return setSpriteAddPos(spno,ax,ay,true);
+	return setSpriteAddPos(spno, ax, ay, true);
+}
+
+
+int essprite::setSpriteAddRotZoom(int spno, int rotz, int zoomx, int zoomy)
+{
+	SPOBJ* sp = getObj(spno);
+	if (sp == NULL) return -1;
+	sp->protz = rotz;
+
+	int ax = (1 << dotshift) * zoomx / 100;
+	int ay = (1 << dotshift) * zoomy / 100;
+	sp->pzoomx = ax;
+	sp->pzoomy = ay;
+
+	if ((rotz==0) && (zoomx==0) && (zoomy==0)) {
+		sp->fl &= ~ESSPFLAG_MOVEROT;
+		return spno;
+	}
+	sp->fl |= ESSPFLAG_MOVEROT;
+	return spno;
 }
 
 
@@ -1111,7 +1221,7 @@ SPOBJ *essprite::resetSprite(int spno)
 	sp->fl = ESSPFLAG_STATIC;
 	sp->type = 1;
 	sp->px = 0; sp->py = 0;
-	sp->prg = 0;
+	sp->progress = 0;
 	sp->fspx = def_fspx;
 	sp->fspy = def_fspy;
 	sp->bound = def_bound;
@@ -1124,12 +1234,17 @@ SPOBJ *essprite::resetSprite(int spno)
 	sp->zoomy = dotshift_base;
 	sp->rotz = 0;
 	sp->splink = 0;
+	sp->timer = 0;
+	sp->timer_base = 0;
 	sp->sbr = NULL;
 
 	sp->xx = 0;
 	sp->yy = 0;
 	sp->chr = -1;
 	sp->ani = 0;
+	sp->protz = 0;
+	sp->pzoomx = 0;
+	sp->pzoomy = 0;
 
 	return sp;
 }
@@ -1203,6 +1318,12 @@ int essprite::setBound(int p1, int p2, int p3)
 }
 
 
+void essprite::resetTimer( SPOBJ *sp )
+{
+	sp->fl = sp->fl & ~(ESSPFLAG_BLINK | ESSPFLAG_FADEIN | ESSPFLAG_FADEOUT | ESSPFLAG_TIMERWIPE);
+}
+
+
 int essprite::setSpriteFade(int id, int sw, int timer)
 {
 	int fl;
@@ -1210,18 +1331,55 @@ int essprite::setSpriteFade(int id, int sw, int timer)
 	SPOBJ *sp = getObj(id);
 	if (sp == NULL) return -1;
 
-	i = timer & 0xff;
-	fl = sp->fl & ~(ESSPFLAG_BLINK | 0xff);
+	i = timer;
+	resetTimer(sp);
+	fl = sp->fl;
+
+	if (sw & 1) {
+		fl |= ESSPFLAG_TIMERWIPE;
+	}
+
 	switch (sw) {
-	case 1:
-		fl |= i;
+	case ESSPF_TIMEWIPE:
 		break;
-	case 3:
-		fl |= i | ESSPFLAG_BLINK;
+	case ESSPF_FADEOUT:
+	case ESSPF_FADEOUTWIPE:
+		if (i > 0) {
+			fl |= ESSPFLAG_FADEOUT;
+			sp->timer_base = i;
+			sp->fadeprm = sp->tpflag & 255;
+		}
+		break;
+	case ESSPF_FADEIN:
+	case ESSPF_FADEINWIPE:
+		if (i > 0) {
+			fl |= ESSPFLAG_FADEIN;
+			sp->timer_base = i;
+			sp->fadeprm = sp->tpflag & 255;
+		}
+		break;
+	case ESSPF_BLINK:
+	case ESSPF_BLINKWIPE:
+		fl |= ESSPFLAG_BLINK;
+		break;
+	case ESSPF_BLINK2:
+	case ESSPF_BLINKWIPE2:
+		fl |= ESSPFLAG_BLINK2;
+		break;
+	case ESSPF_EFADE:
+	case ESSPF_EFADEWIPE:
+		fl |= ESSPFLAG_EFADE;
+		sp->fadeprm = sp->tpflag & 255;
+		break;
+	case ESSPF_EFADE2:
+	case ESSPF_EFADEWIPE2:
+		fl |= ESSPFLAG_EFADE2;
+		sp->fadeprm = sp->tpflag & 255;
 		break;
 	default:
-		break;
+		return -1;
 	}
+	sp->timer = i;
 	sp->fl = fl;
 	return 0;
 }
@@ -1252,6 +1410,7 @@ int essprite::setSpriteRotate(int id, int angle, int zoomx, int zoomy, int rate)
 	}
 
 	sp->rotz = angle;
+	sp->fl &= ~ESSPFLAG_MOVEROT;
 
 	return 0;
 }
@@ -1301,6 +1460,8 @@ int essprite::setMapPos(int bgno, int x, int y)
 	if (bg == NULL) return -1;
 	if (bg->varptr == NULL) return -1;
 
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
 	bg->viewx = x;
 	bg->viewy = y;
 
@@ -1371,6 +1532,8 @@ int essprite::putMap(int xx, int yy, int bgno )
 	sy = bg->sizey;
 	vx = bg->viewx;
 	vy = bg->viewy;
+	if (vx < 0) vx = 0;
+	if (vy < 0) vy = 0;
 	vpx = vx % divx;
 	vpy = vy % divy;
 	if (vpx > 0) sx++;
