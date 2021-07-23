@@ -6,6 +6,7 @@
 #define global _HSP3DISH
 
 #runtime "hsp3dish"
+#addition "dish_enhance.as"
 
 #const global FILTER_NONE 0
 #const global FILTER_LINEAR 1
@@ -273,6 +274,7 @@
 #cmd es_bgmes $22a
 #cmd es_setparent $22b
 #cmd es_modaxis $22c
+#cmd es_arot $22d
 
 #define global es_fmes mes
 #define global es_bye
@@ -297,17 +299,30 @@
 #define global ESI_ZOOMX 17
 #define global ESI_ZOOMY 18
 #define global ESI_ROTZ 19
+#define global ESI_SPLINK 20
+#define global ESI_TIMER 21
+#define global ESI_TIMERBASE 22
+#define global ESI_PROTZ 23
+#define global ESI_PZOOMX 24
+#define global ESI_PZOOMY 25
 
 #define global ESSPFLAG_NONE (0)
 #define global ESSPFLAG_STATIC (0x100)
 #define global ESSPFLAG_MOVE (0x200)
 #define global ESSPFLAG_GRAVITY (0x400)
-#define global ESSPFLAG_BGLINK (0x800)
+#define global ESSPFLAG_SPLINK (0x800)
 #define global ESSPFLAG_NOWIPE (0x1000)
 #define global ESSPFLAG_XBOUNCE (0x2000)
 #define global ESSPFLAG_YBOUNCE (0x4000)
 #define global ESSPFLAG_BLINK (0x8000)
 #define global ESSPFLAG_NODISP (0x10000)
+#define global ESSPFLAG_FADEIN (0x20000)
+#define global ESSPFLAG_FADEOUT (0x40000)
+#define global ESSPFLAG_TIMERWIPE (0x80000)
+#define global ESSPFLAG_BLINK2 (0x100000)
+#define global ESSPFLAG_EFADE (0x200000)
+#define global ESSPFLAG_EFADE2 (0x400000)
+#define global ESSPFLAG_MOVEROT (0x800000)
 
 #define global ESSPPAT_1SHOT (0x1000)
 
@@ -316,15 +331,9 @@
 #define global ESSPSET_FALL (2)
 #define global ESSPSET_BOUNCE (3)
 #define global ESSPSET_ZOOM (4)
+#define global ESSPSET_ADDZOOM (5)
 #define global ESSPSET_DIRECT (0x1000)
 #define global ESSPSET_MASKBIT (0x2000)
-
-#define global ESSPOPT_NONE (0)
-#define global ESSPOPT_EXTDISP (1)
-#define global ESSPOPT_FADEIN (4)
-#define global ESSPOPT_FADEOUT (8)
-#define global ESSPOPT_ADDCOLOR (16)
-#define global ESSPOPT_SUBCOLOR (32)
 
 #define global ESDRAW_NORMAL (0)
 #define global ESDRAW_NOMOVE (1)
@@ -332,6 +341,20 @@
 #define global ESDRAW_NOCALLBACK (4)
 #define global ESDRAW_NODISP (8)
 #define global ESDRAW_NOSORT (16)
+
+#define global ESSPF_TIMEWIPE (1)
+#define global ESSPF_BLINK (2)
+#define global ESSPF_BLINKWIPE (3)
+#define global ESSPF_BLINK2 (4)
+#define global ESSPF_BLINKWIPE2 (5)
+#define global ESSPF_FADEOUT (6)
+#define global ESSPF_FADEOUTWIPE (7)
+#define global ESSPF_FADEIN (8)
+#define global ESSPF_FADEINWIPE (9)
+#define global ESSPF_EFADE (10)
+#define global ESSPF_EFADEWIPE (11)
+#define global ESSPF_EFADE2 (12)
+#define global ESSPF_EFADEWIPE2 (13)
 
 #endif
 

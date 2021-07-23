@@ -119,7 +119,7 @@ goto *skip_module
 	gpgetmat blur_mat, 1, GPGETMAT_OPT_SCRMAT
 	gpgetmat blur_mat2, 2, GPGETMAT_OPT_SCRMAT
 
-	blur_level=6.0			; ぼかし強度(1.0〜10.0程度)
+	blur_level=6.0			; ぼかし強度(1.0～10.0程度)
 	blur_stepx=1.0/sx
 	blur_stepy=1.0/sy
 	gpmatprm1 blur_mat2, "u_length", 0.0

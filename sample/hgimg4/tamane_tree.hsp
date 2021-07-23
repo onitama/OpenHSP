@@ -1,0 +1,66 @@
+#include "hgimg4.as"
+#include "mod_gputil.as"
+
+	;	gpnodeinfo sample
+	;	珠音（たまね）3D modelのモデル階層を表示
+	;	(mod_gputilモジュールのgptree_getを使用することで全階層を取得できます)
+	;	階層の一部(asi_L_)を取り出し座標を取得
+	;
+
+	title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, $404040
+	gpload id_model,"res/tamane2"		; モデル読み込み
+	sc = 0.01				; モデルのスケール
+	setscale id_model, sc, sc, sc
+
+	gpfloor id_floor, 8,8, $00ffff		; 床ノードを追加
+
+	gpbox id_box, 0.2
+
+	setpos GPOBJ_CAMERA, 0,1,5		; カメラ位置を設定
+
+	gpact id_model
+
+	button "TREE",*view_tree
+	nodename = "asi_L_"
+	infonode = 0
+	x=0.0:y=0.0:z=0.0
+*main
+	stick key,15
+	if key&128 : end
+
+	redraw 0			; 描画開始
+
+	;	カーソルキーでカメラ位置を動かす
+	if key&1 : addpos GPOBJ_CAMERA, -0.2, 0
+	if key&4 : addpos GPOBJ_CAMERA, 0.2, 0
+	if key&8 : addpos GPOBJ_CAMERA, 0, 0 , 0.2
+	if key&2 : addpos GPOBJ_CAMERA, 0, 0 , -0.2
+
+	gplookat GPOBJ_CAMERA, 0,1.2,0		; カメラから指定した座標を見る
+
+	;addang id_model,0,0.02		; ノード回転
+	gpdraw				; シーンの描画
+
+	;	特定の階層をノードとして取り出す
+	gpnodeinfo infonode,id_model, GPNODEINFO_NODE, nodename
+	if infonode>0 {
+		getpos infonode,x,y,z
+		setpos id_box,x*sc,y*sc,z*sc
+		color 255,255,255
+		pos 80,0:mes nodename+"("+x+","+y+","+z+")"
+	}
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+	goto *main
+
+*view_tree
+	sdim s1,256
+	gptree_get s1,id_model
+	dialog s1
+	goto *main
