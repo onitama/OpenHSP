@@ -966,6 +966,15 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF );
 			hsp3typeinit_dw_restart( tinfo );
 #endif
+			//		Initalize DEVINFO
+			HSP3DEVINFO *devinfo;
+			devinfo = hsp3extcmd_getdevinfo();
+
+#ifdef DEVCTRL_IO
+			hsp3dish_setdevinfo_io( devinfo );
+#else
+			hsp3dish_setdevinfo( devinfo );
+#endif
 			hspctx->runmode = RUNMODE_RUN;
 			break;
 		}

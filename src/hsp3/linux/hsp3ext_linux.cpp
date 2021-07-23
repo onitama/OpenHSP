@@ -166,30 +166,12 @@ char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
 
 	switch(p2) {
 	case 0:
-#ifdef HSPNDK
-		{
-		char tmp[256];
-		strcpy( tmp, j_getinfo( JAVAFUNC_INFO_VERSION ) );
-		strcpy( p1, "android " );
-		strcat( p1, tmp );
-		}
-#endif
-#ifdef HSPIOS
-        //strcpy(p1, "iOS");
-        gpb_getSysVer( p1 );
-#endif
+		strcpy( p1, "Linux" );
 		fl=HSPVAR_FLAG_STR;
 		break;
 	case 1:
 		break;
 	case 2:
-#ifdef HSPNDK
-		j_getinfo( JAVAFUNC_INFO_DEVICE );
-#endif
-#ifdef HSPIOS
-        gb_getSysModel( p1 );
-#endif
-		fl = HSPVAR_FLAG_STR;
 		break;
 	case 3:
 		*(int*)p1 = hspctx->language;
@@ -251,26 +233,8 @@ char* hsp3ext_getdir(int id)
 
 void hsp3ext_execfile(char* msg, char* option, int mode)
 {
-#ifdef HSPNDK
-	j_callActivity( msg, option, mode );
-#endif
-#ifdef HSPIOS
-    gb_exec( mode, msg );
-#endif
 #ifdef HSPLINUX
 	system(msg);
-#endif
-
-#ifdef HSPEMSCRIPTEN
-	{
-	EM_ASM_({
-		if ($1>=16) {
-			window.open(UTF8ToString($0));
-		} else {
-			window.eval(UTF8ToString($0));
-		}
-	},msg,mode );
-	}
 #endif
 }
 
