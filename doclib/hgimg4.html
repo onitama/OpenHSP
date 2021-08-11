@@ -59,6 +59,7 @@
 		<li><a href="#EVENT">イベントリスト</a></li>
 		<li><a href="#POSTEFFECT">ポストエフェクト<span class="new">（New!）</span></a></li>
 		<li><a href="#FREEMESH">自由な形状の作成<span class="new">（New!）</span></a></li>
+		<li><a href="#NODEINFO">階層情報の取得<span class="new">（New!）</span></a></li>
 		<li><a href="#MEMLIMIT">登録の限界数について</a></li>
 		<li><a href="#ERRORLOG">エラーログ</a></li>
 		<li><a href="#PACKFILE">PACKFILEの対応について</a></li>
@@ -2482,6 +2483,77 @@ optionパラメーターにより設定時のオプションを付加します�
 	<p>
 	sample/hgimg4フォルダにカスタム3Dメッシュのサンプルとして、freemesh.hspが含まれていますので併せて動作をご確認ください。
 	</p>
+
+
+	<h2 id="NODEINFO">階層情報の取得</h2>
+
+	<p>
+	gpload命令で読み込まれた3Dモデルは、親子関係など複雑な階層(ノード)を持っています。
+	この階層情報を取得してアクセス可能にするのが、gpnodeinfo命令です。<br>
+	gpnodeinfo命令により、任意の階層にあるノードの情報、階層全体の情報を調べることができるようになります。
+	</p>
+	<pre>
+	gpnodeinfo var,objid,option,"name"
+
+	var       : 結果が代入される変数名
+	objid(0)  : オブジェクトID
+	option(0) : メッシュ頂点ID1
+	name      : 階層ノード名
+	</pre>
+	<p>
+	gpload命令で読み込まれた3Dモデルの階層情報を取得して、varで指定された変数に結果を代入します。
+	objidで指定した3Dモデルが持つ階層を名前によって指定することで個別のノードを特定します。
+	(階層の名前(ノード名)は、3Dモデル作成時にあらかじめ付けられています。すべての階層を取得する際には、mod_gputilモジュールのgptree_get命令をご使用ください。)
+	option値により、代入される結果を選択することができます。option値に指定できる値は、以下の通りです。
+	</p>
+	<pre>
+	オプション値          | 取得される内容
+	--------------------------------------------------------------
+	GPNODEINFO_NODE         該当するノードを示すオブジェクトID
+	GPNODEINFO_MODEL        該当するモデルノードを示すオブジェクトID
+	GPNODEINFO_NAME         該当するノード名(*)
+	GPNODEINFO_CHILD        階層が持つ子のノード名(*)
+	GPNODEINFO_SIBLING      同じ階層にある隣のノード名(*)
+	GPNODEINFO_SKINROOT     スキンメッシュが持っているノード名(*)
+
+	(*) 結果の文字列が代入されます
+	</pre>
+	<p>
+	GPNODEINFO_NODEを指定した場合は、指定された名前を持つ階層を示す特別なオブジェクトIDの値が代入されます。
+このオブジェクトIDを使用して、getpos、getang、getquatなどそれぞれの階層が持つ座標や回転情報を取得することができます。
+	GPNODEINFO_MODELを指定した場合は、描画するモデルを持った階層のみオブジェクトIDが取得されます。
+	GPNODEINFO_CHILD、GPNODEINFO_SIBLING、GPNODEINFO_SKINROOTのオプションは、他の階層との繋がりを取得します。これにより、ノードの階層を調べることができます。
+	処理が正常に終了した場合は、システム変数statに0が代入されます。エラーが発生した場合は、システム変数statにマイナス値が代入されます。
+	</p>
+	<p>
+	以下の例では、tamane2.gpbのモデル階層内にある「asi_L_」という名前のノードから座標(ローカル座標)を取得します。
+	アニメーションが適用されている場合は、適用後の情報が取得されます。
+	</p>
+	<pre>
+	;	特定の階層をノードとして取り出す
+	gpload id_model,"res/tamane2"		; モデル読み込み
+	nodename = "asi_L_"
+	gpnodeinfo infonode,id_model, GPNODEINFO_NODE, nodename
+	if infonode>0 {
+		getpos infonode,x,y,z		; 座標を取得する
+		mes "XYZ="+x+","+y+","+z
+	}
+	</pre>
+	<p>
+	すべての階層を文字列で取得するためのモジュール「mod_gputil.as」が標準で用意されています。
+	このモジュールを使用することで、gptree_get命令によりモデル階層全体の構造を文字列として取得することが可能です。
+	実際のモデル階層取得は、モジュール内のgpnodeinfo命令によって行われています。
+	</p>
+	<pre>
+	;	すべての階層を文字列で取得
+	#include "hgimg4.as"
+	#include "mod_gputil.as"
+	gpload id_model,"res/tamane2"		; モデル読み込み
+	sdim s1,256
+	gptree_get s1,id_model
+	dialog s1
+	</pre>
+
 
 	<h2 id="MEMLIMIT">登録の限界数について</h2>
 

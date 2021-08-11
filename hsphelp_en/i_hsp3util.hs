@@ -6,7 +6,7 @@
 %type
 Extension instructions
 %ver
-3.4
+3.6
 %note
 Include hsp3util.as.
 %date
@@ -33,7 +33,7 @@ Extended screen control command
 %inst
 Reads the palette information included in the 8-bit format bmp image file and retrieves it as an HSP palette.
 Normally, when loading an image in palette mode using the picload command, the palette information attached to the file cannot be loaded.
-It can be used when you need palette information in a file, such as the hspdx extension plugin.
+It can be used when you need the palette information in the file, such as the hspdx extension plugin.
 Only 8BIT format BMP files can be specified as files.
 If any other file or incorrect format is specified, nothing will be done.
 
@@ -162,7 +162,7 @@ p1 (0): Fade level (0 to 256)
 %inst
 Performs a fixed color fade on the specified area for a full-color screen.
 This command is for fading in, fading out, etc. by changing the fade level every hour.
-Specify the fade level with p1. If it is 0, there is no effect on the screen.
+Specify the fade level with p1. If it is 0, the screen will not be affected.
 When p1 is 256, it will be completely filled with the specified color.
 Specify the upper left X and Y coordinates to fade with (p2, p3). If omitted, it will be (0,0).
 Specify the X and Y sizes to fade with (p4, p5). If omitted, the size of the entire screen is used.
@@ -276,7 +276,7 @@ p2 (0): Incremental value
 %inst
 By specifying the object ID in p1, you can set the step-by-step increment of the progress bar placed by the progbar instruction.
 The progress bar has a value from 0 to 100 as a counter by default.
-On the other hand, the increment is added step by step.
+On the other hand, increments are added step by step.
 If you do not specify an increment, the default value is 10.
 
 %href
@@ -296,7 +296,7 @@ p1 (0): Object ID
 
 %inst
 By specifying the object ID in p1, the progress bar placed by the progbar instruction is advanced by one step.
-The step-by-step increment can be specified with the progbar_set command.
+The step-by-step increment can be specified with the progbar_set instruction.
 
 %href
 progbar_set
@@ -383,7 +383,7 @@ p1: Variable to read
 
 %inst
 The file written by the arraysave command is read into the variable specified by p1.
-This instruction converts a line of a multi-line character string contained in a file into an array element and substitutes it, and the created array array becomes a one-dimensional array.
+This command converts a line of a multi-line character string contained in a file into an array element and substitutes it, and the created array array becomes a one-dimensional array.
 
 
 %href

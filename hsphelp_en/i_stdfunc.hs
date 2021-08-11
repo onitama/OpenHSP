@@ -27,7 +27,7 @@ Let
 int
 Convert to integer value
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Source value or variable
@@ -47,16 +47,16 @@ double
 rnd
 Generate random numbers
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 1 to 32768: Random number range
 
 %inst
 Generates an integer random value in the range 0 to (p1-1).
-The value of p1 is not included in the range. For example
+The value of p1 is not included in the range. for example,
 ^p
-Example:
+example :
     a=rnd(10)
 ^p
 Assigns a random number from 0 to 9 to the variable a.
@@ -72,14 +72,15 @@ randomize
 strlen
 Check the length of the string
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Character string or string type variable name for which you want to check the length of the character string
 
 %inst
-Returns the length of the string specified by p1 or the string held by the string type variable.
-If the character string is Japanese full-width, even one character will be calculated for two characters.
+Returns the length (memory size) of the string specified by p1 or the string type variable.
+If the character string contains double-byte characters (Japanese), even one character is calculated as two characters.
+(However, in the case of HSP64, UTF-8 runtime, the character length may be different)
 %href
 
 
@@ -89,7 +90,7 @@ If the character string is Japanese full-width, even one character will be calcu
 length
 Returns the number of one-dimensional elements in an array
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variables that examine arrays
@@ -109,7 +110,7 @@ length4
 length2
 Returns the number of 2D elements in an array
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variables that examine arrays
@@ -130,7 +131,7 @@ length4
 length3
 Returns the number of 3D elements in an array
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variables that examine arrays
@@ -150,7 +151,7 @@ length4
 length4
 Returns the number of 4D elements in an array
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variables that examine arrays
@@ -170,14 +171,14 @@ length3
 vartype
 Returns the type of a variable
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variable to check type, or string
 
 %inst
 Checks and returns the type of the value stored in the variable specified by p1.
-The value returned will be an integer value indicating the type. The type values are:
+The value returned will be an integer value indicating the type. The type values are as follows:
 ^p
  1: Label type
  2: String type
@@ -208,7 +209,7 @@ varsize
 varptr
 Returns a pointer to variable data
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variable or instruction to check the pointer
@@ -231,7 +232,7 @@ Let
 varsize
 Returns the buffer size of variable data
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variable to check the buffer size
@@ -254,7 +255,7 @@ Let
 gettime
 Get time / date
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 0 to 7 (0): Type to get
@@ -273,10 +274,10 @@ The types to get are as follows.
     6: Second
     7: Milliseconds
 ^p
-For example
+for example,
 
 ^p
-Example:
+example :
     a = gettime (4); What time is it now?
 ^p
 Assigns the current time to the variable a.
@@ -290,7 +291,7 @@ Assigns the current time to the variable a.
 str
 Convert to string
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Source value or variable
@@ -308,7 +309,7 @@ double
 dirinfo
 Get directory information
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 0 to 5: Type to get
@@ -325,7 +326,7 @@ The types to get are as follows.
     5: HSPTV directory (dir_tv)
 ^p
 p1 cannot be omitted.
-If a value of 0x10000 or more is specified for p1, bits 0 to 15 are used as the CSIDL value to acquire the special folder.
+If a value of 0x10000 or more is specified for p1, the special folder will be acquired with bits 0 to 15 as the CSIDL value.
 This allows you to retrieve most of the system-managed folders such as Desktop (0x10000) and My Documents (0x10005).
 Normally, use it through the "dir _ *" macro defined in hspdef.as.
 
@@ -343,7 +344,7 @@ dir_tv
 double
 Convert to real number
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Source value or variable
@@ -362,7 +363,7 @@ str
 sin
 Returns sine value
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = (0.0): Angle value (radians)
@@ -380,7 +381,7 @@ atan
 cos
 Returns a cosine value
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = (0.0): Angle value (radians)
@@ -396,9 +397,9 @@ atan
 
 %index
 tan
-Returns a tangent value
+Returns the tangent value
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = (0.0): Angle value (radians)
@@ -416,7 +417,7 @@ atan
 atan
 Returns the arctangent value
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1,p2)
 p1: Y value
@@ -424,7 +425,7 @@ p2 (1.0): X value
 
 %inst
 Returns the Y / X angle (arc tangent value) in real radians (2π is 360 degrees), where p1 is Y and p2 is the value of X.
-If p2 is omitted, 1.0 is used. Also, if p2 is 0, 0.5π (90 degrees) is returned.
+If p2 is omitted, 1.0 is used.
 
 %href
 sin
@@ -436,7 +437,7 @@ tan
 sqrt
 Returns the root value
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 0.0 ~ (0.0): Value to find the route
@@ -450,9 +451,9 @@ You cannot specify a negative value for p1.
 
 %index
 sysinfo
-Get system information
+Acquisition of system information
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 0 ~: Type to get
@@ -467,7 +468,7 @@ The types that can be obtained are as follows.
   3: Numerical language used by HSP (0 = English / 1 = Japanese)
  16: Numerical value CPU type used (code)
  17: Numerical number Number of CPUs used
- 33: Numerical physical memory size usage (unit:%)
+ 33: Numerical physical memory size usage (unit%)
  34: Numerical total physical memory size
  35: Numerical free physical memory size
  36: Total size of numeric swap file
@@ -544,7 +545,7 @@ wpeek
 callfunc
 Calling an external function
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1,p2,p3)
 p1: Array variable containing parameters
@@ -555,7 +556,7 @@ p3: Number of parameters
 Calls the address specified in p2 as a native function.
 Use the value stored in the numeric array variable specified by p1 as the argument of the call. You can specify the number of parameters with p3.
 ^p
-Example:
+example :
 	a.0=1
 	a.1=2
 	a.2=3
@@ -576,7 +577,7 @@ Normally you do not need to use it. Also, if the external function call fails, i
 absf
 Returns the absolute value of a real number
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Real value to convert to absolute value
@@ -591,7 +592,7 @@ abs
 abs
 Returns the absolute value of an integer
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Integer value to convert to absolute value
@@ -607,7 +608,7 @@ absf
 logf
 Returns logarithm
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 0.0 ~ (0.0): Value to find the logarithm
@@ -624,14 +625,14 @@ expf
 expf
 Returns the index
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 0.0 ~ (0.0): Value for exponent
 
 %inst
 Returns the exponential (exp) value of p1 as a real number.
-Returns infinity (INF) if it overflows, 0 if it underflows.
+Returns infinity (INF) if overflow, 0 if underflow.
 %href
 logf
 
@@ -641,7 +642,7 @@ logf
 limit
 Returns an integer within a certain range
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1,p2,p3)
 p1: Target value
@@ -665,7 +666,7 @@ limitf
 limitf
 Returns a real number within a certain range
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1,p2,p3)
 p1: Target value
@@ -689,7 +690,7 @@ limit
 varuse
 Returns variable usage
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Variable to check usage
@@ -714,7 +715,7 @@ Let
 libptr
 Get the information address of the external call command
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1: Command to look up the address
@@ -793,7 +794,7 @@ Let
 powf
 Find power
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1, p2)
 p1: Bottom (0 or more)
@@ -818,14 +819,14 @@ Let
 getease
 Get the easing value as an integer
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1,p2)
 p1 (0): Time elapsed value (integer value)
 p2 (4096): Maximum time elapsed value (integer value)
 %inst
 Acquires the calculation result value of the easing function that interpolates the numerical value in the determined range with an arbitrary calculation formula as an integer.
-Before using the easing function, it is necessary to set the minimum value, maximum value, and calculation formula output by the setease instruction.
+When using the easing function, it is necessary to set the minimum value, maximum value, and calculation formula output by the setease instruction first.
 The time elapsed value specified by p1 is an integer value starting from 0, and by specifying up to the maximum time elapsed value (p2 parameter), the calculation result of the easing function is returned.
 If you omit the maximum value (p2 parameter), 4096 is used.
 Normally, if the elapsed time value is negative, it is considered to be 0. Also, if the elapsed time value exceeds the maximum value (p2 parameter), it is treated as the maximum value.
@@ -843,14 +844,14 @@ Let
 geteasef
 Get the easing value as a real number
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1,p2)
 p1 (0): Time elapsed value (real value)
 p2 (1.0): Maximum time elapsed value (real value)
 %inst
 Acquires the calculation result value of the easing function that interpolates the numerical value in the determined range with an arbitrary calculation formula as a real number.
-Before using the easing function, it is necessary to set the minimum value, maximum value, and calculation formula output by the setease instruction.
+When using the easing function, it is necessary to set the minimum value, maximum value, and calculation formula output by the setease instruction first.
 The time elapsed value specified by p1 is a real value starting from 0, and by specifying up to the maximum time elapsed value (p2 parameter), the calculation result of the easing function is returned.
 If you omit the maximum value (p2 parameter), 1.0 is used.
 Normally, if the elapsed time value is negative, it is considered to be 0. Also, if the elapsed time value exceeds the maximum value (p2 parameter), it is treated as the maximum value.

@@ -45,7 +45,7 @@
 <li> <a href="#INPUT"> Support for various inputs and outputs </a> </li>
 <li> <a href="#KNOWNBUG"> Known bugs </a> </li>
 <li> <a href="#LICENCE"> Copyright and license </a> </li>
-<li> <a href="#CONTACT"> Contact </a> </li>
+<li> <a href="#CONTACT"> Contacts </a> </li>
 	</ol>
 
 <h2 id = "ABOUT"> What is HSP3Dish? </H2>
@@ -57,7 +57,7 @@ It provides a mechanism to make it work.
 	<p>
 The HSP3 Dish runtime running on Windows has limited functionality compared to the regular version of HSP3.
 Some special features have been added.
-The same function as this HSP3Dish runtime, such as iPhone / iPad or android
+The same function as this HSP3 Dish runtime, such as iPhone / iPad or android
 Scripts that run on the Windows version can be reused by implementing them on different systems.
 It is a mechanism.
 	</p>
@@ -88,9 +88,9 @@ Please take a look at the latest information about HSP3Dish and useful informati
 
 <h2 id = "DISHUSE"> How to use HSP3Dish </h2>
 	<p>
-With HSP3Dish, development is performed using the normal HSP environment such as the HSP3 script editor that runs on Windows.
+With HSP3Dish, you can develop using the normal HSP environment such as HSP3 script editor running on Windows.
 If possible, please use the latest version of HSP. <br>
-If you want to create a script that works in the HSP3Dish environment
+If you want to create a script that works in the HSP3Dish environment,
 You need to add the following code to the first line:
 	</p>
 	<pre>
@@ -171,7 +171,7 @@ Must be included. Adjust the timing with the await or wait instruction.
 
 <li> Alpha channel handling </li>
 	<p>
-Image file including alpha channel by picload and celload instructions
+Image file including alpha channel by picload and celload command
 It can be read. (The recommended image format is a PNG file)
 With instructions such as celput and gcopy, the copy including the alpha channel is
 It will be executed. Therefore, there are some differences in the specification by gmode.
@@ -259,7 +259,7 @@ For more information on standard sprites, see <a href="sprite.html"> Standard Sp
 		</p>
 
 
-<h2 id = "SCREEN"> Screen resizing </h2>
+About screen resizing of <h2 id = "SCREEN"> </h2>
 		<p>
 Supports dynamic change of screen (window) size in Windows / Linux version of HSP3Dish and HGIMG4. (HSP3.6β2 or later) <br>
 Previously, the size was fixed at startup according to the size recorded in the hsp3dish.ini file,
@@ -269,7 +269,7 @@ From HSP3.6, the screen (window) size can be changed by the screen command and b
 	screen p1,p2,p3,p4,p5,p6
 
 p1 = 0 to (0): Window ID
-p2 = 1 to (640): Screen size X to be initialized (in 1-dot units)
+p2 = 1 to (640): Screen size to be initialized X (1 dot unit)
 p3 = 1 to (480): Screen size Y to initialize (1 dot unit)
 p4 = 0 to 1 (0): Screen mode to initialize
 p5 = 0 to (-1): Window layout X (1 dot unit)
@@ -293,7 +293,7 @@ Also note that when resizing the screen, unlike the normal runtime, all image bu
 		<p>
 In HSP3Dish and HGIMG4, the viewcalc instruction that sets the coordinate transformation at the time of drawing has been added. <br>
 The viewcalc instruction is a powerful function that allows you to apply arbitrary calculations to the X and Y coordinates when drawing in 2D.
-You can scale, move, and rotate the entire rendered display.
+You can scale, move, rotate, etc. the entire rendered display.
 		</p><pre>
 	viewcalc p1,p2,p3,p4,p5
 
@@ -310,7 +310,7 @@ Macro name value Content
 vptype_off 0 No coordinate transformation (default)
 vptype_translate 1 Specify movement parameters
 vptype_rotate 2 Specify rotation parameter
-vptype_scale 3 Specify scale parameters
+vptype_scale 3 Specify scale parameter
 vptype_3dmatrix 4 Coordinate transformation by 4 × 4 matrix
 vptype_2d 5 Set 2D coordinate transformation
 vptype_3d 6 Set 3D coordinate transformation
@@ -342,14 +342,14 @@ Create an offscreen buffer by specifying the screen_offscreen option with the bu
 	buffer 2,256,256,screen_offscreen
 		</pre><p>
 Then create a variable buffer to replace the buffer. <br>
-Initialize the one-dimensional array with the dim instruction and create it. The size to be created is X size x Y size of the offscreen buffer.
+Initialize the one-dimensional array with the dim command and create it. The size to be created is X size x Y size of the offscreen buffer.
 		</p><pre>
 	dim bitmap, 256*256
 		</pre><p>
 Now you are ready to use the celbitmap instruction. <br>
-By specifying the ID of the offscreen buffer and the array variable with the celbitmap instruction, the contents of the variable buffer are applied as they are as an image. <br>
+By specifying the ID of the offscreen buffer and the array variable with the celbitmap command, the contents of the variable buffer are applied as they are as an image. <br>
 The variable buffer is 1 dot per element. One dot is RGB format data in which 32-bit elements are stored in 8-bit units for each of R, G, B, and A. (Please note that the order of RGB has changed between 3.6β2 version and 3.6β3 version.) <br>
-For example, if you specify "$ ff204080" (hexagon), then A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses) <br>
+For example, if you specify "$ ff204080" (hexadecimal), A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses) <br>
 Please note that replacing image data is a costly process and may reduce the frame rate when replacing large size images. <br>
 The p2 parameter allows you to specify the replacement format and behavior.
 		</p><pre>
@@ -463,7 +463,7 @@ The color code is set with a single RGB 24bit ($ rrggbb).
 	<li>SYSREQ_TIMER</li>
 	<p>
 Returns a timer value in milliseconds.
-The value returned will vary from platform to platform, but will be incremented by 1 per millisecond.
+The value returned varies from platform to platform, but the value is incremented by 1 per millisecond.
 	</p>
 	<li>SYSREQ_PLATFORM</li>
 	<p>
@@ -498,13 +498,13 @@ var: variable name to which the result is assigned
 id: Point ID
 	</pre>
 	<p>
-First, get the point ID list currently touched by the mtlist instruction.
+First, get the point ID list currently touched by the mtlist command.
 An integer value called the point ID is assigned to the variable specified by the mtlist instruction.
 If multiple points are touched, the array variables are var (0), var (1), var (2), and so on.
 Multiple point IDs will be assigned.
 The number of point IDs assigned to the array is returned in the system variable stat.
 If the system variable stat is 0, it means that nothing has been touched. <br>
-After obtaining the value of the point ID, it is possible to obtain the detailed information corresponding to the point ID by the mtinfo instruction.
+After obtaining the value of the point ID, it is possible to obtain the detailed information corresponding to the point ID by the mtinfo command.
 For example, "mtinfo a, 1" assigns the information of point ID 1 to the variable a.
 The variable a specified here is initialized as an integer type array variable and the following contents are assigned.
 	<pre>
@@ -515,12 +515,12 @@ a (3): Touch identification ID
 	</pre>
 	<p>
 Based on this information, you can manage multiple points.
-The value of the touch identification ID itself has no meaning, and a value different from the others is assigned among multiple touches.
+The touch identification ID has no meaning in the value itself, and a value different from the others is assigned among multiple touches.
 Please note that the touch identification ID value differs for each device. <br> <br>
-<b> When acquiring multi-touch information on iOS, it is necessary to include a setting that allows multi-touch input.
+<b> If you want to get multi-touch information on iOS, you need to include a setting that allows multi-touch input.
 For more information, see <a href="hsp3dish_ios.htm"> iOS Programming Guide </a>. </b>
 	<br><br>
-Even on Windows that does not support multi-touch, information is acquired as information where only one point is touched.
+Even on Windows that does not support multi-touch, the information is acquired as information where only one point is touched.
 	</p>
 
 
@@ -569,7 +569,7 @@ For details of each instruction, refer to the instruction help provided by HSP D
 
 <h2 id = "SAMPLE"> Sample script </h2>
 	<p>
-Sample scripts are included in the HSP full set sample directory hsp3dish.
+HSP full set sample directory hsp3dish contains sample scripts.
 Please refer to it as an example using HSP3Dish.
 	</p>
 
@@ -587,11 +587,11 @@ Since there are merits that normal HSP3 does not have, software compatible with 
 You can also use it for making.
 	</p>
 	<p>
-The Windows version of HSP3Dish runtime is for Windows98, Me, 2000, XP or later.
+HSP3Dish runtime for Windows is for Windows98, Me, 2000, XP or later
 It works in the environment where DirectX8 is installed.
 (Because it is included as standard in Windows XP or later (Windows Vista, 8, 10)
 No additional DirectX installation required) <br>
-In addition, the Windows version of HGIMG4 uses OpenGL and DirectX9.
+In addition, the Windows version of HGIMG4 uses OpenGL and DirectX 9.
 For the operating environment, refer to the HGIMG4 manual separately.
 	</p>
 
@@ -604,7 +604,7 @@ You can change the screen size by preparing it.
 	</p>
 	<p>
 The startup setting file is a script with the file name "hsp3dish.ini"
-It will be reflected if they are placed in the same folder.
+It will be reflected when they are placed in the same folder.
 The following is a description example of the configuration file.
 	</p>
 	<pre>
@@ -615,7 +615,7 @@ The following is a description example of the configuration file.
 	<p>
 It will be reflected by writing "wx = horizontal size" and "wy = vertical size" from the beginning of the line.
 Lines starting with ";" are considered comments.
-If you want to operate on different devices, use the startup configuration file.
+If you want to operate on different devices, use the boot configuration file.
 Please prepare and execute.
 	</p>
 	<p>
@@ -641,7 +641,7 @@ For detailed usage, refer to the physics engine <a href="obaq.txt"> OBAQ manual 
 	<p><b>
 * The physics engine OBAQ is operated under a different license from the HSP3 Dish.
 If the software using OBAQ generates profits that require tax filing (if the profits from paid apps are large), you need to obtain a paid license. However, if you want to distribute a small number of items or distribute them with only the minimum necessary expenses (media price, etc.), it is considered free of charge, so you do not need to obtain a paid license.
-Of course, in the case of a free app, you do not need to obtain a license.
+Of course, for free apps, you don't need to get a license.
 	</b></p>
 
 
@@ -683,7 +683,7 @@ However, please note that some plugins may not be available on the HSP3Dish syst
 	<ul>
 <li> Plugins that draw to HSP windows (hgimg, hspdx, etc.) are not available </li>
 <li> Plugins that extend HSP placement objects (buttons and input boxes) are not available </li>
-<li> Other plugins that refer to HSP window information (BMSCR structure) may not work properly </li>
+<li> Other plugins that refer to information about HSP windows (BMSCR structure) may not work properly </li>
 	</ul>
 	<p><b>
 In either case, the extension plug-in / external DLL calling function is supported only on Windows, so it will not be converted on other platforms (iOS, android, WebGL, etc.). </b>
@@ -701,7 +701,7 @@ For those that do not work on Windows, we are considering creating a system that
 <h2 id = "KNOWNBUG"> Known bugs </h2>
 	<p>
 It has been reported that when calling a user-defined function with multiple parameters by <li> #defcfunc, it is not executed correctly when the parameters are omitted.
-Please avoid using <li> #defcfunc because an error (40) will occur if you execute an instruction such as await, wait, or stop that puts the task in a stopped state in the call of the user-defined function.
+Please avoid using <li> #defcfunc as an error (40) will occur if you execute an instruction such as await, wait, or stop that puts the task in the stopped state in the call of the user-defined function.
 The <li> split instruction is currently not working properly. Please substitute with getstr command etc.
 <li> Images that can be displayed on Windows may not be displayed on iOS and android due to differences in PNG decoders.
 It has been reported that when the gosub instruction is used in the user-defined call destination by the <li> #defcfunc and #deffunc instructions, the argument cannot be accessed in the called subroutine.
@@ -713,9 +713,9 @@ The rights of the original software (executable file) created by the user using 
 It can be used in any form, commercial or non-commercial. Also, no license fee is required.
 	</b></p>
 	<p>
-The software created by the user is not obliged to display the copyright notice of onion software or the fact that it uses HSP.
+User-created software is not obliged to indicate that you are using onion software or that you are using HSP.
 Onion software does not claim copyright to the original software.
-For secondary development systems (game creation system, etc.) created using HSP, please operate at the responsibility of the creator who created the system.
+For secondary development systems (game creation system, etc.) created using HSP, please operate at the responsibility of the author who created the system.
 	</p>
 	<p>
 HSP3Dish is part of the interpreted language Hot Soup Processor (HSP) and is copyrighted by onion software.
@@ -725,7 +725,7 @@ Use at your own risk.
 	<p>
 HSP3Dish is a derivative of OpenHSP technology.
 Files and source code included in HSP3Dish and OpenHSP can be freely attached, duplicated, reorganized, and redistributed under the BSD license.
-I can do it. In that case, please specify <a href="License_j.txt"> license notation (License_j.txt) </a>.
+can. In that case, please specify <a href="License_j.txt"> license notation (License_j.txt) </a>.
 	</p>
 	<p>
 Those who are considering operating the produced software for commercial use and who wish to receive support for a fee

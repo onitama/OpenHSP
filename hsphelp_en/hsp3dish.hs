@@ -42,7 +42,7 @@ SYSREQ_CLSCOLOR RW background clear color
 SYSREQ_TIMER R Timer value in milliseconds
 Platform running SYSREQ_PLATFORM R HSP3Dish
 
-(*) Whether reading (R) or writing (W) is possible differs depending on the item.
+(*) Whether reading (R) or writing (W) is possible differs for each item.
 ^p
 
 -SYSREQ_CLSMODE, SYSREQ_CLSCOLOR
@@ -151,7 +151,7 @@ Element value Content
 ^p
 That is, var (1) is assigned the touched X coordinate, and var (0) is assigned the touch state (if 1 is pressed).
 The variable specified by var is always initialized as an integer type array variable.
-The touch identification ID of var (3) is an integer value for distinguishing from other touches. This value varies from device to device.
+The touch identification ID of var (3) is an integer value to distinguish it from other touches. This value varies from device to device.
 
 %href
 mtlist
@@ -199,7 +199,7 @@ Parameter settings for device control
 "name": A string indicating the parameter name
 "value": string to set
 %inst
-Set the parameters (additional information) when controlling the device with the devcontrol instruction.
+Set the parameters (additional information) when controlling the device with the devcontrol command.
 After execution, if the execution is successful, the system variable stat will be 0 or more.
 If the parameter does not exist or an error occurs, the system variable stat will have a negative value.
 
@@ -245,7 +245,7 @@ Mode value Contents
 0 Do not clear the screen
 1 Clear the screen
 ^p
-You can set the color when clearing with color. The color is set by the numerical value of the 24-bit RGB code ($ rrggbb).
+You can set the color when clearing with color. The color is set by the numerical value of 24bit RGB code ($ rrggbb).
 
 
 %href
@@ -432,7 +432,7 @@ Macro name value Content
 vptype_off 0 No coordinate transformation (default)
 vptype_translate 1 Specify movement parameters
 vptype_rotate 2 Specify rotation parameter
-vptype_scale 3 Specify scale parameters
+vptype_scale 3 Specify scale parameter
 vptype_3dmatrix 4 Coordinate transformation by 4 × 4 matrix
 vptype_2d 5 Set 2D coordinate transformation
 vptype_3d 6 Set 3D coordinate transformation
@@ -485,14 +485,14 @@ Create an offscreen buffer by specifying the screen_offscreen option with the bu
 	buffer 2,256,256,screen_offscreen
 ^p
 Then create a variable buffer to replace the buffer.
-Initialize the one-dimensional array with the dim instruction and create it. The size to be created is X size x Y size of the offscreen buffer.
+Initialize the one-dimensional array with the dim command and create it. The size to be created is X size x Y size of the offscreen buffer.
 ^p
 	dim bitmap, 256*256
 ^p
 Now you are ready to use the celbitmap instruction.
 By specifying the ID of the offscreen buffer and the array variable with the celbitmap instruction, the contents of the variable buffer are applied as they are as an image.
 The variable buffer is 1 dot per element. One dot is RGB format data in which 32-bit elements are stored in 8-bit units for each of R, G, B, and A.
-For example, if you specify "$ ff204080" (hexagon), then A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses)
+For example, if you specify "$ ff204080" (hex number), A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses)
 Please note that replacing image data is a costly process and may reduce the frame rate when replacing large size images.
 The p2 parameter allows you to specify the replacement format and behavior.
 ^p

@@ -36,7 +36,7 @@ The character string specified by "name" is written on the button, and when the 
 ^
 If you write button goto, jump to the label. If you write button gosub, a subroutine jump is performed on the label. If the goto and gosub keywords are omitted, the operation is the same as goto.
 ^p
-Example:
+example :
 button gosub "button", * aaa; Create a button to call * aaa
 ^p
 ^
@@ -44,7 +44,7 @@ The size of the object can be specified with the objsize command. When you place
 ^
 In the program that jumps and executes when the button is pressed, the object ID is assigned as the initial value of the system variable stat.
 ^
-Normally, the button shape provided by the Windows system is used.
+Normally, the shape of the button used is the one provided by the Windows system.
 However, if the custom button using the image is set by the objimage command, you can make it look free.
 See the objimage instruction section for custom button settings.
 
@@ -87,7 +87,7 @@ Object control instructions
 %prm
 p1,p2
 p1 = 0 to (0): Object ID to be erased (start)
-p2 = 0 to (-1): Object ID to be erased (end) (If -1, the final ID is specified
+p2 = -1 to (-1): Object ID to be erased (End) (If -1, the final ID is specified.
 Will be)
 
 %inst
@@ -117,7 +117,7 @@ The size of the object will be the size set by the objsize command. However, the
 ^
 You can set the element to be selected by specifying the character string separated by "\\ n" with p3.
 For example, if you specify the character string "APPLE \\ nORANGE \\ nGRAPE", it becomes a combo box to select one from "APPLE", "ORANGE", and "GRAPE".
-Each element has an index number starting from 0. In the previous example, "APPLE" is numbered with index 0, "ORANGE" is numbered with index 1, "GRAPE" is numbered with index 2, and so on.
+Each element is indexed starting from 0. In the previous example, "APPLE" is numbered with index 0, "ORANGE" is numbered with index 1, "GRAPE" is numbered with index 2, and so on.
 ^
 The data format separated by "\\ n" is the same as the multi-line text data handled by the memory notepad instruction. The data created by the memory notepad instruction can be used as it is for the combox instruction.
 ^
@@ -154,7 +154,7 @@ The entered value is assigned to the variable specified by p1. If the variable o
 ^
 In the initial state of the input box, the value assigned to the variable specified by p1 is displayed in the box.
 ^
-You can specify the maximum number of characters that can be entered with p4. If p4 is omitted, the maximum number of characters that can be stored in the variable specified by p1 is automatically assigned. (If the variable is not a string type, it defaults to 32 characters.)
+You can specify the maximum number of characters that can be entered with p4. If p4 is omitted, the maximum number of characters that can be stored in the variable specified by p1 is automatically assigned. (If the variable is not a string type, it will default to 32 characters.)
 If p4 is specified as 0, the maximum number of characters that can be handled by that version of Windows can be entered.
 ^
 When you place the input box, the current position automatically moves to the next line.
@@ -173,7 +173,7 @@ List box display
 Object control instructions
 %prm
 p1,p2,p3
-p1 = variable: a numeric variable that holds the state of the list box
+p1 = variable: Numeric variable that holds the state of the list box
 p2 = 0 ~ (100): Extended Y size
 p3 = "strings": Strings indicating the contents of the list box
 
@@ -184,7 +184,7 @@ The size of the object will be the size set by the objsize command. However, the
 ^
 You can set the element to be selected by specifying the character string separated by "\\ n" with p3.
 For example, if you specify the character string "APPLE \\ nORANGE \\ nGRAPE", it becomes a list box to select one from "APPLE", "ORANGE", and "GRAPE".
-Each element has an index number starting from 0. In the previous example, "APPLE" is numbered with index 0, "ORANGE" is numbered with index 1, "GRAPE" is numbered with index 2, and so on.
+Each element is indexed starting from 0. In the previous example, "APPLE" is numbered with index 0, "ORANGE" is numbered with index 1, "GRAPE" is numbered with index 2, and so on.
 ^
 The data format separated by "\\ n" is the same as the multi-line text data handled by the memory notepad instruction. The data created by the memory notepad instruction can be used as it is for the listbox instruction.
 ^
@@ -223,7 +223,7 @@ The value (p4) to be set for the message box style is as follows.
      0: Scrollable edit box (non-rewritable)
     +1: Scrollable edit box (rewritable)
     +4: Add a horizontal scroll bar
-    +8: Disable automatic wrap (wrap)
+    +8: Disable automatic wrapping
 ^p
 Creating a rewritable edit box makes it a simple text editor where users can type whatever they want. For +4 (with horizontal scroll bar) and +8 (disable automatic wrap), you can specify multiple values at the same time by adding each value to p4.
 ^
@@ -293,7 +293,7 @@ p3 = 0 to (0): Minimum reserved line size in Y direction (in dots)
 %inst
 Set the size of the object when arranging buttons, input boxes, etc.
 ^
-You can specify the minimum amount that the current position will move after the button or message is placed on p3. This will allow space of the same size when the buttons and messages are placed consecutively.
+You can specify the minimum amount that the current position will move after the button or message is placed on p3. This will allow space of the same size when the buttons and messages are placed in succession.
 ^
 When the screen is cleared, the object size will automatically return to the default.
 
@@ -352,7 +352,7 @@ If you change to mode 2, the font specified by the font instruction will be used
 ^
 Mode 4 (objmode_usecolor) can be used together by adding it to other modes. If "objmode_usefont + objmode_usecolor" is specified, both modes are enabled.
 ^
-Use p2 to turn on / off the focus movement mode of the object with the [TAB] key. When p2 is specified as 1, the input focus of the displayed object can be moved with the [TAB] key. If the mode specification of p2 is omitted, the previous mode is inherited.
+Use p2 to turn ON / OFF the focus movement mode of the object with the [TAB] key. When p2 is specified as 1, the input focus of the displayed object can be moved with the [TAB] key. If the mode specification of p2 is omitted, the previous mode is inherited.
 ^p
   p2: mode
  --------------------------------------------------------------
@@ -432,7 +432,7 @@ p2 = 1 ~ (2): Focus movement mode
 
 %inst
 Sets the focus movement mode for the object ID specified in p1.
-The focus movement mode specifies the behavior when moving an object placed with the [TAB] key for each object.
+The focus movement mode specifies the behavior when moving the object placed by the [TAB] key for each object.
 Specify the mode value with p2. The details of the mode value are as follows.
 ^p
   p2: Focus movement mode
@@ -443,8 +443,8 @@ Specify the mode value with p2. The details of the mode value are as follows.
   +4: Select all text when moving focus (input box only)
 ^p
 Normally, the optimum mode is set when the object is placed, so there is no need to reset the focus movement mode.
-Use this when you change the focus movement mode only for objects that play a special role, or when you add a new system-defined object using the winobj instruction.
-Note that the focus movement is not performed by the [TAB] key when the focus movement mode function is turned off by the objmode command.
+Use this when you change the focus movement mode only for objects that play a special role, or when you add a new system-defined object using the winobj command.
+Note that the focus movement is not performed by pressing the [TAB] key when the focus movement mode function is turned off by the objmode command.
 
 %href
 winobj
@@ -471,7 +471,7 @@ Make settings for placing custom buttons.
 Custom buttons can replace the object appearance of pushbuttons created by the button command with any image.
 In order to create a custom button, you need to prepare an image to be displayed as a button in advance.
 ^
-The id parameter specifies the screen buffer ID where the custom button image is stored.
+In the id parameter, specify the screen buffer ID that stores the image of the custom button.
 If you omit the id parameter or specify -1, the custom button setting is disabled and the button provided by a normal Windows system is used.
 In (x1, y1), specify the upper left coordinates of the image to be displayed as a normal button. (If the parameter is omitted, (0,0) is specified.)
 (x2, y2) specifies the upper left coordinates of the image to be displayed on the button when the button is pressed. (If the parameter is omitted, (0,0) is specified.)
@@ -479,7 +479,7 @@ In (x3, y3), specify the upper left coordinates of the image to be displayed on 
 ^
 After the custom button is set by the objimage command, the setting is applied to all the buttons placed by the button command.
 Custom buttons change their appearance by copying the specified image to the location where the button is located.
-The range to be copied will be the same size as the button (set by the objsize command).
+The range to be copied is the same size as the button (set by the objsize command).
 The behavior other than the appearance is the same as a normal button. Character display on the button, focus movement, etc. are also supported.
 Custom button settings are cleared when the screen is initialized (when the cls command or screen command is executed).
 

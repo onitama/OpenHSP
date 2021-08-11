@@ -284,7 +284,7 @@ sockclose
 
 %index
 sockwait
-Wait for a client to receive an incoming call
+Wait for a client to arrive
 %group
 Communication control command
 %prm
@@ -296,7 +296,7 @@ The socket prepared as a server by the sockmake instruction waits for incoming c
 The sockwait instruction must always be executed after the sockmake instruction completes successfully.
 ^
 The sockwait instruction returns a non-zero value to the system variable stat if there is no incoming client or if an error occurs.
-Only when 0 is assigned to the system variable stat will the connection with the client be successful, and communication such as the sockget instruction and sockput instruction will be possible.
+Only when 0 is assigned to the system variable stat will the connection with the client be successful, and communication such as sockget and sockput instructions will be possible.
 ^
 When waiting for an incoming call as a server, initialize the socket as a server with the sockmake instruction, and then loop and wait until the system variable stat becomes 0 with the sockwait instruction. In that case, it is necessary to put a wait or await instruction in the loop to make a gap.
 Otherwise, the task will not go to other Windows applications.

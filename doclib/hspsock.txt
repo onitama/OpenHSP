@@ -78,7 +78,7 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 	サーバーとして初期化する場合は、sockmake命令を、クライアントとして
 	初期化する場合は、sockopen命令を使用します。
 	いずれの場合も通信が終わったら必ずsockclose命令で切断しなければなりません。
-	また、ソケットには0～31までのIDがあり、同時に複数のソケットを使うことが
+	また、ソケットには0〜31までのIDがあり、同時に複数のソケットを使うことが
 	できます。
 	TCP/IP通信の詳細および、プロトコルについては専門の書籍やドキュメントを
 	参照してください。
@@ -86,9 +86,9 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 
 	sockopen p1,"url",p2			ソケットを初期化して接続
 
-	p1=0～31(0)  : ソケットID番号
+	p1=0〜31(0)  : ソケットID番号
 	"url"       : URL指定文字列
-	p2=0～(0)   : ポート番号
+	p2=0〜(0)   : ポート番号
 
 	・説明
 
@@ -117,7 +117,7 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 
 	sockclose p1				ソケットを切断
 
-	p1=0～31(0)  : ソケットID番号
+	p1=0〜31(0)  : ソケットID番号
 
 	・説明
 
@@ -128,7 +128,7 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 	sockput "message",p1			データを送信
 
 	"message"   : 送信するメッセージ
-	p1=0～31(0)  : ソケットID番号
+	p1=0〜31(0)  : ソケットID番号
 
 	・説明
 
@@ -139,8 +139,8 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 
 	sockputc p1,p2				データを1byte送信
 
-	p1=0～255(0) : 送信するメッセージ(1byte)
-	p2=0～31(0)   : ソケットID番号
+	p1=0〜255(0) : 送信するメッセージ(1byte)
+	p2=0〜31(0)   : ソケットID番号
 
 	・説明
 
@@ -151,9 +151,9 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 	sockputb p1,p2,p3,p4		バッファのデータを送信
 
 	p1=変数     : 送信内容が格納されている変数名
-	p2=0～(0)   : バッファオフセット(byte単位)
-	p3=0～(64)  : 送信サイズ(byte単位)
-	p4=0～31(0)  : ソケットID番号
+	p2=0〜(0)   : バッファオフセット(byte単位)
+	p3=0〜(64)  : 送信サイズ(byte単位)
+	p4=0〜31(0)  : ソケットID番号
 
 	・説明
 
@@ -178,8 +178,8 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 	sockget p1,p2,p3			データを受信
 
 	p1=変数     : 受信内容が格納される変数名
-	p2=0～(64)  : 受信サイズ(byte単位)
-	p3=0～31(0)  : ソケットID番号
+	p2=0〜(64)  : 受信サイズ(byte単位)
+	p3=0〜31(0)  : ソケットID番号
 
 	・説明
 
@@ -191,7 +191,7 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 	sockgetc p1,p2				データを1byte受信
 
 	p1=変数     : 受信内容が格納される変数名
-	p3=0～31(0)  : ソケットID番号
+	p3=0〜31(0)  : ソケットID番号
 
 	・説明
 
@@ -203,9 +203,9 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 	sockgetb p1,p2,p3,p4		バッファにデータを受信
 
 	p1=変数     : 受信内容が格納される変数名
-	p2=0～(0)   : バッファオフセット(byte単位)
-	p3=0～(64)  : 受信サイズ(byte単位)
-	p4=0～31(0)  : ソケットID番号
+	p2=0〜(0)   : バッファオフセット(byte単位)
+	p3=0〜(64)  : 受信サイズ(byte単位)
+	p4=0〜31(0)  : ソケットID番号
 
 	・説明
 
@@ -230,8 +230,8 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 
 	sockmake p1,p2				ソケットをサーバーとして初期化
 
-	p1=0～31(0)  : ソケットID番号
-	p2=0～(0)   : ポート番号
+	p1=0〜31(0)  : ソケットID番号
+	p2=0〜(0)   : ポート番号
 
 	・説明
 
@@ -257,8 +257,8 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 
 	sockwait p1,p2					クライアントの着信を待つ
 
-	p1=0～31(0)  : ソケットID番号
-	p2=0～31(0)  : 代替ソケットID番号
+	p1=0〜31(0)  : ソケットID番号
+	p2=0〜31(0)  : 代替ソケットID番号
 
 	・説明
 
@@ -313,7 +313,7 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 
 	sockcheck p1					データの到着を調べる
 
-	p1=0～31(0)  : ソケットID番号
+	p1=0〜31(0)  : ソケットID番号
 
 	・説明
 

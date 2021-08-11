@@ -6,9 +6,9 @@
 %type
 Built-in instructions
 %ver
-3.4
+3.6
 %note
-ver3.4 standard instruction
+ver3.6 standard instruction
 %date
 2009/08/01
 %author
@@ -57,19 +57,19 @@ Memory management instructions
 %prm
 p1,p2...
 p1 = variable: variable name to which the array is assigned
-p2 = 0 ~: Maximum of elements
+p2 = 0 ~: Maximum of element
 
 %inst
 Create an array variable with arbitrary elements.
 ^p
-Example:
+example:
 	dim a,20
 ^p
 In the above example, 20 elements of variable a, that is, "a (0)" to "a (19)" are reserved in advance.
 ^
 It is also possible to create a multidimensional array by increasing the parameters.
 ^p
-Example:
+example:
 dim a, 10,5: Variable a is a two-dimensional array
 a (0,0) = 1: Substitute 1 for element (0,0)
 a (1,0) = 2: Substitute 2 for element (1,0)
@@ -100,7 +100,7 @@ Memory management instructions
 %prm
 p1,p2,p3...
 p1 = variable: variable name to which the array is assigned
-p2 = type type: variable type
+p2 = type type: variable type type
 p3 = 0 ~: Maximum of elements
 
 %inst
@@ -109,11 +109,11 @@ It behaves like the dim instruction, but dimtype allows you to specify the type 
 For p2, you must specify a type type value that indicates the variable type.
 The type type value can be obtained from the type name string with the vartype function.
 ^p
-Example:
+example :
 	dimtype a,vartype("double"),20
 ^p
 In the above example, 20 elements of the real number type variable a, that is, "a (0)" to "a (19)" are reserved in advance.
-It is possible to secure a multidimensional array in the same way as the dim instruction.
+It is possible to secure a multidimensional array like the dim instruction.
 A multidimensional array can be secured up to 4 dimensions.
 
 %href
@@ -143,7 +143,7 @@ Rewrites the contents of 1 byte anywhere on the data memory stored in the variab
 ^
 Writes the value of p3 to the index location specified by p2 on the buffer of the variable specified by p1. The value is a 1-byte (8-bit) value from 0 to 255.
 ^
-If a string is specified in p3, the string data is expanded in memory and the length of the written string is returned in strsize.
+If a character string is specified in p3, the character string data is expanded in memory and the length of the written character string is returned in strsize.
 
 
 %href
@@ -218,7 +218,7 @@ p3 = 0 ~: Maximum of elements
 Create a string type array variable.
 The difference from the dim instruction is that the parameter of p2 is "default number of characters in the string", and the maximum number of actual array elements is entered after the parameter of p3.
 ^p
-Example:
+example :
 sdim a, 5000; Variable a pre-allocates memory for 5000 characters
 ^p
 In the above example, the variable a reserves memory for 5000 characters and is not an array variable.
@@ -247,13 +247,13 @@ Memory management instructions
 %prm
 p1,p2...
 p1 = variable: variable name to which the array is assigned
-p2 = 0 ~: Maximum of elements
+p2 = 0 ~: Maximum of element
 
 %inst
 Create a real array variable.
 The parameter specifies the maximum number of elements, similar to the dim instruction.
 ^p
-Example:
+example :
 ddim a, 100; Variable a allocates a real type array from a (0) to a (99)
 ^p
 It is possible to secure a multidimensional array in the same way as the dim instruction.
@@ -289,7 +289,7 @@ p5: Copy source variable memory offset (default = 0)
 %inst
 In the memory area allocated to the variable specified by p1
 Copies the contents of memory allocated to the variable specified by p2.
-The copy size (1 byte unit) is specified by p3.
+The size to be copied (1 byte unit) is specified by p3.
 High-speed memory copy can be performed when a large area is allocated to a variable.
 With p4 and p5, the copy destination and copy source start positions can be adjusted in 1-byte units.
 If a specification that exceeds the area reserved by the variable is specified, a buffer overflow error will occur.
@@ -364,18 +364,18 @@ Variable name, p1, p2, p3
 Variable name: Variable name to clone
 p1 = 0 ~: Memory address of clone source
 p2 = 0 ~: Memory size of clone source
-p3 = 1 to (4): Clone variable type specification
+p3 = 1 ~ (4): Clone variable type specification
 
 %inst
 Creates a variable that points to the specified address pointer.
 Clone variables will now act as numeric array variables for referencing information in memory.
 ^
-You can specify the type of the clone variable created by p3.
-The value of p3 is the same as the value indicating the type obtained by the vartype function. If p3 is omitted, it will be 4 (integer type).
+You can specify the type of clone variable created by p3.
+The value of p3 is the same as the value that indicates the type obtained by the vartype function. If p3 is omitted, it will be 4 (integer type).
 ^
 Clone variables cannot detect changes in the location of the memory they are pointing to.
 For example, even if you point to the memory address of the data stored in a variable, it cannot be referenced correctly if the variable's type or contents are updated and the memory location changes.
-Use it only for temporary memory reference, and handle it with care. The dupptr instruction is provided as a function for performing memory references and low-level variable buffer operations exchanged by external functions such as DLLs.
+Use it only for temporary memory references, and handle it with care. The dupptr instruction is provided as a function for performing memory references and low-level variable buffer operations exchanged by external functions such as DLLs.
 We do not recommend the dupptr instruction for beginners.
 
 %href
@@ -408,12 +408,12 @@ Allocates the memory contents specified in p2 to the variables specified in p1.
     69: Palette information
     96 ~: Information of window ID0 ~ (BMSCR structure)
 ^p
-For the system variable of resource ID 64,65, for example, if "mref a, 64" is set, the variable a becomes equivalent to the system variable stat, and a value can be assigned. This makes it possible to reflect the calculation results in user-defined instructions in system variables and return them to the caller.
+If the system variable with resource ID 64,65 is set to "mref a, 64", for example, the variable a becomes equivalent to the system variable stat, and a value can be assigned. This makes it possible to reflect the calculation results in user-defined instructions in system variables and return them to the caller.
 ^
 The image data (VRAM data) in the window of resource 66 is an array variable containing the displayed image.
 This makes it possible to directly access the image data with the poke, peek commands, etc.
 ^
-Resources 67 and above will also give you direct access to HSP internal data, but you usually don't need to use it. It is provided for very limited purposes, such as preparing parameters for passing to a DLL, and should not be used by most people.
+Resources 67 and above will also give you direct access to HSP internal data, but usually you don't need to use it. It is provided for very limited purposes, such as preparing parameters for passing to a DLL, and should not be used by most people.
 ^
 The local parameter is for getting the parameter contents of the newly added instruction by the user-defined instruction (#deffunc).
 It can be obtained according to the parameter type (number, variable, string).
@@ -448,20 +448,20 @@ If it is already modular, add new elements as array variables.
 You can specify the module name already registered in p2, and specify the initialization parameters after p3.
 Module variables provide a new way of storing data that allows you to manage multiple variables and data together.
 ^p
-Example:
+example :
 	#module a x,y,z
 ^p
 In the above example, a module called a has three variables, x, y, and z.
-A variable with the module type a contains all the variables x, y, and z, and can be handled by a module processing instruction (#modfunc).
+A variable with the module type a contains all the variables x, y, and z, and can be handled by the module processing instruction (#modfunc).
 ^p
-Example:
+example :
 	newmod v,a
 ^p
 The above example initializes the variable v for module "a".
 Now, the variable v contains the entire contents of the module variables x, y, z of the module "a".
 If an initialization instruction (#modinit) is prepared for each module, the parameters after p3 are passed to the initialization instruction.
 ^p
-Example:
+example :
 	#module a x,y,z
 	#modinit int p1,int p2,int p3
 	x=p1:y=p2:z=p3
@@ -469,7 +469,7 @@ Example:
 	#global
 	newmod v,a,1,2,3
 ^p
-Modular variables can be used to manipulate elements with newmod and delmod instructions, and can also be used with foreach instructions to handle complex data in a concise manner.
+Modular variables can be manipulated with newmod and delmod instructions, and can handle complex data concisely with foreach instructions.
 
 
 %href
@@ -494,7 +494,7 @@ p1: Variable name
 Deletes the element of the modular variable specified in p1.
 p1 must be a variable that is already set as modular.
 ^p
-Example:
+example :
 	delmod v.1
 ^p
 The delmod instruction calls automatically if a release routine (destructor) is defined by the #modterm instruction.
@@ -509,7 +509,7 @@ newmod
 
 %index
 memexpand
-Reallocate memory block
+Reallocate memory blocks
 %group
 Memory management instructions
 %prm
@@ -540,13 +540,13 @@ Memory management instructions
 %prm
 p1,p2...
 p1 = variable: variable name to which the array is assigned
-p2 = 0 ~: Maximum of elements
+p2 = 0 ~: Maximum of element
 
 %inst
 Create a label type array variable.
 The parameter specifies the maximum number of elements, similar to the dim instruction.
 ^p
-Example:
+example :
 ldim a, 100; Variable a allocates a labeled array from a (0) to a (99)
 ^p
 It is possible to secure a multidimensional array in the same way as the dim instruction.
@@ -567,7 +567,7 @@ dimtype
 
 %index
 newlab
-Initialize label type variable
+Initialize label variable
 %group
 Memory management instructions
 %prm

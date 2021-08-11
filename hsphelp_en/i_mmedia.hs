@@ -31,9 +31,9 @@ Multimedia control instructions
 "strings": MCI command strings
 
 %inst
-Sends a command string to the MCI (Multimedia Control Interface). MIDI playback and movie playback compatible with MCI can be performed.
+Sends a command string to the MCI (Multimedia Control Interface). You can perform MIDI playback, movie playback, etc. that support MCI.
 ^
-For more information on MCI commands, read the Windows MCI documentation. Here, I will introduce only the simple usage.
+For more information on MCI commands, read your Windows MCI documentation. Here, I will introduce only the simple usage.
 ^p
 	mci "play filename"
 ^p
@@ -41,7 +41,7 @@ Plays the "filename" file. For example, "play aaaa.mid" will play a MIDI file ca
 ^p
 	mci "open filename alias abc"
 ^p
-Now you can open the file with "filename" and rename it "abc" from now on. After this
+Now you can open the file with "filename" and then alias the name "abc". After this
 ^p
 mci "play abc"; device play
 mci "stop abc"; Stop device playback
@@ -50,7 +50,7 @@ mci "close abc"; device close
 You will be able to specify such as.
 The result of sending an instruction to mci is reflected in the system variable stat.
 If stat is -1, it indicates that there is an error when interpreting the mci instruction. Also, if you send a command to read the status with mci, the result will be reflected in stat.
-Commands to MCI only work on Windows platforms. Please note that it cannot be used in the HSP3 Dish environment.
+Commands to MCI only work on Windows platforms. Please note that it cannot be used in the HSP3Dish environment.
 
 %portinfo
 At HSPLet, only the following instructions are supported.
@@ -67,7 +67,7 @@ It supports WAV / AIFF / AU / MIDI / MP3. The included jl1.0.jar is required to 
 
 %index
 mmplay
-Sound playback
+Media playback
 %group
 Multimedia control instructions
 %prm
@@ -78,10 +78,10 @@ p1 = 0 to (0): Media buffer ID to play
 Plays the media loaded by the mmload command.
 By specifying the media buffer ID with p1, you can select which of the multiple media loaded by the mmload command to play.
 ^
-The mmplay instruction normally starts playing the sound and the HSP advances to the next instruction.
-However, if load mode 2 is specified in the mmload command, the next command will not proceed until the sound playback is completed.
+The mmplay instruction usually starts playing media and the HSP advances to the next instruction.
+However, if read mode 2 is specified in the mmload command, the next command will not proceed until the media playback is completed.
 ^
-If you execute the mmplay command while the sound is already playing, the previous sound playback will end and then the newly specified sound will start playing.
+If the mmplay command is executed while the media is already playing, the previous media playback will end and then the newly specified media will start playing.
 However, for different devices, such as playing PCM while playing MIDI, playback will not stop.
 ^
 For AVI (video) playback, the current position of the window that is the operation destination when the mmplay command is executed is displayed as the upper left.
@@ -97,7 +97,7 @@ mmstop
 
 %index
 mmload
-Read sound file
+Read media file
 %group
 Multimedia control instructions
 %prm
@@ -140,7 +140,7 @@ If mode 2 is specified, when the specified file is played, HSP will not execute 
 The mmload instruction only stores the data information in memory, and the performance does not start immediately.
 ^
 Mode +16 is a mode that can only be used with AVI (video) files.
-By specifying a value obtained by adding 16 to modes 0 and 2, the video will be played to the full size of the window to be displayed.
+By specifying a value obtained by adding 16 to modes 0 and 2, the video will be played to the full size of the window being displayed.
 The video file is judged by the extension.
 ^
 MP3 format and ASF format can be played only when the OS supports them.
@@ -158,7 +158,7 @@ Supports WAV / AIFF / AU / MIDI / MP3 when HSPLet. The included jl1.0.jar is req
 
 %index
 mmstop
-Sound stop
+Stop media playback
 %group
 Multimedia control instructions
 %prm
@@ -166,8 +166,8 @@ p1
 p1 = 0 to (-1): Media buffer ID
 %inst
 Stops media playback by the mmplay command.
-You can stop the playback of the specified sound by specifying the media buffer ID with p1.
-If p1 is omitted or a negative value is specified, all sound playback will be stopped.
+You can stop the playback of the specified media by specifying the media buffer ID with p1.
+If p1 is omitted or a negative value is specified, all media playback will be stopped.
 
 
 %href

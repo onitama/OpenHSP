@@ -105,7 +105,7 @@ prmid (0): core parameter ID
 value (0): Value to be set (integer value)
 %inst
 Overrides the value specified by value in the core parameter held for each object.
-Use the gpsetprmon / gpsetprmoff instruction if you want to turn ON / OFF bit by bit instead of overwriting the value.
+If you want to turn ON / OFF bit by bit instead of overwriting the value, use the gpsetprmon / gpsetprmoff instruction.
 
 The core parameter is a 32-bit integer value that manages various information.
 The items that can be specified as the core parameter ID are as follows.
@@ -118,7 +118,7 @@ PRMSET_ID Object ID (*)
 PRMSET_ALPHA Transparency (留 value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
-PRMSET_COLGROUP Collision detection collision group
+PRMSET_COLGROUP Collision group for collision detection
 PRMSET_SHAPE Shape ID (*)
 PRMSET_USEGPMAT Material ID
 PRMSET_COLILOG Collision log ID (*)
@@ -155,10 +155,10 @@ Macro name | Contents
 PRMSET_FLAG Object registration flag (*)
 PRMSET_MODE mode flag value
 PRMSET_ID Object ID (*)
-PRMSET_ALPHA Transparency (留 value)
+PRMSET_ALPHA Transparency (α value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
-PRMSET_COLGROUP Collision detection collision group
+PRMSET_COLGROUP Collision group for collision detection
 PRMSET_SHAPE Shape ID (*)
 PRMSET_USEGPMAT Material ID
 PRMSET_COLILOG Collision log ID (*)
@@ -295,9 +295,9 @@ Please note that all item names and settings are character strings. (Item names 
 "ONE_MINUS_SRC_COLOR" Original color (inverted value)
 "DST_COLOR" Write destination color
 "ONE_MINUS_DST_COLOR" Write destination color (inverted value)
-"SRC_ALPHA" write source 留
-"ONE_MINUS_SRC_ALPHA" Write source 留 (inverted value)
-"DST_ALPHA" write destination 留
+"SRC_ALPHA" write source α
+"ONE_MINUS_SRC_ALPHA" Write source α (inverted value)
+"DST_ALPHA" write destination α
 "ONE_MINUS_DST_ALPHA" Write destination α (inverted value)
 "CONSTANT_ALPHA" α fixed value
 "ONE_MINUS_CONSTANT_ALPHA" α fixed value (inverted value)
@@ -621,7 +621,7 @@ Information about the material is read from the ".material" file. Be sure to pre
 If the "defs" parameter is specified, all shader compile-time specified label definitions will be added.
 ^
 Use the gppbind instruction to make physical settings for a node.
-The contact judgment of 3D model data uses a sphere that wraps the whole (bounding sphere).
+For the contact judgment of 3D model data, a sphere that wraps the whole (bounding sphere) is used.
 ^
 The created objects (nodes) are drawn together by the gpdraw instruction.
 ^p
@@ -631,7 +631,7 @@ gpload id_model, "res / duck"; model loading
 In the above example, we will load the duck.gpb file in the res folder.
 At that time, the duck.material file that contains the material information is referenced.
 In addition, if textures are needed, the image files in the same folder will also be loaded. If an error occurs when reading the file, a negative value will be assigned as the object ID.
-If you want to investigate more detailed read errors and warnings, you can collect logs with the gpgetlog command.
+If you want to investigate more detailed read errors and warnings, you can collect logs with the gpgetlog instruction.
 
 ^
 The file (.gpb format) for loading with the gpload instruction is the standard data format used in gameplay 3D.
@@ -663,7 +663,7 @@ You can specify the X, Y size of the model with the sizex, sizey parameters.
 Specify the model color (material color) with the color parameter by the 24-bit RGB value (value indicated by 0xRRGGBB).
 If the color parameter is omitted, white (0xffffff) is used.
 You can specify the material ID with the matobj parameter.
-Specify when using a user-generated material, such as with the gpcolormat instruction.
+Specify when using a user-generated material, such as with the gpcolormat command.
 If the matobj parameter is omitted, standard materials are used.
 ^
 The created objects (nodes) are drawn together by the gpdraw instruction.
@@ -695,7 +695,7 @@ You can specify the X, Y size of the model with the sizex, sizey parameters.
 Specify the model color (material color) with the color parameter by the 24-bit RGB value (value indicated by 0xRRGGBB).
 If the color parameter is omitted, white (0xffffff) is used.
 You can specify the material ID with the matobj parameter.
-Specify when using a user-generated material, such as with the gpcolormat instruction.
+Specify when using a user-generated material, such as with the gpcolormat command.
 If the matobj parameter is omitted, standard materials are used.
 ^
 The created objects (nodes) are drawn together by the gpdraw instruction.
@@ -727,7 +727,7 @@ You can specify the X, Y size of the model with the sizex, sizey parameters.
 Specify the model color (material color) with the color parameter by the 24-bit RGB value (value indicated by 0xRRGGBB).
 If the color parameter is omitted, white (0xffffff) is used.
 You can specify the material ID with the matobj parameter.
-Specify when using a user-generated material, such as with the gpcolormat instruction.
+Specify when using a user-generated material, such as with the gpcolormat command.
 If the matobj parameter is omitted, standard materials are used.
 ^
 The created objects (nodes) are drawn together by the gpdraw instruction.
@@ -808,7 +808,7 @@ gplight id_alight, GPOBJ_LGTOPT_NORMAL; Register as a light
 gpuselight id_alight; Set to default light
 ^p
 The gplight instruction only sets the object to function as a light.
-The set light is reflected in the model material generated after that by registering it as the current light with the gpuselight instruction.
+The set light is reflected in the model material generated after that by registering it as the current light with the gpuselight command.
 
 %href
 gpresetlight
@@ -1197,7 +1197,7 @@ value (255): Value to be set (integer value) (0 to 255)
 Sets the transparency (留 value) of the object.
 Sets the value specified by the value parameter to the object of the objid parameter.
 The value specified by the value parameter is an integer value (留 value) from 0 to 255 that indicates transparency.
-0 is fully transparent and 255 is opaque.
+0 applies to full transparency and 255 applies opacity.
 For objects whose 留 value is other than 255 (semi-transparent), the drawing order is changed to the front.
 (Same state as the mode flag value of OBJ_LATE was specified)
 %href
@@ -1236,7 +1236,7 @@ option (0): Additional options
 %inst
 Add a new animation clip based on the animation data of the loaded 3D model.
 Animated clips are managed by naming and managing some frames cut out from the animation data of a 3D model.
-It is necessary to read the model data including animation data from the gpb file in advance by using the gpload instruction.
+It is necessary to read the model data including animation data from the gpb file in advance by the gpload command.
 The "name" parameter specifies the name of the animation clip. You cannot specify a name that has already been added.
 Specify the frame range of the animation clip with the start and end parameters. These are time specifications in milliseconds.
 If you omit the end parameter or specify a negative value, the last frame of the entire animation is applied.
@@ -1251,7 +1251,7 @@ gpact
 
 %index
 gpact
-Play / stop animation clip
+Play / Stop Animation Clip
 %group
 Extended screen control command
 %prm
@@ -1273,7 +1273,7 @@ GPACT_PAUSE 2 Pause
 ^p
 Animation playback is controlled for each animation clip.
 It is possible to play multiple animation clips for one model at the same time.
-Ggpetanim and gpsetanim are provided as commands for acquiring and setting the animation clip playback status.
+Ggpetanim and gpsetanim are provided as commands for acquiring and setting the playback status of animation clips.
 If the process ends normally, 0 is assigned to the system variable stat. If an error occurs, the system variable stat will be assigned a negative value.
 
 %href
@@ -1296,7 +1296,7 @@ prmid (0): Parameter ID
 %inst
 Gets the settings for the specified animation clip and assigns it to the variable specified by var.
 Specify the index of the animation clip in index and the object ID to get the setting by objid.
-The animation clip index is the number that is sequentially assigned to the animation clips held by the object. If an index that does not exist is specified with an integer value starting from 0 such as 0,1,2,3 ..., -1 (error) is assigned to the system variable.
+The animation clip index is a number that is sequentially assigned to the animation clips held by the object. If an index that does not exist is specified with an integer value starting from 0 such as 0,1,2,3 ..., -1 (error) is assigned to the system variable.
 Specifies what information to get with prmid. The values that can be specified with prmid are as follows.
 ^p
         Macro name value Content
@@ -1329,9 +1329,9 @@ index (0): Index of animation clip (0 ~)
 prmid (0): Parameter ID
 value (0): Set value (integer value)
 %inst
-Updates the settings of the specified animation clip with the new value specified by value.
+Updates the specified animation clip settings with the new value specified by value.
 Specify the index of the animation clip in index and the object ID to get the setting by objid.
-The animation clip index is the number that is sequentially assigned to the animation clips held by the object. If an index that does not exist is specified with an integer value starting from 0 such as 0,1,2,3 ..., -1 (error) is assigned to the system variable.
+The animation clip index is a number that is sequentially assigned to the animation clips held by the object. If an index that does not exist is specified with an integer value starting from 0 such as 0,1,2,3 ..., -1 (error) is assigned to the system variable.
 Specifies what information to set in prmid. The values that can be specified with prmid are as follows.
 ^p
         Macro name value Content
@@ -1475,7 +1475,7 @@ id: object ID
 %inst
 Gets the rotation parameters of the object.
 The contents of the quat group (quaternion) are assigned to the variables specified by (x, y, z, w).
-(x, y, z, w) is set as a variable of real type.
+(x, y, z, w) is set as a real type variable.
 Inside the HGIMG4, all rotation information is held by the quaternion.
 Use the getang or getangr instructions to convert to angle information.
 However, it may not be possible to completely reproduce the rotation information, so be careful when converting it to angle information.
@@ -1528,7 +1528,7 @@ PRMSET_ID Object ID (*)
 PRMSET_ALPHA Transparency (留 value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
-PRMSET_COLGROUP Collision detection collision group
+PRMSET_COLGROUP Collision group for collision detection
 PRMSET_SHAPE Shape ID (*)
 PRMSET_USEGPMAT Material ID (*)
 PRMSET_COLILOG Collision log ID (*)
@@ -1572,7 +1572,7 @@ PRMSET_ID Object ID (*)
 PRMSET_ALPHA Transparency (留 value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
-PRMSET_COLGROUP Collision detection collision group
+PRMSET_COLGROUP Collision group for collision detection
 PRMSET_SHAPE Shape ID (*)
 PRMSET_USEGPMAT Material ID
 PRMSET_COLILOG Collision log ID (*)
@@ -1724,7 +1724,7 @@ By setting the current light, you can determine the details of the light receive
 When the scene is initialized, only one directional light can be set. When using multiple lights, point lights, spot lights, etc., the number of current lights must be determined in advance by the gpresetlight command.
 The p1, p2, and p3 parameters specify the maximum number of lights used by each light type. You must use at least one directional light.
 Specify other point lights and spot lights as needed. Avoid specifying unnecessary lights as much as possible, as this will increase the computational load on the GPU.
-After the current light is initialized, it can be registered with the gpuselight instruction.
+After the current light is initialized, it can be registered with the gpuselight command.
 
 %href
 gpuselight
@@ -1769,7 +1769,7 @@ Multiple collision information may be created. This is because multiple objects 
 The actual collision information can be obtained by the gppinfo instruction. As collision information, you can obtain the object ID of the collision target, the coordinates of the collision, the strength of the collision, and so on.
 Collision information is created for each object ID and is retained until a new gppcontact instruction is executed.
 The gppcontact instruction is an instruction to obtain the details of the collision that occurred in the process of physical behavior. If you just want to know a simple collision, you can use the getcoli instruction as an alternative.
-Also, since it is based on the information that it collided when it moved by physical behavior (it was sunk into another object), it is collision information in a state where there is no movement (a state where it is just in contact) Please note that is not created.
+In addition, since it is based on the information that it collided when it moved by physical behavior (it was sunk into another object), it is collision information in a state where it is completely stationary (a state where it is just in contact). Please note that is not created.
 %href
 gppbind
 gppinfo
@@ -1801,7 +1801,7 @@ var Collision object ID
         fv (2) Collision Z coordinate
         fv (3) Collision strength
 ^p
-If there is more than one collision information detected by the gppcontact instruction, it is identified by the index value starting from 0.
+If there is multiple collision information detected by the gppcontact instruction, it is identified by the index value starting from 0.
 If there are three collision information, the index value can be 0 to 2.
 If the process ends normally, 0 is assigned to the system variable stat. If an error occurs, the system variable stat is assigned a negative value.
 %href
@@ -1851,7 +1851,7 @@ id: event ID
 fade (0): set value
 %inst
 Add an event that sets the fade value of the object.
-By specifying a negative value for the fade, the α value can be faded out toward 0, and by specifying a positive value, the α value can be faded in toward 255.
+By specifying a negative value for the fade, the 留 value can be faded out toward 0, and by specifying a positive value, the 留 value can be faded in toward 255.
 Equivalent to setting the PRMSET_FADE parameter with the event_prmset instruction.
 %href
 event_prmset
@@ -1877,7 +1877,7 @@ You can create a custom 3D mesh by following the steps below.
 ^p
 1. Initialize the custom 3D mesh with the gpmeshclear instruction
 2. Register the required vertex information with the gpmeshadd instruction.
-3. Use the gpmeshpolygon instruction to combine vertex information to form a triangle or quadrangle face.
+3. Use the gpmeshpolygon command to combine vertex information to form a triangle or quadrangle face.
 4. Repeat registration for only the required aspects
 ^p
 The gpmesh instruction generates a model using all the registered faces based on the information of the created custom 3D mesh.
@@ -1889,7 +1889,7 @@ The generated object can be operated in the same way as the 3D model loaded by t
 In the color parameter, specify the color (material color) of the entire model by the 24-bit RGB value (value indicated by 0xRRGGBB).
 If the color parameter is omitted, white (0xffffff) is used.
 You can specify the material ID with the matobj parameter.
-Specify when using a user-generated material, such as with the gpcolormat instruction.
+Specify when using a user-generated material, such as with the gpcolormat command.
 If the matobj parameter is omitted, standard materials are used.
 
 %href
@@ -1905,7 +1905,7 @@ Initialize custom 3D mesh
 Extended screen control command
 %inst
 Initialize the registration information of the custom 3D mesh.
-A custom 3D mesh is a mechanism for building data to define free 3D shapes.
+Custom 3D meshes are a mechanism for building data to define free 3D shapes.
 The actual data registration uses the gpmeshadd and gpmeshpolygon instructions.
 The constructed data can be registered as a node object with the gpmesh instruction.
 %href
@@ -1962,8 +1962,8 @@ p3 (0): Mesh vertex ID3
 p4 (-1): Mesh vertex ID4
 %inst
 Add face (polygon) information to the custom 3D mesh.
-It is necessary to register the necessary vertex information in advance by using the gpmeshadd instruction.
-A face (triangle, quadrangle) is constructed by combining mesh vertex IDs that indicate the index of vertex information.
+It is necessary to register the necessary vertex information in advance by using the gpmeshadd command.
+A face (quadrangle, quadrangle) is constructed by combining mesh vertex IDs that indicate the index of vertex information.
 Specify the mesh vertex ID in the p1, p2, p3 parameter for a quadrangle and the p1, p2, p3, p4 parameter for a quadrangle. Arrange the vertices so that the triangles p1, p2, and p3 are arranged clockwise. (For a quadrangle, add the remaining 1 vertex at the end)
 ^
 The constructed data can be registered as a node object with the gpmesh instruction.

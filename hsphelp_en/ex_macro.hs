@@ -27,7 +27,7 @@ In debug mode
 
 %inst
 This macro is defined only in debug mode.
-It is possible to discriminate and branch with the #ifdef, #ifndef instructions, etc.
+It is possible to distinguish and branch with #ifdef, #ifndef instructions, etc.
 
 %sample
 #ifdef _debug

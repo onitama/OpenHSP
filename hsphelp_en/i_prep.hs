@@ -32,7 +32,7 @@ Registers with the preprocessor so that the keyword specified by the macro name 
 The #define macro is used only when an individual wants to write a script easily and customize it, and is not suitable for beginners. The features described here are also infrequently used and should only be referred to when needed.
 The #define macro basically registers a replacement string.
 ^p
-Example:
+example :
 	#define hyouji mes
 	hyouji "AAAAA..."
 ↓ (after deployment)
@@ -40,7 +40,7 @@ Example:
 ^p
 By inserting "global" immediately after the #define instruction, you can create a macro that can be used permanently in all modules.
 ^p
-Example:
+example :
 	#module
 	#define global test 0x1234
 	#global
@@ -51,10 +51,10 @@ By entering the global specification, you can replace the name defined everywher
 ^
 In addition to simple replacement macros, expansion with arguments is possible.
 The argument is specified by the argument name of% 1,% 2,% 3 ... enclosed in parentheses after the macro name.
-Su.
+vinegar.
 The argument must be specified as "% numerical value", and the numerical value should be described in order from 1. Note that you cannot specify it by symbol name like the C or C ++ preprocessor.
 ^p
-Example:
+example :
 	#define hyouji(%1) mes "prm="+%1
 	hyouji "AAAAA..."
 ↓ (after deployment)
@@ -62,7 +62,7 @@ Example:
 ^p
 You can also set the initial (default) value for the argument.
 ^p
-Example:
+example :
 	#define hyouji(%1="PRM=",%2=123) mes %1+%2
 	hyouji "AAA",a
 	hyouji "BBB"
@@ -113,7 +113,7 @@ The special expansion macro has the following types and functions.
      % c: Start a new line
 ^p
 The special expansion macro is expressed by "%" followed by one alphabetic character + parameter.
-Please put a half-width space after the special expansion macro to distinguish it from the following keywords. Up to the part including spaces such as "% tabc aaa" is judged as a special expansion macro.
+Please put a space after the special expansion macro to distinguish it from the following keywords. Up to the part including spaces such as "% tabc aaa" is judged as a special expansion macro.
 The special expansion macro has a general stack (First In Last Out).
 This stack can be shared by macros with the same tag name.
 Specify the tag name using up to 16 single-byte alphabetic characters after "% t", such as "% t tag name". In the previous example, "start" specified as "% tstart" corresponds to the tag name.
@@ -146,7 +146,7 @@ In special situations, it is possible to expand with a line break by "% c".
 The line is split and expanded at the "% c" part. It can be used mainly for defining macros that are expanded to multiple preprocess statements.
 However, not all preprocessors currently support macro expansion. If you use it too much, it may be difficult to see, so please understand it carefully before using it.
 ^p
-Example:
+example :
 	#define def(%1,%2) #deffunc %1@ %c mes@hsp %2@
 	def test,a
 	return
@@ -203,7 +203,7 @@ The character strings that can be used as the argument type are as follows.
 Items marked with (*) indicate parameters that are automatically passed without having to be specified as arguments.
 The following is an example of executing by specifying four arguments.
 ^p
-Example:
+example :
 	#uselib "test.dll"
 	#func test "_func@16" var,int,int,int
 test a, 1,2,3; func (& a, 1,2,3) in test.dll is called
@@ -221,7 +221,7 @@ In other respects, the same information as HSP ver2.5 will be passed.
 ^
 You can register it as an end call function by putting "onexit" before the function name.
 ^p
-Example:
+example :
 	#func test onexit "_func@16" str,int,int
 ^p
 In the above example, "_func @ 16" is automatically called when the application is closed.
@@ -258,7 +258,7 @@ You can use the same argument parameters as the #func instruction.
 See the #func reference for more information.
 The new name registered by the #cfunc instruction can be described in the expression as a function.
 ^p
-Example:
+example :
 	#uselib "test.dll"
 	#cfunc test "_func@16" var,int,int,int
 res = test (a,1,2,3); func (& a,1,2,3) in test.dll is called
@@ -348,7 +348,7 @@ Let
 At HSPLet, the class with the same name as the specified DLL is loaded.
 The class name loaded will be the last one without .dll or .hpi.
 For example, using winmm.dll loads the winmm class.
-When you create your own extension library class, put the JAR file in the lib folder.
+When you created your own extension library class, put the JAR file in the lib folder.
 The compiler will automatically recognize it and check it at compile time.
 
 
@@ -430,7 +430,7 @@ The name defined by the #deffunc instruction can be used as an instruction in th
 The new instruction will be executed after the line specified by #deffunc.
 Execution is performed as a subroutine jump like the gosub instruction, and the return instruction returns to the original execution position.
 ^p
-Example:
+example :
 	#deffunc test int a
 mes "parameter =" + a
 	return
@@ -450,9 +450,9 @@ The alias name indicates the contents of the passed parameter and can be used in
 Care must be taken when using var and array properly, and the local type, which indicates a local variable, has a special purpose.
 For more information, see the module entry in the programming manual (hspprog.htm).
 
-As a special purpose, you can register it as a cleanup instruction by writing "onexit" instead of the parameter type. Cleanup instructions are called automatically at the end of HSP script execution.
+As a special use, you can register it as a cleanup instruction by writing "onexit" instead of the parameter type. The cleanup instruction is automatically called at the end of HSP script execution.
 ^p
-Example:
+example:
 #deffunc name onexit
 ^p
 It can be used to clean up the system and release memory when the function is expanded by a module.
@@ -460,7 +460,7 @@ It can be used to clean up the system and release memory when the function is ex
 The name of the new instruction is usually shared in all module spaces and global spaces.
 However, if the name is specified after the local specification, it will be treated as module-specific.
 ^p
-Example:
+example :
 	#module user
 	#deffunc local test int a
 mes "parameter =" + a
@@ -505,7 +505,7 @@ The name defined by the #defcfunc instruction can be used as a function in the s
 The new function will be executed after the line specified by #defcfunc. Execution is performed as a subroutine jump like the gosub instruction, and the return instruction returns to the original execution position.
 At that time, it is necessary to specify the parameter of the return value in the return instruction.
 ^p
-Example:
+example :
 	#defcfunc half int a
 	return a/2
 ^p
@@ -526,7 +526,7 @@ For more information, see the module entry in the programming manual (hspprog.ht
 The name of the new function is usually shared in all module spaces and global spaces.
 However, if the name is specified after the local specification, it will be treated as module-specific.
 ^p
-Example:
+example :
 	#module user
 	#defcfunc local test int a
 	return a+5
@@ -560,7 +560,7 @@ In the executable file automatic creation (ctrl + F9), specify the file to be ad
 If you try to add a duplicate file, it will be ignored.
 "Start.ax" does not need to be specified as an additional file because it is automatically added when the executable file is automatically created.
 ^p
-Example:
+example :
 	#pack "a.txt"
 ^p
 In the above example, we will pack a file called "a.txt" with the executable file.
@@ -586,7 +586,7 @@ If you don't need to encrypt, use #pack.
 If you try to add a duplicate file, it will be ignored.
 "Start.ax" does not need to be specified as an additional file because it is automatically added when the executable file is automatically created.
 ^p
-Example:
+example :
 	#epack "a.bmp"
 ^p
 In the above example, the file "a.bmp" is encrypted and packed with the executable file.
@@ -625,15 +625,15 @@ The keywords that can be specified with #packopt are as follows.
   hide | Hide initial window SW | 0
   orgpath | Initial directory maintenance SW | 0
   icon | Icon file settings | None
-  version | version resource settings | none
+  version | Version resource settings | None
   manifest | Manifest settings | None
-  lang | language code settings | none
+  lang | language code setting | none
   upx | UPX compression settings | None
  ------------------------------------------------------
 ^p
 The following example creates a screensaver called "test.scr" using a runtime called "hsp2c.hrt".
 ^p
-Example:
+example :
 	#packopt type 2
 	#packopt name "test"
 	#packopt runtime "hsp2c.hrt"
@@ -644,14 +644,14 @@ The runtime file (with the extension hrt) specified by "#packopt runtime" runtim
 The keywords icon, version, manifest, lang, upx are set using the iconins tool after the executable file is generated.
 For the icon file, you need to specify a .ico format file.
 ^p
-Example:
+example :
 // Specify the icon file to embed
 	#packopt icon "test.ico"
 // Specify the file that describes the version information to be embedded
 	#packopt version "test.txt"
 // Set "1" when compressing using UPX
 	#packopt upx "1"
-// Specify language Default is Japanese (1041) Decimal number
+// Specify language Default is Japanese (1041) Described in decimal
 	#packopt lang "1041"
 ^p
 If you want to use UPX compression, you need to download upx.exe (Win32 console version) in advance and place it in the same folder as the iconins tool.
@@ -674,7 +674,7 @@ Macro name constant expression
 Replaces with the specified macro name and sets the numerical value.
 Similar to #define, but #const replaces the result of pre-calculation when replacing a constant (numerical value).
 ^p
-Example:
+example :
 	#const KAZU 100+50
 	a=KAZU
 ↓ (after deployment)
@@ -682,7 +682,7 @@ Example:
 ^p
 If the value to be used in the source is decided in advance, it is effective for speeding up the source. It is also possible to include macros that have already been defined, so
 ^p
-Example:
+example :
 	#const ALL 50
 	#const KAZU 100*ALL
 	a=KAZU
@@ -693,15 +693,15 @@ Can be used like.
 Integers and real numbers can be used in the calculation formula.
 You can use the same operator and number description styles as you would for a regular expression. You can also specify the ranking in parentheses.
 ^
-By putting "global" immediately after the #const instruction, you can create a macro that can be used permanently in all modules.
+By inserting "global" immediately after the #const instruction, you can create a macro that can be used permanently in all modules.
 ^p
-Example:
+example :
 	#module
 	#const global test 1234
 	#global
 a = test; 1234 is assigned to a
 ^p
-Normally, if you define #const in a module, the same name will not be recognized in other modules and global areas.
+Normally, if you define #const within a module, other modules and global areas will not recognize the same name.
 By entering the global specification, you can replace the name defined everywhere after that with a macro.
 ^
 By inserting "double" immediately after the #const instruction, the defined number is forcibly recognized as a real number.
@@ -722,7 +722,7 @@ Preprocessor instructions
 Macro name
 %inst
 Cancels the macro name that has already been registered.
-Even if you specify it for a macro name that has not been registered, no error will occur and it will be ignored.
+Even if it is specified for a macro name that has not been registered, no error will occur and it will be ignored.
 %href
 #define
 %port+
@@ -743,7 +743,7 @@ If the value is other than 0, the output will be ON.
 This compile control targets the period until #endif appears.
 #if, #ifdef, or #ifndef must have #endif in pairs.
 ^p
-Example:
+example :
 	#if 0
 mes "ABC"; This part is ignored
 a = 111; This part is ignored
@@ -752,7 +752,7 @@ mes "DEF"; This part is ignored
 ^p
 You can also use an expression to specify #if, so
 ^p
-Example:
+example :
 	#define VER 5
 	#if VER<3
 mes "ABC"; This part is ignored
@@ -760,10 +760,10 @@ a = 111; This part is ignored
 mes "DEF"; This part is ignored
 	#endif
 ^p
-You can also use it like this. The description of the calculation formula and the notes on the operator are the same as the #const instruction.
+You can also use it like this. The description of the calculation formula and the precautions for the operator are the same as for the #const instruction.
 You can also nest #if to #endif blocks.
 ^p
-Example:
+example :
 	#ifdef SW
 		#ifdef SW2
 mes "AAA"; if SW and SW2 are defined
@@ -795,7 +795,7 @@ Macro name
 %inst
 Specifies compile ON / OFF.
 If the specified macro is not defined, #ifdef turns off the subsequent compilation output and ignores the compilation result. If defined, the output will be ON. This compile control targets the period until #endif appears.
-For more information on compilation control, see the #if instruction reference.
+For more information on compile control, see the #if instruction reference.
 %href
 #if
 #ifndef
@@ -815,7 +815,7 @@ Macro name
 %inst
 Specifies compile ON / OFF.
 If the specified macro is defined, #ifndef turns off the subsequent compilation output and ignores the compilation result. If it is not defined, the output will be ON. This compile control targets the period until #endif appears.
-For more information on compilation control, see the #if instruction reference.
+For more information on compile control, see the #if instruction reference.
 %href
 #if
 #ifdef
@@ -928,8 +928,8 @@ p1 p2 ~: Parameter type name / alias name
 %inst
 Register the process (constructor) for initializing the module variable.
 You can optionally specify the call parameter type and alias name.
-The interval defined by #modinit will be automatically called when the newmod instruction is executed.
-In addition, the optional parameters specified by the newmod instruction can be acquired on the constructor side.
+The interval defined by #modinit will be called automatically when the newmod instruction is executed.
+In addition, the optional parameters specified by the newmod instruction can be obtained on the constructor side.
 For more information on module variables, see the module entry in the programming manual (hspprog.htm).
 ^
 The parameter type and alias name of the #modinit instruction have the same format as the #deffunc instruction.
@@ -979,11 +979,11 @@ Register the HSP extension plug-in.
 The initialization function name must specify exactly the name exported from the DLL. When exporting from VC ++, "_" is added at the beginning and "@ 4" is added at the end, so describe the name including it. (For DLLs created with compilers other than VC ++, the export name rules are different. For details, refer to the documentation for each environment.)
 For example, if you want to register a function called "hsp3cmdinit" in "hpi3sample.dll",
 ^p
-Example:
+example :
 	#regcmd "_hsp3cmdinit@4","hpi3sample.dll"
 ^p
 It looks like.
-If you want to extend the variable type with a plug-in, you need to specify "Variable type extension number".
+When extending a variable type with a plug-in, it is necessary to specify "Variable type extension number".
 To add one type of variable type, specify 1 for the number of variable type extensions. If you do not want to extend the variable type, omit the number of variable type extensions or specify 0. Note that if the variable type extension is not specified correctly, the type registration will be invalid.
 ^
 If you specify an integer for the first parameter, the type value to be executed as an internal command is assigned to the keywords defined in the subsequent #cmd.
@@ -1010,7 +1010,7 @@ Sub ID: Sub ID value given by the keyword
 Register keywords for HSP extension plugins.
 It is necessary to register the plug-in initialization function in advance by using the #regcmd command.
 ^p
-Example:
+example :
 	#cmd newcmd $000
 	#cmd newcmd2 $001
 	#cmd newcmd3 $002
@@ -1031,7 +1031,7 @@ Specifying an external COM interface
 %group
 Preprocessor instructions
 %prm
-Interface name "Interface IID" "Class IID"
+Interface name "interface IID" "class IID"
 Interface name: Keywords that identify the interface
 "Interface IID": IID string indicating the COM interface
 "Class IID": IID string indicating the class of COM
@@ -1040,9 +1040,9 @@ Interface name: Keywords that identify the interface
 Define the external component (COM).
 Assign class IID and interface IID to the specified interface name to make it available.
 IID can be specified with a string ({~}) similar to the registry.
-Also, "Class IID" can be omitted.
+Also, "class IID" can be omitted.
 ^p
-Example:
+example :
 	#define CLSID_ShellLink "{00021401-0000-0000-C000-000000000046}"
 	#define IID_IShellLinkA "{000214EE-0000-0000-C000-000000000046}"
 	#usecom IShellLinkA IID_IShellLinkA CLSID_ShellLink
@@ -1098,7 +1098,7 @@ The character strings that can be used as the argument type are as follows.
 ^p
 Items marked with (*) indicate parameters that are automatically passed without having to be specified as arguments.
 ^p
-Example:
+example :
 ; Class ID of shell link object
 	#define CLSID_ShellLink "{00021401-0000-0000-C000-000000000046}"
 Interface ID of the IShellLink interface
@@ -1111,7 +1111,7 @@ Interface ID of the IShellLink interface
 	IShellLink_SetPath slink, "c:\\hsp261\\hsp2.exe"
 ^p
 In the above example, IShellLink_SetPath of the IShellLinkA interface is called with a variable called slink.
-Note that the instruction registered with #comfunc will always have the first argument as a COM object type variable with the same interface.
+Note that the instruction registered with #comfunc will always have the same first argument as a COM object type variable with the same interface.
 
 %href
 #usecom
@@ -1134,7 +1134,7 @@ p1: Allotted constant
 Assigns consecutive values to the specified macro name.
 Similar to the #const instruction, you can define a macro name that indicates a constant.
 ^p
-Example:
+example :
 #enum KAZU_A = 0; KAZU_A becomes 0
 #enum KAZU_B; KAZU_B becomes 1
 #enum KAZU_C; KAZU_C becomes 2
@@ -1144,7 +1144,7 @@ Example:
 ^p
 The constant is initialized by writing "= (equal)" and a numerical value (or expression) after the macro name. After that, the number will increase by 1 each time it is defined with the #enum instruction.
 Use the #enum instruction when you want to define consecutive values by macro.
-The #const instruction eliminates the need to specify a numerical value one by one, making it easy to add or delete later.
+The #const command eliminates the need to specify a number one by one, making it easy to add or delete later.
 
 %href
 #const
@@ -1217,7 +1217,7 @@ The keywords that can be specified with #cmpopt are as follows.
 ^p
 The following example outputs the preprocessor result to a file.
 ^p
-Example:
+example :
 	#cmpopt ppout 1
 ^p
 Basically, write the #cmpopt instruction at the beginning of the script.
@@ -1252,7 +1252,7 @@ The keywords that can be specified with #bootopt are as follows.
 ^p
   Options | Contents | Initial value
  -----------------------------------------------------------
-  notimer | Use precision timer | Automatic setting
+  notimer | Use high precision timer | Automatic setting
              | (0 = use / 1 = not use) |
   utf8 | Use UTF-8 format strings | Automatic setting
              | (0 = use / 1 = not use) |
@@ -1260,9 +1260,9 @@ The keywords that can be specified with #bootopt are as follows.
              | (0 = use / 1 = not use) |
  -----------------------------------------------------------
 ^p
-The following example suppresses the use of precision timers.
+The following example suppresses the use of the precision timer.
 ^p
-Example:
+example :
 	#bootopt notimer 1
 ^p
 
@@ -1319,7 +1319,7 @@ Outputs a message to the outside during AHT parsing.
 It is mainly used to write the source code added on the editor by "Easy input".
 Like the mes instruction, the #ahtmes instruction can output strings and macros by connecting them with the "+" operator.
 ^p
-Example:
+example :
 #define Variable to assign a ;; str
 #const Random number range 100 ;; help = "occurs from 0 to specified range -1"
 #ahtmes "" + Variable to be assigned + "= rnd ("+ Range of random numbers + ") \\ t \\ t; Variable" + Variable to be assigned + "is assigned a random number."

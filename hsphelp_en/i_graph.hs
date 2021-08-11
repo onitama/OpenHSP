@@ -54,7 +54,7 @@ Screen control instructions
 sw (0): Optional
 %inst
 Displays the specified message in the window.
-The message is displayed from a virtual cursor position on the window called the current position. (The current position can be set by the pos instruction.)
+The message is displayed from a virtual cursor position on the window called the current position. (The current position can be set by the pos command.)
 The option value allows you to specify the behavior when displaying a message.
 ^p
    Value: Macro name: Behavior
@@ -72,7 +72,7 @@ If 4 or mesopt_outline is specified for the option, the bordered characters will
 For shadows and borders, the color specified by the objcolor command is used.
 Also, the width of the shadow and border can be specified with the font command.
 When 16 or mesopt_gmode is specified as an option, drawing that reflects the settings such as translucency and color addition specified in gmode is performed.
-(This option is only valid for HSP3Dish and HGIM G4, ignored by normal HSP3 runtime)
+(This option is only valid for HSP3Dish and HGIMG4, ignored by normal HSP3 runtime)
 ^
 If the width of the shadow and border is made larger than 1, the load of display processing will increase.
 If you want to reduce the load with simple drawing, specify 8 or mesopt_light as an option.
@@ -111,7 +111,7 @@ sw (0): Optional
 
 %inst
 Displays the specified message in the window.
-The message is displayed from a virtual cursor position on the window called the current position. (The current position can be set by the pos instruction.)
+The message is displayed from a virtual cursor position on the window called the current position. (The current position can be set by the pos command.)
 The option value allows you to specify the behavior when displaying a message.
 ^p
    Value: Macro name: Behavior
@@ -129,7 +129,7 @@ If 4 or mesopt_outline is specified for the option, the bordered characters will
 For shadows and borders, the color specified by the objcolor command is used.
 Also, the width of the shadow and border can be specified with the font command.
 When 16 or mesopt_gmode is specified as an option, drawing that reflects the settings such as translucency and color addition specified in gmode is performed.
-(This option is only valid for HSP3Dish and HGIM G4, ignored by normal HSP3 runtime)
+(This option is only valid for HSP3Dish and HGIMG4, ignored by normal HSP3 runtime)
 ^
 If the width of the shadow and border is made larger than 1, the load of display processing will increase.
 If you want to reduce the load with simple drawing, specify 8 or mesopt_light as an option.
@@ -163,7 +163,7 @@ Screen control instructions
 "strings": Strings to specify
 
 %inst
-If p1 is omitted, the window title bar caption is set to the contents of "strings".
+Set the title bar caption of the window to the contents of "strings".
 (The title bar caption is the part that is usually displayed as "Hot Soup Processor ver3.x")
 
 %href
@@ -190,7 +190,7 @@ p1 = 0 to (0): Dialog type setting
 Displays various standard Windows dialog boxes on the screen.
 The dialog displayed by the dialog command pops up separately from the HSP window.
 ^
-The continuation of the HSP script will not be executed until the dialog is closed by the user.
+The continuation of the HSP script will not be executed until the dialog is closed by the user's operation.
 ^
 The type of dialog depends on the p1 setting.
 ^p
@@ -219,7 +219,7 @@ For types 16-17, a file selection dialog will appear for you to select from the 
 Also, "option" will display the extension details, for example "txt", a supplementary description such as "text file" will be displayed in the "Files of type" dialog.
 "option" can be omitted.
 ^p
-Example:
+example :
 dialog "txt", 16, "text file"
 dialog "STAT =" + stat + "\\ nNAME =" + refstr, 0, "Result"
 	stop
@@ -228,14 +228,14 @@ When the file selection is complete, the result is assigned to the system variab
 If the variable stat is 1, it means that it was selected successfully. If the variable stat is 0, it means that it was canceled or an error occurred.
 Multiple file types can be specified by separating them with the "|" symbol.
 ^p
-Example:
+example :
 dialog "txt | log", 16, "text file | log file"
 dialog "STAT =" + stat + "\\ nNAME =" + refstr, 0, "Result"
 	stop
 ^p
 For types 32 to 33, a color selection dialog is displayed. When the color selection is completed, the RGB data of the selected color is assigned to the system variables ginfo_r, ginfo_g, ginfo_b. Also, if the variable stat is 0, it means that it was canceled or an error occurred. If it is 1, it means that it was selected successfully.
 ^p
-Example:
+example :
 	dialog "",33
 dialog "R =" + ginfo_r + "/ G =" + ginfo_g + "/ B =" + ginfo_b, 0, "Result"
 	stop
@@ -254,9 +254,9 @@ Screen control instructions
 %prm
 p1,p2,p3,p4,p5,p6,p7,p8
 p1 = 0 to (0): Window ID
-p2 = 1 to (640): Screen size X to be initialized (in 1-dot units)
+p2 = 1 to (640): Screen size to be initialized X (1 dot unit)
 p3 = 1 to (480): Screen size Y to initialize (1 dot unit)
-p4 = 0 to 1 (0): Screen mode to initialize
+p4 = 0 to (0): Screen mode to initialize
 p5 = 0 to (-1): Window layout X (1 dot unit)
 p6 = 0 to (-1): Window layout Y (1 dot unit)
 p7 = 0 ~: Window size X (in 1 dot unit)
@@ -309,13 +309,13 @@ Screen image save
 Screen control instructions
 %prm
 "filename"
-"filename": Filename to save
+"filename": File name to save
 
 %inst
 Save the current screen image as it is as an image file in BMP format.
 A file will be created with the name specified in "filename". You need to specify the file name including the extension.
 ^
-The saved image size will be the size that the target window is initialized. If you want to change the size, please copy the contents to a window of another size and then bmp save.
+The saved image size will be the size at which the target window is initialized. If you want to change the size, please copy the contents to a window of another size and then bmp save.
 
 
 
@@ -363,9 +363,9 @@ Screen control instructions
 %prm
 p1,p2,p3,p4
 p1 = 0 to (0): Window ID
-p2 = 1 to (640): Screen size X to be initialized (in 1-dot units)
+p2 = 1 to (640): Screen size to be initialized X (1 dot unit)
 p3 = 1 to (480): Screen size Y to initialize (1 dot unit)
-p4 = 0 to 1 (0): Screen mode to initialize
+p4 = 0 to (0): Screen mode to initialize
 
 %inst
 Like the screen instruction, it initializes the specified window ID so that it can be used. The screen size to be initialized and the screen mode are the same as the screen command, but the buffer command only creates a virtual screen in memory and does not display it on the actual screen.
@@ -400,10 +400,10 @@ p3 = 0 to (480): Setting the image resolution in the Y direction
 
 %inst
 Forces the current display resolution to change.
-Use (p2, p3) to set the X and Y resolutions, and p1 to set the change mode.
+Set the X and Y resolutions with (p2, p3) and set the change mode with p1.
 The mode is 1 for full color mode (32bit) and 2 for palette mode (8bit). If the change mode is 0, it returns to the initial state (before change).
 ^p
-Example:
+example :
 chgdisp 1,640,480; 640x480 Set to full color
 ^p
 If the parameter specification of (p2, p3) is omitted, it will be (640,480).
@@ -513,7 +513,7 @@ p5 = 0 ~: Copy size Y (dot unit)
 
 %inst
 The gcopy command copies a part of the screen with the specified window ID to the current drawing destination current position.
-The window ID of the copy source must be the same as your own window ID or the window ID initialized by the screen or buffer instruction.
+The copy source window ID must be the same as your own window ID or the window ID initialized by the screen or buffer instruction.
 ^
 When copying with the gcopy instruction, you can select several modes to copy with the gmode instruction.
 ^
@@ -564,7 +564,7 @@ Copying is done in the same way as in mode 1, but dots with all 0 RGB (complete 
 ・ Mode 3 = Semi-transparent composite copy
 ^p
 It can be used only in full color mode.
-Performs a translucent composite copy with the blend ratio specified by the 4th parameter of gmode. The blend ratio can range from 0 to 256, with 256 being a perfect copy.
+Performs a semi-transparent composite copy with the blend ratio specified by the 4th parameter of gmode. The blend ratio can range from 0 to 256, with 256 being a perfect copy.
 If the blend ratio is 0, no copy will be executed.
 Also, if the blend ratio is 256 or more, memory-to-memory copy is executed.
 ^p
@@ -579,15 +579,15 @@ It can be used only in full color mode.
 Performs color additive synthesis copying with the blend ratio specified by the 4th parameter of gmode. In color addition, the RGB value of the copy source is added to the RGB value of the copy destination.
 If the brightness exceeds 255 at the time of addition, it will be clamped to 255.
 ^p
-繝サ Mode 6 = Color subtractive composite copy
+・ Mode 6 = Color subtractive composite copy
 ^p
 It can be used only in full color mode.
 Performs color subtractive composite copy with the blend ratio specified by the 4th parameter of gmode. In color subtraction, the RGB value of the copy source is subtracted from the RGB value of the copy destination. If the brightness is less than 0 when subtracting, it will be clamped to 0.
 ^p
-ツキ Mode 7 = Pixel Alpha Blend Copy
+揃 Mode 7 = Pixel Alpha Blend Copy
 ^p
 It can be used only in full color mode.
-Prepare an image of the size specified by gmode on the right side of the original image, and perform background compositing copying using the image on the right side as an alpha blend component.
+Prepare an image of the size specified by gmode on the right side of the original image, and make a background composite copy using the image on the right side as an alpha blend component.
 If the alpha blend component is 255, the pixels of the original image are copied as they are, and if it is smaller than 255, it is combined with the background at that blend ratio.
 Pixels are referenced in RGB units, so you can set different blend rates for RGB.
 Alpha-blended images are usually represented in grayscale from (0,0,0) to (255,255,255).
@@ -666,7 +666,7 @@ p8 = 0 to 1 (0): Zoom mode
 
 %inst
 The gzoom instruction copies a part of the screen with the specified window ID to the current drawing destination current position by scaling it to an arbitrary size.
-The window ID of the copy source must be the same as your own window ID or the window ID initialized by the screen or buffer instruction.
+The copy source window ID must be the same as your own window ID or the window ID initialized by the screen or buffer instruction.
 ^
 You can specify the zoom mode with p8.
 If you specify 1 for p8, a high-quality image using halftone is generated when scaling. (It doesn't work on Windows 9X.)
@@ -793,14 +793,13 @@ GIF format: Extension GIF: GIF format data.
 JPEG format: Extension JPG: JFIF standard JPEG data.
                         Grayscale data is also OK.
 ICO format: Extension ICO: Windows standard ICO format icon data.
-PNG format: Extension PNG: Portable Network Graphics data. (*)
-PSD format: Extension PSD: Photoshop format data. (Composite layer only) (*)
-TGA format: Extension TGA: Data in TARGA format. (*)
+PNG format: Extension PNG: Portable Network Graphics data.
+PSD format: Extension PSD: Photoshop format data. (Composite layer only)
+TGA format: Extension TGA: Data in TARGA format.
 ^p
 The picload instruction can be executed on the screen initialized by the screen, buffer, and bgscr instructions.
 * Multi-icon format ICO files are not supported as standard.
 * Interlaced PNG files are not supported as standard. If you want to load all formats supported by PNG, please use the imgload or hspcv plugin.
-* Please note that the formats marked with (*) cannot be used with the compact runtime (hsp3c) and HSPLet.
 
 %href
 screen
@@ -819,7 +818,7 @@ Current position setting
 Screen control instructions
 %prm
 p1,p2
-p1 = 0 ~: X coordinate of the current position
+p1 = 0 ~: X coordinate of current position
 p2 = 0 ~: Y coordinate of the current position
 
 %inst
@@ -887,14 +886,14 @@ Drawing mode 1:
 ^p
 When the screen control command is executed, it is reflected on the actual screen.
 ^p
-It has become. Normally it is drawing mode 1.
+It has become. Normally, it is drawing mode 1.
 You can copy an image on the screen in drawing mode 0, display a message, and finally set it to mode 1 to eliminate the flicker of screen rewriting and make it look smooth.
 ^
 If mode 1 is specified, the screen will be updated immediately.
 ^
 If you specify the mode value plus 2, only the drawing mode is changed and the screen is not updated.
 ^
-In addition, it is possible to redraw only a part of the screen by the parameters from p2 to p5. Normally, if omitted, the full screen will be updated.
+In addition, it is possible to redraw only a part of the screen by using the parameters from p2 to p5. Normally, if omitted, the full screen will be updated.
 %port+
 Let
 %sample
@@ -925,9 +924,9 @@ Screen control instructions
 %prm
 p1,p2,p3,p4,p5,p6,p7,p8
 p1 = 0 to (0): Window ID
-p2 = 1 to (640): Screen size X to be initialized (in 1-dot units)
+p2 = 1 to (640): Screen size to be initialized X (1 dot unit)
 p3 = 1 to (480): Screen size Y to initialize (1 dot unit)
-p4 = 0 to 1 (0): Screen mode to initialize
+p4 = 0 to (0): Screen mode to initialize
 p5 = 0 to (-1): Window layout X (1 dot unit)
 p6 = 0 to (-1): Window layout Y (1 dot unit)
 p7 = 0 ~: Window size X (in 1 dot unit)
@@ -952,12 +951,12 @@ If "+2" (creates a hidden window) is specified for the p4 parameter, the window 
 ^
 Of the p4 parameters, "+4", "+8", and "+16" are for setting the window style, respectively.
 A "fixed size window" is created in a style that cannot be resized even for windows with ID1 or later, similar to windows with ID0.
-The "Tool Window" creates a window in which the title bar is reduced in size and the window name is not displayed in the taskbar.
+The "Tool Window" creates a window in which the title bar is reduced in size and the window name is not displayed on the taskbar.
 ^
 If the p4 parameter is omitted, the current Windows screen mode will be created in palette mode if it has a palette (256 colors), otherwise it will be created as a full color screen.
 ^
 You can set multiple screen mode values by summing the values.
-For example
+for example,
 ^p
 	screen 2,320,240,4+8
 ^p
@@ -965,7 +964,7 @@ Is created with a fixed size + tool window style.
 ^
 The screen instruction can also reinitialize a window ID that has already been initialized with a different setting.
 ^p
-Example:
+example :
 	screen 0,640,480,1
 ^p
 In the above example, window ID 0, that is, the main window, is reinitialized in palette mode with 640x480 dots.
@@ -1102,7 +1101,7 @@ p4 = 0 ~: Lower right Y coordinate of the rectangle
 p5 = 0 to 1 (1): Drawing mode (0 = line, 1 = fill)
 
 %inst
-Draw a circle on the screen that fits in a rectangle (square) with (p1, p2) and (p3, p4) as the upper left and lower right points.
+Draw a circle on the screen that fits in a rectangle, with (p1, p2) and (p3, p4) as the upper left and lower right points.
 The drawing color will be the one set by the color command, etc.
 ^
 If 0 is specified for p5, only the outline will be drawn as a line.
@@ -1210,7 +1209,7 @@ Specify the color in RGB format ($ rrggbb).
 Specify the value obtained by converting the brightness of each RGB with an 8-bit value in p1.
 You can write something like "$ 112233" using the "$" that specifies the hexadecimal number.
 In this case, "R = $ 11, G = $ 22, B = $ 33" will be specified.
-The function of the command is the same as the color command and hsvcolor command, and the color set by the subsequent drawing commands is used.
+The function of the command is the same as the color command and hsvcolor command, and the color set in the subsequent drawing commands is used.
 The RGB format color code value specified by rgbcolor is compatible with the 24-bit color code specified by html etc.
 
 %href
@@ -1224,7 +1223,7 @@ hsvcolor
 ginfo
 Get window information
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1)
 p1 = 0 ~: Type to get
@@ -1281,7 +1280,7 @@ The types that can be obtained are as follows.
  14: Message output X size
  15: Message output Y size
 
-      Finally, the size of the message output by the mes and print instructions is returned.
+      Finally, the size of the message output by the mes and print commands is returned.
       The size indicates how many dots were drawn on the X and Y coordinates.
       Please note that it is not the absolute coordinates on the screen.
       Also, if you output a character string with multiple lines, the size corresponding to the last line will be acquired.
@@ -1305,11 +1304,11 @@ The types that can be obtained are as follows.
  22: X coordinate of the current position
  23: Y coordinate of the current position
 
-      The X and Y coordinates of the current position set by the pos instruction are returned.
+      The X and Y coordinates of the current position set by the pos command are returned.
 
  24: Window ID at the time of message interrupt
 
-      The window ID at the time of message interrupt set by the oncmd instruction is returned.
+      The window ID at the time of message interrupt set by the oncmd command is returned.
 
  25: Unused window ID
 
@@ -1357,7 +1356,7 @@ Screen control instructions
 p1,p2,p3,p4,p5,p6
 p1 = 0 to (0): Rectangle center X coordinate
 p2 = 0 to (0): Y coordinate of the center of the rectangle
-p3 = 0 to (0.0): Rotation angle (unit is radian)
+p3 = 0.0 ~ (0.0): Rotation angle (unit is radian)
 p4 = 0 ~ (?): X size
 p5 = 0 ~ (?): Y size
 
@@ -1368,7 +1367,7 @@ The unit of angle is radians (starting from 0 and going around at 2π).
 The grect instruction reflects the copy mode specification set in gmode.
 ^
 If gmode is 0,1, normal fill.
-If gmode is 3, it will be translucent at the specified rate.
+If gmode is 3, it becomes translucent at the specified rate.
 When gmode is 5 or 6, color addition and color subtraction are performed respectively.
 If the size specification of (p4, p5) is omitted, the copy size set by the gmode instruction is used.
 ^
@@ -1395,7 +1394,7 @@ p1,p2,p3,p4,p5,p6
 p1 = 0 to (0): Copy source window ID
 p2 = 0 to (0): Upper left X coordinate of copy source
 p3 = 0 to (0): Upper left Y coordinate of copy source
-p4 = 0 to (0.0): Rotation angle (unit is radian)
+p4 = 0.0 ~ (0.0): Rotation angle (unit is radian)
 p5 = 0 ~ (?): X size
 p6 = 0 ~ (?): Y size
 
@@ -1407,7 +1406,7 @@ The unit of angle is radians (starting from 0 and going around at 2π).
 In (p5, p6), specify the X and Y sizes after copying.
 Also, the default copy size set by the gmode instruction is used for the X and Y sizes of the copy source.
 In other words, if you specify a size larger than the size specified by the gmode instruction with (p5, p6), it will be expanded.
-If (p5, p6) is omitted, the copy will be performed in the same size as the copy source, that is, at the same size.
+If (p5, p6) is omitted, copying will be performed in the same size as the copy source, that is, at the same size.
 ^
 The grotate instruction reflects the copy mode specification set in gmode. (Mode 7 pixel alpha blend copy does not apply.)
 The transparent color setting and the translucent setting all work in the same way as when copying with the gcopy command. (See the gmode instruction reference for details)
@@ -1434,7 +1433,7 @@ p1 = 0 to (0): Copy source window ID (filled if negative value)
 p2 = variable name: Numeric array variable name where the copy destination X coordinates are stored
 p3 = variable name: Numeric array variable name where the copy destination Y coordinates are stored
 p4 = variable name: Numeric array variable name where the copy source X coordinates are stored
-p5 = variable name: Numeric array variable name where the copy source Y coordinate is stored
+p5 = variable name: Numeric array variable name where the copy source Y coordinates are stored
 
 %inst
 Copy or fill a rectangle with any 4 points.
@@ -1480,7 +1479,7 @@ Let
 objinfo
 Get window object information
 %group
-Basic input / output functions
+Basic I / O functions
 %prm
 (p1,p2)
 p1 = 0 ~: Window object ID
@@ -1537,7 +1536,7 @@ If the size specification is omitted or less than or equal to 0, the size of the
 If the placement is successful, the object ID is assigned to the system variable stat and the variable p1 is initialized as a COM object type variable for control.
 If the placement of the ActiveX control fails, the system variable stat is assigned -1 and exits.
 ^p
-Example:
+example :
 	axobj ie, "Shell.Explorer.2",640,480
 	ie->"Navigate" "www.onionsoft.net"
 ^p
@@ -1668,7 +1667,7 @@ p1 = 0 to (0): Upper left X coordinate of the rectangle
 p2 = 0 to (0): Upper left Y coordinate of the rectangle
 p3 = 0 ~: Rectangle X size
 p4 = 0 ~: Y size of rectangle
-p5 = 0 to (0): Gradation mode
+p5 = 0 ~ (0): Gradation mode
 p6 = 0 ~: Fill color 1 (RGB color code)
 p7 = 0 ~: Fill color 2 (RGB color code)
 
@@ -1685,12 +1684,12 @@ You can specify the gradation mode with p5.
     0: Horizontal gradation
     1: Vertical gradation
 ^p
-Gradient filling is done with the color specified by p6 in the upper left and p7 in the lower right.
+The gradation is filled with the color specified by p6 in the upper left and p7 in the lower right.
 If p6 and p7 are omitted, the current drawing color will be used.
 If (p1, p2) is omitted, the upper left (0,0) of the screen is set.
 If (p3, p4) is omitted, the screen drawing size will be set.
 ^p
-Example:
+example :
 ; Fill the rectangle with a gradient
 	gradf 120,180,400,100, 1, $ff00ff, $ffffff
 ^p
@@ -1711,7 +1710,7 @@ Screen control instructions
 %prm
 "filename",p1,p2
 "filename": Filename to load
-p1 = 1 ~ (-1): Read destination window ID
+p1 = 1 ~ (-1): Import destination window ID
 p2 = 0 to 1 (0): Screen mode to initialize
 
 %inst
@@ -1724,7 +1723,7 @@ Is basically the same as the operation.
 In the "filename" parameter, specify the name of the image file to read.
 The format of the image file that can be used is the same as the picload command.
 You can specify the window ID of the read destination with p1.
-If p1 is omitted or a negative value, an unused window ID is automatically used.
+If p1 is omitted or a negative value, the unused window ID is automatically used.
 (After executing the instruction, the window ID read in the system variable stat is assigned.)
 You can specify the initialization mode of the virtual screen with p2.
 Full color mode if p2 is omitted or 0. If 1, palette mode is selected.
@@ -1746,7 +1745,7 @@ Set the division size of the image material
 Screen control instructions
 %prm
 p1,p2,p3,p4,p5
-p1 = 0 ~ (1): Window ID
+p1 = 0 to (1): Window ID
 p2 = 1 ~ (0): Horizontal division size
 p3 = 1 ~ (0): Vertical division size
 p4 = 0 to (0): Horizontal center coordinates
@@ -1764,7 +1763,7 @@ If you omit the split size or set it to a value less than or equal to 0, the siz
 ^
 You can set the center coordinates of drawing with (p4, p5).
 This will be the base point position for drawing when drawing with the celput command.
-For example, if (0,0) is specified as the center coordinate, the image material (0,0) will be referenced at the position drawn by the celput command (coordinates specified by the pos command).
+For example, if (0,0) is specified as the center coordinate, the image material (0,0) will be placed at the position drawn by the celput command (coordinates specified by the pos command).
 It also becomes the center of rotation when drawing a rotated image.
 Normally, the position at (0,0), that is, the upper left is the base point position. This is similar to the base point position in the gcopy instruction.
 
@@ -1795,8 +1794,8 @@ angle = 0.0 ~ (0.0): Rotation angle (unit is radian)
 
 %inst
 The image material loaded on the virtual screen is drawn in the current operation destination window.
-In id, specify the window ID that has the image material.
-Specify the split image number with no. The split image No. is the window ID that has the image material.
+In id, specify the window ID that holds the image material.
+With no, specify the split image number. The divided image No. is the window ID that has the image material.
 It is a number that identifies the divided image.
 With zoomx and zoomy, you can specify the horizontal (X) and vertical (Y) direction magnifications of the drawn image.
 You can specify zoomx and zoomy with real numbers.
@@ -1812,7 +1811,7 @@ The size of the image to be drawn and the center position of drawing and rotatio
 If zoomx, zoomy, angle are omitted or the same size is set (1,1,0),
 A fast copy is automatically performed internally. On the contrary, when drawing that is not the same size,
 The same drawing process as the grotate command is executed.
-After drawing, move the current position to the right according to the drawn size.
+After drawing is completed, the current position is moved to the right according to the drawn size.
 (However, the angle is not taken into consideration. The horizontal size of the drawing is moved to the right.)
 ^
 Image materials can be managed efficiently by the celput command and related commands.

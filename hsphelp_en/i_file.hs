@@ -6,9 +6,9 @@
 %type
 Built-in instructions
 %ver
-3.4
+3.6
 %note
-ver3.4 standard instruction
+ver3.6 standard instruction
 
 %date
 2009/08/01
@@ -91,7 +91,7 @@ p2 = 0 to (0): Directory acquisition mode
 %inst
 Create a list of files in the current directory and assign them to variables.
 In "filemask", specify the filemask for creating the list.
-File masks are parameters that you specify in the form of wildcards, such as "*. *".
+The file mask is a parameter that you specify in the form of a wildcard, such as "*. *".
 For example, the file mask "* .as" creates a list of all files with the extension as. To create a list of all files in the current directory, use "*. *".
 The directory list is assigned to the character string type variable specified by p1 as a character string separated by a line feed (\\ n) for each file. This data is in a format that can be handled by memory notepad instructions.
 ^
@@ -204,9 +204,9 @@ Save buffer to file
 File operation command
 %prm
 "filename",p1,p2,p3
-"filename": Filename to save
+"filename": File name to save
 p1 = variable: variable name
-p2 = 0 to (-1): Size to save (in Byte)
+p2 = 0 to (-1): Save size (in Byte)
 p3 = 0 to (-1): File offset
 %inst
 Writes the contents of the memory buffer to a file.
@@ -220,7 +220,7 @@ Also, when offset is specified, an error will occur if the file does not exist. 
 ^
 This makes it possible to update only part of a large file, split it up, and so on.
 ^
-It is recommended to use the dedicated notesave instruction when saving a text file.
+When saving a text file, it is recommended to use the dedicated notesave instruction.
 
 %href
 notesave

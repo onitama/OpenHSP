@@ -43,7 +43,7 @@ Since the es_ini command can be executed any number of times, it can also be use
 ^
 p3 specifies how many times to make the angle used in the es_adir command etc. around. finger
 The numbers that can be determined are multiples of 64 and 256, and multiples of 360. Finger other numbers
-If set, the closest value that meets the conditions is set, which is less than the specified value.
+If set, the closest value that is less than the specified value and meets the conditions is set.
 ^
 If memory allocation fails for some reason, such as when there is not enough free memory,
 A non-zero value is returned in stat.
@@ -272,7 +272,7 @@ Value macro content
 16 ESI_FADEPRM Fade parameters
 17 ESI_ZOOMX X Display magnification
 18 ESI_ZOOMY Y Display magnification
-19 ESI_ROTZ Rotation angle </pre>
+19 ESI_ROTZ Rotation angle </ pre>
 ^p
 All information is stored as a 32-bit integer. Please note that the coordinates, acceleration, magnification, etc. of the sprite are fixed decimal values, so the actual values are multiplied by 65536.
 You can use es_setp to rewrite sprite information directly.
@@ -317,7 +317,7 @@ Value macro content
 16 ESI_FADEPRM Fade parameters
 17 ESI_ZOOMX X Display magnification
 18 ESI_ZOOMY Y Display magnification
-19 ESI_ROTZ Rotation angle </pre>
+19 ESI_ROTZ Rotation angle </ pre>
 ^p
 All information is stored as a 32-bit integer. Most parameters have separate instructions to set, so you do not need to use the es_setp instruction.
 In addition, sprite coordinates, acceleration, magnification, etc. are fixed decimal values, so they may differ from the actual values. In that case, use the es_pos command.
@@ -351,7 +351,7 @@ Will be searched.
 ^
 The search is performed in order from the sprite number specified by p3 to the number specified by p4.
 If this is omitted, all sprites will be searched from No.0.
-When the appropriate sprite is found, assign the result to p1 and finish.
+When the appropriate sprite is found, substitute the result for p1 and finish.
 If the result of the search does not find the corresponding sprite, -1 is assigned.
 ^
 p5 specifies the increment of the sprite number to be searched. If omitted, it is automatically set from p3 and p4, so it is not usually necessary to specify it.
@@ -766,7 +766,7 @@ p3 = flag (1 = X direction 2 = Y direction 3 = both default = 3)
 
 %inst
 When free fall movement is turned on with the es_flag command, it bounces at the bottom (or top) of the screen.
-Set the ease of momentum when returning. The larger this value, the less momentum it loses when it bounces off.
+Set the ease of momentum when returning. The larger this value, the less momentum it loses when it bounces.
 I won't be able to.
 ^
 p3 bounces or does not bounce when it hits the top and bottom edges of the screen, or the left and right edges
@@ -793,7 +793,7 @@ The value specified by p2 is called the EP value and has the following meanings.
 ^p
   EP value content
 -----------------------------------------------------------
-  0 to 255 channel value (0 = transparent, 255 = opaque)
+  0 to 255 留 channel value (0 = transparent, 255 = opaque)
   + $ 300 Enables alpha channel synthesis (equivalent to gmode 3)
   + $ 500 Additive synthesis is performed on the original image (equivalent to gmode 5)
   + $ 600 Subtractive synthesis on the original image (equivalent to gmode 6)
@@ -849,7 +849,7 @@ p2 (0) = priority (0 ~)
 %inst
 Change the sprite priority.
 Sets the value specified in p2 to the sprite specified in p1.
-To actually draw according to the priority, it is necessary to specify the priority setting parameter of the sprite to be displayed by the es_draw command.
+When actually drawing according to the priority, it is necessary to specify the priority setting parameter of the sprite to be displayed by the es_draw command.
 %href
 es_set
 es_draw
@@ -998,7 +998,7 @@ The parameters of p5 are the settings for character animation.
 If 0, there is no animation. If it is 1 or more, the character is displayed for the specified number of frames, and then the next character (character No. + 1) is displayed.
 ^
 Normally, an animation is defined in which the number of patterns specified by the p2 parameter is repeated in the waiting frame of p5.
-Defines a pattern that disappears after animating multiple patterns when ESSPPAT_1SHOT ($ 1000) is added to the p2 parameter.
+When ESSPPAT_1SHOT ($ 1000) is added to the p2 parameter, it defines a pattern that disappears after displaying multiple patterns in animation.
 %href
 es_link
 es_pat
@@ -1061,9 +1061,9 @@ This variable must be initialized with the dim instruction in advance as an arra
 Specify the X and Y sizes of the entire map with (p3, p4).
 Specify the X and Y sizes of the part where the map is displayed with (p5, p6).
 All parameters from p3 to p6 are units of map parts. For example, if the overall size is 4x4, you would specify the variable initialized with "dim map, 4 * 4".
-This variable directly stores the contents of the map data, and if the value is 0, the map part (cell ID) is 0, and so on, the part ID is stored as it is.
-In p7, specify the screen buffer ID in which the image of the map part is loaded. Images must be loaded into this buffer in advance using the picload or celload instructions. (For the map part image, set the part size with the celdiv command.)
-Set the behavior of the BG map with the setting option of p8. This item is for future expansion and is not currently implemented.
+This variable stores the ID of the part as it is, such as 0 for the map part (cell ID) when it has the contents of the map data directly and the value is 0.
+In p7, specify the screen buffer ID in which the image of the map part is loaded. Images must be loaded into this buffer in advance using the picload or celload command. (For the map part image, set the part size with the celdiv command.)
+Set the behavior of the BG map with the setting options on p8. This item is for future expansion and is not currently implemented.
 ^
 The es_bgmap instruction sets the map display. The actual map display is performed with the es_putbg instruction.
 %href
@@ -1140,7 +1140,7 @@ By setting the parent sprite number in the p2 parameter, the sprite will be disp
 If you specify a negative value for p2, the parent sprite setting is canceled and the normal sprite display is restored.
 ^
 Normally, specify 0 for the setting option of the p3 parameter.
-By specifying 1 for p3, it becomes a sprite setting to display the BG map as a parent.
+By specifying 1 for p3, it becomes a sprite setting that displays the BG map as a parent.
 
 
 %index

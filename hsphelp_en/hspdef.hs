@@ -184,7 +184,7 @@ gmode_rgb0alpha
 Translucent composite copy mode with transparent color
 
 %inst
-By specifying it in the first argument of gmode, you can set the screen copy mode to the translucent composite copy mode with transparent color.
+By specifying it as the first argument of gmode, you can set the screen copy mode to the translucent composite copy mode with transparent color.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -568,7 +568,7 @@ font_antialias
 Font setting with antialiasing
 
 %inst
-You can set the antialiasing font by specifying it in the third argument of the font instruction.
+You can set the antialiasing font by specifying it in the third argument of the font command.
 When specifying in combination with other macros, specify the sum or logical sum.
 
 %sample

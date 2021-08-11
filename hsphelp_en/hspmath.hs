@@ -22,11 +22,11 @@ Include hspmath.as.
 User-defined macro
 %index
 M_LOG2E
-Logarithm of the number of Napiers with a base of 2
+Logarithm of Napier numbers with base 2
 
 %inst
 A constant that represents the logarithm of a 2-based Napier number.
-The logarithm of the base 2 Napier number refers to log2 (m_e).
+The logarithm of the number of Napiers with a base of 2 refers to log2 (m_e).
 
 %group
 Mathematical constant
@@ -50,7 +50,7 @@ log2
 User-defined macro
 %index
 M_LOG10E
-Logarithm of the number of Napiers with a base of 10
+Logarithm of Napier numbers with base 10
 
 %inst
 A constant that represents the logarithm of the number of Napiers with a base of 10.
@@ -778,7 +778,7 @@ Round in the positive direction
 p1: Rounding number
 
 %inst
-Returns a number obtained by rounding p1 in the positive direction. The result is returned as a real number.
+Returns the number obtained by rounding p1 in the positive direction. The result is returned as a real number.
 
 Here, "rounding p1 in the positive direction" means
 html{
@@ -790,7 +790,7 @@ It means that.
 #include "hspmath.as"
 	tmp = -2.5
 	while(tmp <= 2.5)
-Rounding mes strf ("% 4.1f", tmp) + "in the positive direction gives" + strf ("% 4.1f", ceil (tmp)) + "."
+Rounding mes strf ("% 4.1f", tmp) + "in the positive direction yields" + strf ("% 4.1f", ceil (tmp)) + "."
 		tmp += 0.5
 	wend
 	stop

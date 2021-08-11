@@ -35,6 +35,7 @@
 <li> <a href="#HSPSW"> About the hspsw plugin </a> </li>
 <li> <a href="#HSPINET"> About updating the hspinet plugin </a> </li>
 <li> <a href="#HSP64"> About the 64-bit (x64) version runtime </a> </li>
+<li> <a href="#HSP3C"> Compact (hsp3c) version runtime </a> </li>
 <li> <a href="#HSPTVSOZAI"> About HSPTV folder material </a> </li>
 <li> <a href="#HSPENG"> Support for English interface </a> </li>
 <li> <a href="#HSP3DISH"> HSP3Dish screen resizing </a> </li>
@@ -59,8 +60,9 @@ Expansion of standard instructions
 			<p>
 An option has been added that allows you to modify shadow characters, borders, etc. with the mes and print commands.
 The objcolor command to specify the color scheme of the placement object and the objlayer command to define the placement object by user definition have been added.
-In addition, many new functions such as stricter <a href="hspprog.htm#CALLBACK"> callback routine </a> and rgbcolor instruction for specifying a 24-bit color code are installed. <br>
-We've also updated new runtimes that use Unicode characters as standard, such as hsp3utf and hsp3_64.
+There are many other new features such as stricter <a href="hspprog.htm#CALLBACK"> callback routines </a> and rgbcolor instructions for specifying 24-bit color codes. <br>
+In addition, minor updates such as the addition of keys acquired by the stick instruction and the joystick input module have been made. <br>
+New runtimes that use Unicode characters as standard, hsp3utf, hsp3_64, etc. have also been updated.
 We have expanded the functions that are useful not only for games but also for tool production and easy prototyping, while keeping the existing functions.
 			</p>
 			</dd>
@@ -82,10 +84,10 @@ Expanded functions of HSP3Dish
 			<dd>
 			<p>
 Various functions of <a href="hsp3dish_prog.htm"> HSP3Dish </a> that support execution on Windows / iOS / android / Linux / html5 (WebGL) have been expanded. <br>
-The drawing of character strings has been greatly revised, and all platforms support the display of character strings including Japanese and translucent composition.
-It also supports checkboxes and input boxes as new placement objects.
+The drawing of character strings has been greatly revised, and all platforms support the display of character strings including Japanese and semi-transparent composition.
+It also supports checkboxes and input boxes as new placement objects. (Some platforms only)
 On Windows / Linux platforms, screen, window size change by bgscr instruction, and full screen display are supported.
-In addition, we are expanding the functions such as support for new SDK compatible with the latest terminals, acquisition of various sensor information, network access, and sprite drawing.
+In addition, we are expanding support for new SDKs compatible with the latest terminals, acquisition of various sensor information, network access, and HSPDX compatible sprite drawing functions.
 Hsp3js, which runs on a web browser, can newly output in WebAssembly format. The speed of drawing HGIM G4 has also been greatly improved, improving its practicality.
 The HSP3Dish Helper tool, which supports conversion to a wide range of devices, is also now more convenient and convenient to use.
 			</p>
@@ -98,8 +100,8 @@ HGIM G4 Plugin Update
 			<p>
 The <a href="hgimg4.html"> HGIMG4 plugin </a> that enables high-level 3D representation has been significantly updated.
 In addition to improving the stability and speed of the system, the lighting function and post-effect related functions have been enhanced. In addition, detailed usability has been improved, such as restrictions on FBX model conversion and restrictions on duplication. <br>
-With the new HGIMG4 tool, you can now see and edit the 3D data after converting the fbx file in more detail.
-It is possible to check the material (.material) file in detail by GUI.
+With the new HGIMG4 tool, you can now see and edit the 3D data after converting the fbx file in more detail. It is possible to check the material (.material) file in detail by GUI. <br>
+With new instructions, it is possible to generate free shapes, acquire physical collision information, acquire node hierarchy information, and so on. In the writing function, the types and number of lasts have been expanded, enabling more advanced expressions. We've also added standard module support for post effects.
 			</p>
 			</dd>
 
@@ -112,6 +114,7 @@ Many materials have been expanded in the HSPTV folder as freely usable materials
 HSP3 official character "Tamane", professional student collaboration materials, etc.
 It can be widely used mainly for games.
 A new sample script is also included, and you can freely use it to create your own original work.
+<a href="https://dev.onionsoft.net/seed/webdish.html" target="_blank"> "WebDish" </a>, a service that allows you to publish web applications using HSPTV materials, has also been published. increase.
 			</p>
 			</dd>
 
@@ -162,7 +165,7 @@ If "mesopt_nocr + mesopt_shadow" is specified, the display will be shaded and wi
 
 <h2 id = "DISHOBJ"> About the placement object of HSP3Dish </h2>
 		<p>
-In HSP3Dish and HGIM G4 runtimes, checkboxes, input boxes
+In HSP3Dish and HGIM G4 runtime, check boxes, input boxes
 Support has been added. (Input box is Windows / Linux only) <br>
 You can use chkbox and input instructions in the same way as HSP3. It also supports changing the background color and font set by the objcolor and objmode commands. <br>
 These GUI parts are not parts provided by the OS, but are implemented independently by HSP3Dish.
@@ -182,7 +185,7 @@ p3 (0): Layer ID
 * label: Layer object processing subroutine
 p4 = 0 to (0): Option value
 
-Example:
+ example :
 				layerobj 320,240,objlayer_normal,*laysub,100
 				stop
 			*laysub
@@ -225,8 +228,9 @@ It is equipped with a flexible system. Also, sprite callbacks, map drawing, etc.
 A unique mechanism has also been introduced, making it more convenient than the original HSPDX plugin. <br>
 Coordinates are also managed by integers, making it easy to handle in 2D games and UI displays.
 Of course, you can also use the conventional plug-in for autonomous movement by event list and cooperation with 3D. <br>
-Standard sprites work on all platforms supported by HSP3Dish and HGIMG4, as well as
-We plan to support it in the HSP3 standard runtime as well. <br>
+Standard sprites work on all platforms supported by HSP3Dish and HGIM G4.
+The drawing speed is superior to the standard HSP3 runtime, and in scenes where speed is required such as drawing games.
+It should be the best choice. <br>
 For more information on standard sprites, see <a href="sprite.html"> Standard Sprite Programming Guide </a>.
 		</p>
 
@@ -282,7 +286,7 @@ The rgbcolor instruction for specifying the 24-bit color code has been added. <b
 In the past, each RGB was divided into "color 1, 2, 3" and the parameters were described.
 It can be written in the form of "rgb color $ 010203". <br>
 It is a specification method that has a high affinity with RGB codes such as "# 112233" used on the Web (html). <br>
-The content to be executed is the same for both the color command and the rgbcolor command. The only difference is the way you write the color code.
+The content to be executed is the same for both the color instruction and the rgbcolor instruction. The only difference is the way you write the color code.
 		</p>
 
 
@@ -330,19 +334,19 @@ The actual sample is included as "sample / new36 / strex_test1.hsp" and "sample 
 The first step is to create the string data. The script of strex_test1.hsp writes the character string contained in strex_test2.hsp as character string data to the strex_test2.strmap file.
 This file consists of the strings used and their management information (indicating the location used in the script). <br>
 Edit the strex_test2.strmap file with a text editor, etc., and rewrite the character string that needs to be replaced from this file.
-For example, you can rewrite the character string "*** Hello ***" to "*** Hello ***". It doesn't matter if the length of the string changes. The actually rewritten data "strex_test2en.strmap" is also included in the sample folder. <br>
+For example, you can replace the string "*** Hello ***" with "*** Hello ***". It doesn't matter if the length of the string changes. The actually rewritten data "strex_test2en.strmap" is also included in the sample folder. <br>
 Finally, in the strex_test2.hsp script, replace your own string. By specifying the "strex_test2en.strmap" file, which is the edited character string with the strexchange command, all the character strings in the script are automatically replaced.
 		</p><pre>
 	strexchange "strex_test2en.strmap"
 		</pre><p>
-This allows you to replace the string in the script with something else without modifying it. It is also possible to replace with multiple languages ​​by preparing multiple files for replacement. <br>
+This allows you to replace it with something else without modifying the string in the script. It is also possible to replace with multiple languages ​​by preparing multiple files for replacement. <br>
 If you want to revert to the string in the script without applying the string replacement,
 		</p><pre>
 	strexchange ""
 		</pre><p>
 Please specify an empty string as in.
 The replacement string data file contains a number (hash code) that indicates the original string. This code is matched with the character string in the script to replace it.
-Therefore, please note that the same string will be grouped together as the same hash. <br>
+Therefore, please note that the same string will be grouped as the same hash. <br>
 Also, since the target is the character string in the script, it does not apply when reading an external text file or generating a character string from the character code. <br>
 It is very useful for translation and customization in various situations. Please use all means.
 		</p>
@@ -446,6 +450,28 @@ The 64-bit (x64) runtime only works on 64-bit versions of Windows (Windows 7 and
 		</p>
 
 
+<h2 id = "HSP3C"> Compact (hsp3c) version runtime </h2>
+		<p>
+Compact runtime (hsp3c) up to HSP3.51 starts with standard HSP3
+Some functions were removed, but the functions have not changed since HSP3.6.
+The big difference from the standard runtime is the single thread library with the old compiler
+It was built using it, which reduces file size and memory usage.
+Execution efficiency may decrease in a new OS or CPU environment. <br>
+The standard runtime is built in the latest compiler environment and is efficient in many environments.
+Optimized to work. <br>
+We recommend using the standard runtime unless you have a specific reason to do so.
+However, while the standard runtime supports Windows XP and later behavior,
+The compact runtime supports Windows 98 and later operations. <br>
+		<br>
+When using the compact runtime, specify the following line at the beginning of the script.
+		</p><pre>
+	#include "hsp3c.as"
+		</pre><p>
+Along with this, the multi-threaded runtime (hsp3mt) that was prepared up to HSP3.51 is no longer included.
+Users who used hsp3mt should continue to use the standard HSP3 runtime.
+		</p>
+
+
 <h2 id = "HSPTVSOZAI"> About HSPTV folder material </h2>
 		<p><img src="img/hsp36_rpgmap.png"></p>
 
@@ -458,6 +484,8 @@ I hope that many works will be created by utilizing "HSPTV folder material" and 
 		</p><pre>
 HSP3.6 WebDish material data
 		<a href="https://dev.onionsoft.net/seed/webdish_res.html" target="_blank">https://dev.onionsoft.net/seed/webdish_res.html</a>
+WebDish service
+		<a href="https://dev.onionsoft.net/seed/webdish.html" target="_blank">https://dev.onionsoft.net/seed/webdish.html</a>
 		</pre><p>
 
 <h2 id = "HSPENG"> Support for English interface </h2>
@@ -480,7 +508,7 @@ From HSP3.6, the screen (window) size can be changed by the screen command and b
 	screen p1,p2,p3,p4,p5,p6
 
 p1 = 0 to (0): Window ID
-p2 = 1 to (640): Screen size X to be initialized (in 1-dot units)
+p2 = 1 to (640): Screen size to be initialized X (1 dot unit)
 p3 = 1 to (480): Screen size Y to initialize (1 dot unit)
 p4 = 0 to 1 (0): Screen mode to initialize
 p5 = 0 to (-1): Window layout X (1 dot unit)
@@ -504,7 +532,7 @@ Also note that when resizing the screen, unlike the normal runtime, all image bu
 		<p>
 In HSP3Dish and HGIMG4, the viewcalc instruction that sets the coordinate transformation at the time of drawing has been added. <br>
 The viewcalc instruction is a powerful function that allows you to apply arbitrary calculations to the X and Y coordinates when drawing in 2D.
-You can scale, move, and rotate the entire rendered display.
+You can scale, move, rotate, etc. the entire rendered display.
 		</p><pre>
 	viewcalc p1,p2,p3,p4,p5
 
@@ -521,7 +549,7 @@ Macro name value Content
 vptype_off 0 No coordinate transformation (default)
 vptype_translate 1 Specify movement parameters
 vptype_rotate 2 Specify rotation parameter
-vptype_scale 3 Specify scale parameters
+vptype_scale 3 Specify scale parameter
 vptype_3dmatrix 4 Coordinate transformation by 4 × 4 matrix
 vptype_2d 5 Set 2D coordinate transformation
 vptype_3d 6 Set 3D coordinate transformation
@@ -553,14 +581,14 @@ Create an offscreen buffer by specifying the screen_offscreen option with the bu
 	buffer 2,256,256,screen_offscreen
 		</pre><p>
 Then create a variable buffer to replace the buffer. <br>
-Initialize the one-dimensional array with the dim instruction and create it. The size to be created is X size x Y size of the offscreen buffer.
+Initialize the one-dimensional array with the dim command and create it. The size to be created is X size x Y size of the offscreen buffer.
 		</p><pre>
 	dim bitmap, 256*256
 		</pre><p>
 Now you are ready to use the celbitmap instruction. <br>
-By specifying the ID of the offscreen buffer and the array variable with the celbitmap instruction, the contents of the variable buffer are applied as they are as an image. <br>
+By specifying the ID of the offscreen buffer and the array variable with the celbitmap command, the contents of the variable buffer are applied as they are as an image. <br>
 The variable buffer is 1 dot per element. One dot is RGB format data in which 32-bit elements are stored in 8-bit units for each of R, G, B, and A. (Please note that the order of RGB has changed between 3.6β2 version and 3.6β3 version.) <br>
-For example, if you specify "$ ff204080" (hexagon), then A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses) <br>
+For example, if you specify "$ ff204080" (hexadecimal), A = $ ff (255), B = $ 20 (32), G = $ 40 (64), R = $ 80 (128). (Decimal numbers in parentheses) <br>
 Please note that replacing image data is a costly process and may reduce the frame rate when replacing large size images. <br>
 The p2 parameter allows you to specify the replacement format and behavior.
 		</p><pre>
@@ -580,8 +608,8 @@ When celbitmap_capture is specified, the data on the drawing destination screen 
 		<p>
 The iOS and android versions of HSP3Dish are compatible with their new SDKs.
 		</p><pre>
-iOS version: For XCode 9 or later iOS 13, 64bit compatible
-android version: Android SDK 7.0 (API 24), 64bit compatible,
+iOS version: For XCode 10 or later iOS14, 64bit compatible
+android version: Android SDK 10 (API 29), 64bit compatible,
 SDK r25, NDK r12 or later, AdMob (Google Firebase) compatible
 		</pre><p>
 Both iOS and android versions support 64-bit binary output.
@@ -623,7 +651,7 @@ Explains how to convert model data and animation in cooperation with the 3D tool
 HGIMG4 Unity Cooperation Guide
 	<a href="hgimg4_unity.html" target="_blank">doclib/hgimg4_unity.html</a>
 		</pre><p>
-"Professional student demo" (sample / pronama3d) made using this cooperation
+The "Professional Student Demo" (sample / pronama3d) created using this collaboration is also available.
 It is included as a sample.
 		</p>
 		<br>
@@ -662,13 +690,14 @@ Images Images can be reused as textures from shaders.
 
 By reusing the contents drawn on the off-screen as a texture, detailed specular reflection (reflection),
 It can be applied to the generation of shadows. <br>
+A mod_posteffect module that makes it easy to use post effects using this function is provided as standard. This allows you to apply effects such as color adjustment, blurring, glowing, and contour extraction to the entire screen. <br>
 (* Off-screen texture buffer is only supported on Windows, Linux and android platforms)
 		<br>
 		<br>
 <LI> Added parallel projection camera option to gpcamera instruction
 		<br><br>
 A camera type parameter option has been added to the gpcamera instruction to generate a camera.
-By specifying 1 for the camera type value, it is possible to set the camera that performs parallel projection (Orthographic).
+By specifying 1 for the camera type value, it is possible to set a camera that performs parallel projection (Orthographic).
 		<br>
 		<br>
 <LI> Cubemap texture support
@@ -684,7 +713,7 @@ is needed. )
 		<br><br>
 A setobjrender instruction has been added to set the rendering group for an object.
 This allows you to give objects a setting to show / hide for each camera.
-You can also set lighting groups to reflect the lights on each object.
+You can also set a lighting group to reflect the light for each object.
 You can control it.
 		</p><pre>
 	setobjrender id,rendergroup,lightgroup
@@ -720,7 +749,7 @@ Please note that the supported font types, qualities, etc. may vary depending on
 		<br>
 Similar to HSP3Dish, TTF font display draws a font character string on a texture and caches it.
 This method has the advantage of using free fonts and characters, but it is CPU- and memory-intensive when displaying different content over a wide area.
-Displaying values ​​and contents that change every frame increases the load for each frame, so this point is very different from before.
+This is a big difference from before, because displaying the values ​​and contents that change every frame increases the load for each frame.
 It also increases the load when the font size is large or when a large amount of text is displayed on the screen. <br>
 If you do not need to draw in TTF font, you can switch the display in the conventional drawing format by system request.
 		</p><pre>
@@ -728,6 +757,27 @@ If you do not need to draw in TTF font, you can switch the display in the conven
 		</pre><p>
 As shown above, you can switch to the traditional font display by setting SYSREQ_USEGPBFONT to 1 in the system request. (You need to prepare the "res / font.gpb" file) <br>
 Font drawing can be switched at any time by system request.
+		<br>
+		<br>
+<LI> Expansion of lighting function
+		<br><br>
+Up to 10 parallel light sources (directional lights), point light sources (point lights), and spot lights can be placed. You can set any of the affected objects, and you can also control the light parameters. <br>
+For more information, see Instructions such as gplight and gpuselight.
+The sample / hgimg4 folder contains light_test1.hsp to light_test5.hsp as light setting samples, so please check the operation as well.
+		<br>
+		<br>
+<LI> Acquisition of various information
+		<br><br>
+The gppcontact and gppinfo commands have been prepared to acquire detailed information such as coordinates and directions when objects with physical behavior set collide.
+We've also added a gppraytest command to find out which objects touch any vector (two points in space). <br>
+A new gpnodeinfo instruction has been added that allows you to traverse each hierarchy of a complex 3D model with hierarchies.
+You can get the coordinates and rotation information in any node hierarchy, and you can retrieve all the hierarchy information.
+		<br>
+		<br>
+<LI> Free shape generation
+		<br><br>
+A function has been added to create polygon surface information from a script and treat it as an object.
+By combining the gpmeshclear, gpmeshadd, and gpmeshpolygon instructions, you can compose a triangular or quadrilateral face and set the X, Y, Z coordinates, normal vector, texture UV coordinates, etc. of each.
 		<br>
 		<br>
 <LI> Built-in 2D drawing shader

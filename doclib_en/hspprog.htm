@@ -34,7 +34,7 @@
 <li> <a href="#ONEKEY_HELP"> One Key Help </a> </li>
 <li> <a href="#MAKE_EXE"> How to create an executable file </a> </li>
 <li> <a href="#MAKE_SAVER"> Creating a screensaver </a> </li>
-<li> <a href="#START_OPT"> Parsing startup options </a> </li>
+<li> <a href="#START_OPT"> parse boot options </a> </li>
 <li> <a href="#ICONINS"> Rewriting the executable file </a> </li>
 <li> <a href="#SCRIPT_SAMPLE"> HSP script sample </a> </li>
 <li> <a href="#HIDDEN_WINDOW"> Main window hidden EXE file </a> </li>
@@ -60,7 +60,7 @@
 <li> <a href="#STRING"> string </a> </li>
 <li> <a href="#VAR"> Variables </a> </li>
 <li> <a href="#ARRAY"> Array variables </a> </li>
-<li> <a href="#FUNC"> Function </a> </li>
+<li> <a href="#FUNC"> Functions </a> </li>
 <li> <a href="#LABEL"> Label </a> </li>
 <li> <a href="#IF"> Conditional judgment </a> </li>
 <li> <a href="#REPEAT"> Repeat instruction </a> </li>
@@ -100,7 +100,7 @@
 <li> <a href="#PLAY_MULTIMEDIA"> Multimedia playback </a> </li>
 <li> <a href="#VAR_INIT"> Uninitialized variable detection </a> </li>
 <li> <a href="#CONSOLE"> Console version HSP </a> </li>
-<li> <a href="#ON_EVENT"> Interrupt </a> </li>
+<li> <a href="#ON_EVENT"> interrupt </a> </li>
 <li> <a href="#STANDARD_MODNAME"> Standard module name </a> </li>
 <li> <a href="#COMMON_DIR"> Common directory </a> </li>
 <li> <a href="#ERR_MSG"> Error message </a> </li>
@@ -118,7 +118,7 @@
 		<p>
 This manual explains how to program HSP on Windows and general language specifications.
 For those who are new to programming, first read "<a href="beginner/start.htm"> Introduction to HSP for beginners </a>"
-I recommend you to read it. <br>
+Recommended to read. <br>
 In development environments other than the Windows version, the operation may differ, but the basic grammar and operation mechanism of HSP3 do not change even if the platform is different.
 See <a href="hsp3.htm"> HSP3 Overview </a> for more information.
 		</p>
@@ -155,7 +155,7 @@ You can think of it as a simplification.
 In addition to this, C language-like macro instructions such as while ~ have, do ~ until, for ~ next, and switch ~ case are prepared.
 For more information, see <a href="#HSPDEF"> Standard Macro Definition File </a>. </li>
 <li> In addition to being able to define instructions and functions, there is a mechanism for dividing the namespace and reusing the source.
-It is prepared. For more information, see the "<a href="#MODULE"> Modules </a>" section and
+It is prepared. For more information, see the <a href="#MODULE"> Modules </a> section and
 See <a href="module.htm"> Module Feature Guide </a>. </li>
 <li> The created script can be converted to an executable file by pressing [ctrl] + [F9].
 For details, see <a href="#MAKE_EXE"> How to create an executable file </a>. </li>
@@ -265,7 +265,7 @@ HSP executes the script in the following flow.
 <dt> Compile </dt>
 			<dd>
 				<p>
-Parses source scripts (text files) with .hsp extensions
+Parses source scripts (text files) with .hsp extensions and
 Create an object file (AX file) for HSP.
 (The work up to this point is done by the script editor (HSED3.EXE) and the code generator (HSPCMP.DLL))
 				</p>
@@ -327,8 +327,8 @@ HSP extension plug-in is a DLL-based extension that is mainly prepared for HSP.
 HSP extension module adds HSP function like extension plug-in,
 The difference is that it is written in HSP itself without using DLL.
 In either case, by writing the description decided on HSP, new instructions / functions will be added and you will be able to use the functions. <br>
-The HSP full set includes many plug-ins and modules.
-For more information, see <a href="plugin.htm"> Extension Plug-in Module List </a>.
+Many plug-ins and modules are included in the HSP full set.
+See <a href="plugin.htm"> Extension Plug-in Module List </a> for more information.
 		</p>
 
 
@@ -367,7 +367,7 @@ Window display and image manipulation are not supported.
 <dt> HSP3Dish runtime (hsp3dish) </dt>
 			<dd>
 				<p>
-It supports only instructions that can be multi-platform, such as smartphones and tablets.
+Only commands that can be multi-platform, such as smartphones and tablets, are supported.
 In addition to the normal drawing commands, extended commands are available. Also, the drawing speed is improved.
 				</p>
 			</dd>
@@ -376,16 +376,16 @@ In addition to the normal drawing commands, extended commands are available. Als
 				<p>
 It is used when creating an executable file of an application created by the HGIMG4 runtime.
 Normal drawing commands cannot be used, and the dedicated commands provided by HGIMG4 are used.
-HGIMG4 works with upward compatibility with the HSP3Dish runtime.
+HGIMG4 works with upward compatibility with the HSP3 Dish runtime.
 				</p>
 			</dd>
 <dt> Compact HSP Runtime (hsp3c) </dt>
 			<dd>
 				<p>
-COM related features have been removed from the standard HSP3, reducing the file size required for runtime by more than 30%.
-The compact HSP runtime was written with an older compiler with a focus on Windows compatibility and supports a wide range of Windows operating systems, including Windows 9x.
+The compact HSP runtime was written with an older compiler with a focus on Windows compatibility and supports a wide range of Windows operating systems since Windows 98.
 Please use when using the past OS and scripts.
 The compact version is not recommended when using the latest OS. Other runtimes, such as standard HSP3, run more efficiently.
+The compact version of the HSP runtime has the same functions as the HSP3 standard runtime, and there are no restrictions or restrictions.
 				</p>
 			</dd>
 <dt> HSP3UTF runtime (hsp3utf) </dt>
@@ -398,7 +398,7 @@ In addition to handling Unicode format text, it is possible to display a wide ra
 <dt> 64-bit version HSP3 runtime (hsp3_64) </dt>
 			<dd>
 				<p>
-It has the same functions as the normal HSP3 runtime, but it is a runtime that operates as a 64-bit application.
+It has the same functions as a normal HSP3 runtime, but it is a runtime that operates as a 64-bit application.
 Like hsp3utf, all strings are processed in Unicode (UTF8) format.
 It is not compatible with the 32-bit version of the plug-in. In the future, 64-bit compatible plug-ins will be expanded.
 				</p>
@@ -409,7 +409,7 @@ It is not compatible with the 32-bit version of the plug-in. In the future, 64-b
 <h3 id = "GAMEDEV"> Game development with HSP </h3>
 		<p>
 HSP can be used for various purposes, but the most used is for easy game development.
-You can decide whether to use HSP extensions according to the content and usage of the game by referring to the following.
+You can decide whether to use HSP extensions according to the content and purpose of the game by referring to the following.
 		</p>
 		<dl>
 <dt> General 2D games </dt>
@@ -437,9 +437,9 @@ Please refer to the sample scripts in the sample / hsp3dish and sample / sprite 
 			<dd>
 				<p>
 Games that use 3D display often lack functionality with the HSP3 standard runtime alone.
-HSP provides HGIMG3 and HGIMG4 as runtimes for 3D display. HGIMG3 uses DirectX8, which has been supported for a long time, and is currently out of new development.
+HSP provides HGIMG3 and HGIMG4 as runtimes for 3D display. HGIMG3 uses DirectX8, which has been supported for a long time, and new development is currently finished.
 Currently, we are constantly expanding the functions of HGIMG4 to replace it. It uses OpenGL and supports android, iOS, linux, html5 platforms as well as HSP3Dish. <br>
-If you need 3D capabilities, HGIMG4 gives you many modern features such as FBX 3D data display, animation playback, 3D physics engine, post effects, and custom shader usage.
+If you need 3D features, HGIMG4 gives you a lot of modern features such as FBX 3D data display, animation playback, 3D physics engine, post effects, use of custom shaders and much more.
 However, not all GPUs and graphics cards are supported. When operating on an older model before Windows 7, there is a possibility that the phenomenon such as not being able to start or the display becoming strange may occur. <br>
 Please refer to the sample scripts in the sample / hgimg4 and sample / pronama3d folders.
 				</p>
@@ -479,7 +479,7 @@ If the input is blank, it refers to a directory called HSPHELP under HSED3.EXE.
 
 		<p>
 For more information about HSP Docs Library and help files
-See <a href="HSP Docs Library / HDL_Readme.txt"> HDL_Readme.txt </a> "<a href="HSP Docs Library / HS_BIBLE.txt"> HS_BIBLE.txt </a> give me.
+See <a href="HSP Docs Library / HDL_Readme.txt"> HDL_Readme.txt </a> "<a href="HSP Docs Library / HS_BIBLE.txt"> HS_BIBLE.txt </a> please.
 		</p>
 
 
@@ -505,7 +505,7 @@ The above example specifies a file to be added to the packfile.
 The specified file is packed together as a resource when the executable file is created.
 #pack packs in the normal format. #epack is encrypted and packed.
 If you try to add a duplicate file, it will be ignored.
-Since "start.ax" is automatically added when the executable file is automatically created, it is not necessary to specify it as an additional file.
+"Start.ax" is automatically added when the executable file is automatically created, so it is not necessary to specify it as an additional file.
 		</p>
 		<p>
 The files specified by #pack and #epack can be used from the script,
@@ -513,7 +513,7 @@ It will not be visible from the outside. This has the following effects:
 		</p>
 		<ul>
 <li> Protect the image files used in the game from being retrieved </li>
-<li> Eliminate wasted clusters of files and reduce disk space </li>
+<li> Eliminate unnecessary clusters of each file and reduce disk space </li>
 <li> Prevent large amounts of data files from being scattered in the directory </li>
 		</ul>
 
@@ -582,7 +582,7 @@ For details, refer to the section "<a href="#ICONINS"> Rewriting the executable 
 <h3 id = "MAKE_SAVER"> Creating a screen saver </h3>
 		<p>
 HSP allows you to create screen saver modules that can be selected from the Windows Control Panel.
-This is when you create a full screen screen using special instructions and the content drawn there becomes a saver as it is
+This is when you create a full screen screen using special commands and the content drawn there becomes a saver as it is.
 So, you can create a normal script with a little tweaking.
 For more information on screen savers, see the directory containing the sample files.
 Try opening the "arusave.hsp" file in "ssaver".
@@ -599,7 +599,7 @@ The window size of the screen saver setting screen (ID0) is different from the n
 It is fixed to the window size set when the screen saver was created.
 		</p>
 
-<h3 id = "START_OPT"> parse startup options </h3>
+<h3 id = "START_OPT"> parse boot options </h3>
 		<p>
 With HSP, you can take in startup options and process them accordingly with a script.
 As a result, an EXE with various functions can be called from a batch file, or on the EXE file icon.
@@ -621,7 +621,7 @@ By preparing a custom icon file, you can freely rewrite the executable file icon
 You can also apply version information, manifests, language codes, UPX compression, etc. to executable files.
 		</p>
 		<p>
-It is possible to describe the information to be applied by the #packopt instruction in the source script when performing "automatic execution file creation". <br>
+When performing "automatic execution file creation", it is possible to describe the information to be applied by the #packopt command in the source script. <br>
 The icons, version, manifest, lang, and upx keywords specified by the #packopt instruction rewrite the executable file using the iconins tool after the executable file is generated.
 		</p>
 <pre>
@@ -631,7 +631,7 @@ The icons, version, manifest, lang, and upx keywords specified by the #packopt i
 	#packopt version "test.txt"
 // Set "1" when compressing using UPX
 	#packopt upx "1"
-// Specify language Default is Japanese (1041) Decimal number
+// Specify language Default is Japanese (1041) Described in decimal
 	#packopt lang "1041"
 </pre>
 		<p>
@@ -712,7 +712,7 @@ This option normally does not need to be turned on.
 The normal operation when starting an executable file is in the directory containing the started EXE file.
 The current directory (working directory) is adjusted. That is, system variables
 dir_cur and dir_exe are in the same location.
-For special circumstances such as wanting to reflect the working folder specified by shortcut activation,
+For special circumstances such as wanting to reflect the working folder specified by starting the shortcut,
 Turn this switch on only if you do not want to change the current directory at startup.
 		</p>
 		<p>
@@ -749,7 +749,7 @@ It also shows system variables such as gosub and loop nesting levels (depths).
 				<p>
 Displays the contents of the defined variables.
 If you check the "Show array variables" checkbox, the contents of the array will be displayed.
-Display in a list. Also, check the "Dump Variables" checkbox.
+Display in a list. Also, check the "Dump variable" checkbox.
 By inserting it, the contents of the variable buffer will be displayed in hexadecimal.
 Variable dumps and array displays are too large
 If the variable is, not all may be displayed.
@@ -769,7 +769,7 @@ The variable name list is sorted alphabetically, making it easier to search.
 <dt> log </dt>
 			<dd>
 				<p>
-Displays the message sent by the logmes instruction.
+Displays the messages sent by the logmes instruction.
 You can check messages for debugging.
 				</p>
 			</dd>
@@ -869,7 +869,7 @@ For more information on AHT, please refer to the separate document aht.txt.
 
 <h3 id = "PEAS_EDITOR"> Peas Editor </h3>
 		<p>
-Another scripting environment <em> Peas editor </em> that replaces the script editor
+Another scripting environment <em> Peas Editor </em> that replaces the script editor
 It is included. This can be done by selecting "Peas Editor" from the menu or directly
 Start it from "ahtman.exe" and use it.
 		</p>
@@ -900,7 +900,7 @@ To run the standard HSP3 runtime on a unicode (UTF-8) character basis
 The HSP3UTF runtime (hsp3utf.exe) is included. <BR>
 It has the same function as the normal HSP3 runtime, but only handles strings.
 It is unicode (UTF-8).
-It is possible to handle characters that cannot be expressed by the standard HSP that handles SJIS character codes.
+Handles SJIS character codes Can handle characters that cannot be expressed by standard HSP
 We plan to continue improving it as the new HSP3.
 If you want to use it, specify the following line at the beginning of the script.
 		</p>
@@ -996,7 +996,7 @@ I am explaining.
 <h3 id = "DESCRIPTION_FORM"> Instruction format </h3>
 		<p>
 The script summarizes what to do in what order
-It is a text file. Instruct what kind of processing to do in it
+This is a text file. Instruct what kind of processing to do in it
 Things are called statements.
 		</p>
 		<p>
@@ -1023,11 +1023,11 @@ Will be done.
 		<p>
 In HSP, the basic format is to add a parameter after the instruction.
 There must be a space between the parameter added to the instruction and the instruction.
-I will. If there are multiple parameters, separate them with ", (comma)".
+increase. If there are multiple parameters, separate them with ", (comma)".
 		</p>
 		<p>
 For example, the script <code> width 640,480 </code>
-"Width" is the instruction (statement), and the numbers 640 and 480 are the parameters.
+"Width" is the statement, and the numbers 640 and 480 are the parameters.
 This combination means "make the window size 640x480".
 		</p>
 		<p>
@@ -1063,15 +1063,15 @@ Parameters that must be variable names may not be omitted.
 
 <h3 id = "MULTI_STATEMENT"> Multi-statement </h3>
 		<p>
-It is also possible to write multiple instructions on one line by separating the instructions with a: (half-width colon).
-Is possible. This is called a multi-statement. For example
+Multiple instructions can be written on one line by separating the instructions with a: (half-width colon).
+Is possible. This is called a multi-statement. for example,
 		</p>
 <pre>; Example:
     mes "Hello": mes "Goodbye" </pre>
 		<p>
-Is
+teeth,
 		</p>
-<Pre> mes "Hello"
+<pre> mes "Hello"
     mes "Goodbye" </pre>
 		<p>
 It is the same as writing like.
@@ -1084,14 +1084,14 @@ There is no limit to the length of one line, but it is better to fit it in a tex
 In one line, after; (half-width semicolon) is regarded as a comment (annotation) and ignored.
 		</p>
 <pre>; Example
-    pos 320,100: mes "(^_^)"; Emoticon display </pre>
+    pos 320,100: mes "(^_^)"; Face mark display </pre>
 		<p>
 You can write comments in the same way as C and Java.
 After // (double slash) in one line, it is regarded as a comment and ignored.
 Between "/ *" and "* /", it is regarded as a comment and ignored.
 		</p>
 <pre>; Example
-    pos 320,100: mes "(^_^;)" // Emoticon display
+    pos 320,100: mes "(^_^;)" // Face mark display
     / * This is a comment * / goto * start </pre>
 		<p>
 Spaces and tabs can be freely inserted for easy viewing.
@@ -1101,18 +1101,18 @@ Spaces and tabs can be freely inserted for easy viewing.
 <h3 id = "EXPRESSION"> Expression </h3>
 <!-Changed the expression to "data and operator" instead of just "operator". 08/01/26 eller->
 		<p>
-Where to specify instruction parameters, use expressions that include the following data and operators:
+Where to specify the parameters of the instruction, put an expression containing the following data and operators
 I can write.
 		</p>
 <table class = "keywordlist" summary = "Introduces the data that can be used with HSP in list format.">
 <caption> List of data available for HSP </caption>
 <tr> <th> Data </​​th> <th> Type </th> </tr>
 <tr> <td> -2147483648 to 2147483647 </td> <td> Decimal integer (32 bits) </td> </tr>
-<tr> <td>-???. ??? ~ ???. ??? </td> <td> Decimal real number (64-bit double precision) </td> </tr>
+<tr> <td>-???. ??? ~ ???. ??? </td> <td> Decimal real numbers (64-bit double precision) </td> </tr>
 <tr> <td> $ 0 ~ $ FFFFFFFF </td> <td rowspan = "2"> Hexadecimal integer </td> </tr>
 <tr> <td> 0x0 ~ 0xffffffff </td> </tr>
 <tr> <td>% 0 to% 111111 ... </td> <td rowspan = "2"> binary integer </td> </tr>
-<tr> <td> 0b0 ~ 0b111111 ... </td> </tr>
+<tr> <td> 0b0 to 0b111111 ... </td> </tr>
 <tr> <td>'A' </td> <td> Character code (8-bit integer value) </td> </tr>
 <tr> <td> "string" </td> <td> string </td> </tr>
 <tr> <td> Variables </td> <td> Keywords that hold values ​​</ td> </tr>
@@ -1124,7 +1124,7 @@ I can write.
 <tr> <td> +,-, *, / </td> <td> Addition, subtraction, multiplication, division </td> </tr>
 <tr> <td> & amp;, |, ^ </td> <td> Logical operation (and, or, xor) </td> </tr>
 <tr> <td> \\ </td> <td> Division remainder </td> </tr>
-<tr> <td> =, & lt;, & gt;,! </Td> <td> Conditional expression (same, small, large, not the same) </td> </tr>
+<tr> <td> =, & lt;, & gt;,! </Td> <td> Conditional expressions (same, small, large, not the same) </td> </tr>
 <tr> <td> ==, & lt; =, & gt; =,! = </td> <td> Conditional expression 2 (same, less, more, not the same) </td> </tr>
 <tr> <td> & lt; & lt;, & gt; & gt; </td> <td> Bit shift to the left and right </td> </tr>
 		</table>
@@ -1162,19 +1162,19 @@ You can also use a function in the expression to process the entered value.
 		<p>
 It is also possible to write expressions that mix integer values, real numbers, strings, and functions.
 In that case, the later terms are type-converted to match the first term to be calculated.
-For example, a calculation like "8 + 4.5" will be treated as 4 (integer) with 4.5 as the first 8 (integer).
+For example, a calculation like "8 + 4.5" will be treated as 4 (integer), and 4.5 will be treated as 4 (integer) to match the first 8 (integer).
 On the contrary, in the case of "4.5 + 8", the calculation result is 12.5, which is adjusted to 4.5 (real number).
 		</p>
 		<p>
 Whether a number is an integer or a real number is distinguished by the presence or absence of a decimal point.
-When performing a real number type operation, explicitly add a decimal point such as "8.0 + 4.5".
+When performing an operation with a real number type, explicitly add a decimal point such as "8.0 + 4.5".
 You need to put it in.
 It is also possible to express a real number with a large digit by specifying the exponent part after "e" such as "1.0e + 10".
 However, be aware that handling real numbers is more costly in terms of memory efficiency and speed than integer values.
 		</p>
 		<p>
 Characters enclosed in'(single-byte single quotation marks) are interpreted as integer values ​​indicating the character code.
-Even if you specify a long character string or double-byte character, only the first byte is interpreted as a code.
+Even if you specify a long character string or double-byte characters, only the first byte is interpreted as a code.
 		</p>
 		<p>
 In the case of <code>'A' </code>, it is the character code (65) indicating "A".
@@ -1186,7 +1186,7 @@ To indicate the character code of "\\", specify <code>'\\\\' </code>.
 
 <h3 id = "STRING"> string </h3>
 		<p>
-In the place where the character string is specified in the instruction parameter, enclose the character string in "(half-width double quotation marks)".
+In the place where a character string is specified as an instruction parameter, enclose the character string in "(half-width double quotation marks)".
 You can write a string.
 		</p>
 <pre>; Example:
@@ -1257,7 +1257,7 @@ You can work with variables with any name. Variables are contents by assignment
 It's like a container that can change.
 		</p>
 		<p>
-The variable is a character string of 59 characters (half-width) or less starting with alphabet or Japanese.
+The variable is a character string of 59 characters (half-width) or less starting with the alphabet or Japanese.
 Will be identified. Variables can store various information such as numerical values ​​and character strings by assignment.
 You can also use array variables to index and store multiple pieces of information within a single variable.
 		</p>
@@ -1320,7 +1320,7 @@ Simple addition and subtraction can also be done in the following format:
     a-; Subtract 1 from variable a </pre>
 		<p>
 +1 and -1 are executed by adding "+" or "-" to "variable".
-(The same result can be obtained with formats compatible with C and Java, a ++ and a--, but they cannot be used in expressions.)
+(The same result is obtained with formats compatible with C and Java, a ++ and a--, but they cannot be used in expressions.)
 		</p>
 		<p>
 You can force a variable type change to determine the variable type. The functions for that are int and str.
@@ -1333,7 +1333,7 @@ You can force a variable type change to determine the variable type. The functio
 Even if you change the type of a variable, it tries to keep its contents as much as possible.
 		</p>
 		<p>
-If you change a variable that contains the string "123" to a numeric type, it will be a number 123,
+If you change a variable that contains the string "123" to a number type, it will be a number 123,
 Conversely, if you change a numeric variable called 123 to a string type, it will be converted to a string called "123".
 		</p>
 		
@@ -1411,7 +1411,7 @@ If you want to use an expression for an element, you need to enclose it in paren
 		<p>
 If you want to use an array for a string type variable, use the sdim instruction.
 In the sdim instruction, first specify the initial number of characters in the character string to be handled, and then set the number of elements.
-Specify. For example
+Specify. for example,
 		</p>
 <pre>; Example
     sdim a, 32,5; Variable a can handle strings up to 32 characters with 5 elements
@@ -1425,7 +1425,7 @@ You can also use the sdim instruction to secure the initial number of characters
     sdim a, 200; Variable a can handle strings up to 200 characters </pre>
 		<p>
 This is a regular variable, not an array variable.
-When the data assigned to the character string type variable exceeds the initial number of characters
+If the data assigned to the string type variable exceeds the initial number of characters
 Most of the time you don't have to worry about the initial number of characters, as it will be re-allocated automatically.
 There is no case.
 		</p>
@@ -1479,11 +1479,11 @@ The following functions are provided as standard in HSP3.
 <tr> <td> dirinfo </td> <td> string </td> <td> return specific directory information </td> </tr>
 <tr> <td> peek </td> <td> integer </td> <td> fetch value from buffer </td> </tr>
 <tr> <td> wpeek </td> <td> integer </td> <td> fetch value from buffer </td> </tr>
-<tr> <td> lpeek </td> <td> integer </td> <td> Fetch value from buffer </td> </tr>
+<tr> <td> lpeek </td> <td> integer </td> <td> fetch value from buffer </td> </tr>
 <tr> <td> double </td> <td> real </td> <td> Convert parameters to real </td> </tr>
-<tr> <td> sin </td> <td> real number </td> <td> return sine value (parameter unit is radian) </td> </tr>
+<tr> <td> sin </td> <td> real number </td> <td> returns a sine value (parameter unit is radians) </td> </tr>
 <tr> <td> cos </td> <td> Real number </td> <td> Returns a cosine value (parameter unit is radians) </td> </tr>
-<tr> <td> tan </td> <td> Real number </td> <td> Returns a tangent value (parameter unit is radians) </td> </tr>
+<tr> <td> tan </td> <td> Real number </td> <td> Returns tangent value (parameter unit is radian) </td> </tr>
 <tr> <td> atan </td> <td> real number </td> <td> return arctangent value </td> </tr>
 <tr> <td> sqrt </td> <td> real number </td> <td> return root (square root) value </td> </tr>
 <tr> <td> logf </td> <td> real number </td> <td> return logarithmic value </td> </tr>
@@ -1530,9 +1530,9 @@ After that, the variable a is treated as a label type variable, and in the place
 You will be able to specify a label type variable.
 		</p>
 		<p>
-The following is an example of a sample script that uses a label type.
+The following is an example of a sample script using the label type.
 		</p>
-<pre>; Testing label variables
+<pre>; Testing labeled variables
 ;
     ldim a,2
     mes "TYPE="+vartype(a)
@@ -1554,7 +1554,7 @@ The following is an example of a sample script that uses a label type.
 		<p>
 The label type variable gets the type value "1" by the vartype function.
 You can also use the varuse function to determine if a valid label has been assigned.
-An array of label type variables can be reserved by specifying <code> ldim a, 20 </code>.
+An array of label variables can be reserved by specifying <code> ldim a, 20 </code>.
 		</p>
 		<p>
 Labeled variables make it difficult to see where the script jumps and make it difficult to understand the whole thing.
@@ -1603,13 +1603,13 @@ Continue execution from the next line.
     a=10
     if a = 10: mes "a is 10." </pre>
 		<p>
-In the above example, the "a = 10" part is the conditional expression. Mainly for conditional expressions
+In the above example, the part "a = 10" is the conditional expression. Mainly for conditional expressions
 		</p>
 <table class = "keywordlist" summary = "Introduces conditional expressions that can be used with HSP in list format.">
 <caption> List of conditional expressions available for HSP </caption>
 <tr> <th> Conditional expression </th> <th> Meaning </th> </tr>
 <tr> <td> a = b </td> <td> a and b are equal </td> </tr>
-<tr> <td> a! B </td> <td> a and b are not equal </td> </tr>
+<tr> <td> a! b </td> <td> a and b are not equal </td> </tr>
 <tr> <td> a & lt; b </td> <td> a is less than b </td> </tr>
 <tr> <td> a & gt; b </td> <td> a is greater than b </td> </tr>
 <tr> <td> a & lt; = b </td> <td> a is less than or equal to b </td> </tr>
@@ -1637,7 +1637,7 @@ This allows you to write multiple conditions at once.
     a=10:b=20
     if a = 10 | b = 10: mes "either a or b is 10." </pre>
 		<p>
-In the above example, the conditional expressions "a = 10" and "b = 10" are connected by | (or),
+In the above example, connect the conditional expressions "a = 10" and "b = 10" with | (or),
 If either is correct, the result is correct.
 Logical operations can be described by the strings "or" and "and" in addition to the symbols "|" and "& amp;".
 		</p>
@@ -1673,7 +1673,7 @@ It is also possible to write the processing when the condition is not satisfied 
 		<p>
 In this case, up to a certain part of the else instruction is executed when the conditions are met,
 After the else instruction, it is executed when the condition is not met.
-From the next line onward, it will be executed normally regardless of the conditions.
+The following lines will be executed normally regardless of the conditions.
 		</p>
 		<p>
 It is also possible to execute the conditional judgment in multiple lines.
@@ -1743,7 +1743,7 @@ With HSP, multiplexing up to 128 layers is possible.
 
 <h3 id = "REPEAT"> Repeat instruction </h3>
 		<p>
-The repeat ~ loop instruction is an important instruction that is indispensable for repeating operations with HSP.
+The repeat ~ loop instruction is an important instruction that is indispensable for repeating operation with HSP.
 		</p>
 <pre>; Example
     repeat 5
@@ -1754,7 +1754,7 @@ If you specify the number of times after the repeat instruction, the loop instru
 During the iteration, the system variable cnt is automatically counted up as 0, 1, 2, 3 ...
 		</p>
 		<p>
-If 0 is specified for the number of iterations, the range from repeat to loop will be passed without being executed.
+If 0 is specified for the number of repetitions, the range from repeat to loop is passed without being executed.
 Also, if you omit the repetition count specification or specify a negative value, an infinite loop will occur.
 By combining the repeat ~ loop instruction with the break and continue instructions, more advanced processing becomes possible.
 		</p>
@@ -1819,7 +1819,7 @@ When the above script is executed,
 You can see that the mes instruction is not executed only when the system variable cnt is 2.
 It may be confusing at first, but the continue instruction is not the location of the loop instruction, but it works the same as the loop instruction.
 I can say.
-The repeat counter is incremented by 1 even when the continue instruction is executed, as with the loop instruction.
+The repeat counter is incremented by 1 when the continue instruction is executed, just like the loop instruction.
 If the continue instruction is executed at the last iteration, the repeat ~ loop is finished, that is, from the instruction following the loop instruction.
 Continue running.
 		</p>
@@ -1882,7 +1882,7 @@ When the program control moves to another place by the goto instruction etc. fro
 The next time you execute the repeat instruction again, it will be repeated multiple times.
 Be sure to end the loop normally or exit the repeat ~ loop instruction with the break instruction.
 please. If you escape with the goto instruction, a multiple loop will occur and an error will occur.
-The repeat to loop instructions can normally be repeated up to 32 multiple times.
+The repeat to loop instructions can normally be repeated up to 32 in multiples.
 		</p>
 
 
@@ -1904,7 +1904,7 @@ Text files that can be loaded and saved with a text editor, etc.
 It can be said that it is a character string containing such multiple lines.
 It is possible to extract and modify these character strings line by line with the memory notepad instruction.
 		</p>
-<table summary = "Memory notepad instructions are listed in list format." Class = "keywordlist">
+<table summary = "Memory notepad instructions are listed in a list format." Class = "keywordlist">
 <caption> Memory notepad instruction list </caption>
 <tr> <th> Instructions </th> <th> Main Functions </th> <th> Remarks </th> </tr>
 <tr> <td> notesel </td> <td> Specify variables to be treated as memory notepads </td> <td> </td> </tr>
@@ -1915,7 +1915,7 @@ It is possible to extract and modify these character strings line by line with t
 <tr> <td> notesave </td> <td> Export content to file </td> <td> </td> </tr>
 <tr> <td> noteunsel </td> <td> Revert to previously selected variable </td> <td> </td> </tr>
 <tr> <td> noteinfo </td> <td> Get information about memory notepads </td> <td> </td> </tr>
-<tr> <td> notemax </td> <td> Get the total number of rows </td> <td> Use as a macro </td> </tr>
+<tr> <td> notemax </td> <td> Get the total number of lines </td> <td> Use as a macro </td> </tr>
 <tr> <td> notesize </td> <td> Get the total size (in bytes) </td> <td> Use as a macro </td> </tr>
 <tr> <td> notefind </td> <td> Find lines containing a specific string </td> <td> Used as a function </td> </tr>
 		</table>
@@ -1963,7 +1963,7 @@ Use the noteadd instruction to add content. "Note add" POTATO "" adds "POTATO" t
 		<pre>noteadd "POTATO",1</pre>
 		<p>
 If you specify, it will be added to the position of index 1.
-The contents that were in index 1 or later will be shifted downward. Also,
+Contents that were in index 1 or later will be shifted downward. also,
 		</p>
 		<pre>noteadd "POTATO",1,0</pre>
 		<p>
@@ -2043,16 +2043,16 @@ The sort instruction set is a group of instructions for sorting numbers and char
 It makes it easy to process multiple data and character strings efficiently.
 		</p>
 		</p>
-<table summary = "The sort instruction set is introduced in list format." Class = "keywordlist">
+<table summary = "Introduces the sort instruction set in list format." Class = "keywordlist">
 <caption> Sort instruction set list </caption>
 <tr> <th> Instructions </th> <th> Main Functions </th> <th> Remarks </th> </tr>
 <tr> <td> sortval </td> <td> Sort array variables numerically </td> <td> </td> </tr>
 <tr> <td> sortstr </td> <td> Sort array variables by string </td> <td> </td> </tr>
 <tr> <td> sortnote </td> <td> Sort memory note strings </td> <td> </td> </tr>
-<tr> <td> sort get </td> <td> Get the index of the sort source </td> <td> Get it after sorting </td> </tr>
+<tr> <td> sort get </td> <td> Get index of sort source </td> <td> Get after sorting </td> </tr>
 		</table>
 		<p>
-Numbers are sorted for integer values ​​or real values ​​assigned to array variables.
+Numbers are sorted for integer values ​​or real numbers assigned to array variables.
 		</p>
 		<pre>
 		dim n,10
@@ -2073,7 +2073,7 @@ When the instruction is executed, the entire contents of the array variable are 
 The sort order can be specified with the second parameter. If it is 0, it is sorted in ascending order of character code, and if it is 1, it is sorted in descending order of character code.
 		</p>
 		<p>
-In addition, the sortnote instruction for sorting the character string with line breaks specified by the memory notepad instruction (notesel) is prepared and can be used properly according to the purpose. <br>
+In addition, the sortnote command for sorting the character string with line breaks specified by the memory notepad command (notesel) is prepared and can be used properly according to the purpose. <br>
 After the sort instruction is executed, you can use the noteget instruction to find out the original position.
 This is to find out in which position (index) the item of the sort result executed immediately before was originally located.
 		</p>
@@ -2104,11 +2104,11 @@ It is possible to assign values ​​to some system variables with the return i
 <tr> <td> err </td> <td> Error code </td> </tr>
 <tr> <td> stat </td> <td> General-purpose system variable to assign the status of various instructions </td> </tr>
 <tr> <td> mousex </td> <td> Mouse cursor X coordinate </td> </tr>
-<tr> <td> mousey </td> <td> Y coordinate of mouse cursor </td> </tr>
+<tr> <td> mousey </td> <td> Mouse cursor Y coordinate </td> </tr>
 <tr> <td> mousew </td> <td> mouse wheel value </td> </tr>
 <tr> <td> strsize </td> <td> Number of bytes read by getstr instruction </td> </tr>
 <tr> <td> refstr </td> <td> General-purpose system variable that stores strings </td> </tr>
-<tr> <td> refdval </td> <td> General-purpose system variable that stores real numbers </td> </tr>
+<tr> <td> refdval </td> <td> General-purpose system variables that store real numbers </td> </tr>
 <tr> <td> looplev </td> <td> repeat ~ loop nesting level </td> </tr>
 <tr> <td> sublev </td> <td> Subroutine (module) nesting level </td> </tr>
 <tr> <td> wparam </td> <td> Windows system values ​​saved on interrupt (wParam) </td> </tr>
@@ -2145,7 +2145,7 @@ It is possible to assign values ​​to some system variables with the return i
 <tr> <td> ginfo_dispx </td> <td> X size of the entire desktop </td> </tr>
 <tr> <td> ginfo_dispy </td> <td> Y size of the entire desktop </td> </tr>
 <tr> <td> ginfo_cx </td> <td> X coordinate of current position </td> </tr>
-<tr> <td> ginfo_cy </td> <td> Y coordinate of the current position </td> </tr>
+<tr> <td> ginfo_cy </td> <td> Y coordinate of current position </td> </tr>
 <tr> <td> ginfo_intid </td> <td> Window ID at message interrupt </td> </tr>
 <tr> <td> ginfo_newid </td> <td> Unused window ID </td> </tr>
 <tr> <td> dir_cur </td> <td> Current directory (folder) </td> </tr>
@@ -2219,7 +2219,7 @@ It will be possible to do.
 		</p>
 		<p>
 To master the HSP module, module specification instruction, user extension instruction
-You need to remember about such things. These are useful functions even by themselves.
+You need to remember about such things. These are useful functions even by themselves
 It is an instruction to provide. Don't try to remember all at once, one by one from what you know
 Let's master it.
 		</p>
@@ -2230,7 +2230,7 @@ This is very powerful even if it is used alone apart from the HSP module functio
 Will be.
 		</p>
 
-<h3 id = "USERDEF_COMMAND"> User-defined command </h3>
+<h3 id = "USERDEF_COMMAND"> User-defined instructions </h3>
 <p> User-defined instructions are used as follows. </p>
 <pre>; Example
     goto *main
@@ -2433,13 +2433,13 @@ As an example of the caller, let's create the following script.
     repeat a
         test1
     loop
-    contents of mes "a =" + a
+    mes "content of a =" + a
     stop</pre>
 		<p>
-If you think of it as a normal subroutine call, the name of the variable a is even in test1.
+Think of it as a normal subroutine call, even if the name of variable a is in test1
 It is being used and should not work properly.
 However, because the sources are separated using module definition instructions
-The variable a inside the module and the variable a outside are treated as different
+The variable a inside the module and the variable a outside are treated as different things.
 So the above script works fine.
 		</p>
 		<p>
@@ -2494,7 +2494,7 @@ is needed.
 In the above example, a module called a has three variables, x, y, and z.
 The #module instruction defines a space with the name "a" as before.
 In 3.0, it is possible to define a variable corresponding to the name "a".
-You can do it. In the sense of the variables x, y, z used by module "a"
+You can do it. In the sense of the variables x, y, z used by the module "a"
 These x, y, z are called module variables.
 		</p>
 		<p>
@@ -2513,7 +2513,7 @@ It is also possible to prepare an instruction for initialization.
     x=1:y=2:z=3
     return</pre>
 		<p>
-The above example defines a routine (constructor) for initializing module variables.
+The above example defines a routine (constructor) for module variable initialization
 is. Initialization routines defined by #modinit are per module
 You can write only one.
 Modules with #modinit defined automatically when using the newmod instruction
@@ -2549,7 +2549,7 @@ To call, first specify a modular variable as an instruction argument
 is needed.
 		</p>
 		<p>
-In other words, in order to call the instruction viewxyz,
+In other words, in order to call the command viewxyz,
 		</p>
 		<pre>#module a x,y,z
 #modinit int p1,int p2,int p3
@@ -2599,7 +2599,7 @@ Conversely, you can also delete the array element stored by the newmod instructi
 In the above example, the content corresponding to element 0 of the variable v is deleted.
 The deleted element can no longer be used, and a new newmod instruction is executed.
 It will be reused when it is done.
-Also, if necessary, when the module variable is destroyed by the delmod instruction.
+Also, if necessary, when the module variable is destroyed by the delmod instruction
 It is also possible to define routines (destructors) that are called automatically.
 		</p>
 		<pre>#modterm
@@ -2613,7 +2613,7 @@ can do.
 <pre> if varuse (v (0)) = 0: mes "v (0) is not used" </pre>
 		<p>
 Also, how much the elements of the array can be used can be obtained with the length function.
-I can do it.
+can.
 		</p>
 <pre> mes "Maximum array element =" + length (v) </pre>
 		<p>
@@ -2628,7 +2628,7 @@ During the iteration, the system variable cnt changes as the value of the elemen
 The system variable cnt skips elements deleted by the delmod instruction.
 		</p>
 		<p>
-In other words
+in short,
 		</p>
 		<pre>    foreach v
         viewxyz v(cnt)
@@ -2664,7 +2664,7 @@ To do.
 		<p>
 Preprocessor instructions are usually for one line starting with "#",
 Preprocessor lines ending in "\\" continue to the next line.
-It can be used when making a definition that does not fit on one line.
+It can be used when defining a definition that does not fit on one line.
 		</p>
 <pre>; Example
 #define aaa mes "AAA"\
@@ -2681,7 +2681,7 @@ The instructions provided as preprocessor instructions are as follows.
 		<p>
 The file specified by "filename" is also compiled at the same time.
 		
-Scripts that cannot fit in the script editor can be included in a separate file
+Scripts that cannot fit in the script editor can be included in a separate file.
 If you split it, you will be able to compile it.
 		</p>
 <pre> #define new name Original name [Register new name] </pre>
@@ -2697,7 +2697,7 @@ Must be an alphabetic string with no spaces.
     stop</pre>
 		<p>
 After #define as above, separate the new name and the original name with a space.
-To do. Then, the instruction "pr" is newly registered, and the instruction "print" is added.
+To do. Then, the command "pr" is newly registered, and the command "print" is displayed.
 You will be able to use it in exactly the same way.
 		</p>
 		<p>
@@ -2730,7 +2730,7 @@ The above example converts "reset a" to a script called "a = 10".
 Many other options are available, including special expansion parameters.
 For more information, see the <a href="#DEFINE_MACRO"> #define macro </a> section.
 		</p>
-<pre> # const macro name Numerical expression [constant definition of macro name] </pre>
+<pre> #const Macro name Numerical expression [Constant definition of macro name] </pre>
 		<p>
 Sets the replacement character string with the specified macro name.
 Similar to #define, but #const is for replacing constants (numeric values)
@@ -2778,7 +2778,7 @@ Specifies compile ON / OFF.
 #if turns off the subsequent compilation output if the specified number is 0.
 Ignore the compilation result. If the value is other than 0, the output will be ON.
 This compile control targets the period until #endif appears.
-#endif exists as a pair in any of #if, #ifdef, and #ifndef
+#Endif exists as a pair in any of #if, #ifdef, and #ifndef
 is needed.
 		</p>
 <pre>; Example
@@ -2855,7 +2855,7 @@ It doesn't matter if you don't have it.
 		</p>
 
 
-<h3 id = "DEFINE_MACRO"> About the #define macro </h3>
+<h3 id = "DEFINE_MACRO"> About #define macro </h3>
 		<p>
 I want to customize the #define macro so that it is easy for individuals to write scripts.
 It is used in cases and is not suitable for beginners. The functions described here are also
@@ -2957,7 +2957,7 @@ The special expansion macro has the following types and functions.
 <tr> <td>% t </td> <td> Set tag name </td> </tr>
 <tr> <td>% n </td> <td> Generate a unique label name </td> </tr>
 <tr> <td>% i </td> <td> Generate a unique label name and put it on the stack </td> </tr>
-<tr> <td>% o </td> <td> Get the strings on the stack </td> </tr>
+<tr> <td>% o </td> <td> Extract the string on the stack </td> </tr>
 <tr> <td>% p </td> <td> Extract the character string on the stack (maintain the stack) </td> </tr>
 <tr> <td>% s </td> <td> Put argument parameters on the stack </td> </tr>
 <tr> <td>% c </td> <td> Line breaks </td> </tr>
@@ -3012,7 +3012,7 @@ It has been realized. If you use this method, the label names will overlap even 
 You can build a loop structure that never happens.
 Also, all stacks are pulled out in one source script file
 Macros (tag names) that are missing will report an error at compile time.
-Be sure to configure macro instructions so that all stacks are fetched and finished
+Be sure to configure the macro instruction so that all the stacks are fetched and finished.
 Please keep it.
 		</p>
 		<p>
@@ -3106,7 +3106,7 @@ You can also restart from the beginning of the repeat with _continue and escape 
 <h4> while ~ wend macro </h4>
 			<p>
 Repeats from while to end only as long as the conditions following while are met.
-If the condition is not met, it will not execute from while to end.
+If the condition is not met, it will not execute from while to wend.
 If the condition following while is omitted, it will be repeated infinitely.
 You can restart from the beginning of the repeat with _continue and escape the repeat with _break.
 			</p>
@@ -3123,7 +3123,7 @@ If is specified as a parameter, it repeats between for and next a specified numb
 Values ​​in parentheses are omitted. The variable name cannot be omitted.
 Using the specified variable as a counter, starting from the initial value,
 The increment is added each time it is repeated. When the closing price is reached,
-Exit from repetition (close price is not included in the loop).
+Exit the iteration (close price is not included in the loop).
 			</p>
 			<p>
 If the closing price condition is met from the beginning, the iteration will not be executed.
@@ -3161,7 +3161,7 @@ Multiple cases can be described in the block, and the processing for each compar
 You can specify it.
 If the case comparison is correct, execute subsequent instructions until swbreak exists.
 Also, if you put <code> default </code> instead of case,
-If the condition does not meet any of the comparison values ​​specified in case, the following will be executed.
+If the condition does not apply to any of the comparison values ​​specified in case, the following will be executed.
 			</p>
 			<p>
 When the switch block is finished, be sure to put <code> swend </code> at the end.
@@ -3206,9 +3206,9 @@ And link.
 		<p>
 Register a new instruction to call the external DLL.
 Write the new name, function name, and type separated by a space.
-The function name is the complete DLL by enclosing it in double quotes, like "function name".
+The full DLL name should be enclosed in double quotes, such as "function name".
 You can write the export name.
-If not enclosed in double quotes, the VC ++ "_function name @ 16"
+If not enclosed in double quotes, VC ++ "_function name @ 16"
 It will be converted to a name based on the export convention.
 		</p>
 		<p>
@@ -3244,7 +3244,7 @@ The following is an example of executing with four arguments.
 #func test "_func@16" var,int,int,int
     test a,1,2,3; func (& amp; a,1,2,3) in test.dll is called </pre>
 		<p>
-Function imports from DLLs occur when the instruction is first executed.
+The function import from the DLL is done when the instruction is first executed.
 If the function name to be imported is not found, at the time of executing the instruction
 An error will occur. (No error at startup)
 The return value of the external API call is assigned to the system variable stat as a 32-bit integer.
@@ -3275,7 +3275,7 @@ You can register.
 In the above example, "_func @ 16" is automatically called when the application is closed.
 		</p>
 		<p>
-Like #func, it can be registered as a function with the #cfunc instruction.
+Like #func, it can also be registered as a function with the #cfunc command.
 		</p>
 <pre> #cfunc New name "function name" Type name 1,… External DLL call function registration </pre>
 		<p>
@@ -3300,7 +3300,7 @@ You can use the function to make a call.
 		<p>
 To use the functionality of COM components, create COM object type variables
 is needed. Normally, the newcom instruction is executed to execute the specified COM class or
-Create a COM object type variable corresponding to the interface. Or later,
+Create a COM object type variable corresponding to the interface. from,
 You will be able to call the method through the created variable.
 A COM object type variable can be an interface pointer to a COM object.
 It is stored and the creation and destruction of objects is managed inside HSP.
@@ -3447,7 +3447,7 @@ It will be done when it is done. It can also be explicitly destroyed with the cl
 Is possible. However, variables initialized as COM object type variables are
 It will be left untouched and should be destroyed by the user.
 Destruction of COM object type variable is done when another value is assigned or when HSP ends.
-Since it is done automatically, there is no memory leak, but
+Since it is done automatically, there is no memory leak etc., but
 Since the pointer of COM that became unusable remains, consciously discard it
 It is recommended to keep it.
 		</p>
@@ -3505,7 +3505,7 @@ Event retrieval continues until the delcom instruction destroys the COM object.
     return</pre>
 		<p>
 In the above example, get the event DWebBrowserEvents2 of the IE component
-And call the * event subroutine.
+And then call the * event subroutine.
 To get a dispatch ID (DISPID) that identifies the type of event that occurred
 Use the comevdisp function.
 		</p>
@@ -3545,7 +3545,7 @@ It will not be.
 		<p>
 The following are special properties that can be referenced when the variable v is a Variant type variable.
 		</p>
-<!-Should I use a defined type list in HTML syntax? ->
+<!-Should I use a defined list in HTML syntax? ->
 <pre> v ("value"): Value stored in Variant </pre>
 		<p>
 Refers to the value stored in v. For example, of integer type (VT_I4)
@@ -3555,7 +3555,7 @@ It can also be referenced by v ("val") or v ("").
 	    </p>
 <pre> v ("isbyref"): Value indicating whether it is a reference </pre>
 		<p>
-Returns 1 if the Variant is a reference type (byRef).
+Returns 1 if Variant is a reference type (byRef).
 	    </p>
 <pre> v ("isarray"): Value indicating whether it is SafeArray </pre>
 		<p>
@@ -3584,7 +3584,7 @@ The following properties are valid for Variant variables that store SafeArray.
 		<p>
 Refers to the value of element n of SafeArray. This example is a one-dimensional SafeArray
 In the case of, for example, v ("value", m, n) in a two-dimensional array. simply
-v ("value") returns a Variant type containing a SafeArray.
+v ("value") returns a Variant type containing SafeArray.
 	    </p>
 <pre> v ("arraylbound", n): Lower limit of element of dimension n of SafeArray
 v ("arrayubound", n): Upper bound of elements of dimension n of SafeArray
@@ -3615,7 +3615,7 @@ The above example is
 <pre> name = pDoc ("Title"); name is a string type </pre>
 		<p>
 It is the same as writing.
-Also,
+also,
 		</p>
 		<pre>    dimtype a, vartype("variant"), 20</pre>
 		<p>
@@ -3676,7 +3676,7 @@ In the case of HSP, the focus is on providing a simpler "template",
 It will be used to reuse scripts more easily.
 		</p>
 		<p>
-AHT provides information and management of reusable HSP source scripts
+AHT manages and information about reusable HSP source scripts
 It is a general term for the mechanism including tools.
 The definition file used by AHT is called "AHT file" with the extension ".aht".
 		</p>
@@ -3767,7 +3767,7 @@ The new virtual screen must be initialized before use. For that
 The instructions are the screen instruction and the buffer instruction. When initialized with the screen instruction,
 The screen will appear on the display as a new window.
 (This window can be resized by default.)
-On the other hand, when initialized with the buffer instruction, the screen exists in memory.
+On the other hand, if you initialize it with the buffer instruction, the screen will exist in memory.
 You can only do it, and you cannot see the contents from the display. like this
 The screen is temporary for copying part of the image to another screen,
 It can also be used as a temporary storage location for images.
@@ -3777,14 +3777,14 @@ After initializing the window ID with the screen or buffer command, the screen w
 On the other hand, you can draw freely. Display characters by mes command
 Or, fill with the boxf command, draw a straight line with the line command, etc.
 Various instructions are available.
-If you are using multiple window IDs, use the gsel command to draw.
+If you are using multiple window IDs, use the gsel instruction to draw.
 It can be changed. Also, another window by gcopy command or gzoom command
 It is possible to copy the image drawn on the ID screen.
 		</p>
 		<p>
 The screen can be reinitialized with the cls command.
 It is also initialized when the image is loaded by the picload command.
-If you want to switch the entire screen at high speed for animation, etc.
+If you want to switch the entire screen at high speed and perform animation etc.
 Turn off the redraw switch with the redraw command to rewrite the screen.
 After doing this, turn on the redraw switch. This will cause the screen
 The result of rewriting is not reflected on the screen, and smooth and fast rewriting
@@ -3799,10 +3799,10 @@ Both the mes and print instructions have the same function. (Although the keywor
 Following the mes command, specify the character string you want to display on the screen by enclosing it in "" (double quotation marks).
 		</p>
 <pre>; Example
-mes "Hello!" </pre>
+mes "Hello!" </Pre>
 		<p>
-In the above example, to display the "Hello!". For the display position, the current position specified by the pos instruction is referenced.
-After displaying the characters, the current position automatically moves to the next line. However, it is possible to move it after the last character by setting an option. <br>
+In the above example, "Hello!" Is displayed. For the display position, the current position specified by the pos instruction is referenced.
+After displaying the character, the current position automatically moves to the next line. However, it is possible to move it after the last character by setting an option. <br>
 The displayed characters use the standard typeface, but you can switch the typeface with the font command.
 		</p>
 <pre>; Example
@@ -3816,7 +3816,7 @@ The font instruction has the following parameters.
 			font "fontname",p1,p2,p3
 "fontname": font name
 p1 = 1 ~ (12): Font size
-p2 = 0 ~ (0): Font style
+p2 = 0 to (0): Font style
 p3 = 1 ~ (1): Width of font modification </pre>
 		<p>
 In the font name, you can specify the name of the installed font.
@@ -3874,9 +3874,9 @@ Can be read and used.
 <caption> List of image file formats that can be used as standard from HSP </caption>
 <tr> <th> Extension </th> <th> Format </th> </tr>
 <tr> <td> bmp </td> <td> Windows standard bitmap image data </​​td> </tr>
-<tr> <td> png </td> <td> PNG format image compressed data </​​td> </tr>
+<tr> <td> png </td> <td> PNG format image compression data </​​td> </tr>
 <tr> <td> jpg </td> <td> JPEG format image compression data </​​td> </tr>
-<tr> <td> gif </td> <td> GIF format image compressed data (excluding animation) </td> </tr>
+<tr> <td> gif </td> <td> GIF format image compression data (excluding animation) </td> </tr>
 <tr> <td> ico </td> <td> Windows standard icon image data </​​td> </tr>
 		</table>
 		<p>
@@ -3898,7 +3898,7 @@ It is performed for the coordinates called the current position.
 The current position is like a text editor cursor,
 After the message is output, the current position is also on the next line with a line break.
 It will move automatically.
-The current position can be changed by the pos command. Also,
+The current position can be changed by the pos command. also,
 The amount of movement of the current position can be adjusted with the objsize command.
 When the screen is initialized by the cls command etc., the current position is also reset to (0,0).
 		</p>
@@ -3933,12 +3933,12 @@ The object ID is assigned.
 		<p>
 Objects can be easily placed and used, but if you master the deeper usage,
 It also makes it possible to write more advanced scripts.
-Objprm command to change the contents of the object later, or Win32 message to the object
+Objprm instruction to change the contents of the object later, or Win32 message to the object
 The sendmsg instruction sent directly is an instruction prepared for such advanced use.
 		</p>
 		<p>
 In addition to the placement objects listed here, there are other controls that Windows supports.
-In addition to being able to add with the winobj instruction, the ActiveX control can be added directly with the axobj instruction.
+In addition to being able to add with the winobj command, the ActiveX control can be added directly with the axobj command.
 It is also possible to add.
 		</p>
 
@@ -3949,7 +3949,7 @@ Layer objects are user-defined placement objects.
 By registering a subroutine that draws on the screen in advance, drawing can be executed at the specified timing (layer).
 		</p>
 		<PRE>
-Example:
+ example :
 				layerobj 320,240,objlayer_normal,*laysub,100
 				stop
 			*laysub
@@ -4011,15 +4011,15 @@ Value: Call factor (macro name)
 3: The int value was passed in the objprm instruction (objlayer_cmdprmi)
 4: A character string was passed by the objprm instruction (objlayer_cmdprms)
 5: A double value was passed in the objprm instruction (objlayer_cmdprmd)
-6: Timing to draw (objlayer_cmddraw)
+6: Draw timing (objlayer_cmddraw)
 7: A certain amount of time has passed (not implemented) (objlayer_cmdtime)
 		</PRE>
 		<p>
-You don't necessarily have to handle all call factors.
-Process only the necessary factors and quickly return the process to the system with the return instruction. <br>
+It is not always necessary to handle all call factors.
+Process only the necessary factors and quickly return the processing to the system with the return instruction. <br>
 1 is called immediately after the layerobj instruction is executed, and 2 is called just before the object is destroyed by the clrobj instruction or the like.
 3 to 5 are called when a value is passed in the objprm instruction. Since the value changes depending on the value type, it is necessary to take appropriate measures.
-For int values, iparam. In the case of a string, the value passed to refstr is assigned, and in the case of a double value, the value passed to refdval is assigned. <br>
+For int values, iparam. In the case of a character string, the value passed to refstr is assigned, and in the case of a double value, the value passed to refdval is assigned. <br>
 6 is called at the appropriate time when the redraw instruction is executed.
 This is the timing to draw the layer specified in advance as the layer to be drawn with the layerobj command. <br>
 Use the drawing command to draw on a valid drawing screen. (It is not always necessary to draw)
@@ -4047,7 +4047,7 @@ It can be used for various purposes such as fade-in / out, post-effects, and pro
 The current color is the color used for message output, drawing points, lines, rectangles, etc.
 is. This can be changed with the color, rgbcolor, hsvcolor, and palcolor instructions.
 		<PRE>
-Example:
+ example :
 color 100,200,300; set R = 300, G = 200, B = 300
 hsvcolor 10,20,30; Set colors in HSV format
 rgbcolor $ 112233; Set the color in 32bit RGB format
@@ -4073,7 +4073,7 @@ The celload command is a command to load an image (texture) for display from a f
 Like the picload command, it expands the specified image file into memory,
 The read destination buffer can be specified.
 		<PRE>
-Example:
+ example :
 			celload "a.bmp",1
 		</PRE>
 In the above example, the image "a.bmp" is loaded into window ID1.
@@ -4082,7 +4082,7 @@ The process of reading is performed at once.
 Also, with the celload command, it is possible to read for an empty window ID.
 It is possible.
 		<PRE>
-Example:
+ example :
 			celload "a.bmp"
 			id = stat
 		</PRE>
@@ -4091,9 +4091,9 @@ If the window ID parameter is omitted in this way, the unused ID will be used.
 It is used and its number is assigned to the system variable stat.
 		<BR><BR>
 The loaded image can be drawn in whole or in part by the celput command.
-I can do it. The celput instruction provides a drawing method similar to a 2D sprite.
+can. The celput instruction provides a drawing method similar to a 2D sprite.
 		<PRE>
-Example:
+ example :
 			celload "a.bmp",1
 			pos 100,100
 			gmode 2
@@ -4115,20 +4115,20 @@ zoomx = 0.0 ~ (1.0): Horizontal display magnification (real number)
 zoomy = 0.0 ~ (1.0): Vertical display magnification (real number)
 angle = 0.0 ~ (0.0): Rotation angle (unit is radian)
 		</PRE>
-Use zoomx, zoomy, angle to set processing such as scaling and rotation for the original image material
+Use zoomx, zoomy, angle to set processing such as scaling and rotation for the original image material.
 can.
 If zoomx, zoomy, angle are omitted or the same size is set (1,1,0),
 A fast copy is automatically performed internally. On the contrary, when drawing that is not the same size,
 The same drawing process as the grotate command is executed.
 		<BR><BR>
-At the time of drawing, the copy mode and transmittance can be specified by the gmode instruction.
+At the time of drawing, the copy mode and transmittance can be specified by the gmode command.
 You can specify the same options as the gcopy and grottate instructions.
 However, the copy size specified by the gmode instruction is not reflected at the time of celput.
 be careful.
 		<BR><BR>
 After drawing is completed, the current position is moved to the right according to the drawn size.
 		<PRE>
-Example:
+ example :
 			repeat 5
 			celput 1
 			loop
@@ -4136,9 +4136,9 @@ Example:
 In the above example, the same image is drawn side by side five times.
 		<BR><BR>
 The material of the original image can be divided into multiple parts with a fixed size.
-The celdiv command is a command to set the size division of parts for each window ID.
+The celdiv command is a command for setting the size division of parts for each window ID.
 		<PRE>
-Example:
+ example :
 			celload "a.bmp",1
 			celdiv 1,64,64
 		</PRE>
@@ -4164,7 +4164,7 @@ Draw a rectangle in the lower right direction.
 However, by setting the drawing base point position, the drawing position will be in the center of the original image, or
 You can make any changes such as lower right. The rotation is also centered around this base point.
 		<PRE>
-Example:
+ example :
 			celload "a.bmp",1
 			celdiv 1,64,64,32,32
 		</PRE>
@@ -4228,7 +4228,7 @@ The memory buffer can usually be allocated with the sdim or alloc instruction.
 File input / output of the memory buffer is usually performed by the bload instruction and bsave instruction.
 		</p>
 		<p>
-Also, noteload command, notesave command to handle text files
+Also, noteload and notesave instructions to handle text files
 Is prepared. See the Memory Notepad Instructions section for more information.
 Basically, whether the target is a text file or binary data
 The handling of the memory buffer does not change.
@@ -4301,10 +4301,10 @@ For example, in the above example, the variables a and b are populated by assign
 The variable x has not yet been assigned a value at the time of the calculation "c = a * b + x".
 HSP treats the content as 0 in such a case, even if it is not assigned.
 I was able to use variables comfortably. However, this also has disadvantages
-There is.
+I have.
 		</p>
 		<pre>
-hensu = 1; Initialize the variable hensu
+hensu = 1; initialize variable hensu
 kotae = hensuu * 2; Calculate doubled
 		</pre>
 		<p>
@@ -4345,7 +4345,7 @@ can do.
 		</p>
 		<pre>
 #cmpopt varinit 1; error uninitialized variable reference
-hensu = 1; Initialize the variable hensu
+hensu = 1; initialize variable hensu
 kotae = hensuu * 2; Calculate doubled
 		</pre>
 		<p>
@@ -4356,7 +4356,7 @@ In this case, the following error message will be displayed and execution will n
 		--> kotae=hensuu*2
 		</pre>
 		<p>
-If you want all uninitialized variable references to be a standard error,
+If you want all uninitialized variable references to be error-standard,
 Add the #cmpopt setting to hspdef.as in the common folder.
 The detection that a variable has been initialized is determined by one of the following conditions:
 		</p>
@@ -4403,9 +4403,9 @@ p1 = variable name: variable name to store information
 p2 = 1 ~: Maximum number of characters assigned to variable
 p3 = 0 to (0): Line feed code recognition flag (0 = none / 1,2 = recognition)
 
-·Description
+·explanation
 
-    Assigns the contents of the standard input to the variable specified by p1.
+    Assigns the contents of standard input to the variable specified by p1.
     The variable specified by p1 is changed to a string type and the result is assigned.
     In this case, the size of the string is up to the number of characters specified in p2.
     If p2 is omitted, it will be the maximum value that can be assigned to the variable.
@@ -4425,7 +4425,7 @@ The number of characters in the input result is saved in the system variable str
 		<p>
 Other functions can be used as equivalent to HSP3.
 Extension plug-ins and COM related instructions can also be used. (However, the plug-in side
-An operation error may occur when acquiring and using a BMSCR structure. )
+An operation error may occur when the BMSCR structure is acquired and used. )
 It also supports executable file creation, PACKFILE embedding, and encryption.
 		</p>
 
@@ -4463,7 +4463,7 @@ Set the processing when interrupted.
 		<p>
 The onerror instruction is for when an error occurs inside HSP due to a script.
 Set the process.
-Even if the processing after the error is specified by the onerror instruction
+Even if you specify post-error processing with the onerror instruction
 When the necessary processing is completed, the application execution will resume.
 Please end it with the end instruction as much as possible.
 The onerror instruction does not recover from an error.
@@ -4482,7 +4482,7 @@ Make sure to return the program control to the main side.
 		</p>
 		<p>
 Interrupts by key or mouse input can be performed with the stop instruction, wait, and await instructions.
-Accepts interrupts only when stopped.
+It accepts interrupts only when it is stopped.
 In addition, the following system variables are displayed after jumping by interrupt.
 It will be set.
 		</p>
@@ -4504,7 +4504,7 @@ It is also possible to temporarily turn ON / OFF the execution of event interrup
 		</p>
 		<pre>onkey 0</pre>
 		<p>
-Temporarily stops the key interrupt.
+Temporarily stops the key interrupt with.
 		</p>
 		<pre>onkey 1</pre>
 		<p>
@@ -4531,14 +4531,14 @@ If iparam = 1, it is terminated by shutting down Windows.
 		<p>
 Await, wait, stop instructions for termination processing when Windows shuts down
 If the system causes idle time (waiting time) due to such reasons,
-Stops the shutdown process (it will not be shut down).
+Cancels the shutdown process (it will not be shut down).
 If the end instruction is used without using the await, wait, and stop instructions,
 The shutdown process will continue as it is.
 		</p>
 		<p>
 If you want to perform the termination process without stopping the shutdown process,
 Instructions that cause a wait time (await, wait, stop instructions, etc.) cannot be used.
-(However, common dialog (dialog instruction) etc. can be used)
+(However, common dialog (dialog command) etc. can be used)
 Perform only the minimum termination processing and end as it is.
 		</p>
 
@@ -4550,7 +4550,7 @@ It is assigned to space.
 This means that the name "mes @ hsp" is the official name for the mes instruction, for example.
 Means However, there is no "@hsp" so that it can be used in normal global space.
 Since the name is also registered as an alias, you can use it as it is with the same instruction name as before
-I can do it.
+can.
 		</p>
 		<p>
 For example, for the mes instruction, "#define global mes mes @ hsp" is defined from the beginning.
@@ -4569,7 +4569,7 @@ The following is an example of replacing the mes instruction with a macro.
     mes "Message."
     stop</pre>
 		<p>
-The keyword "mes" is redefined after being canceled by the #undef instruction.
+The keyword "mes" is redefined after being canceled by the #undef command.
 All standard keywords used by HSP can be canceled and redefined as well.
 The following is an example of replacing the mes instruction with a user-defined instruction.
 		</p>
@@ -4620,7 +4620,7 @@ It also contains commonly used files such as hsp3util.as.
 
 <h3 id = "ERR_MSG"> Error message </h3>
 		<p>
-An error occurred during HSP execution due to a script writing error or a specified error.
+Error during HSP execution due to script writing error or specification error
 When it is found, the error code and error line number are displayed.
 See <a href="error.htm"> Error message list </a> for details.
 		</p>
@@ -4632,7 +4632,7 @@ If this value is exceeded, normal operation cannot be guaranteed.
 		</p>
 <table summary = "Introduces the allowable range of system resources in list format." Class = "keywordlist">
 <caption> List of allowable range of system resources </caption>
-<tr> <td> Maximum size of source file (.AS) </td> <td> Unlimited </td> </tr>
+<tr> <td> Maximum source file (.AS) size </td> <td> Unlimited </td> </tr>
 <tr> <td> Maximum object file (.AX) size </td> <td> Unlimited </td> </tr>
 
 <tr> <td> Maximum number of labels that can be declared </td> <td> Unlimited </td> </tr>
@@ -4645,7 +4645,7 @@ If this value is exceeded, normal operation cannot be guaranteed.
 <tr> <td> Maximum number of defineable plugins </td> <td> Up to 8192 types in total </td> </tr>
 <tr> <td> Maximum number of instructions that can be extended by the plugin </td> <td> Up to 65536 per type </td> </tr>
 <tr> <td> Maximum number of modules that can be defined </td> <td> Unlimited </td> </tr>
-<tr> <td> Maximum number of user-defined instructions in the module </td> <td> Unlimited </td> </tr>
+<tr> <td> Maximum number of user-defined instructions in a module </td> <td> Unlimited </td> </tr>
 <tr> <td> Maximum number of interrupts that can be defined with the oncmd instruction </td> <td> Unlimited </td> </tr>
 
 <tr> <td> Maximum number of window IDs </td> <td> Unlimited </td> </tr>
@@ -4701,7 +4701,7 @@ Perform encryption. This is the standard method.
 				<p>
 Create it using the "Create DPM File" function from the menu of the script editor.
 If the created DPM file is encrypted, you can check the data with an editor etc.
-It will be difficult, but you can easily take out the contents using HSP.
+It will be difficult, but it is possible to take out the contents easily using HSP.
 It is less secure than packing it into an executable file.
 				</p>
 			</dd>
@@ -4709,7 +4709,7 @@ It is less secure than packing it into an executable file.
 			<dd>
 				<p>
 Create a DPM file with individual encryption keys added from HSP3.0.
-The created DPM file uses the key code (32bit value) used for encryption from the script.
+The created DPM file has the key code (32bit value) used for encryption from the script.
 Unless specified, it cannot be opened correctly.
 Difficult to parse because the encryption key is in the script
 It is more secure than packing it into an executable file.
@@ -4733,14 +4733,14 @@ I want to go. Also, how to deal with file analysis and falsification
 We plan to continue this in the future.
 		</p>
 
-<h3 id = "CNVSRC"> Conversion to C source </h3>
+<h3 id = "CNVSRC"> Convert to C source </h3>
 		<p>
 You can convert HSP3 scripts into a compilable form as source code for the C / C ++ language. <br>
 This is done by calling the HSP3 source converter (hsp3cnv).
 Normally, select the "Tools"-> "Convert Specified File to C Source" menu in the HSP Script Editor to call the support tool (cnvsrc).
 		</p>
 		<p>
-Knowledge of the C / C ++ language is required to operate the converted C source code. For details, see <a href="hsp3cnv.txt"> HSP3 Source Converter Manual </a>.
+Knowledge of the C / C ++ language is required to operate the converted C source code. See the <a href="hsp3cnv.txt"> HSP3 Source Converter Manual </a> for more information.
 		</p>
 
 <h3 id = "BOOTOPT"> About using boot setting #bootopt </h3>
@@ -4765,7 +4765,7 @@ The option names that can be specified with #bootopt are as follows.
 		<pre>
 Options | Contents | Initial value
 		 -----------------------------------------------------------
-notimer | Use precision timer | Automatic setting
+notimer | Use high precision timer | Automatic setting
 | (0 = use / 1 = not use) |
 utf8 | Use UTF-8 format strings | Automatic setting
 | (0 = use / 1 = not use) |
@@ -4775,12 +4775,12 @@ hsp64 | Using 64-bit runtime | Automatic configuration
 		</pre>
 		<p>
 Normally, these settings are done automatically.
-"Use high precision timer" is a setting to use high precision timer (multimedia timer) in standard HSP runtime. <br>
+"Use High Precision Timer" is a setting for using the high precision timer (multimedia timer) in the standard HSP runtime. <br>
 In HSP3.4, the high precision timer was used to adjust the waiting time such as the await instruction when executing all scripts.
 CPU load could increase for tools and resident applications that did not require very tight timer control.
-In HSP3.5 and later, it has been modified to use the precision timer only when the await instruction is used in the script. <br>
+In HSP3.5 and later, it has been modified to use the high precision timer only when the await instruction is used in the script. <br>
 If you want to explicitly turn on / off the use of the precision timer, you can use the #bootopt instruction.
-If "#bootopt notimer 1" is written in the script, the precision timer will not be used.
+If "#bootopt notimer 1" is written in the script, the high precision timer will not be used.
 		</p>
 
 <h3 id = "CALLBACK"> Callback Routine </h3>
@@ -4799,7 +4799,7 @@ You cannot wait for a time or stop.
 The following instructions cannot be used in callback routines.
 		</p>
 		<pre class="quote">
-Instructions to wait for time such as wait, await, stop, etc.
+Instructions that wait for a time such as wait, await, stop, etc.
 Run instruction to transfer processing to another program
 Instructions to execute system tasks such as screen, bgscr </pre>
 		<p>

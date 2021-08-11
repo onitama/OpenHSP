@@ -390,7 +390,7 @@ type_autowipe 0x100000 Automatically erase when the border range is exceeded
 type_inner is used when creating the outer wall.
 Used for the default wall (the shape created by the qborder instruction),
 Be careful not to use it for any other purpose.
-type_autowipe is a flag for automatically deleting objects that are outside the border area (frame) set by the qborder command.
+type_autowipe is a flag to automatically delete objects that are outside the border area (frame) set by the qborder command.
 ^
 With option, you can specify how to set the type value.
 ^p
@@ -449,8 +449,8 @@ angle (0.0): Angle setting value (real number) (radian)
 Sets the position and angle parameters of the specified object.
 Specify the reference position (center coordinates) of the object with (x, y).
 Specify the object rotation angle (+ direction is clockwise) with angle. The unit is radians.
-In OBAQ, even when moving an object, the coordinates of the object are basically set.
-Apply force in the direction you want to move instead of changing it, or by using the qgetspeed command
+In OBAQ, even when you move an object, you can directly change the coordinates of the object.
+Apply force in the direction you want to move instead of changing it, or by the qgetspeed command
 Please realize by setting the acceleration.
 If you forcibly change the coordinates, the physical behavior may not be correct.
 ^
@@ -527,8 +527,8 @@ num (0): Object ID
 damper (0.7): Vibration absorption parameter value (real number)
 friction (1.0): Friction resistance value (real number)
 %inst
-Sets parameters such as vibration absorption, inertia, and gravitational constant of the specified object.
-damper (vibration absorption) indicates the ability to suppress shaking when in contact.
+Sets parameters such as vibration damping, inertia, and gravitational constant for the specified object.
+Damper indicates the ability to suppress shaking when in contact.
 Be sure to set a value between 0.0 and 1.0. (No range check)
 Friction is the coefficient of force that decays when objects come into contact with each other.
 The value multiplied by the friction of the contacting object is referenced and calculated.
@@ -742,7 +742,7 @@ qnext
 
 %index
 qnext
-Get object search results
+Object search result acquisition
 %prm
 var
 var: Variable to get search results
@@ -841,7 +841,7 @@ var_slide: Variable to get the horizontal velocity
 %inst
 Acquires the result of the search by the qcollision command.
 Be sure to get the information after receiving the result with the qgetcol instruction.
-The velocity in the direction perpendicular to the contact surface (bouncing direction) (the plus side is the sinking direction) is assigned to the variable specified by var_bound. (Variables are automatically real type.)
+The variable specified by var_bound is assigned the velocity in the direction perpendicular to the contact surface (bounce) (the plus side is the sinking direction). (Variables are automatically real type.)
 The variable specified by var_slide is assigned the velocity in the horizontal (dragging) direction with the contact surface. (Variables are automatically real type.)
 ^
 If execution fails, a non-zero value is assigned to the system variable stat.
@@ -1159,7 +1159,7 @@ Radially apply force to all objects from anywhere.
 A force that is inversely proportional to the distance is applied around (xw, yw).
 power is the magnitude of the force applied at a distance of 1.0.
 Positions closer to near are not inversely proportional and have the same force as near.
-If it is farther than far, no force is applied.
+No force is applied if it is farther than far.
 ^
 If execution fails, a non-zero value is assigned to the system variable stat.
 

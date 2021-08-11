@@ -265,7 +265,7 @@ fv,x,y,z
 fv = variable name to which the FV value is assigned
 (x, y, z) = Vector value to be calculated (real value)
 %inst
-Finds the inner product of the FV value stored in the variable specified by fv and the vector specified by the decimal value (X, Y, Z) and assigns it to fv.0.
+Find the inner product of the FV value stored in the variable specified by fv and the vector specified by the decimal value (X, Y, Z) and assign it to fv.0.
 %href
 fvseti
 fvset
@@ -1486,7 +1486,7 @@ Extended screen control command
 %prm
 id,p1,p2
 id: event ID
-p1 (0): Event number of the jump destination
+p1 (0): Event number of jump destination
 p2 (0): Probability of ignoring jump (%)
 %inst
 A jump event is added to the event ID specified by id.
@@ -2182,7 +2182,7 @@ id: object ID
 
 %inst
 Gets the parameters of the object.
-The contents of the ang group (display angle) are assigned to the variable specified by (x, y, z).
+The contents of the ang group (display angle) are assigned to the variables specified by (x, y, z).
 (x, y, z) is set as a real variable.
 You can get the value as an integer value by adding "i" to the end of the instruction.
 
@@ -2208,7 +2208,7 @@ id: object ID
 
 %inst
 Gets the parameters of the object.
-The contents of the ang group (display angle) are assigned to the variable specified by (x, y, z).
+The contents of the ang group (display angle) are assigned to the variables specified by (x, y, z).
 (x, y, z) is set as an integer variable.
 The unit of the angle is an integer, and the value that goes around from 0 to 255 is used.
 
@@ -2231,7 +2231,7 @@ id
 id: event ID
 %inst
 The object deletion event is added to the event ID specified by id.
-The object delete event is an instruction to delete the object that is currently executing the event.
+An object delete event is an instruction that deletes the object that is currently executing the event.
 %href
 event_regobj
 newevent
