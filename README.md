@@ -10,8 +10,7 @@ HSP3 Windows Manual
 https://www.onionsoft.net/hsp/v36en/doclib/hsp3win.html
 
 OpenHSP/Hot Soup Processor  (HSP3)は、誰でも手軽に使うことのできるスクリプト言語システムです。 テキストによるスクリプトを書くだけで、簡単に画像を使ったゲームプログラム、スクリーンセーバー、ツールや実用ソフトなどのアプリケーションを構築することができます。
-日本語のマニュアルはこちらを参照してください ( Japanese Manual Index )。
-https://www.onionsoft.net/hsp/v36/index.htm
+https://www.onionsoft.net/hsp/v36en/index.htm
 
 
 # Windows installation
