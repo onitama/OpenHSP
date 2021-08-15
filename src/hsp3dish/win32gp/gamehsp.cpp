@@ -3294,7 +3294,7 @@ int gamehsp::setObjLight(int objid)
 	//		ライト設定
 	//
 	gpobj *obj = getObj(objid);
-	if (obj == NULL) return NULL;
+	if (obj == NULL) return 0;
 
 	Node *rootNode = obj->_node;
 	if (rootNode) {

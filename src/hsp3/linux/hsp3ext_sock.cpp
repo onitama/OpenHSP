@@ -98,7 +98,7 @@ static int sockget(char* buf, int size, int socid){
 
 static int sockgetm(char* buf, int size, int socid, int flag){
   int recv_len;
-  memset(buf, 0, sizeof(buf));
+  memset(buf, 0, size);
   recv_len = recv(soc[socid], buf, size, flag);
   if(recv_len == -1) return errno;
   return 0;
