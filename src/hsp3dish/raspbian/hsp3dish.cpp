@@ -35,6 +35,7 @@
 #include "../sysreq.h"
 //#include "../hsp3ext.h"
 #include "../../hsp3/strnote.h"
+#include "../../hsp3/linux/hsp3ext_sock.h"
 
 #include "../emscripten/appengine.h"
 
@@ -815,6 +816,14 @@ int hsp3dish_init( char *startfile )
 	hsp3typeinit_dw_extcmd( tinfo );
 	//hsp3typeinit_dw_extfunc( code_gettypeinfo( TYPE_USERDEF+1 ) );
 #endif
+
+	{
+	// FIXME: Define another C_TYPE macro at `src/hsp3/hsp3struct.h` or in other ways
+	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF+1
+	tinfo->hspctx = ctx;
+	tinfo->hspexinfo = exinfo;
+	hsp3typeinit_sock_extcmd( tinfo );
+	}
 
 	//		Initalize DEVINFO
 #ifdef DEVCTRL_IO

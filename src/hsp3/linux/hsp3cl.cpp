@@ -209,7 +209,8 @@ int hsp3cl_init( char *startfile )
 
 	exinfo = ctx->exinfo2;
 
-	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF
+	// FIXME: Define another C_TYPE macro at `src/hsp3/hsp3struct.h` or in other ways
+	HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF+1 );
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_sock_extcmd( tinfo );
