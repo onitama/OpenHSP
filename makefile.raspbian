@@ -87,7 +87,7 @@ OBJS_CL = \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
 	src/hsp3/linux/hsp3ext_sock.o \
-	src/hsp3/linux/devctrl_io.do \
+	src/hsp3/linux/devctrl_io.o \
 	src/hsp3/linux/hsp3gr_linux.o
 
 TARGETS = hsp3dish hsp3cl hspcmp hsed
