@@ -379,7 +379,7 @@ unsigned char* texmesManager::texmesGetFont(char* msg, int* out_sx, int* out_sy,
 	int pitch,tsx,tsy;
 
 	if (info) {
-		info->length = 0;
+//		info->length = 0;
 	}
 
 	hgio_fontsystem_exec(msg, NULL, 0, &sx, &sy, info);

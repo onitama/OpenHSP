@@ -30,9 +30,9 @@
 #include <GL/gl.h>
 //#include <GL/glut.h>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_opengl.h"
 
 #include <emscripten.h>
 
@@ -188,7 +188,7 @@ static int handleEvent( void ) {
 			if (code < SDLK_SCANCODE_MAX) {
 				keys[code] = true;
 			}
-			switch(code) {
+			switch(event.key.keysym.scancode) {
 			case SDL_SCANCODE_BACKSPACE:
 				wparam = HSPOBJ_NOTICE_KEY_BS;
 				break;

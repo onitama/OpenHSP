@@ -88,9 +88,9 @@ int hgio_fontsystem_get_texid(void);
 //#include <GL/glut.h>
 
 #ifdef HSPEMSCRIPTEN
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_opengl.h"
 #else
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
@@ -191,7 +191,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 		htexfont = CreateFont(
 			size,						// フォント高さ
 			0,							// 文字幅
-			0,							// テキストの角度	
+			0,							// テキストの角度
 			0,							// ベースラインとｘ軸との角度
 			fw,							// フォントの重さ（太さ）
 			((style & 2) != 0),			// イタリック体
@@ -796,36 +796,58 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	//
 
 	if (buffer == NULL) {
+		EM_ASM_({
+			let d = document.getElementById('hsp3dishFontDiv');
+			if (!d) {
+				d = document.createElement("div");
+				d.id = 'hsp3dishFontDiv';
+				d.style.setProperty("width", "auto");
+				d.style.setProperty("height", "auto");
+				d.style.setProperty("position", "absolute");
+				d.style.setProperty("visibility", "hidden");
+				d.style.setProperty("top", "0");
+				d.style.setProperty("left", "0");
+				document.body.appendChild(d);
+			}
+			d.style.setProperty("font", $1 + "px 'sans-serif'");
 
-	EM_ASM_({
-		var d = document.getElementById('hsp3dishFontDiv');
-		if (!d) {
-			d = document.createElement("div");
-			d.id = 'hsp3dishFontDiv';
-			d.style.setProperty("width", "auto");
-			d.style.setProperty("height", "auto");
-			d.style.setProperty("position", "absolute");
-			d.style.setProperty("visibility", "hidden");
-		}
-		d.style.setProperty("font", $1 + "px 'sans-serif'");
-		document.body.appendChild(d);
+			const t = document.createTextNode(UTF8ToString($0));
+			if (d.hasChildNodes())
+				d.removeChild(d.firstChild);
+			d.appendChild(t);
+			HEAP32[$2 >> 2] = d.clientWidth | 0;
+			HEAP32[$3 >> 2] = d.clientHeight | 0;
 
-		var t = document.createTextNode(UTF8ToString($0));
-		if (d.hasChildNodes())
-			d.removeChild(d.firstChild);
-		d.appendChild(t);
-		}, msg, fontsystem_size);
-	fontsystem_sx = EM_ASM_INT_V({
-		var d = document.getElementById('hsp3dishFontDiv');
-		return d.clientWidth;
-	});
-	fontsystem_sy = EM_ASM_INT_V({
-		var d = document.getElementById('hsp3dishFontDiv');
-		return d.clientHeight;
-	});
+			let canvas = document.getElementById('hsp3dishFontCanvas');
+			if (!canvas) {
+				canvas = document.createElement("canvas");
+				canvas.id = 'hsp3dishFontCanvas';
+				canvas.style.setProperty("visibility", "hidden");
+				document.body.appendChild(canvas);
+			}
+
+			if ($4 !== 0) {
+				const context = canvas.getContext("2d");
+				context.font = $1 + "px 'sans-serif'";
+
+				const msg = UTF8ToString($0);
+				const metrics = context.measureText(msg);
+				//console.log({msg, metrics});
+				const arr = Array.from(msg);
+				for (let i = 0; i < msg.length; i++) {
+					const sub = arr.slice(0, i + 1).join("");
+					const m = context.measureText(sub);
+					//console.log({i, sub, m});
+					HEAP16[($4 >> 1) + i + 1] = m.width | 0; //(m.actualBoundingBoxRight - m.actualBoundingBoxLeft) | 0;
+				}
+			}
+		}, msg, fontsystem_size, &fontsystem_sx, &fontsystem_sy, info ? info->pos : nullptr);
+
+		//Alertf("text %s %d %d\n", msg, fontsystem_sx, fontsystem_sy);
 
 		*out_sx = fontsystem_sx;
 		*out_sy = fontsystem_sy;
+
 		return 0;
 	}
 
@@ -851,6 +873,9 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 		canvas = document.createElement("canvas");
 		canvas.id = 'hsp3dishFontCanvas';
 		canvas.style.setProperty("visibility", "hidden");
+		canvas.style.setProperty("position", "absolute");
+		canvas.style.setProperty("top", "0");
+		canvas.style.setProperty("left", "0");
 		canvas.width = $2;
 		canvas.height = $3;
 		document.body.appendChild(canvas);
@@ -862,7 +887,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 		context.clearRect ( 0 , 0 , $2 , $3);
 		context.fillStyle = 'rgba(255, 255, 255, 255)';
 		context.fillText(msg, 0, $1);
-		console.log(msg);
+		//console.log(msg);
 
 		GLctx.texImage2D(GLctx.TEXTURE_2D, 0, GLctx.RGBA, GLctx.RGBA, GLctx.UNSIGNED_BYTE, canvas);
 		}, msg, fontsystem_size, sx, sy);
@@ -935,9 +960,3 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	return 0;
 }
 #endif
-
-
-
-
-
-
