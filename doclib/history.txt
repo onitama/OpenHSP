@@ -1,9 +1,13 @@
 ------------------------------------------------------------------------------
-Hot Soup Processor ver3.6                           HSP : Hot Soup Processor  
+Hot Soup Processor ver3.7                           HSP : Hot Soup Processor  
 更新履歴                              copyright 1997-2021 (c) onion software  
 ------------------------------------------------------------------------------
 
 ・hsp3関連 更新履歴
+
+	2021/08/10 3.7 beta1
+
+	[HGIMG4][Windows] fbx->gpb変換時のマテリアル名修正オプションを追加
 
 	2021/08/10 3.6
 
