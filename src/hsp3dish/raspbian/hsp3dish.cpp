@@ -778,8 +778,8 @@ int hsp3dish_init( char *startfile )
 #endif
 	}
 
-//	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
-//	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
+	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
 
 #ifdef HSPDISHGP
 	//		Initalize gameplay
@@ -810,16 +810,14 @@ int hsp3dish_init( char *startfile )
 	exinfo = ctx->exinfo2;
 
 #ifdef USE_OBAQ
-	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF
+	HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF );
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_dw_extcmd( tinfo );
-	//hsp3typeinit_dw_extfunc( code_gettypeinfo( TYPE_USERDEF+1 ) );
 #endif
 
 	{
-	// FIXME: Define another C_TYPE macro at `src/hsp3/hsp3struct.h` or in other ways
-	HSP3TYPEINFO *tinfo = code_gettypeinfo( -1 ); //TYPE_USERDEF+1
+	HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF+1 );
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_sock_extcmd( tinfo );

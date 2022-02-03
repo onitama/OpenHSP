@@ -158,7 +158,7 @@ int hsp3cl_init( char *startfile )
 #ifdef HSPDEBUG
 
 	if ( *startfile == 0 ) {
-		printf( "OpenHSP CL ver%s / onion software 1997-2021\n", hspver );
+		printf( "OpenHSP CL ver%s / onion software 1997-2022\n", hspver );
 		usage1();
 		return -1;
 	}
@@ -209,7 +209,6 @@ int hsp3cl_init( char *startfile )
 
 	exinfo = ctx->exinfo2;
 
-	// FIXME: Define another C_TYPE macro at `src/hsp3/hsp3struct.h` or in other ways
 	HSP3TYPEINFO *tinfo = code_gettypeinfo( TYPE_USERDEF+1 );
 	tinfo->hspctx = ctx;
 	tinfo->hspexinfo = exinfo;

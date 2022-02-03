@@ -3,7 +3,7 @@ CXX = g++
 AR = ar
 CFLAGS_DISH =  -Wno-write-strings -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -DUSE_OBAQ -I /opt/vc/include
 CFLAGS_GP =  -Wno-write-strings -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -I /opt/vc/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src -std=c++11
-LDFLAGS= -lm -L$(SDKSTAGE)/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lSDL2 -lSDL2_mixer -lSDL2_ttf
+LDFLAGS= -lm -L$(SDKSTAGE)/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lSDL2 -lSDL2_mixer -lSDL2_ttf -lcurl
 CFLAGS_CL =  -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSPRASPBIAN
 CFLAGS_CMP =  -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
 
@@ -115,7 +115,7 @@ hspcmp: $(OBJS_CMP)
 	$(CXX) $(CFLAGS_CMP) -c $< -o $*.o
 
 hsp3cl: $(OBJS_CL)
-	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -s -o $@
+	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -lcurl -s -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CL) -c $< -o $*.o
 %.o: %.cpp
