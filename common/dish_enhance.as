@@ -7,7 +7,7 @@
 ;
 ;	Socket Enhance
 ;
-#regcmd 18
+#regcmd 19
 #cmd sockopen $60
 #cmd sockclose $61
 #cmd sockreadbyte $62
