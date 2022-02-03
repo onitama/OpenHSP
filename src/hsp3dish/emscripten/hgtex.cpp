@@ -54,10 +54,10 @@
 
 #if defined(HSPEMSCRIPTEN)
 #include <emscripten.h>
-#ifdef HSPDISHGP
-#include <SDL/SDL_ttf.h>
-#define USE_TTFFONT
-#endif
+//#ifdef HSPDISHGP
+//#include <SDL2/SDL_ttf.h>
+//#define USE_TTFFONT
+//#endif
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
 #define FONT_TEX_SY 128
@@ -86,9 +86,9 @@ int hgio_fontsystem_get_texid(void);
 //#include <GL/glut.h>
 
 #ifdef HSPEMSCRIPTEN
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_opengl.h"
 #else
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"

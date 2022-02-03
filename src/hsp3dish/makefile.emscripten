@@ -5,7 +5,7 @@ AR = emar
 #CFLAGS = -Wall -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG -fpermissive -g4 -s LEGACY_GL_EMULATION=1
 
 CFLAGS_CORE = -Wall -DNDEBUG -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG \
-	   -fpermissive -s WASM=0 -s ALLOW_MEMORY_GROWTH=1 \
+	   -fpermissive -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
 	   -s "EXTRA_EXPORTED_RUNTIME_METHODS=['addRunDependency', 'removeRunDependency', 'FS_createPreloadedFile', 'FS_createPath']" \
 	   -s DISABLE_EXCEPTION_CATCHING=0 \
 	   --memory-init-file 0
@@ -14,7 +14,7 @@ CFLAGS_DEBUG =
 #CFLAGS_DEBUG = -g3 --js-opts 0 -s SAFE_HEAP=1
 
 CFLAGS = $(CFLAGS_CORE) $(CFLAGS_DEBUG) -DUSE_OBAQ\
-	   -s USE_SDL=2 -O3\
+	   -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -O3\
 	   -s LEGACY_GL_EMULATION=1
 
 CFLAGS_GP = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
