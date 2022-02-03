@@ -9,13 +9,33 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <curl/curl.h>
 
 #include "webtask_linux.h"
 
 void WebTask::Reset( void )
 {
 	// Reset Value
+	Terminate();
 	mode = CZHTTP_MODE_READY;
+
+	const char* agent = str_agent;
+	if ( agent == NULL ) agent = "HSP3Dish(Windows)";
+
+	curl = curl_easy_init();
+	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, agent);
+	curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, (long)CURL_HTTP_VERSION_2TLS);
+	curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+
+	if ( proxy_url[0] != 0 ) {
+		curl_easy_setopt(curl, CURLOPT_PROXY, proxy_url);
+		if ( proxy_local ) {
+			char *local_prm = NULL;
+			local_prm = "<local>";
+			curl_easy_setopt(curl, CURLOPT_NOPROXY, local_prm);
+		}
+	}
 }
 
 
@@ -23,10 +43,16 @@ WebTask::WebTask( void )
 {
 	//	コンストラクタ
 	//
-	//str_agent = NULL;
+	str_agent = NULL;
 	mode = CZHTTP_MODE_NONE;
 	vardata = NULL;
 	postdata = NULL;
+	proxy_local = 0;
+	proxy_url[0] = 0;
+	req_header = NULL;
+	curl = NULL;
+
+	mcurl = curl_multi_init();
 
 	//	初期化を行う
 	Reset();
@@ -37,6 +63,26 @@ WebTask::~WebTask( void )
 {
 	//	デストラクタ
 	//
+	curl_multi_cleanup(mcurl);
+}
+
+void WebTask::Terminate( void )
+{
+	//	Delete Session
+	if ( curl != NULL ) {
+		curl_multi_remove_handle(mcurl, curl);
+		curl_easy_cleanup(curl);
+		curl = NULL;
+
+	}
+	errstr[0] = 0;
+	req_url[0] = 0;
+
+	//	Clear headers
+	if ( req_header != NULL ) { free( req_header ); req_header = NULL; }
+
+	ClearVarData();
+	ClearPostData();
 }
 
 
@@ -122,18 +168,59 @@ int WebTask::Exec( void )
 {
 	//	毎フレーム実行
 	//
-	//int handle;
+	CURLMcode ret;
+	int running = 1;
 
 	switch( mode ) {
 	case CZHTTP_MODE_VARREQUEST:
+		//printf("url %s\n", req_url.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, req_url.c_str());
+		if (postdata) {
+			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
+			curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)strlen(postdata));
+		}
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WebTask::OnReceive);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+		varsize = INETBUF_MAX;
+		ClearVarData();
+		vardata = (char *)malloc( varsize );
+		size = 0;
+		mode = CZHTTP_MODE_VARREQSEND;
+		// FALL THROUGH
 	case CZHTTP_MODE_VARREQSEND:
 		// HTTPに接続
-//		handle = emscripten_async_wget2_data(req_url.c_str(), varstr,
-//									postdata, this, true,
-//									WebTask::onLoaded, WebTask::onError, WebTask::onProgress);
+#if 0
+		//printf("perform curl\n");
+		ret = curl_easy_perform(curl);
+		if (ret == CURLE_OK) {
+			//printf("curle ok\n");
+			mode = CZHTTP_MODE_VARDATAEND;
+		} else {
+			//printf("curle error\n");
+		        char buffer[256];
+		        sprintf(buffer, "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_easy_strerror(ret));
+			SetError(buffer);
+		}
+#else
+
+		curl_multi_add_handle(mcurl, curl);
 		mode = CZHTTP_MODE_VARDATAWAIT;
+#endif
 		// FALL THROUGH
 	case CZHTTP_MODE_VARDATAWAIT:
+		ret = curl_multi_perform(mcurl, &running);
+		if (ret != CURLM_OK && ret != CURLM_CALL_MULTI_PERFORM) {
+		        char buffer[256];
+		        sprintf(buffer, "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_multi_strerror(ret));
+			SetError(buffer);
+			break;
+		}
+		if (running == 0) {
+			struct CURLMsg *m;
+
+			mode = CZHTTP_MODE_VARDATAEND;
+			break;
+		}
 		break;
 	case CZHTTP_MODE_VARDATAEND:
 		mode = CZHTTP_MODE_READY;
@@ -173,6 +260,18 @@ void WebTask::SetURL( char *url )
 	// サーバーのURLを設定
 	//
 	req_url = url;
+}
+
+
+void WebTask::SetHeader( char *header )
+{
+	// ヘッダ文字列の設定
+	//
+	if ( req_header != NULL ) { free( req_header ); req_header = NULL; }
+	if ( header == NULL ) return;
+	//
+	req_header = (char *)malloc( strlen( header ) + 1 );
+	strcpy( req_header, header );
 }
 
 
@@ -217,3 +316,21 @@ void WebTask::SetError( char *mes )
 	strcpy( errstr,mes );
 }
 
+size_t WebTask::OnReceive(char* ptr, size_t size, size_t nmemb, void* stream) {
+	//printf("curle receive %ld %ld\n", size, nmemb);
+	WebTask* web = (WebTask*) stream;
+	const size_t sizes = size * nmemb;
+
+	size_t needed_size = size + sizes;
+	if ( needed_size > web->varsize ) {
+		while ( needed_size > web->varsize ) {
+			web->varsize *= 2;
+		}
+		web->vardata = (char *)realloc( web->vardata, web->varsize );
+		//printf("curle alloc %ld %ld\n", (size_t)web->vardata, web->varsize);
+	}
+	memcpy(web->vardata + web->size, ptr, sizes);
+	web->size += sizes;
+	//printf("curle received %ld\n", web->size);
+	return sizes;
+}

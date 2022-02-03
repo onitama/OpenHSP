@@ -152,7 +152,7 @@ void strcase( char *str )
 		a1=*ss;
 		if (a1==0) break;
 		if (a1>=0x80) {
-			*ss++;
+			ss++;
 			a1=*ss++;
 			if (a1==0) break;
 		}
@@ -176,7 +176,7 @@ void strcase2( char *str, char *str2 )
 		a1=*ss;
 		if (a1==0) break;
 		if (a1>=0x80) {
-			*ss++;
+			ss++;
 			*ss2++=a1;
 			a1=*ss++;
 			if (a1==0) break;

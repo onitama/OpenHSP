@@ -742,7 +742,7 @@ static void HSP_run(GtkWidget *w,int flag)
 		p+=fread(complog+p,1,400,fp);
 	}
 	complog[p]='\0';
-	printf(complog);
+	printf("%s",complog);
 	if(pclose(fp)){
 		printf("hsed: Compile error.\n");
 		chdir(mydir);
@@ -769,7 +769,7 @@ static void HSP_run(GtkWidget *w,int flag)
 		p+=fread(complog+p,1,400,fp);
 	}
 	complog[p]='\0';
-	printf(complog);
+	printf("%s",complog);
 	pclose(fp);
 
 	sch = 0;
@@ -826,7 +826,7 @@ static void HSP_run(GtkWidget *w,int flag)
 			p = 0;
 		}
 		complog[p]='\0';
-		printf(complog);
+		printf("%s",complog);
 
 	} else {
 		//	結果をファイルから取得
