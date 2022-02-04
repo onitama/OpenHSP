@@ -35,6 +35,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include <emscripten.h>
+#include <emscripten/html5.h>
 
 //#define USE_OBAQ
 
@@ -565,6 +566,15 @@ static void hsp3dish_setdevinfo( HSP3DEVINFO *devinfo )
 	devinfo->devinfoi = hsp3dish_devinfoi;
 }
 
+static EM_BOOL hsp3dish_em_mouse_callback(int eventType, const EmscriptenMouseEvent *mouseEvent, void *userData)
+{
+	// デフォルト動作ではpreventDefault()されてフォーカスがあたらないので手動でフォーカスを要求する
+	EM_ASM_({
+		Module.canvas.focus();
+	});
+	return false;
+}
+
 /*----------------------------------------------------------*/
 
 int hsp3dish_init( char *startfile )
@@ -760,6 +770,9 @@ int hsp3dish_init( char *startfile )
 	HSP3DEVINFO *devinfo;
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo( devinfo );
+
+    // イベントハンドラ追加
+    emscripten_set_mousedown_callback("#canvas", nullptr, true, hsp3dish_em_mouse_callback);
 
 	return 0;
 }
