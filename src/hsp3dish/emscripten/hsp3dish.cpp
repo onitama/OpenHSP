@@ -185,7 +185,7 @@ static int handleEvent( void ) {
 		case SDL_KEYDOWN:
 			{
 			int wparam = 0;
-			int code = (int)event.key.keysym.sym;
+			int code = (int)event.key.keysym.scancode;
 			if (code < SDLK_SCANCODE_MAX) {
 				keys[code] = true;
 			}
@@ -285,8 +285,8 @@ static int handleEvent( void ) {
 			break;
 			}
 		case SDL_KEYUP:
-			if (event.key.keysym.sym < SDLK_SCANCODE_MAX) {
-				keys[event.key.keysym.sym] = false;
+			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX) {
+				keys[event.key.keysym.scancode] = false;
 			}
 			//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
