@@ -327,6 +327,11 @@ static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowt
 		return;
 	}
 
+	char *env_keyboard_element = getenv( "HSP_KEYBOARD_ELEMENT" );
+	if (env_keyboard_element) {
+		SDL_SetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT, env_keyboard_element);
+	}
+
 	window = SDL_CreateWindow( "HSPDish ver" hspver, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sx, sy, SDL_WINDOW_OPENGL );
 	if ( window==NULL ) {
 		printf("Unable to set window: %s\n", SDL_GetError());
