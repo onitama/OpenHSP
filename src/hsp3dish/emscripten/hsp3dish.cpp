@@ -35,6 +35,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include <emscripten.h>
+#include <emscripten/html5.h>
 
 //#define USE_OBAQ
 
@@ -184,7 +185,7 @@ static int handleEvent( void ) {
 		case SDL_KEYDOWN:
 			{
 			int wparam = 0;
-			int code = (int)event.key.keysym.sym;
+			int code = (int)event.key.keysym.scancode;
 			if (code < SDLK_SCANCODE_MAX) {
 				keys[code] = true;
 			}
@@ -284,8 +285,8 @@ static int handleEvent( void ) {
 			break;
 			}
 		case SDL_KEYUP:
-			if (event.key.keysym.sym < SDLK_SCANCODE_MAX) {
-				keys[event.key.keysym.sym] = false;
+			if (event.key.keysym.scancode < SDLK_SCANCODE_MAX) {
+				keys[event.key.keysym.scancode] = false;
 			}
 			//printf("key up: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
@@ -324,6 +325,11 @@ static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowt
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
 		printf("Unable to initialize SDL: %s\n", SDL_GetError());
 		return;
+	}
+
+	char *env_keyboard_element = getenv( "HSP_KEYBOARD_ELEMENT" );
+	if (env_keyboard_element) {
+		SDL_SetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT, env_keyboard_element);
 	}
 
 	window = SDL_CreateWindow( "HSPDish ver" hspver, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sx, sy, SDL_WINDOW_OPENGL );
@@ -565,6 +571,15 @@ static void hsp3dish_setdevinfo( HSP3DEVINFO *devinfo )
 	devinfo->devinfoi = hsp3dish_devinfoi;
 }
 
+static EM_BOOL hsp3dish_em_mouse_callback(int eventType, const EmscriptenMouseEvent *mouseEvent, void *userData)
+{
+	// デフォルト動作ではpreventDefault()されてフォーカスがあたらないので手動でフォーカスを要求する
+	EM_ASM_({
+		Module.canvas.focus();
+	});
+	return false;
+}
+
 /*----------------------------------------------------------*/
 
 int hsp3dish_init( char *startfile )
@@ -760,6 +775,9 @@ int hsp3dish_init( char *startfile )
 	HSP3DEVINFO *devinfo;
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo( devinfo );
+
+    // イベントハンドラ追加
+    emscripten_set_mousedown_callback("#canvas", nullptr, true, hsp3dish_em_mouse_callback);
 
 	return 0;
 }

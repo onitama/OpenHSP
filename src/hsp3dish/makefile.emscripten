@@ -8,6 +8,7 @@ CFLAGS_CORE = -Wall -DNDEBUG -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG \
 	   -fpermissive -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
 	   -s "EXTRA_EXPORTED_RUNTIME_METHODS=['addRunDependency', 'removeRunDependency', 'FS_createPreloadedFile', 'FS_createPath']" \
 	   -s DISABLE_EXCEPTION_CATCHING=0 \
+	   -lidbfs.js \
 	   --memory-init-file 0
 CFLAGS_DEBUG =
 #CFLAGS_DEBUG = -g3 --js-opts 0

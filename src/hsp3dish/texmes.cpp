@@ -378,9 +378,11 @@ unsigned char* texmesManager::texmesGetFont(char* msg, int* out_sx, int* out_sy,
 	int sx, sy, size;
 	int pitch,tsx,tsy;
 
+#if !defined(HSPEMSCRIPTEN)
 	if (info) {
 		info->length = 0;
 	}
+#endif
 
 	hgio_fontsystem_exec(msg, NULL, 0, &sx, &sy, info);
 
