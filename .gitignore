@@ -1,9 +1,12 @@
-*.ax
 *.gpo
 *.do
 *.o
 __hsptmp.*
 .hspres
+hsptmp
+obj
+packfile
+start.ax
 
 # Built outputs
 *.a
