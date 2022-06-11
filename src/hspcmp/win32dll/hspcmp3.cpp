@@ -266,7 +266,7 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	strcat( fname2, ".i" );
 	hsc3->SetCommonPath( compath );
 	ppopt = 0;
-	if ( p1 ) ppopt|=HSC3_OPT_DEBUGMODE;
+	if ( p1&1 ) ppopt|=HSC3_OPT_DEBUGMODE;
 	if ( p2&1 ) ppopt|=HSC3_OPT_NOHSPDEF;
 	if ( p2&4 ) ppopt|=HSC3_OPT_MAKEPACK;
 	if ( p2&8 ) ppopt|=HSC3_OPT_READAHT;
