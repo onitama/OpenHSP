@@ -23,6 +23,8 @@
 #include "../../hsp3/strnote.h"
 #include "../../hsp3/linux/hsp3ext_sock.h"
 
+#define MAXWAITDELAY (16)
+
 struct engine;
 
 //#include "../emscripten/appengine.h"
@@ -377,8 +379,11 @@ bool get_key_state(int sym)
 
 void hsp3dish_dialog( char *mes )
 {
-	//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", mes, window);
+#ifndef HSPRASPBIAN
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", mes, window);
+#else
 	printf( "%s\n", mes );
+#endif
 }
 
 static int hsp3dish_initwindow( engine* p_engine, int sx, int sy, int autoscale, char *windowtitle )
@@ -887,16 +892,16 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 {
 	int tick;
 
-	if ( handleEvent() ) {
-		hspctx->runmode = RUNMODE_END;
-	}
-
 	while(1) {
 		// logmes なら先に処理する
 		if ( hspctx->runmode == RUNMODE_LOGMES ) {
 			printf( "%s\r\n",ctx->stmp );
 			hspctx->runmode = RUNMODE_RUN;
 			return;
+		}
+
+		if ( handleEvent() ) {
+			hspctx->runmode = RUNMODE_END;
 		}
 
 		switch( hspctx->runmode ) {
@@ -909,15 +914,19 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			//	高精度タイマー
 			tick = hgio_gettick();					// すこし早めに抜けるようにする
 			if ( code_exec_await( tick ) != RUNMODE_RUN ) {
-					SDL_Delay( ( hspctx->waittick - tick) / 2 );
-			} else {
-				tick = hgio_gettick();
-				while( tick < hspctx->waittick ) {	// 細かいwaitを取る
-					SDL_Delay(1);
-					tick = hgio_gettick();
+				int maxtick = hspctx->waittick - tick;
+				if ( maxtick >= MAXWAITDELAY ) {
+					if ( maxtick > MAXWAITDELAY ) maxtick = MAXWAITDELAY;
+					SDL_Delay( maxtick );
+				} else {
+					while( tick < hspctx->waittick ) {	// 細かいwaitを取る
+						SDL_Delay(1);
+						tick = hgio_gettick();
+					}
+					hspctx->lasttick = tick;
+					hspctx->runmode = RUNMODE_RUN;
 				}
-				hspctx->lasttick = tick;
-				hspctx->runmode = RUNMODE_RUN;
+			} else {
 #ifndef HSPDEBUG
 				if ( ctx->hspstat & HSPSTAT_SSAVER ) {
 					if ( hsp_sscnt ) hsp_sscnt--;
