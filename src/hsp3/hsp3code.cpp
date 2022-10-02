@@ -297,7 +297,9 @@ void code_puterror( HSPERROR error )
 	//
 	if ( error == HSPERR_NONE ) {
 		hspctx->runmode = RUNMODE_END;
+#ifndef __GNUC__
 		return;
+#endif
 	}
 	throw error;
 }

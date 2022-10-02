@@ -353,16 +353,23 @@ static int handleEvent( void ) {
 				break;
 			}
 
+		case SDL_WINDOWEVENT:
+			if (event.window.event==SDL_WINDOWEVENT_CLOSE) {
+				int id,retval;
+				id = 0;
+				if (code_isirq(HSPIRQ_ONEXIT)) {
+					int iparam = 0;
+					retval = code_sendirq(HSPIRQ_ONEXIT, iparam, id, 0);
+					if (retval == RUNMODE_INTJUMP) retval = code_execcmd2();	// onexit goto時は実行してみる
+					if (retval != RUNMODE_END) break;
+				}
+				code_puterror(HSPERR_NONE);
+				res = -1;
+			}
+			break;
+
 		case SDL_QUIT: /** ウィンドウのxボタンやctrl-Cを押した場合 */
 			{
-			int id,retval;
-			id = 0;
-			if (code_isirq(HSPIRQ_ONEXIT)) {
-				int iparam = 0;
-				retval = code_sendirq(HSPIRQ_ONEXIT, iparam, id, 0);
-				if (retval == RUNMODE_INTJUMP) retval = code_execcmd2();	// onexit goto時は実行してみる
-				if (retval != RUNMODE_END) return 0;
-			}
 			code_puterror(HSPERR_NONE);
 			res = -1;
 			break;
