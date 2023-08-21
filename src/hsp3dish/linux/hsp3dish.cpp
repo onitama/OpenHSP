@@ -803,7 +803,7 @@ int hsp3dish_init( char *startfile )
 
 void hsp3dish_error( void )
 {
-	char errmsg[1024];
+	char errmsg[4096];
 	char *msg;
 	char *fname;
 	HSPERROR err;
@@ -820,7 +820,8 @@ void hsp3dish_error( void )
 		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
 	}
 	hsp3dish_debugopen();
-	hsp3dish_dialog( errmsg );
+	printf( "%s\n", errmsg );
+	//hsp3dish_dialog( errmsg );
 }
 
 
