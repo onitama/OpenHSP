@@ -55,6 +55,7 @@ OBJS = \
 	src/hsp3/hspvar_label.js.o \
 	src/hsp3/hspvar_str.js.o \
 	src/hsp3/hspvar_struct.js.o \
+	src/hsp3/hspvar_int64.js.o \
 	src/hsp3dish/hspwnd_dish.js.o \
 	src/hsp3dish/hspwnd_obj.js.o \
 	src/hsp3dish/hspwnd_edit.js.o \
@@ -98,6 +99,7 @@ OBJS_GP = \
 	src/hsp3/hspvar_label.g.o \
 	src/hsp3/hspvar_str.g.o \
 	src/hsp3/hspvar_struct.g.o \
+	src/hsp3/hspvar_int64.g.o \
 	src/hsp3dish/hspwnd_dish.g.o \
 	src/hsp3dish/hspwnd_obj.g.o \
 	src/hsp3dish/hspwnd_edit.g.o \

@@ -63,6 +63,13 @@ static void *HspVarStr_Cnv( const void *buffer, int flag )
 		//_gcvt( *(double *)buffer, 32, conv );
 		sprintf( conv,"%f", *(double *)buffer );
 		return conv;
+	case HSPVAR_FLAG_INT64:
+#ifdef HSPWIN
+		_i64toa( *(int64_t *)buffer, conv, 10 );
+#else
+		sprintf( conv, "%lld", (long long)(*(int64_t*)buffer));
+#endif
+		return conv;
 	default:
 		throw HSPVAR_ERROR_TYPEMISS;
 	}

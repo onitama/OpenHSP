@@ -5,6 +5,7 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "hsp3config.h"
@@ -49,6 +50,9 @@ static void *HspVarInt_Cnv( const void *buffer, int flag )
 		break;
 	case HSPVAR_FLAG_DOUBLE:
 		conv = (int)( *(double *)buffer );
+		return &conv;
+	case HSPVAR_FLAG_INT64:
+		conv = (int)( *(int64_t *)buffer );
 		return &conv;
 	default:
 		throw HSPVAR_ERROR_TYPEMISS;
