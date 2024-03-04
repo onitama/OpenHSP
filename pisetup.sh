@@ -11,3 +11,4 @@ make -f makefile.raspbian
 sudo cp hsed.png /usr/share/pixmaps/
 sudo cp hsed.desktop /usr/share/applications/
 lxpanelctl restart
+
