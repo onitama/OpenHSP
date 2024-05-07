@@ -323,7 +323,7 @@ size_t WebTask::OnReceive(char* ptr, size_t size, size_t nmemb, void* stream) {
 	WebTask* web = (WebTask*) stream;
 	const size_t sizes = size * nmemb;
 
-	size_t needed_size = size + sizes;
+	size_t needed_size = web->size + sizes;
 	if ( needed_size > web->varsize ) {
 		while ( needed_size > web->varsize ) {
 			web->varsize *= 2;
