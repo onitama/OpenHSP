@@ -197,8 +197,8 @@ int WebTask::Exec( void )
 			mode = CZHTTP_MODE_VARDATAEND;
 		} else {
 			//printf("curle error\n");
-		        char buffer[256];
-		        sprintf(buffer, "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_easy_strerror(ret));
+			char buffer[256];
+			snprintf(buffer, sizeof(buffer), "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_easy_strerror(ret));
 			SetError(buffer);
 		}
 #else
@@ -210,14 +210,16 @@ int WebTask::Exec( void )
 	case CZHTTP_MODE_VARDATAWAIT:
 		ret = curl_multi_perform(mcurl, &running);
 		if (ret != CURLM_OK && ret != CURLM_CALL_MULTI_PERFORM) {
-		        char buffer[256];
-		        sprintf(buffer, "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_multi_strerror(ret));
+			curl_multi_remove_handle(mcurl, curl);
+			char buffer[256];
+			snprintf(buffer, sizeof(buffer), "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_multi_strerror(ret));
 			SetError(buffer);
 			break;
 		}
 		if (running == 0) {
 			struct CURLMsg *m;
 
+			curl_multi_remove_handle(mcurl, curl);
 			mode = CZHTTP_MODE_VARDATAEND;
 			break;
 		}
@@ -321,7 +323,7 @@ size_t WebTask::OnReceive(char* ptr, size_t size, size_t nmemb, void* stream) {
 	WebTask* web = (WebTask*) stream;
 	const size_t sizes = size * nmemb;
 
-	size_t needed_size = size + sizes;
+	size_t needed_size = web->size + sizes;
 	if ( needed_size > web->varsize ) {
 		while ( needed_size > web->varsize ) {
 			web->varsize *= 2;
