@@ -180,7 +180,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 #ifdef JPNMSG
 			tk.Mes( "#プリプロセッサファイルの出力に失敗しました" );
 #else
-			tk.Mes( "#Can't write output file." );
+			tk.Mes( "#Can't write output file" );
 #endif
 			return -2;
 		}
@@ -205,11 +205,14 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 #ifdef JPNMSG
 			tk.Mes( "#packfileの出力に失敗しました" );
 #else
-			tk.Mes( "#Can't write packfile." );
+			tk.Mes( "#Failed to output packfile" );
 #endif
 			return -3;
 		}
-		tk.Mes( "#packfile generated." );
+#ifdef JPNMSG
+		tk.Mes( "#パックファイルを生成しました" );
+#else
+		tk.Mes( "#Generated packfile" );
 	}
 
 	hed_option = tk.GetHeaderOption();
@@ -267,10 +270,18 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 	sprintf( mm,"#%s ver%s / onion software 1997-2021(c)", HSC3TITLE2, hspver );
 	tk.Mes( mm );
 	if (genmode & HSC3_MODE_UTF8) {
-		tk.Mes("#use UTF-8 strings.");
+#ifdef JPNMSG
+		tk.Mes("#UTF-8文字列を使用します");
+#else
+		tk.Mes("#Use UTF-8 strings");
+#endif
 	}
 	if (genmode & HSC3_MODE_STRMAP) {
-		tk.Mes("#output string map.");
+#ifdef JPNMSG
+		tk.Mes("#文字列マップを出力します");
+#else
+		tk.Mes("#Output string map");
+#endif
 	}
 
 	if ( outbuf != NULL ) {

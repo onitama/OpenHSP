@@ -388,7 +388,10 @@ void CAht::UpdateModelProperty( int id )
 CAht::CAht( void )
 {
 	stdbuf = new CMemBuf( 0x1000 );		// debug message buffer
-	Mesf( "AHT processor ready.\r\n" );
+#ifdef JPNMSG
+	Mesf( "AHTプロセッサが準備されました\r\n" );
+#else
+	Mesf( "AHT processor is ready\r\n" );
 	mem_ahtmodel = NULL;				// model data
 	model_cnt = 0;
 	mem_ahtmodel_size = 0;
