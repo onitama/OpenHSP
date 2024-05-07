@@ -158,9 +158,9 @@ void CToken::CalcCG_factor( void )
 		if ( lb->GetType(id) == TYPE_VAR ) {
 			if ( lb->GetInitFlag(id) == LAB_INIT_NO ) {
 #ifdef JPNMSG
-				Mesf( "#未初期化の変数があります(%s)", cg_str );
+				Mesf( "#未初期化の変数があります (%s)", cg_str );
 #else
-				Mesf( "#Uninitalized variable (%s).", cg_str );
+				Mesf( "#Uninitalized variable (%s)", cg_str );
 #endif
 				if ( hed_cmpmode & CMPMODE_VARINIT ) {
 					throw CGERROR_VAR_NOINIT;
@@ -1638,7 +1638,7 @@ void CToken::GenerateCodePP_func( int deftype )
 #ifdef JPNMSG
 			Mesf( "#未使用の外部DLL関数の登録を削除しました %s", fbase );
 #else
-			Mesf( "#Delete func %s", fbase );
+			Mesf( "#Removed unused external DLL function registration %s", fbase );
 #endif
 		}
 		return;
@@ -1791,7 +1791,7 @@ int CToken::GetParameterTypeCG( char *name )
 #ifdef JPNMSG
 		Mesf( "警告:古いdeffunc表記があります 行%d.[%s]", cg_orgline, name );
 #else
-		Mesf( "Warning:Old deffunc expression at %d.[%s]", cg_orgline, name );
+		Mesf( "Warning: Old deffunc expression at %d.[%s]", cg_orgline, name );
 #endif
 		return MPTYPE_SINGLEVAR;
 	}
@@ -2024,7 +2024,7 @@ void CToken::GenerateCodePP_module( void )
 #ifdef JPNMSG
 					Mesf( "#未使用のモジュールを削除しました %s", modname );
 #else
-					Mesf( "#Delete module %s", modname );
+					Mesf( "#Removed unused module %s", modname );
 #endif
 				}
 				return;
@@ -2449,7 +2449,7 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 #ifdef JPNMSG
 				Mesf( "#ラベルの定義が存在しません [%s]", lb->GetName(a) );
 #else
-				Mesf( "#Label definition not found [%s]", lb->GetName(a) );
+				Mesf( "Label definition doesn't exist [%s]", lb->GetName(a) );
 #endif
 				errend++;
 			}
@@ -2461,7 +2461,7 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 #ifdef JPNMSG
 				Mesf( "#関数が定義されていません [%s]", lb->GetName(GET_FI(a)->otindex) );
 #else
-				Mesf( "#Function not found [%s]", lb->GetName(GET_FI(a)->otindex) );
+				Mesf( "Function is not defined [%s]", lb->GetName(GET_FI(a)->otindex) );
 #endif
 				errend++;
 			}
@@ -2472,7 +2472,7 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 #ifdef JPNMSG
 				Mesf( "#波括弧が閉じられていません" );
 #else
-				Mesf( "#Missing closing braces" );
+				Mesf( "Brace is not closed" );
 #endif
 				errend ++;
 		}
@@ -2596,7 +2596,11 @@ int CToken::PutDSStr(char *str, bool converts_to_utf8)
 			int i_cache = ds_buf->SearchIndexedData(p, -1);
 			if (i_cache >= 0) {
 				if (CG_optInfo()) {
-					Mesf("#String pool:%s", p);
+#ifdef JPNMSG
+					Mesf("#文字列プール: %s", p);
+#else
+					Mesf("#String pool: %s", p);
+#endif
 				}
 				return i_cache;
 			}
@@ -3006,7 +3010,11 @@ int CToken::GenerateCode( char *fname, char *oname, int mode )
 {
 	CMemBuf srcbuf;
 	if ( srcbuf.PutFile( fname ) < 0 ) {
-		Mes( "#No file." );
+#ifdef JPNMSG
+		Mes( "#ファイルが見つかりません" );
+#else
+		Mes( "#File not found" );
+#endif
 		return -1;
 	}
 	return GenerateCode( &srcbuf, oname, mode );
@@ -3051,7 +3059,11 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		char tmp[512];
 		CStrNote note;
 		CMemBuf srctmp;
-		Mesf( "%s(%d) : error %d : %s (%d行目)", cg_orgfile, cg_orgline, res, cg_geterror((CGERROR)res), cg_orgline );
+#ifdef JPNMSG
+		Mesf( "%s(%d) : エラー %d : %s (%d行目)", cg_orgfile, cg_orgline, res, cg_geterror((CGERROR)res), cg_orgline );
+#else
+		Mesf( "%s(%d) : Error %d : %s (%d line)", cg_orgfile, cg_orgline, res, cg_geterror((CGERROR)res), cg_orgline );
+#endif
 		if ( cg_errline > 0 ) {
 			note.Select( bakbuf.GetBuffer() );
 			note.GetLine( tmp, cg_errline-1, 510 );
@@ -3213,18 +3225,31 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 #ifdef JPNMSG
 			Mes( "#出力ファイルを書き込めません" );
 #else
-			Mes( "#Can't write output file." );
+			Mes( "#Failed to write output file" );
 #endif
 		} else {
 			int n_mod, n_hpi;
 			n_hpi = hpi_buf->GetSize() / sizeof(HPIDAT);
 			n_mod = fi_buf->GetSize() / sizeof(STRUCTDAT);
-			Mesf( "#Code size (%d) String data size (%d) param size (%d)",cs_size,ds_size,mi_buf->GetSize() );
+#ifdef JPNMSG
+			Mesf( "#コードサイズ (%d) 文字列データサイズ (%d) パラメータサイズ (%d)", cs_size, ds_size, mi_buf->GetSize() );
+			Mesf( "#変数 (%d) ラベル (%d) モジュール (%d) ライブラリ (%d) プラグイン (%d)", cg_valcnt, ot_size >> 2, n_mod, li_size, n_hpi );
+#else
+			Mesf( "#Code size (%d) String data size (%d) param size (%d)", cs_size, ds_size, mi_buf->GetSize() );
 			Mesf( "#Vars (%d) Labels (%d) Modules (%d) Libs (%d) Plugins (%d)",cg_valcnt,ot_size>>2,n_mod,li_size,n_hpi );
+#endif
 			if (sz_exopt) {
-				Mesf("#Output extra data field (%d).", sz_exopt);
+#ifdef JPNMSG
+				Mesf("#出力拡張データフィールド (%d)", sz_exopt);
+#else
+				Mesf("#Output extended data field (%d)", sz_exopt);
+#endif
 			}
-			Mesf( "#No error detected. (total %d bytes)",hsphed.allsize );
+#ifdef JPNMSG
+			Mesf( "#コンパイル完了. (合計 %d バイト)", hsphed.allsize );
+#else
+			Mesf( "#Compile completed. (total %d bytes)", hsphed.allsize );
+#endif
 			res = 0;
 		}
 	}

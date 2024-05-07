@@ -3518,7 +3518,7 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 #ifdef JPNMSG
 						Mesf( "#スクリプトファイルが見つかりません [%s]", purename );
 #else
-						Mesf( "#Source file not found.[%s]", purename );
+						Mesf( "#Couldn't find script file [%s]", purename );
 #endif
 					}
 					return -1;
@@ -3529,7 +3529,11 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 	fbuf.Put( (char)0 );
 
 	if ( fileadd ) {
-		Mesf( "#Use file [%s]",purename );
+#ifdef JPNMSG
+		Mesf( "#ファイルを追加 [%s]", purename );
+#else
+		Mesf( "#Add file [%s]", purename );
+#endif
 	}
 
 	char *fname_literal = to_hsp_string_literal( refname );
@@ -3549,7 +3553,7 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 #ifdef JPNMSG
 			Mesf( "#スタックが空になっていないマクロタグが%d個あります [%s]", res, refname_copy );
 #else
-			Mesf( "#%d unresolved macro(s).[%s]", res, refname_copy );
+			Mesf( "#There are %d macro tags that have not been emptied [%s]", res, refname_copy );
 #endif
 			Mes( linebuf );
 		}
@@ -3560,7 +3564,7 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 #ifdef JPNMSG
 		Mes("#重大なエラーが検出されています");
 #else
-		Mes( "#Fatal error reported." );
+		Mes("#A fatal error has been detected");
 #endif
 		return -2;
 	}
