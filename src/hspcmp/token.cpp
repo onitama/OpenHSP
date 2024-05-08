@@ -867,16 +867,27 @@ int CToken::Calc( CALCVAR &val )
 	Calc_token();
 	Calc_start( v );
 	if ( ttype == TK_CALCERROR ) {
-		SetError("abnormal calculation");
+#ifdef JPNMSG
+		SetError("計算式が異常です");
+#else
+		SetError("Abnormal calculation");
+#endif
 		return -1;
 	}
 	if (ttype != TK_NONE) {
-		SetError("expression syntax error");
+#ifdef JPNMSG
+		SetError("式の構文が異常です");
+#else
+		SetError("Syntax error in expression");
 		return -1;
 	}
 	if ( wp==NULL ) { val = v; return 0; }
 	if ( *wp==0 ) { val = v; return 0; }
-	SetError("expression syntax error");
+#ifdef JPNMSG
+	SetError("式の構文が異常です");
+#else
+	SetError("Syntax error in expression");
+#endif
 	return -1;
 }
 
@@ -1607,7 +1618,7 @@ int CToken::ReplaceLineBuf( char *str1, char *str2, char *repl, int opt, MACDEF 
 #ifdef JPNMSG
 				SetError("ctypeマクロの直後には、丸括弧でくくられた引数リストが必要です");
 #else
-				SetError("C-Type macro syntax error");
+				SetError("C-Type macro requires a parameter list enclosed in parentheses immediately after it");
 #endif
 				return 4;
 			}
@@ -1684,7 +1695,7 @@ int CToken::ReplaceLineBuf( char *str1, char *str2, char *repl, int opt, MACDEF 
 #ifdef JPNMSG
 				SetError("マクロの引数が多すぎます");
 #else
-				SetError("too many macro parameters");
+				SetError("Too many macro arguments");
 #endif
 				return 3;
 			}
@@ -1705,7 +1716,14 @@ int CToken::ReplaceLineBuf( char *str1, char *str2, char *repl, int opt, MACDEF 
 	wp = (unsigned char *)repl;
 	while(1) {					// マクロ置き換え
 		if ( wp==NULL ) break;
-		if ( w>=linetmp ) { SetError("macro buffer overflow"); return 4; }
+		if ( w>=linetmp ) {
+#ifdef JPNMSG
+			SetError("マクロバッファがオーバーフローしました");
+#else
+			SetError("Macro buffer overflow");
+#endif
+			return 4; 
+		}
 		a1=*wp++;if (a1==0) break;
 		if (a1=='%') {
 			if (*wp=='%') { *w++=a1;wp++;continue; }
@@ -1725,7 +1743,12 @@ int CToken::ReplaceLineBuf( char *str1, char *str2, char *repl, int opt, MACDEF 
 				case 's':
 					val = (int)(s3[1]-48);val--;
 					if ( !( 0 <= val && val <= macopt - 1 ) ) {
-						SetError("illegal macro parameter %s"); return 2;
+#ifdef JPNMSG
+						SetError("マクロパラメータが不正です %s");
+#else
+						SetError("Invalid macro parameter %s");
+#endif
+						return 2;
 					}
 					w2 = mactmp;
 					p = prm[val]; endp = prme[val];
@@ -1793,7 +1816,7 @@ int CToken::ReplaceLineBuf( char *str1, char *str2, char *repl, int opt, MACDEF 
 #ifdef JPNMSG
 					SetError("デフォルトパラメータのないマクロの引数は省略できません");
 #else
-					SetError("no default parameter");
+					SetError("Cannot omit macro arguments without default parameters");
 #endif
 					return 5;
 				}
@@ -1814,7 +1837,14 @@ int CToken::ReplaceLineBuf( char *str1, char *str2, char *repl, int opt, MACDEF 
 	}
 	*w = 0;
 	if ( last!=NULL ) {
-		if ( w + strlen(last) + 1 >= linetmp ) { SetError("macro buffer overflow"); return 4; }
+		if ( w + strlen(last) + 1 >= linetmp ) {
+#ifdef JPNMSG
+			SetError("マクロバッファがオーバーフローしました");
+#else
+			SetError("Macro buffer overflow");
+#endif
+			return 4; 
+		}
 		strcpy( w, last );
 	}
 	return 0;
@@ -1825,7 +1855,11 @@ ppresult_t CToken::PP_SwitchStart( int sw )
 {
 	if ( swsp==0 ) { swflag = 1; swlevel = LMODE_ON; }
 	if ( swsp >= SWSTACK_MAX ) {
-		SetError("#if nested too deeply");
+#ifdef JPNMSG
+		SetError("#ifネストが深すぎる");
+#else
+		SetError("#if nesting is too deep");
+#endif
 		return PPRESULT_ERROR;
 	}
 	swstack[swsp] = swflag;				// 有効フラグ
@@ -1845,7 +1879,11 @@ ppresult_t CToken::PP_SwitchStart( int sw )
 ppresult_t CToken::PP_SwitchEnd( void )
 {
 	if ( swsp == 0 ) {
+#ifdef JPNMSG
+		SetError("#endifなしの#if");
+#else
 		SetError("#endif without #if");
+#endif
 		return PPRESULT_ERROR;
 	}
 	swsp--;
@@ -1860,11 +1898,20 @@ ppresult_t CToken::PP_SwitchEnd( void )
 ppresult_t CToken::PP_SwitchReverse( void )
 {
 	if ( swsp == 0 ) {
+		// SetError("#else without #if");
+#ifdef JPNMSG
+		SetError("#elseなしの#if");
+#else
 		SetError("#else without #if");
+#endif
 		return PPRESULT_ERROR;
 	}
 	if ( swmode != 0 ) {
+#ifdef JPNMSG
+		SetError("#elseの後に#else");
+#else
 		SetError("#else after #else");
+#endif
 		return PPRESULT_ERROR;
 	}
 	if ( swstack[swsp-1] == 0 ) return PPRESULT_SUCCESS;	// 上のスタックが無効なら無視
@@ -1883,15 +1930,28 @@ ppresult_t CToken::PP_Include( int is_addition )
 	int add_bak;
 	if ( GetToken() != TK_STRING ) {
 		if ( is_addition ) {
-			SetError("invalid addition suffix");
+			// SetError("invalid addition suffix");
+#ifdef JPNMSG
+			SetError("追加指定が不正です");
+#else
+			SetError("Invalid addition suffix");
+#endif
 		} else {
-			SetError("invalid include suffix");
+#ifdef JPNMSG
+			SetError("インクルード指定が不正です");
+#else
+			SetError("Invalid include suffix");
+#endif
 		}
 		return PPRESULT_ERROR;
 	}
 	incinf++;
 	if ( incinf > 32 ) {
-		SetError("too many include level");
+#ifdef JPNMSG
+		SetError("インクルードレベルが深すぎます");
+#else
+		SetError("Include level is too deep");
+#endif
 		return PPRESULT_ERROR;
 	}
 	strcpy( tmp_spath, search_path );
@@ -1923,14 +1983,23 @@ ppresult_t CToken::PP_Const( void )
 	glmode = 0;
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
-		sprintf( strtmp,"invalid symbol [%s]", word );
+#ifdef JPNMSG
+		SetError( "シンボルが不正です [%s]", word );
+#else
+		SetError( "Invalid symbol [%s]", word );
+#endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
 
 	strcase( word );
 	if (tstrcmp(word,"global")) {		// global macro
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad global syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "global構文が不正です" );
+#else
+			SetError( "Invalid global syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		glmode=1;
 		strcase( word );
@@ -1944,7 +2013,12 @@ ppresult_t CToken::PP_Const( void )
 	}
 	if (valuetype != ConstType::Indeterminate) {
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad #const syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "#const構文が不正です" );
+#else
+			SetError( "Invalid #const syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		strcase(word);
 	}
@@ -1981,7 +2055,12 @@ ppresult_t CToken::PP_Const( void )
 				ahtmodel->SetPropertyDefaultInt( keyword, (int)cres );
 			}
 			if ( ahtmodel->SetAHTPropertyString( keyword, ahtkeyword ) ) {
-				SetError( "AHT parameter syntax error" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+				SetError( "AHTパラメータ構文エラー" );
+#else
+				SetError( "AHT parameter syntax error" );
+#endif
+				return PPRESULT_ERROR;
 			}
 		}
 	}
@@ -2010,14 +2089,23 @@ ppresult_t CToken::PP_Enum( void )
 	glmode = 0;
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
-		sprintf( strtmp,"invalid symbol [%s]", word );
+#ifdef JPNMSG
+		SetError( "シンボルが不正です [%s]", word );
+#else
+		SetError( "Invalid symbol [%s]", word );
+#endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
 
 	strcase( word );
 	if (tstrcmp(word,"global")) {		// global macro
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad global syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "global構文が不正です" );
+#else
+			SetError( "Invalid global syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		glmode=1;
 		strcase( word );
@@ -2120,27 +2208,46 @@ ppresult_t CToken::PP_Define( void )
 	glmode = 0; ctype = 0;
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
-		sprintf( strtmp,"invalid symbol [%s]", word );
+#ifdef JPNMSG
+		SetError( "シンボルが不正です [%s]", word );
+#else
+		SetError( "Invalid symbol [%s]", word );
+#endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
 
 	strcase( word );
 	if (tstrcmp(word,"global")) {		// global macro
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad macro syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "マクロ構文が不正です" );
+#else
+			SetError( "Invalid macro syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		glmode=1;
 		strcase( word );
 	}
 	if (tstrcmp(word,"ctype")) {		// C-type macro
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad macro syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "マクロ構文が不正です" );
+#else
+			SetError( "Invalid macro syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		ctype=1;
 		strcase( word );
 		if (tstrcmp(word, "global")) {		// global macro
 			if (GetToken() != TK_OBJ || glmode==1) {
-				SetError("bad macro syntax"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+				SetError( "マクロ構文が不正です" );
+#else
+				SetError( "Invalid macro syntax" );
+#endif
+				return PPRESULT_ERROR;
 			}
 			glmode = 1;
 			strcase(word);
@@ -2175,7 +2282,12 @@ ppresult_t CToken::PP_Define( void )
 				AHTPROP *prop;
 				prop = ahtmodel->SetPropertyDefault( keyword, wdata );
 				if ( ahtmodel->SetAHTPropertyString( keyword, ahtkeyword ) ) {
-					SetError( "AHT parameter syntax error" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+					SetError( "AHTパラメータ構文エラー" );
+#else
+					SetError( "AHT parameter syntax error" );
+#endif
+					return PPRESULT_ERROR;
 				}
 				if ( prop->ahtmode & AHTMODE_OUTPUT_RAW ) {
 					ahtmodel->SetPropertyDefaultStr( keyword, wdata );
@@ -2251,14 +2363,22 @@ ppresult_t CToken::PP_Define( void )
 					break;
 				}
 				if ( type != TK_NUM ) {
-					SetError("bad default value");
+#ifdef JPNMSG
+					SetError("デフォルト値が不正です");
+#else
+					SetError("Invalid default value");
+#endif
 					return PPRESULT_ERROR;
 				}
 				//_itoa( val, word, 10 );
 				sprintf( word,"-%d",val );
 				break;
 			default:
-				SetError("bad default value");
+#ifdef JPNMSG
+				SetError("デフォルト値が不正です");
+#else
+				SetError("Invalid default value");
+#endif
 				return PPRESULT_ERROR;
 			}
 			macbuf = (macdef->data) + macptr;
@@ -2279,7 +2399,14 @@ ppresult_t CToken::PP_Define( void )
 			wp++;
 		}
 	}
-	if ( a1 == 0 ) { SetError("macro contains no data"); return PPRESULT_ERROR; }
+	if ( a1 == 0 ) {
+#ifdef JPNMSG
+		SetError("マクロにデータがありません");
+#else
+		SetError("Macro contains no data");
+#endif
+		return PPRESULT_ERROR; 
+	}
 	if ( ctype ) prms|=PRM_FLAG_CTYPE;
 
 	//		データ定義
@@ -2293,7 +2420,11 @@ ppresult_t CToken::PP_Define( void )
 	return PPRESULT_SUCCESS;
 
 bad_macro_param_expr:
-	SetError("bad macro parameter expression");
+#ifdef JPNMSG
+	SetError("マクロパラメータが不正です");
+#else
+	SetError("Invalid macro parameter expression");
+#endif
 	return PPRESULT_ERROR;
 }
 
@@ -2318,7 +2449,14 @@ ppresult_t CToken::PP_Defcfunc( int mode )
 	if ( i == TK_OBJ ) {
 		strcase( word );
 		if (tstrcmp(word,"local")) {		// local option
-			if ( *mod == 0 ) { SetError("module name not found"); return PPRESULT_ERROR; }
+			if ( *mod == 0 ) {
+#ifdef JPNMSG
+				SetError("モジュール名が見つかりません");
+#else
+				SetError("Module name not found");
+#endif
+				return PPRESULT_ERROR;
+			}
 			glmode = 1;
 			i = GetToken();
 		}
@@ -2329,7 +2467,14 @@ ppresult_t CToken::PP_Defcfunc( int mode )
 	}
 
 	strcase2( word, fixname );
-	if ( i != TK_OBJ ) { SetError("invalid func name"); return PPRESULT_ERROR; }
+	if ( i != TK_OBJ ) {
+#ifdef JPNMSG
+		SetError("関数名が不正です");
+#else
+		SetError("Invalid function name");
+#endif
+		return PPRESULT_ERROR;
+	}
 	i = lb->Search( fixname );if ( i != -1 ) {
 		if ( lb->GetFlag(i) != LAB_TYPE_PP_PREMODFUNC ) {
 			SetErrorSymbolOverdefined(fixname, i); return PPRESULT_ERROR;
@@ -2359,7 +2504,14 @@ ppresult_t CToken::PP_Defcfunc( int mode )
 		} else {
 			wrtbuf->PutStr( "modinit " );
 		}
-		if ( *mod == 0 ) { SetError("module name not found"); return PPRESULT_ERROR; }
+		if ( *mod == 0 ) {
+#ifdef JPNMSG
+			SetError("モジュール名が見つかりません");
+#else
+			SetError("Module name not found");
+#endif
+			return PPRESULT_ERROR;
+		}
 		wrtbuf->PutStr( mod );
 		if ( wp != NULL ) wrtbuf->Put( ',' );
 	}
@@ -2379,7 +2531,12 @@ ppresult_t CToken::PP_Defcfunc( int mode )
 		}
 		if ( wp == NULL ) break;
 		if ( i != TK_OBJ ) {
-			SetError("invalid func param"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("関数パラメータが不正です");
+#else
+			SetError("Invalid function parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 
 		i = GetToken();
@@ -2392,7 +2549,12 @@ ppresult_t CToken::PP_Defcfunc( int mode )
 		}
 		if ( wp == NULL ) break;
 		if ( i != ',' ) {
-			SetError("invalid func param"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("関数パラメータが不正です");
+#else
+			SetError("Invalid function parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 		wrtbuf->Put( ',' );
 
@@ -2427,7 +2589,14 @@ ppresult_t CToken::PP_Deffunc( int mode )
 		if ( i == TK_OBJ ) {
 			strcase( word );
 			if (tstrcmp(word,"local")) {		// local option
-				if ( *mod == 0 ) { SetError("module name not found"); return PPRESULT_ERROR; }
+				if ( *mod == 0 ) {
+#ifdef JPNMSG
+					SetError("モジュール名が見つかりません");
+#else
+					SetError("Module name not found");
+#endif
+					return PPRESULT_ERROR;
+				}
 				glmode = 1;
 				i = GetToken();
 			}
@@ -2438,7 +2607,14 @@ ppresult_t CToken::PP_Deffunc( int mode )
 		}
 
 		strcase2( word, fixname );
-		if ( i != TK_OBJ ) { SetError("invalid func name"); return PPRESULT_ERROR; }
+		if ( i != TK_OBJ ) {
+#ifdef JPNMSG
+			SetError("関数名が不正です");
+#else
+			SetError("Invalid function name");
+#endif
+			return PPRESULT_ERROR; 
+		}
 		i = lb->Search( fixname );if ( i != -1 ) {
 			if ( lb->GetFlag(i) != LAB_TYPE_PP_PREMODFUNC ) {
 				SetErrorSymbolOverdefined(fixname, i); return PPRESULT_ERROR;
@@ -2464,7 +2640,14 @@ ppresult_t CToken::PP_Deffunc( int mode )
 
 		if ( mode ) {
 			wrtbuf->PutStr( "modvar " );
-			if ( *mod == 0 ) { SetError("module name not found"); return PPRESULT_ERROR; }
+			if ( *mod == 0 ) {
+#ifdef JPNMSG
+				SetError("モジュール名が見つかりません");
+#else
+				SetError("Module name not found");
+#endif
+				return PPRESULT_ERROR;
+			}
 			wrtbuf->PutStr( mod );
 			if ( wp != NULL ) wrtbuf->Put( ',' );
 		}
@@ -2475,7 +2658,14 @@ ppresult_t CToken::PP_Deffunc( int mode )
 		} else {
 			wrtbuf->PutStr( "#deffunc __term modterm " );
 		}
-		if ( *mod == 0 ) { SetError("module name not found"); return PPRESULT_ERROR; }
+		if ( *mod == 0 ) {
+#ifdef JPNMSG
+			SetError("モジュール名が見つかりません");
+#else
+			SetError("Module name not found");
+#endif
+			return PPRESULT_ERROR;
+		}
 		wrtbuf->PutStr( mod );
 		if ( wp != NULL ) wrtbuf->Put( ',' );
 	}
@@ -2493,7 +2683,12 @@ ppresult_t CToken::PP_Deffunc( int mode )
 
 		if ( wp == NULL ) break;
 		if ( i != TK_OBJ ) {
-			SetError("invalid func param"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("関数パラメータが不正です");
+#else
+			SetError("Invalid function parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 
 		i = GetToken();
@@ -2506,7 +2701,12 @@ ppresult_t CToken::PP_Deffunc( int mode )
 		}
 		if ( wp == NULL ) break;
 		if ( i != ',' ) {
-			SetError("invalid func param"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("関数パラメータが不正です");
+#else
+			SetError("Invalid function parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 		wrtbuf->Put( ',' );
 
@@ -2532,14 +2732,23 @@ ppresult_t CToken::PP_Struct( void )
 	glmode = 0;
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
-		sprintf( strtmp,"invalid symbol [%s]", word );
+#ifdef JPNMSG
+		SetError( "シンボルが不正です [%s]", word );
+#else
+		SetError( "Invalid symbol [%s]", word );
+#endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
 
 	strcase( word );
 	if (tstrcmp(word,"global")) {		// global macro
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad global syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "global構文が不正です" );
+#else
+			SetError( "Invalid global syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		glmode=1;
 		strcase( word );
@@ -2558,12 +2767,27 @@ ppresult_t CToken::PP_Struct( void )
 
 		i = GetToken();
 		if ( wp == NULL ) break;
-		if ( i != TK_OBJ ) { SetError("invalid struct param"); return PPRESULT_ERROR; }
+		if ( i != TK_OBJ ) {
+			// SetError("invalid struct param");
+#ifdef JPNMSG
+			SetError("構造体パラメータが不正です");
+#else
+			SetError("Invalid struct parameter");
+#endif
+			return PPRESULT_ERROR;
+		}
 		wrtbuf->PutStr( word );
 		wrtbuf->Put( ' ' );
 
 		i = GetToken();
-		if ( i != TK_OBJ ) { SetError("invalid struct param"); return PPRESULT_ERROR; }
+		if ( i != TK_OBJ ) {
+#ifdef JPNMSG
+			SetError("構造体パラメータが不正です");
+#else
+			SetError("Invalid struct parameter");
+#endif
+			return PPRESULT_ERROR;
+		}
 
 		sprintf( keyword,"%s_%s", tagname, word );
 		if ( glmode ) FixModuleName( keyword ); else AddModuleName( keyword );
@@ -2576,7 +2800,12 @@ ppresult_t CToken::PP_Struct( void )
 		i = GetToken();
 		if ( wp == NULL ) break;
 		if ( i != ',' ) {
-			SetError("invalid struct param"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("構造体パラメータが不正です");
+#else
+			SetError("Invalid struct parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 		wrtbuf->Put( ',' );
 
@@ -2596,13 +2825,25 @@ ppresult_t CToken::PP_Func( char *name )
 	char *word;
 	word = (char *)s3;
 	i = GetToken();
-	if ( i != TK_OBJ ) { SetError("invalid func name"); return PPRESULT_ERROR; }
+	if ( i != TK_OBJ ) {
+#ifdef JPNMSG
+		SetError("関数名が不正です");
+#else
+		SetError("Invalid function name");
+#endif
+		return PPRESULT_ERROR;
+	}
 
 	glmode = 0;
 	strcase( word );
 	if (tstrcmp(word,"global")) {		// global macro
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad global syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "global構文が不正です" );
+#else
+			SetError( "Invalid global syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		glmode=1;
 	}
@@ -2629,7 +2870,14 @@ ppresult_t CToken::PP_Cmd( char *name )
 	char *word;
 	word = (char *)s3;
 	i = GetToken();
-	if ( i != TK_OBJ ) { SetError("invalid func name"); return PPRESULT_ERROR; }
+	if ( i != TK_OBJ ) {
+#ifdef JPNMSG
+		SetError("関数名が不正です");
+#else
+		SetError("Invalid function name");
+#endif
+		return PPRESULT_ERROR;
+	}
 	i = lb->Search( word );
 	if ( i != -1 ) { SetErrorSymbolOverdefined(word, i); return PPRESULT_ERROR; }
 
@@ -2658,13 +2906,25 @@ ppresult_t CToken::PP_Usecom( void )
 	char *word;
 	word = (char *)s3;
 	i = GetToken();
-	if ( i != TK_OBJ ) { SetError("invalid COM symbol name"); return PPRESULT_ERROR; }
+	if ( i != TK_OBJ ) {
+#ifdef JPNMSG
+		SetError("COMシンボル名が不正です");
+#else
+		SetError("Invalid COM symbol name");
+#endif
+		return PPRESULT_ERROR;
+	}
 
 	glmode = 0;
 	strcase( word );
 	if (tstrcmp(word,"global")) {		// global macro
 		if ( GetToken() != TK_OBJ ) {
-			SetError( "bad global syntax" ); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError( "global構文が不正です" );
+#else
+			SetError( "Invalid global syntax" );
+#endif
+			return PPRESULT_ERROR;
 		}
 		glmode=1;
 	}
@@ -2695,10 +2955,29 @@ ppresult_t CToken::PP_Module( void )
 	i = GetToken();
 	if (( i == TK_OBJ )||( i == TK_STRING )) fl=1;
 	if ( i == TK_NONE ) { sprintf( word, "M%d", modgc ); modgc++; fl=1; }
-	if ( fl == 0 ) { SetError("invalid module name"); return PPRESULT_ERROR; }
-	if ( !IsGlobalMode() ) { SetError("not in global mode"); return PPRESULT_ERROR; }
+	if ( fl == 0 ) {
+#ifdef JPNMSG
+		SetError("モジュール名が不正です");
+#else
+		SetError("Invalid module name");
+#endif
+		return PPRESULT_ERROR;
+	}
+	if ( !IsGlobalMode() ) { 
+#ifdef JPNMSG
+		SetError("#moduleはグローバルモードでのみ使用できます");
+#else
+		SetError("#module can only be used in global mode");
+#endif
+		return PPRESULT_ERROR;
+	}
 	if ( CheckModuleName( word ) ) {
-		SetError("bad module name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("モジュール名が不正です");
+#else
+		SetError("Invalid module name");
+#endif
+		return PPRESULT_ERROR;
 	}
 	sprintf( tagname, "%.*s", MODNAME_MAX, word );
 	res = lb->Search( tagname );
@@ -2717,7 +2996,14 @@ ppresult_t CToken::PP_Module( void )
 	  while(1) {
 
 		i = GetToken();
-		if ( i != TK_OBJ ) { SetError("invalid module param"); return PPRESULT_ERROR; }
+		if ( i != TK_OBJ ) { 
+#ifdef JPNMSG
+			SetError("モジュールパラメータが不正です");
+#else
+			SetError("Invalid module parameter");
+#endif
+			return PPRESULT_ERROR; 
+		}
 		AddModuleName( word );
 		res = lb->Search(word);
 		if ( res != -1 ) { SetErrorSymbolOverdefined(word, res); return PPRESULT_ERROR; }
@@ -2728,7 +3014,12 @@ ppresult_t CToken::PP_Module( void )
 		i = GetToken();
 		if ( wp == NULL ) break;
 		if ( i != ',' ) {
-			SetError("invalid module param"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("モジュールパラメータが不正です");
+#else
+			SetError("Invalid module parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 		wrtbuf->Put( ',' );
 	  }
@@ -2745,9 +3036,9 @@ ppresult_t CToken::PP_Global( void )
 	//
 	if ( IsGlobalMode() ) {
 #ifdef JPNMSG
-		SetError("#module と対応していない #global があります");
+		SetError("#globalなしの#module");
 #else
-		SetError("already in global mode");
+		SetError("#global without #module");
 #endif
 		return PPRESULT_ERROR;
 	}
@@ -2772,12 +3063,22 @@ ppresult_t CToken::PP_Aht( void )
 
 	i = GetToken();
 	if ( i != TK_OBJ ) {
-		SetError("invalid AHT option name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("AHTオプション名が不正です");
+#else
+		SetError("Invalid AHT option name");
+#endif
+		return PPRESULT_ERROR;
 	}
 	strcpy2( tmp, (char *)s3, 512 );
 	i = GetToken();
 	if (( i != TK_STRING )&&( i != TK_NUM )) {
-		SetError("invalid AHT option value"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("AHTオプション値が不正です");
+#else
+		SetError("Invalid AHT option value");
+#endif
+		return PPRESULT_ERROR;
 	}
 	ahtmodel->SetAHTOption( tmp, (char *)s3 );
 
@@ -2818,14 +3119,25 @@ ppresult_t CToken::PP_Ahtmes( void )
 		i = GetToken();
 		if ( i == TK_NONE ) break;
 		if (( i != TK_OBJ )&&( i != TK_NUM )&&( i != TK_STRING )) {
-			SetError("illegal ahtmes parameter"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("AHTメッセージパラメータが不正です");
+#else
+			SetError("Invalid AHT message parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 		ahtbuf->PutStr( (char *)s3 );
 
 		if ( wp == NULL ) {	addprm = 0; break; }
 
 		i = GetToken();
-		if ( i != '+' ) { SetError("invalid ahtmes format"); return PPRESULT_ERROR; }
+		if ( i != '+' ) { 
+#ifdef JPNMSG
+			SetError("AHTメッセージパラメータが不正です");
+#else
+			SetError("Invalid AHT message parameter");
+#endif
+			return PPRESULT_ERROR; }
 		addprm++;
 
 	}
@@ -2842,7 +3154,12 @@ ppresult_t CToken::PP_Pack( int mode )
 	if ( packbuf!=NULL ) {
 		i = GetToken();
 		if ( i != TK_STRING ) {
-			SetError("invalid pack name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("パックファイル名が不正です");
+#else
+			SetError("Invalid pack file name");
+#endif
+			return PPRESULT_ERROR;
 		}
 		AddPackfile( (char *)s3, mode );
 	}
@@ -2860,12 +3177,22 @@ ppresult_t CToken::PP_PackOpt( void )
 	if ( packbuf!=NULL ) {
 		i = GetToken();
 		if ( i != TK_OBJ ) {
-			SetError("illegal option name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("オプション名が不正です");
+#else
+			SetError("Invalid option name");
+#endif
+			return PPRESULT_ERROR;
 		}
 		strncpy( optname, (char *)s3, 128 );
 		i = GetToken();
 		if (( i != TK_OBJ )&&( i != TK_NUM )&&( i != TK_STRING )) {
-			SetError("illegal option parameter"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+			SetError("オプションパラメータが不正です");
+#else
+			SetError("Invalid option parameter");
+#endif
+			return PPRESULT_ERROR;
 		}
 		sprintf( tmp, ";!%s=%s", optname, (char *)s3 );
 		AddPackfile( tmp, 2 );
@@ -2883,13 +3210,23 @@ ppresult_t CToken::PP_CmpOpt( void )
 
 	i = GetToken();
 	if ( i != TK_OBJ ) {
-		SetError("illegal option name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("オプション名が不正です");
+#else
+		SetError("Invalid option name");
+#endif
+		return PPRESULT_ERROR;
 	}
 	strcase2( (char *)s3, optname );
 
 	i = GetToken();
 	if ( i != TK_NUM ) {
-		SetError("illegal option parameter"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("オプションパラメータが不正です");
+#else
+		SetError("Invalid option parameter");
+#endif
+		return PPRESULT_ERROR;
 	}
 
 	i = 0;
@@ -2922,7 +3259,12 @@ ppresult_t CToken::PP_CmpOpt( void )
 	}
 
 	if ( i == 0 ) {
-		SetError("illegal option name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("オプション名が不正です");
+#else
+		SetError("Invalid option name");
+#endif
+		return PPRESULT_ERROR;
 	}
 
 	if ( val ) {
@@ -2945,7 +3287,12 @@ ppresult_t CToken::PP_RuntimeOpt( void )
 
 	i = GetToken();
 	if ( i != TK_STRING ) {
-		SetError("illegal runtime name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("ランタイム名が不正です");
+#else
+		SetError("Invalid runtime name");
+#endif
+		return PPRESULT_ERROR;
 	}
 	strncpy( hed_runtime, (char *)s3, sizeof hed_runtime );
 	hed_runtime[sizeof hed_runtime - 1] = '\0';
@@ -2974,13 +3321,23 @@ ppresult_t CToken::PP_BootOpt(void)
 
 	i = GetToken();
 	if (i != TK_OBJ) {
-		SetError("illegal option name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("オプション名が不正です");
+#else
+		SetError("Invalid option name");
+#endif
+		return PPRESULT_ERROR;
 	}
 	strcase2((char *)s3, optname);
 
 	i = GetToken();
 	if (i != TK_NUM) {
-		SetError("illegal option parameter"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("オプションパラメータが不正です");
+#else
+		SetError("Invalid option parameter");
+#endif
+		return PPRESULT_ERROR;
 	}
 
 	i = 0;
@@ -3008,7 +3365,12 @@ ppresult_t CToken::PP_BootOpt(void)
 	}
 
 	if (i == 0) {
-		SetError("illegal option name"); return PPRESULT_ERROR;
+#ifdef JPNMSG
+		SetError("オプション名が不正です");
+#else
+		SetError("Invalid option name");
+#endif
+		return PPRESULT_ERROR;
 	}
 
 	if (val) {
@@ -3119,7 +3481,11 @@ ppresult_t CToken::PreprocessNM( char *str )
 
 	if (tstrcmp(word,"undef")) {		// keyword terminate
 		if ( GetToken() != TK_OBJ ) {
-			SetError("invalid symbol");
+#ifdef JPNMSG
+			SetError("シンボルが不正です");
+#else
+			SetError("Invalid symbol");
+#endif
 			return PPRESULT_ERROR;
 		}
 
@@ -3355,7 +3721,11 @@ int CToken::ExpandTokens( char *vp, CMemBuf *buf, int *lineext, int is_preproces
 		if ( vp_bak == vp ) {
 			macloop++;
 			if ( macloop > 999 ) {
-				SetError("Endless macro loop");
+#ifdef JPNMSG
+				SetError("マクロ展開が無限ループになりました");
+#else
+				SetError("Macro expression became an endless loop");
+#endif
 				return -1;
 			}
 		}
@@ -3518,7 +3888,7 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 #ifdef JPNMSG
 						Mesf( "#スクリプトファイルが見つかりません [%s]", purename );
 #else
-						Mesf( "#Couldn't find script file [%s]", purename );
+						Mesf( "#Cannot find script file [%s]", purename );
 #endif
 					}
 					return -1;
@@ -3532,7 +3902,7 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 #ifdef JPNMSG
 		Mesf( "#ファイルを追加 [%s]", purename );
 #else
-		Mesf( "#Add file [%s]", purename );
+		Mesf( "#Adding file [%s]", purename );
 #endif
 	}
 
@@ -3551,7 +3921,7 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 		res = tstack->StackCheck( linebuf );
 		if ( res ) {
 #ifdef JPNMSG
-			Mesf( "#スタックが空になっていないマクロタグが%d個あります [%s]", res, refname_copy );
+			Mesf( "#スタックが空になっていないマクロタグが %d 個あります [%s]", res, refname_copy );
 #else
 			Mesf( "#There are %d macro tags that have not been emptied [%s]", res, refname_copy );
 #endif
@@ -3564,7 +3934,7 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 #ifdef JPNMSG
 		Mes("#重大なエラーが検出されています");
 #else
-		Mes("#A fatal error has been detected");
+		Mes("#Fatal error occurred");
 #endif
 		return -2;
 	}
@@ -3878,7 +4248,7 @@ void CToken::SetErrorSymbolOverdefined(char* keyword, int label_id)
 #ifdef JPNMSG
 	sprintf( strtmp,"定義済みの識別子は使用できません [%s]", keyword );
 #else
-	sprintf( strtmp,"symbol in use [%s]", keyword );
+	sprintf( strtmp,"Symbol already defined [%s]", keyword );
 #endif
 	SetError(strtmp);
 }

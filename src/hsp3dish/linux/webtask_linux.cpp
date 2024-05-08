@@ -198,7 +198,11 @@ int WebTask::Exec( void )
 		} else {
 			//printf("curle error\n");
 		        char buffer[256];
-		        sprintf(buffer, "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_easy_strerror(ret));
+#ifdef JPNMSG
+			sprintf(buffer, "ダウンロード中にエラーが発生しました (%d:%s)", ret, curl_easy_strerror(ret));
+#else
+			sprintf(buffer, "Error occurred while downloading (%d:%s)", ret, curl_easy_strerror(ret));
+#endif
 			SetError(buffer);
 		}
 #else
@@ -211,7 +215,11 @@ int WebTask::Exec( void )
 		ret = curl_multi_perform(mcurl, &running);
 		if (ret != CURLM_OK && ret != CURLM_CALL_MULTI_PERFORM) {
 		        char buffer[256];
-		        sprintf(buffer, "ダウンロード中にエラーが発生しました(%d:%s)", ret, curl_multi_strerror(ret));
+#ifdef JPNMSG
+			sprintf(buffer, "ダウンロード中にエラーが発生しました (%d:%s)", ret, curl_multi_strerror(ret));
+#else
+			sprintf(buffer, "Error occurred while downloading (%d:%s)", ret, curl_multi_strerror(ret));
+#endif
 			SetError(buffer);
 			break;
 		}

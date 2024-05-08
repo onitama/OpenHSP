@@ -231,7 +231,11 @@ void WebTask::onError(unsigned handle, void* parent, int statuserror, const char
 {
 	auto webtask = static_cast<WebTask*>(parent);
 	char buffer[256];
-	sprintf(buffer, "ダウンロード中にエラーが発生しました(%d:%s)", statuserror, statusText);
+#ifdef JPNMSG
+	sprintf(buffer, "ダウンロード中にエラーが発生しました (%d:%s)", statuserror, statusText);
+#else
+	sprintf(buffer, "Error occurred during download (%d:%s)", statuserror, statusText);
+#endif
 	webtask->SetError(buffer);
 }
 

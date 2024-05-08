@@ -74,49 +74,49 @@ static char *err_jp[]={
 };
 
 static char *err[]={
-	"",									// 0
-	"Unknown system error",				// 1
-	"Syntax error",						// 2
-	"Illegal function call",			// 3
-	"Wrong expression",					// 4
-	"Default parameter not allowed",	// 5
-	"Type mismatch",					// 6
-	"Array overflow",					// 7
-	"Not a label object",				// 8
-	"Too many nesting",					// 9
-	"Return without gosub",				// 10
-	"Loop without repeat",				// 11
-	"File I/O error",					// 12
-	"Picture file missing",				// 13
-	"External execute error",			// 14
-	"Priority error",					// 15
-	"Too many parameters",				// 16
-	"Temporary buffer overflow",		// 17
-	"Wrong valiable name",				// 18
-	"Divided by zero",					// 19
-	"Buffer Overflow",					// 20
-	"Unsupported function",				// 21
-	"Expression too complex",			// 22
-	"Variable required",				// 23
-	"Integer value required",			// 24
-	"Bad array expression",				// 25
-	"Out of memory",					// 26
-	"Type initalization failed",		// 27
-	"No Function parameters",			// 28
-	"Stack overflow",					// 29
-	"Invalid parameter name",			// 30
-	"Invalid type of array",			// 31
-	"Invalid function parameter",		// 32
-	"Too many window objects",			// 33
-	"Invalid Array/Function",			// 34
-	"Structure required",				// 35
-	"Illegal structure call",			// 36
-	"Invalid type of variable",			// 37
-	"DLL call failed",					// 38
-	"External COM call failed",			// 39
-	"No function result",				// 40
-	"Invalid syntax for function",		// 41
-	"function not allowed in callback",	// 42
+	"",									   			// 0
+	"System error occurred",			   			// 1
+	"Invalid syntax",						   	    // 2
+	"Invalid parameter value",			   			// 3
+	"Error in expression",				   			// 4
+	"Cannot omit parameters",	   			        // 5
+	"Mismatching parameter type",	       			// 6
+	"Invalid array element",			   			// 7
+	"No valid label specified",		   			    // 8
+	"Subroutine or loop nested too deep", 			// 9
+	"Return without gosub",				   			// 10
+	"Loop without repeat",				   			// 11
+	"File not found or invalid name",	   			// 12
+	"No image file",				       			// 13
+	"Error during external file call",	   			// 14
+	"Error in priority",	    				    // 15
+	"Too many parameters",				   			// 16
+	"Temporary buffer overflow",		   			// 17
+	"Incorrect variable name",			   			// 18
+	"Divided by zero",					   			// 19
+	"Buffer overflow",					   			// 20
+	"Unsupported function",				   			// 21
+	"Expression too complex",			   			// 22
+	"No variable specified",				   		// 23
+	"Non-integer specified",			   			// 24
+	"Invalid array element format",				   	// 25
+	"Memory allocation failed",					   	// 26
+	"Type initalisation failed",		   			// 27
+	"No arguments set for function",			   	// 28
+	"Stack overflow",					   			// 29
+	"Invalid parameter name",			   			// 30
+	"Invalid type of array",			   			// 31
+	"Invalid function parameter",		   			// 32
+	"Too many objects",			   			        // 33
+	"Type cannot be used as array or function",		// 34
+	"Structure required",				   			// 35
+	"Illegal structure call",			   			// 36
+	"Invalid type of variable",			   			// 37
+	"Failed to call external DLL",					// 38
+	"Failed to call external COM",			   		// 39
+	"No return value set for function",				// 40
+	"Invalid syntax for function",		   			// 41
+	"Function not allowed in callback",	   			// 42
 	"*"
 };
 
@@ -141,10 +141,10 @@ char *hspd_geterror( HSPERROR error )
 	int lang = ctx->language;
 
 	if (lang == 1) {
-		sprintf(errmsg, "内部エラーが発生しました(%d)", (int)error);
+		sprintf(errmsg, "内部エラーが発生しました (%d)", (int)error);
 		return errmsg;
 	}
-	sprintf( errmsg, "Internal Error(%d)", (int)error );
+	sprintf( errmsg, "Internal error occurred (%d)", (int)error );
 	return errmsg;
 }
 

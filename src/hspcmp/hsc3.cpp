@@ -180,7 +180,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 #ifdef JPNMSG
 			tk.Mes( "#プリプロセッサファイルの出力に失敗しました" );
 #else
-			tk.Mes( "#Can't write output file" );
+			tk.Mes( "#Cannot write output file" );
 #endif
 			return -2;
 		}
@@ -205,14 +205,14 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 #ifdef JPNMSG
 			tk.Mes( "#packfileの出力に失敗しました" );
 #else
-			tk.Mes( "#Failed to output packfile" );
+			tk.Mes( "#Cannot output packfile" );
 #endif
 			return -3;
 		}
 #ifdef JPNMSG
-		tk.Mes( "#パックファイルを生成しました" );
+		tk.Mes( "#packfileを生成しました" );
 #else
-		tk.Mes( "#Generated packfile" );
+		tk.Mes( "#packfile generated" );
 	}
 
 	hed_option = tk.GetHeaderOption();
@@ -273,7 +273,7 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 #ifdef JPNMSG
 		tk.Mes("#UTF-8文字列を使用します");
 #else
-		tk.Mes("#Use UTF-8 strings");
+		tk.Mes("#Using UTF-8 strings");
 #endif
 	}
 	if (genmode & HSC3_MODE_STRMAP) {

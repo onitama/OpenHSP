@@ -158,9 +158,9 @@ void CToken::CalcCG_factor( void )
 		if ( lb->GetType(id) == TYPE_VAR ) {
 			if ( lb->GetInitFlag(id) == LAB_INIT_NO ) {
 #ifdef JPNMSG
-				Mesf( "#未初期化の変数があります (%s)", cg_str );
+				Mesf( "#未初期化の変数があります [%s]", cg_str );
 #else
-				Mesf( "#Uninitalized variable (%s)", cg_str );
+				Mesf( "#Uninitalized variable [%s]", cg_str );
 #endif
 				if ( hed_cmpmode & CMPMODE_VARINIT ) {
 					throw CGERROR_VAR_NOINIT;
@@ -1638,7 +1638,7 @@ void CToken::GenerateCodePP_func( int deftype )
 #ifdef JPNMSG
 			Mesf( "#未使用の外部DLL関数の登録を削除しました %s", fbase );
 #else
-			Mesf( "#Removed unused external DLL function registration %s", fbase );
+			Mesf( "#Removed unused external DLL functions %s", fbase );
 #endif
 		}
 		return;
@@ -2022,9 +2022,9 @@ void CToken::GenerateCodePP_module( void )
 				cg_flag = CG_FLAG_DISABLE;
 				if ( hed_cmpmode & CMPMODE_OPTINFO ) {
 #ifdef JPNMSG
-					Mesf( "#未使用のモジュールを削除しました %s", modname );
+					Mesf( "#未使用のモジュールを削除しました [%s]", modname );
 #else
-					Mesf( "#Removed unused module %s", modname );
+					Mesf( "#Removed unused module [%s]", modname );
 #endif
 				}
 				return;
@@ -2449,7 +2449,7 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 #ifdef JPNMSG
 				Mesf( "#ラベルの定義が存在しません [%s]", lb->GetName(a) );
 #else
-				Mesf( "Label definition doesn't exist [%s]", lb->GetName(a) );
+				Mesf( "#Missing label definition [%s]", lb->GetName(a) );
 #endif
 				errend++;
 			}
@@ -2461,7 +2461,7 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 #ifdef JPNMSG
 				Mesf( "#関数が定義されていません [%s]", lb->GetName(GET_FI(a)->otindex) );
 #else
-				Mesf( "Function is not defined [%s]", lb->GetName(GET_FI(a)->otindex) );
+				Mesf( "#Undefined function [%s]", lb->GetName(GET_FI(a)->otindex) );
 #endif
 				errend++;
 			}
@@ -2472,7 +2472,7 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 #ifdef JPNMSG
 				Mesf( "#波括弧が閉じられていません" );
 #else
-				Mesf( "Brace is not closed" );
+				Mesf( "#Curly braces not closed" );
 #endif
 				errend ++;
 		}
@@ -3225,7 +3225,7 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 #ifdef JPNMSG
 			Mes( "#出力ファイルを書き込めません" );
 #else
-			Mes( "#Failed to write output file" );
+			Mes( "#Cannot write output file" );
 #endif
 		} else {
 			int n_mod, n_hpi;
@@ -3248,7 +3248,7 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 #ifdef JPNMSG
 			Mesf( "#コンパイル完了. (合計 %d バイト)", hsphed.allsize );
 #else
-			Mesf( "#Compile completed. (total %d bytes)", hsphed.allsize );
+			Mesf( "#Compilation finished. (total %d bytes)", hsphed.allsize );
 #endif
 			res = 0;
 		}
@@ -3276,9 +3276,9 @@ void CToken::CG_MesLabelDefinition(int label_id)
 	LABOBJ* const labobj = lb->GetLabel(label_id);
 	if ( labobj->def_file ) {
 #ifdef JPNMSG
-		Mesf("#識別子「%s」の定義位置: line %d in [%s]", lb->GetName(label_id), labobj->def_line, labobj->def_file);
+		Mesf("#識別子「%s」の定義位置: %s の %d 行目", lb->GetName(label_id), labobj->def_file, labobj->def_line);
 #else
-		Mesf("#Identifier '%s' has already defined in line %d in [%s]", lb->GetName(label_id), labobj->def_line, labobj->def_file);
+		Mesf("#Identifier '%s' already defined in %d.[%s]", lb->GetName(label_id), labobj->def_line, labobj->def_file);
 #endif
 	}
 }
