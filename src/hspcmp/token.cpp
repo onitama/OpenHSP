@@ -879,6 +879,7 @@ int CToken::Calc( CALCVAR &val )
 		SetError("式の構文が異常です");
 #else
 		SetError("Syntax error in expression");
+#endif
 		return -1;
 	}
 	if ( wp==NULL ) { val = v; return 0; }

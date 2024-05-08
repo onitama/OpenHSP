@@ -213,6 +213,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		tk.Mes( "#packfileを生成しました" );
 #else
 		tk.Mes( "#packfile generated" );
+#endif
 	}
 
 	hed_option = tk.GetHeaderOption();

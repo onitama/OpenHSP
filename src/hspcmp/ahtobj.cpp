@@ -392,6 +392,7 @@ CAht::CAht( void )
 	Mesf( "AHTプロセッサが準備されました\r\n" );
 #else
 	Mesf( "AHT processor is ready\r\n" );
+#endif
 	mem_ahtmodel = NULL;				// model data
 	model_cnt = 0;
 	mem_ahtmodel_size = 0;
