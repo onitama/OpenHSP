@@ -1985,9 +1985,9 @@ ppresult_t CToken::PP_Const( void )
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
 #ifdef JPNMSG
-		SetError( "シンボルが不正です [%s]", word );
+		sprintf( strtmp, "シンボルが不正です [%s]", word );
 #else
-		SetError( "Invalid symbol [%s]", word );
+		sprintf( strtmp, "Invalid symbol [%s]", word );
 #endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
@@ -2091,9 +2091,9 @@ ppresult_t CToken::PP_Enum( void )
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
 #ifdef JPNMSG
-		SetError( "シンボルが不正です [%s]", word );
+		sprintf( strtmp, "シンボルが不正です [%s]", word );
 #else
-		SetError( "Invalid symbol [%s]", word );
+		sprintf( strtmp, "Invalid symbol [%s]", word );
 #endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
@@ -2210,9 +2210,9 @@ ppresult_t CToken::PP_Define( void )
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
 #ifdef JPNMSG
-		SetError( "シンボルが不正です [%s]", word );
+		sprintf( strtmp, "シンボルが不正です [%s]", word );
 #else
-		SetError( "Invalid symbol [%s]", word );
+		sprintf( strtmp, "Invalid symbol [%s]", word );
 #endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
@@ -2734,9 +2734,9 @@ ppresult_t CToken::PP_Struct( void )
 	word = (char *)s3;
 	if ( GetToken() != TK_OBJ ) {
 #ifdef JPNMSG
-		SetError( "シンボルが不正です [%s]", word );
+		sprintf( strtmp, "シンボルが不正です [%s]", word );
 #else
-		SetError( "Invalid symbol [%s]", word );
+		sprintf( strtmp, "Invalid symbol [%s]", word );
 #endif
 		SetError( strtmp ); return PPRESULT_ERROR;
 	}
