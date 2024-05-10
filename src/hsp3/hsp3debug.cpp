@@ -68,7 +68,7 @@ static char *err_jp[]={
 	"外部DLLの呼び出しに失敗しました",				// 38
 	"外部オブジェクトの呼び出しに失敗しました",		// 39
 	"関数の戻り値が設定されていません",				// 40
-	"関数を命令として記述しています。\n(HSP2から関数化された名前を使用している可能性があります)",			// 41
+	"関数を命令として記述しています\n(HSP2から関数化された名前を使用している可能性があります)",			// 41
 	"コールバック内で使用できない命令です",			// 42
 	"*"
 };
@@ -78,45 +78,45 @@ static char *err[]={
 	"System error occurred",			   			// 1
 	"Invalid syntax",						   	    // 2
 	"Invalid parameter value",			   			// 3
-	"Error in expression",				   			// 4
-	"Cannot omit parameters",	   			        // 5
-	"Mismatching parameter type",	       			// 6
+	"Error in expression evaluation",				// 4
+	"Parameter cannot be omitted",	   			    // 5
+	"Invalid parameter type",	       			    // 6
 	"Invalid array element",			   			// 7
 	"No valid label specified",		   			    // 8
-	"Subroutine or loop nested too deep", 			// 9
-	"Return without gosub",				   			// 10
-	"Loop without repeat",				   			// 11
-	"File not found or invalid name",	   			// 12
+	"Subroutine or loop nesting too deep", 			// 9
+	"'return' outside subroutine is invalid",		// 10
+	"'repeat' outside 'loop' is invalid",			// 11
+	"File not found or invalid name specified",     // 12
 	"No image file",				       			// 13
-	"Error during external file call",	   			// 14
-	"Error in priority",	    				    // 15
+	"Error occurred in calling external file",	   	// 14
+	"Different brackets in expression",			    // 15
 	"Too many parameters",				   			// 16
-	"Temporary buffer overflow",		   			// 17
-	"Incorrect variable name",			   			// 18
-	"Divided by zero",					   			// 19
-	"Buffer overflow",					   			// 20
-	"Unsupported function",				   			// 21
-	"Expression too complex",			   			// 22
-	"No variable specified",				   		// 23
+	"String exceeds character limit",		   		// 17
+	"Variable name cannot be assigned",			   	// 18
+	"Division by zero",					   			// 19
+	"Buffer overflow occurred",					   	// 20
+	"Unsupported feature selected",				   	// 21
+	"Expression brackets too deep",			   		// 22
+	"No variable name specified",				   	// 23
 	"Non-integer specified",			   			// 24
 	"Invalid array element format",				   	// 25
 	"Memory allocation failed",					   	// 26
 	"Type initalisation failed",		   			// 27
 	"No arguments set for function",			   	// 28
 	"Stack overflow",					   			// 29
-	"Invalid parameter name",			   			// 30
-	"Invalid type of array",			   			// 31
-	"Invalid function parameter",		   			// 32
+	"Invalid name specified for parameter",			// 30
+	"Different type assigned for array",			// 31
+	"Invalid function parameter description",		// 32
 	"Too many objects",			   			        // 33
-	"Type cannot be used as array or function",		// 34
-	"Structure required",				   			// 35
-	"Illegal structure call",			   			// 36
-	"Invalid type of variable",			   			// 37
+	"Type cannot be used as array/function",		// 34
+	"Module variable not specified",				// 35
+	"Invalid module variable specification",		// 36
+	"Failed to convert variable type",			   	// 37
 	"Failed to call external DLL",					// 38
 	"Failed to call external COM",			   		// 39
 	"No return value set for function",				// 40
-	"Invalid syntax for function",		   			// 41
-	"Function not allowed in callback",	   			// 42
+	"Function described as command\n(may be using names from HSP2)",		   		// 41
+	"Command not usable within callback",	   		// 42
 	"*"
 };
 
