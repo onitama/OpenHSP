@@ -799,7 +799,11 @@ void hsp3dish_error( void )
 		sprintf( errmsg, "#Error %d --> %s\n",(int)err,msg );
 		fname = NULL;
 	} else {
+#ifdef JPNMSG
+		sprintf( errmsg, "#エラー %d 行 %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
+#else
 		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
+#endif
 	}
 	hsp3dish_debugopen();
 	hsp3dish_dialog( errmsg );

@@ -204,11 +204,19 @@ static int getfile( void )
 
 	fp=fopen(fname,"rb");
 	if (fp==NULL) {
-		sprintf(tmp,"#No pack file [%s].\r\n",fname);
+#ifdef JPNMSG
+		sprintf(tmp,"#パックファイル [%s] が見つかりません\r\n",fname);
+#else
+		sprintf(tmp,"#Pack file [%s] not found\r\n",fname);
+#endif
 		prt(tmp);
 		return -1;
 	}
-	sprintf(tmp,"Searching pack file [%s].\r\n",fname);
+#ifdef JPNMSG
+	sprintf(tmp,"パックファイル [%s] を検索しています。。。\r\n",fname);
+#else
+	sprintf(tmp,"Searching pack file [%s]...\r\n",fname);
+#endif
 	prt(tmp);
 	fread( buf,16,1,fp );gethdr();
 
@@ -220,7 +228,11 @@ static int getfile( void )
 	fclose(fp);
 
 	if (a2==-1) {
-		sprintf( tmp,"#No such file.[%s]\r\n",aname );
+#ifdef JPNMSG
+		sprintf( tmp,"#ファイル [%s] が見つかりません\r\n",aname );
+#else
+		sprintf( tmp,"#File [%s] not found\r\n",aname );
+#endif
 		prt(tmp);
 		return -1;
 	}
@@ -235,7 +247,11 @@ static int getfile( void )
 		fclose(fp2);
 	fclose(fp);
 
-	sprintf( tmp,"Take [%s](%ld) from pack.\r\n",aname,fs );
+#ifdef JPNMSG
+	sprintf( tmp,"パックファイルから [%s](%ld) を取り出しました\r\n",aname,fs );
+#else
+	sprintf( tmp,"Take [%s](%ld) from pack\r\n",aname,fs );
+#endif
 	prt(tmp);
 	return 0;
 }
@@ -251,7 +267,11 @@ static int viewfile( void )
 
 	fp=fopen(fname,"rb");
 	if (fp==NULL) {
-		sprintf( tmp,"#No pack file [%s].\r\n",fname );
+#ifdef JPNMSG
+		sprintf(tmp,"#パックファイル [%s] が見つかりません\r\n",fname);
+#else
+		sprintf(tmp,"#Pack file [%s] not found\r\n",fname);
+#endif
 		prt(tmp);
 		return -1;
 	}
@@ -310,11 +330,19 @@ static int newfile( int mode )
 
 	fp2=fopen(aname,"rb");
 	if (fp2==NULL) {
-		sprintf(tmp,"#Listing file [%s] not found.\r\n",aname);
+#ifdef JPNMSG
+		sprintf(tmp,"#リストファイル [%s] が見つかりません\r\n",aname);
+#else
+		sprintf(tmp,"#Listing file [%s] not found\r\n",aname);
+#endif
 		prt(tmp);
 		return -1;
 	}
-	sprintf(tmp,"Listing file [%s] analysis.\r\n",aname);
+#ifdef JPNMSG
+	sprintf(tmp,"リストファイル [%s] を解析します\r\n",aname);
+#else
+	sprintf(tmp,"Listing file [%s] analysis\r\n",aname);
+#endif
 	prt(tmp);
 
 	//	make dir buffer
@@ -342,7 +370,11 @@ static int newfile( int mode )
 					if ( res < 0 ) name2 = NULL;
 				}
 				if ( name2 == NULL ) {
-					sprintf(tmp,"#No File [%s]\r\n",s1);
+#ifdef JPNMSG
+					sprintf(tmp,"#ファイル [%s] が見つかりません\r\n",s1);
+#else
+					sprintf(tmp,"#File [%s] not found\r\n",s1);
+#endif
 					prt(tmp);efl++;
 					break;
 				}
@@ -480,7 +512,11 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 			sprintf( hrtfile,"%s%s", p_fname, p_ext ); 
 			fp=fopen( hrtfile, "rb" );
 			if (fp==NULL) {
-				sprintf( tmp,"#No file [%s].\r\n",hspexe );
+#ifdef JPNMSG
+				sprintf( tmp,"#ファイル [%s] が見つかりません\r\n",hspexe );
+#else
+				sprintf( tmp,"#File [%s] not found\r\n",hspexe );
+#endif
 				prt(tmp);
 				return -1;
 			}
@@ -497,10 +533,18 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	fclose(fp);
 
 	if (sidx==0) {
-		prt("#Not found hsp index.\r\n");
+#ifdef JPNMSG
+		sprintf(tmp,"#HSPヘッダが見つかりません\r\n");
+#else
+		sprintf(tmp,"#HSP header not found\r\n");
+#endif
 		return -1;
 	}
-	sprintf( tmp,"#Found hsp index in $%05lx/$%05lx.\r\n",sidx,x1 );
+#ifdef JPNMSG
+    sprintf(tmp,"#HSPヘッダーが $%05lx/$%05lx で見つかりました)\r\n",sidx,x1);
+#else
+	sprintf(tmp,"#HSP header found in $%05lx/$%05lx)\r\n",sidx,x1);
+#endif
 	prt(tmp);
 	strcpy(sname,bname);
 
@@ -514,7 +558,11 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	//
 	fp=fopen(fname,"rb");
 	if (fp==NULL) {
-		sprintf(tmp,"#No file [%s].\r\n",fname);
+#ifdef JPNMSG
+		sprintf(tmp,"#ファイル [%s] が見つかりません\r\n",fname);
+#else
+		sprintf(tmp,"#File [%s] not found\r\n",fname);
+#endif
 		prt(tmp);
 		return -1;
 	}
@@ -550,13 +598,21 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	fp2=fopen(fname,"rb");
 	fp=fopen( hrtfile, "rb");
 	if (fp==NULL) {
-		sprintf(tmp,"#No file [%s].\r\n",hspexe );
+#ifdef JPNMSG
+		sprintf(tmp,"#ファイル [%s] が見つかりません\r\n",hspexe);
+#else
+		sprintf(tmp,"#File [%s] not found\r\n",hspexe);
+#endif
 		prt(tmp);
 		return -1;
 	}
 	fp3=fopen(sname,"wb");
 	if (fp3==NULL) {
-		sprintf(tmp,"#Write error [%s].\r\n",sname );
+#ifdef JPNMSG
+		sprintf(tmp,"#ファイル [%s] が書き込めません。\r\n",sname);
+#else
+		sprintf(tmp,"#File [%s] write error.\r\n",sname);
+#endif
 		prt(tmp);
 		return -1;
 	}
@@ -576,7 +632,11 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 
 	fclose(fp3);fclose(fp2);fclose(fp);
 
-	sprintf(tmp,"Make custom execute file [%s](%ld).\r\n",sname,x0);
+#ifdef JPNMSG
+	sprintf(tmp,"カスタム実行ファイル [%s](%ld) を作成しました\r\n",sname,x0);
+#else
+	sprintf(tmp,"Custom executable file [%s](%ld) created\r\n",sname,x0);
+#endif
 	prt(tmp);
 	return 0;
 }

@@ -3620,11 +3620,19 @@ void code_dbg_global( void )
 {
 	HSPHED *hed;
 	hed = hspctx->hsphed;
+#ifdef JPNMSG
 	code_adddbg( "axサイズ", hed->allsize );
 	code_adddbg( "コードサイズ", hed->max_cs );
 	code_adddbg( "データサイズ", hed->max_ds );
 	code_adddbg( "変数予約", hed->max_val );
 	code_adddbg( "実行モード", hspctx->runmode );
+#else
+	code_adddbg( "ax size", hed->allsize );
+	code_adddbg( "code size", hed->max_cs );
+	code_adddbg( "data size", hed->max_ds );
+	code_adddbg( "var size", hed->max_val );
+	code_adddbg( "runmode", hspctx->runmode );
+#endif
 	code_adddbg( "stat", hspctx->stat );
 	code_adddbg( "cnt", hspctx->mem_loop[hspctx->looplev].cnt );
 	code_adddbg( "looplev", hspctx->looplev );
@@ -3675,7 +3683,11 @@ static void code_dbgvarinf_ext( PVal *pv, void *src, char *buf )
 		FlexValue *fv;
 		fv = (FlexValue *)src;
 		if ( fv->type == FLEXVAL_TYPE_NONE ) {
+#ifdef JPNMSG
+			sprintf( buf, "STRUCT (空)" );
+#else
 			sprintf( buf,"STRUCT (Empty)" ); 
+#endif
 		} else {
 			sprintf( buf,"STRUCT ID%d-%d PTR$%p SIZE%d(%d)", fv->myid, fv->customid, (void *)(fv->ptr), fv->size, fv->type ); 
 		}
@@ -3707,7 +3719,11 @@ static void code_arraydump( PVal *pv )
 	amax = pv->len[1];
 	if ( amax <= 1 ) return;
 	if ( amax > 16 ) {
+#ifdef JPNMSG
 		sbStrAdd( &dbgbuf, "(配列の一部だけを表示)\r\n" );
+#else
+		sbStrAdd( &dbgbuf, "(Only part of the array is displayed)\r\n" );
+#endif
 		amax = 16;
 	}
 
@@ -3783,17 +3799,32 @@ char *code_dbgvarinf( char *target, int option )
 
 	pv = &hspctx->mem_var[id];
 	proc = HspVarCoreGetProc(pv->flag);
+#ifdef JPNMSG
 	code_adddbg2( "変数名", name );
 	code_adddbg2( "型", proc->vartype_name );
+#else
+	code_adddbg2( "Variable name", name );
+	code_adddbg2( "Type", proc->vartype_name );
+#endif
 	sprintf( tmp, "(%d,%d,%d,%d)",pv->len[1],pv->len[2],pv->len[3],pv->len[4] );
+#ifdef JPNMSG
 	code_adddbg2( "配列", tmp );
 	code_adddbg2( "モード", pv->mode );
 	code_adddbg2( "使用サイズ", pv->size );
+#else
+	code_adddbg2( "Array", tmp );
+	code_adddbg2( "Mode", pv->mode );
+	code_adddbg2( "Size", pv->size );
+#endif
 
 	HspVarCoreReset( pv );
 	src = proc->GetPtr( pv );
 	padr = (char *)proc->GetBlockSize( pv, src, &size );
+#ifdef JPNMSG
 	code_adddbg2( "バッファサイズ", size );
+#else
+	code_adddbg2( "Buffer size", size );
+#endif
 
 	switch( pv->flag ) {
 	case HSPVAR_FLAG_STR:
@@ -3808,7 +3839,11 @@ char *code_dbgvarinf( char *target, int option )
 		if ( orgsize >= 1024 ) {
 			strncpy( hspctx->stmp, p, 1023 );
 			p = hspctx->stmp; p[1023] = 0;
-			sprintf( tmp, "(内容%dbytesの一部を表示しています)\r\n",orgsize );
+#ifdef JPNMSG
+			sprintf( tmp, "(%dバイトの一部を表示しています)\r\n", orgsize );
+#else
+			sprintf( tmp, "(%d bytes of contents are displayed)\r\n", orgsize );
+#endif
 			sbStrAdd( &dbgbuf, tmp );
 		}
 		code_adddbg( "内容:", p );

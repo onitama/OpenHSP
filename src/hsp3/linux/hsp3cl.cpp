@@ -82,7 +82,11 @@ void hsp3cl_msgfunc( HSPCTX *hspctx )
 		case RUNMODE_STOP:
 			//		stop命令
 			if ( cl_option & HSP3CL_OPT1_ERRSTOP ) {
+#ifdef JPNMSG
+				hsp3win_dialog( "[ストップ] キーを押してください。。。" );
+#else
 				hsp3win_dialog( "[STOP] Press any key..." );
+#endif
 				getchar();
 			}
 			throw HSPERR_NONE;
@@ -116,6 +120,9 @@ void hsp3cl_msgfunc( HSPCTX *hspctx )
 		case RUNMODE_END:
 			//		end命令
 			if ( cl_option & HSP3CL_OPT1_ERRSTOP ) {
+#ifdef JPNMSG
+				hsp3win_dialog( "[終了] キーを押してください。。。" );
+#else
 				hsp3win_dialog( "[END] Press any key..." );
 				getchar();
 			}
@@ -158,7 +165,7 @@ int hsp3cl_init( char *startfile )
 #ifdef HSPDEBUG
 
 	if ( *startfile == 0 ) {
-		printf( "OpenHSP CL ver%s / onion software 1997-2022\n", hspver );
+		printf( "OpenHSP CL ver%s / onion software 1997-2017\n", hspver );
 		usage1();
 		return -1;
 	}
@@ -186,7 +193,11 @@ int hsp3cl_init( char *startfile )
 	}
 
 	if ( hsp->Reset( mode ) ) {
-		hsp3win_dialog( "Startup failed." );
+#ifdef JPNMSG
+		hsp3win_dialog( "スタートアップに失敗しました。" );
+#else
+		hsp3win_dialog( "Failed to start up." );
+#endif
 		return -1;
 	}
 
@@ -268,7 +279,11 @@ void hsp3cl_error( void )
 		sprintf( errmsg, "#Error %d\n-->%s\n",(int)err,msg );
 		fname = NULL;
 	} else {
+#ifdef JPNMSG
+		sprintf( errmsg, "#エラー %d 行 %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
+#else
 		sprintf( errmsg, "#Error %d in line %d (%s)\n-->%s\n",(int)err, ln, fname, msg );
+#endif
 	}
 
 	hsp3win_dialog( errmsg );
@@ -278,7 +293,11 @@ void hsp3cl_error( void )
 	}
 
 	if ( cl_option & HSP3CL_OPT1_ERRSTOP ) {
+#ifdef JPNMSG
+		hsp3win_dialog( "[エラー] キーを押してください。。。" );
+#else
 		hsp3win_dialog( "[ERROR] Press any key..." );
+#endif
 		getchar();
 	}
 }
