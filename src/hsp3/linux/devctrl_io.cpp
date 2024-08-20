@@ -349,13 +349,14 @@ const char *gpiod_appname = "hsp3dish";
 
 static gpiod_chip *gchip;
 struct gpiod_line *gline;
+static int gpio_type[GPIO_MAX];
 
 static int gpiod_line( int port )
 {
 	if ( port >= GPIO_MAX ) return -1;
 	gline = gpiod_chip_get_line(gchip, port);
 	if ( gline == NULL ) return -1;
-	return gpiod_line_direction(gline);
+	return 0;
 }
 
 static int gpio_out( int port, int value )
@@ -363,11 +364,12 @@ static int gpio_out( int port, int value )
 	int i = gpiod_line(port);
 	if ( i < 0 ) return -1;
 
-	if ( i != GPIOD_LINE_DIRECTION_OUTPUT ) {
+	if ( gpio_type[port] != GPIOD_LINE_DIRECTION_OUTPUT ) {
 		// GPIOを出力モードに設定する
 		if (gpiod_line_request_output(gline, gpiod_appname, value) != 0) {
 			return -1;
 		}
+		gpio_type[port]=GPIOD_LINE_DIRECTION_OUTPUT;
 		return 0;
 	}
 	// GPIOの値を設定する
@@ -379,17 +381,18 @@ static int gpio_out( int port, int value )
 static int gpio_in( int port, int *value )
 {
 	int i = gpiod_line(port);
-	if ( i < 0 ) return -1;
+	if ( i < 0 ) return -2;
 
-	if ( i != GPIOD_LINE_DIRECTION_INPUT ) {
+	if ( gpio_type[port] != GPIOD_LINE_DIRECTION_INPUT ) {
 		// GPIOを入力モードに設定する
 		if (gpiod_line_request_input(gline, gpiod_appname) != 0) {
-			return -1;
+			return -3;
 		}
+		gpio_type[port]=GPIOD_LINE_DIRECTION_INPUT;
 	}
 	// GPIOの値を取得する
 	i = gpiod_line_get_value(gline);
-	if  (i < 0 ) return -1;
+	if  (i < 0 ) return -4;
 	*value = i;
 	return 0;
 }
@@ -398,6 +401,8 @@ static int gpio_dir( int port, int *value )
 {
 	int i = gpiod_line(port);
 	if ( i < 0 ) return -1;
+
+	i = gpiod_line_direction(gline);
 	*value = i;
 	return 0;
 }
@@ -408,6 +413,10 @@ static void gpio_init( void )
 	gchip = gpiod_chip_open_lookup("");
 	if ( gchip == NULL ) {
 		printf("gpiod initalize failed.\r\n");
+	}
+	int i;
+	for(i=0;i<GPIO_MAX;i++) {
+		gpio_type[i] = 0;
 	}
 }
 
@@ -573,10 +582,21 @@ static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
 	}
 	if (( strcmp( cmd, "gpiodir" )==0 )||( strcmp( cmd, "GPIODIR" )==0 )) {
 		int res,val;
+		if (p1==1) {
+			gpio_out( p1, 0 );
+		} 
+		if (p1==2) {
+			res = gpio_in( p1, &val );
+		} 
+		return 0;
+	}
+	if (( strcmp( cmd, "gpiogetdir" )==0 )||( strcmp( cmd, "GPIOGETDIR" )==0 )) {
+		int res,val;
 		res = gpio_dir( p1, &val );
 		if ( res == 0 ) return val;
 		return res;
 	}
+
 	if (( strcmp( cmd, "i2creadw" )==0 )||( strcmp( cmd, "I2CREADW" )==0 )) {
 		return I2C_ReadWord( p1 );
 	}
