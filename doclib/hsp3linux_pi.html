@@ -221,6 +221,51 @@ Raspberry Pi版では、フルスクリーンで実行を行ないます。 実�
 		</p>
 
 
+		<h2 id="DATA">Raspberry PiのSPI入出力</h2>
+		<p>
+		Raspberry Pi版では、devcontrol(spi～)命令によりI2Cデバイスとの入出力を行なう拡張が行われています。<br>
+		SPI制御を行う場合は、RaspberryPiのオプション設定でSPIをEnableにする必要があります。(SPI制御を行なわない場合は、設定の必要ありません) SPI制御を行う場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "spiopen", バス番号, チップセレクト, チャンネル
+		「チャンネル」は複数のデバイスを同時に指定する場合に識別を行う番号です。(0～31の整数値)
+		単一のデバイスを制御する場合は省略(0)して構いません。
+		バス番号セレクトとチップセレクトはデバイスファイルへのパス<code>/dev/spidev&lt;バス番号&gt;.&lt;チップセレクト&gt;</code>に対応し、
+		指定したデバイスファイルに対応するデバイスを制御できるようになります。
+		結果がシステム変数statに返ります。0の場合は成功、それ以外はエラーになります。
+		</pre><p>
+		データを送受信する場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "spitransceive", データ値, データサイズ, チャンネル
+		データ値は、HSPが扱う32bitの整数値になります。
+		データサイズが0または省略した場合は、8bit(1byte)のみ出力されます。
+		データサイズは、1,2,3が指定できます。それぞれ、1～3byteのサイズが送信・受信されます。
+		送受信は同時に行われます。
+		命令の実行後に指定したサイズの受信データがシステム変数statに結果が代入されます。（エラーが発生した場合は、マイナス値が代入されます）。
+		ビッグエンディアン環境で使用する場合は上位3 byteがデータを、下位1 byteがエラーを表します。
+		SPI制御は、hsp3dishだけでなくhsp3clからも使用することが可能です。
+		</pre><p>
+		SPI デバイスドライバに対して設定が必要な場合は、<code>spiconfigureh</code>、<code>spiconfighrem</code>、<code>spiconfigurel</code>、加えて<code>spisetmode</code>、<code>spisetmode32</code>、<code>spisetlsbfirst</code>、<code>spisetbitsperword</code>、<code>spisetmaxspeedhz</code>を使用します。それぞれ以下のように記述します。
+		</p><pre>
+	devcontrol "spiconfigureh", SPEED_HZ, DELAY_USECS, BITS_PER_WORD
+	devcontrol "spiconfighrem", CS_CHANGE, TX_NBITS, RX_NBITS
+	devcontrol "spiconfighrel", WORD_DELAY_USECS
+	devcontrol "spisetmode", MODE, チャンネル
+	devcontrol "spisetmode32", MODE, チャンネル
+	devcontrol "spisetlsbfirst", LSB_FIRST, チャンネル
+	devcontrol "spisetbitsperword", BITSPERWORD, チャンネル
+	devcontrol "spisetmaxspeedhz", SPEED_HZ, チャンネル
+		<code>SPEED_HZ</code> でクロック周波数を設定します。
+		<code>DELAT_USECS</code> に非ゼロを設定すると最終ビット送信と次のバイト送信の間にマイクロ秒単位の遅延を挿入します。
+		<code>BITS_PER_WORD</code> でデバイスのワードサイズを設定します。
+		<code>CS_CHANGE</code> に非ゼロを設定すると通信の後にチップセレクトを非アクティブ化しません。
+		<code>TX_NBITS</code> で書き込みのデータ線本数を指定します。0 でシングルモードになります。デュアル、クアッドモードに設定する場合ホストのヘッダーから <code>SPI_TX_DUAL</code>、<code>SPI_TX_QUAD</code> が参照する値を設定してください。
+		<code>RX_NBITS</code> で読み込み時のデータ線本数を指定します。0 でシングルモードになります。デュアル、クアッドモードに設定する場合ホストのヘッダーから <code>SPI_RX_DUAL</code>、<code>SPI_RX_QUAD</code> が参照する値を設定してください。
+		<code>WORD_DELAY_USECS</code> でワード間の遅延をマイクロ秒単位で設定します。
+		<code>MODE</code> に0&mdash;3を設定するとSPIの動作モードがそれぞれモード0、...、モード3 に設定されます。
+		<code>LSB_FIRST</code>にゼロを設定するとMSB先行モードに、非ゼロを設定するとLSB先行モードになります。
+		</pre>
+
+
 		<h2 id="COPYRIGHT">著作権とライセンス</h2>
 		<p>
 		HSP3 for Linux/Raspberry Piは、OpenHSPの派生物として取り扱い、ライセンスもOpenHSP/HSP3に準拠した修正BSDライセンスとなります。

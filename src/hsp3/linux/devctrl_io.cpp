@@ -145,9 +145,22 @@ static int I2C_WriteByte( int ch, int value, int length )
 #include <linux/spi/spidev.h>
 
 #define HSPSPI_CHMAX 16
-#define HSPSPI_DEVNAME "/dev/spidev0."
+#define HSPSPI_DEVNAME "/dev/spidev"
 
 int spifd_ch[HSPSPI_CHMAX];
+struct spi_ioc_transfer spi_tr_data = {
+	.tx_buf = (uint64_t)NULL,
+	.rx_buf = (uint64_t)NULL,
+	.len = 0,
+	.speed_hz = 0,
+	.delay_usecs = 0,
+	.bits_per_word = 0,		// use the device default of bits per word.
+	.cs_change = 0,
+	.tx_nbits = 0,			// SPI_TX_SINGLE
+	.rx_nbits = 0,			// SPI_RX_SINGLE
+	.word_delay_usecs = 0,
+	.pad = 0,
+};
 
 void SPI_Init( void )
 {
@@ -174,137 +187,262 @@ void SPI_Term( void )
 	}
 }
 
-int SPI_Open( int ch, int ss )
+int SPI_Open( int ch, int bus, int cs )
 {
 	int fd;
-  char ss_char[2];
-  char devname[128] = HSPSPI_DEVNAME;
+	char devname_suffix[128];
+	char devname[128] = HSPSPI_DEVNAME;
 
-  if(ss >= 10) return -2;   // FIXME: you need `itoa()`.
+	if(cs >= 10) return -2;		// FIXME: you need `itoa()`.
+	if(bus >= 10) return -3;	// FIXME: you need `itoa()`.
 
 	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
 	if ( spifd_ch[ch] ) SPI_Close( ch );
 
-  ss_char[0] = ss + '0';
-  ss_char[1] = '\0';
+	devname_suffix[0] = bus + '0';
+	devname_suffix[1] = '.';
+	devname_suffix[2] = cs + '0';
+	devname_suffix[3] = '\0';
 
-  strcat(devname, ss_char);
+	strcat(devname, devname_suffix);
 
 	if((fd = open( devname, O_RDWR )) < 0){
-        return 1;
-    }
-
-  uint8_t spimode = SPI_MODE_0;
-  uint8_t msbfirst = 0;
-  // Set read mode 0
-  if (ioctl(fd, SPI_IOC_RD_MODE, &spimode) < 0) {
-    close( fd );
-    return 2;
-  }
-
-  // Set write mode 0
-  if (ioctl(fd, SPI_IOC_WR_MODE, &spimode) < 0) {
-    close( fd );
-    return 2;
-  }
-
-  // Set MSB first
-  if (ioctl(fd, SPI_IOC_RD_LSB_FIRST, &msbfirst) < 0) {
-    close( fd );
-    return 2;
-  }
-  if (ioctl(fd, SPI_IOC_WR_LSB_FIRST, &msbfirst) < 0) {
-    close( fd );
-    return 2;
-  }
+		return 1;
+	}
 
 	spifd_ch[ch] = fd;
 	return 0;
 }
 
+int SPI_ConfigureH(int speed_hz, int delay_usecs, int bits_per_word){
+	spi_tr_data.speed_hz = speed_hz;
+	spi_tr_data.delay_usecs = delay_usecs;
+	spi_tr_data.bits_per_word = bits_per_word;
+	return 0;
+}
+
+int SPI_ConfigureM(int cs_change, int tx_nbits, int rx_nbits){
+	spi_tr_data.cs_change = cs_change;
+	spi_tr_data.tx_nbits = tx_nbits;
+	spi_tr_data.rx_nbits = rx_nbits;
+	return 0;
+}
+
+int SPI_ConfigureL(int word_delay_usecs){
+	spi_tr_data.word_delay_usecs = word_delay_usecs;
+	return 0;
+}
+
+/*
+ * SPI_Transceive
+ *
+ * Send and receive data simultaneously (full duplex communication)
+ * with an SPI device. This function only supports little endian
+ * environments.
+ *
+ * Parameters
+ * ----------
+ * ch: int
+ *     index at spifd_ch.
+ * val: int
+ *     sending at most three values of uint8_t stored as int.
+ *     Transfer order depends on the host byte order (endianness).
+ * len: int
+ *     the number of bytes to send/receive.
+ *
+ * Returns
+ * -------
+ * read_byte_int: int
+ *     received values of uint8_t stored as int.
+ *     Negative values indicates error occured in little endian
+ *     environment.
+ *     Transfer order depends on the host byte order (endianness).
+ *
+ * Note
+ * ----
+ * The allowed data length is limited to 3 bytes even for little endian
+ * environments to indicate errors by negative values while 32-bit int
+ * can store 4 bytes.
+ *
+ * In big endian environments this function potentially returns
+ * unexpected negative values (e.g., receiving [0xff 0xff 0xff]
+ * results in 0xffffff00 according to big endien). At the moment which
+ * error ids fall within the range of -1 to -255, data and errors are
+ * distinguishable. When it is -256, for example, data or errors are not
+ * distinguishable from 0xffffff00.
+ */
+int SPI_Transceive( int ch, int val, int len ){
+	uint8_t *write_bytes = (uint8_t *)&val;
+	int read_bytes;
+	int *leading_read_bytes = &read_bytes;
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -2;
+	if ( len > 3 ) return -3;
+	if ( len == 0 ) len = 1;
+	spi_tr_data.tx_buf = (uint64_t)(uint8_t *)write_bytes;
+	spi_tr_data.rx_buf = (uint64_t)(uint8_t *)leading_read_bytes;
+	spi_tr_data.len = len;
+	if(ioctl(spifd_ch[ch], SPI_IOC_MESSAGE(1), &spi_tr_data) < 0){
+		return -4;
+	}
+	return read_bytes;
+}
+
 int SPI_ReadByte( int ch )
 {
 	int res;
-	unsigned char data[8];
+	unsigned char data;
 
 	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-	if ( spifd_ch[ch] == 0 ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -2;
 
-	res = read( spifd_ch[ch], data, 1 );
-	if ( res < 0 ) return -1;
+	res = read( spifd_ch[ch], &data, 1 );
+	if ( res < 0 ) return -3;
 
-	res = (int)data[0];
+	res = (int)data;
 	return res;
 }
 
 int SPI_ReadWord( int ch )
 {
 	int res;
-	unsigned char data[8];
+	unsigned char data[2];
 
 	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-	if ( spifd_ch[ch] == 0 ) return -1;
+	if ( spifd_ch[ch] == 0 ) return -2;
 
 	res = read( spifd_ch[ch], data, 2 );
-	if ( res < 0 ) return -1;
+	if ( res < 0 ) return -3;
 
 	res = ((int)data[1]) << 8;
-	res += (int)data[0];
+	res |= (int)data[0];
 	return res;
 }
 
-int SPI_WriteByte( int ch, int value, int length )
+int SPI_WriteByte( int ch, int value )
 {
 	int res;
-	int len;
-	unsigned char *data;
 
-	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -1;
-	if ( spifd_ch[ch] == 0 ) return -1;
-	if ( ( length<0 )||( length>4 ) ) return -1;
+	if ( ( ch<0 )||( ch>=HSPSPI_CHMAX ) ) return -5;
+	if ( spifd_ch[ch] == 0 ) return -2;
 
-	len = length;
-	if ( len == 0 ) len = 1;
-	data = (unsigned char *)(&value);
-	res = write( spifd_ch[ch], data, len );
-	if ( res < 0 ) return -1;
+	res = write( spifd_ch[ch], &value, 1 );
+	if ( res < 0 ) return -4;
 
 	return 0;
 }
 
-int MCP3008_FullDuplex(int spich, int adcch){
-  const int COMM_SIZE = 3;
-  const uint8_t START_BIT = 0x01;
-  const uint8_t SINGLE_ENDED = 0x80;
-  const uint8_t CHANNEL = adcch << 4;
-  int res;
-  struct spi_ioc_transfer tr;
-  memset(&tr, 0, sizeof(struct spi_ioc_transfer));
-  uint8_t tx[COMM_SIZE] = {0, };
-  uint8_t rx[COMM_SIZE] = {0, };
+/*
+ * Configure SPI options.
+ *
+ * Commands and arguments can be found on:
+ * - https://codebrowser.dev/linux/linux/include/uapi/linux/spi/spidev.h.html
+ * - https://codebrowser.dev/linux/linux/include/uapi/linux/spi/spi.h.html
+ */
+int SPI_WR_Options(int ch, int cmd, void *param){
+	if (ioctl(spifd_ch[ch], cmd, param) != 0) {
+		return 2;
+	}
+	return 0;
+}
 
-	if ( ( spich<0 )||( spich>=HSPSPI_CHMAX ) ) return -1;
-  if(spifd_ch[spich] == 0) return -1;
+const size_t SPIMODE_LEN = 4;
+uint8_t mode_list[SPIMODE_LEN] = {SPI_MODE_0, SPI_MODE_1, SPI_MODE_2, SPI_MODE_3};
 
-  tx[0] = START_BIT;
-  tx[1] = SINGLE_ENDED | CHANNEL;
+int spi_check_spi_mode(uint32_t mode){
+	for(int i = 0; i < (int)SPIMODE_LEN; i++){
+		if(mode == (uint32_t)mode_list[i]){
+			return i;
+		}
+	}
+	return -1;
+}
 
-  tr.tx_buf = (unsigned long)tx;
-  tr.rx_buf = (unsigned long)rx;
-  tr.len = COMM_SIZE;
-  tr.delay_usecs = 0;
-  tr.bits_per_word = 8;
-  tr.cs_change = 0;
-  tr.speed_hz = 5000;
+int spi_set_spi_mode(uint8_t *mode, int param){
+	if(0 <= param && param < (int)SPIMODE_LEN){
+		*mode = mode_list[param];
+		return 0;
+	}else{
+		return -1;
+	}
+}
 
-  if(ioctl(spifd_ch[spich], SPI_IOC_MESSAGE(1), &tr) < 1){
-    return -2;
-  }
+int SPI_RD_MODE(int ch){
+	uint8_t mode;
+	if(ioctl(spifd_ch[ch], SPI_IOC_RD_MODE, &mode) != 0){
+		return -2;
+	}
+	return spi_check_spi_mode(mode);
+}
 
-  res = (0x03 & rx[1]) << 8;
-  res |= rx[2];
+int SPI_WR_MODE(int ch, int param){
+	uint8_t mode;
+	if(spi_set_spi_mode(&mode, param) != 0){
+		return -1;
+	}
+	return SPI_WR_Options(ch, SPI_IOC_WR_MODE, &mode);
+}
 
-  return res;
+int SPI_RD_MODE32(int ch){
+	uint32_t mode;
+	if(ioctl(spifd_ch[ch], SPI_IOC_RD_MODE32, &mode) != 0){
+		return -2;
+	}
+	return spi_check_spi_mode(mode);
+}
+
+int SPI_WR_MODE32(int ch, int param){
+	uint8_t _mode;
+	uint32_t mode;
+	if(spi_set_spi_mode(&_mode, param) != 0){
+		return -1;
+	}
+	mode = (uint32_t)_mode;
+	return SPI_WR_Options(ch, SPI_IOC_WR_MODE32, &mode);
+}
+
+int SPI_RD_LSB_FIRST(int ch){
+	uint8_t lsb_first = 1;			// Zero indicates MSB-first. https://www.kernel.org/doc/Documentation/spi/spidev
+	if(ioctl(spifd_ch[ch], SPI_IOC_RD_LSB_FIRST, &lsb_first) != 0){
+		return -2;
+	}
+	return lsb_first;
+}
+
+int SPI_WR_LSB_FIRST(int ch, int param){
+	uint8_t lsb_first = (uint8_t) param;
+	return SPI_WR_Options(ch, SPI_IOC_WR_LSB_FIRST, &lsb_first);
+}
+
+int SPI_RD_BITS_PER_WORD(int ch){
+	uint8_t bits_per_word;
+	if(ioctl(spifd_ch[ch], SPI_IOC_RD_BITS_PER_WORD, &bits_per_word) != 0){
+		return -2;
+	}
+	return bits_per_word;
+}
+
+int SPI_WR_BITS_PER_WORD(int ch, int param){
+	uint8_t bits_per_word = (uint8_t)param;
+	return SPI_WR_Options(ch, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word);
+}
+
+int SPI_RD_MAX_SPEED_HZ(int ch) {
+	uint32_t speed_hz;
+	if(ioctl(spifd_ch[ch], SPI_IOC_RD_MAX_SPEED_HZ, &speed_hz) != 0){
+		return -2;
+	}
+	return speed_hz;
+}
+
+int SPI_WR_MAX_SPEED_HZ(int ch, int param){
+	uint32_t speed_hz = param;
+	return SPI_WR_Options(ch, SPI_IOC_WR_MAX_SPEED_HZ, &speed_hz);
+}
+
+int SPI_Setting(int ch, int mode, int lsb_first){
+	return SPI_WR_MODE(ch, mode) |
+	SPI_WR_LSB_FIRST(ch, lsb_first);
 }
 
 
@@ -497,19 +635,60 @@ static int hsp3dish_devcontrol( char *cmd, int p1, int p2, int p3 )
 		return SPI_ReadByte( p1 );
 	}
 	if (( strcmp( cmd, "spiwrite" )==0 )||( strcmp( cmd, "SPIWRITE" )==0 )) {
-		return SPI_WriteByte( p3, p1, p2 );
+		return SPI_WriteByte( p2, p1 );
 	}
 	if (( strcmp( cmd, "spiopen" )==0 )||( strcmp( cmd, "SPIOPEN" )==0 )) {
-		return SPI_Open( p2, p1 );
+		return SPI_Open( p3, p1, p2 );
 	}
 	if (( strcmp( cmd, "spiclose" )==0 )||( strcmp( cmd, "SPICLOSE" )==0 )) {
 		SPI_Close( p1 );
-    return 0;
+		return 0;
 	}
-	if (( strcmp( cmd, "readmcpduplex" )==0 )||( strcmp( cmd, "READMCPDUPLEX" )==0 )) {
-    return MCP3008_FullDuplex(p2, p1);
+	if (( strcmp( cmd, "spisetting" )==0 )||( strcmp( cmd, "SPISETTING" )==0 )) {
+		return SPI_Setting(p3, p1, p2);
 	}
-	
+	if (( strcmp( cmd, "spigetmode" )==0 )||( strcmp( cmd, "SPIGETMODE" )==0 )) {
+		return SPI_RD_MODE(p1);
+	}
+	if (( strcmp( cmd, "spisetmode" )==0 )||( strcmp( cmd, "SPISETMODE" )==0 )) {
+		return SPI_WR_MODE(p2, p1);
+	}
+	if (( strcmp( cmd, "spigetmode32" )==0 )||( strcmp( cmd, "SPIGETMODE32" )==0 )) {
+		return SPI_RD_MODE32(p1);
+	}
+	if (( strcmp( cmd, "spisetmode32" )==0 )||( strcmp( cmd, "SPISETMODE32" )==0 )) {
+		return SPI_WR_MODE32(p2, p1);
+	}
+	if (( strcmp( cmd, "spigetlsbfirst" )==0 )||( strcmp( cmd, "SPIGETLSBFIRST" )==0 )) {
+		return SPI_RD_LSB_FIRST(p1);
+	}
+	if (( strcmp( cmd, "spisetlsbfirst" )==0 )||( strcmp( cmd, "SPISETLSBFIRST" )==0 )) {
+		return SPI_WR_LSB_FIRST(p2, p1);
+	}
+	if (( strcmp( cmd, "spigetbitsperword" )==0 )||( strcmp( cmd, "SPIGETBITSPERWORD" )==0 )) {
+		return SPI_RD_BITS_PER_WORD(p1);
+	}
+	if (( strcmp( cmd, "spisetbitsperword" )==0 )||( strcmp( cmd, "SPISETBITSPERWORD" )==0 )) {
+		return SPI_WR_BITS_PER_WORD(p2, p1);
+	}
+	if (( strcmp( cmd, "spigetmaxspeedhz" )==0 )||( strcmp( cmd, "SPIGETMAXSPEEDHZ" )==0 )) {
+		return SPI_RD_MAX_SPEED_HZ(p1);
+	}
+	if (( strcmp( cmd, "spisetmaxspeedhz" )==0 )||( strcmp( cmd, "SPISETMAXSPEEDHZ" )==0 )) {
+		return SPI_WR_MAX_SPEED_HZ(p2, p1);
+	}
+	if (( strcmp( cmd, "spiconfigureh" )==0 )||( strcmp( cmd, "SPICONFIGUREH" )==0 )) {
+		return SPI_ConfigureH(p1, p2, p3);
+	}
+	if (( strcmp( cmd, "spiconfigurem" )==0 )||( strcmp( cmd, "SPICONFIGUREM" )==0 )) {
+		return SPI_ConfigureM(p1, p2, p3);
+	}
+	if (( strcmp( cmd, "spiconfigurel" )==0 )||( strcmp( cmd, "SPICONFIGUREL" )==0 )) {
+		return SPI_ConfigureL(p1);
+	}
+	if (( strcmp( cmd, "spitransceive" )==0 )||( strcmp( cmd, "SPITRANSCEIVE" )==0 )) {
+		return SPI_Transceive(p3, p1, p2);
+	}
 	return -1;
 }
 

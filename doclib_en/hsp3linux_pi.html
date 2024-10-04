@@ -221,6 +221,53 @@ The result is assigned to the system variable stat after the instruction is exec
 		</p>
 
 
+		<h2 id="DATA">Raspberry Pi SPI input / output</h2>
+		<p>
+		In the Raspberry Pi version, the extension to input / output with the SPI device is done by the devcontrol (spi ~) command. <br>
+		For SPI control, SPI must be enabled in the Raspberry Pi option settings. (If SPI control is not performed, no setting is required.) When SPI control is performed, describe as follows.
+		</p><pre>
+	devcontrol "spiopen", bus number, chip select, channel
+		"Channel" is a number that identifies when multiple devices are specified at the same time. (Integer value from 0 to 31)
+		It can be omitted (0) when controlling a single device.
+		spiopen will enable control of the SPI device at the corresponding device file as <code>/dev/spidev&lt;bus number&gt;.&lt;chip select&gt;</code>.
+		The result is returned in the system variable stat. If it is 0, it will be successful, otherwise it will be an error.
+		</pre><p>
+		To send and receive data, write as follows.
+		</p><pre>
+	devcontrol "spitransceive", data value, data size, channel
+		The data value is a 32-bit integer value handled by HSP.
+		If the data size is 0 or omitted, only 8bit (1byte) is output.
+		The data size can be 1,2, and 3. The size of 1 to 3 bytes is output for each.
+		Transmission performs in the full-duplex manner.
+		The received data is assigned to the system variable stat after the instruction is executed.
+		Values received first come to lower bytes and negative values represents
+		any errors occured in little endian-environment.
+		Higher 3 bytes represents data and lower 1 byte represents errors in big endian-environment.
+		SPI control can be used not only from hsp3dish but also from hsp3cl.
+		</pre><p>
+		<code>spiconfigureh</code>,<code>spiconfighrem</code>,<code>spiconfigurel</code>,<code>spisetmode</code>,<code>spisetmode32</code>,<code>spisetlsbfirst</code>,<code>spisetbitsperword</code>, and <code>spisetmaxspeedhz</code> can be used to configure SPI device drivers.
+		</p><pre>
+	devcontrol "spiconfigureh", SPEED_HZ, DELAY_USECS, BITS_PER_WORD
+	devcontrol "spiconfighrem", CS_CHANGE, TX_NBITS, RX_NBITS
+	devcontrol "spiconfighrel", WORD_DELAY_USECS
+	devcontrol "spisetmode", MODE, channel
+	devcontrol "spisetmode32", MODE, channel
+	devcontrol "spisetlsbfirst", LSB_FIRST, channel
+	devcontrol "spisetbitsperword", BITSPERWORD, channel
+	devcontrol "spisetmaxspeedhz", SPEED_HZ, channel
+		where
+		<code>SPEED_HZ</code> sets clock frequency in Hz.
+		<code>DELAT_USECS</code> sets delay between last bit transmission and next byte transmission in micro seconds.
+		<code>BITS_PER_WORD</code> sets word size for the device.
+		Non-zero <code>CS_CHANGE</code> keep chiselect activated after the execution of spitransceive.
+		<code>TX_NBITS</code> sets the number of data lines to send. 0 indicates single mode. Refer the values of <code>SPI_TX_DUAL</code> and <code>SET_TX_QUAD</code> from host headers to enable DUAL or QUAD modes.
+		<code>RX_NBITS</code> sets the number of data lines to receive. 0 indicates single mode. Refer the values of <code>SPI_RX_DUAL</code> and <code>SET_RX_QUAD</code> from host headers to enable DUAL or QUAD modes.
+		<code>WORD_DELAY_USECS</code> sets delays between words in micro seconds.
+		Setting <code>MODE</code> 0&mdash;3 changes SPI operation modes into mode0&mdash;mode3.
+		Set <code>LSB_FIRST</code> zero to enable the MSB-first mode, non-zero to enable the LSB-first mode.
+		</pre>
+
+
 <h2 id = "COPYRIGHT"> Copyright and license </h2>
 		<p>
 HSP3 for Linux / Raspberry Pi is treated as a derivative of OpenHSP, and the license is also a modified BSD license compliant with OpenHSP / HSP3.
