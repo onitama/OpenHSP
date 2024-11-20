@@ -317,6 +317,21 @@ bool get_key_state(int sym)
 	}
 }
 
+static int devicemotion_callback(int eventType, const EmscriptenDeviceMotionEvent *e, void *userData) {
+	hgio_setinfo( GINFO_EXINFO_ACCEL_X, e->accelerationX );
+	hgio_setinfo( GINFO_EXINFO_ACCEL_Y, e->accelerationY );
+	hgio_setinfo( GINFO_EXINFO_ACCEL_Z, e->accelerationZ );
+	return 0;
+}
+
+static int deviceorientation_callback(int eventType, const EmscriptenDeviceOrientationEvent *e, void *userData) {
+	hgio_setinfo( GINFO_EXINFO_GYRO_X, e->beta ); // [-180, 180)
+	hgio_setinfo( GINFO_EXINFO_GYRO_Y, e->gamma ); // [-90, 90)
+	hgio_setinfo( GINFO_EXINFO_GYRO_Z, e->alpha ); // [0, 360)
+
+	return 0;
+}
+
 static void hsp3dish_initwindow( engine* p_engine, int sx, int sy, char *windowtitle )
 {
 	printf("INIT %dx%d %s\n", sx,sy,windowtitle);
@@ -776,8 +791,12 @@ int hsp3dish_init( char *startfile )
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo( devinfo );
 
-    // イベントハンドラ追加
-    emscripten_set_mousedown_callback("#canvas", nullptr, true, hsp3dish_em_mouse_callback);
+	// イベントハンドラ追加
+	emscripten_set_mousedown_callback("#canvas", nullptr, true, hsp3dish_em_mouse_callback);
+
+	// 各種センサー対応
+	emscripten_set_deviceorientation_callback(nullptr, true, deviceorientation_callback);
+	emscripten_set_devicemotion_callback(nullptr, true, devicemotion_callback);
 
 	return 0;
 }
