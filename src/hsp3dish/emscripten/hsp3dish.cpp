@@ -318,9 +318,9 @@ bool get_key_state(int sym)
 }
 
 static int devicemotion_callback(int eventType, const EmscriptenDeviceMotionEvent *e, void *userData) {
-	hgio_setinfo( GINFO_EXINFO_ACCEL_X, e->accelerationX );
-	hgio_setinfo( GINFO_EXINFO_ACCEL_Y, e->accelerationY );
-	hgio_setinfo( GINFO_EXINFO_ACCEL_Z, e->accelerationZ );
+	hgio_setinfo( GINFO_EXINFO_ACCEL_X, e->accelerationIncludingGravityX );
+	hgio_setinfo( GINFO_EXINFO_ACCEL_Y, e->accelerationIncludingGravityY );
+	hgio_setinfo( GINFO_EXINFO_ACCEL_Z, e->accelerationIncludingGravityZ );
 	return 0;
 }
 
