@@ -300,7 +300,8 @@ using std::va_list;
 #elif EMSCRIPTEN
     #define GLEW_STATIC
     #include <GL/glew.h>
-//    #define USE_VAO //for IE11
+    #define OPENGL_ES
+    #define USE_VAO
 #endif
 
 // Graphics (GLSL)

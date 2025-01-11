@@ -5,386 +5,391 @@ AR = emar
 #CFLAGS = -Wall -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG -fpermissive -g4 -s LEGACY_GL_EMULATION=1
 
 CFLAGS_CORE = -Wall -DNDEBUG -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG \
-	   -fpermissive -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
-	   -s "EXTRA_EXPORTED_RUNTIME_METHODS=['addRunDependency', 'removeRunDependency', 'FS_createPreloadedFile', 'FS_createPath']" \
+	   -fpermissive \
 	   -s DISABLE_EXCEPTION_CATCHING=0 \
-	   -lidbfs.js \
-	   --memory-init-file 0
+	   -lidbfs.js
 CFLAGS_DEBUG =
 #CFLAGS_DEBUG = -g3 --js-opts 0
 #CFLAGS_DEBUG = -g3 --js-opts 0 -s SAFE_HEAP=1
 
 CFLAGS = $(CFLAGS_CORE) $(CFLAGS_DEBUG) -DUSE_OBAQ\
-	   -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -O3\
+	   -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -s USE_SDL_MIXER=2 \
+	   -O3 \
 	   -s LEGACY_GL_EMULATION=1
 
 CFLAGS_GP = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
-		  -s FULL_ES2=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
-		  -s USE_SDL=2 -s USE_SDL_TTF=2\
+		  -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 \
 		  -D_LARGEFILE64_SOURCE -O3\
 		  -DHSPDISHGP -I emscripten/extlib/include -I extlib/src -I gameplay/src -I win32gp
 
 CFLAGS_EXTLIB = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
-		  -s FULL_ES2=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+		  -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
 		  -D_LARGEFILE64_SOURCE -O3\
 		  -I emscripten/extlib/include -I extlib/src -I gameplay/src
 
+LINK_FLAGS_CORE =  -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
+	-s "EXPORTED_RUNTIME_METHODS=['addRunDependency', 'removeRunDependency', 'FS_createPreloadedFile', 'FS_createPath', 'ccall', 'cwrap']" \
+	-s "EXPORTED_FUNCTIONS=['_main', '_malloc', '_free']"
+
+LINK_FLAGS = $(LINK_FLAGS_CORE)
+LINK_FLAGS_GP = $(LINK_FLAGS_CORE) \
+		-s FULL_ES2=1
 
 OBJS = \
-	../hsp3/dpmread.bc \
-	geometry.bc \
-	../hsp3/hsp3.bc \
-	../hsp3/hsp3code.bc \
-	../hsp3/hsp3debug.bc \
-	hsp3gr_dish.bc \
-	../hsp3/hsp3int.bc \
-	../hsp3/hspvar_core.bc \
-	../hsp3/hspvar_double.bc \
-	../hsp3/hspvar_int.bc \
-	../hsp3/hspvar_label.bc \
-	../hsp3/hspvar_str.bc \
-	../hsp3/hspvar_struct.bc \
-	hspwnd_dish.bc \
-	hspwnd_obj.bc \
-	hspwnd_edit.bc \
-	random.bc \
-	../hsp3/stack.bc \
-	../hsp3/strbuf.bc \
-	../hsp3/strnote.bc \
-	../hsp3/emscripten/hsp3ext_emscripten.bc \
-	sysreq.bc \
-	texmes.bc \
-	essprite.bc \
-	obaq/hsp3dw.bc \
-	obaq/omkedraw.bc \
-	obaq/game.bc \
-	../obaq/physics/vessel.bc \
-	../obaq/physics/rock.bc \
-	emscripten/fontsystem.bc \
-	emscripten/hgtex.bc \
-	emscripten/hgiox.bc \
-	emscripten/hsp3dish.bc \
-	emscripten/main.bc \
-	emscripten/mmman.bc \
-	emscripten/webtask_emscripten.bc \
-	emscripten/stb_image.bc \
-	emscripten/supio_emscripten.bc
+	../hsp3/dpmread.o \
+	geometry.o \
+	../hsp3/hsp3.o \
+	../hsp3/hsp3code.o \
+	../hsp3/hsp3debug.o \
+	hsp3gr_dish.o \
+	../hsp3/hsp3int.o \
+	../hsp3/hspvar_core.o \
+	../hsp3/hspvar_double.o \
+	../hsp3/hspvar_int.o \
+	../hsp3/hspvar_label.o \
+	../hsp3/hspvar_str.o \
+	../hsp3/hspvar_struct.o \
+	hspwnd_dish.o \
+	hspwnd_obj.o \
+	hspwnd_edit.o \
+	random.o \
+	../hsp3/stack.o \
+	../hsp3/strbuf.o \
+	../hsp3/strnote.o \
+	../hsp3/emscripten/hsp3ext_emscripten.o \
+	sysreq.o \
+	texmes.o \
+	essprite.o \
+	obaq/hsp3dw.o \
+	obaq/omkedraw.o \
+	obaq/game.o \
+	../obaq/physics/vessel.o \
+	../obaq/physics/rock.o \
+	emscripten/fontsystem.o \
+	emscripten/hgtex.o \
+	emscripten/hgiox.o \
+	emscripten/hsp3dish.o \
+	emscripten/main.o \
+	emscripten/mmman.o \
+	emscripten/webtask_emscripten.o \
+	emscripten/stb_image.o \
+	emscripten/supio_emscripten.o
 
 OBJS_GP = \
-	../hsp3/dpmread.gp.bc \
-	geometry.gp.bc \
-	../hsp3/hsp3.gp.bc \
-	../hsp3/hsp3code.gp.bc \
-	../hsp3/hsp3debug.gp.bc \
-	hsp3gr_dish.gp.bc \
-	../hsp3/hsp3int.gp.bc \
-	../hsp3/hspvar_core.gp.bc \
-	../hsp3/hspvar_double.gp.bc \
-	../hsp3/hspvar_int.gp.bc \
-	../hsp3/hspvar_label.gp.bc \
-	../hsp3/hspvar_str.gp.bc \
-	../hsp3/hspvar_struct.gp.bc \
-	hspwnd_dish.gp.bc \
-	hspwnd_obj.gp.bc \
-	hspwnd_edit.gp.bc \
-	random.gp.bc \
-	../hsp3/stack.gp.bc \
-	../hsp3/strbuf.gp.bc \
-	../hsp3/strnote.gp.bc \
-	../hsp3/emscripten/hsp3ext_emscripten.gp.bc \
-	sysreq.gp.bc \
-	texmes.gp.bc \
-	essprite.gp.bc \
-	win32gp/gamehsp.gp.bc \
-	win32gp/gpevent.gp.bc \
-	win32gp/gpcam.gp.bc \
-	win32gp/gplgt.gp.bc \
-	win32gp/gpmat.gp.bc \
-	win32gp/gpphy.gp.bc \
-	emscripten/fontsystem.gp.bc \
-	emscripten/hgtex.gp.bc \
-	win32gp/hgiox.gp.bc \
-	emscripten/hsp3dish.gp.bc \
-	emscripten/main.gp.bc \
-	emscripten/mmman.gp.bc \
-	emscripten/webtask_emscripten.gp.bc \
-	emscripten/stb_image.gp.bc \
-	emscripten/supio_emscripten.gp.bc
+	../hsp3/dpmread.gp.o \
+	geometry.gp.o \
+	../hsp3/hsp3.gp.o \
+	../hsp3/hsp3code.gp.o \
+	../hsp3/hsp3debug.gp.o \
+	hsp3gr_dish.gp.o \
+	../hsp3/hsp3int.gp.o \
+	../hsp3/hspvar_core.gp.o \
+	../hsp3/hspvar_double.gp.o \
+	../hsp3/hspvar_int.gp.o \
+	../hsp3/hspvar_label.gp.o \
+	../hsp3/hspvar_str.gp.o \
+	../hsp3/hspvar_struct.gp.o \
+	hspwnd_dish.gp.o \
+	hspwnd_obj.gp.o \
+	hspwnd_edit.gp.o \
+	random.gp.o \
+	../hsp3/stack.gp.o \
+	../hsp3/strbuf.gp.o \
+	../hsp3/strnote.gp.o \
+	../hsp3/emscripten/hsp3ext_emscripten.gp.o \
+	sysreq.gp.o \
+	texmes.gp.o \
+	essprite.gp.o \
+	win32gp/gamehsp.gp.o \
+	win32gp/gpevent.gp.o \
+	win32gp/gpcam.gp.o \
+	win32gp/gplgt.gp.o \
+	win32gp/gpmat.gp.o \
+	win32gp/gpphy.gp.o \
+	emscripten/fontsystem.gp.o \
+	emscripten/hgtex.gp.o \
+	win32gp/hgiox.gp.o \
+	emscripten/hsp3dish.gp.o \
+	emscripten/main.gp.o \
+	emscripten/mmman.gp.o \
+	emscripten/webtask_emscripten.gp.o \
+	emscripten/stb_image.gp.o \
+	emscripten/supio_emscripten.gp.o
 
 OBJS_GAMEPLAY = \
-	gameplay/src/AbsoluteLayout.gp.bc \
-	gameplay/src/AIAgent.gp.bc \
-	gameplay/src/AIController.gp.bc \
-	gameplay/src/AIMessage.gp.bc \
-	gameplay/src/AIState.gp.bc \
-	gameplay/src/AIStateMachine.gp.bc \
-	gameplay/src/Animation.gp.bc \
-	gameplay/src/AnimationClip.gp.bc \
-	gameplay/src/AnimationController.gp.bc \
-	gameplay/src/AnimationTarget.gp.bc \
-	gameplay/src/AnimationValue.gp.bc \
-	gameplay/src/AudioController.gp.bc \
-	gameplay/src/AudioListener.gp.bc \
-	gameplay/src/AudioSource.gp.bc \
-	gameplay/src/BoundingBox.gp.bc \
-	gameplay/src/BoundingSphere.gp.bc \
-	gameplay/src/Bundle.gp.bc \
-	gameplay/src/Button.gp.bc \
-	gameplay/src/Camera.gp.bc \
-	gameplay/src/CheckBox.gp.bc \
-	gameplay/src/Container.gp.bc \
-	gameplay/src/Control.gp.bc \
-	gameplay/src/ControlFactory.gp.bc \
-	gameplay/src/Curve.gp.bc \
-	gameplay/src/DebugNew.gp.bc \
-	gameplay/src/DepthStencilTarget.gp.bc \
-	gameplay/src/Drawable.gp.bc \
-	gameplay/src/Effect.gp.bc \
-	gameplay/src/FileSystem.gp.bc \
-	gameplay/src/FlowLayout.gp.bc \
-	gameplay/src/Font.gp.bc \
-	gameplay/src/Form.gp.bc \
-	gameplay/src/FrameBuffer.gp.bc \
-	gameplay/src/Frustum.gp.bc \
-	gameplay/src/Game.gp.bc \
-	gameplay/src/Gamepad.gp.bc \
-	gameplay/src/HeightField.gp.bc \
-	gameplay/src/Image.gp.bc \
-	gameplay/src/ImageControl.gp.bc \
-	gameplay/src/Joint.gp.bc \
-	gameplay/src/JoystickControl.gp.bc \
-	gameplay/src/Label.gp.bc \
-	gameplay/src/Layout.gp.bc \
-	gameplay/src/Light.gp.bc \
-	gameplay/src/Logger.gp.bc \
-	gameplay/src/Material.gp.bc \
-	gameplay/src/MaterialParameter.gp.bc \
-	gameplay/src/MathUtil.gp.bc \
-	gameplay/src/Matrix.gp.bc \
-	gameplay/src/Mesh.gp.bc \
-	gameplay/src/MeshBatch.gp.bc \
-	gameplay/src/MeshPart.gp.bc \
-	gameplay/src/MeshSkin.gp.bc \
-	gameplay/src/Model.gp.bc \
-	gameplay/src/Node.gp.bc \
-	gameplay/src/ParticleEmitter.gp.bc \
-	gameplay/src/Pass.gp.bc \
-	gameplay/src/PhysicsCharacter.gp.bc \
-	gameplay/src/PhysicsCollisionObject.gp.bc \
-	gameplay/src/PhysicsCollisionShape.gp.bc \
-	gameplay/src/PhysicsConstraint.gp.bc \
-	gameplay/src/PhysicsController.gp.bc \
-	gameplay/src/PhysicsFixedConstraint.gp.bc \
-	gameplay/src/PhysicsGenericConstraint.gp.bc \
-	gameplay/src/PhysicsGhostObject.gp.bc \
-	gameplay/src/PhysicsHingeConstraint.gp.bc \
-	gameplay/src/PhysicsRigidBody.gp.bc \
-	gameplay/src/PhysicsSocketConstraint.gp.bc \
-	gameplay/src/PhysicsSpringConstraint.gp.bc \
-	gameplay/src/PhysicsVehicle.gp.bc \
-	gameplay/src/PhysicsVehicleWheel.gp.bc \
-	gameplay/src/Plane.gp.bc \
-	gameplay/src/Platform.gp.bc \
-	gameplay/src/PlatformEmscripten.gp.bc \
-	gameplay/src/Properties.gp.bc \
-	gameplay/src/Quaternion.gp.bc \
-	gameplay/src/RadioButton.gp.bc \
-	gameplay/src/Ray.gp.bc \
-	gameplay/src/Rectangle.gp.bc \
-	gameplay/src/Ref.gp.bc \
-	gameplay/src/RenderState.gp.bc \
-	gameplay/src/RenderTarget.gp.bc \
-	gameplay/src/Scene.gp.bc \
-	gameplay/src/SceneLoader.gp.bc \
-	gameplay/src/ScreenDisplayer.gp.bc \
-	gameplay/src/ScriptController.gp.bc \
-	gameplay/src/ScriptTarget.gp.bc \
-	gameplay/src/Slider.gp.bc \
-	gameplay/src/Sprite.gp.bc \
-	gameplay/src/SpriteBatch.gp.bc \
-	gameplay/src/Technique.gp.bc \
-	gameplay/src/Terrain.gp.bc \
-	gameplay/src/TerrainPatch.gp.bc \
-	gameplay/src/Text.gp.bc \
-	gameplay/src/TextBox.gp.bc \
-	gameplay/src/Texture.gp.bc \
-	gameplay/src/Theme.gp.bc \
-	gameplay/src/ThemeStyle.gp.bc \
-	gameplay/src/TileSet.gp.bc \
-	gameplay/src/Transform.gp.bc \
-	gameplay/src/Vector2.gp.bc \
-	gameplay/src/Vector3.gp.bc \
-	gameplay/src/Vector4.gp.bc \
-	gameplay/src/VertexAttributeBinding.gp.bc \
-	gameplay/src/VertexFormat.gp.bc \
-	gameplay/src/VerticalLayout.gp.bc \
-	extlib/src/libpng/png.gp.bc \
-	extlib/src/libpng/pngerror.gp.bc \
-	extlib/src/libpng/pngget.gp.bc \
-	extlib/src/libpng/pngmem.gp.bc \
-	extlib/src/libpng/pngpread.gp.bc \
-	extlib/src/libpng/pngread.gp.bc \
-	extlib/src/libpng/pngrio.gp.bc \
-	extlib/src/libpng/pngrtran.gp.bc \
-	extlib/src/libpng/pngrutil.gp.bc \
-	extlib/src/libpng/pngset.gp.bc \
-	extlib/src/libpng/pngtrans.gp.bc \
-	extlib/src/libpng/pngwio.gp.bc \
-	extlib/src/libpng/pngwrite.gp.bc \
-	extlib/src/libpng/pngwtran.gp.bc \
-	extlib/src/libpng/pngwutil.gp.bc \
-	extlib/src/zlib/adler32.gp.bc \
-	extlib/src/zlib/compress.gp.bc \
-	extlib/src/zlib/crc32.gp.bc \
-	extlib/src/zlib/deflate.gp.bc \
-	extlib/src/zlib/gzclose.gp.bc \
-	extlib/src/zlib/gzlib.gp.bc \
-	extlib/src/zlib/gzread.gp.bc \
-	extlib/src/zlib/gzwrite.gp.bc \
-	extlib/src/zlib/infback.gp.bc \
-	extlib/src/zlib/inffast.gp.bc \
-	extlib/src/zlib/inflate.gp.bc \
-	extlib/src/zlib/inftrees.gp.bc \
-	extlib/src/zlib/trees.gp.bc \
-	extlib/src/zlib/uncompr.gp.bc \
-	extlib/src/zlib/zutil.gp.bc
+	gameplay/src/AbsoluteLayout.gp.o \
+	gameplay/src/AIAgent.gp.o \
+	gameplay/src/AIController.gp.o \
+	gameplay/src/AIMessage.gp.o \
+	gameplay/src/AIState.gp.o \
+	gameplay/src/AIStateMachine.gp.o \
+	gameplay/src/Animation.gp.o \
+	gameplay/src/AnimationClip.gp.o \
+	gameplay/src/AnimationController.gp.o \
+	gameplay/src/AnimationTarget.gp.o \
+	gameplay/src/AnimationValue.gp.o \
+	gameplay/src/AudioController.gp.o \
+	gameplay/src/AudioListener.gp.o \
+	gameplay/src/AudioSource.gp.o \
+	gameplay/src/BoundingBox.gp.o \
+	gameplay/src/BoundingSphere.gp.o \
+	gameplay/src/Bundle.gp.o \
+	gameplay/src/Button.gp.o \
+	gameplay/src/Camera.gp.o \
+	gameplay/src/CheckBox.gp.o \
+	gameplay/src/Container.gp.o \
+	gameplay/src/Control.gp.o \
+	gameplay/src/ControlFactory.gp.o \
+	gameplay/src/Curve.gp.o \
+	gameplay/src/DebugNew.gp.o \
+	gameplay/src/DepthStencilTarget.gp.o \
+	gameplay/src/Drawable.gp.o \
+	gameplay/src/Effect.gp.o \
+	gameplay/src/FileSystem.gp.o \
+	gameplay/src/FlowLayout.gp.o \
+	gameplay/src/Font.gp.o \
+	gameplay/src/Form.gp.o \
+	gameplay/src/FrameBuffer.gp.o \
+	gameplay/src/Frustum.gp.o \
+	gameplay/src/Game.gp.o \
+	gameplay/src/Gamepad.gp.o \
+	gameplay/src/HeightField.gp.o \
+	gameplay/src/Image.gp.o \
+	gameplay/src/ImageControl.gp.o \
+	gameplay/src/Joint.gp.o \
+	gameplay/src/JoystickControl.gp.o \
+	gameplay/src/Label.gp.o \
+	gameplay/src/Layout.gp.o \
+	gameplay/src/Light.gp.o \
+	gameplay/src/Logger.gp.o \
+	gameplay/src/Material.gp.o \
+	gameplay/src/MaterialParameter.gp.o \
+	gameplay/src/MathUtil.gp.o \
+	gameplay/src/Matrix.gp.o \
+	gameplay/src/Mesh.gp.o \
+	gameplay/src/MeshBatch.gp.o \
+	gameplay/src/MeshPart.gp.o \
+	gameplay/src/MeshSkin.gp.o \
+	gameplay/src/Model.gp.o \
+	gameplay/src/Node.gp.o \
+	gameplay/src/ParticleEmitter.gp.o \
+	gameplay/src/Pass.gp.o \
+	gameplay/src/PhysicsCharacter.gp.o \
+	gameplay/src/PhysicsCollisionObject.gp.o \
+	gameplay/src/PhysicsCollisionShape.gp.o \
+	gameplay/src/PhysicsConstraint.gp.o \
+	gameplay/src/PhysicsController.gp.o \
+	gameplay/src/PhysicsFixedConstraint.gp.o \
+	gameplay/src/PhysicsGenericConstraint.gp.o \
+	gameplay/src/PhysicsGhostObject.gp.o \
+	gameplay/src/PhysicsHingeConstraint.gp.o \
+	gameplay/src/PhysicsRigidBody.gp.o \
+	gameplay/src/PhysicsSocketConstraint.gp.o \
+	gameplay/src/PhysicsSpringConstraint.gp.o \
+	gameplay/src/PhysicsVehicle.gp.o \
+	gameplay/src/PhysicsVehicleWheel.gp.o \
+	gameplay/src/Plane.gp.o \
+	gameplay/src/Platform.gp.o \
+	gameplay/src/PlatformEmscripten.gp.o \
+	gameplay/src/Properties.gp.o \
+	gameplay/src/Quaternion.gp.o \
+	gameplay/src/RadioButton.gp.o \
+	gameplay/src/Ray.gp.o \
+	gameplay/src/Rectangle.gp.o \
+	gameplay/src/Ref.gp.o \
+	gameplay/src/RenderState.gp.o \
+	gameplay/src/RenderTarget.gp.o \
+	gameplay/src/Scene.gp.o \
+	gameplay/src/SceneLoader.gp.o \
+	gameplay/src/ScreenDisplayer.gp.o \
+	gameplay/src/ScriptController.gp.o \
+	gameplay/src/ScriptTarget.gp.o \
+	gameplay/src/Slider.gp.o \
+	gameplay/src/Sprite.gp.o \
+	gameplay/src/SpriteBatch.gp.o \
+	gameplay/src/Technique.gp.o \
+	gameplay/src/Terrain.gp.o \
+	gameplay/src/TerrainPatch.gp.o \
+	gameplay/src/Text.gp.o \
+	gameplay/src/TextBox.gp.o \
+	gameplay/src/Texture.gp.o \
+	gameplay/src/Theme.gp.o \
+	gameplay/src/ThemeStyle.gp.o \
+	gameplay/src/TileSet.gp.o \
+	gameplay/src/Transform.gp.o \
+	gameplay/src/Vector2.gp.o \
+	gameplay/src/Vector3.gp.o \
+	gameplay/src/Vector4.gp.o \
+	gameplay/src/VertexAttributeBinding.gp.o \
+	gameplay/src/VertexFormat.gp.o \
+	gameplay/src/VerticalLayout.gp.o \
+	extlib/src/libpng/png.gp.o \
+	extlib/src/libpng/pngerror.gp.o \
+	extlib/src/libpng/pngget.gp.o \
+	extlib/src/libpng/pngmem.gp.o \
+	extlib/src/libpng/pngpread.gp.o \
+	extlib/src/libpng/pngread.gp.o \
+	extlib/src/libpng/pngrio.gp.o \
+	extlib/src/libpng/pngrtran.gp.o \
+	extlib/src/libpng/pngrutil.gp.o \
+	extlib/src/libpng/pngset.gp.o \
+	extlib/src/libpng/pngtrans.gp.o \
+	extlib/src/libpng/pngwio.gp.o \
+	extlib/src/libpng/pngwrite.gp.o \
+	extlib/src/libpng/pngwtran.gp.o \
+	extlib/src/libpng/pngwutil.gp.o \
+	extlib/src/zlib/adler32.gp.o \
+	extlib/src/zlib/compress.gp.o \
+	extlib/src/zlib/crc32.gp.o \
+	extlib/src/zlib/deflate.gp.o \
+	extlib/src/zlib/gzclose.gp.o \
+	extlib/src/zlib/gzlib.gp.o \
+	extlib/src/zlib/gzread.gp.o \
+	extlib/src/zlib/gzwrite.gp.o \
+	extlib/src/zlib/infback.gp.o \
+	extlib/src/zlib/inffast.gp.o \
+	extlib/src/zlib/inflate.gp.o \
+	extlib/src/zlib/inftrees.gp.o \
+	extlib/src/zlib/trees.gp.o \
+	extlib/src/zlib/uncompr.gp.o \
+	extlib/src/zlib/zutil.gp.o
 
 OBJS_LINEAR_MATH = \
-	extlib/src/LinearMath/btAlignedAllocator.gp.bc \
-	extlib/src/LinearMath/btConvexHull.gp.bc \
-	extlib/src/LinearMath/btConvexHullComputer.gp.bc \
-	extlib/src/LinearMath/btGeometryUtil.gp.bc \
-	extlib/src/LinearMath/btPolarDecomposition.gp.bc \
-	extlib/src/LinearMath/btQuickprof.gp.bc \
-	extlib/src/LinearMath/btSerializer.gp.bc \
-	extlib/src/LinearMath/btVector3.gp.bc
+	extlib/src/LinearMath/btAlignedAllocator.gp.o \
+	extlib/src/LinearMath/btConvexHull.gp.o \
+	extlib/src/LinearMath/btConvexHullComputer.gp.o \
+	extlib/src/LinearMath/btGeometryUtil.gp.o \
+	extlib/src/LinearMath/btPolarDecomposition.gp.o \
+	extlib/src/LinearMath/btQuickprof.gp.o \
+	extlib/src/LinearMath/btSerializer.gp.o \
+	extlib/src/LinearMath/btVector3.gp.o
 
 OBJS_BULLET_COLLISION = \
-	extlib/src/BulletCollision/BroadphaseCollision/btAxisSweep3.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btDbvt.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btDbvtBroadphase.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btDispatcher.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btQuantizedBvh.gp.bc \
-	extlib/src/BulletCollision/BroadphaseCollision/btSimpleBroadphase.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btBoxBoxDetector.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btCollisionDispatcher.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btCollisionObject.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btCollisionWorld.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btGhostObject.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btHashedSimplePairCache.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btInternalEdgeUtility.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btManifoldResult.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btSimulationIslandManager.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/btUnionFind.gp.bc \
-	extlib/src/BulletCollision/CollisionDispatch/SphereTriangleDetector.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btBox2dShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btBoxShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btCapsuleShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btCollisionShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btCompoundShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConcaveShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConeShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConvex2dShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConvexHullShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConvexInternalShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConvexPointCloudShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConvexPolyhedron.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConvexShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btCylinderShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btEmptyShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btMinkowskiSumShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btMultiSphereShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btOptimizedBvh.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btShapeHull.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btSphereShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btStaticPlaneShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btStridingMeshInterface.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btTetrahedronShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btTriangleBuffer.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btTriangleCallback.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btTriangleMesh.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btTriangleMeshShape.gp.bc \
-	extlib/src/BulletCollision/CollisionShapes/btUniformScalingShape.gp.bc \
-	extlib/src/BulletCollision/Gimpact/btContactProcessing.gp.bc \
-	extlib/src/BulletCollision/Gimpact/btGenericPoolAllocator.gp.bc \
-	extlib/src/BulletCollision/Gimpact/btGImpactBvh.gp.bc \
-	extlib/src/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.gp.bc \
-	extlib/src/BulletCollision/Gimpact/btGImpactQuantizedBvh.gp.bc \
-	extlib/src/BulletCollision/Gimpact/btGImpactShape.gp.bc \
-	extlib/src/BulletCollision/Gimpact/btTriangleShapeEx.gp.bc \
-	extlib/src/BulletCollision/Gimpact/gim_box_set.gp.bc \
-	extlib/src/BulletCollision/Gimpact/gim_contact.gp.bc \
-	extlib/src/BulletCollision/Gimpact/gim_memory.gp.bc \
-	extlib/src/BulletCollision/Gimpact/gim_tri_collision.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btConvexCast.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkEpa2.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btRaycastCallback.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.gp.bc \
-	extlib/src/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.gp.bc
+	extlib/src/BulletCollision/BroadphaseCollision/btAxisSweep3.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btDbvt.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btDbvtBroadphase.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btDispatcher.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btQuantizedBvh.gp.o \
+	extlib/src/BulletCollision/BroadphaseCollision/btSimpleBroadphase.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btBoxBoxDetector.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btCollisionDispatcher.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btCollisionObject.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btCollisionWorld.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btGhostObject.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btHashedSimplePairCache.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btInternalEdgeUtility.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btManifoldResult.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btSimulationIslandManager.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/btUnionFind.gp.o \
+	extlib/src/BulletCollision/CollisionDispatch/SphereTriangleDetector.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btBox2dShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btBoxShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btCapsuleShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btCollisionShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btCompoundShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConcaveShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConeShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConvex2dShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConvexHullShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConvexInternalShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConvexPointCloudShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConvexPolyhedron.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConvexShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btCylinderShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btEmptyShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btMinkowskiSumShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btMultiSphereShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btOptimizedBvh.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btShapeHull.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btSphereShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btStaticPlaneShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btStridingMeshInterface.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btTetrahedronShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btTriangleBuffer.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btTriangleCallback.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btTriangleMesh.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btTriangleMeshShape.gp.o \
+	extlib/src/BulletCollision/CollisionShapes/btUniformScalingShape.gp.o \
+	extlib/src/BulletCollision/Gimpact/btContactProcessing.gp.o \
+	extlib/src/BulletCollision/Gimpact/btGenericPoolAllocator.gp.o \
+	extlib/src/BulletCollision/Gimpact/btGImpactBvh.gp.o \
+	extlib/src/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.gp.o \
+	extlib/src/BulletCollision/Gimpact/btGImpactQuantizedBvh.gp.o \
+	extlib/src/BulletCollision/Gimpact/btGImpactShape.gp.o \
+	extlib/src/BulletCollision/Gimpact/btTriangleShapeEx.gp.o \
+	extlib/src/BulletCollision/Gimpact/gim_box_set.gp.o \
+	extlib/src/BulletCollision/Gimpact/gim_contact.gp.o \
+	extlib/src/BulletCollision/Gimpact/gim_memory.gp.o \
+	extlib/src/BulletCollision/Gimpact/gim_tri_collision.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btConvexCast.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkEpa2.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btRaycastCallback.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.gp.o \
+	extlib/src/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.gp.o
 OBJS_BULLET_DYNAMICS = \
-	extlib/src/BulletDynamics/Character/btKinematicCharacterController.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btContactConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btFixedConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btGearConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btHinge2Constraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btHingeConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btSliderConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btTypedConstraint.gp.bc \
-	extlib/src/BulletDynamics/ConstraintSolver/btUniversalConstraint.gp.bc \
-	extlib/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.gp.bc \
-	extlib/src/BulletDynamics/Dynamics/btRigidBody.gp.bc \
-	extlib/src/BulletDynamics/Dynamics/btSimpleDynamicsWorld.gp.bc \
-	extlib/src/BulletDynamics/Dynamics/Bullet-C-API.gp.bc \
-	extlib/src/BulletDynamics/Featherstone/btMultiBody.gp.bc \
-	extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraint.gp.bc \
-	extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.gp.bc \
-	extlib/src/BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.gp.bc \
-	extlib/src/BulletDynamics/Featherstone/btMultiBodyJointLimitConstraint.gp.bc \
-	extlib/src/BulletDynamics/Featherstone/btMultiBodyJointMotor.gp.bc \
-	extlib/src/BulletDynamics/Featherstone/btMultiBodyPoint2Point.gp.bc \
-	extlib/src/BulletDynamics/MLCPSolvers/btDantzigLCP.gp.bc \
-	extlib/src/BulletDynamics/MLCPSolvers/btMLCPSolver.gp.bc \
-	extlib/src/BulletDynamics/Vehicle/btRaycastVehicle.gp.bc \
-	extlib/src/BulletDynamics/Vehicle/btWheelInfo.gp.bc
+	extlib/src/BulletDynamics/Character/btKinematicCharacterController.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btContactConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btFixedConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btGearConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btHinge2Constraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btHingeConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btSliderConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btTypedConstraint.gp.o \
+	extlib/src/BulletDynamics/ConstraintSolver/btUniversalConstraint.gp.o \
+	extlib/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.gp.o \
+	extlib/src/BulletDynamics/Dynamics/btRigidBody.gp.o \
+	extlib/src/BulletDynamics/Dynamics/btSimpleDynamicsWorld.gp.o \
+	extlib/src/BulletDynamics/Dynamics/Bullet-C-API.gp.o \
+	extlib/src/BulletDynamics/Featherstone/btMultiBody.gp.o \
+	extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraint.gp.o \
+	extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.gp.o \
+	extlib/src/BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.gp.o \
+	extlib/src/BulletDynamics/Featherstone/btMultiBodyJointLimitConstraint.gp.o \
+	extlib/src/BulletDynamics/Featherstone/btMultiBodyJointMotor.gp.o \
+	extlib/src/BulletDynamics/Featherstone/btMultiBodyPoint2Point.gp.o \
+	extlib/src/BulletDynamics/MLCPSolvers/btDantzigLCP.gp.o \
+	extlib/src/BulletDynamics/MLCPSolvers/btMLCPSolver.gp.o \
+	extlib/src/BulletDynamics/Vehicle/btRaycastVehicle.gp.o \
+	extlib/src/BulletDynamics/Vehicle/btWheelInfo.gp.o
 
 LIBS =
 LIBS_GP = \
@@ -400,11 +405,11 @@ all: $(TARGETS)
 .SUFFIXES: .cpp
 
 emscripten/hsp3dish.js: $(OBJS) emscripten/license.js
-	$(CXX) $(CFLAGS) $(OBJS) -o hsp3dish.js $(LIBS)
+	$(CXX) $(CFLAGS) $(LINK_FLAGS) $(OBJS) -o hsp3dish.js $(LIBS)
 	cat emscripten/license.js hsp3dish.js > $@
 
 emscripten/hsp3dish-gp.js: $(OBJS_GP) $(LIBS_GP) emscripten/license.js
-	$(CXX) $(CFLAGS_GP) $(OBJS_GP) $(LIBS_GP) -o hsp3dish-gp.js
+	$(CXX) $(CFLAGS_GP) $(LINK_FLAGS_GP) $(OBJS_GP) $(LIBS_GP) -o hsp3dish-gp.js
 	cat emscripten/license.js hsp3dish-gp.js > $@
 
 emscripten/libgameplay.a: $(OBJS_GAMEPLAY)
@@ -423,20 +428,20 @@ emscripten/libLinearMath.a: $(OBJS_LINEAR_MATH)
 	rm -f $@
 	$(AR) rcs $@ $(OBJS_LINEAR_MATH)
 
-%.bc: %.c
-	echo $(CC) $(CFLAGS) -c $< -o $*.bc
-	$(CC) $(CFLAGS) -c $< -o $*.bc
-%.bc: %.cpp
-	echo $(CC) $(CFLAGS) -c $< -o $*.bc
-	$(CXX) $(CFLAGS) -c $< -o $*.bc
+%.o: %.c
+	echo $(CC) $(CFLAGS) -c $< -o $*.o
+	$(CC) $(CFLAGS) -c $< -o $*.o
+%.o: %.cpp
+	echo $(CC) $(CFLAGS) -c $< -o $*.o
+	$(CXX) $(CFLAGS) -c $< -o $*.o
 
 
-%.gp.bc: %.c
-	echo $(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.gp.bc
-	$(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.gp.bc
-%.gp.bc: %.cpp
-	echo $(CC) $(CFLAGS_GP) -std=c++11 -c $< -o $*.gp.bc
-	$(CXX) $(CFLAGS_GP) -std=c++11 -c $< -o $*.gp.bc
+%.gp.o: %.c
+	echo $(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.gp.o
+	$(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.gp.o
+%.gp.o: %.cpp
+	echo $(CC) $(CFLAGS_GP) -std=c++11 -c $< -o $*.gp.o
+	$(CXX) $(CFLAGS_GP) -std=c++11 -c $< -o $*.gp.o
 
 clean:
 	rm -f $(OBJS) $(OBJS_GP) $(OBJS_GAMEPLAY) $(TARGETS)
