@@ -32,16 +32,18 @@ It works in the Linux GUI environment (X Window System). Some features work usin
 If you have an archive, extract the contents to any directory and compile the source. To compile, you need an environment where you can run gcc and make. The following libraries are required when compiling, so please check in advance.
 
 OpenGL ES2.0 or later / EGL
-	SDL1.2
+	SDL2 / SDL2-mixer
 	gtk+-2
 
 For Debian (Ubuntu), you can install the library from the package manager as follows.
 
 	sudo apt update
-	sudo apt install libgtk2.0-dev
-	sudo apt install libglew-dev
-	sudo apt install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
-	sudo apt install libgles2-mesa-dev libegl1-mesa-dev
+	sudo apt install -y libgtk2.0-dev
+	sudo apt install -y libglew-dev
+	sudo apt install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+	sudo apt install -y libgles2-mesa-dev libegl1-mesa-dev
+	sudo apt install -y libcurl4-openssl-dev
+	sudo apt install -y libgpiod2 libgpiod-dev
 
 The repository contains only the source, so you need to compile it with make. (If it doesn't compile correctly depending on your Linux version or distribution, you'll need to fix it.)
 
@@ -53,8 +55,8 @@ The necessary tools have been compiled and HSP3 is ready for use.
 
 # Raspberry Pi installation
 
-It runs on Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi4, Raspberry Pi zeo.
-It runs on Raspbian (RaspberryPi OS). (Recommended version is September 2017 Kernel version 4.9 or later)
+It runs on Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi4, Raspberry Pi5, Raspberry Pi zeo.
+It runs on RaspberryPi OS.
 Please use it with Raspbian running and a keyboard and mouse connected in advance.
 hsp3dish, hsp3gp (HGIMG4) and hsed (script editor) only work in GUI environment.
 Extract the latest version from github to any directory and compile the source. To compile, you need an environment where you can run gcc and make.
@@ -64,15 +66,15 @@ Extract the latest version from github to any directory and compile the source. 
 
 Additional libraries are required when compiling. Setup is executed by executing the following command while connected to the network.
 
-	./pisetup.sh
+	./setup.sh
 
-The archive contains only the sources and must be compiled by make. (If it doesn't compile correctly depending on the version or distribution of Raspbian, you need to fix it.)
+For devices up to RaspberryPi 3, use “pisetup.sh” or try this.
 
 	make -f makefile.raspbian
 
 Execute the make command in the directory where the contents of the archive are expanded. The necessary tools have been compiled and HSP3 is ready for use.
-* For Raspberry Pi 4, please install with make in the same way as Linux.
-* Raspberry Pi 4 does not support full-screen execution
+* For Raspberry Pi 4 or later, please install with make in the same way as Linux.
+* Raspberry Pi 4 or later does not support full-screen execution
 
 
 # Usage
@@ -119,11 +121,11 @@ HSP3 for Linux / Raspberry Pi is treated as a derivative of OpenHSP, and the lic
 
 -------------------------------------------------------------------------------
 Hot Soup Processor (HSP)
-Copyright (C) 1997-2021, Onion Software/onitama, all rights reserved.
+Copyright (C) 1997-2025, Onion Software/onitama, all rights reserved.
 Made with base technology of OpenHSP.
 
 OpenHSP
-Copyright (C) 1997-2021, Onion Software/onitama, all rights reserved.
+Copyright (C) 1997-2025, Onion Software/onitama, all rights reserved.
 
 These softwares are provided by the copyright holders and contributors "as is" and
 any express or implied warranties, including, but not limited to, the implied
