@@ -221,6 +221,9 @@ void FrameBuffer::setRenderTarget(RenderTarget* target, unsigned int index, GLen
 
         // Restore the FBO binding
         GL_ASSERT( glBindFramebuffer(GL_FRAMEBUFFER, _currentFrameBuffer->_handle) );
+
+        // FIXME: Without this, setDepthStencilTarget will fail
+        glGetError();
     }
 }
 
