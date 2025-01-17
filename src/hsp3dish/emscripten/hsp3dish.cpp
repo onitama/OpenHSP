@@ -317,14 +317,14 @@ bool get_key_state(int sym)
 	}
 }
 
-static int devicemotion_callback(int eventType, const EmscriptenDeviceMotionEvent *e, void *userData) {
+static EM_BOOL devicemotion_callback(int eventType, const EmscriptenDeviceMotionEvent *e, void *userData) {
 	hgio_setinfo( GINFO_EXINFO_ACCEL_X, e->accelerationIncludingGravityX );
 	hgio_setinfo( GINFO_EXINFO_ACCEL_Y, e->accelerationIncludingGravityY );
 	hgio_setinfo( GINFO_EXINFO_ACCEL_Z, e->accelerationIncludingGravityZ );
 	return 0;
 }
 
-static int deviceorientation_callback(int eventType, const EmscriptenDeviceOrientationEvent *e, void *userData) {
+static EM_BOOL deviceorientation_callback(int eventType, const EmscriptenDeviceOrientationEvent *e, void *userData) {
 	hgio_setinfo( GINFO_EXINFO_GYRO_X, e->beta ); // [-180, 180)
 	hgio_setinfo( GINFO_EXINFO_GYRO_Y, e->gamma ); // [-90, 90)
 	hgio_setinfo( GINFO_EXINFO_GYRO_Z, e->alpha ); // [0, 360)
