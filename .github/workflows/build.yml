@@ -1,0 +1,59 @@
+name: Build
+
+on: [push]
+
+env:
+  EM_VERSION: 3.1.74
+  EM_CACHE_FOLDER: 'emsdk-cache'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install libraries
+      run: sudo apt install -y libgtk2.0-dev libglew-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libgles2-mesa-dev libegl1-mesa-dev libcurl4-openssl-dev libgpiod2 libgpiod-dev
+    - name: make
+      run: make -j2
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: openhsp-linux-x86_64
+        path: |
+          hsp3dish
+          hsp3gp
+          hsp3cl
+          hspcmp
+          hsed
+
+  build-js:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4    
+    - name: Setup cache
+      id: cache-system-libraries
+      uses: actions/cache@v2
+      with:
+        path: ${{env.EM_CACHE_FOLDER}}
+        key: ${{env.EM_VERSION}}-${{ runner.os }}
+    - uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: ${{env.EM_VERSION}}
+        actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+    - name: Build hsp3dish.js
+      run: |
+        cd src/hsp3dish
+        make -f  makefile.emscripten -j2
+    - name: Build hspcmp.js
+      run: |
+        cd src/hspcmp
+        make -f  makefile.emscripten -j2
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: openhsp-js
+        path: |
+          src/hsp3dish/*.js
+          src/hsp3dish/*.wasm
+          src/hspcmp/*.js
+          src/hspcmp/*.wasm
