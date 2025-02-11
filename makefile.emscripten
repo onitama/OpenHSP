@@ -1,0 +1,451 @@
+CC = emcc
+CXX = em++
+AR = emar
+#CFLAGS = -Wall -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG -fpermissive -g4 --js-opts 0 -s SAFE_HEAP=1 -s LEGACY_GL_EMULATION=1
+#CFLAGS = -Wall -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG -fpermissive -g4 -s LEGACY_GL_EMULATION=1
+
+CFLAGS_CORE = -Wall -DNDEBUG -DHSPDISH -DHSPEMSCRIPTEN -DHSPDEBUG \
+	   -fpermissive \
+	   -s DISABLE_EXCEPTION_CATCHING=0 \
+	   -lidbfs.js
+CFLAGS_DEBUG =
+#CFLAGS_DEBUG = -g3 --js-opts 0
+#CFLAGS_DEBUG = -g3 --js-opts 0 -s SAFE_HEAP=1
+
+CFLAGS = $(CFLAGS_CORE) $(CFLAGS_DEBUG) -DUSE_OBAQ\
+	   -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -s USE_SDL_MIXER=2 \
+	   -s "SDL2_MIXER_FORMATS=['ogg', 'mp3']" \
+	   -O3 \
+	   -s LEGACY_GL_EMULATION=1
+
+CFLAGS_GP = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
+		  -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 \
+		  -s "SDL2_MIXER_FORMATS=['ogg', 'mp3']" \
+		  -D_LARGEFILE64_SOURCE -O3\
+		  -DHSPDISHGP \
+		  -I src/hsp3dish/emscripten/extlib/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src -I src/hsp3dish/win32gp
+
+CFLAGS_EXTLIB = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
+		  -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+		  -D_LARGEFILE64_SOURCE -O3\
+		  -I src/hsp3dish/emscripten/extlib/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src
+
+LINK_FLAGS_CORE =  -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
+	-s "EXPORTED_RUNTIME_METHODS=['addRunDependency', 'removeRunDependency', 'FS_createPreloadedFile', 'FS_createPath', 'ccall', 'cwrap']" \
+	-s "EXPORTED_FUNCTIONS=['_main', '_malloc', '_free']"
+
+LINK_FLAGS = $(LINK_FLAGS_CORE)
+LINK_FLAGS_GP = $(LINK_FLAGS_CORE) \
+		-s FULL_ES2=1 -s USE_WEBGL2=1 -s MIN_WEBGL_VERSION=2
+
+OBJS = \
+	src/hsp3/dpmread.js.o \
+	src/hsp3dish/geometry.js.o \
+	src/hsp3/hsp3.js.o \
+	src/hsp3/hsp3code.js.o \
+	src/hsp3/hsp3debug.js.o \
+	src/hsp3dish/hsp3gr_dish.js.o \
+	src/hsp3/hsp3int.js.o \
+	src/hsp3/hspvar_core.js.o \
+	src/hsp3/hspvar_double.js.o \
+	src/hsp3/hspvar_int.js.o \
+	src/hsp3/hspvar_label.js.o \
+	src/hsp3/hspvar_str.js.o \
+	src/hsp3/hspvar_struct.js.o \
+	src/hsp3dish/hspwnd_dish.js.o \
+	src/hsp3dish/hspwnd_obj.js.o \
+	src/hsp3dish/hspwnd_edit.js.o \
+	src/hsp3dish/random.js.o \
+	src/hsp3/stack.js.o \
+	src/hsp3/strbuf.js.o \
+	src/hsp3/strnote.js.o \
+	src/hsp3/emscripten/hsp3ext_emscripten.js.o \
+	src/hsp3dish/sysreq.js.o \
+	src/hsp3dish/texmes.js.o \
+	src/hsp3dish/essprite.js.o \
+	src/hsp3dish/obaq/hsp3dw.js.o \
+	src/hsp3dish/obaq/omkedraw.js.o \
+	src/hsp3dish/obaq/game.js.o \
+	src/obaq/physics/vessel.js.o \
+	src/obaq/physics/rock.js.o \
+	src/hsp3dish/emscripten/fontsystem.js.o \
+	src/hsp3dish/emscripten/hgtex.js.o \
+	src/hsp3dish/emscripten/hgiox.js.o \
+	src/hsp3dish/emscripten/hsp3dish.js.o \
+	src/hsp3dish/emscripten/main.js.o \
+	src/hsp3dish/emscripten/mmman.js.o \
+	src/hsp3dish/emscripten/webtask_emscripten.js.o \
+	src/hsp3dish/emscripten/stb_image.js.o \
+	src/hsp3dish/emscripten/supio_emscripten.js.o
+
+OBJS_GP = \
+	src/hsp3/dpmread.gpjs.o \
+	src/hsp3dish/geometry.gpjs.o \
+	src/hsp3/hsp3.gpjs.o \
+	src/hsp3/hsp3code.gpjs.o \
+	src/hsp3/hsp3debug.gpjs.o \
+	src/hsp3dish/hsp3gr_dish.gpjs.o \
+	src/hsp3/hsp3int.gpjs.o \
+	src/hsp3/hspvar_core.gpjs.o \
+	src/hsp3/hspvar_double.gpjs.o \
+	src/hsp3/hspvar_int.gpjs.o \
+	src/hsp3/hspvar_label.gpjs.o \
+	src/hsp3/hspvar_str.gpjs.o \
+	src/hsp3/hspvar_struct.gpjs.o \
+	src/hsp3dish/hspwnd_dish.gpjs.o \
+	src/hsp3dish/hspwnd_obj.gpjs.o \
+	src/hsp3dish/hspwnd_edit.gpjs.o \
+	src/hsp3dish/random.gpjs.o \
+	src/hsp3/stack.gpjs.o \
+	src/hsp3/strbuf.gpjs.o \
+	src/hsp3/strnote.gpjs.o \
+	src/hsp3/emscripten/hsp3ext_emscripten.gpjs.o \
+	src/hsp3dish/sysreq.gpjs.o \
+	src/hsp3dish/texmes.gpjs.o \
+	src/hsp3dish/essprite.gpjs.o \
+	src/hsp3dish/win32gp/gamehsp.gpjs.o \
+	src/hsp3dish/win32gp/gpevent.gpjs.o \
+	src/hsp3dish/win32gp/gpcam.gpjs.o \
+	src/hsp3dish/win32gp/gplgt.gpjs.o \
+	src/hsp3dish/win32gp/gpmat.gpjs.o \
+	src/hsp3dish/win32gp/gpphy.gpjs.o \
+	src/hsp3dish/emscripten/fontsystem.gpjs.o \
+	src/hsp3dish/emscripten/hgtex.gpjs.o \
+	src/hsp3dish/win32gp/hgiox.gpjs.o \
+	src/hsp3dish/emscripten/hsp3dish.gpjs.o \
+	src/hsp3dish/emscripten/main.gpjs.o \
+	src/hsp3dish/emscripten/mmman.gpjs.o \
+	src/hsp3dish/emscripten/webtask_emscripten.gpjs.o \
+	src/hsp3dish/emscripten/stb_image.gpjs.o \
+	src/hsp3dish/emscripten/supio_emscripten.gpjs.o
+
+OBJS_GAMEPLAY = \
+	src/hsp3dish/gameplay/src/AbsoluteLayout.gpjs.o \
+	src/hsp3dish/gameplay/src/AIAgent.gpjs.o \
+	src/hsp3dish/gameplay/src/AIController.gpjs.o \
+	src/hsp3dish/gameplay/src/AIMessage.gpjs.o \
+	src/hsp3dish/gameplay/src/AIState.gpjs.o \
+	src/hsp3dish/gameplay/src/AIStateMachine.gpjs.o \
+	src/hsp3dish/gameplay/src/Animation.gpjs.o \
+	src/hsp3dish/gameplay/src/AnimationClip.gpjs.o \
+	src/hsp3dish/gameplay/src/AnimationController.gpjs.o \
+	src/hsp3dish/gameplay/src/AnimationTarget.gpjs.o \
+	src/hsp3dish/gameplay/src/AnimationValue.gpjs.o \
+	src/hsp3dish/gameplay/src/AudioController.gpjs.o \
+	src/hsp3dish/gameplay/src/AudioListener.gpjs.o \
+	src/hsp3dish/gameplay/src/AudioSource.gpjs.o \
+	src/hsp3dish/gameplay/src/BoundingBox.gpjs.o \
+	src/hsp3dish/gameplay/src/BoundingSphere.gpjs.o \
+	src/hsp3dish/gameplay/src/Bundle.gpjs.o \
+	src/hsp3dish/gameplay/src/Button.gpjs.o \
+	src/hsp3dish/gameplay/src/Camera.gpjs.o \
+	src/hsp3dish/gameplay/src/CheckBox.gpjs.o \
+	src/hsp3dish/gameplay/src/Container.gpjs.o \
+	src/hsp3dish/gameplay/src/Control.gpjs.o \
+	src/hsp3dish/gameplay/src/ControlFactory.gpjs.o \
+	src/hsp3dish/gameplay/src/Curve.gpjs.o \
+	src/hsp3dish/gameplay/src/DebugNew.gpjs.o \
+	src/hsp3dish/gameplay/src/DepthStencilTarget.gpjs.o \
+	src/hsp3dish/gameplay/src/Drawable.gpjs.o \
+	src/hsp3dish/gameplay/src/Effect.gpjs.o \
+	src/hsp3dish/gameplay/src/FileSystem.gpjs.o \
+	src/hsp3dish/gameplay/src/FlowLayout.gpjs.o \
+	src/hsp3dish/gameplay/src/Font.gpjs.o \
+	src/hsp3dish/gameplay/src/Form.gpjs.o \
+	src/hsp3dish/gameplay/src/FrameBuffer.gpjs.o \
+	src/hsp3dish/gameplay/src/Frustum.gpjs.o \
+	src/hsp3dish/gameplay/src/Game.gpjs.o \
+	src/hsp3dish/gameplay/src/Gamepad.gpjs.o \
+	src/hsp3dish/gameplay/src/HeightField.gpjs.o \
+	src/hsp3dish/gameplay/src/Image.gpjs.o \
+	src/hsp3dish/gameplay/src/ImageControl.gpjs.o \
+	src/hsp3dish/gameplay/src/Joint.gpjs.o \
+	src/hsp3dish/gameplay/src/JoystickControl.gpjs.o \
+	src/hsp3dish/gameplay/src/Label.gpjs.o \
+	src/hsp3dish/gameplay/src/Layout.gpjs.o \
+	src/hsp3dish/gameplay/src/Light.gpjs.o \
+	src/hsp3dish/gameplay/src/Logger.gpjs.o \
+	src/hsp3dish/gameplay/src/Material.gpjs.o \
+	src/hsp3dish/gameplay/src/MaterialParameter.gpjs.o \
+	src/hsp3dish/gameplay/src/MathUtil.gpjs.o \
+	src/hsp3dish/gameplay/src/Matrix.gpjs.o \
+	src/hsp3dish/gameplay/src/Mesh.gpjs.o \
+	src/hsp3dish/gameplay/src/MeshBatch.gpjs.o \
+	src/hsp3dish/gameplay/src/MeshPart.gpjs.o \
+	src/hsp3dish/gameplay/src/MeshSkin.gpjs.o \
+	src/hsp3dish/gameplay/src/Model.gpjs.o \
+	src/hsp3dish/gameplay/src/Node.gpjs.o \
+	src/hsp3dish/gameplay/src/ParticleEmitter.gpjs.o \
+	src/hsp3dish/gameplay/src/Pass.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsCharacter.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsCollisionObject.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsCollisionShape.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsConstraint.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsController.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsFixedConstraint.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsGenericConstraint.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsGhostObject.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsHingeConstraint.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsRigidBody.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsSocketConstraint.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsSpringConstraint.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsVehicle.gpjs.o \
+	src/hsp3dish/gameplay/src/PhysicsVehicleWheel.gpjs.o \
+	src/hsp3dish/gameplay/src/Plane.gpjs.o \
+	src/hsp3dish/gameplay/src/Platform.gpjs.o \
+	src/hsp3dish/gameplay/src/PlatformEmscripten.gpjs.o \
+	src/hsp3dish/gameplay/src/Properties.gpjs.o \
+	src/hsp3dish/gameplay/src/Quaternion.gpjs.o \
+	src/hsp3dish/gameplay/src/RadioButton.gpjs.o \
+	src/hsp3dish/gameplay/src/Ray.gpjs.o \
+	src/hsp3dish/gameplay/src/Rectangle.gpjs.o \
+	src/hsp3dish/gameplay/src/Ref.gpjs.o \
+	src/hsp3dish/gameplay/src/RenderState.gpjs.o \
+	src/hsp3dish/gameplay/src/RenderTarget.gpjs.o \
+	src/hsp3dish/gameplay/src/Scene.gpjs.o \
+	src/hsp3dish/gameplay/src/SceneLoader.gpjs.o \
+	src/hsp3dish/gameplay/src/ScreenDisplayer.gpjs.o \
+	src/hsp3dish/gameplay/src/ScriptController.gpjs.o \
+	src/hsp3dish/gameplay/src/ScriptTarget.gpjs.o \
+	src/hsp3dish/gameplay/src/Slider.gpjs.o \
+	src/hsp3dish/gameplay/src/Sprite.gpjs.o \
+	src/hsp3dish/gameplay/src/SpriteBatch.gpjs.o \
+	src/hsp3dish/gameplay/src/Technique.gpjs.o \
+	src/hsp3dish/gameplay/src/Terrain.gpjs.o \
+	src/hsp3dish/gameplay/src/TerrainPatch.gpjs.o \
+	src/hsp3dish/gameplay/src/Text.gpjs.o \
+	src/hsp3dish/gameplay/src/TextBox.gpjs.o \
+	src/hsp3dish/gameplay/src/Texture.gpjs.o \
+	src/hsp3dish/gameplay/src/Theme.gpjs.o \
+	src/hsp3dish/gameplay/src/ThemeStyle.gpjs.o \
+	src/hsp3dish/gameplay/src/TileSet.gpjs.o \
+	src/hsp3dish/gameplay/src/Transform.gpjs.o \
+	src/hsp3dish/gameplay/src/Vector2.gpjs.o \
+	src/hsp3dish/gameplay/src/Vector3.gpjs.o \
+	src/hsp3dish/gameplay/src/Vector4.gpjs.o \
+	src/hsp3dish/gameplay/src/VertexAttributeBinding.gpjs.o \
+	src/hsp3dish/gameplay/src/VertexFormat.gpjs.o \
+	src/hsp3dish/gameplay/src/VerticalLayout.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/png.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngerror.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngget.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngmem.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngpread.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngread.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngrio.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngrtran.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngrutil.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngset.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngtrans.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngwio.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngwrite.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngwtran.gpjs.o \
+	src/hsp3dish/extlib/src/libpng/pngwutil.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/adler32.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/compress.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/crc32.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/deflate.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/gzclose.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/gzlib.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/gzread.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/gzwrite.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/infback.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/inffast.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/inflate.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/inftrees.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/trees.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/uncompr.gpjs.o \
+	src/hsp3dish/extlib/src/zlib/zutil.gpjs.o
+
+OBJS_LINEAR_MATH = \
+	src/hsp3dish/extlib/src/LinearMath/btAlignedAllocator.gpjs.o \
+	src/hsp3dish/extlib/src/LinearMath/btConvexHull.gpjs.o \
+	src/hsp3dish/extlib/src/LinearMath/btConvexHullComputer.gpjs.o \
+	src/hsp3dish/extlib/src/LinearMath/btGeometryUtil.gpjs.o \
+	src/hsp3dish/extlib/src/LinearMath/btPolarDecomposition.gpjs.o \
+	src/hsp3dish/extlib/src/LinearMath/btQuickprof.gpjs.o \
+	src/hsp3dish/extlib/src/LinearMath/btSerializer.gpjs.o \
+	src/hsp3dish/extlib/src/LinearMath/btVector3.gpjs.o
+
+OBJS_BULLET_COLLISION = \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btAxisSweep3.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btDbvt.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btDbvtBroadphase.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btDispatcher.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btQuantizedBvh.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btSimpleBroadphase.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btBoxBoxDetector.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionDispatcher.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionObject.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionWorld.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btGhostObject.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btHashedSimplePairCache.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btInternalEdgeUtility.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btManifoldResult.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btSimulationIslandManager.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btUnionFind.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/SphereTriangleDetector.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btBox2dShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btBoxShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btCapsuleShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btCollisionShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btCompoundShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConcaveShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConeShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConvex2dShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConvexHullShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConvexInternalShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConvexPointCloudShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConvexPolyhedron.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConvexShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btCylinderShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btEmptyShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btMinkowskiSumShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btMultiSphereShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btOptimizedBvh.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btShapeHull.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btSphereShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btStaticPlaneShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btStridingMeshInterface.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btTetrahedronShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btTriangleBuffer.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btTriangleCallback.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btTriangleMesh.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btTriangleMeshShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btUniformScalingShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/btContactProcessing.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/btGenericPoolAllocator.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/btGImpactBvh.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/btGImpactQuantizedBvh.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/btGImpactShape.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/btTriangleShapeEx.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/gim_box_set.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/gim_contact.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/gim_memory.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/Gimpact/gim_tri_collision.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btConvexCast.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btGjkEpa2.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btRaycastCallback.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.gpjs.o \
+	src/hsp3dish/extlib/src/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.gpjs.o
+OBJS_BULLET_DYNAMICS = \
+	src/hsp3dish/extlib/src/BulletDynamics/Character/btKinematicCharacterController.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btContactConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btFixedConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btGearConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btHinge2Constraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btHingeConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btSliderConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btTypedConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btUniversalConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btRigidBody.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btSimpleDynamicsWorld.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/Bullet-C-API.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBody.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyJointLimitConstraint.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyJointMotor.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyPoint2Point.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/MLCPSolvers/btDantzigLCP.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/MLCPSolvers/btMLCPSolver.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Vehicle/btRaycastVehicle.gpjs.o \
+	src/hsp3dish/extlib/src/BulletDynamics/Vehicle/btWheelInfo.gpjs.o
+
+LIBS =
+LIBS_GP = \
+	libgameplay.js.a \
+	libBulletDynamics.js.a \
+	libBulletCollision.js.a \
+	libLinearMath.js.a
+
+TARGETS = hsp3dish.js hsp3dish-gp.js
+
+all: $(TARGETS)
+
+.SUFFIXES: .cpp
+
+hsp3dish.js: $(OBJS) src/hsp3dish/emscripten/license.js
+	$(CXX) $(CFLAGS) $(LINK_FLAGS) $(OBJS) -o $@ $(LIBS) \
+	--extern-pre-js src/hsp3dish/emscripten/license.js
+
+hsp3dish-gp.js: $(OBJS_GP) $(LIBS_GP) src/hsp3dish/emscripten/license.js
+	$(CXX) $(CFLAGS_GP) $(LINK_FLAGS_GP) $(OBJS_GP) $(LIBS_GP) -o hsp3dish-gp.js \
+	--extern-pre-js src/hsp3dish/emscripten/license.js
+
+libgameplay.js.a: $(OBJS_GAMEPLAY)
+	rm -f $@
+	$(AR) rcs $@ $(OBJS_GAMEPLAY)
+
+libBulletCollision.js.a: $(OBJS_BULLET_COLLISION)
+	rm -f $@
+	$(AR) rcs $@ $(OBJS_BULLET_COLLISION)
+
+libBulletDynamics.js.a: $(OBJS_BULLET_DYNAMICS)
+	rm -f $@
+	$(AR) rcs $@ $(OBJS_BULLET_DYNAMICS)
+
+libLinearMath.js.a: $(OBJS_LINEAR_MATH)
+	rm -f $@
+	$(AR) rcs $@ $(OBJS_LINEAR_MATH)
+
+%.js.o: %.c
+	echo $(CC) $(CFLAGS) -c $< -o $*.js.o
+	$(CC) $(CFLAGS) -c $< -o $*.js.o
+%.js.o: %.cpp
+	echo $(CC) $(CFLAGS) -c $< -o $*.js.o
+	$(CXX) $(CFLAGS) -c $< -o $*.js.o
+
+
+%.gpjs.o: %.c
+	echo $(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.gpjs.o
+	$(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.gpjs.o
+%.gpjs.o: %.cpp
+	echo $(CC) $(CFLAGS_GP) -std=c++11 -c $< -o $*.gpjs.o
+	$(CXX) $(CFLAGS_GP) -std=c++11 -c $< -o $*.gpjs.o
+
+clean:
+	rm -f $(OBJS) $(OBJS_GP) $(OBJS_GAMEPLAY) $(TARGETS)
+
