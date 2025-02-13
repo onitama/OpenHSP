@@ -38,7 +38,6 @@
 #ifdef HSPEMSCRIPTEN
 #include <emscripten.h>
 #include <unistd.h>
-int hgio_fontsystem_get_texid(void);
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -2045,14 +2044,6 @@ int hgio_font(char* fontname, int size, int style)
 	}
 	return 0;
 }
-
-
-#if defined(HSPEMSCRIPTEN)
-int hgio_fontsystem_setup(int sx, int sy, void *buffer)
-{
-	return hgio_fontsystem_get_texid();
-}
-#endif
 
 
 void hgio_editputclip(BMSCR* bm, char *str)

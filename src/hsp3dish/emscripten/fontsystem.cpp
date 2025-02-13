@@ -63,7 +63,6 @@
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
 #define FONT_TEX_SY 128
-int hgio_fontsystem_get_texid(void);
 #endif
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
@@ -753,7 +752,6 @@ static	int fontdata_size;
 static	int fontdata_color;
 static	int fontsystem_size;
 static	int fontsystem_style;
-static	int fontsystem_texid;
 
 static int Get2N(int val)
 {
@@ -763,11 +761,6 @@ static int Get2N(int val)
 		res <<= 1;
 	}
 	return res;
-}
-
-int hgio_fontsystem_get_texid(void)
-{
-	return fontsystem_texid;
 }
 
 void hgio_fontsystem_term(void)
@@ -811,10 +804,11 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 			}
 			d.style.setProperty("font", $1 + "px 'sans-serif'");
 
-			const t = document.createTextNode(UTF8ToString($0));
-			if (d.hasChildNodes())
-				d.removeChild(d.firstChild);
-			d.appendChild(t);
+			//const t = document.createTextNode(UTF8ToString($0));
+			//if (d.hasChildNodes())
+			//	d.removeChild(d.firstChild);
+			//d.appendChild(t);
+			d.innerText = UTF8ToString($0);
 			HEAP32[$2 >> 2] = d.clientWidth | 0;
 			HEAP32[$3 >> 2] = d.clientHeight | 0;
 
@@ -854,33 +848,22 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	int sx = Get2N(fontsystem_sx);
 	int sy = Get2N(fontsystem_sy);
 
-	GLuint id;
-	glGenTextures( 1, &id );
-	glBindTexture( GL_TEXTURE_2D, id );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, sx, sy, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-
-	glBindTexture( GL_TEXTURE_2D, id );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1);
-
 	EM_ASM_({
 		var canvas = document.getElementById('hsp3dishFontCanvas');
-		if (canvas) {
-			document.body.removeChild(canvas);
+		if (!canvas) {
+			//document.body.removeChild(canvas);
+			canvas = document.createElement("canvas");
+			canvas.id = 'hsp3dishFontCanvas';
+			canvas.style.setProperty("visibility", "hidden");
+			canvas.style.setProperty("position", "absolute");
+			canvas.style.setProperty("top", "0");
+			canvas.style.setProperty("left", "0");
+			canvas.width = $2;
+			canvas.height = $3;
+			document.body.appendChild(canvas);
 		}
-		canvas = document.createElement("canvas");
-		canvas.id = 'hsp3dishFontCanvas';
-		canvas.style.setProperty("visibility", "hidden");
-		canvas.style.setProperty("position", "absolute");
-		canvas.style.setProperty("top", "0");
-		canvas.style.setProperty("left", "0");
-		canvas.width = $2;
-		canvas.height = $3;
-		document.body.appendChild(canvas);
 
-		var context = canvas.getContext("2d");
+		var context = canvas.getContext("2d", { willReadFrequently: true });
 		context.font = $1 + "px 'sans-serif'";
 
 		var msg = UTF8ToString($0);
@@ -889,12 +872,11 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 		context.fillText(msg, 0, $1);
 		//console.log(msg);
 
-		GLctx.texImage2D(GLctx.TEXTURE_2D, 0, GLctx.RGBA, GLctx.RGBA, GLctx.UNSIGNED_BYTE, canvas);
-		}, msg, fontsystem_size, sx, sy);
+		//GLctx.texImage2D(GLctx.TEXTURE_2D, 0, GLctx.RGBA, GLctx.RGBA, GLctx.UNSIGNED_BYTE, context.getImageData(0, 0, $2, $3));
+		var imageData = context.getImageData(0, 0, $2, $3);
+		HEAPU8.set(imageData.data, $4);
 
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	fontsystem_texid = (int)id;
+		}, msg, fontsystem_size, sx, sy, buffer);
 
 	//Alertf( "Init:Surface(%d,%d) %d destpitch%d",fontsystem_sx,fontsystem_sy,fontdata_color,pitch );
 	*out_sx = fontsystem_sx;

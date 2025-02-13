@@ -61,7 +61,6 @@
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
 #define FONT_TEX_SY 128
-int hgio_fontsystem_get_texid(void);
 #endif
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)

@@ -63,7 +63,6 @@
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
 #define FONT_TEX_SY 128
-int hgio_fontsystem_get_texid(void);
 #endif
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
@@ -493,9 +492,11 @@ void hgio_reset( void )
     //ポイントの設定
     glEnable(GL_POINT_SMOOTH);
 
+#if !defined(HSPEMSCRIPTEN)
     //前処理
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+#endif
 
 	//テクスチャ設定リセット
 	TexReset();
@@ -2163,9 +2164,6 @@ void hgio_fontsystem_delete(int id)
 
 int hgio_fontsystem_setup(int sx, int sy, void *buffer)
 {
-#if defined(HSPEMSCRIPTEN)
-	return hgio_fontsystem_get_texid();
-#else
 	GLuint id;
 	glGenTextures( 1, &id );
 	glBindTexture( GL_TEXTURE_2D, id );
@@ -2175,7 +2173,6 @@ int hgio_fontsystem_setup(int sx, int sy, void *buffer)
 	ChangeTex( tid );
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, sx,sy, GL_RGBA, GL_UNSIGNED_BYTE, (char *)buffer);
 	return tid;
-#endif
 }
 
 

@@ -77,14 +77,8 @@ void texmes::reset(int width, int height, int p_texsx, int p_texsy, void *data)
 	texsy = p_texsy;
 
 #ifdef HSPDISHGP
-#ifdef HSPEMSCRIPTEN
-	TextureHandle texid;
-	texid = hgio_fontsystem_setup( texsx, texsy, data);
-	Texture* texture = Texture::create(texid,texsx, texsy, Texture::Format::RGBA);
-#else
 	Texture* texture = Texture::create(Texture::Format::RGBA, texsx, texsy, NULL, false, Texture::TEXTURE_2D);
 	texture->setData((const unsigned char*)data);
-#endif
 	// Bind the texture to the material as a sampler
 	_texture = Texture::Sampler::create(texture); // +ref texture
 	_texture->setFilterMode(Texture::Filter::NEAREST, Texture::Filter::NEAREST);
