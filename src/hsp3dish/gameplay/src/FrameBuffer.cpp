@@ -221,9 +221,6 @@ void FrameBuffer::setRenderTarget(RenderTarget* target, unsigned int index, GLen
 
         // Restore the FBO binding
         GL_ASSERT( glBindFramebuffer(GL_FRAMEBUFFER, _currentFrameBuffer->_handle) );
-
-        // FIXME: Without this, setDepthStencilTarget will fail
-        glGetError();
     }
 }
 
@@ -261,14 +258,21 @@ void FrameBuffer::setDepthStencilTarget(DepthStencilTarget* target)
         GL_ASSERT( glBindFramebuffer(GL_FRAMEBUFFER, _handle) );
 
         // Attach the render buffer to the framebuffer
-        GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
         if (target->isPacked())
         {
-            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
+            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
         }
         else if (target->getFormat() == DepthStencilTarget::DEPTH_STENCIL)
         {
+#ifdef __EMSCRIPTEN__
+            GP_WARN("Unexpected status %d %zu %zu", target->isPacked(), _depthStencilTarget->_depthBuffer, _depthStencilTarget->_stencilBuffer);
+            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
             GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_stencilBuffer) );
+#endif
+        }
+        else
+        {
+            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
         }
 
         // Check the framebuffer is good to go.
