@@ -42,7 +42,6 @@ jobs:
         actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
     - name: Build hsp3dish.js
       run: |
-        cd src/hsp3dish
         make -f  makefile.emscripten -j2
     - name: Build hspcmp.js
       run: |
@@ -53,7 +52,7 @@ jobs:
       with:
         name: openhsp-js
         path: |
-          src/hsp3dish/*.js
-          src/hsp3dish/*.wasm
+          *.js
+          *.wasm
           src/hspcmp/*.js
           src/hspcmp/*.wasm

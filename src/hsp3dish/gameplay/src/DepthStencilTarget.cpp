@@ -50,6 +50,14 @@ DepthStencilTarget* DepthStencilTarget::create(const char* id, Format format, un
     __gl_error_code = glGetError();
     if ( __gl_error_code != GL_NO_ERROR)
     {
+#ifdef __EMSCRIPTEN__
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_STENCIL, width, height);
+    }
+
+    __gl_error_code = glGetError();
+    if ( __gl_error_code != GL_NO_ERROR)
+    {
+#endif
         const char* extString = (const char*)glGetString(GL_EXTENSIONS);
 
         if (strstr(extString, "GL_OES_packed_depth_stencil") != 0)
