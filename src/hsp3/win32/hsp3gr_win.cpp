@@ -27,7 +27,7 @@
 #include "../win32gui/hsp3ext_win.h"
 
 #ifdef HSPUTF8
-#pragma execution_character_set("utf-8")
+//#pragma execution_character_set("utf-8")
 #endif
 
 /*------------------------------------------------------------*/
