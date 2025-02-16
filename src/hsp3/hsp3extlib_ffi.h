@@ -8,8 +8,12 @@
 #include "hsp3code.h"
 
 #include <deque>
-//#include <windows.h>
 
+#ifdef _WIN32
+typedef HINSTANCE HANDLE_MODULE;
+#else
+typedef void * HANDLE_MODULE;
+#endif
 //------------------------------------------------------------//
 
 namespace hsp3 {
@@ -22,7 +26,7 @@ namespace hsp3 {
 
 class CDllManager
 {
-	typedef std::deque< HMODULE > holder_type;
+	typedef std::deque< HANDLE_MODULE > holder_type;
 
 	//............................//
 
@@ -30,10 +34,10 @@ public:
 	CDllManager();
 	~CDllManager();
 
-	HMODULE load_library( const char *lpFileName );
-	BOOL free_library( HMODULE hModule );
-	BOOL free_all_library();
-	HMODULE get_error() const;
+	HANDLE_MODULE load_library( const char *lpFileName );
+	bool free_library( HANDLE_MODULE hModule );
+	bool free_all_library();
+	HANDLE_MODULE get_error() const;
 
 private:
 	// uncopyable;
@@ -44,7 +48,7 @@ private:
 
 private:
 	holder_type mModules;
-	HMODULE mError;
+	HANDLE_MODULE mError;
 };
 
 //------------------------------------------------------------//
@@ -62,21 +66,16 @@ int cmdfunc_dllcmd( int cmd );
 int exec_dllcmd( int cmd, int mask );
 int code_expand_and_call( const STRUCTDAT *st );
 
-#ifdef HSP64
+/*
+#if defined(HSP64) || defined(PTR64BIT)
 
-extern "C" INT_PTR CallFunc64(INT_PTR *, FARPROC, int);
-#define call_extfunc(externalFunction, arguments, numberOfArguments)	CallFunc64((INT_PTR *)arguments, (FARPROC)externalFunction, numberOfArguments)
+extern "C" int CallFunc64(int **, void*, int);
+#define call_extfunc(externalFunction, arguments, numberOfArguments)	CallFunc64((int**)(arguments), (void*)(externalFunction), numberOfArguments)
 
 #else
-
-#if defined( __GNUC__ )
-int __cdecl call_extfunc( void *proc, int *prm, int prms ) __attribute__(( noinline ));
-#else
-int __cdecl call_extfunc( void *proc, int *prm, int prms );
+int call_extfunc( void *proc, int **prm, int prms );
 #endif
-
-#endif
-
+*/
 
 int cnvwstr( void *out, char *in, int bufsize );
 int cnvsjis( void *out, char *in, int bufsize );
