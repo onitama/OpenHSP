@@ -853,3 +853,27 @@ int ReplaceDone( void )
 }
 
 
+//
+//		linux debug support
+//
+void Alert( const char *mes )
+{
+	printf( "%s", mes );
+	printf( "\r\n" );
+}
+
+void AlertV( const char *mes, int val )
+{
+	printf( "%s%d\r\n",mes,val );
+}
+
+void Alertf( const char *format, ... )
+{
+	char textbf[4096];
+	va_list args;
+	va_start(args, format);
+	vsprintf(textbf, format, args);
+	va_end(args);
+	printf( "%s", textbf );
+	printf( "\r\n" );
+}
