@@ -22,6 +22,7 @@
 #include "../hsp3ext.h"
 #include "../../hsp3/strnote.h"
 #include "../../hsp3/linux/hsp3ext_sock.h"
+#include "../../hsp3/hsp3extlib_ffi.h"
 
 #define MAXWAITDELAY (16)
 
@@ -882,6 +883,7 @@ static void hsp3dish_bye( void )
 	//		HSP関連の解放
 	//
 	if ( hsp != NULL ) { delete hsp; hsp = NULL; }
+	DllManager().free_all_library();
 }
 
 

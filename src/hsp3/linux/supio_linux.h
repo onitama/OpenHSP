@@ -41,9 +41,9 @@ void ReplaceSetMatch( char *src, char *match, char *result, int in_src, int in_m
 char *ReplaceStr( char *repstr );
 int ReplaceDone( void );
 
-void Alert( char *mes );
-void AlertV( char *mes, int val );
-void Alertf( char *format, ... );
+void Alert( const char *mes );
+void AlertV( const char *mes, int val );
+void Alertf( const char *format, ... );
 
 HSPAPICHAR *chartoapichar( const HSPCHAR*,HSPAPICHAR** );
 void freehac( HSPAPICHAR** );

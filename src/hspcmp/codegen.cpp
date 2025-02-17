@@ -1866,8 +1866,8 @@ int CToken::GetParameterResTypeCG( char *name )
 }
 
 
-#define GET_FI_SIZE() ((int)(fi_buf->GetSize() / sizeof(STRUCTDAT)))
-#define GET_FI(n) (((STRUCTDAT *)fi_buf->GetBuffer()) + (n))
+#define GET_FI_SIZE() ((int)(fi_buf->GetSize() / sizeof(HED_STRUCTDAT)))
+#define GET_FI(n) (((HED_STRUCTDAT *)fi_buf->GetBuffer()) + (n))
 #define STRUCTDAT_INDEX_DUMMY ((short)0x8000)
 
 
@@ -1882,7 +1882,7 @@ void CToken::GenerateCodePP_deffunc0( int is_command )
 	int prep;
 	char funcname[1024];
 	STRUCTPRM *prm;
-	STRUCTDAT *st;
+	HED_STRUCTDAT *st;
 
 	prep = 0;
 	GetTokenCG( GETTOKEN_DEFAULT );
@@ -1945,7 +1945,7 @@ void CToken::GenerateCodePP_deffunc0( int is_command )
 				regflag = 0;
 			}
 			if ( t == MPTYPE_TMODULEVAR ) {
-				st = (STRUCTDAT *)fi_buf->GetBuffer();
+				st = (HED_STRUCTDAT *)fi_buf->GetBuffer();
 				if ( st[ subid ].otindex != 0 ) throw CGERROR_PP_MODTERM_USED;
 				st[ subid ].otindex = GET_FI_SIZE();
 				regflag = 0;
@@ -1979,7 +1979,7 @@ void CToken::GenerateCodePP_deffunc0( int is_command )
 	ot = PutOT( GetCS() );
 	if ( index == -1 ) {
 		index = GET_FI_SIZE();
-		fi_buf->PreparePtr( sizeof(STRUCTDAT) );
+		fi_buf->PreparePtr( sizeof(HED_STRUCTDAT) );
 		if ( regflag ) {
 			lb->Regist( funcname, TYPE_MODCMD, index, cg_orgfile, cg_orgline);
 		}
@@ -2528,10 +2528,10 @@ void CToken::PutCSSymbol( int label_id, int exflag )
 		int id = *(int *)lb->GetData2(label_id);
 		tmp_lb->AddReference( id );
 		
-		STRUCTDAT st = { STRUCTDAT_INDEX_DUMMY };
+		HED_STRUCTDAT st = { STRUCTDAT_INDEX_DUMMY };
 		st.otindex = label_id;
 		value = GET_FI_SIZE();
-		fi_buf->PutData( &st, sizeof(STRUCTDAT) );
+		fi_buf->PutData( &st, sizeof(HED_STRUCTDAT) );
 		lb->SetOpt( label_id, value );
 	}
 	if ( exflag & EXFLG_1 && type != TYPE_VAR && type != TYPE_STRUCT ) {
@@ -2789,10 +2789,10 @@ char *CToken::GetDS( int ptr )
 int CToken::PutLIB( int flag, char *name )
 {
 	int a,i = -1,p;
-	LIBDAT lib;
-	LIBDAT *l;
-	p = li_buf->GetSize() / sizeof(LIBDAT);
-	l = (LIBDAT *)li_buf->GetBuffer();
+	HED_LIBDAT lib;
+	HED_LIBDAT *l;
+	p = li_buf->GetSize() / sizeof(HED_LIBDAT);
+	l = (HED_LIBDAT *)li_buf->GetBuffer();
 
 	if ( flag == LIBDAT_FLAG_DLL ) {
 		if ( *name != 0 ) {
@@ -2817,9 +2817,14 @@ int CToken::PutLIB( int flag, char *name )
 
 	lib.flag = flag;
 	lib.nameidx = i;
+#ifdef PTR64BIT
+	lib.p_hlib = 0;
+#else
 	lib.hlib = NULL;
+#endif
 	lib.clsid = -1;
-	li_buf->PutData( &lib, sizeof(LIBDAT) );
+	li_buf->PutData( &lib, sizeof(HED_LIBDAT) );
+
 	//Mesf( "LIB#%d:%s",flag,name );
 
 	return p;
@@ -2828,8 +2833,8 @@ int CToken::PutLIB( int flag, char *name )
 
 void CToken::SetLIBIID( int id, char *clsid )
 {
-	LIBDAT *l;
-	l = (LIBDAT *)li_buf->GetBuffer();
+	HED_LIBDAT *l;
+	l = (HED_LIBDAT *)li_buf->GetBuffer();
 	l += id;
 	if ( *clsid == 0 ) {
 		l->clsid = -1;
@@ -2884,7 +2889,9 @@ int CToken::PutStructParam( short mptype, int extype )
 	case MPTYPE_PTR_EXINFO:
 	case MPTYPE_PTR_DPMINFO:
 	case MPTYPE_NULLPTR:
-		size = sizeof(char *);
+		// XXX 32bit版換算でax出力する
+		//size = sizeof(char *);
+		size = 4;
 		break;
 	case MPTYPE_SINGLEVAR:
 	case MPTYPE_ARRAYVAR:
@@ -2934,7 +2941,7 @@ int CToken::PutStructEnd( int i, char *name, int libindex, int otindex, int func
 {
 	//		STRUCTDATを登録する(モジュール用)
 	//
-	STRUCTDAT st;
+	HED_STRUCTDAT st;
 	st.index = libindex;
 	st.nameidx = PutDSBuf( name );
 	st.subid = i;
@@ -2957,7 +2964,7 @@ int CToken::PutStructEnd( int i, char *name, int libindex, int otindex, int func
 int CToken::PutStructEnd( char *name, int libindex, int otindex, int funcflag )
 {
 	int i = GET_FI_SIZE();
-	fi_buf->PreparePtr( sizeof(STRUCTDAT) );
+	fi_buf->PreparePtr( sizeof(HED_STRUCTDAT) );
 	return PutStructEnd( i, name, libindex, otindex, funcflag );
 }
 
@@ -2966,7 +2973,7 @@ int CToken::PutStructEndDll( char *name, int libindex, int subid, int otindex )
 	//		STRUCTDATを登録する(DLL用)
 	//
 	int i;
-	STRUCTDAT st;
+	HED_STRUCTDAT st;
 	i = GET_FI_SIZE();
 	st.index = libindex;
 	if ( name[0] == '*' ) {
@@ -2977,10 +2984,10 @@ int CToken::PutStructEndDll( char *name, int libindex, int subid, int otindex )
 	st.subid = subid;
 	st.prmindex = cg_stptr;
 	st.prmmax = cg_stnum;
-	st.proc = NULL;
+	st.funcflag = 0;
 	st.size = cg_stsize;
 	st.otindex = otindex;
-	fi_buf->PutData( &st, sizeof(STRUCTDAT) );
+	fi_buf->PutData( &st, sizeof(HED_STRUCTDAT) );
 	//Mesf( "#%d : %s(LIB%d) prm%d size%d ot%d", i, name, libindex, cg_stnum, cg_stsize, otindex );
 	return i;
 }
@@ -2993,7 +3000,7 @@ void CToken::PutHPI( short flag, short option, char *libname, char *funcname )
 	hpi.option = option;
 	hpi.libname = PutDSBuf( libname );
 	hpi.funcname = PutDSBuf( funcname );
-#ifndef HSP64
+#ifndef PTR64BIT
 	hpi.libptr = NULL;
 #else
 	hpi.p_libptr = 0;
@@ -3218,7 +3225,7 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		} else {
 			int n_mod, n_hpi;
 			n_hpi = hpi_buf->GetSize() / sizeof(HPIDAT);
-			n_mod = fi_buf->GetSize() / sizeof(STRUCTDAT);
+			n_mod = fi_buf->GetSize() / sizeof(HED_STRUCTDAT);
 			Mesf( "#Code size (%d) String data size (%d) param size (%d)",cs_size,ds_size,mi_buf->GetSize() );
 			Mesf( "#Vars (%d) Labels (%d) Modules (%d) Libs (%d) Plugins (%d)",cg_valcnt,ot_size>>2,n_mod,li_size,n_hpi );
 			if (sz_exopt) {
