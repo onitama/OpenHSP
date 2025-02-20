@@ -862,12 +862,16 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 			canvas.height = $3;
 			document.body.appendChild(canvas);
 		}
+		if (canvas.width < $2)
+			canvas.width = $2;
+		if (canvas.height < $3)
+			canvas.height = $3;
 
 		var context = canvas.getContext("2d", { willReadFrequently: true });
 		context.font = $1 + "px 'sans-serif'";
 
 		var msg = UTF8ToString($0);
-		context.clearRect ( 0 , 0 , $2 , $3);
+		context.clearRect(0, 0, canvas.width, canvas.height);
 		context.fillStyle = 'rgba(255, 255, 255, 255)';
 		context.fillText(msg, 0, $1);
 		//console.log(msg);
