@@ -87,7 +87,7 @@ namespace gameplay
         int versionGL[2] = {-1, -1};
         glGetIntegerv(GL_MAJOR_VERSION, versionGL);
         glGetIntegerv(GL_MINOR_VERSION, versionGL + 1);
-        printf("GL version: %d.%d\n", versionGL[0], versionGL[1]);
+        //printf("GL version: %d.%d\n", versionGL[0], versionGL[1]);
 
         return platform;
     }

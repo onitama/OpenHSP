@@ -7,7 +7,6 @@ extern "C" {
 
 /*---------------------------------------------------------------------------*/
 
-#define TEXINF_MAX 512
 // テクスチャ情報
 typedef struct
 {
@@ -20,6 +19,8 @@ short height;		// real y-size
 char *data;			// real data
 float ratex;		// 1/sx
 float ratey;		// 1/sy
+float ratehx;		// 0.5/sx
+float ratehy;		// 0.5/sy
 
 short	divx, divy;					// Divide value for CEL
 short	divsx, divsy;				// CEL size
@@ -46,6 +47,8 @@ int RegistTexEmpty( int w, int h, int tmode );
 int UpdateTex( int texid, char *data, int sw );
 int UpdateTexStar(int texid, int mode);
 int UpdateTex32(int texid, char* srcptr, int mode);
+
+char* GetPixelMaskBuffer(char *fileptr, int size, int* xsize, int* ysize);
 
 int GetNextTexID( void );
 void DeleteTex( int id );

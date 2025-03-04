@@ -24,7 +24,6 @@
 #include <direct.h>
 #endif
 
-#include "hspwnd.h"
 #include "supio.h"
 #include "dpmread.h"
 #include "strbuf.h"
@@ -741,7 +740,24 @@ static int cmdfunc_intcmd( int cmd )
 
 		if (( tval != TYPE_PROGCMD )&&( tval != TYPE_LABEL )) {		// ON/OFF切り替え
 			int i = code_geti();
-			code_enableirq( cmd, i );
+			if (cmd != 0x04) {
+				code_enableirq(cmd, i);
+				break;
+			}
+			cust = code_getdi(0);
+			if (cust == 0) {
+				code_enableirq(cmd, i);
+				break;
+			}
+			actid = *(exinfo->actscr);
+			irq = code_seekirq(actid, cust);
+			if (irq == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+			if (i) {
+				irq->flag = IRQ_FLAG_ENABLE;
+			}
+			else {
+				irq->flag = IRQ_FLAG_DISABLE;
+			}
 			break;
 		}
 
@@ -871,10 +887,22 @@ static int cmdfunc_intcmd( int cmd )
 		if ( fl != HSPVAR_FLAG_INT ) throw HSPERR_TYPE_MISMATCH;
 		if ( cmd == 0x1b ) {
 			if ( (p1+2)>size ) throw HSPERR_BUFFER_OVERFLOW;
+#ifdef HSPEMSCRIPTEN
+			ptr[0] = bp[0];
+			ptr[1] = bp[1];
+#else
 			*(short *)ptr = (short)(*(short *)bp);
+#endif
 		} else {
 			if ( (p1+4)>size ) throw HSPERR_BUFFER_OVERFLOW;
+#ifdef HSPEMSCRIPTEN
+			ptr[0] = bp[0];
+			ptr[1] = bp[1];
+			ptr[2] = bp[2];
+			ptr[3] = bp[3];
+#else
 			*(int *)ptr = (*(int *)bp);
+#endif
 		}
 		break;
 		}
@@ -903,9 +931,10 @@ static int cmdfunc_intcmd( int cmd )
 		}
 	case 0x1e:								// chdpm
 		code_event( HSPEVENT_FNAME, 0, 0, code_gets() );
-		p1 = code_getdi( -1 );
+		p1 = code_getdi(-1);
+		p2 = code_getdi(-1);
 		dpm_bye();
-		p2 = dpm_ini( ctx->fnbuffer, 0, -1, p1 );
+		p2 = dpm_ini( ctx->fnbuffer, 0, -1, p1, p2 );
 		if ( p2 ) throw HSPERR_FILE_IO;
 #ifndef HSP3IMP
 #ifdef HSPWIN
@@ -1455,10 +1484,24 @@ static void *reffunc_intfunc( int *type_res, int arg )
 			reffunc_intfunc_ivalue = ((int)(*ptr)) & 0xff;
 		} else if ( arg == 0x0a ) {
 			if ( (p1+2)>size ) throw HSPERR_ILLEGAL_FUNCTION;
+#ifdef HSPEMSCRIPTEN
+			int wval0 = ((int)(ptr[0])) & 0xff;
+			int wval1 = ((int)(ptr[1])) & 0xff;
+			reffunc_intfunc_ivalue = (wval1<<8) + wval0;
+#else
 			reffunc_intfunc_ivalue = ((int)(*(short *)ptr)) & 0xffff;
+#endif
 		} else {
 			if ( (p1+4)>size ) throw HSPERR_ILLEGAL_FUNCTION;
-			reffunc_intfunc_ivalue = *(int *)ptr;
+#ifdef HSPEMSCRIPTEN
+			int lval0 = ((int)(ptr[0])) & 0xff;
+			int lval1 = ((int)(ptr[1])) & 0xff;
+			int lval2 = ((int)(ptr[2])) & 0xff;
+			int lval3 = ((int)(ptr[3])) & 0xff;
+			reffunc_intfunc_ivalue = (lval3 << 24) + (lval2 << 16) + (lval1 << 8) + lval0;
+#else
+			reffunc_intfunc_ivalue = *(int*)ptr;
+#endif
 		}
 		break;
 		}
@@ -1558,10 +1601,12 @@ static void *reffunc_intfunc( int *type_res, int arg )
 		char *p;
 		int findopt;
 		ps = code_gets();
-		p = code_stmpstr( ps );
+		p = mem_ini( strlen(ps)+1 );
+		strcpy(p,ps);
 		findopt = code_getdi(0);
 		note_update();
 		reffunc_intfunc_ivalue = note.FindLine( p, findopt );
+		mem_bye(p);
 		break;
 		}
 

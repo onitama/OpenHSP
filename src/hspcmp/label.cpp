@@ -129,6 +129,7 @@ int CLabel::Regist( char *name, int type, int opt, char const *filename, int lin
 	lab->typefix = LAB_TYPEFIX_NONE;
 	lab->def_file = NULL;
 	lab->def_line = -1;
+	lab->skiplablist = false;
 	SetDefinition(label_id, filename, line);
 
 	labels.insert(std::make_pair(lab->name, label_id));
@@ -387,9 +388,15 @@ LABOBJ *CLabel::GetLabel( int id )
 }
 
 
-int CLabel::GetInitFlag( int id )
+int CLabel::GetInitFlag(int id)
 {
 	return (int)mem_lab[id].init;
+}
+
+
+int CLabel::GetForceType(int id)
+{
+	return (int)mem_lab[id].typefix;
 }
 
 
@@ -626,55 +633,58 @@ void CLabel::DumpLabel( char *str )
 }
 
 
-void CLabel::DumpHSPLabel( char *str, int option, int maxsize )
+int CLabel::DumpHSPLabelById(int id, char* str, int option)
 {
 	char tmp[256];
-	char *typem;
-//	char optm[256];
+	char* typem;
+	char* p;
+	p = str;
+
+	LABOBJ* lab = &mem_lab[id]; typem = NULL;
+	switch (lab->type) {
+	case LAB_TYPE_PPEX_PRECMD:
+		if (option & LAB_DUMPMODE_RESCMD) typem = "pre|func";
+		break;
+	case LAB_TYPE_PPEX_EXTCMD:
+		if (option & LAB_DUMPMODE_RESCMD) typem = "sys|func|1";
+		break;
+	case LAB_TYPE_PPDLLFUNC:
+		if (option & LAB_DUMPMODE_DLLCMD) typem = "sys|func|2";
+		break;
+	case LAB_TYPE_PPMODFUNC:
+		if (option & LAB_DUMPMODE_DLLCMD) typem = "sys|func|3";
+		break;
+	case LAB_TYPE_PPMAC:
+	case LAB_TYPE_PPVAL:
+		if (option & LAB_DUMPMODE_RESCMD) typem = "sys|macro";
+		break;
+	default:
+		if (option & LAB_DUMPMODE_RESCMD) typem = "sys|func";
+		break;
+	}
+	if (typem != NULL) {
+		sprintf(tmp, "%s\t,%s", lab->name, typem);
+		p = Prt(p, tmp);
+	}
+
+	*p = 0;
+	return (p-str);
+}
+
+
+void CLabel::DumpHSPLabel( char *str, int option, int maxsize )
+{
 	char *p;
 	char *p_limit;
 	int a;
+	int len;
 	p = str;
 	p_limit = p + maxsize;
 
 	for(a=0;a<cur;a++) {
 		if ( p >= p_limit ) break;
-
-		LABOBJ *lab=&mem_lab[a]; typem = NULL;
-		switch( lab->type ) {
-		case LAB_TYPE_PPEX_PRECMD:
-			if ( option & LAB_DUMPMODE_RESCMD ) typem = "pre|func";
-			break;
-		case LAB_TYPE_PPEX_EXTCMD:
-			if ( option & LAB_DUMPMODE_RESCMD ) typem = "sys|func|1";
-			break;
-		case LAB_TYPE_PPDLLFUNC:
-			if ( option & LAB_DUMPMODE_DLLCMD ) typem = "sys|func|2";
-			break;
-		case LAB_TYPE_PPMODFUNC:
-			if ( option & LAB_DUMPMODE_DLLCMD ) typem = "sys|func|3";
-			break;
-		case LAB_TYPE_PPMAC:
-		case LAB_TYPE_PPVAL:
-			if ( option & LAB_DUMPMODE_RESCMD ) typem = "sys|macro";
-			break;
-		default:
-			if ( option & LAB_DUMPMODE_RESCMD ) typem = "sys|func";
-			break;
-		}
-/*
-		if ( lab->opt >= 0x100 ) {
-			if (( lab->opt & 0xff )<0x10 ) {
-				optm[0]='|';
-				optm[1]=48+(lab->opt>>8); optm[2]=0;
-				strcat( typem,optm );
-			}
-		}
-*/
-		if ( typem != NULL ) {
-			sprintf( tmp,"%s\t,%s",lab->name,typem );
-			p=Prt( p,tmp );
-		}
+		len = DumpHSPLabelById(a,p,option);
+		p += len;
 	}
 	*p=0;
 }
@@ -775,4 +785,10 @@ void CLabel::SetDefinition(int id, char const* filename, int line)
 	LABOBJ* const it = GetLabel(id);
 	it->def_file = filenames.insert(filename).first->c_str();
 	it->def_line = line;
+}
+
+void CLabel::SetSkipLabList(int id)
+{
+	LABOBJ* const it = GetLabel(id);
+	it->skiplablist = true;
 }

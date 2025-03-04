@@ -8,9 +8,53 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "../hsp3/strnote.h"
 #include "supio.h"
-#include "strnote.h"
 #include "ahtobj.h"
+
+#ifdef HSPWIN
+#include <windows.h>
+#include <shlobj.h>
+#include <direct.h>
+#endif
+
+void dirinfo(char* p, int id)
+{
+	//		dirinfo命令の内容をstmpに設定する
+	//
+#ifdef HSPWIN
+	char fname[_MAX_PATH + 1];
+
+	switch (id) {
+	case 0:				//    カレント(現在の)ディレクトリ
+		_getcwd(p, _MAX_PATH);
+		break;
+	case 1:				//    実行ファイルがあるディレクトリ
+		GetModuleFileName(NULL, fname, _MAX_PATH);
+		getpath(fname, p, 32);
+		break;
+	case 2:				//    Windowsディレクトリ
+		GetWindowsDirectory(p, _MAX_PATH);
+		break;
+	case 3:				//    Windowsのシステムディレクトリ
+		GetSystemDirectory(p, _MAX_PATH);
+		break;
+	default:
+		if (id & 0x10000) {
+			SHGetSpecialFolderPath(NULL, p, id & 0xffff, FALSE);
+			break;
+		}
+		*p = 0;
+		return;
+	}
+
+	//		最後の'\\'を取り除く
+	//
+	CutLastChr(p, '\\');
+#else
+	* p = 0;
+#endif
+}
 
 //-------------------------------------------------------------
 //		Routines
@@ -908,5 +952,22 @@ void CAht::AddMakeBufferMain( char *str, int size )
 		ahtwrt_buf->PutData( str, size );
 	}
 	ahtwrt_buf->PutCR();
+}
+
+
+int CAht::tstrcmp(const char* str1, const char* str2)
+{
+	//	string compare (0=not same/-1=same)
+	//
+	int ap;
+	char as;
+	ap = 0;
+	while (1) {
+		as = str1[ap];
+		if (as != str2[ap]) return 0;
+		if (as == 0) break;
+		ap++;
+	}
+	return -1;
 }
 

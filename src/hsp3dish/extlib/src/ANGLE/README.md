@@ -1,7 +1,7 @@
 #ANGLE
 The goal of ANGLE is to allow Windows users to seamlessly run WebGL and other OpenGL ES content by translating OpenGL ES API calls to DirectX 9 or DirectX 11 API calls.
 
-ANGLE is a conformant implementation of the OpenGL ES 2.0 specification that is hardware窶紳ccelerated via Direct3D. ANGLE v1.0.772 was certified compliant by passing the ES 2.0.3 conformance tests in October 2011. ANGLE also provides an implementation of the EGL 1.4 specification. Work on ANGLE's OpenGL ES 3.0 implementation is currently in progress, but should not be considered stable.
+ANGLE is a conformant implementation of the OpenGL ES 2.0 specification that is hardware‐accelerated via Direct3D. ANGLE v1.0.772 was certified compliant by passing the ES 2.0.3 conformance tests in October 2011. ANGLE also provides an implementation of the EGL 1.4 specification. Work on ANGLE's OpenGL ES 3.0 implementation is currently in progress, but should not be considered stable.
 
 ANGLE is used as the default WebGL backend for both Google Chrome and Mozilla Firefox on Windows platforms. Chrome uses ANGLE for all graphics rendering on Windows, including the accelerated Canvas2D implementation and the Native Client sandbox environment.
 

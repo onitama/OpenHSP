@@ -227,7 +227,16 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 			id = (int)GetWindowLongPtr( hwnd, GWLP_USERDATA );
 			bm =curwnd->GetBmscr( id );
 			//Alertf( "%d,%x,%x (%d)",id,wParam,lParam , ( wParam & (MESSAGE_HSPOBJ-1)) );
-			bm->SendHSPObjectNotice( (int)wParam );
+#ifdef HSPERR_HANDLE
+			try {
+#endif
+				bm->SendHSPObjectNotice( (int)wParam );
+#ifdef HSPERR_HANDLE
+			}
+			catch (HSPERROR code) {						// HSPエラー例外処理
+				code_catcherror(code);
+			}
+#endif
 		}
 		return 0;
 
@@ -307,23 +316,52 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 */
 /*------------------------------------------------------------*/
 
-void HspWnd::Dispose( void )
+void HspWnd::Dispose(void)
 {
 	//		破棄
 	//
 	int i;
 	HWND hwnd;
-	Bmscr *bm;
-	for(i=0;i<bmscr_max;i++) {
+	Bmscr* bm;
+
+	if (mem_bm == NULL) return;
+
+	for (i = 0; i < bmscr_max; i++) {
 		bm = mem_bm[i];
-		if ( bm != NULL ) {
+		if (bm != NULL) {
 			hwnd = bm->hwnd;
-			if ( hwnd != NULL ) DestroyWindow( hwnd );
+			if (hwnd != NULL) DestroyWindow(hwnd);
 			delete bm;
 		}
 	}
-	free( mem_bm );
-	UnregisterClass( defcls, hInst );
+	free(mem_bm);
+	UnregisterClass(defcls, hInst);
+	bmscr_max = 0;
+	mem_bm = NULL;
+}
+
+
+void HspWnd::ClearAllObjects(void)
+{
+	//		破棄
+	//
+	int i;
+	HWND hwnd;
+	Bmscr* bm;
+	for (i = 0; i < bmscr_max; i++) {
+		bm = mem_bm[i];
+		if (bm != NULL) {
+			hwnd = bm->hwnd;
+			if (hwnd != NULL) {
+				int p4 = bm->objmax - 1;
+				if (p4 >= 0) {
+					for (int i = 0; i <= p4; i++) {
+						bm->DeleteHSPObject(i);
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -577,7 +615,7 @@ void HspWnd::MakeBmscrWnd( int id, int type, int xx, int yy, int wx, int wy, int
 
 	bm->wx = wx;
 	bm->wy = wy;
-	bm->Width( wx, wy, -1, -1, 1 );
+	bm->Width( wx, wy, -1, -1, 0 );
 
 	SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0,
 	 ( mode & 2 ? SWP_NOACTIVATE | SWP_NOZORDER : SWP_SHOWWINDOW ) |
@@ -671,6 +709,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
 		x = bm->cx; y = bm->cy;
 		if (bm->RenderAlphaBitmap(psx, psy, components, sp_image)) return 4;
 		bm->Send( x, y, psx, psy );
+		bm->resname = fname;
 
 		stbi_image_free(sp_image);
 		GlobalUnlock( h );
@@ -710,6 +749,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
 	// display picture using IPicture::Render
 	gpPicture->Render( bm->hdc, x, y, psx, psy, 0, hmHeight, hmWidth, -hmHeight, &rc );
 	bm->Send( x, y, psx, psy );
+	bm->resname = fname;
 
 	gpPicture->Release();
 	GlobalFree(h);
@@ -742,6 +782,52 @@ int HspWnd::GetEmptyBufferId( void )
 		if ( bm->flag == BMSCR_FLAG_NOUSE ) return i;
 	}
 	return bmscr_max;
+}
+
+
+int HspWnd::GetPreloadBufferId(char* fname)
+{
+	//		既存のファイルを読み込んだIDを取得
+	//
+	int i;
+	Bmscr* bm;
+	char basename[HSP_MAX_PATH];
+
+	HSPAPICHAR* hactmp1 = 0;
+	HSPAPICHAR basenameW[HSP_MAX_PATH];
+	HSPCHAR* hctmp1 = 0;
+	getpathW(chartoapichar(fname, &hactmp1), basenameW, 8+16);
+	freehac(&hactmp1);
+
+	apichartohspchar(basenameW, &hctmp1);
+	strncpy(basename, hctmp1, HSP_MAX_PATH - 1);
+	freehc(&hctmp1);
+
+	for (i = 1; i < bmscr_max; i++) {
+		bm = GetBmscr(i);
+		if (bm != NULL) {
+			if (bm->flag == BMSCR_FLAG_INUSE) {
+				char bname[_MAX_PATH];
+				char* p = (char *)bm->resname.c_str();
+				if (*p != 0) {
+					HSPAPICHAR* hactmp2 = 0;
+					HSPAPICHAR bnameW[HSP_MAX_PATH];
+					HSPCHAR* hctmp2 = 0;
+					getpathW(chartoapichar(p, &hactmp2), bnameW, 8 + 16);
+					freehac(&hactmp2);
+
+					apichartohspchar(bnameW, &hctmp2);
+					strncpy(bname, hctmp2, HSP_MAX_PATH - 1);
+					freehc(&hctmp2);
+
+					if (strcmp(bname, basename) == 0) {
+						return bm->wid;
+					}
+				}
+			}
+		}
+	}
+	return -1;
 }
 
 
@@ -934,6 +1020,7 @@ void Bmscr::Cls( int mode )
 	//		CEL initalize
 	//
 	SetCelDivideSize( 0, 0, 0, 0 );
+	resname.clear();
 
 	//		all update
 	//
@@ -995,9 +1082,15 @@ void Bmscr::Width( int x, int y, int wposx, int wposy, int mode )
 	sizex = wx + framesx;
 	sizey = wy + framesy;
 	GetWindowRect( hwnd,&rw );
-	if ( wposx >= 0 ) rw.left = wposx;
-	if ( wposy >= 0 ) rw.top = wposy;
-	MoveWindow( hwnd, rw.left, rw.top, sizex, sizey, (mode>0) );
+	if (mode == 0) {
+		if (wposx >= 0) rw.left = wposx;
+		if (wposy >= 0) rw.top = wposy;
+	}
+	else {
+		rw.left = wposx;
+		rw.top = wposy;
+	}
+	MoveWindow( hwnd, rw.left, rw.top, sizex, sizey, true );
 }
 
 
@@ -1365,12 +1458,12 @@ int Bmscr::PrintSub(char *mes)
 {
 	int chk;
 	int px;
-	char stmp[1024];
+	char stmp[4096];
 	px = 0;
 
 	strsp_ini();
 	while (1) {
-		chk = strsp_get(mes, stmp, 0, 1022);
+		chk = strsp_get(mes, stmp, 0, 4095);
 		PrintLine(stmp);
 		if (px < printsize.cx) px = printsize.cx;
 		if (chk == 0) break;
@@ -2000,7 +2093,8 @@ int Bmscr::RenderAlphaBitmap( int t_psx, int t_psy, int components, unsigned cha
 	int psx,psy;
 	BYTE *p;
 	BYTE *p2;
-	BYTE a1,a2,a3,a4,a4r;
+	BYTE a1, a2, a3;
+	WORD a4, a4r;
 	int p_ofs, p2_ofs;
 
 	x = this->cx;
@@ -2048,7 +2142,8 @@ int Bmscr::RenderAlphaBitmap( int t_psx, int t_psy, int components, unsigned cha
 	short ha;
 	for(b=0;b<psy;b++) {
 		for(a=0;a<psx;a++) {
-			a1=*p2++;a2=*p2++;a3=*p2++;a4=*p2++;a4r=255-a4;
+			a1 = *p2++; a2 = *p2++; a3 = *p2++; a4 = *p2++; a4 += a4 >> 7; a4r = 256 - a4;
+
 			if ( a4r == 0 ) {
 				*p++=a3;
 				*p++=a2;

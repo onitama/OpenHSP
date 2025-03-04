@@ -239,6 +239,7 @@ unsigned int FrameBuffer::getRenderTargetCount() const
     return _renderTargetCount;
 }
 
+#ifdef __EMSCRIPTEN__
 void FrameBuffer::setDepthStencilTarget(DepthStencilTarget* target)
 {
     if (_depthStencilTarget == target)
@@ -286,6 +287,50 @@ void FrameBuffer::setDepthStencilTarget(DepthStencilTarget* target)
         GL_ASSERT( glBindFramebuffer(GL_FRAMEBUFFER, _currentFrameBuffer->_handle) );
     }
 }
+
+#else
+
+void FrameBuffer::setDepthStencilTarget(DepthStencilTarget* target)
+{
+    if (_depthStencilTarget == target)
+        return;
+
+    // Release our existing depth stencil target.
+    SAFE_RELEASE(_depthStencilTarget);
+
+    _depthStencilTarget = target;
+
+    if (target)
+    {
+        // The FrameBuffer now owns this DepthStencilTarget.
+        target->addRef();
+
+        // Now set this target as the color attachment corresponding to index.
+        GL_ASSERT( glBindFramebuffer(GL_FRAMEBUFFER, _handle) );
+
+        // Attach the render buffer to the framebuffer
+        GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
+        if (target->isPacked())
+        {
+            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
+        }
+        else if (target->getFormat() == DepthStencilTarget::DEPTH_STENCIL)
+        {
+            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_stencilBuffer) );
+        }
+
+        // Check the framebuffer is good to go.
+        GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
+        {
+            GP_ERROR("Framebuffer status incomplete: 0x%x", fboStatus);
+        }
+
+        // Restore the FBO binding
+        GL_ASSERT( glBindFramebuffer(GL_FRAMEBUFFER, _currentFrameBuffer->_handle) );
+    }
+}
+#endif
 
 DepthStencilTarget* FrameBuffer::getDepthStencilTarget() const
 {

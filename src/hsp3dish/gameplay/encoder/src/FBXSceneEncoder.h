@@ -140,12 +140,12 @@ private:
     /**
      * Loads materials for each node in the scene.
      */
-    void loadMaterials(FbxScene* fbxScene);
+    void loadMaterials(FbxScene* fbxScene, bool orgName);
 
     /**
      * Loads the material from the given node.
      */
-    void loadMaterial(FbxNode* fbxNode);
+    void loadMaterial(FbxNode* fbxNode, bool orgName );
 
     void loadMaterialTextures(FbxSurfaceMaterial* fbxMaterial, Material* material);
 

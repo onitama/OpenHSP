@@ -83,6 +83,8 @@ Game::Game()
 
     __gameInstance = this;
     _timeEvents = new std::priority_queue<TimeEvent, std::vector<TimeEvent>, std::less<TimeEvent> >();
+    Texture::resetCache();
+    Effect::resetCache();
 }
 
 Game::~Game()

@@ -5,11 +5,7 @@
 #ifndef __hgio_h
 #define __hgio_h
 
-#if defined(HSPWIN) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 #include "../hsp3/hsp3config.h"
-#else
-#include "hsp3config.h"
-#endif
 #include "../hsp3/dpmread.h"
 #include "hspwnd_dish.h"
 #include "geometry.h"
@@ -35,6 +31,7 @@ void hgio_screen( BMSCR *bm );
 void hgio_delscreen( BMSCR *bm );
 int hgio_redraw( BMSCR *bm, int flag );
 int hgio_texload( BMSCR *bm, char *fname );
+char *hgio_texmaskbuffer( BMSCR*bm, char *resname);
 void hgio_setback( BMSCR *bm );
 
 int hgio_dialog( int mode, char *str1, char *str2 );
@@ -115,11 +112,11 @@ CLSMODE_MAX,
 #endif
 
 #ifdef HSPIOS
-#include "ios/hgiox.h"
+#include "emscripten/hgiox.h"
 #endif
 
 #ifdef HSPNDK
-#include "ndk/hgiox.h"
+#include "emscripten/hgiox.h"
 #endif
 
 #ifdef HSPLINUX

@@ -1,25 +1,13 @@
 
-#define HSPAPICHAR char
-#define HSPCHAR char
-
 //
 //	supio.cpp functions
 //
 
-HSPAPICHAR *chartoapichar( const HSPCHAR*,HSPAPICHAR** );
-void freehac( HSPAPICHAR** );
-HSPCHAR *apichartohspchar( const HSPAPICHAR*,HSPCHAR** );
-void freehc( HSPCHAR** );
-HSPAPICHAR *ansichartoapichar(const char *, HSPAPICHAR **);
-char *apichartoansichar(const HSPAPICHAR *, char **);
-void freeac(char **);
+#include "../hsp3utfcnv.h"
 
 char *mem_ini( int size );
 void mem_bye( void *ptr );
 char *mem_alloc( void *base, int newsize, int oldsize );
-int mem_load( const char *fname, void *mem, int msize );
-int mem_save( char *fname, void *mem, int msize, int seekofs );
-int filecopy( const char *fname, const char *sname );
 
 //void prtini( char *mes );
 //void prt( char *mes );
@@ -33,8 +21,6 @@ void cutlast( char *st );
 void cutlast2( char *st );
 void strcpy2( char *dest, const char *src, size_t size );
 char *strchr2( char *target, char code );
-int is_sjis_char_head( const unsigned char *str, int pos );
-char *to_hsp_string_literal( const char *src );
 
 void getpath( char *src, char *outbuf, int p2 );
 void getpathW( HSPAPICHAR *src, HSPAPICHAR *outbuf, int p2 );
@@ -47,11 +33,6 @@ void Alert( const char *mes );
 void AlertV( const char *mes, int val );
 void Alertf( const char *format, ... );
 #define AlertfW Alertf
-
-inline int issjisleadbyte( unsigned char c )
-{
-	return ( c >= 0x81 && c <= 0x9F ) || ( c >= 0xE0 && c <= 0xFC );
-}
 
 int makedir( char *name );
 int changedir( char *name );

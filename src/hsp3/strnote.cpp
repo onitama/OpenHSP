@@ -7,7 +7,6 @@
 #include <string.h>
 #include "hsp3config.h"
 #include "strnote.h"
-#include "supio.h"
 
 #if defined(HSPLINUX) || defined(HSPMAC) || defined(HSPIOS) || defined(HSPNDK) || defined(HSPEMSCRIPTEN)
 // LFを改行として扱う
@@ -16,6 +15,74 @@
 #else
 // CR/LFを改行として扱う
 #define CRSTR "\r\n"
+#endif
+
+//-------------------------------------------------------------
+//		Utility
+//-------------------------------------------------------------
+
+#ifdef HSPUTF8
+static char* strstr2(char* target, char* src)
+{
+	//		strstr関数のutf8対応版
+	//
+	unsigned char* p;
+	unsigned char* s;
+	unsigned char* p2;
+	unsigned char a1;
+	unsigned char a2;
+	unsigned char a3;
+	p = (unsigned char*)target;
+	if ((*src == 0) || (*target == 0)) return NULL;
+	while (1) {
+		a1 = *p; if (a1 == 0) break;
+		p2 = p;
+		s = (unsigned char*)src;
+		while (1) {
+			a2 = *s++; if (a2 == 0) return (char*)p;
+			a3 = *p2++; if (a3 == 0) break;
+			if (a2 != a3) break;
+		}
+		p++;							// 検索位置を移動
+		if (a1 >= 128) {					// 多バイト文字チェック
+			if (a1 >= 192) p++;
+			if (a1 >= 224) p++;
+			if (a1 >= 240) p++;
+			if (a1 >= 248) p++;
+			if (a1 >= 252) p++;
+		}
+	}
+	return NULL;
+}
+#else
+static char* strstr2(char* target, char* src)
+{
+	//		strstr関数の全角対応版
+	//
+	unsigned char* p;
+	unsigned char* s;
+	unsigned char* p2;
+	unsigned char a1;
+	unsigned char a2;
+	unsigned char a3;
+	p = (unsigned char*)target;
+	if ((*src == 0) || (*target == 0)) return NULL;
+	while (1) {
+		a1 = *p; if (a1 == 0) break;
+		p2 = p;
+		s = (unsigned char*)src;
+		while (1) {
+			a2 = *s++; if (a2 == 0) return (char*)p;
+			a3 = *p2++; if (a3 == 0) break;
+			if (a2 != a3) break;
+		}
+		p++;							// 検索位置を移動
+		if (a1 >= 129) {					// 全角文字チェック
+			if ((a1 <= 159) || (a1 >= 224)) p++;
+		}
+	}
+	return NULL;
+}
 #endif
 
 //-------------------------------------------------------------

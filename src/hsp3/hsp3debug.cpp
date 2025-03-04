@@ -68,8 +68,10 @@ static char *err_jp[]={
 	"外部DLLの呼び出しに失敗しました",				// 38
 	"外部オブジェクトの呼び出しに失敗しました",		// 39
 	"関数の戻り値が設定されていません",				// 40
-	"関数を命令として記述しています。\n(HSP2から関数化された名前を使用している可能性があります)",			// 41
+	"関数を命令として記述しています。",				// 41
 	"コールバック内で使用できない命令です",			// 42
+	"固定された変数型を変更しようとしました",		// 43
+	"固定された変数値を変更しようとしました",		// 44
 	"*"
 };
 
@@ -117,6 +119,8 @@ static char *err[]={
 	"No function result",				// 40
 	"Invalid syntax for function",		// 41
 	"function not allowed in callback",	// 42
+	"Invalid change of variable type",	// 43
+	"Invalid change of variable value",	// 44
 	"*"
 };
 

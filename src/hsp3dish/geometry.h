@@ -70,6 +70,12 @@ typedef struct {
 	VECTOR cmax;		// クリップ最大範囲
 } ViewScreen;
 
+#define GEOMETRY_VECTYPE_ROTORDER_ZYX (0)
+#define GEOMETRY_VECTYPE_ROTORDER_XYZ (1)
+#define GEOMETRY_VECTYPE_ROTORDER_YXZ (2)
+#define GEOMETRY_VECTYPE_HALFVECTOR (4)
+#define GEOMETRY_VECTYPE_REFRECTION (5)
+#define GEOMETRY_VECTYPE_MIRROR (6)
 
 //---------------------------------------------------------------------------
 
@@ -157,6 +163,8 @@ void  UnitVector(VECTOR *v);
 void  LookAt(VECTOR *cam_pos, VECTOR *cam_int);
 void  LookAtWithRoll(VECTOR *cam_pos, VECTOR *cam_int, float roll);
 void GetTargetAngle( VECTOR *ang, VECTOR *src, VECTOR *target );
+int GetTargetVector(VECTOR* result, VECTOR* target, int type);
+
 
 //	View->Screenマトリクス生成
 void PerspectiveViewScreen( ViewScreen * vs, float scrz, float ax, float ay, 

@@ -36,6 +36,41 @@ void AHTMODEL::Mesf( char *format, ... )
 }
 
 
+void AHTMODEL::strcpy2(char* dest, const char* src, size_t size)
+{
+	if (size == 0) {
+		return;
+	}
+	char* d = dest;
+	const char* s = src;
+	size_t n = size;
+	while (--n) {
+		if ((*d++ = *s++) == '\0') {
+			return;
+		}
+	}
+	*d = '\0';
+	return;
+}
+
+
+int AHTMODEL::tstrcmp(const char* str1, const char* str2)
+{
+	//	string compare (0=not same/-1=same)
+	//
+	int ap;
+	char as;
+	ap = 0;
+	while (1) {
+		as = str1[ap];
+		if (as != str2[ap]) return 0;
+		if (as == 0) break;
+		ap++;
+	}
+	return -1;
+}
+
+
 AHTPROP *AHTMODEL::GetPropertyFromAlias( char *propname )
 {
 	//		プロパティ名から検索
@@ -859,4 +894,5 @@ double AHTPROP::GetValueDouble( void )
 	p = GetValue();
 	return atof( p );
 }
+
 

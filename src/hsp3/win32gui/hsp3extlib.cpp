@@ -24,6 +24,7 @@
 #include "../../hsp3dish/hspwnd.h"
 #include "../../hsp3/dpmread.h"
 #include "../../hsp3/strbuf.h"
+#include "../../hsp3dish/win32/bmscr_exc.h"
 #else
 #include "../hspwnd.h"
 //#include "hspvar_comobj.h"
@@ -312,9 +313,14 @@ static int Hsp3ExtAddPlugin( void )
 
 static BMSCR *GetBMSCR( void )
 {
+
+#ifdef HSPDISH
+	return (BMSCR *)get_bmscr3();
+#else
 	HSPEXINFO *exinfo;
 	exinfo = hspctx->exinfo2;
 	return (BMSCR *)exinfo->HspFunc_getbmscr( *(exinfo->actscr) );
+#endif
 }
 
 

@@ -75,6 +75,17 @@ Texture::~Texture()
     }
 }
 
+
+void Texture::resetCache(void)
+{
+    //   reset Texture cache
+    //
+    __textureCache.clear();
+    __currentTextureId = 0;
+    __currentTextureType = Texture::TEXTURE_2D;
+}
+
+
 Texture* Texture::create(const char* path, bool generateMipmaps, bool cubemap)
 {
     GP_ASSERT( path );

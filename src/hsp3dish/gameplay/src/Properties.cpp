@@ -923,25 +923,17 @@ bool Properties::getPath(const char* name, std::string* path) const
             path->assign(valueString);
             return true;
         }
-        else
-        {
-            const Properties* prop = this;
-            while (prop != NULL)
-            {
-                // Search for the file path relative to the bundle file
-                const std::string* dirPath = prop->_dirPath;
-                if (dirPath != NULL && !dirPath->empty())
-                {
-                    std::string relativePath = *dirPath;
-                    relativePath.append(valueString);
-                    if (FileSystem::fileExists(relativePath.c_str()))
-                    {
-                        path->assign(relativePath);
-                        return true;
-                    }
+        else {
+            //  exclude 'res/' folder path
+            const char* resfolder = "res/";
+            const char* plain_fname = valueString + strlen(resfolder);
+            if (strncmp(valueString, resfolder, strlen(resfolder)) == 0) {
+                if (FileSystem::fileExists(plain_fname)){
+                    path->assign(plain_fname);
+                    return true;
                 }
-                prop = prop->_parent;
             }
+
         }
     }
     return false;

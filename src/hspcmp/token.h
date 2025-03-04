@@ -95,6 +95,8 @@ typedef struct MACDEF {
 #define COMP_MODE_DEBUGWIN 2
 #define COMP_MODE_UTF8 4
 #define COMP_MODE_STRMAP 8
+#define COMP_MODE_LABOUT 16
+#define COMP_MODE_SKIPERROR 64
 
 #define SWSTACK_MAX 32
 
@@ -126,6 +128,23 @@ class AHTMODEL;
 #define SCNVBUF_DEFAULTSIZE 0x8000
 #define SCNV_OPT_NONE 0
 #define SCNV_OPT_SJISUTF8 1
+#define SCNV_OPT_UTF8SJIS 2
+
+#define LABBUF_FLAG_NONE (0)
+#define LABBUF_FLAG_FUNC (1)
+#define LABBUF_FLAG_MACRO (2)
+#define LABBUF_FLAG_LABEL (3)
+#define LABBUF_FLAG_VAR (4)
+#define LABBUF_FLAG_EXVAR (5)
+#define LABBUF_FLAG_CMD (6)
+#define LABBUF_FLAG_EXCMD (7)
+#define LABBUF_FLAG_REFER (0x100)
+
+#define LABLIST_MODE_LABEL (0)
+#define LABLIST_MODE_VAR (1)
+#define LABLIST_MODE_ALL (2)
+#define LABLIST_MODE_REFERENCE (16)
+#define LABLIST_MODE_PARTMATCH (32)
 
 //  token analysis class
 class CToken {
@@ -133,6 +152,8 @@ public:
 	CToken();
 	CToken( char *buf );
 	~CToken();
+	void addCmpMode(int mode);
+	void delCmpMode(int mode);
 	CLabel *GetLabelInfo( void );
 	void SetLabelInfo( CLabel *lbinfo );
 
@@ -143,7 +164,9 @@ public:
 	void Mesf( char *format, ...);
 	void SetErrorBuf( CMemBuf *buf );
 	void SetAHT( AHTMODEL *aht );
-	void SetAHTBuffer( CMemBuf *aht );
+	void SetAHTBuffer(CMemBuf* aht);
+	void SetLabelListBuffer(CMemBuf* buf, int mode, char* match, int line=0, char *filename=NULL);
+	char* GetLabelListHeader(int flag);
 
 	void ResetCompiler( void );
 	int GetToken( void );
@@ -171,13 +194,14 @@ public:
 	int LabelRegist( char **list, int mode );
 	int LabelRegist2( char **list );
 	int LabelRegist3( char **list );
-	int LabelDump( CMemBuf *out, int option );
+	int LabelDump( CMemBuf *out, int option, char *match=NULL );
 	int GetLabelBufferSize( void );
 	int RegistExtMacroPath( char *name, char *str );
 	int RegistExtMacro( char *name, char *str );
 	int RegistExtMacro( char *keyword, int val );
 	void SetPackfileOut( CMemBuf *pack );
-	int AddPackfile( char *name, int mode );
+	int AddPackfile(char* name, int mode);
+	int AddPackfileOrig(char* name, int mode);
 
 	void InitSCNV( int size );
 	char *ExecSCNV( char *srcbuf, int opt );
@@ -227,6 +251,10 @@ public:
 	void SetCmpOption( int cmpmode ) { hed_cmpmode = cmpmode; }
 	void SetUTF8Input( int utf8mode ) { pp_utf8 = utf8mode; }
 
+	void GenerateLabelList(int mode, char* match);
+	char* GetLabelListLineModule(void);
+	int GetLabelListLineCaseFlag(void);
+
 private:
 	//		For preprocess
 	//
@@ -242,12 +270,15 @@ private:
 	void Calc_compare( CALCVAR &v );
 	void Calc_start( CALCVAR &v );
 
+	ppresult_t PP_IncludeSub(char *name, int is_addition);
+
 	ppresult_t PP_Define( void );
 	ppresult_t PP_Const( void );
 	ppresult_t PP_Enum( void );
 	ppresult_t PP_SwitchStart( int sw );
 	ppresult_t PP_SwitchEnd( void );
 	ppresult_t PP_SwitchReverse( void );
+	ppresult_t PP_use( void );
 	ppresult_t PP_Include( int is_addition );
 	ppresult_t PP_Module( void );
 	ppresult_t PP_Global( void );
@@ -264,7 +295,8 @@ private:
 	ppresult_t PP_Aht( void );
 	ppresult_t PP_Ahtout( void );
 	ppresult_t PP_Ahtmes( void );
-	ppresult_t PP_BootOpt( void );
+	ppresult_t PP_BootOpt(void);
+	ppresult_t PP_VarFix( char *word );
 
 	void SetModuleName( char *name );
 	char *GetModuleName( void );
@@ -291,13 +323,15 @@ private:
 
 	//		For Code Generate
 	//
-	int GenerateCodeMain( CMemBuf *src );
+	void ResetGenerator(unsigned char* ptr);
+	int GenerateCodeMain(CMemBuf* src);
+	int GenerateCodeMainSkipError(CMemBuf* src);
 	void RegisterFuncLabels( void );
 	int GenerateCodeBlock( void );
 	int GenerateCodeSub( void );
 	void GenerateCodePP( char *buf );
 	void GenerateCodeCMD( int id );
-	void GenerateCodeLET( int id );
+	void GenerateCodeLET( int id, bool first=false );
 	void GenerateCodeVAR( int id, int ex );
 	void GenerateCodePRM( void );
 	void GenerateCodePRMN( void );
@@ -321,6 +355,13 @@ private:
 	void GenerateCodePP_comfunc( void );
 	void GenerateCodePP_defvars( int fixedvalue );
 
+	void GenerateLabelTag(char* name, int flag, int type, char* fname, int line);
+	void GenerateLabelListAndTag(int labelid, int flag = 0);
+	void GenerateLabelListAndTag(char* name, int flag = 0);
+	void GenerateLabelListAndTagRef(int labelid, int flag = 0);
+	void GenerateLabelListAndTagPP(char* name, int flag = 0);
+	void GenerateLabelListAndTagRefPP(char* name, int flag = 0);
+
 	int GetParameterTypeCG( char *name );
 	int GetParameterStructTypeCG( char *name );
 	int GetParameterFuncTypeCG( char *name );
@@ -335,7 +376,7 @@ private:
 	char *PickLongStringCG( char *str );
 	int PickNextCodeCG( void );
 	void CheckInternalListenerCMD(int opt);
-	void CheckInternalProgCMD( int opt, int orgcs );
+	int CheckInternalProgCMD( int opt, int orgcs );
 	void CheckInternalIF( int opt );
 	void CheckCMDIF_Set( int mode );
 	void CheckCMDIF_Fin( int mode );
@@ -361,6 +402,12 @@ private:
 
 	int	SaveStringMap(char* fname);
 
+	//	UTF-8 service
+	char* to_hsp_string_literal(const char* src, bool filename=false);
+	int atoi_allow_overflow(const char* s);
+	int ConvSJis2Utf8(char* pSource, char* pDist, int buffersize);
+	int ConvUtf82SJis(char* pSource, char* pDist, int buffersize);
+
 	//		Data
 	//
 	CLabel *lb;						// label object
@@ -370,6 +417,7 @@ private:
 	CMemBuf *wrtbuf;
 	CMemBuf *packbuf;
 	CMemBuf *ahtbuf;
+	CMemBuf *labbuf;
 	CStrNote *note;
 	AHTMODEL *ahtmodel;				// AHT process data
 	char common_path[HSP_MAX_PATH];	// common path
@@ -384,7 +432,7 @@ private:
 	double val_d;
 	double fpbit;
 	unsigned char *wp;
-	unsigned char s2[1024];
+	unsigned char s2[4096];
 	unsigned char *s3;
 	char linebuf[LINEBUF_MAX];		// Line expand buffer
 	char linetmp[LINEBUF_MAX];		// Line expand temp
@@ -430,11 +478,19 @@ private:
 	int cg_defvarfix;
 	int cg_utf8out;
 	int cg_strmap;
+	int cg_skiperror;
 	char *cg_ptr;
 	char *cg_ptr_bak;
 	char *cg_str;
 	unsigned char *cg_wp;
 	char cg_libname[1024];
+	int cg_labout_mode;
+	int cg_labout_line;
+	char *cg_labout_match;
+	char **cg_labout_header;
+	char cg_labout_modname[MODNAME_MAX + 2];	// Module Name Prefix
+	int cg_labout_caseflag;
+	char cg_labout_orgfile[HSP_MAX_PATH];
 
 	int	replev;
 	int repend[CG_REPLEV_MAX];
@@ -479,9 +535,13 @@ private:
 
 	//		for Error
 	//
+	int pp_orgline;
+	char pp_orgfile[HSP_MAX_PATH];
+	char pp_orgfilefull[HSP_MAX_PATH];
 	int cg_errline;
 	int cg_orgline;
 	char cg_orgfile[HSP_MAX_PATH];
+	char cg_orgfilefull[HSP_MAX_PATH];
 
 	//		for SCNV
 	//
@@ -490,5 +550,10 @@ private:
 
 };
 
+//	String Service
+void strcase2(char* str, char* str2);
+void strcpy2(char* dest, const char* src, size_t size);
+void addext(char* st, const char* exstr);
+void cutext(char* st);
 
 #endif

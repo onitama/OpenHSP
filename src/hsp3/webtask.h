@@ -10,11 +10,11 @@
 #endif
 
 #ifdef HSPIOS
-//#include "ios/webtask_ios.h"
+#include "ios/webtask_ios.h"
 #endif
 
 #ifdef HSPNDK
-//#include "ndk/webtask_ndk.h"
+#include "ndk/webtask_ndk.h"
 #endif
 
 #ifdef HSPLINUX

@@ -90,7 +90,7 @@ ifneq ($(filter linux,$(PLATFORM)),)
     vpath %.hpp ./linux ../hsp3
 
     CC = gcc
-    CFLAGS_B = -Wall -finput-charset=cp932 -fexec-charset=cp932 \
+    CFLAGS_B = -Wall -finput-charset=utf-8 -fexec-charset=utf-8 \
                -DHSPLINUX $(addprefix -I,$(includedir))
     CFLAGS_D = $(CFLAGS_B) -DHSPDEBUG -g
     CFLAGS_R = $(CFLAGS_B) -O3 -DNDEBUG
@@ -138,7 +138,7 @@ ifneq ($(filter win32_mingw,$(PLATFORM)),)
 
     CC = gcc
     CFLAGS_B = -Wall -Wno-unused -fexceptions -fsigned-char \
-               -finput-charset=cp932 -fexec-charset=cp932 -mconsole \
+               -finput-charset=utf-8 -fexec-charset=utf-8 -mconsole \
                -DWINVER=0x0400 -D_WIN32_IE=0x0500 -DHSPWIN \
                $(addprefix -I,$(includedir))
     CFLAGS_D = $(CFLAGS_B)
@@ -187,7 +187,7 @@ ifneq ($(filter win32dll_mingw,$(PLATFORM)),)
 
     CC = gcc
     CFLAGS_B = -Wall -Wno-unused -fexceptions -fsigned-char \
-               -finput-charset=cp932 -fexec-charset=cp932 -mdll \
+               -finput-charset=utf-8 -fexec-charset=utf-8 -mdll \
                -DWINVER=0x0400 -D_WIN32_IE=0x0500 -DHSPWIN \
                $(addprefix -I,$(includedir))
     CFLAGS_D = $(CFLAGS_B)

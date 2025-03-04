@@ -181,8 +181,8 @@ bool PhysicsController::rayTest(const Ray& ray, float distance, PhysicsControlle
 
     public:
 
-        RayTestCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld, PhysicsController::HitFilter* filter)
-            : btCollisionWorld::ClosestRayResultCallback(rayFromWorld, rayToWorld), filter(filter)
+        RayTestCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld, PhysicsController::HitFilter* p_filter)
+            : btCollisionWorld::ClosestRayResultCallback(rayFromWorld, rayToWorld), filter(p_filter)
         {
         }
 
@@ -493,7 +493,7 @@ bool PhysicsController::execContactTest(PhysicsCollisionObject* object, btCollis
 	return false;
 }
 
-void PhysicsController::update(float elapsedTime)
+void PhysicsController::update(float elapsedTime, int steps)
 {
     GP_ASSERT(_world);
     _isUpdating = true;
@@ -503,7 +503,7 @@ void PhysicsController::update(float elapsedTime)
     //
     // Note that stepSimulation takes elapsed time in seconds
     // so we divide by 1000 to convert from milliseconds.
-    _world->stepSimulation(elapsedTime * 0.001f, 10);
+    _world->stepSimulation(elapsedTime * 0.001f, steps);
 
 
 #if 0

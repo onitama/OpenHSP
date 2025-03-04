@@ -150,7 +150,7 @@ int gamehsp::AttachEvent(int objid, int eventid, int entry)
 		i = obj->GetEmptyEvent();
 		if (i < 0) return -1;
 	}
-	obj->StartEvent(ev, entry);
+	obj->StartEvent(ev, i);
 	return i;
 }
 
@@ -486,16 +486,16 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 		{
 			// targetにlinear補間
 			gameplay::Vector3 *pv1;
-			gameplay::Vector4 *pv2;
+			gameplay::Vector3 *pv2;
 			if (getObjectVector(obj->_id, ev->_target, &v1) < 0) {
 				putEventError(obj, ev, "無効なMOC設定");
 			}
 
 			pv1 = ev->GetEventVector();
-			pv2 = &(obj->_evvec[entry]);
+			pv2 = &obj->_evvec[ev->_target];
 
 			if (tbase == 0.0f) {
-				pv2->set( v1.x, v1.y, v1.z, v1.w );
+				pv2->set( v1.x, v1.y, v1.z );
 			}
 			tval = tbase * ev->_timer;
 			if (tval > 1.0f) tval = 1.0f;
@@ -511,16 +511,16 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 		{
 			// targetにlinear補間(相対)
 			gameplay::Vector3 *pv1;
-			gameplay::Vector4 *pv2;
+			gameplay::Vector3 *pv2;
 			if (getObjectVector(obj->_id, ev->_target, &v1) < 0) {
 				putEventError(obj, ev, "無効なMOC設定");
 			}
 
 			pv1 = ev->GetEventVector();
-			pv2 = &(obj->_evvec[entry]);
+			pv2 = &obj->_evvec[ev->_target];
 
 			if (tbase == 0.0f) {
-				pv2->set(v1.x, v1.y, v1.z, v1.w);
+				pv2->set(v1.x, v1.y, v1.z);
 			}
 			tval = tbase * ev->_timer;
 			if (tval > 1.0f) tval = 1.0f;
@@ -544,7 +544,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 			Vector3	tmp;
 			Vector3	*nextv;
 			gameplay::Vector3 *pv1;
-			gameplay::Vector4 *pv2;
+			gameplay::Vector3 *pv2;
 			float t1, t2, t3;
 			if (ev->nextvec == NULL) storeNextVector(ev);
 
@@ -552,11 +552,11 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 				putEventError(obj, ev, "無効なMOC設定");
 			}
 			pv1 = ev->GetEventVector();
-			pv2 = &(obj->_evvec[entry]);
+			pv2 = &obj->_evvec[ev->_target];
 
 			nextv = ev->nextvec;
 			if (tbase == 0.0f) {
-				pv2->set(v1.x, v1.y, v1.z, v1.w);
+				pv2->set(v1.x, v1.y, v1.z);
 			}
 			tval = tbase * ev->_timer;
 			if (tval > 1.0f) tval = 1.0f;
@@ -614,7 +614,7 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 			Vector3	tmp;
 			Vector3	*nextv;
 			gameplay::Vector3 *pv1;
-			gameplay::Vector4 *pv2;
+			gameplay::Vector3 *pv2;
 			float t1, t2, t3;
 			if (ev->nextvec == NULL) storeNextVector(ev);
 
@@ -622,11 +622,11 @@ void gamehsp::ExecuteObjEvent(gpobj *obj, float timepass, int entry)
 				putEventError(obj, ev, "無効なMOC設定");
 			}
 			pv1 = ev->GetEventVector();
-			pv2 = &(obj->_evvec[entry]);
+			pv2 = &obj->_evvec[ev->_target];
 
 			nextv = ev->nextvec;
 			if (tbase == 0.0f) {
-				pv2->set(v1.x, v1.y, v1.z, v1.w);
+				pv2->set(v1.x, v1.y, v1.z);
 			}
 			tval = tbase * ev->_timer;
 			if (tval > 1.0f) tval = 1.0f;

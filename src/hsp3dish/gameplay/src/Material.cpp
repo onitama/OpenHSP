@@ -66,6 +66,7 @@ Material* Material::create(Properties* materialProperties, PassCallback callback
     // Create new material from the file passed in.
     Material* material = new Material();
 	//GP_WARN("NewMaterial[%s][%s][%x]", materialProperties->getNamespace(), materialProperties->getId(),callback);
+    material->setName(materialProperties->getId());
 
     // Load uniform value parameters for this material.
     loadRenderState(material, materialProperties);
@@ -461,7 +462,10 @@ void Material::loadRenderState(RenderState* renderState, Properties* properties)
             std::string path;
             if (!ns->getPath("path", &path))
             {
-                GP_WARN("Texture sampler '%s' is missing required image file path.", name);
+                const char* value = ns->getString("path");
+                if (value != NULL) {
+                    GP_WARN("Texture sampler '%s' is missing required image file path (%s).", name, value);
+                }
                 continue;
             }
 

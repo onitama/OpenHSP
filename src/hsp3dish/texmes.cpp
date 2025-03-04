@@ -66,7 +66,7 @@ void texmes::terminate(void)
 }
 
 
-void texmes::reset(int width, int height, int p_texsx, int p_texsy, void *data)
+void texmes::reset(int width, int height, int p_texsx, int p_texsy, void* data)
 {
 	clear();
 
@@ -85,19 +85,21 @@ void texmes::reset(int width, int height, int p_texsx, int p_texsy, void *data)
 	SAFE_RELEASE(texture);
 
 #else
-	_texture = hgio_fontsystem_setup( texsx, texsy, data);
+	_texture = hgio_fontsystem_setup(texsx, texsy, data);
 
 #endif
 
-	ratex = ( 1.0f / (float)texsx);
-	ratey = ( 1.0f / (float)texsy);
+	ratex = (1.0f / (float)texsx);
+	ratey = (1.0f / (float)texsy);
 	hash = 0;
 	life = TEXMES_CACHE_DEFAULT;
 	font_size = 0;
 	font_style = 0;
-	if (text!=NULL) text[0] = 0;
+	if (text != NULL) text[0] = 0;
 	buf[0] = 0;
+	texmespos = NULL;
 }
+
 
 int texmes::registText(char* msg)
 {
@@ -233,7 +235,7 @@ void texmesManager::texmesProc(void)
 }
 
 
-int texmesManager::texmesGetCache(char* msg, short mycache)
+int texmesManager::texmesGetCache(char* msg, short mycache, texmesPos* info)
 {
 	//		キャッシュ済みの文字列があればidを返す
 	//		(存在しない場合は-1)
@@ -245,16 +247,24 @@ int texmesManager::texmesGetCache(char* msg, short mycache)
 		if (t->flag) {							// 使用中だった時
 			if (t->hash == mycache) {			// まずハッシュを比べる
 				if (t->font_size == _fontsize && t->font_style == _fontstyle) {	// サイズ・スタイルを比べる
-					if (t->text) {
-						if (strcmp(msg, t->text) == 0) {
-							t->life = TEXMES_CACHE_DEFAULT;			// キャッシュを保持
-							return i;
+					bool found = true;
+					if (info) {
+						if (info != t->texmespos) {	// 異なるtexmesPosはキャッシュしない
+							found = false;
 						}
 					}
-					else {
-						if (strcmp(msg, t->buf) == 0) {
-							t->life = TEXMES_CACHE_DEFAULT;			// キャッシュを保持
-							return i;
+					if (found) {
+						if (t->text) {
+							if (strcmp(msg, t->text) == 0) {
+								t->life = TEXMES_CACHE_DEFAULT;			// キャッシュを保持
+								return i;
+							}
+						}
+						else {
+							if (strcmp(msg, t->buf) == 0) {
+								t->life = TEXMES_CACHE_DEFAULT;			// キャッシュを保持
+								return i;
+							}
 						}
 					}
 				}
@@ -338,7 +348,7 @@ int texmesManager::texmesRegist(char* msg, texmesPos *info)
 	mycache = str2hash(msg, &mylen);			// キャッシュを取得
 	if (mylen <= 0) return -1;
 
-	texid = texmesGetCache(msg, mycache);
+	texid = texmesGetCache(msg, mycache, info);
 	if (texid >= 0) {
 		tex = texmesGet(texid);
 		_area_px = tex->sx;
@@ -362,6 +372,7 @@ int texmesManager::texmesRegist(char* msg, texmesPos *info)
 	tex->hash = mycache;
 	tex->font_size = _fontsize;
 	tex->font_style = _fontstyle;
+	tex->texmespos = info;
 
 	return tex->entry;
 }

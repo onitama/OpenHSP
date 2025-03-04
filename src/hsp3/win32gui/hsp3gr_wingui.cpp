@@ -683,7 +683,8 @@ static int cmdfunc_extcmd( int cmd )
 		p2 = code_getdi( -1 );
 		p3 = code_getdi( -1 );
 		p4 = code_getdi( -1 );
-		bmscr->Width( p1, p2, p3, p4, 1 );
+		p5 = code_getdi( 0 );
+		bmscr->Width( p1, p2, p3, p4, p5 );
 		break;
 
 	case 0x1d:								// gsel
@@ -882,7 +883,7 @@ static int cmdfunc_extcmd( int cmd )
 		}
 		wnd->MakeBmscr( p1, t, p5, p6, p7, p8, p2, p3, p4 );
 		bmscr = wnd->GetBmscr( p1 );
-		bmscr->Width( p7, p8, p5, p6, 1 );
+		bmscr->Width( p7, p8, p5, p6, 0 );
 
 		cur_window = p1;
 
@@ -911,7 +912,7 @@ static int cmdfunc_extcmd( int cmd )
 			}
 		}
 		SetCursorPos(p1, p2);
-		if (p3 > 0) break;
+		if (p3 == 1) break;
 		if (p3 < 0) {
 			if (msact >= 0) {
 				msact = ShowCursor(0);
@@ -1176,10 +1177,15 @@ static int cmdfunc_extcmd( int cmd )
 		int i;
 		char fname[_MAX_PATH];
 		strncpy( fname, code_gets(), _MAX_PATH-1 );
-		p1 = code_getdi( -1 );
+		if (*fname==0) throw HSPERR_ILLEGAL_FUNCTION;		// 空文字の場合はエラー
+		p1 = code_getdi( -2 );
 		p2 = code_getdi( 0 );
-		if ( p1 < 0 ) p1 = wnd->GetEmptyBufferId();
-
+		if (p1 == -2) {
+			p1 = wnd->GetPreloadBufferId(fname);
+		}
+		if (p1 < 0) {
+			p1 = wnd->GetEmptyBufferId();
+		}
 		wnd->MakeBmscrOff( p1, 32, 32, p2 );
 		i = wnd->Picload( p1, fname, 2 );
 		if ( i ) throw HSPERR_PICTURE_MISSING;
@@ -1675,6 +1681,17 @@ void hsp3typeinit_extcmd( HSP3TYPEINFO *info, int sx, int sy, int wd, int xx, in
 void hsp3typeinit_extfunc( HSP3TYPEINFO *info )
 {
 	info->reffunc = reffunc_sysvar;
+}
+
+
+void hsp3gr_cleanup(void)
+{
+	//		全オブジェクトを破棄(クリーンアップ)
+	//
+	if (wnd) {
+		wnd->ClearAllObjects();
+		wnd->Dispose();
+	}
 }
 
 

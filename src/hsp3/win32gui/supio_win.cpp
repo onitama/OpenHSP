@@ -20,54 +20,11 @@
 #include "supio_win.h"
 #include "../dpmread.h"
 #include "../strbuf.h"
-
-HSPAPICHAR *chartoapichar( const char *orig,HSPAPICHAR **pphac)
-{
-	*pphac = (HSPAPICHAR*)orig;
-	return (HSPAPICHAR*)orig;
-}
-
-void freehac(HSPAPICHAR **pphac)
-{
-	*pphac = 0;
-	return;
-}
-
-HSPCHAR *apichartohspchar( const HSPAPICHAR *orig,HSPCHAR **pphc)
-{
-	*pphc = (HSPAPICHAR*)orig;
-	return (HSPCHAR*)orig;
-}
-
-void freehc(HSPCHAR **pphc)
-{
-	*pphc = 0;
-	return;
-}
-
-HSPAPICHAR *ansichartoapichar(const char *orig, HSPAPICHAR **pphac)
-{
-	*pphac = (HSPAPICHAR*)orig;
-	return (HSPAPICHAR*)orig;
-}
-
-char *apichartoansichar(const HSPAPICHAR *orig, char **ppc)
-{
-	*ppc = (char*)orig;
-	return (char*)orig;
-}
-
-void freeac(char **ppc)
-{
-	*ppc = 0;
-	return;
-}
+#include "../hsp3utfcnv.h"
 
 //
 //		basic C I/O support
 //
-static FILE *fp;
-
 char *mem_ini( int size ) {
 	return (char *)calloc(size,1);
 }
@@ -76,23 +33,18 @@ void mem_bye( void *ptr ) {
 	free(ptr);
 }
 
-
-int mem_save( char *fname, void *mem, int msize, int seekofs )
+char *mem_alloc( void *base, int newsize, int oldsize )
 {
-	FILE *fp;
-	int flen;
-
-	if (seekofs<0) {
-		fp=fopen(fname,"wb");
+	char *p;
+	if ( base == NULL ) {
+		p = (char *)calloc( newsize, 1 );
+		return p;
 	}
-	else {
-		fp=fopen(fname,"r+b");
-	}
-	if (fp==NULL) return -1;
-	if ( seekofs>=0 ) fseek( fp, seekofs, SEEK_SET );
-	flen = (int)fwrite( mem, 1, msize, fp );
-	fclose(fp);
-	return flen;
+	if ( newsize <= oldsize ) return (char *)base;
+	p = (char *)calloc( newsize, 1 );
+	memcpy( p, base, oldsize );
+	free( base );
+	return p;
 }
 
 
@@ -172,7 +124,7 @@ char *strstr2( char *target, char *src )
 		}
 		p++;							// 検索位置を移動
 		if (a1>=129) {					// 全角文字チェック
-			if (((a1<=159)||(a1>=224))&&(*p!=0)) p++;
+			if ((a1<=159)||(a1>=224)) p++;
 		}
 	}
 	return NULL;
@@ -193,7 +145,7 @@ char *strchr2( char *target, char code )
 		if ( a1==code ) res=(char *)p;
 		p++;							// 検索位置を移動
 		if (a1>=129) {					// 全角文字チェック
-			if (((a1<=159)||(a1>=224))&&(*p!=0)) p++;
+			if ((a1<=159)||(a1>=224)) p++;
 		}
 	}
 	return res;
@@ -202,20 +154,31 @@ char *strchr2( char *target, char code )
 
 void getpath( char *stmp, char *outbuf, int p2 )
 {
+	//	getpath
+	// 
+	//	0 : 文字列のコピー(操作なし)
+	//	1 : 拡張子を除くファイル名
+	//	2 : 拡張子のみ(. ? ? ? )
+	//	8 : ディレクトリ情報を取り除く
+	//	16 : 文字列を小文字に変換する
+	//	32 : ディレクトリ情報のみ
 	char *p;
+	char workbuf[_MAX_PATH];
+
 	char p_drive[_MAX_PATH];
 	char p_dir[_MAX_DIR];
 	char p_fname[_MAX_FNAME];
 	char p_ext[_MAX_EXT];
 
 	p = outbuf;
-	if (p2&16) strcase( stmp );
+	strcpy(workbuf,stmp);
+	if (p2&16) strcase(workbuf);
 
 	//新しいVC++で0x5cコードが正しく処理されないためSJIS版の_splitpathは使用せず
 	//_splitpath( stmp, p_drive, p_dir, p_fname, p_ext );
 	wchar_t wszBufPath[_MAX_PATH], wdrive[_MAX_DRIVE], wdir[_MAX_DIR], wfname[_MAX_FNAME], wext[_MAX_EXT];
 
-	mbstowcs(wszBufPath, stmp, strlen(stmp) + 1);
+	mbstowcs(wszBufPath, workbuf, strlen(workbuf) + 1);
 	_wsplitpath(wszBufPath, wdrive, wdir, wfname, wext);
 
 	wcstombs(p_drive, wdrive, _MAX_DRIVE);
@@ -225,20 +188,21 @@ void getpath( char *stmp, char *outbuf, int p2 )
 
 	strcat( p_drive, p_dir );
 	if ( p2&8 ) {
-		strcpy( stmp, p_fname ); strcat( stmp, p_ext );
+		strcpy(workbuf, p_fname );
+		strcat(workbuf, p_ext );
 	} else if ( p2&32 ) {
-		strcpy( stmp, p_drive );
+		strcpy(workbuf, p_drive );
 	}
 	switch( p2&7 ) {
 	case 1:			// Name only ( without ext )
-		stmp[ strlen(stmp)-strlen(p_ext) ] = 0;
-		strcpy( p, stmp );
+		workbuf[ strlen(workbuf)-strlen(p_ext) ] = 0;
+		strcpy( p, workbuf);
 		break;
 	case 2:			// Ext only
 		strcpy( p, p_ext );
 		break;
 	default:		// Direct Copy
-		strcpy( p, stmp );
+		strcpy( p, workbuf);
 		break;
 	}
 }

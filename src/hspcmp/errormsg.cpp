@@ -68,6 +68,8 @@ static char *err[]={
 	"インポートするIID名が指定されていません",				// 38
 	"未初期化変数を使用しようとしました",					// 39
 	"指定できない変数名です",								// 40
+	"既に属性が設定された変数名です",						// 41
+	"既に定義されている変数名です",							// 42
 	"*"
 };
 #else
@@ -113,6 +115,8 @@ static char *err[]={
 	"No import IID to bind",								// 38
 	"Uninitalized variable detected",						// 39
 	"Wrong name for variable",								// 40
+	"Already defined type of variable",						// 41
+	"Already defined variable",								// 42
 	"*"
 };
 #endif

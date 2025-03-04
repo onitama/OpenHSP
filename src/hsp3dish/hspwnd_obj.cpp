@@ -77,8 +77,8 @@ static void Object_SendSetVar(HSPOBJINFO *obj)
 {
 	//	オブジェクトに関連付けされた変数の値を更新する
 	//
-	HSP3VARSET *var = obj->varset;
-	if (var == NULL) return;
+	HSP3VARSET *var = &obj->varset;
+	if (var->pval == NULL) return;
 	code_setva(var->pval, var->aptr, var->type, var->ptr);
 }
 
@@ -87,8 +87,8 @@ static void Object_SendSetVar(HSPOBJINFO *obj, int type, void *ptr)
 	//	オブジェクトに関連付けされた変数の値を更新する
 	//	(任意の型とポインタによる更新)
 	//
-	HSP3VARSET *var = obj->varset;
-	if (var == NULL) return;
+	HSP3VARSET *var = &obj->varset;
+	if (var->pval == NULL) return;
 
 	if (var->type == type) {
 		//	同じタイプの場合はそのまま代入する
@@ -414,26 +414,84 @@ static void Object_InputBoxApplyVAR(HSPOBJINFO *info)
 	Bmscr *bm = (Bmscr *)info->bm;
 	Hsp3ObjInput *edit = (Hsp3ObjInput *)info->btnset;
 	if (edit == NULL) return;
-	HSP3VARSET *var = info->varset;
-	if (var == NULL) return;
+	HSP3VARSET *var = &info->varset;
+	if (var->pval == NULL) return;
 
 }
 
 
-static int Object_InputBoxApplyFuncKey(HSPOBJINFO *info, int code)
+static int Object_InputBoxApplyFuncKey(HSPOBJINFO* info, int code)
 {
 	//		ファンクションキーを処理する
 	//		(HSPOBJ_NOTICE_KEY_F* を送信する)
 	//		(返値 0=OK、1=更新あり、マイナス値はエラー)
 	//
 	if ((code < HSPOBJ_NOTICE_KEY_F1) || (code > HSPOBJ_NOTICE_KEY_F12)) return -1;
-/*
+	/*
+		switch (code) {
+		default:
+			break;
+		}
+	*/
+	//	Alertf("FUNC");
+	return 0;
+}
+
+
+static int Object_InputBoxApplyExtKey(HSPOBJINFO* info, int code)
+{
+	//		拡張キーを処理する
+	//		(HSPOBJ_NOTICE_KEY_EXTKEYを含むコードを送信する)
+	//		(返値 0=OK、1=更新あり、マイナス値はエラー)
+	//
+	Bmscr* bm = (Bmscr*)info->bm;
+	Hsp3ObjInput* edit = (Hsp3ObjInput*)info->btnset;
+	if (edit == NULL) return -1;
+
 	switch (code) {
-	default:
+	case HSPOBJ_NOTICE_KEY_SLEFT:
+		edit->tpos.moveCaret(-1, true);
 		break;
+	case HSPOBJ_NOTICE_KEY_LEFT:
+		edit->tpos.moveCaret(-1);
+		break;
+	case HSPOBJ_NOTICE_KEY_SRIGHT:
+		edit->tpos.moveCaret(1, true);
+		break;
+	case HSPOBJ_NOTICE_KEY_RIGHT:
+		edit->tpos.moveCaret(1);
+		break;
+	case HSPOBJ_NOTICE_KEY_SHOME:
+		edit->tpos.setCaretHome(true);
+		break;
+	case HSPOBJ_NOTICE_KEY_HOME:
+		edit->tpos.setCaretHome();
+		break;
+	case HSPOBJ_NOTICE_KEY_SEND:
+		edit->tpos.setCaretEnd(true);
+		break;
+	case HSPOBJ_NOTICE_KEY_END:
+		edit->tpos.setCaretEnd();
+		break;
+	case HSPOBJ_NOTICE_KEY_INS:
+		edit->tpos.toggleInsertMode();
+		break;
+	case HSPOBJ_NOTICE_KEY_DEL:
+		edit->tpos.deleteStringFromCaret(false);
+		return 1;
+
+	case HSPOBJ_NOTICE_KEY_UP:
+	case HSPOBJ_NOTICE_KEY_DOWN:
+	case HSPOBJ_NOTICE_KEY_SCROLL_UP:
+	case HSPOBJ_NOTICE_KEY_SCROLL_DOWN:
+	case HSPOBJ_NOTICE_KEY_SUP:
+	case HSPOBJ_NOTICE_KEY_SDOWN:
+	case HSPOBJ_NOTICE_KEY_SSCROLL_UP:
+	case HSPOBJ_NOTICE_KEY_SSCROLL_DOWN:
+		break;
+	default:
+		return -1;
 	}
-*/
-//	Alertf("FUNC");
 	return 0;
 }
 
@@ -516,50 +574,10 @@ static void Object_InputBox(HSPOBJINFO *info, int wparam)
 		break;
 	}
 
-	case HSPOBJ_NOTICE_KEY_SLEFT:
-		edit->tpos.moveCaret(-1,true);
-		break;
-	case HSPOBJ_NOTICE_KEY_LEFT:
-		edit->tpos.moveCaret(-1);
-		break;
-	case HSPOBJ_NOTICE_KEY_SRIGHT:
-		edit->tpos.moveCaret(1, true);
-		break;
-	case HSPOBJ_NOTICE_KEY_RIGHT:
-		edit->tpos.moveCaret(1);
-		break;
-	case HSPOBJ_NOTICE_KEY_SHOME:
-		edit->tpos.setCaretHome(true);
-		break;
-	case HSPOBJ_NOTICE_KEY_HOME:
-		edit->tpos.setCaretHome();
-		break;
-	case HSPOBJ_NOTICE_KEY_SEND:
-		edit->tpos.setCaretEnd(true);
-		break;
-	case HSPOBJ_NOTICE_KEY_END:
-		edit->tpos.setCaretEnd();
-		break;
-	case HSPOBJ_NOTICE_KEY_INS:
-		edit->tpos.toggleInsertMode();
-		break;
 	case HSPOBJ_NOTICE_KEY_BS:
 		edit->tpos.deleteStringFromCaret(true);
 		update = true;
 		break;
-	case HSPOBJ_NOTICE_KEY_DEL:
-		edit->tpos.deleteStringFromCaret(false);
-		update = true;
-		break;
-
-	case HSPOBJ_NOTICE_KEY_UP:
-	case HSPOBJ_NOTICE_KEY_DOWN:
-	case HSPOBJ_NOTICE_KEY_SCROLL_UP:
-	case HSPOBJ_NOTICE_KEY_SCROLL_DOWN:
-	case HSPOBJ_NOTICE_KEY_SUP:
-	case HSPOBJ_NOTICE_KEY_SDOWN:
-	case HSPOBJ_NOTICE_KEY_SSCROLL_UP:
-	case HSPOBJ_NOTICE_KEY_SSCROLL_DOWN:
 	case HSPOBJ_NOTICE_KEY_TAB:
 	case HSPOBJ_NOTICE_KEY_CR:
 		break;
@@ -569,6 +587,13 @@ static void Object_InputBox(HSPOBJINFO *info, int wparam)
 		break;
 
 	default:
+		if (wparam & HSPOBJ_NOTICE_KEY_EXTKEY) {
+			int code = wparam & (HSPOBJ_NOTICE_KEY_EXTKEY - 1);
+			if (Object_InputBoxApplyExtKey(info, code) > 0) {
+				update = true;
+			}
+			break;
+		}
 		if (wparam & HSPOBJ_NOTICE_KEY_CTRLADD) {
 			int code = wparam & (HSPOBJ_NOTICE_KEY_CTRLADD - 1);
 			if (Object_InputBoxApplySpecialKey(info, code ) > 0) {
@@ -733,7 +758,10 @@ HSPOBJINFO *Bmscr::AddHSPObject( int id, int mode )
 	obj->owid = 0;
 	obj->owsize = 0;
 	obj->btnset = NULL;
-	obj->varset = NULL;
+	obj->varset.type = 0;
+	obj->varset.aptr = NULL;
+	obj->varset.ptr = NULL;
+	obj->varset.pval = NULL;
 	obj->exinfo1 = 0;
 	obj->exinfo2 = 0;
 
@@ -802,8 +830,11 @@ void Bmscr::DeleteHSPObject( int id )
 	if (obj->btnset != NULL) {
 		delete obj->btnset; obj->btnset = NULL;
 	}
-	if (obj->varset != NULL) {
-		sbFree(obj->varset); obj->varset = NULL;
+	if (obj->varset.pval != NULL) {
+		obj->varset.type = 0;
+		obj->varset.aptr = NULL;
+		obj->varset.ptr = NULL;
+		obj->varset.pval = NULL;
 	}
 	if (obj->fontname != NULL) {
 		delete obj->fontname; obj->fontname = NULL;
@@ -835,9 +866,7 @@ HSPOBJINFO *Bmscr::AddHSPVarEventObject(int id, int mode, PVal *pval, APTR aptr,
 	HSP3VARSET *vset;
 	obj = AddHSPObject(id, mode);
 
-	vset = (HSP3VARSET *)sbAlloc(sizeof(HSP3VARSET));
-	obj->varset = vset;
-
+	vset = &obj->varset;
 	vset->pval = pval;
 	vset->aptr = aptr;
 	vset->type = type;

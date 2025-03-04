@@ -125,7 +125,7 @@ ifneq ($(filter linux,$(PLATFORM)),)
 
     CC = gcc
     ENVFLAGS    +=  -DHSPLINUX -DHSPUTF8
-    CFLAGS_B    =   -Wall -finput-charset=cp932 -fexec-charset=cp932 \
+    CFLAGS_B    =   -Wall -finput-charset=utf-8 -fexec-charset=cp932 \
                     $(ENVFLAGS) $(addprefix -I,$(includedir))
     CFLAGS_D    =   $(CFLAGS_B) -DHSPDEBUG
     CFLAGS_R    =   $(CFLAGS_B) -O3 -DNDEBUG
@@ -150,6 +150,7 @@ ifneq ($(filter linux,$(PLATFORM)),)
            hspvar_core.o hspvar_double.o hspvar_int.o hspvar_label.o \
            hspvar_str.o hspvar_struct.o stack.o strbuf.o strnote.o \
            dpmread.o linux/supio_linux.o linux/hsp3cl.o \
+           hsp3crypt.o hsp3utfcnv.o filepack.o \
            linux/hsp3ext_linux.o linux/hsp3gr_linux.o
     RESES =
     LIBS = m stdc++
@@ -184,7 +185,7 @@ ifneq ($(filter win32_mingw,$(PLATFORM)),)
 
     CC = gcc
     ENVFLAGS    +=  -DWINVER=0x0500 -D_WIN32_IE=0x0500 -DHSPWIN -DHSPCL_WIN
-    CFLAGS_B    =   -m32 -Wall -Wno-unused -fexceptions -fsigned-char -finput-charset=cp932 -fexec-charset=cp932 -mwindows -mconsole -Os \
+    CFLAGS_B    =   -m32 -Wall -Wno-unused -fexceptions -fsigned-char -finput-charset=utf-8 -fexec-charset=cp932 -mwindows -mconsole -Os \
                     $(ENVFLAGS) $(addprefix -I,$(includedir))
     CFLAGS_D    =   $(CFLAGS_B) -DHSPDEBUG
     CFLAGS_R    =   $(CFLAGS_B) -DNDEBUG
@@ -251,7 +252,7 @@ ifneq ($(filter win32gui_mingw,$(PLATFORM)),)
 
     CC = gcc
     ENVFLAGS    +=  -DWINVER=0x0500 -D_WIN32_IE=0x0500 -D_WIN32_WINNT=0x0500 -DHSPWIN -DHSPWINGUI
-    CFLAGS_B    =   -m32 -Wall -Wno-unused -fexceptions -fsigned-char -finput-charset=cp932 -fexec-charset=cp932 -mwindows -Os \
+    CFLAGS_B    =   -m32 -Wall -Wno-unused -fexceptions -fsigned-char -finput-charset=utf-8 -fexec-charset=cp932 -mwindows -Os \
                     $(ENVFLAGS) $(addprefix -I,$(includedir))
     CFLAGS_D    =   $(CFLAGS_B) -DHSPDEBUG
     CFLAGS_R    =   $(CFLAGS_B) -DNDEBUG
@@ -321,7 +322,7 @@ ifneq ($(filter win64gui_mingw,$(PLATFORM)),)
 
     CC = gcc
     ENVFLAGS    +=  -DHSP64 -DHSPWIN -DHSPWINGUI
-    CFLAGS_B    =   -m64 -Wall -Wno-unused -fexceptions -fsigned-char -finput-charset=cp932 -fexec-charset=cp932 -mwindows -Os \
+    CFLAGS_B    =   -m64 -Wall -Wno-unused -fexceptions -fsigned-char -finput-charset=utf-8 -fexec-charset=utf-8 -mwindows -Os \
                     $(ENVFLAGS) $(addprefix -I,$(includedir))
     CFLAGS_D    =   $(CFLAGS_B) -DHSPDEBUG
     CFLAGS_R    =   $(CFLAGS_B) -DNDEBUG

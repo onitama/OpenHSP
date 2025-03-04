@@ -11,7 +11,16 @@
 #include <string.h>
 #include <direct.h>
 
+#include "../hsp3config.h"
+#include "../supio.h"
 #include "hsp3win.h"
+
+#ifdef HSPUTF8
+#include <shellapi.h>
+#include "../hsp3utfcnv.h"
+static LPWSTR* szArglist;
+static int nArgs;
+#endif
 
 /*----------------------------------------------------------*/
 
@@ -22,7 +31,21 @@ int APIENTRY WinMain ( HINSTANCE hInstance,
 {
 	int res;
 #ifdef HSPDEBUG
-	res = hsp3win_init( hInstance, lpCmdParam );
+#ifdef HSPUTF8
+	char* sptr = lpCmdParam;
+	char utf8filename[4096];
+	szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+	if (szArglist) {
+		if (nArgs > 1) {
+			utf16_to_hsp3(utf8filename, szArglist[1], 4095);
+			sptr = utf8filename;
+		}
+	}
+	res = hsp3win_init( hInstance, sptr);
+	LocalFree(szArglist);
+#else
+	res = hsp3win_init(hInstance, lpCmdParam);
+#endif
 #else
 	res = hsp3win_init( hInstance, NULL );
 #endif

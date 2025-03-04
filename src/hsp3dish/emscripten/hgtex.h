@@ -4,8 +4,6 @@
 #ifndef __hgtex_h
 #define __hgtex_h
 
-#define TEXINF_MAX 512
-
 // テクスチャ情報
 typedef struct
 {

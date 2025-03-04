@@ -158,6 +158,19 @@ public:
      */
     Material* clone(NodeCloneContext &context) const;
 
+    /**
+     * Sets the current material name
+     *
+     * @param id name to set.
+     */
+    void setName(const char* id) { _name = id; };
+
+    /**
+     * Sets the current material name
+     *
+     * @param id name to set.
+     */
+    const char* getName(void) { return _name.c_str(); };
 private:
 
     /**
@@ -197,6 +210,7 @@ private:
 
     Technique* _currentTechnique;
     std::vector<Technique*> _techniques;
+    std::string _name;
 };
 
 }

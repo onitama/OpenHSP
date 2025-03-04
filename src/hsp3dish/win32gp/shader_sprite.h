@@ -41,7 +41,7 @@ const char *intshd_sprite_frag = {
 	"\r\n"
 	"///////////////////////////////////////////////////////////\r\n"
 	"// Uniforms\r\n"
-	"uniform sampler2D u_texture;\r\n"
+	"uniform sampler2D u_diffuseTexture;\r\n"
 	"\r\n"
 	"///////////////////////////////////////////////////////////\r\n"
 	"// Varyings\r\n"
@@ -51,7 +51,7 @@ const char *intshd_sprite_frag = {
 	"\r\n"
 	"void main()\r\n"
 	"{\r\n"
-	"    gl_FragColor = v_color * texture2D(u_texture, v_texCoord);\r\n"
+	"    gl_FragColor = v_color * texture2D(u_diffuseTexture, v_texCoord);\r\n"
 	"}\r\n"
 };
 

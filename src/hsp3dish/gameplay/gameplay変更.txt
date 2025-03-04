@@ -1,34 +1,34 @@
 
-・gameplay.libの変更
+�Egameplay.lib�̕ύX
 
 
 ScriptController
 AudioController
 
-を引き剥がす
+������������
 
 
-AudioController → 空のクラスに変更
-ScriptController → 空のクラスに変更
+AudioController �� ��̃N���X�ɕύX
+ScriptController �� ��̃N���X�ɕύX
 
 
-プロジェクトから除外
+�v���W�F�N�g���珜�O
 
 AudioSource.cpp
 AudioBuffer.cpp
 gameplay-main-windows.cpp
 
-リンクライブラリから
-ogg関連、lua関連を除外
+�����N���C�u��������
+ogg�֘A�Alua�֘A�����O
 
 
 base.h
-GP_ERRORマクロでexitしないように修正
+GP_ERROR�}�N����exit���Ȃ��悤�ɏC��
 
 
 PlatformWindows.cpp
 
-	以下をコメントアウト
+	�ȉ����R�����g�A�E�g
         //SetWindowLongPtr(__hwnd, GWLP_WNDPROC, (LONG)(WNDPROC)__WndProc);
 
 error:
@@ -37,12 +37,12 @@ error:
 
 Node.cpp
 
-_audioSource呼び出し部分をコメントアウト
+_audioSource�Ăяo���������R�����g�A�E�g
 
 SceneLoader.cpp
 
 case SceneNodeProperty::AUDIO:
-のAudioSource呼び出し部分をコメントアウト
+��AudioSource�Ăяo���������R�����g�A�E�g
 
 
 
@@ -50,13 +50,13 @@ font.cpp
 
 void drawText(const char* text, int x, int y, const Vector4& color, unsigned int size = 0, bool rightToLeft = false);
 
-の表示Xサイズをint値で返すように設定
-(「return xPos - x;」を追加)
+�̕\��X�T�C�Y��int�l�ŕԂ��悤�ɐݒ�
+(�ureturn xPos - x;�v��ǉ�)
 
 
-・マルチスレッド(DLLなし)でライブラリ再作成
+�E�}���`�X���b�h(DLL�Ȃ�)�Ń��C�u�����č쐬
 
-libpng,zlib をマルチスレッド(DLLなし)でライブラリ再作成
+libpng,zlib ���}���`�X���b�h(DLL�Ȃ�)�Ń��C�u�����č쐬
 
 
 

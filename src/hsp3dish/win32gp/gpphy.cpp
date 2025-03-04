@@ -16,6 +16,7 @@ gpphy::gpphy()
 	_flag = GPPHY_FLAG_NONE;
 	_colObj = NULL;
 	_parent = NULL;
+	_master = NULL;
 }
 
 gpphy::~gpphy()
@@ -146,6 +147,20 @@ gpphy *gamehsp::getPhy( int objid )
 }
 
 
+void gamehsp::deletePhy(gpobj* obj)
+{
+	gpphy* phy = obj->_phy;
+	if (phy != NULL) {
+		Node* node = obj->_node;
+		PhysicsRigidBody::Parameters rigParams;
+		PhysicsCollisionShape::Definition pShape;
+		node->setCollisionObject(PhysicsCollisionObject::NONE, pShape, &rigParams);
+		delete obj->_phy;
+		obj->_phy = NULL;
+	}
+}
+
+
 gppinfo::gppinfo()
 {
 	_objid = -1;
@@ -212,14 +227,15 @@ gpphy *gamehsp::setPhysicsObjectAuto( gpobj *obj, float mass, float friction, in
 	if ( obj->_shape < 0 ) return NULL;
 
 	if ( obj->_phy ) {
-		delete obj->_phy;
-		obj->_phy = NULL;
+		deletePhy(obj);
+		if (option == BIND_PHYSICS_NONE) return NULL;
 	}
 
 	phy = new gpphy;
 	if ( phy == NULL ) return NULL;
 	phy->reset( obj );
 	phy->_option = option;
+	phy->_master = this;
 	
 	PhysicsRigidBody::Parameters rigParams;
 
@@ -260,7 +276,8 @@ gpphy *gamehsp::setPhysicsObjectAuto( gpobj *obj, float mass, float friction, in
 			if (model) {
 				Mesh *mesh = model->getMesh();
 				if (mesh) {
-					phy->bindNodeAsMesh(model->getNode(), mesh, &rigParams);
+					Node* node = model->getNode();
+					phy->bindNodeAsMesh(node, mesh, &rigParams);
 				}
 			}
 			break;
@@ -306,8 +323,10 @@ int gamehsp::setObjectBindPhysics( int objid, float mass, float friction, int op
 
 int gamehsp::objectPhysicsApply( int objid, int type, Vector3 *prm )
 {
-	gpphy *phy;
-	PhysicsRigidBody *colObj;
+	gpphy* phy;
+	PhysicsRigidBody* colObj;
+	Vector4 work;
+
 	phy = getPhy( objid );
 	if ( phy == NULL ) return -1;
 
@@ -327,6 +346,14 @@ int gamehsp::objectPhysicsApply( int objid, int type, Vector3 *prm )
 	case GPPAPPLY_TORQUE_IMPULSE:
 		colObj->applyTorqueImpulse( *prm );
 		break;
+	case GPPAPPLY_FORCE_POS:
+		getObjectVector(objid, MOC_WORK, &work);
+		colObj->applyForce(*prm, (Vector3*)&work);
+		break;
+	case GPPAPPLY_IMPULSE_POS:
+		getObjectVector(objid, MOC_WORK, &work);
+		colObj->applyImpulse(*prm, (Vector3*)&work);
+		break;
 	default:
 		return -1;
 	}
@@ -334,17 +361,24 @@ int gamehsp::objectPhysicsApply( int objid, int type, Vector3 *prm )
 }
 
 
-int gamehsp::execPhysicsRayTest(Vector3 *pos, Vector3 *direction, float distance)
+int gamehsp::execPhysicsRayTest(Vector3 *pos, Vector3 *direction, float distance, int usegroup)
 {
 	//		Ray Test
 	//
 	Ray ray;
 	PhysicsController::HitResult result;
+	PhysicsController::HitFilter* filter = NULL;
+
 	ray.setOrigin(*pos);
 	ray.setDirection(*direction);
-	PhysicsController *pc = Game::getInstance()->getPhysicsController();
+	PhysicsController *pc = getPhysicsController();
 
-	bool res = pc->rayTest( ray, distance, &result );
+	if (usegroup) {
+		setFilterGroup(usegroup);
+		filter = &_hitfilter;
+	}
+
+	bool res = pc->rayTest( ray, distance, &result, filter );
 	if (res == false) return 0;
 
 	PhysicsCollisionObject *cobj = result.object;
@@ -356,4 +390,68 @@ int gamehsp::execPhysicsRayTest(Vector3 *pos, Vector3 *direction, float distance
 
 	return obj->_id;
 }
+
+int gamehsp::execPhysicsSweepTest(int objid, Vector3* pos, int usegroup, Vector3* angle )
+{
+	//		Sweep Test
+	//
+	PhysicsController::HitResult result;
+	PhysicsController::HitFilter* filter = NULL;
+	PhysicsController* pc = getPhysicsController();
+
+	gpobj* obj;
+	gpphy* phy;
+	obj = getObj(objid);
+	phy = obj->_phy;
+	if (phy == NULL) return -1;
+
+	if (usegroup) {
+		setFilterGroup(obj->_colgroup);
+		filter = &_hitfilter;
+	}
+
+	bool res = pc->sweepTest(phy->_colObj, *pos, &result, filter);
+	if (res == false) return 0;
+
+	if (pos != NULL) *pos = result.point;
+	if (angle != NULL) *angle = result.normal;
+
+	PhysicsCollisionObject* cobj = result.object;
+	obj = (gpobj*)cobj->getUserPtr();
+	if (obj->_phy == NULL) return -1;
+
+	return obj->_id;
+}
+
+
+myPhysicsFilter::myPhysicsFilter()
+{
+}
+
+myPhysicsFilter::~myPhysicsFilter()
+{
+}
+
+bool myPhysicsFilter::filter(PhysicsCollisionObject* object)
+{
+	gpobj* obj = (gpobj*)object->getUserPtr();
+	if (obj == NULL) return false;
+	gpphy* phy = obj->_phy;
+	if (phy == NULL) return false;
+	gamehsp* game = (gamehsp*)phy->_master;
+	if (game == NULL) return false;
+
+	if (obj->_mygroup & game->getFilterGroup()) {
+		return false;
+	}
+
+	//	グループ対象でない場合は無視する
+	return true;
+}
+
+bool myPhysicsFilter::hit(const PhysicsController::HitResult& result)
+{
+	return false;
+}
+
 

@@ -95,17 +95,17 @@ ifeq ($(PLATFORM),windows)
 
   ifneq ($(findstring list,$(MAKECMDGOALS)),)  # test for the "list" target
     dump_target_list:
-	    @echo ï£³
+	    @echo ÿ
 	    @echo $(PROJECT_TITLE) build system -- supported compilers
-	    @echo ï£³
+	    @echo ÿ
 	    @echo Several command-line compilers are supported on Win32:
-	    @echo ï£³
-	    @echo ï£³ï£³make setupï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³gcc (with Mingw)
-	    @echo ï£³ï£³make setup visualcï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³Microsoft Visual C++
-	    @echo ï£³ï£³make setup bcc32ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³Borland C/C++
-	    @echo ï£³ï£³make setup lccï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³Win32-LCC
-	    @echo ï£³ï£³make setup intelcï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³Intel C/C++
-	    @echo ï£³
+	    @echo ÿ
+	    @echo ÿÿmake setupÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿgcc (with Mingw)
+	    @echo ÿÿmake setup visualcÿÿÿÿÿÿÿÿÿÿÿÿÿMicrosoft Visual C++
+	    @echo ÿÿmake setup bcc32ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿBorland C/C++
+	    @echo ÿÿmake setup lccÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿWin32-LCC
+	    @echo ÿÿmake setup intelcÿÿÿÿÿÿÿÿÿÿÿÿÿÿIntel C/C++
+	    @echo ÿ
 
     setup: dump_target_list
     .PHONY: dump_target_list list

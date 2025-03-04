@@ -172,6 +172,9 @@ public:
 
 private:
 	//		Routines
+	int tstrcmp(const char* str1, const char* str2);
+	void strcpy2(char* dest, const char* src, size_t size);
+
 
 	//		Data
 	int id;					// ID
