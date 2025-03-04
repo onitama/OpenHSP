@@ -51,7 +51,7 @@ OBJS = \
 	src/hsp3/linux/hsp3ext_sock.do \
 	src/hsp3/linux/hsp3ext_linux.do \
 	src/hsp3/linux/devctrl_io.do \
-	src/hsp3dish/linux/supio_linux.do
+	src/hsp3/linux/supio_linux.do
 
 OBJS_CMP = \
 	src/hspcmp/main.o \
@@ -68,7 +68,7 @@ OBJS_CMP = \
 	src/hspcmp/label.o \
 	src/hspcmp/localinfo.o \
 	src/hspcmp/membuf.o \
-	src/hspcmp/strnote.o \
+	src/hsp3/strnote.o \
 	src/hspcmp/hsmanager.o \
 	src/hspcmp/tagstack.o
 

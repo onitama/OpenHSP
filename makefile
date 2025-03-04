@@ -50,7 +50,7 @@ OBJS = \
 	src/obaq/physics/vessel.do \
 	src/hsp3dish/linux/hsp3dish.do \
 	src/hsp3dish/linux/webtask_linux.do \
-	src/hsp3dish/linux/supio_linux.do
+	src/hsp3/linux/supio_linux.do
 
 OBJS_CMP = \
 	src/hspcmp/ahtmodel.o \
@@ -64,7 +64,7 @@ OBJS_CMP = \
 	src/hspcmp/localinfo.o \
 	src/hspcmp/main.o \
 	src/hspcmp/membuf.o \
-	src/hspcmp/strnote.o \
+	src/hsp3/strnote.o \
 	src/hspcmp/tagstack.o \
 	src/hspcmp/hsmanager.o \
 	src/hspcmp/token.o \
@@ -140,7 +140,7 @@ OBJS_GP = \
 	src/hsp3dish/win32gp/gpphy.gpo \
 	src/hsp3dish/linux/hsp3dish.gpo \
 	src/hsp3dish/linux/webtask_linux.gpo \
-	src/hsp3dish/linux/supio_linux.gpo
+	src/hsp3/linux/supio_linux.gpo
 
 OBJS_GAMEPLAY = \
 	src/hsp3dish/gameplay/src/AbsoluteLayout.gpo \
