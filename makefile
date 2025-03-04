@@ -68,7 +68,8 @@ OBJS_CMP = \
 	src/hspcmp/tagstack.o \
 	src/hspcmp/hsmanager.o \
 	src/hspcmp/token.o \
-	src/hspcmp/linux/supio_linux.o
+	src/hsp3/strbuf.o \
+	src/hsp3/linux/supio_linux.o
 
 OBJS_CL = \
 	src/hsp3/linux/main.o \
@@ -457,7 +458,7 @@ hsp3cl: $(OBJS_CL)
 %.o: %.cpp
 	$(CXX) $(CFLAGS_CL) -c $< -o $*.o
 
-hsed: src/tools/hsed_gtk2.cpp src/tools/supio.cpp
+hsed: src/tools/linux/hsed_gtk2.cpp src/tools/linux/supio.cpp
 	$(CXX) -O2 -Wno-write-strings -o hsed src/tools/linux/hsed_gtk2.cpp src/tools/linux/supio.cpp `$(PKG_CONFIG) --cflags --libs gtk+-2.0`
 
 libgameplay.a: $(OBJS_GAMEPLAY)

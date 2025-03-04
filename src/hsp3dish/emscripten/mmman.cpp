@@ -9,8 +9,8 @@
 #include <assert.h>
 
 #ifdef HSPEMSCRIPTEN
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #else
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
@@ -141,10 +141,18 @@ MMMan::MMMan()
 	engine_flag = false;
 	MusicInit();
 
-	Mix_Init(MIX_INIT_OGG|MIX_INIT_MP3);
+	int init_result = Mix_Init(MIX_INIT_OGG|MIX_INIT_MP3);
+	if (init_result != (MIX_INIT_OGG|MIX_INIT_MP3)) {
+		Alertf("[MMMan] Mix_Init: %d OGG:%d MP3:%d\n", init_result, init_result & MIX_INIT_OGG, init_result & MIX_INIT_MP3);
+	}
 
-	Mix_ReserveChannels(16);
 	int ret = Mix_OpenAudio(0, 0, 0, 0);
+
+	int allocated_channels = Mix_AllocateChannels(MIX_MAX_CHANNEL);
+	if (allocated_channels != MIX_MAX_CHANNEL) {
+		printf("[MMMan] Mix_AllocateChannels: %d\n", allocated_channels);
+	}
+
 	//assert(ret == 0);
 	engine_flag = ret == 0;
 }
@@ -155,9 +163,10 @@ MMMan::~MMMan()
 	ClearAllBank();
 	MusicTerm();
 
+	Mix_CloseAudio();
+
 	while(Mix_Init(0))
 		Mix_Quit();
-	Mix_CloseAudio();
 }
 
 void MMMan::DeleteBank( int bank )

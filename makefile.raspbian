@@ -55,8 +55,9 @@ OBJS = \
 
 OBJS_CMP = \
 	src/hspcmp/main.o \
+	src/hsp3/strbuf.o \
+	src/hsp3/linux/supio_linux.o \
 	src/hspcmp/token.o \
-	src/hspcmp/linux/supio_linux.o \
 	src/hspcmp/ahtmodel.o \
 	src/hspcmp/ahtobj.o \
 	src/hspcmp/codegen.o \
@@ -128,8 +129,8 @@ hsp3cl: $(OBJS_CL)
 %.o: %.cpp
 	$(CXX) $(CFLAGS_CL) -c $< -o $*.o
 
-hsed: src/tools/hsed_gtk2.cpp src/tools/supio.cpp
-	$(CXX) -O2 -Wno-write-strings -DHSPRASPBIAN -o hsed src/tools/linux/hsed_gtk2.cpp src/tools/linux/supio.cpp `$(PKG_CONFIG) --cflags --libs gtk+-2.0`
+hsed: src/tools/linux/hsed_gtk2.cpp src/tools/linux/supio.cpp
+	$(CXX) -O2 -Wno-write-strings -o hsed src/tools/linux/hsed_gtk2.cpp src/tools/linux/supio.cpp `$(PKG_CONFIG) --cflags --libs gtk+-2.0`
 
 clean:
 	rm -f $(OBJS) $(OBJS_CMP) $(OBJS_CL) $(TARGETS)
