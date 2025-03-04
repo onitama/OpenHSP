@@ -458,7 +458,7 @@ hsp3cl: $(OBJS_CL)
 	$(CXX) $(CFLAGS_CL) -c $< -o $*.o
 
 hsed: src/tools/hsed_gtk2.cpp src/tools/supio.cpp
-	$(CXX) -O2 -Wno-write-strings -o hsed src/tools/hsed_gtk2.cpp src/tools/supio.cpp `$(PKG_CONFIG) --cflags --libs gtk+-2.0`
+	$(CXX) -O2 -Wno-write-strings -o hsed src/tools/linux/hsed_gtk2.cpp src/tools/linux/supio.cpp `$(PKG_CONFIG) --cflags --libs gtk+-2.0`
 
 libgameplay.a: $(OBJS_GAMEPLAY)
 	rm -f $@
