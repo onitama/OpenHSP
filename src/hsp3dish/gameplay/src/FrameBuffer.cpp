@@ -261,12 +261,18 @@ void FrameBuffer::setDepthStencilTarget(DepthStencilTarget* target)
         // Attach the render buffer to the framebuffer
         if (target->isPacked())
         {
+#ifdef __EMSCRIPTEN__
             GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
+#else
+            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
+            GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
+#endif
         }
         else if (target->getFormat() == DepthStencilTarget::DEPTH_STENCIL)
         {
 #ifdef __EMSCRIPTEN__
             GP_WARN("Unexpected status %d %zu %zu", target->isPacked(), _depthStencilTarget->_depthBuffer, _depthStencilTarget->_stencilBuffer);
+#else
             GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_depthBuffer) );
             GL_ASSERT( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _depthStencilTarget->_stencilBuffer) );
 #endif
