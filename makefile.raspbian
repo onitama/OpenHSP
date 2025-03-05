@@ -1,11 +1,12 @@
 CC = gcc
 CXX = g++
 AR = ar
-CFLAGS_DISH =  -Wno-write-strings -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -DUSE_OBAQ -I /opt/vc/include
-CFLAGS_GP =  -Wno-write-strings -fpermissive --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPRASPBIAN -DHSPDEBUG -I /opt/vc/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src -std=c++11
-LDFLAGS= -lm -L$(SDKSTAGE)/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lSDL2 -lSDL2_mixer -lSDL2_ttf -lcurl
-CFLAGS_CL =  -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSPRASPBIAN
-CFLAGS_CMP =  -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
+
+CFLAGS_ENV = # 32bit
+CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11 $(CFLAGS_ENV)
+CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
 PKG_CONFIG = pkg-config
 
 OBJS = \
@@ -50,6 +51,7 @@ OBJS = \
 	src/hsp3dish/linux/webtask_linux.do \
 	src/hsp3/linux/hsp3ext_sock.do \
 	src/hsp3/linux/hsp3ext_linux.do \
+	src/hsp3/linux/hsp3extlib_ffi.do \
 	src/hsp3/linux/devctrl_io.do \
 	src/hsp3/linux/supio_linux.do
 
@@ -95,7 +97,8 @@ OBJS_CL = \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
 	src/hsp3/linux/hsp3ext_sock.o \
-	src/hsp3/linux/devctrl_io.do \
+	src/hsp3/linux/devctrl_io.o \
+	src/hsp3/linux/hsp3extlib_ffi.o \
 	src/hsp3/linux/hsp3gr_linux.o
 
 TARGETS = hsp3dish hsp3cl hspcmp hsed

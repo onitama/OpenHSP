@@ -1,10 +1,13 @@
 CC = gcc
 CXX = g++
 AR = ar
-CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ
-CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11
-CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
-CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG
+
+# CFLAGS_ENV = # 32bit
+CFLAGS_ENV =  -DHSP64 # 64bit
+CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11 $(CFLAGS_ENV)
+CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
 PKG_CONFIG = pkg-config
 
 OBJS = \
@@ -34,6 +37,7 @@ OBJS = \
 	src/hsp3/linux/hsp3ext_sock.do \
 	src/hsp3/linux/hsp3ext_linux.do \
 	src/hsp3/linux/devctrl_io.do \
+	src/hsp3/linux/hsp3extlib_ffi.do \
 	src/hsp3dish/essprite.do \
 	src/hsp3dish/texmes.do \
 	src/hsp3dish/sysreq.do \
@@ -95,6 +99,7 @@ OBJS_CL = \
 	src/hsp3/linux/hsp3ext_linux.o \
 	src/hsp3/linux/hsp3ext_sock.o \
 	src/hsp3/linux/devctrl_io.o \
+	src/hsp3/linux/hsp3extlib_ffi.o \
 	src/hsp3/linux/hsp3gr_linux.o
 
 OBJS_GP = \
@@ -124,6 +129,7 @@ OBJS_GP = \
 	src/hsp3/linux/hsp3ext_sock.gpo \
 	src/hsp3/linux/hsp3ext_linux.gpo \
 	src/hsp3/linux/devctrl_io.gpo \
+	src/hsp3/linux/hsp3extlib_ffi.gpo \
 	src/hsp3dish/essprite.gpo \
 	src/hsp3dish/texmes.gpo \
 	src/hsp3dish/sysreq.gpo \
@@ -419,8 +425,8 @@ OBJS_LINEAR_MATH = \
 	src/hsp3dish/extlib/src/LinearMath/btVector3.gpo
 
 TARGETS = hsp3dish hsp3gp hsp3cl hspcmp hsed
-LIBS1 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lcurl -lgpiod -lpthread
-LIBS2 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lcurl -lgpiod -lpthread
+LIBS1 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lcurl -lgpiod -lpthread -lffi
+LIBS2 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lcurl -lgpiod -lpthread -lffi
 LIBS_GP = \
 	libgameplay.a \
 	libBulletDynamics.a \
@@ -452,7 +458,7 @@ hspcmp: $(OBJS_CMP)
 	$(CXX) $(CFLAGS_CMP) -c $< -o $*.o
 
 hsp3cl: $(OBJS_CL)
-	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -lcurl -lgpiod -lpthread -s -o $@
+	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -lcurl -lgpiod -lpthread -lffi -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CL) -c $< -o $*.o
 %.o: %.cpp
