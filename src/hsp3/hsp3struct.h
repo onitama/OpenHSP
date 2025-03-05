@@ -5,13 +5,23 @@
 #ifndef __hsp3struct_h
 #define __hsp3struct_h
 
+#include <cstdint>
 #include "hspvar_core.h"
 #include "hsp3debug.h"
 
-#ifdef _WIN64
+#if UINTPTR_MAX == 0xffffffffffffffffu
 #define PTR64BIT        //  ポインタは64bit
-#else
+#ifndef HSP64
+#warning HSP64 is not defined, but pointer is 64bit
+#endif
+#elif UINTPTR_MAX == 0xffffffff
 #define PTR32BIT        //  ポインタは32bit
+
+#ifdef HSP64
+#warning HSP64 is defined, but pointer is 32bit
+#endif
+#else
+#error Unknown pointer size
 #endif
 
 //		HSPが使用する実数型
