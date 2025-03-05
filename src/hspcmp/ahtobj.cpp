@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "../hsp3/hsp3config.h"
 #include "../hsp3/strnote.h"
 #include "supio.h"
 #include "ahtobj.h"

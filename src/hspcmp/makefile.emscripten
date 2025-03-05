@@ -13,7 +13,6 @@ OBJS = ahtmodel.o ahtobj.o codegen.o comutil.o errormsg.o hsc3.o \
     hsmanager.o tagstack.o token.o \
 	win32dll/dpm.o \
 	emscripten/supio_emscripten.o emscripten/hspcmp3.o
-
 TARGET = hspcmp.js
 LIBS = 
 .SUFFIXES: .cpp

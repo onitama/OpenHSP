@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "../hsp3/hsp3config.h"
 #include "supio.h"
 #include "ahtmodel.h"
 
