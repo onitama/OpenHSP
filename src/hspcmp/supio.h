@@ -32,7 +32,7 @@
 #endif
 
 #ifdef HSPEMSCRIPTEN
-#include "emscripten/supio_emscripten.h"
+#include "../hsp3/emscripten/supio_emscripten.h"
 #endif
 
 

@@ -25,6 +25,7 @@
 #else
 #include <windows.h>
 #endif
+#include "../../hsp3/hsp3config.h"
 #include "../membuf.h"
 #include "../supio.h"
 

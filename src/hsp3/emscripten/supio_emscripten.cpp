@@ -853,3 +853,23 @@ void Alertf( const char *format, ... )
 			//alert(UTF8ToString($0));
 		}, textbf );
 }
+
+
+
+//
+//		Memory Manager
+//
+char *mem_alloc( void *base, int newsize, int oldsize )
+{
+	char *p;
+	if ( base == NULL ) {
+		p = (char *)calloc( newsize, 1 );
+		return p;
+	}
+	if ( newsize <= oldsize ) return (char *)base;
+	p = (char *)calloc( newsize, 1 );
+	memcpy( p, base, oldsize );
+	free( base );
+	return p;
+}
+

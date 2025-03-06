@@ -7,9 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cctype>
-#include <direct.h>
 
 #ifdef HSPWIN
+#include <direct.h>
 #include "windows.h"
 #endif
 

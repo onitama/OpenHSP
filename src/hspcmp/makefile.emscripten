@@ -9,20 +9,22 @@ CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive \
 #CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -g4 --js-opts 0 -s SAFE_HEAP=1 -s NO_EXIT_RUNTIME=1 -std=gnu++11
 
 OBJS = ahtmodel.o ahtobj.o codegen.o comutil.o errormsg.o hsc3.o \
-    hspcmd.o label.o localinfo.o membuf.o strnote.o \
+    hspcmd.o label.o localinfo.o membuf.o ../hsp3/strnote.o \
     hsmanager.o tagstack.o token.o \
-	win32dll/dpm.o \
-	emscripten/supio_emscripten.o emscripten/hspcmp3.o
+    ../hsp3/filepack.o \
+    ../hsp3/filepack_write.o \
+    ../hsp3/hsp3crypt.o \
+    ../hsp3/hsp3utfcnv.o \
+    ../hsp3/strbuf.o \
+	../hsp3/emscripten/supio_emscripten.o emscripten/hspcmp3.o
 TARGET = hspcmp.js
 LIBS = 
 .SUFFIXES: .cpp
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBS)
 %.o: %.c
-	echo $(CC) $(CFLAGS) -c $< -o $*.o
 	$(CC) $(CFLAGS) -c $< -o $*.o
 %.o: %.cpp
-	echo $(CC) $(CFLAGS) -c $< -o $*.o
 	$(CC) $(CFLAGS) -c $< -o $*.o
 
 codegen_utf8.cpp: codegen.cpp
