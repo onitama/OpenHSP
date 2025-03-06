@@ -10,26 +10,40 @@
 	helpname="hsphelp"
 	if sysinfo(3)=0 : helpname+="_en"
 	helpdir=dir_exe+"/"+helpname
+	;helpdir=helpname
 
 	chdir helpdir
 	;
-	ihelp_init msg			;index build
-	;
 	s1=dir_cmdline
+	;s1="stop"
 
 	if s1="" {
-		mes msg
 		mes "Usage : helpmes [keyword]"
 		end
 	}
 
+	res=0
+*main
+	if res>1 {
+		mes "[ERROR] No answer."
+		end
+	}
+	ihelp_init msg, res			;index build
+	if stat {
+		mes "[ERROR] Index build failed."
+		end
+	}
+	res++
+
 	ihelp_find s1
 	if stat=0 {
-		mes "Keyword not found ["+s1+"]."
-		end
+		goto *main
 	}
 
 	ihelp_open 0
+	if stat {
+		goto *main
+	}
 
 	mes ih_ans_key+" "+ih_fncprm+"     ["+ih_ans_title+"]"
 	mes ih_prminf

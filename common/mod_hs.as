@@ -103,9 +103,11 @@ Other commands
 
 
 #module "ihelp"
-#deffunc ihelp_init var _p1
+#deffunc ihelp_init var _p1, int _p2
 	;
 	;	hsphelpライブラリ初期化
+	;		ihelp_init msg, flag
+	;		( msg=結果文字列が代入されるバッファ, flag=1の場合はindex再構築 )
 	;
 	ih_msg="Init HSPhelp.\n"
 
@@ -118,8 +120,11 @@ Other commands
 	if flmax=0 : goto *failidx
 
 	fname2=ih_file@				; 書き出しファイル
+	if _p2 : goto *initidx
+
 	exist fname2
 	if strsize>0 : goto *loadidx
+
 *initidx
 	ih_msg+="Rebuild index.\n"
 	if idxerror>0 : goto *failidx
@@ -280,7 +285,7 @@ Other commands
 	ih_ans_dll@ = ans_dll
 	;
 	exist ans_name
-	if strsize<0 : dialog "No file ["+ans_name+"]." : lnidx=-1 : return
+	if strsize<0 : dialog "No file ["+ans_name+"]." : lnidx=-1 : return 1
 
 	;	Helpのnote項目を取得
 	;
@@ -289,6 +294,7 @@ Other commands
 	sdim buf,$8000				; hs読み込みバッファ
 	notesel buf
 	noteload ans_name			; 先頭からロード
+
 	bufmax=strlen(buf)
 	i=0:c=0
 *getnopt
@@ -311,15 +317,17 @@ Other commands
 	notesel buf
 	bufmax=notemax
 	;
+	noteget tmp,0
+	if tmp!="%index" : lnidx=-1 : return 1
+	noteget tmp,1
+	if tmp!=ans_key : lnidx=-1 : return 1
+	noteget ans_title,2
+	ih_ans_title@ = ans_title
+	;
 	sdim ln,256
 	sdim cate,256
 	sdim tmp,$8000				; text一時バッファ(32K)
 	sdim refsel,$4000			; リファレンス情報2(16K)
-	;
-	noteget tmp,0
-	if tmp!="%index" : lnidx=-1 : return 1
-	noteget ans_title,2
-	ih_ans_title@ = ans_title
 	;
 	c=0
 	a=""
