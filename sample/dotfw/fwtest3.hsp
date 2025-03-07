@@ -1,0 +1,17 @@
+#include "dotfw.as"
+
+	;	単純な縦画面シューティングゲーム
+	;	(ランダムな位置から敵を出します)
+	;
+	df_config "arcade Z300 star"
+	df_reset
+
+	df_addmes "TAMANE DOT FRAMEWORK",1,1, 0,8
+	df_addplayer 120,210,CHR_SHIP1			; プレイヤーの設定
+
+	df_emode EMODE_XAIM, CHR_MONSTER1, 5, 4, 200	; 敵の設定
+*main
+	if key&PLAYER_KEY_ESC : end
+	df_enemygen DIR_DOWN,20				; 敵を生成
+	df_update
+	goto *main

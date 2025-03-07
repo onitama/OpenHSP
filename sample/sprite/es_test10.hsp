@@ -1,0 +1,52 @@
+
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample10
+	;		ランダムな位置からスプライトを放射状に飛ばす
+	;		フェードアウト機能によりきれいに消滅します
+	;------------------------------------------------------------------
+
+	randomize
+	wx=640:wy=480				; 画面サイズ
+	screen 0,wx,wy				; スクリーン初期化
+
+	es_ini					; スプライトを初期化
+
+	buffer 3
+	picload "testchr.png"
+	es_size 64,64,100
+	es_pat 1, 256,0				; ボール
+	gsel 0
+
+	frame=0
+*main
+	stick key,15
+	if key&$80 : goto *owari
+
+	if frame\30=0 : gosub *putfire		; 30フレームごとに呼び出す
+
+	redraw 0
+	rgbcolor 0:boxf				; 背景を消去
+	es_draw					; スプライトを描画
+	redraw 1
+
+	frame=frame+1				; フレーム数を加算する
+	await 1000/60				; タスク更新
+	goto *main
+
+*putfire
+	;	16個のスプライトを出します
+	x=rnd(wx):y=rnd(wy)			; ランダム座標を取得
+	repeat 16
+	es_set -1, x,y,1 : no=stat		; 新規スプライト登録
+	es_adir no, cnt*4, 400			; 指定方向に飛ばす
+	es_fade no, ESSPF_FADEOUTWIPE, 60	; 60フレームで消滅させる
+	loop
+	return
+
+
+*owari
+	es_bye
+	end
+

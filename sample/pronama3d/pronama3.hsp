@@ -14,6 +14,7 @@
 	;	http://www.custommapmakers.org/
 	;	で公開されている、Colin Lowndes氏のデータを使用させて頂きました。
 	;
+	;	*2022/5 K-sさんによる鏡面反射の修正を反映
 
 	title "HGIMG4 Test"
 
@@ -99,11 +100,14 @@
 
 	gpusecamera id_camera			; 使用するカメラを選択する
 	gpcnvaxis dx,dy,dz,0,-3,3, 3
-	;setpos id_camera, dx,dy,dz
-	setpos id_camera, dx*0.8,dy*0.8,dz*0.8
 
-	;setpos id_camera, camx,-camy,camz		; カメラ位置を設定
+	setpos id_camera, camx, -camy, camz
 	gplookat id_camera, 0,0,0		; カメラから指定した座標を見る
+	addang id_camera, 0, 0, atan(-camz, camx) - M_PI / 2
+
+	rt = sqrt(camx * camx + camy * camy + camz * camz) / 8 ; 8はid_floorの大きさ（大きさを変えてたらここも変える）
+	bs = 0.025 ; モデルのスケール
+	setscale id_model, bs * rt, bs * rt, bs * rt ; カメラの距離に応じてスケール変える
 
 	gsel id_shadow
 	redraw 0			; 描画開始
@@ -113,6 +117,7 @@
 	gpusecamera GPOBJ_CAMERA		; 使用するカメラを選択する
 	setpos GPOBJ_CAMERA, camx,camy,camz		; カメラ位置を設定
 	gplookat GPOBJ_CAMERA, 0,1.8,0		; カメラから指定した座標を見る
+	setscale id_model, bs, bs, bs ; スケール戻す
 
 	gsel id_render
 	redraw 0			; 描画開始

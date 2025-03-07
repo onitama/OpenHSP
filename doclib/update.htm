@@ -6,7 +6,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
 	<meta name="author" content="OpenHSP3 Project">
-	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,更新情報,アップデート">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,更新情報,アップデート,HSP3.7">
 	<meta name="description" content="HSPの更新情報を掲載">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
 	<title>HSP3 アップデートガイド</title>
@@ -14,7 +14,7 @@
 <body>
 	<div id="CONTAINER">
 		<!-- ヘッダー -->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2024(c)</p>
 		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
 		<h1>HSP3 アップデートガイド</h1>
 
@@ -59,29 +59,32 @@
 		<!-- 本文 -->
 		<h2 id="INTRO">イントロダクション</h2>
 		<p>
-			HSP3.6は、HSP3.5に替わる新しいバージョンです。
+			HSP3.7は、HSP3.6に替わる新しいバージョンです。
 			大幅な仕様の変更はなく、あくまでも上位互換として動作する形で、各種機能が追加されています。
 		</p>
 		<p>
-			ここでは、HSP3.6とHSP3.5の違いについて。
+			ここでは、HSP3.7とHSP3.6の違いについて。
 			そして、HSP2.xとHSP3全般の違いについて解説していきます。
 		</p>
 
 
 	<h2 id="HSP3UPDATE">HSP3のアップデート概要</h2>
 		<p>
-		HSP3.6は、特に変更を意識することなく、それまでのHSP3と同様にお使い頂けます。<br>
-		HSP3.6で追加された機能の詳細については、<a href="update36.htm" target="_blank">「HSP3.6新機能ハイライト」</a>を参照してください。
-		また、HSP3の詳細な更新履歴については、<a href="history.txt" target="_blank">「HSP3更新履歴」</a>を参照してください。
+		HSP3.7は、特に変更を意識することなく、それまでのHSP3と同様にお使い頂けます。<br>
+		HSP3.7で追加された機能の詳細については、<a href="update37.htm" target="_blank">「HSP3.7新機能ハイライト」</a>を参照してください。
+		また、HSP3の詳細な更新履歴については、<a href="history.txt" target="_blank">「HSP3更新履歴」</a>を参照してください。<br>
+		HSP3.7では、新しい<a href="hsp3update.html">HSP3アップデーター (HSP3Update)</a>を同梱しており、β版を含む以前のバージョンにシステムを変更することが可能です。		また、必要な機能やサンプル・素材などの追加データを手軽に導入することができるようになっています。
 		</p>
 		<dl>
-			<dt>HSP3.6新機能ハイライト</dt>
-			<dd><p><a href="update36.htm" target="_blank">update36.htm</a></p></dd>
+			<dt>HSP3.7新機能ハイライト</dt>
+			<dd><p><a href="update37.htm" target="_blank">update37.htm</a></p></dd>
 			<dt>HSP3更新履歴</dt>
 			<dd><p><a href="history.txt" target="_blank">history.txt</a></p></dd>
+			<dt>HSP3アップデーター (HSP3Update)マニュアル</dt>
+			<dd><p><a href="hsp3update.html" target="_blank">hsp3update.html</a></p></dd>
 		</dl>
 		<p>
-		HSP3.6で追加された新機能を手軽に試すことができるサンプルスクリプトが、「sample/new36」フォルダに含まれています。
+		HSP3.7で追加された新機能を手軽に試すことができるサンプルスクリプトが、「sample/new37」フォルダに含まれています。
 		ぜひ新しいサンプルでの動作を、実際に実行してお試しください。
 		</p>
 
@@ -107,12 +110,12 @@
 
 	<h2 id="HSPOBSOLETE">パッケージの同梱終了について</h2>
 		<p>
-		これまでのフルセットに同梱されていたllmod3、HGIMG / HGIMGX (3D描画用プラグイン)/HSP3MT(ランタイム)/HSPLetパッケージは、同梱されません。
+		これまでのフルセットに同梱されていたllmod3、HGIMG / HGIMGX (3D描画用プラグイン) / HGIMG3 /HSP3MT(ランタイム)/HSPLetパッケージは、同梱されません。
 		古いパッケージに含まれているランタイムを引き続き使用することは可能ですが、非推奨として扱われているため、マニュアル及びヘルプは、提供されません。
 		</p>
 		<UL>
 		<LI>llmod3 -> HSP3に対応した各種モジュールをご使用ください
-		<LI>HGIMG / HGIMGX (3D描画用プラグイン) -> HGIMG3/HGIMG4をご使用ください
+		<LI>HGIMG / HGIMGX (3D描画用プラグイン) / HGIMG3 -> HGIMG4をご使用ください
 		<LI>HSPDX (2D描画用プラグイン) -> HSP3DISHをご使用ください
 		<LI>HSP3MTランタイム -> hsp3utfやhsp3_64をご使用ください
 		<LI>HSPLetランタイム -> HSP3Dish(html5)をご使用ください
@@ -127,6 +130,9 @@
 		hsp3utfやhsp3_64などの新しいランタイムでも代用が可能です。
 		また、OpenHSPとしてソースが公開されているため、ライブラリそのものの配布も
 		必要がなくなったと判断しています。
+		</p><p>
+		HGIMG3はDirectXによる3D機能を幅広くサポートしていますが、ほとんどの機能はHGIMG4に引き継がれています。
+		HGIMG3については、<a href="hsp3update.html">HSP3アップデーター (HSP3Update)</a>を使用して、機能追加を行うことができます。
 		</p>
 
 

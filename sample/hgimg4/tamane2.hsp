@@ -1,6 +1,13 @@
 #include "hgimg4.as"
 
-title "HGIMG4 Test"
+	;	珠音（たまね）3D model sample
+	;	モデリング&アニメーション製作 : オガワコウサク(チームグリグリ)
+	;	HGIM43対応 HSP3用スクリプトサンプル
+	;	※このスクリプト及びサンプルデータは、自作ソフトで自由にお使い頂けます
+	;	※詳しくは、 http://hsp.tv/make/tamane3d.html
+	;
+
+	title "HGIMG4 Test"
 
 	gpreset
 

@@ -20,7 +20,7 @@ title "HGIMG4 Test"
 	event_setdir ev1, -0.2,0.2,-0.5, 0.2,0.7,0.2
 	event_adddir ev1, 0, -0.05, 0
 	event_wait ev1, 40
-	event_suicide ev1
+	event_delobj ev1
 
 repeat
 	stick key,15

@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSP3Dish,WebGL,JavaScript,hsp3dish.js">
+	<meta name="description" content="HSP3Dish hsp3dish.js版に関する情報を掲載">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HSP3Dish WebGL/html5版(hsp3dish.js)プログラミングガイド</title>
+</head>
+<body>
+	<div id="CONTAINER">
+	<!-- ヘッダー -->
+	<p id="COPY">HSP : HSP3Dish / onion software 2025(c)</p>
+	<img src="hsp3dish.jpg" width="640" height="200" alt="title">
+	<h1>hsp3dish.js (WebGL/html5版)<br><br>プログラミングガイド</h1>
+
+	<!-- 目次 -->
+	<ol>
+		<li><a href="#ABOUT">hsp3dish.js概要</a></li>
+		<li><a href="#LOGIC">hsp3dish.jsの仕組み</a></li>
+		<li><a href="#CONVERT">HSP3Dish Helperによる変換</a></li>
+		<li><a href="#BROWSE">ブラウザ上での実行</a></li>
+		<li><a href="#SCRSIZE">表示サイズのスケーリング</a></li>
+		<li><a href="#MEDIA">メディアファイルの再生</a></li>
+		<li><a href="#EXEC">exec,dialog命令によるブラウザ制御</a></li>
+		<li><a href="#SENSOR">センサー情報の取得<span class="new">（New!）</span></a></li>
+		<li><a href="#NOTICE">制限事項・既知の問題点</a></li>
+		<li><a href="#FUTURE">今後の予定</a></li>
+		<li><a href="#LICENSE">ライセンス・謝辞</a></li>
+	</ol>
+
+	<h2 id="ABOUT">hsp3dish.js概要</h2>
+	<p>
+	hsp3dish.jsは、WebGLをサポートしたWEBブラウザ上で動作するHSP3Dishのランタイムです。
+	Windows版 HSP3Dishがサポートする機能を多くのWEBブラウザ上で再現することが可能です。
+	これにより、WindowsだけでなくMacOSやLinuxなど様々なOS上での動作が可能になり、インストールの手間なく手軽に、HSPのアプリケーションを実行させることができるようになります。
+	<br>
+	このマニュアルでは、hsp3dish.js版の利用方法、注意点などを説明していきます。
+	<br>
+	<br>
+	動作には、WebGL対応のブラウザが必要です。以下の環境での動作を確認しています。
+	<UL>
+	<LI>Chrome
+	<LI>Firefox
+	<LI>Safari
+	<LI>Internet Explorer 11 (制限あり)
+	<LI>Microsoft Edge
+	<LI>Firefox モバイルブラウザ(Android)
+	</UL>
+	<br>
+	HSP3Dishスクリプトの変換を支援するための、HSP3Dish Helperツールが同梱されています。
+	これにより、比較的スムーズにhsp3dish.js向けに変換を行なうことが可能になります。
+	(尚、動作を確認するためには、自分がアップロード可能なホームページか、ローカルで動作するWEBサーバーが必要となります。)
+	</p>
+
+	<h2 id="LOGIC">hsp3dish.jsの仕組み</h2>
+	<p>
+	hsp3dish.jsは、	<a href="https://llvm.org/" target="_blank">llvmコンパイラ</a>、及び<a href="https://github.com/kripken/emscripten" target="_blank">Emscripten</a>を使用して、
+	HSP3ランタイムをJavaScript及びWebAssembly向けに変換したものです。
+	HSP3のオリジナルソースを元にしているため、動作の互換性が高く、アップデートも容易なシステムになっています。
+	<br>
+	iOS版、android版のHSP3Dishは、HSPのスクリプトをネイティブコードに変換した上で実行していますが、
+	hsp3dish.jsは、HSPのスクリプトを中間コードに出力したもの(.axオブジェクトファイル)をもとにして、インタプリタ(逐次実行)として動作します。これは、Windows版のHSP3Dishと同一のプログラムとなっており、極めて高い互換性を持っています。
+	<br>
+	スクリプトの実行速度は、ブラウザを実行しているマシンのCPU速度、VMの速度に依存しますが、最近のPCであれば実用的な範囲で動作します。
+	</p>
+
+	<h2 id="CONVERT">HSP3Dish Helperによる変換</h2>
+	<p>
+	HSPインストールフォルダ(最新版のHSP3Dish開発セットによりアップデートされている必要があります)にあるHSP3Dish Helper(hsp3dh.exe)を起動してください。
+	<br>
+	</p>
+	<ul><img src="hsp3dish/s_js1.jpg"><br></ul>
+	<br>
+	<p>
+	下に並んでいる「hsp3dish.js」のボタンを押して、hsp3dish.js変換のモードにしてください。上のような表示になるはずです。
+	<br>
+	このダイアログ内に必要な情報を設定し、「変換」ボタンを押すことで、webブラウザ上の動作に必要なファイルがすべて作成されます。ダイアログで設定する項目は、以下の通りです。
+	</p>
+	<ul>
+	<li>ソーススクリプト</li><br><p>
+	変換するためのHSPスクリプト(.hsp)を指定します。必ずHSP3Dish用に記述されたスクリプトでなければなりません。「参照」ボタンを押すことで、ファイル選択ダイアログを開くことができます。<br>
+	スクリプトファイル名は、必ず<b>「半角英数のみのファイル名(日本語(全角)を使わない)」</b>ように注意してください。<br>
+	生成される画面サイズは、ソーススクリプトと同一フォルダにあるhsp3dish.iniファイルの設定が使用されます。hsp3dish.iniファイルの設定については、<a href="hsp3dish_prog.htm#INIFILE">「起動設定ファイルについて」</a>の項目を参照してください。
+	</p>
+	<li>データフォルダ</li><br><p>
+	データフォルダは、picload命令やbload命令など、スクリプト中で読み込まれるファイル(画像データ、サウンドデータなども含む)を準備するためのものです。<br>
+	「ソーススクリプト」で指定したフォルダ以下の「data」フォルダをデータフォルダとして認識します。
+	スクリプトから読み込まれるファイルは、データフォルダにまとめて格納しておいてください。<br>
+	データフォルダが内にあるファイルをすべてデータファイル(.dataの拡張子)としてパックされます。不要なファイルが含まれていると、無駄に容量を消費してしまうので、必ず必要なファイルだけを置くようにしてください。<br>
+	データフォルダに含まれるファイルは、必ず<b>「半角英数のみのファイル名(日本語(全角)を使わない)」</b>ように注意してください。また、指定されたデータフォルダのみが検索対象となり、サブフォルダは含まれません。
+	データファイルが必要なし場合は、空欄にしておいて構いません。
+	</p>
+	<li>メモリサイズ</li><br><p>
+	ブラウザ実行時に確保されるメモリブロックの上限値を設定することができます。
+	空欄の場合は、デフォルトの値(200メガバイト)が使用されます。
+	通常は、デフォルト値で問題ありませんが、規模の大きいスクリプトや膨大なデータを使用する場合は、100よりも大きい値を指定してください。(500を指定した場合は、500メガバイトとなります。)<br>
+	(ブラウザ実行時に、hsp3dish.jsコンソールに「Cannot enlarge memory arrays.」という表示が出る場合は、メモリブロックの上限値を調整してみてください。)
+	</p>
+	<li>HGIMG4を使用する</li><br><p>
+	HGIMG4のスクリプトを変換します。実行時には「hsp3dish-gp.js」が必要になります。<br>
+	HGIMG4が使用するデータは、「ソーススクリプト」で指定したフォルダ以下の「res」「res/shaders」に配置しておいてください。(sample/hgimg4内にあります)
+	</p>
+	<li>WebAssemblyを使用する</li><br><p>
+	WebAssembly形式に変換します。実行時には「.wasm」ファイルが追加で必要になります。<br>
+	WebAssembly形式にすることで、読み込みや実行速度の高速化などが期待できます。
+	ただし、Webブラウザのサポートが限られているため、現在はまだ実験的な実装になっています。
+	</p>
+	<li>デバッグ情報を出力する</li><br><p>
+	スクリプトを変換する際にデバッグ情報を含めたデータを生成します。<br>
+	デバッグ情報を出力することによって、ブラウザ上での実行時にエラーが発生した際に、
+	行番号やソーススクリプトのファイル名を参照することができます。
+	ブラウザ実行時にどこでエラーが発生したかわからない場合は、デバッグ情報を出力して確認してみてください。
+	</p>
+	<li>センサーを使用する</li><br><p>
+	実行するスクリプトがモーションセンサーの情報を使用する場合にチェックを入れてください。<br>
+	iOSやandroidなど、デバイスにモーションセンサーが搭載されている機種で実行した際に情報を取得できるようになります。<br>
+	モーションセンサーを使用しない場合は特に設定する必要はありません。
+	</p>
+	</ul>
+	<p>
+	設定ができたら、「変換」ボタンを押してください。
+	その際に、上のコンボボックスでhtmlテンプレートの種類を選択することができます。現在は、標準のhtml(白の背景)と、黒い背景のhtmlを選択することができます。
+	<br>
+	変換を行うことで、スクリプトやデータファイルがhsp3dish.js向けに生成されます。<br>
+	生成されるファイルは、以下の通りです。
+	</p>
+	<ul>
+	<li>(ソーススクリプト名).html ファイル</li>
+	<li>(ソーススクリプト名).data ファイル</li>
+	<li>hsp3dish.js ファイル (HGIMG4使用時は、hsp3dish-gp.js)</li>
+	<li>hsp3dish.wasm ファイル (WebAssembly使用時のみ) (HGIMG4使用時は、hsp3dish-gp.wasm)</li>
+	</ul>
+	<p>
+	元のソーススクリプトがあるフォルダに、これらのファイルが生成されているはずです。
+	(たとえば、block3.hspを変換した場合は、block3.htmlとblock3.dataが生成されます。)<br>
+	ここで生成されたファイルを、WEB上にアップロードするだけで、WEBブラウザ上での実行が可能です。<br>
+	.htmlファイルは、WEBブラウザ上から開くためのHTMLファイルとなります。
+	たとえば、「www.onionsoft.net/hsp/hsp3js/」という場所にアップロードを行なった場合は、
+	「https://www.onionsoft.net/hsp/hsp3js/block3.html」が実行のためのURLとなります。<br>
+	.dataファイルは、HTMLファイル内のJavaScriptから読み込まれるデータファイルで、実行に必要なデータがすべて含まれています。
+	<br>
+	「hsp3dish.js」「hsp3dish-gp.js」ファイルは、HSPランタイムの核となる部分で、WEB上でHSP3Dishを実行させる場合に必ず必要となります。
+	これは、すべてのスクリプトで同一となるため、同じフォルダに複数の.htmlと.dataを置いた場合でも、共用することが可能です。<br>
+	WebAssembly形式に変換した場合は、hsp3dish.wasm ファイル (HGIMG4使用時は、hsp3dish-gp.wasm)が生成されます。(通常時は生成されません)
+	このファイルも、「hsp3dish.js」と同様にサーバーにアップロードしてください。
+	</p>
+
+
+	<h2 id="BROWSE">ブラウザ上での実行</h2>
+	<p>
+	<a href="https://www.onionsoft.net/hsp/hsp3js/block3.html" target="_blank"><img src="hsp3dish/s_js2.jpg" style="float:right;"></a>
+	HSP3Dish Helperから生成された、.htmlファイル、.dataファイル、及びhsp3dish.jsファイルをWEB上にアップロードすることにより、ブラウザ上で実行させることができます。
+	ローカルファイルの.htmlファイルを開いても起動されません。必ず、WEBサーバー上にファイルを設置するようにしてください。
+	<br>
+	<a href="https://www.onionsoft.net/hsp/hsp3js/block3.html" target="_blank">こちらのページ</a>から、実際にblock3.hspスクリプトの動作を確認することができます。
+	<br>
+	デフォルトで生成されたhtmlファイルでは、「Resize Cavas(表示領域のリサイズ指定)」「Lock/hide mouse pointer(マウスポインタを隠す)」チェックボックス、「Fullscreen(フルスクリーン表示)」のボタンが付加されます。
+	<br>
+	また実行画面の下部には、hsp3dish.jsのコンソール(システムメッセージ表示エリア)が配置されます。
+	<br>
+	htmlファイルは、ユーザーが自由に改変して頂いて構いません。レイアウト、配置等は任意で調整を行なってください。
+	<br>
+
+	</p>
+	<br clear="all">
+
+
+	<h2 id="SCRSIZE">表示サイズのスケーリング</h2>
+	<p>
+	htmlファイルを編集することで、表示サイズ、スケーリングその他の設定を行なうことができます。
+	生成された、.htmlファイルをテキストエディタで開き、以下の場所を編集してください。
+	</p>
+	<ul><pre>
+	    Module.preRun.push(function() {
+	        ENV.HSP_WX = "480";//スクリプトの動作解像度
+	        ENV.HSP_WY = "800";
+	        ENV.HSP_SX = "480";//表示解像度
+	        ENV.HSP_SY = "800";
+	        ENV.HSP_AUTOSCALE = "0";//スケーリングモード
+	        ENV.HSP_FPS = "0";//フレームレート
+	        ENV.HSP_LIMIT_STEP = "15000";//ブラウザに処理を返すまでの実行ステップ数
+	    });
+	</pre></ul>
+	<p>
+	「ENV.HSP_WX」「ENV.HSP_WY」で指定されている数値が、スクリプトの動作解像度サイズ(X,Y)となります。
+	これは、スクリプトの変換時にhsp3dish.iniファイルから取得された値が設定されています。<br>
+	「ENV.HSP_SX」「ENV.HSP_SY」で指定されている数値が、実際にWEBブラウザ上で表示される解像度サイズ(X,Y)となります。
+	スクリプトの動作解像度と表示解像度が異なる場合に、スケーリング(拡大縮小)を行なうための設定が「ENV.HSP_AUTOSCALE」項目になります。デフォルトで「0」が指定されていますが、以下の値を設定することが可能です。
+	</p>
+	<ul><pre>
+		0 : 画面全体に収まる最適な大きさ(縦横比は維持)
+		1 : X方向のサイズを基準に拡大縮小(縦横比は維持)
+		2 : Y方向のサイズを基準に拡大縮小(縦横比は維持)
+		3 : 縦横比は無視して画面全体に表示
+	</pre></ul>
+	<p>
+	その他のオプションも、以下の通り設定することができます。<br>
+	「HSP_FPS」で固定のフレームレートを指定します。30の場合は30FPS(30/1000秒)で更新を行ないます。0(デフォルト)の場合は、フレーム数をブラウザに任せます(requestAnimationFrame)。<br>
+	「HSP_LIMIT_STEP」は、強制的にブラウザに処理を返すまでの実行ステップ数を指定します。デフォルトで「15000」が指定されています。あまり大きいとスクリプトや処理系に問題が有った時にブラウザの応答がなくなってしまうので注意してください。
+	</p>
+
+
+	<h2 id="MEDIA">メディアファイルの再生</h2>
+	<p>
+	現在のバージョンでは、メディアファイル再生に関して試験的な対応となっています。
+	</p>
+	<ul><pre>
+		・wav,mp3形式の再生に対応しています(mmload,mmplay命令)
+		・ogg形式は一部のブラウザのみ対応しています(mmload,mmplay命令)
+		・Chrome及び、Firefox上での動作を確認しています
+		・IE11上では動作しません(エラーにはなりません)
+		・mci命令には対応していません
+		・動画の再生には対応していません
+	</pre></ul>
+	<p>
+	mmload命令で読み込み可能なフォーマットは、「.wav」「.mp3」「.ogg」です。<br>
+	メディアファイルはリソースとして膨大なサイズになる場合があるため、起動時にすべてメモリに読み込む現在のリソース管理では、大量の楽曲を流す処理には向いていません。
+	この点は、今後のバージョンでは改良していきたいと考えています。
+	</p>
+
+
+	<h2 id="EXEC">exec,dialog命令によるブラウザ制御</h2>
+	<p>
+	dialog命令により、標準的なブラウザのダイアログを表示することができます。
+	(標準ダイアログ以外のコモンダイアログはサポートしていません)
+	<br>
+	exec命令により、より細かいレベルでブラウザを制御することが可能です。
+	通常のexec命令は、OSのコマンドを呼び出すための機能ですが、
+	hsp3dish.jsでは、JavaScriptのコードを直接実行させる役割を持っています。
+	</p>
+	<ul><pre>
+		exec "alert('TEST');"
+	</pre></ul>
+	<p>
+	これにより、JavaScriptが持つ機能をHSPスクリプトの中から呼び出すことができます。
+	ただし、JavaScriptの文法でエラーが発生した場合は、ブラウザのエラーで停止することが
+	ありますので注意して記述してください。<br>
+	exec命令のオプション値に16を指定することにより、新しく開くページのURLを指定することができます。
+	</p>
+	<ul><pre>
+		exec "https://hsp.tv",16
+	</pre></ul>
+	<p>
+	この例では、「https://hsp.tv」のURLを新しくブラウザで開きます。
+	<br>
+	exec命令により、HSP側のプログラムと連携して、WEBページを開いたり
+	ブラウザの表示を変更するなどの処理が可能になります。
+	</p>
+
+
+	<h2 id="SENSOR">センサー情報の取得</h2>
+	<p>
+	加速度やジャイロセンサーを搭載したデバイス上では、以下のマクロによりセンサー値を取得することが可能です。<br>
+	センサー使用時には、HSP3Dish Helperのスクリプトの変換時に「センサーを使用する」項目にチェックを入れるようにしてください。<br>
+	モーションセンサーの情報は、すべてのブラウザがサポートしているわけではありません。また、デバイスやブラウザの種類によって値に差異がある可能性もありますのでご注意ください。<br>
+	また、実行確認の際にはhttps接続が必要になります。また、iOS(iPhone,iPad)に搭載されているSafariブラウザでは、センサーを使用する際の確認が必要となります。(ユーザーは、左下にある「センサーを許可する」ボタンを押して承認を行わないとセンサー値を取得することができません。)<br>
+	センサー情報を実際に使用する際には、以下のマクロをご使用ください。
+	</p>
+	<ul><pre>
+	ginfo_accelx	加速度センサー値(X)
+	ginfo_accely	加速度センサー値(Y)
+	ginfo_accelz	加速度センサー値(Z)
+	</pre></ul>
+	<p>
+	加速度センサーが使用可能な環境で、センサーの値を取得します。
+	それぞれの座標軸の加速度を実数(m/s^2)で取得したものになります。(重力加速度9.8m/s^2を含んだ数値が取得されます。)<br>
+	加速度センサーが使用できない環境では、0.0が取得されます。
+	</p>
+	<ul><pre>
+	ginfo_gyrox	ジャイロセンサー値(X)
+	ginfo_gyroy	ジャイロセンサー値(Y)
+	ginfo_gyroz	ジャイロセンサー値(Z)
+	</pre></ul>
+	<p>
+	ジャイロセンサーが使用可能な環境で、センサーの値を取得します。
+	それぞれの座標軸に対する傾き角度(Degree)を取得したものになります。
+	ジャイロセンサーが使用できない環境では、0.0が取得されます。
+	</p>
+
+
+	<h2 id="NOTICE">制限事項・既知の問題点</h2>
+	<p>
+	現在のバージョンでは、以下の制限事項があります。
+	それ以外の機能については、基本的にHSP3Dishと同等となります。
+	</p>
+	<ul><pre>
+		・メディア関連の機能(ブラウザ、ファイルタイプによる制限あり)
+		・bsave命令などによるローカルファイルへの静的な保存はできません
+	</pre></ul>
+	<p>
+	また、既知の問題として以下が報告されています。
+	</p>
+	<ul><pre>
+		・IE11でマルチメディア関連の命令が動作しない
+	</pre></ul>
+	<p>
+	その他、WEBブラウザ上で動作していることから、異なる動作、表示が行われる可能性があります。
+	現在は、データファイルをまとめて読み込んでいるため、大規模なアプリケーション(画像を大量に使用するなど)は、
+	重くなったり、処理ができないことがありますので注意ください。
+	</p>
+
+
+	<h2 id="FUTURE">今後の予定</h2>
+	<p>
+	hsp3dish.jsは、WEB上で手軽にHSPの実行を行なう環境として、今後も機能を拡充していく予定です。
+	以下は、今後のバージョンアップで検討している機能です。
+	将来のバージョンでは、より高い互換性と機能の向上を目指していきたいと考えています。
+	</p>
+	<ul><pre>
+		・ネットワーク拡張処理の実装
+		・SoupSeedとの連携機能
+		・WEB上でのコード編集及びコンパイル実行
+	</pre></ul>
+
+
+	<h2 id="LICENSE">ライセンス・謝辞</h2>
+	<p>
+	ユーザーは、<a href="hsp3dish_prog.htm#LICENCE">HSP3Dishと同様のライセンス(BSDライセンス)</a>で、hsp3dish.js/hsp3dish-gp.jsを利用することができます。
+	以下のライセンス表記が、ファイルに含まれていますので、hsp3dish.js/hsp3dish-gp.jsファイルを改変せずにそのままホームページにアップロードしてご使用ください。
+	それ以外の場所に、ライセンス及び著作者に関する情報を表示する義務はありません。また、利用にあたっては商用、非商用を問わずライセンス料は必要ありません。
+	</p>
+	<p>
+	hsp3dish.js/hsp3dish-gp.jsを直接リンクして使用する場合は、「https://www.onionsoft.net/hsp/v36/hsp3js/hsp3dish.js」「https://www.onionsoft.net/hsp/v36/hsp3js/hsp3dish-gp.js」をご使用ください。
+	(ただし、高い負荷が発生する場合や、セキュリティの懸念があるなど、運用に支障が生じる場合は内容が変更されることがありますのでご了承ください。)
+	</p>
+	<ul><pre>
+	Copyright (C) 1997-, Onion Software/onitama.
+	Copyright (C) 2014-, zakki, K-s.
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	Redistributions of source code must retain the above copyright notice, this
+	list of conditions and the following disclaimer.  Redistributions in binary
+	form must reproduce the above copyright notice, this list of conditions and
+	the following disclaimer in the documentation and/or other materials provided
+	with the distribution.  Neither the name of the Onion Software nor the names
+	of its contributors may be used to endorse or promote products derived from
+	this software without specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+	</pre></ul>
+	<p>
+	hsp3dish.js/hsp3dish-gp.jsは、<a href="https://github.com/zakki" target="_blank">zakkiさん</a>によって実装されたEmscripten版HSP3Dishをベースに作成したものです。
+	マルチメディア機能、描画機能の改善をK-sさんにご協力頂きました。
+	素晴らしいシステムを開発したzakkiさん、ご意見をお寄せいただいた多くの方々に感謝致します。
+	<br>
+	Emscripten版HSP3Dishは、OpenHSPの派生物となっています。ソースコードは、OpenHSPリポジトリから取得することができます。
+	</p>
+	<ul><pre>
+		OpenHSP Development
+		<a href="https://dev.onionsoft.net/trac/openhsp/" target="_blank">https://dev.onionsoft.net/trac/openhsp/</a>
+
+		Emscripten版HSP3Dish WiKi
+		<a href="https://dev.onionsoft.net/trac/openhsp/wiki/DirTrunk/Hsp3dish/Emscripten" target="_blank">https://dev.onionsoft.net/trac/openhsp/wiki/DirTrunk/Hsp3dish/Emscripten</a>
+
+		zakki
+		<a href="https://x.com/k_matsuzaki" target="_blank">https://x.com/k_matsuzaki</a>
+	</pre></ul>
+
+	<!-- フッター -->
+	<ul id="FOOTER">
+		<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+		<li><a href="../index.htm">インデックスに戻る</a></li>
+	</ul>
+	<a href="https://www.onionsoft.net/">
+		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+	</a>
+</div><!-- container -->
+</body>
+</html>

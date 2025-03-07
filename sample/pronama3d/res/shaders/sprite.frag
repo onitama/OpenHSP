@@ -8,7 +8,7 @@ precision mediump float;
 
 ///////////////////////////////////////////////////////////
 // Uniforms
-uniform sampler2D u_texture;
+uniform sampler2D u_diffuseTexture;
 
 ///////////////////////////////////////////////////////////
 // Varyings
@@ -18,5 +18,5 @@ varying vec4 v_color;
 
 void main()
 {
-    gl_FragColor = v_color * texture2D(u_texture, v_texCoord);
+    gl_FragColor = v_color * texture2D(u_diffuseTexture, v_texCoord);
 }

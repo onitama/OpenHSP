@@ -1,16 +1,12 @@
-#include "hsp3dish.as"
-
+	screen 0,320,240
 	cx=160:cy=120
 	repeat
 	redraw 0
 	dir=atan(cy-mousey,cx-mousex)
 	color 255,255,255:boxf
-	rgbcolor 0:pos 0,0
+	color 0,0,0:pos 0,0
 	mes "mouse=("+mousex+","+mousey+") dir="+dir
 	grect cx,cy,dir,100,100
-	rgbcolor 0xff0000
-	boxf mousex-2,mousey-2,mousex+2,mousey+2
-
 	redraw 1
 	await 20
 	loop

@@ -8,7 +8,7 @@ precision mediump float;
 
 ///////////////////////////////////////////////////////////
 // Uniforms
-uniform sampler2D u_texture;
+uniform sampler2D u_diffuseTexture;
 uniform float u_width;
 uniform float u_height;
 
@@ -24,15 +24,15 @@ void main()
       float h = u_height;
      
       vec4 n[9];
-      n[0] = texture2D(u_texture, v_texCoord + vec2( -w, -h));
-      n[1] = texture2D(u_texture, v_texCoord + vec2(0.0, -h)) * 2.0;
-      n[2] = texture2D(u_texture, v_texCoord + vec2(  w, -h));
-      n[3] = texture2D(u_texture, v_texCoord + vec2( -w, 0.0)) * 2.0;
-      n[4] = texture2D(u_texture, v_texCoord);
-      n[5] = texture2D(u_texture, v_texCoord + vec2(  w, 0.0)) * 2.0;
-      n[6] = texture2D(u_texture, v_texCoord + vec2( -w, h));
-      n[7] = texture2D(u_texture, v_texCoord + vec2(0.0, h)) * 2.0;
-      n[8] = texture2D(u_texture, v_texCoord + vec2(  w, h));
+      n[0] = texture2D(u_diffuseTexture, v_texCoord + vec2( -w, -h));
+      n[1] = texture2D(u_diffuseTexture, v_texCoord + vec2(0.0, -h)) * 2.0;
+      n[2] = texture2D(u_diffuseTexture, v_texCoord + vec2(  w, -h));
+      n[3] = texture2D(u_diffuseTexture, v_texCoord + vec2( -w, 0.0)) * 2.0;
+      n[4] = texture2D(u_diffuseTexture, v_texCoord);
+      n[5] = texture2D(u_diffuseTexture, v_texCoord + vec2(  w, 0.0)) * 2.0;
+      n[6] = texture2D(u_diffuseTexture, v_texCoord + vec2( -w, h));
+      n[7] = texture2D(u_diffuseTexture, v_texCoord + vec2(0.0, h)) * 2.0;
+      n[8] = texture2D(u_diffuseTexture, v_texCoord + vec2(  w, h));
       
       // Sobel Edge
       vec4 sobel_horizEdge = n[2] + n[5] + n[8];

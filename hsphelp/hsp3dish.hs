@@ -6,12 +6,12 @@
 %type
 拡張命令
 %ver
-3.6
+3.7
 %note
 hsp3dish.asをインクルードすること。
 
 %date
-2020/06/10
+2022/06/02
 %author
 onitama
 %dll
@@ -35,12 +35,64 @@ val(0)  : 設定する値
 HSP3Dishランタイムに対して様々なシステム設定を行ないます。
 設定タイプ名で指定できるのは以下のシンボルです。
 ^p
-	設定タイプ名      読み書き(*)   内容
-------------------------------------------------------------------------
-	SYSREQ_CLSMODE        RW        背景のクリアフラグ
-	SYSREQ_CLSCOLOR       RW        背景クリア色
-	SYSREQ_TIMER          R         ミリ秒単位のタイマー値
-	SYSREQ_PLATFORM       R         HSP3Dishを実行しているプラットフォーム
+	設定タイプ名             読み書き(*)   内容
+---------------------------------------------------------------------------
+	SYSREQ_MAXMODEL          RW            HGIMG3最大モデル数
+	SYSREQ_MAXOBJ            RW            HGIMG3/4最大オブジェクト数
+	SYSREQ_MAXTEX            RW            HGIMG3/4最大テクスチャ数
+	SYSREQ_MAXMOC            RW            HGIMG3最大MOC数
+	SYSREQ_DXMODE            RW            DirectXモード(Windowsのみ)
+	SYSREQ_DXHWND            R             DirectXウインドウハンドル(Windowsのみ)
+	SYSREQ_DXWIDTH           RW            DirectXフルスクリーンXサイズ(Windowsのみ)
+	SYSREQ_DXHEIGHT          RW            DirectXフルスクリーンYサイズ(Windowsのみ)
+	SYSREQ_COLORKEY          RW            DirectXカラーキー(Windowsのみ)
+	SYSREQ_RESULT            R             DirectX初期化結果(Windowsのみ)
+	SYSREQ_RESVMODE          R             DirectXビデオ初期化結果(Windowsのみ)
+	SYSREQ_PKTSIZE           RW            パケットサイズ(未使用)
+	SYSREQ_MAXEVENT          RW            HGIMG3/4最大イベント数
+	SYSREQ_PTRD3D            R             Direct3Dクラスポインタ(Windows/HGIMG3のみ)
+	SYSREQ_PTRD3DDEV         R             Direct3DDeviceクラスポインタ(Windows/HGIMG3のみ)
+	SYSREQ_MDLANIM           RW            モデルあたりのアニメーション最大数(HGIMG3)
+	SYSREQ_CALCNORMAL        RW            Xファイルモデル法線再計算スイッチ(HGIMG3)
+	SYSREQ_2DFILTER          RW            2D描画時のテクスチャ補間モード(HGIMG3)
+	SYSREQ_3DFILTER          RW            3D描画時のテクスチャ補間モード(HGIMG3)
+	SYSREQ_OLDCAM            RW            カメラ注視モードの動作(HGIMG3)
+	SYSREQ_QUATALG           RW            Xファイルモデルアニメーション補間モード(HGIMG3)
+	SYSREQ_DXVSYNC           RW            フルスクリーンモード時のVSYNC待ちモード(HGIMG3)
+	SYSREQ_DEFTIMER          RW            hgsyncの時間待ちモード(HGIMG3)
+	SYSREQ_NOMIPMAP          RW            テクスチャのMIPMAP生成モード(HGIMG3)
+	SYSREQ_DEVLOST           RW            DirectXデバイスの存在フラグ
+	SYSREQ_MAXEMITTER        RW            HGIMG3エミッター最大数
+	SYSREQ_THROUGHFLAG       RW            X方向のボーダー処理フラグ(HGIMG3)
+	SYSREQ_OBAQMATBUF        RW            OBAQ用マテリアルバッファ数(HGIMG3)
+	SYSREQ_2DFILTER2         RW            2D直接描画時のテクスチャ補間モード(HGIMG3)
+	SYSREQ_FPUPRESERVE       RW            FPU演算精度設定オプション(HGIMG3)
+	SYSREQ_CLSMODE           RW            背景のクリアフラグ
+	SYSREQ_CLSCOLOR          RW            背景クリア色
+	SYSREQ_CLSTEX            RW            背景クリアテクスチャID(HGIMG3)
+	SYSREQ_TIMER             R             ミリ秒単位のタイマー値
+	SYSREQ_PLATFORM          R             HSP3Dishを実行しているプラットフォーム
+	SYSREQ_FPS               R             フレームレート(HGIMG4)
+	SYSREQ_VSYNC             RW            VSync待ちモード(HGIMG4)
+	SYSREQ_MAXMATERIAL       RW            HGIMG4最大マテリアル数
+	SYSREQ_PHYSICS_RATE      RW            OBAQ用物理パラメーター(OBAQ)
+	SYSREQ_MAXOBAQ           RW            OBAQ用オブジェクト最大数(OBAQ)
+	SYSREQ_MAXLOG            RW            OBAQ用コリジョンログ最大数(OBAQ)
+	SYSREQ_DEFAULT_WEIGHT    RW            OBAQ用デフォルトWeight値(OBAQ)
+	SYSREQ_DEFAULT_MOMENT    RW            OBAQ用デフォルトMoment値(OBAQ)
+	SYSREQ_DEFAULT_DAMPER    RW            OBAQ用デフォルトDamper値(OBAQ)
+	SYSREQ_DEFAULT_FRICTION  RW            OBAQ用デフォルトFriction値(OBAQ)
+	SYSREQ_MESCACHE_MAX      RW            メッセージキャッシュ最大数(HSP3Dish)
+	SYSREQ_DLIGHT_MAX        RW            ディレクショナルライト最大数(HGIMG4)
+	SYSREQ_PLIGHT_MAX        RW            ポイントライト最大数(HGIMG4)
+	SYSREQ_SLIGHT_MAX        RW            スポットライト最大数(HGIMG4)
+	SYSREQ_LOGWRITE          RW            終了時のログ出力スイッチ(HGIMG4)
+	SYSREQ_FIXEDFRAME        RW            固定フレームレートスイッチ(HGIMG4)
+	SYSREQ_DRAWNUMOBJ        R             描画されたオブジェクト数(HGIMG4)
+	SYSREQ_DRAWNUMPOLY       R             描画されたポリゴン数(HGIMG4)
+	SYSREQ_USEGPBFONT        RW            gpbフォント使用スイッチ(HGIMG4)
+	SYSREQ_FIXMESALPHA       RW            文字描画alpha値固定モード(HSP3Dish)
+	SYSREQ_OLDBOXF           RW            従来のboxf描画モード(HSP3Dish)
 
 	(*)項目ごとに、読み(R)書き(W)の可否が異なります
 ^p
@@ -231,25 +283,26 @@ setcls
 %group
 拡張マルチメディア制御命令
 %prm
-mode,color,tex
+mode,color
 mode(0)  : 画面クリアのモード
 color(0) : 画面クリア色(24bitRGBコード)
 %inst
 redraw 0による画面初期化時に行なわれる画面クリアのための設定を行ないます。
 mode値の設定により、画面クリアを行なうためのモードを設定します。
-1を設定した場合はクリア、0の場合はクリアを行ないません。
+CLSMODE_SOLIDまたは1を設定した場合はクリア、CLSMODE_NONEまたは0の場合はクリアを行ないません。
 スクリプト内で画面のクリアを行なっている場合は、システム側で背景クリアをしない方が処理速度の向上につながります。
 ^p
-	モード値  内容
-	------------------------------------------------------
-	    0     画面クリアを行なわない
-	    1     画面クリアを行なう
+	モード値  定義マクロ名         内容
+	-----------------------------------------------------------------
+	    0     CLSMODE_NONE         画面クリアを行なわない
+	    1     CLSMODE_SOLID        クリア色による画面クリアを行なう
 ^p
-colorでクリアする際の色を設定することができます。色は、24bitRGBコード($rrggbb)の数値で設定します。
+colorでクリアする際の色を設定することができます。色は、rgbcolor命令のパラメーターと同様の24bitRGBコード($rrggbb)の数値で設定します。
 
 
 %href
 redraw
+rgbcolor
 
 
 %index

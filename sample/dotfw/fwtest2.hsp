@@ -1,0 +1,19 @@
+#include "dotfw.as"
+
+	;	エフェクトテスト
+	;	(ランダムな位置に花火を出します)
+	;
+	df_config "pce Z300 star"
+	df_reset
+
+	df_addmes "TAMANE DOT FRAMEWORK",1,1, 0,8
+	df_addfmes "タマネいくよ!!!!",96,80, $00ffff,16
+
+	df_addplayer
+*main
+	if key&PLAYER_KEY_ESC : end
+	if (_dotfw_frame&3)=0 {
+		df_addfire rnd(_dotfw_sx),rnd(_dotfw_sy), rnd(4)+4, 1, 200, 20
+	}
+	df_update
+	goto *main

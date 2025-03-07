@@ -1,0 +1,169 @@
+#use strict,hsp3cl
+#varint sx,sy
+#varstr s1,s2
+
+;	More BASIC Computer Games(1979)に掲載された"Chase"をhsp3clに移植したものです
+;	もともとはBASIC言語で書かれており、1970年初頭にダートマス大学で開発されたと言われています
+
+	mes "                          CHASE"
+	mes "                    CREATIVE COMPUTING"
+	mes "                  MORRISTOWN, NEW JERSEY"
+	mes "\r\r\r"
+	mes "YOU ARE WITHIN THE WALLS OF A HIGH VOLTAGE MAZE"
+	mes "THERE ARE FIVE SECURITY MACHINES TRYING TO DESTORY YOU"
+	mes "YOU ARE THE '*'   THE INTERCEPTORS ARE THE '+'"
+	mes "THE AREAS MARKED 'X' ARE HIGH VOLTAGE"
+	mes "YOUR ONLY CHANCE FOR SURVIVAL IS TO MANEUVER EACH"
+	mes "INTERCEPTOR INTO AN 'X'.-----GOOD LUCK-----"
+	mes "MOVES ARE   7.8.9"
+	mes "            4.*.6"
+	mes "            1.2.3"
+	mes ""
+	mes "10 = NO MOVE FOR THE REST OF THE GAME"
+	mes "-1 = GAVE UP, SITUATION HOPELESS."
+	mes " 0 = A TREMENDOUS (BUT UNFORTUNATELY RANDOM) LEAP"
+	mes ""
+
+	randomize
+
+*start
+	sx=20:sy=10
+	enemy=5
+	cmdval=0
+	cmdstr=""
+
+	dim map,sx,sy
+	dim enex,enemy
+	dim eney,enemy
+	dim movx,10
+	dim movy,10
+	movx(1)=-1:movx(4)=-1:movx(7)=-1
+	movx(9)=1:movx(6)=1:movx(3)=1
+	movy(7)=-1:movy(8)=-1:movy(9)=-1
+	movy(1)=1:movy(2)=1:movy(3)=1
+
+	sdim s1,256
+	sdim s2,256
+	repeat sy:y=cnt:repeat sx:x=cnt
+	a=rnd(10):if a=5 : map(x,y)='X'
+	loop:loop
+	repeat sy:map(0,cnt)='X':map(sx-1,cnt)='X':loop
+	repeat sx:map(cnt,0)='X':map(cnt,sy-1)='X':loop
+
+	gosub *randpos
+	mx=x:my=y
+	map(mx,my)='*'
+
+	repeat enemy
+		gosub *randpos
+		enex(cnt)=x:eney(cnt)=y
+		map(x,y)='+'
+	loop
+
+*main
+	;	player move
+	gosub *putmap
+	if cmdval=10 : goto *main2
+
+	mes "? ",1
+	input cmdstr,,1
+	cmdval=0+cmdstr
+
+	if cmdval<0 : goto *giveup
+	if cmdval=0 : goto *rndjump
+	if cmdval>=10 : goto *main2
+
+	map(mx,my)=0
+	mx=mx+movx(cmdval)
+	my=my+movy(cmdval)
+	a=map(mx,my)
+	if a='X' : goto *highvol
+
+	map(mx,my)='*'
+
+	goto *main2
+
+*rndjump
+	mes "$6,000,000 JUMP!!!"
+	map(mx,my)=0
+	gosub *randpos
+	mx=x:my=y
+	map(mx,my)='*'
+	goto *main2
+
+*main2
+	;	interceptor move
+	loseflag=0
+	repeat  enemy
+		g9=0
+		x=enex(cnt):y=eney(cnt)
+		gosub *enemymove
+		if g9=0 {
+			enex(cnt)=x:eney(cnt)=y
+		} else {
+			loseflag=1
+		}
+	loop
+	if loseflag : goto *destroyed
+
+	down=0
+	repeat  enemy
+		x=enex(cnt):y=eney(cnt)
+		if map(x,y)='X' : down++
+		if map(x,y)=0 : map(x,y)='+'
+	loop
+
+	if down=enemy : goto *wingame
+	goto *main
+
+*enemymove
+	if map(x,y)='X' : return
+	x2=x:y2=y
+	x=limit(mx-x,-1,1):y=limit(my-y,-1,1)
+	x=x+x2:y=y+y2
+	if map(x,y)='*' : g9=99 : return
+	if map(x,y)!=0 : map(x2,y2)=0 : return
+	map(x,y)='+'
+	map(x2,y2)=0
+	return
+
+*highvol
+	mes "HIGH VOLTAGE!!!!!!!!!!"
+	mes "***** ZAP *****  YOU'RE DEAD!!!"
+	mes ""
+	goto *another
+*wingame
+	mes "YOU HAVE DESTROYED ALL YOUR OPPONENTS - THE GAME IS YOURS"
+	goto *another
+*giveup
+	mes "GIVE UP, EH."
+*destroyed
+	mes "*** YOU HAVE BEEN DESTROYED BY A LUCKY COMPUTER ***"
+	goto *another
+*another
+	mes "ANOTHER GAME (Y/N) ? ",1
+	input cmdstr,,1
+	if cmdstr="n"|cmdstr="N" : goto *byebye
+	goto *start
+
+*byebye
+	end
+
+*putmap
+	s2=" "
+	repeat sy:y=cnt
+	s1=""
+	repeat sx:x=cnt
+		a=map(x,y):if a=0 : a=' '
+		poke s2,0,a
+		s1=s1+s2
+	loop
+	mes s1
+	loop
+	return
+
+*randpos
+	x=rnd(sx-2)+1
+	y=rnd(sy-2)+1
+	if map(x,y)>0 : goto *randpos
+	return

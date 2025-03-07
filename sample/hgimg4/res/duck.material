@@ -15,6 +15,9 @@ material textured
     {
         cullFace = true
         depthTest = true
+        blend = true
+        blendSrc = SRC_ALPHA
+        blendDst = ONE_MINUS_SRC_ALPHA
     }
     
     technique

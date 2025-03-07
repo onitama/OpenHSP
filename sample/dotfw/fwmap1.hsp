@@ -1,0 +1,24 @@
+#include "dotfw.as"
+#define MYMAP_ID (1)
+
+	;
+	;	マップを使ったサンプル
+	;	(マップエディタで作成したtest.tmapを表示します)
+	;
+	df_config "ps1 Z200"
+	df_reset
+
+	df_loadbgmap MYMAP_ID, "test.tmap"
+
+	df_mapaction MYMAP_ID, 0, 0		; マップアクション設定
+	df_bgview MYMAP_ID, 80,80, 20,20	; スクロール設定
+
+	df_mes "TAMANE DOT FRAMEWORK",1,1	; テキスト表示
+
+	df_addplayer 300,200			; プレイヤーを追加
+*main
+	;	メイン
+	df_update
+	if key&PLAYER_KEY_ESC : end		; [ESC]キーで終了
+	goto *main
+

@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="Tamamap,Map Editor,HSP,HSP3,HotSoupProcessor,HSP3Dish,android,ndk,google">
+	<meta name="description" content="HSP3Dish android(NDK)版に関する情報を掲載">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>マップエディタ Tamamap マニュアル</title>
+</head>
+<body>
+	<div id="CONTAINER">
+	<!-- ヘッダー -->
+	<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 2023-(c)</p>
+	<h1>マップエディタ Tamamap マニュアル</h1>
+
+	<p><img src="hsp3dish/tamamap.jpg" width="720"></p>
+
+	<!-- 目次 -->
+	<ol>
+		<li><a href="#ABOUT">はじめに</a></li>
+		<li><a href="#USAGE">使用方法</a></li>
+		<li><a href="#TOOLSCR">ツールの画面説明</a></li>
+		<li><a href="#MAPAREA">マップエリア</a></li>
+		<li><a href="#MAPNAVI">マップナビ</a></li>
+		<li><a href="#TOOLAREA">ツールエリア</a></li>
+		<li><a href="#CELAREA">セルエリア</a></li>
+		<li><a href="#MENU">メニュー画面</a></li>
+		<li><a href="#COPYRIGHT">著作権、ライセンスについて</a></li>
+	</ol>
+
+
+	<h2 id="ABOUT">はじめに</h2>
+	<p>
+	Tamamapは、<a href="dotfw.html">珠音ドットフレームワーク</a>で使用可能な2Dベースのセル(タイル)マップを編集するためのツール(マップエディタ)です。<br>
+	以下のような特長を持っています。
+	</p>
+	<pre class="quote">
+	・任意サイズの2Dマップを編集
+	・セルの属性設定及び編集
+	・珠音ドットフレームワークと連携
+	・マップのファイル(.tmap形式)ロード、セーブ、マージ
+	・HSP3Dishベースで作られたツールのため、Linux,RaspberryPi環境でも動作可能</pre>
+	<p>
+	広い世界を手軽に構築するための様々な機能を持っています。
+	</p>
+
+
+	<h2 id="USAGE">使用方法</h2>
+	<p>
+	Tamamapは、標準スクリプトエディタのメニューから起動可能です。
+	「ツール」メニューの「マップエディタを開く」項目を選択することで、Tamamapが起動されます。<br>
+	</p>
+	<pre class="quote">
+		hspsdk/tamamap/tamamap.hsp</pre>
+	<p>
+	HSPフルパッケージ上記の場所にソースコードが含まれていますので、このファイルをHSPスクリプトエディタから読み込み実行することで使用することも可能です。
+	</p>
+
+
+	<h2 id="TOOLSCR">ツールの画面説明</h2>
+	<p><img src="hsp3dish/tamamap_inst.jpg" width="720"></p>
+	<p>
+	ツールの画面は、大きく4つのエリアに分かれています。それぞれ、<a href="#MAPAREA">マップエリア</a>、<a href="#MAPNAVI">マップナビ</a>、<a href="#TOOLAREA">ツールエリア</a>、<a href="#CELAREA">セルエリア</a>と呼ばれます。<br>
+	1つのウインドウ内にある機能を適切に使いながらマップの編集を行います。
+	</p>
+
+	<h2 id="MAPAREA">マップエリア</h2>
+	<p>
+	編集中のマップが表示されるエリアです。広いマップの一部をスクロールして表示します。<br>
+	<a href="#MAPNAVI">マップナビ</a>で現在表示されている位置を調整できるほか、カーソルキーの上下左右でスクロールさせることが可能です。	また、表示倍率は<a href="#TOOLAREA">ツールエリア</a>のボタンにより変更可能です。<br>
+	マウスの左クリックでカーソル位置のマップを設定できます。設定されるセルは、<a href="#CELAREA">セルエリア</a>で選択されているセルになります。<br>
+	マウスの右クリックでカーソル位置のマップにあるセルを参照して選択することができます。
+	</p>
+
+
+	<h2 id="MAPNAVI">マップナビ</h2>
+	<p>
+	マップ全体の中で、<a href="#MAPAREA">マップエリア</a>が表示している位置とサイズをガイドします。<br>
+	マウスの左クリックで、スクロール表示されている位置を直接変更することができます。
+	</p>
+
+
+	<h2 id="TOOLAREA">ツールエリア</h2>
+	<p><img src="hsp3dish/cmdarea.png"></p>
+	<p>
+		現在のカーソル位置や選択されているセルの情報を表示します。<br>
+		また、マップエディタの機能を選択するためのインターフェースがまとめられています。
+		それぞれ以下の機能を持っています。
+	</p>
+	<dl>
+		<dt>MENUボタン</dt>
+		<dd><p><a href="#MENU">メニュー画面</a>を開きます。</p></dd>
+		<dt>UNDOボタン</dt>
+		<dd><p>1つ前の状態に戻します、1段階のみ戻すことが可能です</p></dd>
+		<dt>COPYボタン</dt>
+		<dd><p>マップの一部(矩形)をコピーします。最初にコピーする左上のブロックを選び、次に右下のブロックを選ぶことでその矩形範囲をコピーするモードに入ります。以降は、左ボタンを押すことでカーソル位置にコピー元のマップがコピーされます。</p></dd>
+		<dt>×1～×8ボタン</dt>
+		<dd><p>マップエリアの拡大率を指定します</p></dd>
+		<dt>+、-ボタン</dt>
+		<dd><p>セルエリアのバンク(表示位置)を移動させます</p></dd>
+		<dt>SETボタン</dt>
+		<dd><p>セルエリアで選択されているセルに対して、Op値、Gr値、A,N,E,Hのフラグ状態を設定します。複数選択されている場合は、すべてのセルに対して同一の内容を設定します</p></dd>
+		<dt>Op値</dt>
+		<dd><p>Op(Option)値を直接入力します。この値はスクリプト上で汎用的に使用可能な値です。</p></dd>
+		<dt>Gr値</dt>
+		<dd><p>Gr(Group)値を直接入力します。珠音ドットフレームワークでは、優先順位の設定に使用されます。0が通常表示、1にした場合はスプライトより手前に背景が表示されます。</p></dd>
+		<dt>A(Animation)フラグ</dt>
+		<dd><p>マップセルに対して4パターンのアニメーション表示を適用します</p></dd>
+		<dt>N(Notice)フラグ</dt>
+		<dd><p>マップセル表示時の通知(Notice)フラグを有効にします</p></dd>
+		<dt>E(Event)フラグ</dt>
+		<dd><p>マップセル当たり判定時のイベント(Event)フラグを有効にします</p></dd>
+		<dt>H(Hold)フラグ</dt>
+		<dd><p>マップセル当たり判定時のHoldフラグを有効にします、これは上からぶつかった時に侵入不可となります。H(Hold)フラグとE(Event)フラグを同時にセットした場合は、すべての方向から侵入不可の壁となります。</p></dd>
+	</dl>
+
+
+	<h2 id="CELAREA">セルエリア</h2>
+	<p>
+	マップの元となるセル(パーツとなる画像)を表示し、その一部を選択することができます。<br>
+	選択されたセルは、<a href="#MAPAREA">マップエリア</a>で配置することができます。
+	また、選択されたセルの属性を<a href="#TOOLAREA">ツールエリア</a>で設定することが可能です。<br>
+	セルエリア内でマウスの左または右クリックをすることで、カーソル位置にあるセルが選択されます。
+	右クリックを押しながら範囲を選択することで、複数のセルを選択することが可能です。
+	</p>
+
+
+	<h2 id="MENU">メニュー画面</h2>
+	<p><img src="hsp3dish/tamamap_menu.png" width="720"></p>
+	<p>
+	メニュー画面では、ファイルの操作やツールのオプション変更などを行います。
+	</p>
+	<dl>
+		<dt>&lt;&lt</dt>
+		<dd><p>メニューを終了しエディタ画面に戻ります</p></dd>
+		<dt>Load</dt>
+		<dd><p>ファイルを読み込みマップを編集できるようにします</p></dd>
+		<dt>Save</dt>
+		<dd><p>編集中のマップをファイルに保存します</p></dd>
+		<dt>Save as...</dt>
+		<dd><p>編集中のマップを別名でファイルに保存します</p></dd>
+		<dt>New</dt>
+		<dd><p>編集中のマップを破棄し、新規のマップを初期化します</p></dd>
+		<dt>Merge</dt>
+		<dd><p>現在編集中のマップに別なファイルのマップから一部を取り出してマージ(合成)します</p></dd>
+		<dt>Label</dt>
+		<dd><p>汎用的に使用するマップのラベル情報を編集します、ここで指定した値はマップデータ読み込み時にスクリプトから参照することが可能です</p></dd>
+		<dt>Web</dt>
+		<dd><p>関連するWebページを表示します</p></dd>
+		<dt>Option</dt>
+		<dd><p>ツールのオプションを編集します</p></dd>
+	</dl>
+
+
+	<h2 id="COPYRIGHT">著作権、ライセンスについて</h2>
+	<p>
+		Tamamapの著作権、ライセンスは、「HSP開発システム」と同様です。
+		ソースコードの改造、改変、公開については、自由に行って頂いて構いません。
+	</p>
+
+
+	<!-- フッター -->
+	<ul id="FOOTER">
+		<li><a href="#CONTAINER">このページの1番上に戻る</a></li>
+		<li><a href="../index.htm">インデックスに戻る</a></li>
+	</ul>
+	<a href="https://www.onionsoft.net/">
+		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+	</a>
+</div><!-- container -->
+</body>
+</html>
+

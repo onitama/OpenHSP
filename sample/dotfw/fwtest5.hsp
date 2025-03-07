@@ -1,0 +1,27 @@
+#include "dotfw.as"
+
+	;	テキスト画面出力テスト
+	;	テキスト画面にランダムな色で文字を表示します
+	;	(df_configの指定に「bfont」または「cfont」を指定するとフォントが変わります)
+	;
+	df_config "pc80 Z300"
+	df_reset
+
+	s1="TAMANE DOT FRAMEWORK"
+*main
+	df_addmes s1,0,24, rnd(16),2
+*main2
+	if key&PLAYER_KEY_ESC : end
+	df_update
+	if _dotfw_effect>0 : goto *main2		; エフェクト表示が完了するまで待つ
+
+	max=rnd(10)+15:chr=rnd(4)*32+$40
+	repeat max
+		poke s1,cnt,chr	
+		chr++
+	loop
+	poke s1,max,0
+
+	df_vshift DIR_UP				; テキストを上にスクロール
+	df_update
+	goto *main

@@ -1,0 +1,15 @@
+#include "dotfw.as"
+
+	;	プレイヤー操作テスト
+	;	(プレイヤーを追加して操作できます)
+	;
+	df_config "fc Z300 star"		; 初期化の設定
+	df_reset				; 初期化の実行
+
+	df_mes "TAMANE DOT FRAMEWORK",1,1	; テキスト表示
+
+	df_addplayer				; プレイヤーを追加
+*main
+	df_update				; 画面更新
+	goto *main
+

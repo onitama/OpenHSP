@@ -14,7 +14,7 @@
 <body>
 	<div id="CONTAINER">
 		<!-- ヘッダー -->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2022(c)</p>
 		<h1>HSPTVフォルダ素材一覧</h1>
 
 		<h2 id="ABOUT">素材について</h2>
@@ -33,11 +33,11 @@
 		HSPスクリプトから、手軽に素材を参照することができます。
 		</p>
 		<pre>
-			picload dir_tv+"bg01.jpg"
+			picload "bg01.jpg"
 		</pre>
 		<p>
-		「dir_tv+」に続けてファイル名を記述することで、HSPTVフォルダが参照されます。
-		(HSP3Dishでは、dir_tvを入れなくても標準でHSPTVフォルダ内の素材が検索されます。)<br>
+		HSPTVフォルダ内の同名ファイルが参照されます。
+		(HSPTV素材フォルダを示すマクロ「dir_tv」を入れて「picload dir_tv+"bg01.jpg"」のようにファイル名を記述することもできます。)<br>
 		実行ファイルを作成して配布する場合は、必要な素材だけを#packまたは#epack命令で
 		リソースとして追加する必要がありますので注意してください。<br>
 		HSP3.6β3以降では、リソースをまとめて読み込むためのモジュールが用意されています。
@@ -271,14 +271,14 @@
 		<p>
 
 		<p>
-		HSPTVフォルダ素材は、HSP(Hot Soup Procrssor)フルセットの一部として提供され、onion softwareが著作権を持っています。
+		HSPTVフォルダ素材は、HSP(Hot Soup Processor)フルセットの一部として提供され、onion softwareが著作権を持っています。
 		</p>
 		<p>
 		HSPTVフォルダ素材は、ユーザーがソフトを作成する際に、自由に使用・改変・配布することができます。
 		著作権表記をする場合は、以下のように掲載ください。
 		</p>
 		<pre>
-		HSP3.6 WebDish素材データ
+		HSP3 WebDish素材データ
 		https://dev.onionsoft.net/seed/webdish_res.html
 		</pre>
 		<p>

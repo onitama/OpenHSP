@@ -1,0 +1,81 @@
+#include "hgimg4.as"
+
+	;
+	;	自分のモデルが移動した際の衝突を予想する(gppsweeptest命令テスト)
+	;	カーソルキーで箱を動かすと正面の衝突位置にエフェクトが出ます
+	;
+	randomize
+	title "HGIMG4 Test"
+	wx=ginfo_sx:wy=ginfo_sy			; 描画エリアのサイズ
+
+	;	3Dモデルを生成
+	gpfloor id_floor, 40,40, $008080	; 床ノードを追加
+	gppbind id_floor, 0
+
+	max=16
+	x=-8
+	repeat max
+	gpbox id_model, 1, $808080		; 箱ノードを生成する
+	setscale id_model, 1,2,0.2
+	z=rnd(8)-8
+	setpos id_model, x,0.5,z
+	gppbind id_model
+	setcoli id_model, 1
+	x+=1
+	loop
+
+	; テクスチャマテリアル作成
+	gptexmat id_ptex, "res/efx.png"	,GPOBJ_MATOPT_BLENDADD|GPOBJ_MATOPT_NOZWRITE
+
+	;	イベントリストを登録
+	;
+	newevent ev1			; 新しいイベントIDを取得
+	event_setdir ev1, -0.05,-0.05,-0.05, 0.05,0.05,0.05
+	event_adddir ev1
+	event_fade ev1, -8
+	event_wait ev1, 32
+	event_delobj ev1
+
+	hitres=0
+
+	px=0.0:pz=6.0
+	gpbox id_my, 1, $40c040
+	setpos id_my,px,1,pz
+	gppbind id_my, 1, 0.5		; 箱の物理設定を行なう
+	setcoli id_my, 2, 1
+
+	setpos GPOBJ_CAMERA, 0,5,12		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, 0,0,0	; カメラから指定した座標を見る
+
+*main
+	stick key,15+256
+	if key&128 : end
+	;	カーソルキーで箱を動かす
+	if key&1 : gppapply id_my,GPPAPPLY_IMPULSE, -0.1, 0, 0
+	if key&4 : gppapply id_my,GPPAPPLY_IMPULSE, 0.1, 0, 0
+	if key&8 : gppapply id_my,GPPAPPLY_IMPULSE, 0,0, 0.1
+	if key&2 : gppapply id_my,GPPAPPLY_IMPULSE, 0,0, -0.1
+
+	getpos id_my,dx,dy,dz
+	dz=-16
+	gppsweeptest hitres,id_my,dx,dy,dz
+	if hitres>0 {
+		setcolor hitres, 255,0,0
+		getwork id_my,dx,dy,dz
+		gpplate id, 1,1,-1,id_ptex		; 板ノードを追加
+		setobjmode id, OBJ_MOVE			; 自動移動を設定する
+		setpos id,dx,dy,dz
+		setevent id, ev1
+	}
+
+	redraw 0
+	rgbcolor $eecc:boxf
+	gpdraw
+
+	rgbcolor -1:pos 0,0
+	mes "HGIMG4 Sample"
+
+	redraw 1
+	await 16
+
+	goto *main

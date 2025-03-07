@@ -6,6 +6,9 @@ material colored
     {
         cullFace = true
         depthTest = true
+        blend = true
+        blendSrc = SRC_ALPHA
+        blendDst = ONE_MINUS_SRC_ALPHA
     }
     
     technique
@@ -35,6 +38,9 @@ material textured
     {
         cullFace = true
         depthTest = true
+        blend = true
+        blendSrc = SRC_ALPHA
+        blendDst = ONE_MINUS_SRC_ALPHA
     }
     
     technique
@@ -184,7 +190,6 @@ material hair_187 : textured
 
 material skin_187 : textured
 {
-    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
     u_matrixPalette = MATRIX_PALETTE
     
     sampler u_diffuseTexture
@@ -266,7 +271,6 @@ material spats_187 : textured
 material transparent_187 : colored
 {
     u_diffuseColor = 1, 1, 1, 1
-    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
     u_matrixPalette = MATRIX_PALETTE
     
     renderState

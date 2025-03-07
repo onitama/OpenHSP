@@ -1,0 +1,55 @@
+#include "dotfw.as"
+#define BGPIC_ID (0)
+#define MYMAP_ID (1)
+
+	;
+	;	マップを使ったサンプル4
+	;	(珠音ちゃんのキャラでジャンプアクションを実行します)
+	;
+	df_config "ps2 Z100"
+	df_reset
+
+	df_setbgpicfile BGPIC_ID,"sozai5.jpg"	; 背景画像
+	df_loadbgmap MYMAP_ID, "test2.tmap"	; マップファイル読み込み
+	mapsx = _dotfw_curmapx			; マップサイズXを取得
+	mapsy = _dotfw_curmapy			; マップサイズYを取得
+	df_getbgmap map, MYMAP_ID		; マップ配列変数を取得
+
+	df_mapaction MYMAP_ID, 120, 14		; マップアクション設定
+	df_bgview MYMAP_ID, 90,90, 10,10, 32, 32	; スクロール設定
+	df_paction *player_mapev,PACTION_MAPITEM	; マップイベント処理
+
+	df_celload bgcel,"tamadot.png"		; キャラクターの画像ファイル
+	es_sizeex 64,64,,40,40,12,24		; キャラクターのサイズ指定
+	es_patanim 0, 4, 256, 64, 0, bgcel	; キャラクターの登録(0)
+	es_patanim 4, 4, 256, 192, 0, bgcel	; キャラクターの登録(4)
+
+	df_mes "TAMANE DOT FRAMEWORK",1,1	; テキスト表示
+
+	df_addplayer 300,200,0			; プレイヤーを追加
+	df_pmode 0, 4				; 移動スピード
+*main
+	;	メイン
+	if key&PLAYER_KEY_ESC : end		; [ESC]キーで終了
+	df_getplayer
+	i=0:if _dotfw_mydir=DIR_RIGHT : i=4
+	j=(_dotfw_myani>>2)&3
+	if _dotfw_myact!=1 : j=0
+	es_chr _dotfw_cursp, i+j
+
+	df_update
+	goto *main
+
+*player_mapev
+	;	イベント処理
+	op=_dotfw_curmapattr
+	if op=0 {
+		; アイテム取得
+		map(mapsx*_dotfw_curmapy+_dotfw_curmapx)=0	; アイテムを消す
+	}
+	if op=1 {
+		; トゲにあたるとミス
+		df_mes "PLAYER MISS!",1,2		; テキスト表示
+		df_pwipe				; プレイヤーを消去
+	}
+	return

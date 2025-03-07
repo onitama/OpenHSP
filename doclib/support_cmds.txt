@@ -330,9 +330,6 @@ delmod	,sys|func
 split	,sys|func
 
 #usecom	,pre|func
-#defint	,pre|func
-#defdouble	,pre|func
-#defnone	,pre|func
 #modfunc	,pre|func
 #modcfunc	,pre|func
 #modinit	,pre|func
@@ -341,8 +338,6 @@ split	,sys|func
 
 HSP3Dishサポート外コマンド
 
-resume	,sys|func
-yield	,sys|func
 pget	,sys|func
 groll	,sys|func
 

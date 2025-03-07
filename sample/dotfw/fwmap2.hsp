@@ -1,0 +1,28 @@
+#include "dotfw.as"
+#define MYMAP_ID (1)
+
+	;
+	;	マップを使ったサンプル2
+	;	(64×64ドットのキャラクターをマップ上で動かします)
+	;
+	df_config "ps1 Z200"
+	df_reset
+
+	df_loadbgmap MYMAP_ID, "test.tmap"
+
+	df_mapaction MYMAP_ID, 0, 0		; マップアクション設定
+	df_bgview MYMAP_ID, 90,90, 10,10, 32, 32	; スクロール設定
+
+	df_celload bgcel,"bgcel.png"		; キャラクターの画像ファイル
+	es_size 64,64,100			; キャラクターのサイズ指定
+	es_patanim 0, 2, 0, 192, 8, bgcel	; キャラクターの登録(0)
+
+	df_mes "TAMANE DOT FRAMEWORK",1,1	; テキスト表示
+
+	df_addplayer 300,200,0			; プレイヤーを追加
+*main
+	;	メイン
+	df_update
+	if key&PLAYER_KEY_ESC : end		; [ESC]キーで終了
+	goto *main
+

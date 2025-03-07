@@ -1,0 +1,66 @@
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample
+	;		BGマップ機能のテスト
+	;		8×8サイズのマップ内をキーで移動します
+	;		(下方向の重力がある中を左右移動、スペースキーでジャンプ)
+	;		(画面外に移動するとスプライトが消去されます)
+	;		[ESC]キーで終了
+	;
+	;------------------------------------------------------------------
+
+	randomize
+	wx=640:wy=480
+	screen 0,wx,wy				; スクリーン初期化
+	es_ini					; スプライト初期化
+
+	;	セルの画像素材を読み込みます
+	;	("parts.png"ファイルはhsptvフォルダにあります)
+	celload "parts.png",3
+	es_size 40,40				; キャラクターのサイズ指定
+	es_pat 0, 200, 0, 0, 3			; キャラクターの登録(0)
+
+	mapsx=8:mapsy=8				; マップサイズ
+	dim map,mapsx*mapsy			; マップデータ変数
+	celdiv 3,40,40				; マップのセル設定
+
+	es_bgmap 0,map,mapsx,mapsy,mapsx,mapsy,3 	; マップ登録
+	es_bgattr 0, 6,11, ESMAP_ATTR_HOLD	; アトリビュート値を設定
+	es_bglink 0, ESSPMAPHIT_BGHIT		; スプライトのBG当たり判定を有効にする
+	es_gravity -1, 0, 256
+
+	map(44)=6:map(45)=6			; マップデータを設定(壁を作る)
+	repeat 8:map(56+cnt)=6:loop
+
+	es_set 0, 64, 0, 0			; スプライトを登録
+	es_apos 0, 0, 0				; スプライト移動を有効にする
+	jump=-16				; ジャンプ力
+
+*main
+	stick ky,15				; カーソルキーの情報を取得
+	if ky&$80 : goto *owari
+
+	;	キーで移動します
+	es_get myres,0,ESI_MOVERES
+	px=0:py=0:speed=2
+	if ky&1 : px=-speed			; 左移動
+	if ky&4 : px=speed			; 右移動
+	es_setp 0,ESI_SPDX,px<<16		; X移動値のみを設定
+	if ky&16 {				; ジャンプ処理
+		if myres&ESSPRES_GROUND {	; 着地しているかチェック
+			es_setp 0,ESI_SPDY,jump<<16	; Y移動値のみを設定
+		}
+	}
+
+	redraw 0
+	rgbcolor $404040:boxf
+	es_putbg 0				; マップを描画
+	es_draw					; スプライト描画
+	redraw 1
+	await 1000/60				; タスク更新
+	goto *main
+
+*owari
+	es_bye
+	end

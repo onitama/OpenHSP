@@ -66,7 +66,7 @@ title "HGIMG4 Test"
 	gpmesh id_model,,id_texmat		; メッシュノードを追加
 	setpos id_model,0,5,0
 	setangr id_model,50,50
-	gppbind id_model, 1, GPPBIND_MESH	; メッシュ形状を物理設定する
+	gppbind id_model, 1, , GPPBIND_MESH ; メッシュ形状を物理設定する
 
 	gpfloor id_floor, 40,40, $008080	; 床ノードを追加
 	gppbind id_floor, 0

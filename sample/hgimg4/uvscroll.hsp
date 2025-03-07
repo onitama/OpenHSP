@@ -1,0 +1,50 @@
+#include "hgimg4.as"
+
+	;
+	;	テクスチャのUVオフセット設定サンプル
+	;
+
+title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, 0		; 画面クリア設定
+
+	setpos GPOBJ_CAMERA, 0,0,5	; カメラ位置を設定
+
+	offsetx = 0.5
+	offsety = 0.0
+
+	gptexmat id_texmat, "res/qbox.png", GPOBJ_MATOPT_SPECULAR|GPOBJ_MATOPT_UVOFFSET   	; テクスチャマテリアル作成
+	gpmatprm1 id_texmat, "u_specularExponent", 4.0			; スペキュラー値
+	gpmatprm2 id_texmat, "u_textureOffset", offsetx, offsety
+
+	gpbox id_model, 1 , , id_texmat		; 箱ノードを追加
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	gpmatprm2 id_model, "u_textureOffset", offsetx, offsety		; UVオフセットの設定
+	offsetx += 0.01
+	offsety += 0.02
+
+	addang id_model,0.01,0.02		; ノード回転
+
+	;	カーソルキーでカメラ位置を動かす
+	if key&1 : addpos GPOBJ_CAMERA, -0.2
+	if key&4 : addpos GPOBJ_CAMERA, 0.2
+	if key&8 : addpos GPOBJ_CAMERA, 0, 0, 0.2
+	if key&2 : addpos GPOBJ_CAMERA, 0, 0, -0.2
+
+	redraw 0			; 描画開始
+
+	gpdraw				; シーンの描画
+
+	pos 8,8:mes "HGIMG4 sample"
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+

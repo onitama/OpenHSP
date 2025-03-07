@@ -1,0 +1,35 @@
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample
+	;		BGマップ機能のテスト
+	;		8×6サイズのマップを表示します
+	;		[ESC]キーで終了
+	;
+	;------------------------------------------------------------------
+
+	randomize
+	wx=640:wy=480
+	screen 0,wx,wy				; スクリーン初期化
+	es_ini					; スプライト初期化
+
+	;	セルの画像素材を読み込みます
+	;	("mapbg.png"ファイルはhsptvフォルダにあります)
+	celload "mapbg.png",3
+
+	mapsx=8:mapsy=6				; マップサイズ
+	dim map,mapsx*mapsy			; マップデータ変数
+	celdiv 3,64,64				; マップのセル設定
+
+	es_bgmap 0,map,mapsx,mapsy,mapsx,mapsy,3,ESBGOPT_NOTRANS 	; マップ登録
+
+	map(0)=2:map(8+1)=1:map(24)=2		; マップデータを設定
+
+*main
+	redraw 0
+	es_putbg 0				; マップを描画
+	es_draw					; スプライト描画
+	redraw 1
+	await 1000/60				; タスク更新
+	goto *main
+

@@ -1,35 +1,17 @@
-#include "hsp3dish.as"
 
-#module
-#deffunc gettimestr var _p1
+#include "hsp3util.as"	; gettimestr,getdatestrを使うため
 
-	;	"hh:mm:ss"の形式で時刻を得て変数に代入する
-	;	gettimestr 変数名
-	;
-	_p1 = strf("%02d:%02d:%02d",gettime(4),gettime(5),gettime(6))
-	return
-
-#deffunc getdatestr var _p1
-
-	;	"yyyy/mm/dd"の形式で日付を得て変数に代入する
-	;	getdatestr 変数名
-	;
-	_p1 = strf("%02d/%02d/%02d",gettime(0),gettime(1),gettime(3))
-	return
-#global
-
+	t1="":t2=""
+	objsize 120,20
+	mesbox t1,160,32,0		; メッセージボックスを表示
+					; (オブジェクトID0になります)
+	mesbox t2,160,32,0		; メッセージボックスを表示
+					; (オブジェクトID1になります)
 *tmprt
-	redraw 0
-
 	gettimestr t1
 	getdatestr t2
-	pos 0,0:rgbcolor 0
-	mes "Time:"
-	mes t1
-	mes "date:"
-	mes t2
-
-	redraw 1
-	wait 100			;
-	goto *tmprt			; 
+	objprm 0,t1			; メッセージボックスID0の内容を更新
+	objprm 1,t2			; メッセージボックスID1の内容を更新
+	wait 100			; 1秒ウエイトする
+	goto *tmprt			; 無限ループ
 

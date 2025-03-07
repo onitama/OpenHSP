@@ -2,7 +2,7 @@
 #include "hsp3dish.as"
 
 	;
-	;	HSPDX.DLL sample5
+	;	Sprite sample5
 	;		シューティングゲームのサンプル。
 	;		カーソルキーで移動、スペースで発射
 	;		[ESC]キーで終了
@@ -24,11 +24,12 @@
 	buffer 3
 	picload "testchr.png"
 	es_size chrsx,chrsy,60
-	es_pat 0, 128,0			; 顔
-	es_pat 1, 192,0			; リンゴ
-	es_pat 2, 256,0			; リンゴ
-	es_pat 3, 320,0			; リンゴ
-	es_pat 4, 384,0			; リンゴ
+	es_pat 0, 64,64			; プレイヤー
+	es_pat 1, 192,0			; ミサイル
+	es_pat 2, 256,0			; 大きな弾
+	es_pat 3, 320,0			; 敵の弾
+	es_pat 4, 384,0			; 敵
+	es_patanim 10,4,256,64,2	; 爆発
 
 	gsel 0
 
@@ -78,14 +79,14 @@
 
 	;	敵ミサイル
 	;
-	if rnd(10)<5 : goto *noset
+	if rnd(100)>20 : goto *noset
 	es_getpos n,x,y
 	es_new a,128
 	es_set a,x,y,3
 	es_type a,8
 	es_aim a,myx,myy,600
 *noset
-	if gcnt&15 : return
+	if gcnt\20 : return
 
 	;	敵キャラ配置
 	;
@@ -102,7 +103,7 @@
 	repeat
 	es_find n,2,n:if n=-1 : break		; ミサイルのスプライトを検出
 	es_check a,n,4				; 衝突チェック
-	if a>=0 : es_kill n:es_chr a,2:es_type a,16:es_flag a,20
+	if a>=0 : es_kill n:es_chr a,10:es_type a,16:es_fade a,ESSPF_TIMEWIPE,20
 	n+
 	loop
 
@@ -157,9 +158,10 @@
 	es_pos 0,myx,myy			; スプライト座標設定
 	es_check a,0,12
 	if a<0 : return
+	;	やられた
 	gres=1
-	es_flag 0,30
-	es_chr 0,2
+	es_fade 0,ESSPF_TIMEWIPE,30
+	es_chr 0,10
 	return
 
 

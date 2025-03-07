@@ -1,0 +1,61 @@
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample12
+	;		デコレーションスプライトのテスト
+	;		スペースキーかマウスクリックで装飾スプライトを表示します
+	;		[ESC]キーで終了
+	;
+	;------------------------------------------------------------------
+
+	randomize
+	wx=640:wy=480				; 画面サイズ
+	screen 0,wx,wy				; スクリーン初期化
+	es_ini					; スプライト初期化
+
+	buffer 3
+	picload "testchr.png"
+	es_size 64,64,100
+	es_pat 0, 0,0				; 顔
+	es_pat 1, 64,0				; リンゴ
+	gsel 0
+
+	;	装飾スプライトの登録
+	;	deco1にIDが代入されます
+	es_regdeco 0,ESDECO_MULTI8,0,400
+	deco1=stat
+
+	;	装飾スプライトの登録
+	;	deco2にIDが代入されます
+	es_regdeco 1,ESDECO_BOOST|ESDECO_MULTI8
+	deco2=stat
+
+*main
+	stick ky,$1f				; カーソルキーの情報を取得
+	if ky&$80 : goto *owari
+	if ky&256 {
+		;	マウスクリックで装飾スプライトの表示
+		;	マウスカーソルの位置に出します
+		es_setdeco mousex,mousey,deco1
+	}
+	if ky&16 {
+		;	スペースキーで装飾スプライトの表示
+		;	ランダムな位置に出します
+		es_setdeco rnd(wx),rnd(wy),deco2
+	}
+
+	redraw 0
+	es_draw					; スプライト描画
+	pos 0,0
+	mes "Press mouse button or space key"	
+
+	redraw 1
+	await 1000/60				; タスク更新
+
+	goto *main
+
+*owari
+	es_bye
+	end
+
+

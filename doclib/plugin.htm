@@ -23,7 +23,7 @@
 
 	<div id="CONTAINER">
 		<!-- ヘッダー -->
-		<p id="COPY"><a id="top" class="head">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</a></p>
+		<p id="COPY"><a id="top" class="head">HSP : Hot Soup Processor ver3.7 / onion software 1997-2024(c)</a></p>
 		<img src="hsp3ttl.jpg" alt="タイトル" width="640" height="200">
 		<h1>拡張プラグイン・モジュール一覧</h1>
 
@@ -51,6 +51,7 @@
 					<li><a href="#HSPSW">HSPSW.DLL</a></li>
 					<li><a href="#HSPMUCOM">HSPMUCOM.DLL</a></li>
 					<li><a href="#HSPZLIB">ZLibWrap.dll</a></li>
+					<li><a href="#HSPVOICEVOX">hspvoicevox.dll</a></li>
 				</ol>
 			</li>
 			<li><a href="#MODULE">モジュール</a>
@@ -60,6 +61,7 @@
 					<li><a href="#HSP3DISH">HSP3DISH.hrt</a></li>
 					<li><a href="#SQLele">SQLele</a></li>
 					<li><a href="#hsp3util">hsp3util.as</a></li>
+					<li><a href="#dotfw">珠音（たまね）ドットフレームワーク</a></li>
 					<li><a href="#hsp261cmp">hsp261cmp.as</a></li>
 					<li><a href="#form_decode">form_decode.as</a></li>
 					<li><a href="#mod_getenv">mod_getenv.as</a></li>
@@ -74,6 +76,8 @@
 					<li><a href="#mod_stbar">mod_stbar.as</a></li>
 					<li><a href="#modclbk">modclbk3.hsp</a></li>
 					<li><a href="#dmxusb">mod_dmxusb.as</a></li>
+					<li><a href="#mod_mmaudio">mod_mmaudio.as</a></li>
+					<li><a href="#mod_vpad">mod_vpad.as</a></li>
 					<li><a href="#winapi">Win32API定義</a></li>
 				</ol>
 			</li>
@@ -204,7 +208,7 @@
 							<li>ストリーム再生を含むサウンド機能を装備</li>
 					</ul>
 					<p>
-						詳しくは、別途ドキュメント「<a href="hgimg3.txt">hgimg3.txt</a>」を参照してください。
+						HSP3.7β8以降は、本体には同梱されていません。<a href="hsp3update.html">HSP3アップデーター (HSP3Update)</a>により別途ダウンロードすることができます。
 						このランタイムは、現在開発を終了しています。後継となるHGIMG4をご使用ください。
 					</p>
 				</td>
@@ -630,6 +634,28 @@
 				</td>
 			</tr>
 		</table>
+		<h3 id="HSPVOICEVOX">hspvoicevox.dll</h3>
+		<table summary="拡張プラグインhspvoicevox.dllの紹介です。" class="pluginlist">
+			<caption>hspvoicevox.dllの紹介</caption>
+			<tr>
+				<th width="20%">拡張プラグイン</th>
+				<th width="30%">hspvoicevox.dll</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					VOICEVOX COREによる音声合成を呼び出す機能を提供します。
+					VOICEVOXにより、様々なキャラクターによる精度の高い音声読み上げを行うことが可能になります。
+					</p>
+					<p>
+						詳しくは、<a href="hspvoicevox.html">hspvoicevox.html</a>ファイル及びヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
 
 
 		<h2 id="MODULE">モジュール</h2>
@@ -759,6 +785,28 @@
 					</p>
 					<p>
 					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="dotfw">珠音（たまね）ドットフレームワークの紹介</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>珠音（たまね）ドットフレームワークの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">珠音（たまね）ドットフレームワーク</th>
+				<th width="5%">^Verβ</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					ドット絵のHSP3オフィシャル素材とHSP3Dish上で使用できるライブラリのセットです。<br>
+					ゲームに特化したシンプルな命令セットとオールインワンの素材パッケージで手軽にレトロスタイルの自作ゲームを作り始めることが可能です。 作成したゲームは、WindowsだけでなくWebやラズパイ、Linux、android、iOSなどで発表することが可能です。
+					</p>
+					<p>
+						詳しくは、別途ドキュメント「<a href="dotfw.html">dotfw.html</a>」を参照してください。
 					</p>
 				</td>
 			</tr>
@@ -926,7 +974,7 @@
 				<th width="20%">拡張モジュール</th>
 				<th width="30%">mod_joystick.as</th>
 				<th width="5%">---</th>
-				<th width="25%">作者:MIA</th>
+				<th width="25%">作者:MIA / onitama</th>
 				<th width="20%"><a href="http://taillove.jp/mia/">作者のページ</a></th>
 			</tr>
 			<tr>
@@ -934,6 +982,9 @@
 					<p>
 					Windowsに接続されたジョイスティックの状態を取得するためのモジュールです。
 					アナログ状態の検出が可能な、joyGetPosEx及びstick命令互換の値を取得可能な、jstick命令が追加されます。
+					</p>
+					<p>
+					より互換性が向上した、mod_joystick2.as モジュールもありますので、適宜選択してご利用ください。
 					</p>
 					<p>
 					詳しくは、モジュールのソーススクリプト及び命令ヘルプを参照してください。
@@ -1069,6 +1120,47 @@
 				</td>
 			</tr>
 		</table>
+		<h3 id="mod_mmaudio">mod_mmaudio.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_mmaudio.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_mmaudio.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:inovia,onitama</th>
+				<th width="20%"><a href="https://hsp.moe/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					Windowsのオーディオ制御モジュールです。音量の設定・取得、ミュートなどの設定を行うことができます。
+					詳しくは、モジュールのソーススクリプト及びヘルプを参照してください。sample/mmaudioフォルダ内にサンプルスクリプトも用意されています。
+					</p>
+				</td>
+			</tr>
+		</table>
+		<h3 id="mod_vpad">mod_vpad.as</h3>
+		<table summary="拡張モジュールの紹介です。" class="pluginlist">
+			<caption>mod_vpad.asの紹介</caption>
+			<tr>
+				<th width="20%">拡張モジュール</th>
+				<th width="30%">mod_vpad.as</th>
+				<th width="5%">---</th>
+				<th width="25%">作者:おにたま</th>
+				<th width="20%"><a href="https://www.onionsoft.net/">作者のページ</a></th>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<p>
+					キャラクターを移動させるゲームなどにバーチャルパッドを実装するためのモジュールです。<br>
+					バーチャルパッドはゲームなどで使用する4つの方向と4つのボタンを画面に表示してタッチ等で利用できるようにしたものです。
+					詳しくは、モジュールのソーススクリプト及びヘルプを参照してください。sample/game/vpadmove.hsp、及び sample/hgimg4/boxf_snake.hsp にサンプルスクリプトが用意されています。
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
 		<h3 id="winapi">Win32API定義</h3>
 		<table summary="拡張モジュールの紹介です。" class="pluginlist">
 			<caption>Win32API定義の紹介</caption>

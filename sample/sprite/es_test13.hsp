@@ -1,0 +1,58 @@
+#include "hsp3dish.as"
+
+	;
+	;	HSP3Dish sprite sample13
+	;		スプライト移動のテスト
+	;		珠音ちゃんがカーソルキーで移動します
+	;		(160×120ドットの画面を4倍に拡大して表示しています)
+	;		[ESC]キーで終了
+	;
+	;------------------------------------------------------------------
+
+	randomize
+	wx=160:wy=120				; 画面サイズ
+	zoom=4					; 画面拡大
+	screen 0,wx*zoom,wy*zoom		; スクリーン初期化
+	viewcalc vptype_2d, zoom, zoom		; 画面のズームを設定
+
+	es_ini					; スプライト初期化
+
+	;	珠音ちゃんの歩きアニメーションを登録します
+	sx=16:sy=16
+	celload "tamane16.png",3		; 画像ファイル読み込み
+	es_size sx,sy				; キャラクターのサイズ指定
+	es_patanim 0,4, 0, 0, 4, 3		; キャラクターの登録(0〜3)
+	es_patanim 4,4, sx*4, 0, 4, 3		; キャラクターの登録(4〜7)
+	es_patanim 8,4, 0, sy*1, 4, 3		; キャラクターの登録(0〜3)
+	es_patanim 12,4, sx*4, sy*1, 4, 3	; キャラクターの登録(4〜7)
+
+	es_set 0, 50, 40, 0			; (50,40)の位置にスプライトを登録
+	mychr=0
+*main
+	stick ky,$1f				; カーソルキーの情報を取得
+	if ky&$80 : goto *owari			; [ESC]キーで終了
+
+	;	キーで移動します
+	px=0:py=0
+	if ky&8 : py=1 : newchr=0		; 下移動
+	if ky&2 : py=-1 : newchr=4		; 上移動
+	if ky&1 : px=-1 : newchr=8		; 左移動
+	if ky&4 : px=1 : newchr=12		; 右移動
+	es_apos 0, px,py			; スプライトを移動させる
+	if mychr!=newchr {
+		mychr=newchr
+		es_chr 0,mychr			; キャラクターを置き換える
+	}
+	redraw 0				; 描画開始
+	rgbcolor $8000:boxf			; 画面クリア
+	es_draw					; スプライト描画
+	redraw 1				; 描画終了
+	await 1000/60				; タスク更新
+
+	goto *main
+
+*owari
+	es_bye
+	end
+
+

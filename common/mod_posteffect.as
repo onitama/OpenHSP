@@ -32,7 +32,7 @@
 #deffunc post_select int _p1
 
 	;	ポストエフェクトIDを指定
-	;	(post_select 0～10)
+	;	(post_select 0〜10)
 	;
 	if postid=_p1 : return
 	postid=_p1
@@ -336,6 +336,8 @@
 *opt_crt
 	crt_curvex=postopt_p1		; X方向の湾曲率
 	crt_curvey=postopt_p2		; Y方向の湾曲率
+	gpmatprm1 crt_mat, "u_curvex", crt_curvex
+	gpmatprm1 crt_mat, "u_curvey", crt_curvey
 	return
 
 *exec_crt
@@ -381,7 +383,7 @@
 	gpgetmat blur_mat, bufid_effect, GPGETMAT_OPT_SCRMAT
 	gpgetmat blur_mat2, bufid_effect+1, GPGETMAT_OPT_SCRMAT
 
-	blur_level=6.0			; ぼかし強度(1.0～10.0程度)
+	blur_level=6.0			; ぼかし強度(1.0〜10.0程度)
 	blur_stepx=1.0/sx2
 	blur_stepy=1.0/sy2
 	
@@ -458,7 +460,7 @@
 	gpgetmat blur_mat, bufid_effect, GPGETMAT_OPT_SCRMAT
 	gpgetmat blur_mat2, bufid_effect+1, GPGETMAT_OPT_SCRMAT
 
-	blur_level=10.0			; ぼかし強度(1.0～10.0程度)
+	blur_level=10.0			; ぼかし強度(1.0〜10.0程度)
 	blur_stepx=1.0/sx2
 	blur_stepy=1.0/sy2
 	glow_rate=160
