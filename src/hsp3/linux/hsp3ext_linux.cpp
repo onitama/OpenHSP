@@ -19,8 +19,8 @@
 #include "hsp3ext_linux.h"
 #include "hsp3extlib_ffi.h"
 
-static HSPCTX *hspctx;		// Current Context
-static HSPEXINFO *exinfo;	// Info for Plugins
+static HSPCTX *hspctx = NULL;		// Current Context
+static HSPEXINFO *exinfo = NULL;	// Info for Plugins
 static int *type;
 static int *val;
 static int *exflg;
@@ -172,6 +172,7 @@ char* hsp3ext_getdir(int id)
 {
 	//		dirinfo命令の内容を設定する
 	//
+	if ( hspctx==NULL ) return "";
 	char *p = hspctx->stmp;
 	*p = 0;
 	int cutlast = 0;
@@ -194,7 +195,11 @@ char* hsp3ext_getdir(int id)
 		p = hspctx->cmdline;
 		break;
 	case 5:				//    HSPTV素材があるディレクトリ
+#if defined(HSPDEBUG)||defined(HSP3IMP)
 		p = hspctx->tvfoldername;
+#else
+		p = "";
+#endif
 		break;
 	case 6:				//    ランゲージコード
 		p = hspctx->langcode;

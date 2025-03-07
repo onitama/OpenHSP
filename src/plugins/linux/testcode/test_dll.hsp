@@ -1,0 +1,15 @@
+#uselib "test.so"
+
+#cfunc test0 "func0"
+#cfunc test1 "func1" var,int,int,int
+
+repeat 10
+    mes "call test0"
+    res=test0()
+    mes "return " + res
+    a = "abc"
+
+    mes "call test1"
+    res=test1(a,1,2,3)
+    mes "return " + res
+loop

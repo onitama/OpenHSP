@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+char* hsp3ext_getdir(int id);
+
 #ifdef HSPWIN
 #include <windows.h>
 #include <tchar.h>
@@ -267,6 +269,16 @@ FILE *hsp3_fopen(char*name, int offset)
 
 	// Linux
 	hsp3_fp = fopen(name, "rb");
+#ifdef HSPDEBUG
+	if (hsp3_fp == NULL) {
+		//	hsptvフォルダを検索する
+		char fn[2048];
+		strcpy(fn, hsp3ext_getdir(5));		// tv folder
+		strcat(fn, name);
+		hsp3_fp = fopen(fn, "rb");
+	}
+#endif
+
 
 #endif
 	if (hsp3_fp == NULL) return NULL;

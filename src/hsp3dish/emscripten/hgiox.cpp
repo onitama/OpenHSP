@@ -2452,7 +2452,7 @@ void hgio_setview(BMSCR* bm)
 		UnitMatrix();
 		RotZ(bm->vp_viewrotate[2]);
 		GetCurrentMatrix(&tmpmat);
-		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)_bgsx / bm->vp_viewscale[0], (float)-_bgsy / bm->vp_viewscale[1], 0.0f, 1.0f);
+		OrthoMatrix(-bm->vp_viewtrans[0], bm->vp_viewtrans[1], (float)_bgsx / bm->vp_viewscale[0], (float)-_bgsy / bm->vp_viewscale[1], 0.0f, 1.0f);
 		MulMatrix(&tmpmat);
 		break;
 	case BMSCR_VPFLAG_3D:

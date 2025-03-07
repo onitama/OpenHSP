@@ -66,7 +66,6 @@ int main( int argc, char *argv[] )
 #else
 	p = NULL;
 #endif
-
 	hsp3dish_cmdline((char *)clopt.c_str());
 	hsp3dish_modname((char *)clmod.c_str());
 
