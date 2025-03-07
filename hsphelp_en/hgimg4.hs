@@ -67,7 +67,7 @@ GPDRAW_OPT_DRAW2D_LATE 2D sprite drawing process (OBJ_LATE)
 If you omit the option parameter, all items are selected.
 Normally, you don't have to specify the option parameter.
 Also, if you use only 2D direct drawing instructions and do not need to draw with an object, you do not need to write a gpdraw instruction.
-Items with the OBJ_LATE mode flag value added (including those with a semi-transparent ç•™ value) are drawn after the opaque object, so the items are separated.
+Items with the OBJ_LATE mode flag value added (including those with a semi-transparent —¯ value) are drawn after the opaque object, so the items are separated.
 You can also specify multiple items separated by "|".
 ^p
 Example:
@@ -115,7 +115,7 @@ Macro name | Contents
 PRMSET_FLAG Object registration flag (*)
 PRMSET_MODE mode flag value
 PRMSET_ID Object ID (*)
-PRMSET_ALPHA Transparency (ç•™ value)
+PRMSET_ALPHA Transparency (—¯ value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
 PRMSET_COLGROUP Collision group for collision detection
@@ -155,7 +155,7 @@ Macro name | Contents
 PRMSET_FLAG Object registration flag (*)
 PRMSET_MODE mode flag value
 PRMSET_ID Object ID (*)
-PRMSET_ALPHA Transparency (Î± value)
+PRMSET_ALPHA Transparency (ƒ¿ value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
 PRMSET_COLGROUP Collision group for collision detection
@@ -295,13 +295,13 @@ Please note that all item names and settings are character strings. (Item names 
 "ONE_MINUS_SRC_COLOR" Original color (inverted value)
 "DST_COLOR" Write destination color
 "ONE_MINUS_DST_COLOR" Write destination color (inverted value)
-"SRC_ALPHA" write source Î±
-"ONE_MINUS_SRC_ALPHA" Write source Î± (inverted value)
-"DST_ALPHA" write destination Î±
-"ONE_MINUS_DST_ALPHA" Write destination Î± (inverted value)
-"CONSTANT_ALPHA" Î± fixed value
-"ONE_MINUS_CONSTANT_ALPHA" Î± fixed value (inverted value)
-"SRC_ALPHA_SATURATE" Write source Î± inversion value
+"SRC_ALPHA" write source ƒ¿
+"ONE_MINUS_SRC_ALPHA" Write source ƒ¿ (inverted value)
+"DST_ALPHA" write destination ƒ¿
+"ONE_MINUS_DST_ALPHA" Write destination ƒ¿ (inverted value)
+"CONSTANT_ALPHA" ƒ¿ fixed value
+"ONE_MINUS_CONSTANT_ALPHA" ƒ¿ fixed value (inverted value)
+"SRC_ALPHA_SATURATE" Write source ƒ¿ inversion value
 
 (*) Character string that can be set with cullFaceSide
 
@@ -979,4 +979,997 @@ id is the object ID.
 setwork2
 work2 Set group information
 %group
-Extended screen contro”0øÂÇÕ
+Extended screen control command
+%prm
+id,x,y,z
+id: object ID
+(x, y, z): Value to set (default = 0)
+%inst
+Set the parameters of the object.
+Sets the value specified by (x, y, z) to the work2 group (work2 value).
+(x, y, z) can be a real number or an integer value.
+%href
+setwork
+
+
+%index
+addwork2
+work2 Add group information
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: object ID
+(x, y, z): Value to set (default = 0)
+%inst
+Set the parameters of the object.
+Adds the value specified by (x, y, z) to the work2 group (work2 value).
+(x, y, z) can be a real number or an integer value.
+%href
+addwork
+
+
+%index
+gpcnvaxis
+Perform 3D coordinate conversion
+%group
+Extended screen control command
+%prm
+var_x,var_y,var_z,x,y,z,mode
+var_x: Variable to which the X value is assigned
+var_y: Variable to which the Y value is assigned
+var_z: Variable to which the Z value is assigned
+x (0.0): X value of conversion source
+y (0.0): Y value of conversion source
+z (0.0): Z value of conversion source
+mode (0): Conversion mode
+%inst
+Converts the 3D coordinates of (x, y, z) according to the determined mode.
+The result is assigned in real type to the variables specified by var_x, var_y, var_z. (Variable type is set automatically)
+The contents of conversion by mode value are as follows.
+^p
+Mode content
+-----------------------------------------------
+0 2D coordinate (X, Y) position to be drawn + Z buffer value
+Same as 10 but with normalized (X, Y) coordinates
+2 View-transformed (X, Y, Z) coordinates
+^p
+Modes 0 and 1 convert to the X, Y coordinates, and Z-buffer values of a 2D projection on the screen.
+In mode 2, the view is converted to the X, Y, Z coordinate values that take the camera position into consideration.
+%href
+
+
+%index
+gppset
+Set the physical parameters of the node
+%group
+Extended screen control command
+%prm
+objid,prmid,x,y,z
+objid (0): Object ID
+prmid (0): Parameter ID
+x (0.0): Setting parameter X value
+y (0.0): Setting parameter Y value
+z (0.0): Setting parameter Z value
+%inst
+Sets the detailed physical parameters of the node specified by objid.
+Specify the item to be set with the prmid parameter, and the values specified for X, Y, and Z are applied as the values corresponding to each item.
+^p
+        Macro name Contents
+    ----------------------------------------------------------------------------
+GPPSET_ENABLE X = Physical behavior ON / OFF (0 = Invalid)
+GPPSET_FRICTION X = coefficient of friction, Y = elasticity setting
+GPPSET_DAMPING X = linear repulsion (0-1.0), Y = angular repulsion (0-1.0)
+GPPSET_KINEMATIC X = Kinematic setting ON / OFF (0 = invalid)
+GPPSET_ANISOTROPIC_FRICTION X, Y, Z = anisotropic friction
+GPPSET_GRAVITY X, Y, Z = Gravity
+GPPSET_LINEAR_FACTOR X, Y, Z = Vector movement settings
+GPPSET_ANGULAR_FACTOR X, Y, Z = Rotation settings along vector
+GPPSET_ANGULAR_VELOCITY X, Y, Z = Rotating Velocity
+GPPSET_LINEAR_VELOCITY X, Y, Z = Linear Velocity
+GPPSET_MASS_CENTER X, Y, Z = Center coordinate offset
+^p
+Be sure to set the basic physical characteristics with the gppbind instruction before making the detailed settings.
+If the settings are incorrect, an error will occur.
+%href
+gppbind
+
+
+%index
+gpobjpool
+Object ID generation settings
+%group
+Extended screen control command
+%prm
+start,num
+start (0): Assignment start number
+num (-1): Maximum number of allocations
+%inst
+Change the method of assigning the object ID.
+The object ID is assigned an unused ID number within a predetermined maximum number.
+The maximum number of objects is 1024 by default and can be expanded with the sysreq instruction.
+^p
+Example:
+setreq SYSREQ_MAXOBJ, 4096; Expand maximum number of objects to 4096
+^p
+The gpobjpool instruction can change the ID number allocation range as desired.
+Sets the number specified by the start parameter as the allocation start number.
+Sets the number specified by the num parameter to the maximum number that can be assigned.
+If the num parameter is negative or omitted, the maximum range that can be taken from the allocation start number is set.
+^p
+Example:
+gpobjpool 100,50; Change object ID generation settings
+^p
+In the above example, only ID numbers 100 to 150 are assigned.
+Subsequent object creation instructions (such as gpbox and gpnull) will only assign object IDs within the specified range.
+If you want to limit the number of objects that can be generated to a certain number, or
+It can be used when you want to control the display order to some extent.
+The gpobjpool instruction cannot extend the preset maximum number of objects.
+Be sure to set within the maximum number.
+%href
+delobj
+
+
+%index
+gppapply
+Apply physical force to a node
+%group
+Extended screen control command
+%prm
+objid,action,x,y,z
+objid (0): Object ID
+action (0): Force type (type)
+x (0.0): Setting parameter X value
+y (0.0): Setting parameter Y value
+z (0.0): Setting parameter Z value
+%inst
+Apply the physical force of the vector specified by (x, y, z) to the node.
+The types that can be set with the action parameter are as follows.
+^p
+        Macro name Contents
+    ----------------------------------------------------------------------------
+GPPAPPLY_FORCE Add the force to move
+GPPAPPLY_IMPULSE Gives a momentary impact
+GPPAPPLY_TORQUE Gives torque (twisting) force
+GPPAPPLY_TORQUE_IMPULSE Torque + impact
+^p
+Be sure to apply the force after setting the basic physical characteristics with the gppbind instruction.
+If the settings are incorrect, an error will occur.
+%href
+gppbind
+
+
+%index
+gpmatprm1
+Material parameter setting (2)
+%group
+Extended screen control command
+%prm
+id,"name",value
+id (0): Material ID / Object ID
+"name": Parameter name
+value (0.0): X setting value (real value)
+%inst
+Sets the shader parameters for the generated material.
+It has basically the same function as the gpmatprm instruction.
+The gpmatprm1 instruction specifies a real parameter for only one item.
+%href
+gpmat
+gpmatprm
+gpmatprm4
+gpmatprm16
+
+
+%index
+gpmatprm4
+Material parameter setting (3)
+%group
+Extended screen control command
+%prm
+id,"name",x,y,z,w
+id (0): Material ID / Object ID
+"name": Parameter name
+x (0.0): X setting value (real value)
+y (0.0): Y setting value (real value)
+z (0.0): Z setting value (real value)
+w (0.0): W setting value (real value)
+%inst
+Sets the shader parameters for the generated material.
+It has basically the same function as the gpmatprm instruction.
+The gpmatprm4 instruction specifies real parameters for 4 items (x, y, z, w).
+%href
+gpmat
+gpmatprm
+gpmatprm1
+gpmatprm16
+
+
+%index
+setalpha
+Object transparency (—¯ value) setting
+%group
+Extended screen control command
+%prm
+objid,value
+objid (0): Object ID
+value (255): Value to be set (integer value) (0 to 255)
+%inst
+Sets the transparency (—¯ value) of the object.
+Sets the value specified by the value parameter to the object of the objid parameter.
+The value specified by the value parameter is an integer value (—¯ value) from 0 to 255 that indicates transparency.
+0 applies to full transparency and 255 applies opacity.
+For objects whose —¯ value is other than 255 (semi-transparent), the drawing order is changed to the front.
+(Same state as the mode flag value of OBJ_LATE was specified)
+%href
+gpsetprm
+
+
+%index
+gpgetlog
+Get HGIM G4 error log
+%group
+Extended screen control command
+%prm
+var
+var: Variable to which the error log is assigned
+%inst
+Get the HGIMG4 error log and assign it to a variable. The variable is initialized as a string type.
+The error log records the details of the error that occurred during execution of the gpreset, gpload instruction, etc., and can be used for investigating the cause.
+
+%href
+gpload
+gpreset
+
+
+%index
+gpaddanim
+Add animation clip
+%group
+Extended screen control command
+%prm
+objid,"name",start,end,option
+objid (0): Object ID
+"name": Animation clip name
+start (0): Start frame (milliseconds)
+end (-1): end frame (milliseconds)
+option (0): Additional options
+%inst
+Add a new animation clip based on the animation data of the loaded 3D model.
+Animated clips are managed by naming and managing some frames cut out from the animation data of a 3D model.
+It is necessary to read the model data including animation data from the gpb file in advance by the gpload command.
+The "name" parameter specifies the name of the animation clip. You cannot specify a name that has already been added.
+Specify the frame range of the animation clip with the start and end parameters. These are time specifications in milliseconds.
+If you omit the end parameter or specify a negative value, the last frame of the entire animation is applied.
+
+If the process ends normally, 0 is assigned to the system variable stat. If an error occurs, the system variable stat will be assigned a negative value.
+
+%href
+gpgetanim
+gpsetanim
+gpact
+
+
+%index
+gpact
+Play / Stop Animation Clip
+%group
+Extended screen control command
+%prm
+objid,"name",option
+objid (0): Object ID
+"name" (""): Animation clip name
+option (1): Playback option
+%inst
+Controls the play / stop of the animation clip with the specified name.
+Specify the object ID of the model in which the animation is set, and select the animation clip with "name".
+Animation clips can be set in advance with the gpaddanim instruction. Also, omit the specification of "name", or if it is "" (empty string), it will be the default animation clip.
+Playback is controlled by the value of option.
+^p
+        Macro name value Content
+    ----------------------------------------------------------------------------
+GPACT_STOP 0 Stop
+GPACT_PLAY 1 start
+GPACT_PAUSE 2 Pause
+^p
+Animation playback is controlled for each animation clip.
+It is possible to play multiple animation clips for one model at the same time.
+Ggpetanim and gpsetanim are provided as commands for acquiring and setting the playback status of animation clips.
+If the process ends normally, 0 is assigned to the system variable stat. If an error occurs, the system variable stat will be assigned a negative value.
+
+%href
+gpaddanim
+gpgetanim
+gpsetanim
+
+
+%index
+gpgetanim
+Get animation clip settings
+%group
+Extended screen control command
+%prm
+var,objid,index,prmid
+var: Variable to which information is assigned
+objid (0): Object ID
+index (0): Index of animation clip (0 ~)
+prmid (0): Parameter ID
+%inst
+Gets the settings for the specified animation clip and assigns it to the variable specified by var.
+Specify the index of the animation clip in index and the object ID to get the setting by objid.
+The animation clip index is a number that is sequentially assigned to the animation clips held by the object. If an index that does not exist is specified with an integer value starting from 0 such as 0,1,2,3 ..., -1 (error) is assigned to the system variable.
+Specifies what information to get with prmid. The values that can be specified with prmid are as follows.
+^p
+        Macro name value Content
+    ----------------------------------------------------------------------------
+GPANIM_OPT_START_FRAME 0 Start frame (in milliseconds)
+GPANIM_OPT_END_FRAME 1 End frame (in milliseconds)
+GPANIM_OPT_DURATION 2 Playback length (in milliseconds)
+GPANIM_OPT_ELAPSED 3 Elapsed time (in milliseconds)
+GPANIM_OPT_BLEND 4 Blend coefficient (in%)
+GPANIM_OPT_PLAYING 5 Playing flag (0 = stop / 1 = play)
+GPANIM_OPT_SPEED 6 Playback speed (in%)
+GPANIM_OPT_NAME 16 Animation clip name
+^p
+The variables retrieved are initialized with the appropriate type. In the case of GPANIM_OPT_NAME, it will be a character string type.
+If the process ends normally, 0 is assigned to the system variable stat. If an error occurs, the system variable stat will be assigned a negative value.
+%href
+gpaddanim
+gpsetanim
+
+
+%index
+gpsetanim
+Updated animation clip settings
+%group
+Extended screen control command
+%prm
+objid,index,prmid,value
+objid (0): Object ID
+index (0): Index of animation clip (0 ~)
+prmid (0): Parameter ID
+value (0): Set value (integer value)
+%inst
+Updates the specified animation clip settings with the new value specified by value.
+Specify the index of the animation clip in index and the object ID to get the setting by objid.
+The animation clip index is a number that is sequentially assigned to the animation clips held by the object. If an index that does not exist is specified with an integer value starting from 0 such as 0,1,2,3 ..., -1 (error) is assigned to the system variable.
+Specifies what information to set in prmid. The values that can be specified with prmid are as follows.
+^p
+        Macro name value Content
+    ----------------------------------------------------------------------------
+GPANIM_OPT_DURATION 2 Playback length (in milliseconds)
+GPANIM_OPT_BLEND 4 Blend coefficient (in%)
+GPANIM_OPT_SPEED 6 Playback speed (in%)
+^p
+If the process ends normally, 0 is assigned to the system variable stat. If an error occurs, the system variable stat will be assigned a negative value.
+%href
+gpaddanim
+gpgetanim
+
+
+%index
+gpmatprm16
+Material parameter settings (matrix)
+%group
+Extended screen control command
+%prm
+id,"name",var
+id (0): Material ID / Object ID
+"name": Parameter name
+var: Array variable name to which the value is assigned (real type)
+count (1): Number of matrices to be set
+%inst
+Sets the shader parameters for the generated material.
+It has basically the same function as the gpmatprm instruction, but the gpmatprm16 instruction sets the numerical value stored in the real number type array variable specified by var as a 4x4 matrix matrix.
+The 16 real numbers from var (0) to var (15) form a matrix matrix. If count is specified, the number of values will be fetched from the array variable.
+%href
+gpmatprm
+gpmatprm1
+gpmatprm4
+
+
+%index
+gpmatprmt
+Material parameter settings (texture)
+%group
+Extended screen control command
+%prm
+id,"name","filename"
+id (0): Material ID / Object ID
+"name": Parameter name
+"filename": image file name
+opt (0): Material option value
+%inst
+Sets the shader parameters for the generated material.
+It has basically the same function as the gpmatprm instruction, but the gpmatprmt instruction sets the file specified by "filename" as a texture image.
+It can be used to pass sampler2D type parameters to the shader.
+If GPOBJ_MATOPT_NOMIPMAP is specified in the opt parameter, MIPMAP will not be generated.
+If GPOBJ_MATOPT_CUBEMAP is specified in the opt parameter, the texture will be treated as a cubemap.
+Cubemaps can be used for environment maps, skyboxes, etc. in a special format that summarizes images in six directions.
+(For the cubemap image, use one .PNG format in which 6 images of + X, -X, + Y, -Y, + Z, -Z broadcast are connected vertically.)
+
+%href
+gpmatprm
+gpmatprm1
+gpmatprm4
+
+
+
+%index
+gpusershader
+Specifying a user shader
+%group
+Extended screen control command
+%prm
+"vsh","fsh","defs"
+"vsh": Vertex shader filename
+"fsh": Fragment shader filename
+"defs": additional label definitions
+%inst
+Specifies a shader for the user to set independently.
+Vertex shaders, fragment shaders and additional label definitions can be written and used.
+The specified shader is referenced when specifying a custom shader for the screen buffer by the buffer instruction as the default value of gpusermat.
+%href
+buffer
+gpusermat
+
+
+%index
+gpgetmat
+Get Material ID
+%group
+Extended screen control command
+%prm
+var,id,opt
+var: Variable to which the material ID is assigned
+id (0): Referenced ID
+opt (0): Get options
+%inst
+Gets the ID of the specified object and the custom material used in the screen buffer.
+Specify the acquisition option with the opt parameter. The values that can be specified with opt are as follows. ^ p
+        Macro name value Content
+    ----------------------------------------------------------------------------
+GPGETMAT_OPT_OBJMAT 0 Custom material of the object
+GPGETMAT_OPT_SCRMAT 1 Custom material in the screen buffer
+^p
+If GPGETMAT_OPT_OBJMAT is specified, the ID of the custom material that the object has can be obtained by specifying the object ID in the id parameter.
+If GPGETMAT_OPT_SCRMAT is specified, the ID of the custom material of each screen buffer can be obtained by specifying the screen buffer ID in the id parameter.
+
+
+%href
+buffer
+gpmatprm
+gpmatprm1
+gpmatprm4
+gpmatprm16
+
+
+%index
+setquat
+Set quat group information
+%group
+Extended screen control command
+%prm
+id,x,y,z,w
+id: object ID
+(x, y, z, w): Value to set (default = 0)
+
+%inst
+Sets the rotation parameters of the object.
+Sets the quat group (quaternion) to the value specified by (x, y, z, w).
+(x, y, z, w) is set by quaternion (quaternion). Inside the HGIMG4, all rotation information is held by the quaternion.
+
+%href
+getquat
+
+
+%index
+getquat
+Get quat group information
+%group
+Extended screen control command
+%prm
+id,x,y,z,w
+id: object ID
+(x, y, z, w): Variables to get
+
+%inst
+Gets the rotation parameters of the object.
+The contents of the quat group (quaternion) are assigned to the variables specified by (x, y, z, w).
+(x, y, z, w) is set as a real type variable.
+Inside the HGIMG4, all rotation information is held by the quaternion.
+Use the getang or getangr instructions to convert to angle information.
+However, it may not be possible to completely reproduce the rotation information, so be careful when converting it to angle information.
+
+%href
+getang
+getangr
+setquat
+
+
+
+%index
+event_suicide
+Added object destruction event
+%group
+Extended screen control command
+%prm
+p1
+p1: Event ID
+%inst
+The object destruction event is added to the event ID specified by id.
+This instruction can be used equivalent to event_delobj.
+%href
+event_delobj
+
+
+%index
+gpsetprmon
+Object core parameter setting (bit addition)
+%group
+Extended screen control command
+%prm
+objid,prmid,value
+objid (0): Object ID
+prmid (0): core parameter ID
+value (0): Value to be set (integer value)
+%inst
+Set the value of the core parameter held for each object to ON only for the bit set by value.
+(The value of value is combined with the original core parameter value by OR)
+This can be used, for example, to add a new bit to a parameter that needs to be set on a bit-by-bit basis, such as the mode flag value.
+
+The core parameter is a 32-bit integer value that manages various information.
+The items that can be specified as the core parameter ID are as follows.
+^p
+Macro name | Contents
+	--------------------------------------------------------------
+PRMSET_FLAG Object registration flag (*)
+PRMSET_MODE mode flag value
+PRMSET_ID Object ID (*)
+PRMSET_ALPHA Transparency (—¯ value)
+PRMSET_TIMER Timer value
+PRMSET_MYGROUP own collision group
+PRMSET_COLGROUP Collision group for collision detection
+PRMSET_SHAPE Shape ID (*)
+PRMSET_USEGPMAT Material ID (*)
+PRMSET_COLILOG Collision log ID (*)
+PRMSET_FADE fade parameter
+PRMSET_SPRID Source buffer ID (sprites only)
+PRMSET_SPRCELID Source cell ID (sprites only)
+PRMSET_SPRGMODE Copy mode (sprites only)
+
+Items in (*) are read only
+^p
+%href
+gpgetprm
+gpsetprm
+gpsetprmoff
+
+
+
+%index
+gpsetprmoff
+Object core parameter setting (bit deletion)
+%group
+Extended screen control command
+%prm
+objid,prmid,value
+objid (0): Object ID
+prmid (0): core parameter ID
+value (0): Value to be set (integer value)
+%inst
+Set the value of the core parameter held for each object to OFF only for the bit set by value.
+(Erases the bit specified by value from the original core parameter value)
+This can be used, for example, to remove a specific bit from a parameter that needs to be set bitwise, such as the mode flag value.
+
+The core parameter is a 32-bit integer value that manages various information.
+The items that can be specified as the core parameter ID are as follows.
+^p
+Macro name | Contents
+	--------------------------------------------------------------
+PRMSET_FLAG Object registration flag (*)
+PRMSET_MODE mode flag value
+PRMSET_ID Object ID (*)
+PRMSET_ALPHA Transparency (—¯ value)
+PRMSET_TIMER Timer value
+PRMSET_MYGROUP own collision group
+PRMSET_COLGROUP Collision group for collision detection
+PRMSET_SHAPE Shape ID (*)
+PRMSET_USEGPMAT Material ID
+PRMSET_COLILOG Collision log ID (*)
+PRMSET_FADE fade parameter
+PRMSET_SPRID Source buffer ID (sprites only)
+PRMSET_SPRCELID Source cell ID (sprites only)
+PRMSET_SPRGMODE Copy mode (sprites only)
+
+Items in (*) are read only
+^p
+%href
+gpgetprm
+gpsetprm
+gpsetprmon
+
+
+
+%index
+setangy
+ang Set group information
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: object ID
+(x, y, z): Value to set (default = 0)
+
+%inst
+It has the same function as the setang command, but the order of rotation is Y-> X-> Z.
+
+%href
+setang
+setangz
+setangr
+
+
+%index
+setangz
+ang Set group information
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: object ID
+(x, y, z): Value to set (default = 0)
+
+%inst
+It has the same function as the setang command, but the order of rotation is Z-> Y-> X.
+
+%href
+setang
+setangy
+setangr
+
+
+%index
+event_angy
+ang Added group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1,sw
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+sw (0): Interpolation options
+
+%inst
+It has the same function as the event_ang instruction, but the order of rotation is Y-> X-> Z.
+
+%href
+event_ang
+event_angz
+event_angr
+
+
+%index
+event_angz
+ang Added group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1,sw
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+sw (0): Interpolation options
+
+%inst
+It has the same function as the event_ang instruction, but the order of rotation is Z-> Y-> X.
+
+%href
+event_ang
+event_angy
+event_angr
+
+
+%index
+event_setangy
+ang Added group configuration event
+%group
+Extended screen control command
+%prm
+id,x1,y1,z1,x2,y2,z2
+id: event ID
+(x1, y1, z1): Set value (lower limit)
+(x2, y2, z2): Set value (upper limit)
+%inst
+It has the same function as the event_setang instruction, but the order of rotation is Y-> X-> Z.
+
+%href
+event_setang
+event_setangz
+event_setangr
+
+
+%index
+event_setangz
+ang Added group configuration event
+%group
+Extended screen control command
+%prm
+id,x1,y1,z1,x2,y2,z2
+id: event ID
+(x1, y1, z1): Set value (lower limit)
+(x2, y2, z2): Set value (upper limit)
+%inst
+It has the same function as the event_setang instruction, but the order of rotation is Z-> Y-> X.
+
+%href
+event_setang
+event_setangy
+event_setangr
+
+
+%index
+gpresetlight
+Initialization of current light
+%group
+Extended screen control command
+%prm
+p1,p2,p3
+p1 = 1 to 9 (1): Number of directional lights
+p2 = 0 to 9 (0): Number of point lights
+p3 = 0-9 (0): Number of spotlights
+%inst
+Initializes the current light along with the type of light to use.
+By setting the current light, you can determine the details of the light received by the models and materials generated after that.
+When the scene is initialized, only one directional light can be set. When using multiple lights, point lights, spot lights, etc., the number of current lights must be determined in advance by the gpresetlight command.
+The p1, p2, and p3 parameters specify the maximum number of lights used by each light type. You must use at least one directional light.
+Specify other point lights and spot lights as needed. Avoid specifying unnecessary lights as much as possible, as this will increase the computational load on the GPU.
+After the current light is initialized, it can be registered with the gpuselight command.
+
+%href
+gpuselight
+gplight
+
+
+%index
+setobjlight
+Set current light on object
+%group
+Extended screen control command
+%prm
+id
+id: object ID
+%inst
+Set the current light for the object specified by id.
+The object specified by id must be a 3D model that performs light source calculations.
+The light settings previously set on the object will be discarded and the current light settings will be overwritten.
+However, please note that the current light settings (number of directional lights, point lights, spotlights) at the time the 3D model is generated will not be changed. (Be sure to set the number of lights included in the current light to be the same.)
+%href
+gpuselight
+gpresetlight
+
+
+%index
+gppcontact
+Create physical collision information for objects
+%group
+Extended screen control command
+%prm
+var,objid
+var: Variable to which the result is assigned
+objid (0): Object ID
+%inst
+Creates accurate collision information for physically configured 3D objects.
+Creates all the information when the 3D object specified by objid collides with another object.
+The 3D object specified by objid must be physically set by the gppbind instruction.
+In addition, it is necessary to properly set the collision group of the object for which collision is detected by the setcoli instruction.
+The number of collision information created is assigned as an integer value to the variable specified by var.
+If an error occurs, a negative value will be assigned.
+Multiple collision information may be created. This is because multiple objects can collide at the same time. If the variable is assigned 0, it indicates that there are no conflicting objects.
+The actual collision information can be obtained by the gppinfo instruction. As collision information, you can obtain the object ID of the collision target, the coordinates of the collision, the strength of the collision, and so on.
+Collision information is created for each object ID and is retained until a new gppcontact instruction is executed.
+The gppcontact instruction is an instruction to obtain the details of the collision that occurred in the process of physical behavior. If you just want to know a simple collision, you can use the getcoli instruction as an alternative.
+In addition, since it is based on the information that it collided when it moved by physical behavior (it was sunk into another object), it is collision information in a state where it is completely stationary (a state where it is just in contact). Please note that is not created.
+%href
+gppbind
+gppinfo
+getcoli
+setcoli
+gppraytest
+
+
+%index
+gppinfo
+Get physical collision information for objects
+%group
+Extended screen control command
+%prm
+var,fv,objid,index
+var: Variable name to which the conflicting object ID value is assigned
+fv: variable name to which the FV value is assigned
+objid (0): Object ID
+index (0): Index value
+%inst
+Gets the physical collision information of the object created by the gppcontact instruction. Be sure to execute the gppcontact instruction first.
+Assigns the physical collision information of the 3D object specified by objid to the variables specified by var and fv. The following contents are stored in the variable.
+^p
+Variables | What to assign
+	--------------------------------------------------------------
+var Collision object ID
+        fv (0) Collision X coordinate
+        fv (1) Collision Y coordinate
+        fv (2) Collision Z coordinate
+        fv (3) Collision strength
+^p
+If there is multiple collision information detected by the gppcontact instruction, it is identified by the index value starting from 0.
+If there are three collision information, the index value can be 0 to 2.
+If the process ends normally, 0 is assigned to the system variable stat. If an error occurs, the system variable stat is assigned a negative value.
+%href
+gppcontact
+
+
+%index
+gppraytest
+Get physical collision information on a vector
+%group
+Extended screen control command
+%prm
+var,objid,distance
+var: Variable name to which the detected object ID value is assigned
+objid (0): Object ID
+distance (100): vector length
+%inst
+Acquires the information of the object that collides with the specified line segment in the 3D object with physical settings.
+Investigate the object ID of the first 3D object that collides within the distance specified by distance from the direction the object is facing, starting from the object with the 3D node specified by objid.
+The object specified by objid does not need to be physically configured. There is no problem even if it is a camera or a null node.
+The result is assigned to the variable specified by var. If any error occurs, a negative value will be assigned.
+If there is an object that collides with the line segment, that object ID is assigned. If there are no conflicting objects, 0 is assigned.
+If there is a conflict, more detailed information will be stored in the node work values (work, work2) of the object specified by objid.
+The nodework value can be obtained by the getwork and getwork2 instructions. The contents set for each are as follows.
+^p
+Nodework value | What is set
+	--------------------------------------------------------------
+work X, Y, Z coordinates where the collision occurred
+work2 Normal vector of collision surface X, Y, Z value
+^p
+With the gppraytest instruction, all physically configured objects are subject to collision. Collision group settings are not taken into account.
+%href
+gppcontact
+getcoli
+getwork
+getwork2
+
+
+%index
+event_fade
+Added fade setting event
+%group
+Extended screen control command
+%prm
+id,fade
+id: event ID
+fade (0): set value
+%inst
+Add an event that sets the fade value of the object.
+By specifying a negative value for the fade, the —¯ value can be faded out toward 0, and by specifying a positive value, the —¯ value can be faded in toward 255.
+Equivalent to setting the PRMSET_FADE parameter with the event_prmset instruction.
+%href
+event_prmset
+
+
+%index
+gpmesh
+Generate 3D mesh node
+%group
+Extended screen control command
+%prm
+var,color,matobj
+var: Variable name to which the generated object ID is assigned
+color (-1): Material color (24bit RGB value)
+matobj (-1): Material ID
+%inst
+A node object that defines a free shape as a 3D model is generated.
+In advance, it is necessary to build model information called a custom 3D mesh using instructions such as gpmeshclear, gpmeshadd, and gpmeshpolygon.
+It is not a simple model like gpbox or gpplate, but you can freely define complicated shapes, but since you need to define each vertex coordinate and normal vector, it is a function for advanced users. Please think.
+Normally, use the 3D model data prepared as a .gpb file.
+^
+You can create a custom 3D mesh by following the steps below.
+^p
+1. Initialize the custom 3D mesh with the gpmeshclear instruction
+2. Register the required vertex information with the gpmeshadd instruction.
+3. Use the gpmeshpolygon command to combine vertex information to form a triangle or quadrangle face.
+4. Repeat registration for only the required aspects
+^p
+The gpmesh instruction generates a model using all the registered faces based on the information of the created custom 3D mesh.
+X, Y, Z coordinates, normal vectors, texture UV coordinates, etc. can be registered in the vertex information. By setting these appropriately, you can define a free shape.
+Custom 3D meshes can be redefined as many times as you like to register different model shapes.
+^
+The ID of the created object is assigned to the variable specified by var.
+The generated object can be operated in the same way as the 3D model loaded by the gpload instruction.
+In the color parameter, specify the color (material color) of the entire model by the 24-bit RGB value (value indicated by 0xRRGGBB).
+If the color parameter is omitted, white (0xffffff) is used.
+You can specify the material ID with the matobj parameter.
+Specify when using a user-generated material, such as with the gpcolormat command.
+If the matobj parameter is omitted, standard materials are used.
+
+%href
+gpmeshclear
+gpmeshpolygon
+gpmeshadd
+
+
+%index
+gpmeshclear
+Initialize custom 3D mesh
+%group
+Extended screen control command
+%inst
+Initialize the registration information of the custom 3D mesh.
+Custom 3D meshes are a mechanism for building data to define free 3D shapes.
+The actual data registration uses the gpmeshadd and gpmeshpolygon instructions.
+The constructed data can be registered as a node object with the gpmesh instruction.
+%href
+gpmesh
+gpmeshpolygon
+gpmeshadd
+
+
+%index
+gpmeshadd
+Add vertex information to custom 3D mesh
+%group
+Extended screen control command
+%prm
+var,x,y,z,nx,ny,nz,u,v
+var: Variable name to which the generated mesh vertex ID is assigned
+x (0): X coordinate (real number)
+y (0): Y coordinate (real number)
+z (0): Z coordinate (real number)
+nx (0): normal vector X (real number)
+ny (0): Normal vector Y (real number)
+nz (0): Normal vector Z (real number)
+u (0): Texture vertex coordinates X (real number)
+v (0): Texture vertex coordinates Y (real number)
+%inst
+Add vertex information to the custom 3D mesh.
+For vertex information, X, Y, Z coordinates, normal vectors, and texture UV coordinates are registered as one set.
+The registered mesh vertex ID is assigned to the variable specified by var. The mesh vertex ID is used when constructing faces (triangles, quadrilaterals).
+In the case of vertex information that has already been registered, the mesh vertex ID registered in the past will be assigned and duplicate registration will not be performed. Up to 32767 vertex information can be registered.
+^
+The (X, Y, Z) coordinates indicate the vertices in 3D space.
+The normal vector (X, Y, Z) shows the normalized direction (vector) of the vertices. The normal vector is needed when performing the light source calculation.
+Texture vertex coordinates (X (u), Y (v)) specify the coordinates that will be referenced when pasting the texture. It is a normalized value from the origin (0.0, 0.0) to both ends (1.0, 1.0). You will need it when you apply a texture as a material.
+^
+When defining a custom 3D mesh, it is necessary to clear the registration information with the gpmeshclear instruction first.
+To actually register faces (triangles, quadrilaterals) by combining vertex information, use the gpmeshpolygon instruction.
+The constructed data can be registered as a node object with the gpmesh instruction.
+%href
+gpmeshclear
+gpmeshpolygon
+gpmesh
+
+
+%index
+gpmeshpolygon
+Add surface information to custom 3D mesh
+%group
+Extended screen control command
+%prm
+p1,p2,p3,p4
+p1 (0): Mesh vertex ID1
+p2 (0): Mesh vertex ID2
+p3 (0): Mesh vertex ID3
+p4 (-1): Mesh vertex ID4
+%inst
+Add face (polygon) information to the custom 3D mesh.
+It is necessary to register the necessary vertex information in advance by using the gpmeshadd command.
+A face (quadrangle, quadrangle) is constructed by combining mesh vertex IDs that indicate the index of vertex information.
+Specify the mesh vertex ID in the p1, p2, p3 parameter for a quadrangle and the p1, p2, p3, p4 parameter for a quadrangle. Arrange the vertices so that the triangles p1, p2, and p3 are arranged clockwise. (For a quadrangle, add the remaining 1 vertex at the end)
+^
+The constructed data can be registered as a node object with the gpmesh instruction.
+%href
+gpmeshclear
+gpmeshadd
+gpmesh
+
+

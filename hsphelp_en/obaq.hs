@@ -289,7 +289,7 @@ Specify the coordinates of the placement with (x, y). (Set the internal coordina
 Specify the placement angle (+ direction is clockwise) with r. The unit is radians.
 Use (sx, sy) to specify the size at the time of placement. By default, the size (10,10) is used.
 mygroup, exgroup, loggroup are the group values set for collision detection.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768‚Ä¶).
+The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
 You can select the mode of placement check with colsw.
 ^p
 Mode value Contents
@@ -348,7 +348,7 @@ Specify the coordinates of the placement with (x, y). (Set the internal coordina
 Specify the placement angle (+ direction is clockwise) with r. The unit is radians.
 Use (sx, sy) to specify the size at the time of placement. By default, the size (10,10) is used.
 mygroup, exgroup, loggroup are the group values set for collision detection.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768‚Ä¶).
+The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
 You can select the mode of placement check with colsw.
 ^p
 Mode value Contents
@@ -575,7 +575,7 @@ loggroup (0): Group value that creates the collision log
 %inst
 Sets the group parameters for the specified object.
 Group parameters are used to identify conflicting objects, such as when identifying them.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768‚Ä¶).
+The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
 ^
 If execution fails, a non-zero value is assigned to the system variable stat.
 
@@ -977,4 +977,251 @@ var_gravity: Variable to get the gravity value of the object
 %inst
 Gets the parameters of the specified object in a variable.
 The inertia parameter value is assigned to the variable specified by var_inertia. (Variables are automatically real type.)
-The gravity valî0¯¬«’
+The gravity value of the object is assigned to the variable specified by var_gravity. (Variables are automatically real type.)
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+qinertia
+
+
+%index
+qgetgroup
+Get group parameters
+%prm
+num,var_mygroup,var_exgroup,var_loggroup
+num (0): Object ID
+var_mygroup: Variable to get the collision group value to which you belong
+var_exgroup: Variable to get the group value to exclude collisions
+var_loggroup: Variable to get the group value that creates the collision log
+%inst
+Gets the parameters of the specified object in a variable.
+The collision group value to which you belong is assigned to the variable specified by var_mygroup. (Variables are automatically integer type.)
+The variable specified by var_exgroup is assigned the group value that excludes collisions. (Variables are automatically integer type.)
+The variable specified by var_loggroup is assigned the group value that creates the collision log. (Variables are automatically integer type.)
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+qgroup
+qfind
+qcollision
+
+
+%index
+qgetmat
+Get material parameters
+%prm
+num,var_type,var_id,var_subid
+num (0): Object ID
+var_type: Variable to get the material type value
+var_id: Variable to get the reference id value
+var_subid: Variable to get the reference subid value
+%inst
+Gets the parameters of the specified object in a variable.
+The material type value is assigned to the variable specified by var_type. (Variables are automatically integer type.)
+The reference id value is assigned to the variable specified by var_id. (Variables are automatically integer type.)
+The reference subid value is assigned to the variable specified by var_subid. (Variables are automatically integer type.)
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+qmat
+qgetmat2
+qgetmat3
+
+
+%index
+qgetmat2
+Get material detail parameters
+%prm
+num,var_offsetx,var_offsety,var_zoomx,var_zoomy
+num (0): Object ID
+var_offsetx: Variable to get the X-direction display offset value
+var_offsety: Variable to get the Y-direction display offset value
+var_zoomx: Variable to get the X-direction display magnification value
+var_zoomy: Variable to get the Y-direction display magnification value
+%inst
+Gets the parameters of the specified object in a variable.
+The X-direction display offset value is assigned to the variable specified by var_offsetx. (Variables are automatically integer type.)
+Gets the parameters of the specified object in a variable.
+The Y-direction display offset value is assigned to the variable specified by var_offsety. (Variables are automatically integer type.)
+Gets the parameters of the specified object in a variable.
+The X-direction display magnification value is assigned to the variable specified by var_zoomx. (Variables are automatically real type.)
+Gets the parameters of the specified object in a variable.
+The Y-direction display magnification value is assigned to the variable specified by var_zoomy. (Variables are automatically real type.)
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+qmat2
+qgetmat
+qgetmat3
+
+
+%index
+qgetmat3
+Get material display parameters
+%prm
+num,var_gmode,var_rate
+num (0): Object ID
+var_gmode: Variable to get the copy mode value
+var_rate: Variable to get the translucent rate value
+%inst
+Gets the parameters of the specified object in a variable.
+The copy mode value is assigned to the variable specified by var_gmode. (Variables are automatically integer type.)
+The translucent rate value is assigned to the variable specified by var_rate. (Variables are automatically integer type.)
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+qmat3
+qgetmat
+qgetmat2
+
+
+%index
+qgetuser
+Get user-defined data
+%prm
+num,var_user1,var_user2,var_user3
+num (0): Object ID
+var_user1: Variable to get the value of user-defined data 1.
+var_user2: Variable to get the value of user-defined data2
+var_user3: Variable to get the value of user-defined data 3
+%inst
+Gets the parameters of the specified object in a variable.
+The value of user-defined data 1 is assigned to the variable specified by var_user1. (Variables are automatically integer type.)
+The value of user-defined data 2 is assigned to the variable specified by var_user2. (Variables are automatically integer type.)
+The value of user-defined data 3 is assigned to the variable specified by var_user3. (Variables are automatically integer type.)
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+quser
+qgetuser2
+
+
+%index
+qgetuser2
+Get user-defined data 2
+%prm
+num,var_user4,var_user5,var_user6
+num (0): Object ID
+var_user4: Variable to get the value of user-defined data 4
+var_user5: Variable to get the value of user-defined data 5
+var_user6: Variable to get the value of user-defined data 6.
+%inst
+Gets the parameters of the specified object in a variable.
+The value of user-defined data 4 is assigned to the variable specified by var_user4. (Variables are automatically real type.)
+The value of user-defined data 5 is assigned to the variable specified by var_user5. (Variables are automatically real type.)
+The value of user-defined data 6 is assigned to the variable specified by var_user6. (Variables are automatically real type.)
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+quser2
+qgetuser
+
+
+%index
+qpush
+Empower anywhere
+%prm
+num,xw,yw,ax,ay,sw
+num (0): Object ID
+xw (0.0): X coordinate (real number)
+yw (0.0): Y coordinate (real number)
+ax (0.0): Force in the X direction (real number)
+ay (0.0): Force in Y direction (real number)
+sw (1): configuration options
+%inst
+Apply force to the specified object from the position of (xw, yw) with the strength of (ax, ay).
+The posture and speed of the object change according to the applied force.
+You can specify the setting method with sw.
+^p
+sw content
+--------------------------------------------------
+0 Not reflected in the speed of the object
+1 Reflect in the speed of the object
+^p
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+qblast
+
+
+%index
+qblast
+Radially apply force from anywhere
+%prm
+xw,yw,power,near,far
+xw (0.0): X coordinate (real number)
+yw (0.0): Y coordinate (real number)
+power (1.0): magnitude of force (real number)
+near (1.0): closest distance (real number)
+far (9999.0): Farthest distance (real number)
+%inst
+Radially apply force to all objects from anywhere.
+A force that is inversely proportional to the distance is applied around (xw, yw).
+power is the magnitude of the force applied at a distance of 1.0.
+Positions closer to near are not inversely proportional and have the same force as near.
+No force is applied if it is farther than far.
+^
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+qpush
+
+
+%index
+qgetversion
+Get version information
+%prm
+var
+var: Variable to get version information
+%inst
+Get OBAQ version information.
+Version information is assigned as a character string to the variable specified by var.
+
+%href
+
+
+%index
+qinner
+Get if the coordinates are in the object
+%prm
+var,x,y,num
+var: Variable to get the result
+x (0.0): X coordinate (real number)
+y (0.0): Y coordinate (real number)
+num (-1): Object ID
+%inst
+Checks if the coordinates specified by (x, y) are inside the object shape.
+Specify the ID of the object you want to check with num.
+If num is negative or omitted, it spans all valid objects
+Check if the coordinates are inside.
+If it is inside, the object ID value is assigned to the variable specified by var.
+If it is not inside, -1 is assigned to the variable specified by var.
+The variable specified by var is automatically an integer type.
+The coordinates specified by (x, y) are the internal coordinate values used by OBAQ, not the coordinates on the screen.
+If you want to get the result from the coordinates on the screen, convert it to the internal coordinate value with the cnvaxis command etc.
+Please note that you need to do it.
+^
+If execution fails, a non-zero value is assigned to the system variable stat.
+
+%href
+cnvaxis
+
+
+%index
+qgetptr
+Get system pointer value
+%prm
+var,option
+var: Variable to get the contents
+option (0): option value
+%inst
+Gets the OBAQ system pointer value.
+This system pointer value is used to access OBAQ's internal data from external applications, plugins, etc.
+For normal use, no system pointer value is needed.
+You can set the option value with the option parameter.
+Currently, the option parameter has no non-zero value.
+
+%href
+hgobaq
+
+

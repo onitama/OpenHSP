@@ -793,7 +793,7 @@ The value specified by p2 is called the EP value and has the following meanings.
 ^p
   EP value content
 -----------------------------------------------------------
-  0 to 255 ç•™ channel value (0 = transparent, 255 = opaque)
+  0 to 255 —¯ channel value (0 = transparent, 255 = opaque)
   + $ 300 Enables alpha channel synthesis (equivalent to gmode 3)
   + $ 500 Additive synthesis is performed on the original image (equivalent to gmode 5)
   + $ 600 Subtractive synthesis on the original image (equivalent to gmode 6)
@@ -901,7 +901,7 @@ Extended screen control command
 %prm
 p1,p2
 p1 = variable name to which the result is assigned
-p2 = angle (0 to è³Š n)
+p2 = angle (0 to ‘¯ n)
 * N = es_ini Accuracy set by the 3rd parameter
 
 %inst
@@ -919,7 +919,7 @@ Extended screen control command
 %prm
 p1,p2
 p1 = variable name to which the result is assigned
-p2 = angle (0 to è³Š n)
+p2 = angle (0 to ‘¯ n)
 * N = es_ini Accuracy set by the 3rd parameter
 
 %inst
@@ -1019,4 +1019,170 @@ p4 (0) = configuration option
 %inst
 Get X and Y information such as sprite coordinates and assign them to two variables.
 Specify the sprite number with p1 and set the variables to be assigned with the p2 and p3 parameters.
-The p4 configuration”0øÂÇÕ
+The p4 configuration options allow you to specify what coordinates to get.
+^p
+   p4 macro name Contents
+--------------------------------------------------
+      0 ESSPSET_POS Sprite X, Y coordinates
+      1 ESSPSET_ADDPOS Sprite X, Y moving component
+      2 ESSPSET_FALL Sprite X, Y Fall speed
+      3 ESSPSET_BOUNCE Sprite bound coefficient
+      4 ESSPSET_ZOOM Sprite X, Y Display magnification
+ 0x1000 ESSPSET_DIRECT Get 32bit value directly
+^p
+The coordinate value acquired by the es_getpos instruction is internally a fixed 16-bit decimal number. Normally, the conversion is done automatically, but adding ESSPSET_DIRECT to the configuration option disables the conversion.
+
+%href
+es_set
+es_pos
+
+
+%index
+es_bgmap
+Initialize BG map
+%group
+Extended screen control command
+%prm
+p1,p2,p3,p4,p5,p6,p7,p8
+p1 = BGNo. (0 to 15)
+p2 = variable name to store map data
+p3 (16) = X size of the entire map
+p4 (16) = Y size of the entire map
+p5 (16) = X size of map display part
+p6 (16) = X size of map display part
+p7 (0) = Screen buffer ID to store map parts
+p8 (0) = configuration option
+
+%inst
+Initialize a BG map with any size.
+Specify the BG No. to be initialized with p1. BG No. can be specified from 0 to 15.
+Specify the variable to store the map data in p2.
+This variable must be initialized with the dim instruction in advance as an array variable that has the element "X size of the entire map x Y size of the entire map".
+Specify the X and Y sizes of the entire map with (p3, p4).
+Specify the X and Y sizes of the part where the map is displayed with (p5, p6).
+All parameters from p3 to p6 are units of map parts. For example, if the overall size is 4x4, you would specify the variable initialized with "dim map, 4 * 4".
+This variable stores the ID of the part as it is, such as 0 for the map part (cell ID) when it has the contents of the map data directly and the value is 0.
+In p7, specify the screen buffer ID in which the image of the map part is loaded. Images must be loaded into this buffer in advance using the picload or celload command. (For the map part image, set the part size with the celdiv command.)
+Set the behavior of the BG map with the setting options on p8. This item is for future expansion and is not currently implemented.
+^
+The es_bgmap instruction sets the map display. The actual map display is performed with the es_putbg instruction.
+%href
+es_putbg
+dim
+celload
+celdiv
+
+
+%index
+es_putbg
+Display BG map
+%group
+Extended screen control command
+%prm
+p1,p2,p3,p4,p5
+p1 = BGNo. (0 to 15)
+p2 (0) = Display start X coordinate
+p3 (0) = Display start Y coordinate
+p4 (0) = Display start map X position
+p5 (0) = Display start map Y position
+
+%inst
+Displays the BG map of the specified BG No.
+It is necessary to initialize the size and parts information of the BG map with the es_bgmap command in advance.
+Specify the display start position (upper left) on the screen with the (p2, p3) parameter.
+Specify the map display start position (upper left) with the (p4, p5) parameter.
+Normally, the map is displayed from the (0,0) position in the entire map.
+By specifying the map display start position, you can change the position of the map that corresponds to the upper left when a part of the entire map is displayed.
+%href
+es_bgmap
+
+
+%index
+es_bgmes
+Write a string to the BG map
+%group
+Extended screen control command
+%prm
+p1,p2,p3,"str",p4
+p1 (0) = BGNo. (0 to 15)
+p2 (0) = map X position
+p3 (0) = map Y position
+"str" = write string
+p4 (0) = character code offset value
+
+%inst
+Writes the code of the character string specified by "str" to the BG map of the specified BG No.
+It is necessary to initialize the size and parts information of the BG map with the es_bgmap command in advance.
+The es_bgmes instruction operates on the assumption that the character font in ASCII code order can be displayed as a BG map.
+From the position of the map specified by (p2, p3), the character code included in the character string is written to the right.
+^
+Specify the offset value for the character code with the p4 parameter. Normally, it can be 0 or omitted. For example, the letter "A" has the character code 65 and writes the value 65 to the map.
+If it contains a line feed code, move to the next line.
+
+%href
+es_bgmap
+
+
+%index
+es_setparent
+Sprite parent settings
+%group
+Extended screen control command
+%prm
+p1,p2,p3
+p1 = Sprite No.
+p2 = Parent sprite No.
+p3 = configuration options
+
+%inst
+Sets the sprite that is the parent of the specified sprite.
+By setting the parent sprite number in the p2 parameter, the sprite will be displayed in coordinates relative to the parent's coordinates.
+If you specify a negative value for p2, the parent sprite setting is canceled and the normal sprite display is restored.
+^
+Normally, specify 0 for the setting option of the p3 parameter.
+By specifying 1 for p3, it becomes a sprite setting that displays the BG map as a parent.
+
+
+%index
+es_modaxis
+Change sprite information at once
+%group
+Extended screen control command
+%prm
+p1,p2,p3
+p1 (0) = Start sprite No.
+p2 (-1) = End sprite No.
+p3 (0) = type value option
+p4 (0) = X value to change
+p5 (0) = Y value to change
+p6 (0) = configuration option
+
+%inst
+For sprites with numbers from p1 to p2, change the coordinates collectively.
+If you omit the specification of p1 and p2, all sprites will be the target.
+^
+You can specify the type value with p3. If 4 is specified for p3, sprites with type value 4 will be targeted.
+If you omit the p3 parameter or specify 0, all type values are included.
+^
+You can specify the value to be added to each of the sprite coordinate parameters X and Y with the (p4, p5) parameter. If you specify a negative value, it will be subtracted.
+The value specified here will be added (subtracted) to all sprites that are subject to change.
+^
+The setting option on p6 allows you to set other than the X and Y coordinates of the sprite.
+^p
+   p4 macro name Contents
+--------------------------------------------------
+      0 ESSPSET_POS Sprite X, Y coordinates
+      1 ESSPSET_ADDPOS Sprite X, Y moving component
+      2 ESSPSET_FALL Sprite X, Y Fall speed
+      3 ESSPSET_BOUNCE Sprite bound coefficient
+      4 ESSPSET_ZOOM Sprite X, Y Display magnification
+ 0x1000 ESSPSET_DIRECT Set 32bit value directly
+ 0x2000 ESSPSET_MASKBIT Hold fixed fractional part
+^p
+You can use the same configuration options as the es_pos instruction.
+
+%href
+es_pos
+
+
+

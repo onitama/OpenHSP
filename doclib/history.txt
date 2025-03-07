@@ -229,7 +229,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 	[HSP3Dish] Dish P Helper 及び、Android/iOSアイコン作成ツールをパッケージに同梱
 	[HSP3Dish] mmload命令でwavファイルを同じIDに読み込む際にメモリリークが起こる不具合を修正
 	[HGIMG4] gpsetprm命令でマテリアルID書き換え時に反映されるように修正
-	[HGIMG4] get～系の命令で指定された変数が配列の場合に要素が拡張されない不具合を修正
+	[HGIMG4] get〜系の命令で指定された変数が配列の場合に要素が拡張されない不具合を修正
 	[HGIMG4] イベント内で複数のパラメーター変化を行った際にHGIMG3との差異が出る不具合を修正
 	[HGIMG4] OBJ_TIMERによるタイマーが正しく動作していなかった不具合を修正
 	[HGIMG4] 3Dモデルのclone時に正しくマテリアルがクローンされないことがある不具合を修正
@@ -337,7 +337,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 
 	mes(print)命令に影付け、縁取りなどの描画オプションを追加
 	ユーザー定義による配置オブジェクトを追加するlayerobj命令を追加
-	on～命令などによる割り込みコールバックルーチンの制約を厳格化してエラーチェックを追加
+	on〜命令などによる割り込みコールバックルーチンの制約を厳格化してエラーチェックを追加
 	500時間以上起動したPC上でwait,await命令の待ち時間が正しく反映されなくなる不具合を修正
 	スクリプトエディタの最終行へ移動メニューが動作していなかった不具合を修正
 	hsedsdkのhsed_gettextで最後の1文字が取得されない不具合を修正
@@ -742,7 +742,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 	2013/07/10 3.4β2
 
 	windowsの終了セッションにHSPランタイムが残ってしまう不具合を修正
-	on gosub～命令の指定先でend命令が認識されない不具合を修正(BT#263)
+	on gosub〜命令の指定先でend命令が認識されない不具合を修正(BT#263)
 	[HGIMG4] 最初のバージョンを同梱
 	[HSP3Dish] Windows版でmp3のボリューム設定が反映されないことがある不具合を修正
 	[HSP3Dish][android] アプリのレジューム時にテクスチャデータが復帰しないことがある不具合を修正
@@ -1027,8 +1027,8 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 	2009/05/22 3.2b3
 
 	CEL関連命令(celload、celdiv、celput)を追加
-	ver3.2β1～β2で終了時にエラーが起こることがあった不具合を修正
-	ver3.2β1～β2でバージョン番号(hspver)がおかしかった不具合を修正
+	ver3.2β1〜β2で終了時にエラーが起こることがあった不具合を修正
+	ver3.2β1〜β2でバージョン番号(hspver)がおかしかった不具合を修正
 	HGIMG3ランタイムで別なプラグインを使用した際の解放が正しく行なわれなかった不具合を修正
 	HGIMG3で、hgbyeによる解放後に再度hginiによる初期化を失敗する不具合を修正
 	ラベル型の配列変数を作成するためのldimマクロを追加
@@ -1236,7 +1236,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 		不必要なモジュール、DLLインポート情報をオブジェクトファイルから破棄する最適化機能を追加。
 		コンパイル時の設定をソース内に記述するための#cmpoptプリプロセッサ命令を追加。
 		プリプロセッサ出力ファイル(hsptmp.i)を標準で生成しないように修正。
-		複数行文字列({"～"})内に半角文字列がある時にエラーが出る不具合を修正。(HSPBT#51)
+		複数行文字列({"〜"})内に半角文字列がある時にエラーが出る不具合を修正。(HSPBT#51)
 		メニューバー作成モジュール(mod_menu.as)の不具合を修正。
 		onkey割り込み時のiparamの内容がキーコードだったものを文字コードとなるように修正。
 		拡張プラグインHGIMG3の機能追加と不具合をいくつか修正(詳細はhgimg3.txtを参照してください)。
@@ -1328,7 +1328,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 
 	2005/06/27 3.0β11
 
-		複数行文字列({"～"})指定中にあるダブルクォートが正しく処理されない不具合を修正。(HSPBT#24)
+		複数行文字列({"〜"})指定中にあるダブルクォートが正しく処理されない不具合を修正。(HSPBT#24)
 		onexit命令実行時にWindowsのシャットダウン処理が常に中止される不具合を修正。(HSPBT#26)
 		sendmsg命令のパラメーターをHSP2.61のobjsend命令と互換のある形式に修正。
 		COMイベント作成を行なうcomevent命令の仕様を一部変更。
@@ -1538,7 +1538,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 	2004/11/06 3.0α11
 
 		COMオートメーション(IDispatch)に対応(一部仮実装)。
-		mcall,exgoto,on～goto/gosub,circle,syscolor命令を実装。
+		mcall,exgoto,on〜goto/gosub,circle,syscolor命令を実装。
 		hsvcolor,gsquare,grect,grotate命令を標準として実装。
 		ginfo関数を実装。
 		文字列型の比較演算子(=,!=)を実装。
@@ -1569,7 +1569,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 		callfunc,strmid,instr関数を実装。
 		変数のIDが重複することがある不具合を修正。
 		複数行のif命令記述がエラーになる不具合を修正。
-		複数行の文字列 {"～"} が認識されなかったのを修正。
+		複数行の文字列 {"〜"} が認識されなかったのを修正。
 		割り込みが多重に発生した時に正常に実行されない不具合を修正。
 		割り込みジャンプからの復帰時にstop命令を越える不具合を修正。
 
@@ -1714,7 +1714,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 	・コマンドライン起動、ドラッグアンドドロップでのファイル オープンがうまく動作していない
 	　バグを修正しました。
 	・一部のキーワードが色分けされていなかったバグを修正しました(仮)。
-	・色分け可能なキーワードに文字列("～")とプリプロセッサ命令(#～)を追加しました。
+	・色分け可能なキーワードに文字列("〜")とプリプロセッサ命令(#〜)を追加しました。
 	・設定の初期化機能を実装しました。
 	・「非文字」の設定が保存されていなかった不具合を修正しました。
 

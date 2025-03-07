@@ -1533,4 +1533,1018 @@
 	} else {
 		df_addpmis _dotfw_myx@,_dotfw_myy@, DIR_RIGHT, 400, CHR_MISSILE2		; ミサイル発射
 	}
-	�0����
+	return
+
+*player_act_miss
+	;	ミス時の処理(デフォルト)
+	if sp_player_mode<0 : return
+	;
+	df_getplayer
+	df_addbom _dotfw_myx@,_dotfw_myy@,3
+	es_kill sp_player
+	sp_player_mode=-1
+	return
+
+
+*enemy_main
+	;	敵コントロールメイン
+	;
+	_dotfw_enemy@=0
+	n=0
+	chk_type=TYPE_PMISSLE|TYPE_PBOMB
+	mytype=TYPE_ENEMY|TYPE_EXTENEMY|TYPE_NCENEMY|TYPE_ITEM
+	df_getplayer
+	repeat
+		es_find n,mytype,n
+		if n=-1 : break				; スプライトを検出
+		_dotfw_cursp@ = n
+		es_get etype,n,ESI_TYPE
+		if etype&TYPE_ITEM : goto *skip_echk
+
+		_dotfw_enemy@++
+		es_check res,n,chk_type			; 衝突チェック
+		if res>=0 {
+			_dotfw_hitsp@ = res
+			gosub enemy_hitlb
+		}
+		if etype&TYPE_EXTENEMY : goto *skip_echk2
+
+*skip_echk
+		_dotfw_curemode@ = enemy_mode(n)
+		_dotfw_enemy_exprm@ = enemy_exprm(n)
+		gosub enemy_actlb
+
+		enemy_cnt(n)++
+		if enemy_cnt(n)>=enemy_interval(n) {
+			enemy_cnt(n)=0
+			if _dotfw_curemode@>0 {
+				gosub enemy_modelb(_dotfw_curemode@)
+			}
+			i=enemy_misrate(n)
+			if i>0 {
+				if rnd(100)<i {
+					if sp_player_mode>=0 {
+						gosub enemy_shotlb
+					}
+				}
+			}
+			enemy_turn(n)++
+			if enemy_timer(n) {			; シーケンス制御
+				enemy_timer(n)--
+				;title "seq"+enemy_seqid(n)+":"+enemy_timer(n)
+				if enemy_timer(n)=0 {
+					sp_enemy=n
+					seqid=enemy_seqid(n)+1
+					i=eseq_mode(seqid)
+					if (i<0) {
+						seqid = eseq_timer(seqid)
+					}
+					enemy_seqid(n)=seqid
+					e_mode=i
+					e_timer=eseq_timer(seqid)
+					e_exprm=eseq_exprm(seqid)
+					e_dir=enemy_dir(sp_enemy)
+					gosub *dfi_setenemymode
+				}
+			}
+		}
+*skip_echk2
+		n+
+	loop
+	return
+
+*enemy_act_hit
+	;	ヒット時(デフォルト)
+	df_getaxis
+	df_addbom _dotfw_cx@,_dotfw_cy@,1
+	es_kill _dotfw_cursp@
+	if _dotfw_hitsp@>=0 : es_kill _dotfw_hitsp@
+	gosub enemy_destlb
+	return
+
+*enemy_act_shot
+	;	ショット時(デフォルト)
+	df_getaxis
+	if enemy_misrange>0 {
+		es_nearobj i,_dotfw_cursp@,TYPE_PLAYER, enemy_misrange
+		if i>=0 : return
+	}
+	df_addemis _dotfw_cx@,_dotfw_cy@, DIR_AIM, 200
+	return
+
+*enemy_act_move
+	;	移動時(デフォルト)
+	return
+
+*esub_xaim
+	df_getaxis
+	if _dotfw_cx@<_dotfw_myx@ : _dotfw_movex@ += $2000
+	if _dotfw_cx@>_dotfw_myx@ : _dotfw_movex@ -= $2000
+	df_putaxis
+	;es_aim _dotfw_cursp@,_dotfw_myx@,_dotfw_myy@,enemy_speed(n)
+	return
+*esub_yaim
+	df_getaxis
+	if _dotfw_cy@<_dotfw_myy@ : _dotfw_movey@ += $2000
+	if _dotfw_cy@>_dotfw_myy@ : _dotfw_movey@ -= $2000
+	df_putaxis
+	return
+
+
+;------------------------------------------------------------
+
+#deffunc df_bgview int _p1, int _p2, int _p3, int _p4, int _p5, int _p6, int _p7
+
+	;	背景マップとプレイヤーのリンクを指定
+	;		BGNo., rateX%, rateY%, freex%, freey%, xadj, yadj
+	;
+	gmp_id = _p1+ DOTFW_BGID_BGMAP
+	sp_player_map = gmp_id
+	es_setparent sp_player,gmp_id,1
+	;
+	sp_player_bgtrack=1
+	ratex=_p2:if ratex<=0 : ratex=50
+	ratey=_p3:if ratey<=0 : ratey=50
+	sp_player_bgx1 = _dotfw_sx@ * ratex / 200
+	sp_player_bgy1 = _dotfw_sy@ * ratey / 200
+	sp_player_bgx2 = _dotfw_sx@ - sp_player_bgx1
+	sp_player_bgy2 = _dotfw_sy@ - sp_player_bgy1
+
+	ratex=ratex+_p4
+	ratey=ratey+_p5
+	x = _dotfw_sx@ * ratex / 200
+	y = _dotfw_sy@ * ratey / 200
+	sp_player_bgxrate = x - sp_player_bgx1 + 1
+	sp_player_bgyrate = y - sp_player_bgy1 + 1
+	sp_player_bgxadj=_p6
+	sp_player_bgyadj=_p7
+	return
+
+
+#deffunc df_bgviewfix int _p1, int _p2, int _p3
+
+	;	背景マップの位置を固定
+	;		BGNo., X, Y
+	;
+	sp_player_bgtrack=2
+	a=_p1
+	bgp_px(a)=_p2<<10
+	bgp_py(a)=_p3<<10
+	return
+
+
+#deffunc df_mapshoot int _p1
+
+	;	プレイヤーマップシューティング設定
+	;		BGNo.
+	;
+	dim hitinfo,10
+	gmp_id = _p1+ DOTFW_BGID_BGMAP
+	sp_player_shtmap = gmp_id
+	es_bgparam sp_player_shtmap, ESMAP_OPT_WIPENOTICE, ESMAP_PRM_OPTION
+	return
+
+
+#deffunc df_mapaction int _p1, int _p2, int _p3
+
+	;	プレイヤーマップアクション設定
+	;		BGNo., gravity, jumppow
+	;
+
+	dim hitinfo,10
+	a=_p1
+	i=_p2:if i<=0 : i=0
+	sp_player_grav = _p2
+	if sp_player_grav<0 : sp_player_grav=128
+
+	sp_player_myani=0
+	sp_player_mydir=DIR_RIGHT
+	sp_player_myres=0
+	sp_player_myact=0
+	sp_player_myjmp=_p3 * 65536
+	sp_player_mypx=0
+	if sp_player_myjmp<=0 : sp_player_myjmp=9 * 65536
+	sp_player_myjmp=-sp_player_myjmp
+
+	sp_player_x1 = 0
+	sp_player_y1 = 0
+	sp_player_x2 = bgp_sx(a)
+	sp_player_y2 = bgp_sy(a)
+
+	gmp_id = _p1+ DOTFW_BGID_BGMAP
+	sp_player_map = gmp_id
+	;es_setparent sp_player,gmp_id,1
+
+	es_bgparam sp_player_map, ESMAP_OPT_WIPENOTICE, ESMAP_PRM_OPTION
+
+	es_bglink gmp_id, ESSPMAPHIT_BGHIT
+	es_gravity -1, 0, sp_player_grav
+	es_bgparam sp_player_map, sp_player_grav, ESMAP_PRM_GRAVITY
+
+	player_btn1lb=*actdefault
+	player_keylb=*map2d_key
+	sp_player_acttype=DOTFW_PACTTYPE_2DMAP
+	if sp_player_grav>0 {
+			player_keylb=*jumpact_key
+			player_btn2lb=*jumpact_jump
+			sp_player_acttype=DOTFW_PACTTYPE_JUMP
+	}
+	return
+
+*map2d_key
+	ky=key@
+	sp_player_mypx = 0
+	sp_player_mypy = 0
+	sp_player_myact = 0
+	if ky&1 {
+		sp_player_mydir = DIR_LEFT
+		sp_player_mypx = -sp_player_speedx
+		sp_player_myact=1
+	}
+	if ky&4 {
+		sp_player_mydir = DIR_RIGHT
+		sp_player_mypx = sp_player_speedx
+		sp_player_myact=1
+	}
+	if ky&2 {
+		sp_player_mydir = DIR_UP
+		sp_player_mypy = -sp_player_speedy
+		sp_player_myact=1
+	}
+	if ky&8 {
+		sp_player_mydir = DIR_DOWN
+		sp_player_mypy = sp_player_speedy
+		sp_player_myact=1
+	}
+	es_apos sp_player,sp_player_mypx,sp_player_mypy
+	goto *map2d_move
+
+
+*jumpact_key
+	ky=key@
+	es_getpos sp_player,myx,myy
+	sp_player_mypx = 0
+	sp_player_myact = 0
+	pxadd=sp_player_speedx<<16
+	if ky&1 {
+		sp_player_mydir = DIR_LEFT
+		sp_player_mypx = -pxadd
+		sp_player_myact=1
+	}
+	if ky&4 {
+		sp_player_mydir = DIR_RIGHT
+		sp_player_mypx = pxadd
+		sp_player_myact=1
+	}
+
+	;x=myx+(sp_player_mypx>>14)
+	;if x<sp_player_x1 : sp_player_mypx=0
+	;if x>sp_player_x2 : sp_player_mypx=0
+
+	es_setp sp_player,ESI_SPDX, sp_player_mypx
+
+*map2d_move
+	es_get sp_player_myani, sp_player,ESI_PRGCOUNT
+	es_bghit sp_player
+	es_get sp_player_myres, sp_player,ESI_MOVERES
+	if (sp_player_myres&ESSPRES_GROUND)=0 : sp_player_myact=2
+
+	es_getbghit numinfo,sp_player_map
+	repeat numinfo
+		es_getbghit hitinfo,sp_player_map,cnt
+;		if hitinfo=ESMAPHIT_HITX {
+			;title "HITX:"+hitinfo(1)+","+hitinfo(2)
+;		}
+;		if hitinfo=ESMAPHIT_HITY {
+			;title "HITY:"+hitinfo(1)+","+hitinfo(2)
+;		}
+		if hitinfo=ESMAPHIT_EVENT {
+			;title "EVENT:"+hitinfo(1)+","+hitinfo(2)
+			;dialog "EVENT:"+hitinfo(3)+","+hitinfo(4)
+			_dotfw_curmapx@ = hitinfo(3)
+			_dotfw_curmapy@ = hitinfo(4)
+			_dotfw_curmapcel@ = hitinfo(1)
+			_dotfw_curmapattr@ = hitinfo(2)>>8
+			gosub player_mapitemlb
+		}
+;		if hitinfo=ESMAPHIT_HITY {
+;			hity=1
+;		}
+;		if hitinfo=0 {
+;			myx=hitinfo(5)-sp_player_hitofsx
+;			myy=hitinfo(6)-sp_player_hitofsy
+;			x=myx>>16:y=myy>>16
+;		}
+	loop
+	return
+
+*jumpact_jump
+	if sp_player_myact=2 : return
+
+	es_stick sp_player,-1
+	es_setp sp_player,ESI_SPDY, sp_player_myjmp
+	return
+
+*pcont_normal
+	;	ノーマル移動
+	ky=key@
+	es_getpos sp_player,myx,myy
+	sp_player_mydir=-1
+	if ky&2 {
+		sp_player_mydir = DIR_UP
+		myy-=sp_player_speedy
+	}
+	if ky&8 {
+		sp_player_mydir = DIR_DOWN
+		myy+=sp_player_speedy
+	}
+	if ky&1 {
+		sp_player_mydir = DIR_LEFT
+		myx-=sp_player_speedx
+	}
+	if ky&4 {
+		sp_player_mydir = DIR_RIGHT
+		myx+=sp_player_speedx
+	}
+	es_pos sp_player,myx,myy			; スプライト座標設定
+	sp_player_myani++
+	return
+
+
+;------------------------------------------------------------
+
+#deffunc df_addplayer int _p1, int _p2, int _p3, int _p4
+
+	;	プレイヤースプライト登録
+	;		x,y,chr,opt
+	;
+	sp_player_tamane=1
+	i=CHR_TAMANE
+	x=sx/2:y=sy/2
+	if _p1>0 : x=_p1
+	if _p2>0 : y=_p2
+	if _p3>0 : i=_p3 : sp_player_tamane=0
+	es_new sp_player
+	if sp_player<0 : return
+	es_set sp_player,x,y,i,_p4
+	es_flag sp_player,ESSPFLAG_NOWIPE,1
+	es_type sp_player,TYPE_PLAYER
+
+	if sp_player_map {
+		es_setp sp_player,ESI_MAPHIT,ESSPMAPHIT_STICKSP,1
+	}
+
+	_dotfw_cursp@ = sp_player
+	sp_player_mode=0
+	sp_player_myani=0
+	sp_player_mydir=0
+	return
+
+
+#deffunc df_addpmis int _p4, int _p5, int _p1, int _p2, int _p3, int _p6
+
+	;	プレイヤー弾登録
+	;	x,y, direction, speed, chrno, option
+	;
+	pmchr=CHR_MISSILE
+	if _p3>0 : pmchr=_p3
+	spno=-1
+	spd=100
+	if _p2>0 : spd=_p2
+
+	es_new spno
+	_dotfw_cursp@ = spno
+	if spno<0 : return
+
+	es_set spno,_p4,_p5,pmchr,_p6
+	if sp_player_map {
+		es_pos spno,0,0,ESSPSET_FALL
+		es_setp spno,ESI_MAPHIT,ESSPMAPHIT_HITWIPE,1
+	}
+
+	es_type spno,TYPE_PMISSLE
+	es_adir spno,_p1,spd
+	return
+
+
+#deffunc df_pattack int _p1, int _p2, int _p3
+
+	;	プレイヤー攻撃
+	;	x,y,CHR No.
+	;
+	es_new spno
+	es_set spno,_p1, _p2, _p3
+	es_type spno,TYPE_PBOMB
+
+	n=0
+	chk_type=TYPE_PBOMB
+	df_getplayer
+	repeat
+		es_find n,TYPE_ENEMY|TYPE_EXTENEMY|TYPE_NCENEMY,n
+		if n=-1 : break				; スプライトを検出
+		_dotfw_cursp@ = n
+		es_check res,n,chk_type			; 衝突チェック
+		if res>=0 {
+			_dotfw_hitsp@ = -1;res
+			gosub enemy_hitlb
+		}
+		n+
+	loop
+	;es_fade spno, ESSPF_TIMEWIPE, 2
+	es_clear spno,1
+	return
+
+
+#deffunc df_getplayer
+
+	;	プレイヤー座標を取得する
+	;
+	if sp_player<0 {
+		_dotfw_cursp@ = 0
+		_dotfw_myx@ = 0
+		_dotfw_myy@ = 0
+		return
+	}
+	_dotfw_cursp@ = sp_player
+	es_getpos sp_player,_dotfw_myx@,_dotfw_myy@
+
+	if sp_player_acttype>=DOTFW_PACTTYPE_JUMP {
+		_dotfw_myani@ = sp_player_myani
+		_dotfw_mydir@ = sp_player_mydir
+		_dotfw_myres@ = sp_player_myres
+		_dotfw_myact@ = sp_player_myact
+	}
+	return
+
+
+#deffunc df_getaxis
+
+	;	カレントスプライト座標を取得する
+	;
+	es_getpos _dotfw_cursp@,_dotfw_cx@,_dotfw_cy@
+	es_getpos _dotfw_cursp@,_dotfw_movex@,_dotfw_movey@,ESSPSET_ADDPOS|ESSPSET_DIRECT
+	return
+
+
+#deffunc df_putaxis
+
+	;	カレントスプライト移動量を再設定する
+	;	(df_getaxisをしておくこと)
+	;
+	es_setp _dotfw_cursp@,ESI_SPDX,_dotfw_movex@
+	es_setp _dotfw_cursp@,ESI_SPDY,_dotfw_movey@
+	return
+
+
+#deffunc df_putemode int _p1
+
+	;	制御中の敵情報(モード)を再設定する
+	;
+	enemy_mode(_dotfw_cursp@) = _p1
+	return
+
+
+#deffunc df_getenemyprm
+
+	;	制御中の敵情報を取得する
+	;
+	spno=_dotfw_cursp@
+	_dotfw_enemy_turn@ = enemy_turn(spno)
+	_dotfw_enemy_timer@ = enemy_timer(spno)
+	_dotfw_enemy_speed@ = enemy_speed(spno)
+	_dotfw_enemy_dir@ = enemy_dir(spno)
+	return
+
+
+#deffunc df_putenemyprm
+
+	;	制御中の敵情報を再設定する
+	;
+	spno=_dotfw_cursp@
+	enemy_turn(spno) = _dotfw_enemy_turn@
+	enemy_timer(spno) = _dotfw_enemy_timer@
+	enemy_speed(spno) = _dotfw_enemy_speed@
+	enemy_dir(spno) = _dotfw_enemy_dir@
+	return
+
+
+#deffunc df_parea int _p1, int _p2, int _p3, int _p4
+
+	;	プレイヤー移動範囲を設定する
+	;
+	sp_player_x1=_p1
+	sp_player_y1=_p2
+	sp_player_x2=_p3
+	sp_player_y2=_p4
+	return
+
+
+#deffunc df_pmode int _p1, int _p2, int _p3
+
+	;	プレイヤーコントロール設定
+	;		mode, speedx, speedy
+	;
+	sp_player_mode=_p1
+	if _p2>0 : sp_player_speedx=_p2 : sp_player_speedy=_p2
+	if _p3>0 : sp_player_speedy=_p3
+	return
+
+#deffunc df_pwipe
+
+	;	プレイヤー消去
+	;
+	if sp_player_mode>=0 {
+		es_kill sp_player
+		sp_player_mode=-1
+	}
+	_dotfw_player@=0
+	return
+
+#deffunc df_paction label _p1, int _p2
+
+	;	プレイヤーのアクション動作ラベルを設定
+	;		label, mode
+	;
+	if _p2=PACTION_CONTROL {
+		player_actlb=_p1
+	}
+	if _p2=PACTION_HIT {
+		player_hitlb=_p1
+	}
+	if _p2=PACTION_KEY {
+		player_keylb=_p1
+	}
+	if _p2=PACTION_BUTTON {
+		player_btn1lb=_p1
+	}
+	if _p2=PACTION_BUTTON2 {
+		player_btn2lb=_p1
+	}
+	if _p2=PACTION_BUTTON3 {
+		player_btn3lb=_p1
+	}
+	if _p2=PACTION_MISS {
+		player_misslb=_p1
+	}
+	if _p2=PACTION_ITEM {
+		player_itemlb=_p1
+	}
+	if _p2=PACTION_MAPITEM {
+		player_mapitemlb=_p1
+	}
+	if _p2=PACTION_MAPNOTICE {
+		player_mapnoticelb=_p1
+	}
+	return
+
+
+;------------------------------------------------------------
+
+#deffunc df_earea int _p1, int _p2, int _p3, int _p4
+
+	;	エネミー出現範囲を設定する
+	;
+	enemy_x1=_p1
+	enemy_y1=_p2
+	enemy_x2=_p3
+	enemy_y2=_p4
+	return
+
+#deffunc df_emode int _p1, int _p2, int _p3, int _p4, int _p5, int _p6, int _p7
+
+	;	エネミー生成設定
+	;		mode, chr, misrate, interval, speed, exprm, opt
+	;
+	enemy_def_seq = 0
+	enemy_def_timer = 0
+	enemy_def_exprm=_p6
+	enemy_def_mode=_p1
+
+	if enemy_def_mode & EMODE_SEQ {						; シーケンス制御
+		enemy_def_seq=enemy_def_mode & (EMODE_SEQ-1)
+		if enemy_def_seq>eseq_max : dialog "SEQ ID error" : enemy_def_seq=0
+		enemy_def_mode=eseq_mode(enemy_def_seq)
+		enemy_def_timer=eseq_timer(enemy_def_seq)
+		enemy_def_exprm=eseq_exprm(enemy_def_seq)
+	}
+	enemy_def_chr=_p2
+	enemy_def_misrate=_p3
+	enemy_def_interval=8
+	if _p4>0 : enemy_def_interval=_p4
+	enemy_def_speed=200
+	if _p5>0 : enemy_def_speed=_p5
+	if _p5<0 : enemy_def_speed=0
+	enemy_def_opt=_p7
+	return
+
+#deffunc df_mapspawn int _p1, int _p2, int _p3, int _p4, int _p5
+
+	;	マップからエネミー生成
+	;		dir, size, X-ofs, Y-ofs, opt
+	;		opt : -1=nospwan/1=優先順位UP
+	;		       2=TYPE_EXTENEMY 4=TYPE_NCENEMY
+	;
+	if sp_player_shtmap!=0 : goto *df_mapspawn2
+	;
+	es_bgfetch sp_player_map,_p1,_p2
+	es_getbghit numinfo,sp_player_map,-1
+	if _p5<0 : return
+	repeat numinfo
+		es_getbghit hitinfo,sp_player_map,cnt
+		if hitinfo=ESMAPHIT_NOTICE {
+			df_addenemy hitinfo(5)+_p3,hitinfo(6)+_p4, DIR_LEFT, 50,_p5
+		}
+	loop
+	return
+
+*df_mapspawn2
+	;	マップからエネミー生成(2)
+	a = sp_player_shtmap - DOTFW_BGID_BGMAP
+	x=bgp_gx(a)>>10
+	y=bgp_gy(a)>>10
+	es_bgfetch sp_player_shtmap,_p1,_p2
+	es_getbghit numinfo,sp_player_shtmap,-1
+	if _p5<0 : return
+	repeat numinfo
+		es_getbghit hitinfo,sp_player_shtmap,cnt
+		if hitinfo=ESMAPHIT_NOTICE {
+			;dialog ""+(hitinfo(5))+","+(hitinfo(6))+"/"+x+","+y
+			df_addenemy hitinfo(5)-x+_p3,hitinfo(6)-y+_p4, DIR_DOWN, 50,_p5
+		}
+	loop
+	return
+
+
+#deffunc df_eaction label _p1, int _p2
+
+	;	エネミーのアクション動作ラベルを設定
+	;		label, mode
+	;
+	if _p2=EACTION_CONTROL {
+		enemy_actlb=_p1
+	}
+	if _p2=EACTION_HIT {
+		enemy_hitlb=_p1
+	}
+	if _p2=EACTION_SHOT {
+		enemy_shotlb=_p1
+	}
+	if _p2=EACTION_DESTROY {
+		enemy_destlb=_p1
+	}
+	return
+
+
+#deffunc df_addenemy int _p1, int _p2, int _p3, int _p4, int _p5
+
+	;	エミネースプライト登録
+	;		x,y,dir,speed,opt
+	;		opt : 1=優先度UP 2=重なりを抑制 16=TYPE_EXTENEMY 32=TYPE_NCENEMY
+	;
+	i=0:if _p5&1 : i=128
+	es_new sp_enemy,i
+	_dotfw_cursp@ = sp_enemy
+	if sp_enemy<0 : return
+	es_set sp_enemy,_p1,_p2,enemy_def_chr,enemy_def_opt
+
+	i=TYPE_ENEMY
+	if _p5&16 : i=TYPE_EXTENEMY
+	if _p5&32 : i=TYPE_NCENEMY
+	es_type sp_enemy,i
+	speed = enemy_def_speed
+	if _p4>0 : speed = _p4
+	if _p4<0 {
+		speed=0
+	} else {
+		es_adir sp_enemy,_p3,speed
+	}
+	;
+	e_mode = enemy_def_mode
+	e_dir = _p3
+	e_timer = enemy_def_timer
+	e_exprm = enemy_def_exprm
+	gosub *dfi_setenemymode
+
+	if sp_player_map {
+		es_bound sp_enemy,128,3
+		es_setp sp_enemy, ESI_MAPHIT, ESSPMAPHIT_BLOCKBIT, 1
+	}
+
+	enemy_interval(sp_enemy) = enemy_def_interval
+	enemy_misrate(sp_enemy) = enemy_def_misrate
+
+	enemy_seqid(sp_enemy) = enemy_def_seq
+	enemy_speed(sp_enemy) = speed
+
+	return
+
+*dfi_setenemymode
+	;	エミネーモード設定
+	;	(sp_enemy) e_mode, e_dir, e_timer, e_exprm
+	;
+	if e_mode>enemy_modemax : e_mode=0
+	enemy_mode(sp_enemy) = e_mode
+	enemy_cnt(sp_enemy) = 0
+	enemy_dir(sp_enemy) = e_dir
+	enemy_timer(sp_enemy) = e_timer
+	enemy_turn(sp_enemy) = 0
+	enemy_exprm(sp_enemy) = e_exprm
+	return
+
+
+#deffunc df_enemygen int _p1, int _p2, int _p3, int _p4
+
+	;	時間ごとのエネミー生成
+	;		dir, rate, interval, option
+	;
+	if _dotfw_update_flag@&UPDATE_PAUSE : return
+	;
+	enemy_addinterval=4
+	if _p3>0 : enemy_addinterval=_p3
+	if _dotfw_frame@\enemy_addinterval : return
+
+	enemy_addrate=10
+	if _p2>0 : enemy_addrate=_p2
+	if rnd(100)>=enemy_addrate : return
+	;
+	i=enemy_x2-enemy_x1
+	a=enemy_y2-enemy_y1
+	enemygen_dir=_p1
+	enemygen_opt=_p4
+	;
+	hitchk=0
+	if enemygen_opt&2 : hitchk=3
+	gosub *enemygen_exec
+	df_addenemy x,y,enemygen_dir, 0, enemygen_opt
+
+*enemygen_loop
+	if hitchk<=0 : return
+	es_check i, sp_enemy, TYPE_ENEMY
+	if i>=0 {
+		gosub *enemygen_exec
+		es_pos sp_enemy,x,y
+		hitchk--
+		goto *enemygen_loop
+	}
+	return
+	;
+*enemygen_exec
+	if enemygen_dir=DIR_UP {
+		x=enemy_x1
+		if i>0 : x+=rnd(i)
+		y=enemy_y2
+		return
+	}
+	if enemygen_dir=DIR_DOWN {
+		x=enemy_x1
+		if i>0 : x+=rnd(i)
+		y=enemy_y1
+		return
+	}
+	if enemygen_dir=DIR_LEFT {
+		y=enemy_y1
+		if a>0 : y+=rnd(a)
+		x=enemy_x2
+		return
+	}
+	if enemygen_dir=DIR_RIGHT {
+		y=enemy_y1
+		if a>0 : y+=rnd(a)
+		x=enemy_x1
+		return
+	}
+	return
+
+
+#deffunc df_emodesub label _p1, int _p2
+
+	;	エネミーのモード動作ラベルを設定
+	;		label, mode
+	;
+	i=_p2
+	if i=0 {
+		i = enemy_modemax+1
+	}
+	if enemy_modemax<i : enemy_modemax=i
+	enemy_modelb(i)=_p1
+	return i
+
+
+#deffunc df_addseq int _p1, int _p2, int _p3, int _p4
+
+	;	エネミーのシーケンス登録
+	;		id, mode, timer, exprm
+	;
+	seqid=_p1
+	if seqid=0 : seqid=eseq_max+1
+	if eseq_max<seqid : eseq_max=seqid
+	eseq_mode(seqid)=_p2
+	eseq_timer(seqid)=_p3
+	eseq_exprm(seqid)=_p4
+	return seqid
+
+
+#deffunc df_addemis int _p4, int _p5, int _p1, int _p2, int _p3, int _p6
+
+	;	エネミー弾登録
+	;	x,y, direction, speed, chrno, option
+	;
+	x=_p4:y=_p5
+	;
+	i=CHR_CIRCLE
+	if _p3>0 : i=_p3
+	spno=-1
+	spd=100
+	if _p2>0 : spd=_p2
+
+	es_new spno
+	_dotfw_cursp@ = spno
+	if spno<0 : return
+
+	edir=_p1
+	if edir=DIR_AIM {
+		es_ang x,y,_dotfw_myx@,_dotfw_myy@
+		edir=stat
+	}
+	es_set spno,x,y,i,_p6
+	if sp_player_map {
+		es_pos spno,0,0,ESSPSET_FALL
+		es_setp spno,ESI_MAPHIT,ESSPMAPHIT_HITWIPE,1
+	}
+	es_type spno,TYPE_EMISSLE
+	es_adir spno,edir,spd
+	return
+
+
+#deffunc df_additem int _p1, int _p2, int _p3, int _p4, int _p5, int _p6
+
+	;	アイテムスプライト登録
+	;		x,y,chr,mode,dir,speed
+	;
+	es_new sp_enemy
+	if sp_enemy<0 : return
+	es_set sp_enemy,_p1,_p2,_p3,enemy_def_opt
+	es_type sp_enemy,TYPE_ITEM
+	speed = enemy_def_speed
+	if _p6>0 : speed = _p6
+	es_adir sp_enemy,_p5,speed
+	;
+	e_mode = _p4
+	e_dir = _p5
+	e_timer = 0
+	gosub *dfi_setenemymode
+
+	enemy_interval(sp_enemy) = enemy_def_interval
+	enemy_misrate(sp_enemy) = 0
+
+	enemy_seqid(sp_enemy) = enemy_def_seq
+	enemy_speed(sp_enemy) = speed
+	return
+
+
+#deffunc df_enemyconf int _p1, int _p2
+
+	;	エネミーの詳細設定
+	;		misrange
+	;
+	enemy_misrange=_p1
+	return
+
+
+
+;------------------------------------------------------------
+
+#deffunc df_efftimer int _p1
+
+	;	エフェクトタイマー設定
+	;		time
+	;
+	if spid<0 : return
+	dfi_sprtimer spid, _p1
+	return
+
+#deffunc df_effanim int _p1, int _p2
+
+	;	エフェクトアニメーション設定
+	;		count, pattern, px, py
+	;
+	if spid<0 : return
+	dfi_spranim spid, _p1, _p2
+	return
+
+#deffunc df_effmove int _p1, int _p2
+
+	;	エフェクト移動設定
+	;		px, py
+	;
+	if spid<0 : return
+	dfi_move spid, _p1*100/16, _p2*100/16
+	return
+
+#deffunc df_addbom int _p1, int _p2, int _p3, int _p4
+
+	;	爆発エフェクト登録
+	;		x,y,level,aniframe
+	;
+	aniframe=4
+	if _p4>0 : aniframe=_p4
+	;
+	;dfi_sprnew
+	if _p3>0 : goto *bomlev1
+*bomlev0
+	es_regdeco CHR_BOM, ESDECO_FRONT, 0, 0, aniframe*4, 0
+	es_setdeco _p1,_p2, 0
+	;dfi_sprset spid, _p1, _p2, CHR_BOM
+	;dfi_spranim spid, aniframe, 8
+	;dfi_sprtimer spid, aniframe*5
+	return
+*bomlev1
+	if _p3>1 : goto *bomlev2
+
+	es_regdeco CHR_BOM, ESDECO_FRONT, 0, 0, aniframe*6, 0
+	es_setdeco _p1,_p2, 0
+	;dfi_sprset spid, _p1, _p2, CHR_BOM
+	;dfi_spranim spid, aniframe, 8
+	;dfi_sprtimer spid, aniframe*6
+	return
+*bomlev2
+	bomkaz=ESDECO_MULTI4
+	if _p3>2 : bomkaz=ESDECO_MULTI8
+	es_regdeco CHR_BOM, ESDECO_FRONT|bomkaz, -1, -1, aniframe*4, 0
+	es_setdeco _p1,_p2, 0
+
+	;dfi_sprset spid, _p1, _p2, CHR_BOM
+	;dfi_spranim spid, aniframe, 8
+	;dfi_sprtimer spid, aniframe*6
+	;
+	;bomkaz=4
+	;if _p3>2 : bomkaz=8
+	;repeat bomkaz
+	;	dfi_sprnew
+	;	gosub *bomlev0
+	;	x=rnd(16)-8:y=rnd(16)-8
+	;	if _p3>2 : x*=2 : y*=2
+	;	dfi_move spid, x,y
+	;loop
+	return
+
+#deffunc df_addfire int _p1, int _p2, int _p3, int _p4, int _p5, int _p6
+
+	;	花火エフェクト登録
+	;		x,y,color,level,speed, frame
+	;
+	bomframe=50
+	if _p6>0 : bomframe=_p6
+	bomspeed=100
+	if _p5>0 :bomspeed=_p5
+	bomkaz=ESDECO_MULTI8
+	if _p4>0 : bomkaz=ESDECO_MULTI16
+
+	es_regdeco CHR_DOT1+_p3, ESDECO_FRONT|ESDECO_FADEOUT|bomkaz, 0, bomspeed, bomframe, 0
+	es_setdeco _p1,_p2, 0
+	;repeat bomkaz
+	;	dfi_sprnew
+	;	dfi_sprset spid, _p1, _p2, CHR_DOT1+_p3
+	;	dfi_rotmove spid, cnt*bomrot, bomspeed
+	;	dfi_sprtimer spid, bomframe
+	;loop
+	return
+
+
+#deffunc df_addeff int _p1, int _p2, int _p3, int _p4, int _p5
+
+	;	汎用スプライトエフェクト登録
+	;		x,y,celid,bufid
+	;
+	dfi_sprnew
+	dfi_sprset spid, _p2, _p3, _p4, _p5
+	return
+
+#deffunc df_addfmes str _p1, int _p2, int _p3, int _p4, int _p5
+
+	;	フォントメッセージ登録(エフェクト)
+	;		"mes",x,y,color,wait
+	;
+	dfi_sprnew
+	dfi_sprset spid, _p2, _p3, 0
+	dfi_sprstr spid, _p1, _p4, _p5
+	sprflag(spid)=SPR_FMES
+	dfi_sprtimer spid, _dotfw_fps@*10
+	return
+
+#deffunc df_addmes str _p1, int _p2, int _p3, int _p4, int _p5
+
+	;	BGメッセージ登録(エフェクト)
+	;		"mes",x,y,color,wait
+	;
+	dfi_sprnew
+	dfi_sprset spid, _p2, _p3, 0
+	dfi_sprstr spid, _p1, _p4, _p5
+	return
+
+
+
+;------------------------------------------------------------
+#global
+#endif
+

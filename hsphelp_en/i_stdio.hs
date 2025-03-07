@@ -57,9 +57,9 @@ The details of the value specified by the key code are as follows.
        35: [END] (PC98 [HELP])
        36: [HOME] ([HOMECLR] of PC98)
        37: Cursor key [<-]
-       38: Cursor key [‚Üë]
+       38: Cursor key [Å™]
        39: Cursor key [->]
-       40: Cursor key [‚Üì]
+       40: Cursor key [Å´]
    48 to 57: [0] to [9] (main keyboard)
    65-90: [A]-[Z]
   96 to 105: [0] to [9] (numeric keypad)
@@ -157,9 +157,9 @@ When the stick instruction is executed, the following multiple button informatio
 Value (decimal) Value (hexadecimal) key
 -------------------------------------
      1: $ 00001: Cursor key left (<-)
-     2: $ 00002: On the cursor key (‚Üë)
+     2: $ 00002: On the cursor key (Å™)
      4: $ 00004: Cursor key right (->)
-     8: $ 00008: Cursor down (‚Üì)
+     8: $ 00008: Cursor down (Å´)
     16: $ 00010: Spacebar
     32: $ 00020: Enter key
     64: $ 00040: Ctrl key
@@ -260,7 +260,7 @@ Method call
 %group
 Basic I / O control instructions
 %prm
-p1, p2, p3‚Ä¶
+p1, p2, p3Åc
 p1: Variable name
 p2: method name
 p3: Parameter
@@ -348,7 +348,7 @@ When dealing with normal coordinates, there is no problem even if you get it as 
 color 0,0,0: boxf; clear screen
 x = getease (i, 50); Get easing value (integer)
 		color 255,255,255
-pos x, 100: mes "‚óè"
+pos x, 100: mes "Åú"
 		redraw 1
 		await 30
 		i=i+1

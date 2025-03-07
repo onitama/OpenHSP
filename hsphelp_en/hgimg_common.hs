@@ -298,7 +298,7 @@ fval = variable name to which a real value is assigned
 frot = rotation angle (radians)
 %inst
 Assigns the sine value of the angle specified by frot to the variable specified by fval.
-The unit of angle is radians (2Ï€ = 360 degrees).
+The unit of angle is radians (2ƒÎ = 360 degrees).
 %href
 fcos
 fsqr
@@ -317,7 +317,7 @@ fval = variable name to which a real value is assigned
 frot = rotation angle (radians)
 %inst
 Assigns the cosine value of the angle specified by frot to the variable specified by fval.
-The unit of angle is radians (2Ï€ = 360 degrees).
+The unit of angle is radians (2ƒÎ = 360 degrees).
 %href
 fsin
 fsqr
@@ -1704,4 +1704,537 @@ id: event ID
 The group setting event is added to the event ID specified by id.
 Group settings events set the parameters that an object has.
 If you specify (x1, y1, z1) and (x2, y2, z2), the values within each range will be created with random numbers.
-If (x2, y2, z2) is omitted and only”0øÂÇÕ
+If (x2, y2, z2) is omitted and only (x1, y1, z1) is specified, the value will be set as it is.
+
+%href
+event_setpos
+event_setang
+event_setangr
+event_setscale
+event_setefx
+event_setwork
+newevent
+setevent
+
+
+%index
+event_setwork
+Added work group configuration event
+%group
+Extended screen control command
+%prm
+id,x1,y1,z1,x2,y2,z2
+id: event ID
+(x1, y1, z1): Set value (lower limit)
+(x2, y2, z2): Set value (upper limit)
+%inst
+The group setting event is added to the event ID specified by id.
+Group settings events set the parameters that an object has.
+If you specify (x1, y1, z1) and (x2, y2, z2), the values within each range will be created with random numbers.
+If (x2, y2, z2) is omitted and only (x1, y1, z1) is specified, the value will be set as it is.
+
+%href
+event_setpos
+event_setang
+event_setangr
+event_setscale
+event_setdir
+event_setefx
+newevent
+setevent
+
+
+%index
+event_pos
+Added pos group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1,sw
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+sw (1): Interpolation options
+%inst
+The group change event is added to the event ID specified by id.
+The group change event sets the time-dependent changes in the parameters that the object has.
+The value becomes (x1, y1, z1) when the number of frames specified by frame has elapsed.
+The following values can be specified for the sw interpolation option.
+^p
+sw = 0: Linear interpolation (absolute value)
+sw = 1: Spline interpolation (absolute value)
+sw = 2: Linear interpolation (relative value)
+sw = 3: Spline interpolation (relative value)
+^p
+If sw is omitted, an absolute spline is set.
+When 16 is added to the sw value, the change is set using the work group value of the object instead of the value set by (x1, y1, z1).
+
+%href
+event_ang
+event_angr
+event_scale
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_ang
+ang Added group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1,sw
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+sw (0): Interpolation options
+%inst
+The group change event is added to the event ID specified by id.
+The group change event sets the time-dependent changes in the parameters that the object has.
+The value becomes (x1, y1, z1) when the number of frames specified by frame has elapsed.
+The following values can be specified for the sw interpolation option.
+^p
+sw = 0: Linear interpolation (absolute value)
+sw = 1: Spline interpolation (absolute value)
+sw = 2: Linear interpolation (relative value)
+sw = 3: Spline interpolation (relative value)
+^p
+If sw is omitted, the absolute value linear is set.
+When 16 is added to the sw value, the change is set using the work group value of the object instead of the value set by (x1, y1, z1).
+(The angle is specified in the same way as the setang instruction, and the rotation order is X-> Y-> Z. There are event_angy and event_angz instructions to rotate in other orders.)
+
+
+%href
+event_pos
+event_angr
+event_scale
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_angr
+ang Added group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+%inst
+The group change event is added to the event ID specified by id.
+The group change event sets the time-dependent changes in the parameters that the object has.
+The value becomes (x1, y1, z1) when the number of frames specified by frame has elapsed.
+The following values can be specified for the sw interpolation option.
+^p
+sw = 0: Linear interpolation (absolute value)
+sw = 1: Spline interpolation (absolute value)
+sw = 2: Linear interpolation (relative value)
+sw = 3: Spline interpolation (relative value)
+^p
+If sw is omitted, the absolute value linear is set.
+When 16 is added to the sw value, the change is set using the work group value of the object instead of the value set by (x1, y1, z1).
+
+%href
+event_pos
+event_ang
+event_scale
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_scale
+scale Added group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1,sw
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+sw (0): Interpolation options
+%inst
+The group change event is added to the event ID specified by id.
+The group change event sets the time-dependent changes in the parameters that the object has.
+The value becomes (x1, y1, z1) when the number of frames specified by frame has elapsed.
+The following values can be specified for the sw interpolation option.
+^p
+sw = 0: Linear interpolation (absolute value)
+sw = 1: Spline interpolation (absolute value)
+sw = 2: Linear interpolation (relative value)
+sw = 3: Spline interpolation (relative value)
+^p
+If sw is omitted, the absolute value linear is set.
+When 16 is added to the sw value, the change is set using the work group value of the object instead of the value set by (x1, y1, z1).
+
+%href
+event_pos
+event_ang
+event_angr
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_dir
+Added dir group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1,sw
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+sw (0): Interpolation options
+%inst
+The group change event is added to the event ID specified by id.
+The group change event sets the time-dependent changes in the parameters that the object has.
+The value becomes (x1, y1, z1) when the number of frames specified by frame has elapsed.
+The following values can be specified for the sw interpolation option.
+^p
+sw = 0: Linear interpolation (absolute value)
+sw = 1: Spline interpolation (absolute value)
+sw = 2: Linear interpolation (relative value)
+sw = 3: Spline interpolation (relative value)
+^p
+If sw is omitted, the absolute value linear is set.
+When 16 is added to the sw value, the change is set using the work group value of the object instead of the value set by (x1, y1, z1).
+
+%href
+event_pos
+event_ang
+event_angr
+event_scale
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_work
+Added work group change event
+%group
+Extended screen control command
+%prm
+id,frame,x1,y1,z1,sw
+id: event ID
+frame: Number of frames until change
+(x1, y1, z1): Value to be set
+sw (0): Interpolation options
+%inst
+The group change event is added to the event ID specified by id.
+The group change event sets the time-dependent changes in the parameters that the object has.
+The value becomes (x1, y1, z1) when the number of frames specified by frame has elapsed.
+The following values can be specified for the sw interpolation option.
+^p
+sw = 0: Linear interpolation (absolute value)
+sw = 1: Spline interpolation (absolute value)
+sw = 2: Linear interpolation (relative value)
+sw = 3: Spline interpolation (relative value)
+^p
+If sw is omitted, the absolute value linear is set.
+
+%href
+event_pos
+event_ang
+event_angr
+event_scale
+event_dir
+event_efx
+newevent
+setevent
+
+
+%index
+event_addpos
+Added pos group addition event
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: event ID
+(x, y, z): Value to be added
+%inst
+The group addition event is added to the event ID specified by id.
+The group addition event adds the value of (x, y, z) to the parameters that the object has.
+
+%href
+event_addang
+event_addangr
+event_addscale
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addang
+Added ang group addition event
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: event ID
+(x, y, z): Value to be added
+%inst
+The group addition event is added to the event ID specified by id.
+The group addition event adds the value of (x, y, z) to the parameters that the object has.
+
+%href
+event_addpos
+event_addangr
+event_addscale
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addangr
+Added ang group addition event
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: event ID
+(x, y, z): Value to be added
+%inst
+The group addition event is added to the event ID specified by id.
+The group addition event adds the value of (x, y, z) to the parameters that the object has.
+
+%href
+event_addpos
+event_addang
+event_addscale
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addscale
+Added scale group addition event
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: event ID
+(x, y, z): Value to be added
+%inst
+The group addition event is added to the event ID specified by id.
+The group addition event adds the value of (x, y, z) to the parameters that the object has.
+
+%href
+event_addpos
+event_addang
+event_addangr
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_adddir
+Added dir group addition event
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: event ID
+(x, y, z): Value to be added
+%inst
+The group addition event is added to the event ID specified by id.
+The group addition event adds the value of (x, y, z) to the parameters that the object has.
+
+%href
+event_addpos
+event_addang
+event_addangr
+event_addscale
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addwork
+Added work group addition event
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: event ID
+(x, y, z): Value to be added
+%inst
+The group addition event is added to the event ID specified by id.
+The group addition event adds the value of (x, y, z) to the parameters that the object has.
+
+%href
+event_addpos
+event_addang
+event_addangr
+event_addscale
+event_adddir
+event_addefx
+newevent
+setevent
+
+
+%index
+setevent
+Set an event on an object
+%group
+Extended screen control command
+%prm
+p1,p2,p3
+p1 (0): Object ID
+p2 (0): Event ID
+p3 (-1): Event slot ID
+%inst
+Applies the event of p2 to the object specified by p1.
+It is necessary to prepare an event list in which a fixed flow process (event) is registered in advance.
+^
+Up to 4 events set by the setevent command can be applied to each object at the same time.
+You can specify the event slot ID (0 to 3) for setting the event in p3.
+If p3 is omitted or -1 is specified, the event slot IDs that are vacant in order from 0 are used.
+To delete the event set in the object, specify the event slot ID in p3 and set p2 to a negative value.
+^
+If the event setting is successful, the event slot ID set in the system variable stat is assigned.
+If the event setting fails, the system variable stat is assigned -1.
+
+
+%href
+newevent
+
+
+%index
+delevent
+Delete event list
+%group
+Extended screen control command
+%prm
+p1
+p1: Event ID
+%inst
+Deletes the event list specified in p1.
+
+%href
+newevent
+
+
+%index
+newevent
+Create an event list
+%group
+Extended screen control command
+%prm
+p1
+p1: Variable name to which the event ID is assigned
+%inst
+Gets the new event ID and assigns it to the variable specified in p1.
+^
+When creating a new event, it is necessary to acquire the event ID with the newevent instruction.
+Next, various actions can be registered by the event list addition command starting with "event_".
+Once the event ID is acquired, the scene is reset (hgreset instruction) or
+Or it is retained until the event list is deleted by the delevent instruction.
+^
+The resulting event can be applied to the object at any time with the setevent command.
+
+
+%href
+delevent
+setevent
+
+
+%index
+getang
+ang get group information
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: object ID
+(x, y, z): Variables to get
+
+%inst
+Gets the parameters of the object.
+The contents of the ang group (display angle) are assigned to the variables specified by (x, y, z).
+(x, y, z) is set as a real variable.
+You can get the value as an integer value by adding "i" to the end of the instruction.
+
+%href
+getangi
+getpos
+getangr
+getscale
+getdir
+getefx
+getwork
+
+
+%index
+getangr
+ang get group information
+%group
+Extended screen control command
+%prm
+id,x,y,z
+id: object ID
+(x, y, z): Variables to get
+
+%inst
+Gets the parameters of the object.
+The contents of the ang group (display angle) are assigned to the variables specified by (x, y, z).
+(x, y, z) is set as an integer variable.
+The unit of the angle is an integer, and the value that goes around from 0 to 255 is used.
+
+%href
+getpos
+getang
+getscale
+getdir
+getefx
+getwork
+
+
+%index
+event_delobj
+Added object delete event
+%group
+Extended screen control command
+%prm
+id
+id: event ID
+%inst
+The object deletion event is added to the event ID specified by id.
+An object delete event is an instruction that deletes the object that is currently executing the event.
+%href
+event_regobj
+newevent
+setevent
+
+

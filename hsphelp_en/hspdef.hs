@@ -807,7 +807,7 @@ It can also be said to convert the angle expressed in the radian method to the a
 
 %sample
 	tmp = M_PI
-mes str (tmp) + "Radian is" + rad2deg (tmp) + "å±ž."
+mes str (tmp) + "Radian is" + rad2deg (tmp) + "‘®."
 	stop
 
 %href
@@ -830,7 +830,7 @@ It can also be said that the angle expressed in the degree method is converted i
 
 %sample
 	tmp = 90
-mes str (tmp) + "å±ž is" + deg2rad (tmp) + "radians."
+mes str (tmp) + "‘® is" + deg2rad (tmp) + "radians."
 	stop
 
 %href

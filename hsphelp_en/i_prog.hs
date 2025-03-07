@@ -750,7 +750,7 @@ Numerical branch
 %group
 Program control instructions
 %prm
-p1 goto / gosub Label 0, Label 1‚Ä¶
+p1 goto / gosub Label 0, Label 1Åc
 p1 = 0 to (0): Value for branching
 Label 0 to: Label name of branch destination
 %inst
@@ -1050,4 +1050,125 @@ Escape the macro loop
 %group
 Program control macro
 %inst
-Repeating macros definî0¯¬«’
+Repeating macros defined by standard macros,
+Break out of the loop between while ~ wend, do ~ until, and for ~ next.
+It does not execute in the repeating block after the present, and resumes from the instruction next to the loop.
+%href
+_continue
+while
+wend
+do
+until
+for
+next
+
+
+
+
+%index
+foreach
+Repeat for the number of elements of the variable
+%group
+Program control instructions
+%prm
+p1
+p1 = variable name: variable to be looped
+
+%inst
+Iterate as many times as there are elements stored in the array variable.
+Foreach is described at the loop start location like the repeat instruction, and the loop instruction is described at the loop end location.
+The difference from the repeat instruction is that the number of elements of the specified array variable is the number of repetitions, and in the case of modular variables, the elements deleted by the delmod instruction do not execute the loop contents.
+^p
+example :
+	dim a,10
+	foreach a
+	mes "#"+cnt+":"+a.cnt
+	loop
+^p
+By specifying the system variable cnt as an array element in a loop, you can concisely write a process that causes all elements to be executed repeatedly.
+Also, the break and continue instructions function in the same way as when using the repeat instruction.
+
+%href
+repeat
+loop
+break
+continue
+
+
+
+%index
+oncmd
+Windows message interrupt execution specification
+%group
+Program control instructions
+%prm
+goto/gosub *label,p1
+* label: Label name
+p1: Message ID
+
+%inst
+Specifies where to jump automatically when the specified window message is sent.
+^
+After oncmd, specify the goto or gosub keyword before writing the label.
+In the case of goto, a simple program jump. In the case of gosub, a subroutine jump is performed.
+If the goto / gosub keyword is omitted, the operation is the same as the goto keyword.
+^
+If you specify a label with the oncmd instruction, it will jump to the label specified by * label when the p1 message is sent to the HSP window after that.
+The oncmd instruction applies only to the current operation window.
+If multiple windows are created, each window can be registered using the oncmd command.
+^
+If a window message that has already been registered is specified, the previous registration will be invalidated.
+Also, interrupt registration is out of sync with window initialization.
+Once registered, interrupts are valid until the application is closed.
+^
+The interrupt jump accepts an interrupt and jumps when it is stopped by the stop instruction and the wait or await instruction.
+In addition, the system variables iparam, wparam, and lparam are set after jumping by interrupt.
+The window ID where the interrupt occurred can be obtained by using the ginfo function.
+^p
+   Interrupt factor | iparam | wparam | lparam
+ ---------------------------------------------------------------------
+   oncmd | Message ID | wParam | lParam
+^p
+The sent message ID is assigned to the system variable iparam.
+In addition, wparam and lparam store the parameters passed as Windows messages as they are.
+If a subroutine jump occurs due to the gosub keyword in the interrupt settings, the return value can be set with the return instruction.
+For "return number", specify the value returned by the window procedure.
+If no parameter is specified in the return instruction, processing is passed to the default window procedure.
+^
+It is also possible to temporarily turn ON / OFF the execution of event interrupts.
+^p
+	oncmd 0
+^p
+Temporarily stops the interrupt with.
+^p
+	oncmd 1
+^p
+You can resume the interrupt that was paused with.
+
+
+%href
+onkey
+onclick
+onexit
+onerror
+
+
+%index
+else
+If the condition is not met, execute the instruction on that line
+%group
+Program control instructions
+%inst
+Used in combination with the if instruction.
+For details, refer to the explanation of the if instruction.
+
+%sample
+if a == 0 {
+mes "a is 0."
+} else {
+mes "a is not 0."
+}
+
+%href
+if
+

@@ -370,7 +370,7 @@ p1 = (0.0): Angle value (radians)
 
 %inst
 Returns the sine value of p1 as a real number.
-The unit specified by p1 is radian (2Ï€ is 360 degrees).
+The unit specified by p1 is radian (2ƒÎ is 360 degrees).
 %href
 cos
 tan
@@ -388,7 +388,7 @@ p1 = (0.0): Angle value (radians)
 
 %inst
 Returns the cosine value of p1 as a real number.
-The unit specified by p1 is radian (2Ï€ is 360 degrees).
+The unit specified by p1 is radian (2ƒÎ is 360 degrees).
 %href
 sin
 tan
@@ -406,7 +406,7 @@ p1 = (0.0): Angle value (radians)
 
 %inst
 Returns the tangent value of p1 as a real number.
-The unit specified by p1 is radian (2Ï€ is 360 degrees).
+The unit specified by p1 is radian (2ƒÎ is 360 degrees).
 %href
 sin
 cos
@@ -424,7 +424,7 @@ p1: Y value
 p2 (1.0): X value
 
 %inst
-Returns the Y / X angle (arc tangent value) in real radians (2Ï€ is 360 degrees), where p1 is Y and p2 is the value of X.
+Returns the Y / X angle (arc tangent value) in real radians (2ƒÎ is 360 degrees), where p1 is Y and p2 is the value of X.
 If p2 is omitted, 1.0 is used.
 
 %href

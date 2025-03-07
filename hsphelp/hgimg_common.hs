@@ -1376,4 +1376,1000 @@ getobjcoli
 
 %index
 findobj
-�0����
+オブジェクト検索
+%group
+拡張画面制御命令
+%prm
+exmode,group
+exmode(0) : 検索を除外するモード
+group(0)  : 検索対象コリジョングループ値
+%inst
+有効なオブジェクトを列挙します。
+コリジョングループ値を指定した場合は、特定のコリジョングループに属するオブジェクトだけを検索します。
+コリジョングループ値が0の場合は、すべてのオブジェクトが検索対象となります。
+最初にfindobjを実行して、次にnextobj命令で該当するオブジェクトを検索することができます。
+また、exmodeで指定したモード(regobjで指定するモード値と同じ)は検索から除外されます。
+%href
+setcoli
+nextobj
+
+
+%index
+nextobj
+次のオブジェクト検索
+%group
+拡張画面制御命令
+%prm
+val
+val      : 結果が代入される変数名
+%inst
+findobj命令で指定された条件をもとにオブジェクトを検索します。
+検索されると、変数にオブジェクトIDが代入されます。
+検索対象がなくなった時には-1が代入されます。
+%href
+setcoli
+findobj
+
+
+%index
+setborder
+オブジェクト有効範囲設定
+%group
+拡張画面制御命令
+%prm
+fx,fy,fz,option
+( fx,fy,fz ) : ボーダー領域の設定値(実数値)
+option(0) : 設定オプション(0〜2)
+%inst
+ボーダー領域(オブジェクト有効範囲)を設定します。
+optionパラメーターにより、( fx,fy,fz )に設定する内容が変わります。
+optionパラメーターを省略するか、または0の場合は、
+( 0,0,0 )を中心にした、( fx,fy,fz )サイズの立方体がボーダー領域となります。
+optionパラメーターが1の場合は、( fx,fy,fz )の座標を数値が小さい側のボーダー領域として設定します。
+optionパラメーターが2の場合は、( fx,fy,fz )の座標を数値が大きい側のボーダー領域として設定します。
+
+%href
+regobj
+setobjmode
+
+
+%index
+selmoc
+MOC情報を設定
+%group
+拡張画面制御命令
+%prm
+id, mocofs
+id     : オブジェクトID
+mocofs : MOCのグループ指定
+%inst
+MOC設定命令の対象となるMOCグループを指定します。
+idは、オブジェクトIDとなります。
+通常は、selpos,selang,selscale,seldir命令をお使いください。
+%href
+selpos
+selang
+selscale
+seldir
+selcam
+selcpos
+selcang
+selcint
+
+
+%index
+objgetfv
+MOC情報を取得
+%group
+拡張画面制御命令
+%prm
+fv
+fv      = FV値が代入される変数名
+%inst
+MOCに設定されている値を変数fvに代入します。
+%href
+objsetfv
+fvset
+fvadd
+fvsub
+fvmul
+fvdiv
+
+
+%index
+objsetfv
+MOC情報を設定
+%group
+拡張画面制御命令
+%prm
+fv
+fv      = FV値が代入されている変数名
+%inst
+変数fvの内容をMOCに設定します。
+%href
+objgetfv
+fvset
+fvadd
+fvsub
+fvmul
+fvdiv
+
+
+%index
+objaddfv
+MOC情報を加算
+%group
+拡張画面制御命令
+%prm
+fv
+fv      = FV値が代入されている変数名
+%inst
+変数fvの内容をMOCに加算します。
+%href
+objgetfv
+fvset
+fvadd
+fvsub
+fvmul
+fvdiv
+
+
+%index
+objexist
+オブジェクトIDが有効か調べる
+%group
+拡張画面制御命令
+%prm
+p1
+p1(0) : オブジェクトID
+%inst
+p1で指定されたオブジェクトIDが有効であるか調べます。
+オブジェクトIDが有効(登録済み)の場合は、システム変数statに0が代入されます。
+オブジェクトIDが無効(未登録)の場合は、システム変数statに-1が代入されます。
+
+%href
+regobj
+delobj
+
+
+
+%index
+event_wait
+待ち時間イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,p1
+id      : イベントID
+p1(0)   : 待ち時間(フレーム)
+%inst
+idで指定しているイベントIDに、待ち時間イベントを追加します。
+待ち時間イベントは、p1で指定されたフレーム数だけ次のイベントに進むことを保留します。
+
+%href
+newevent
+setevent
+
+
+%index
+event_jump
+ジャンプイベントを追加
+%group
+拡張画面制御命令
+%prm
+id,p1,p2
+id      : イベントID
+p1(0)   : ジャンプ先のイベント番号
+p2(0)   : ジャンプ無視の確率(%)
+%inst
+idで指定しているイベントIDに、ジャンプイベントを追加します。
+ジャンプイベントは、指定されたイベント番号から実行を続けることを指示します。
+イベントリストの中でのgoto命令にあたります。
+p1で指定するイベント番号は、イベントに追加された順番に0,1,2…と数えたものになります。
+p2で、ジャンプ無視の確率(%)を設定することができます。
+0または省略された場合は、必ず(無条件)でジャンプを行ないます。
+それ以外の場合は、乱数をもとに1〜100%の確率でジャンプを行ない、
+ジャンプしなかった場合は次のイベントに進みます。
+
+%href
+newevent
+setevent
+
+
+%index
+event_prmset
+パラメーター設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,p1,p2
+id      : イベントID
+p1(0)   : パラメーターID(PRMSET_*)
+p2(0)   : 設定される値
+%inst
+idで指定しているイベントIDに、パラメーター設定イベントを追加します。
+パラメーター設定イベントは、p1で指定されたパラメーターIDにp2の値を設定します。
+(それまでに設定されていた内容は消去されます)
+パラメーターIDには、以下の名前を使用することができます。
+^p
+パラメーターID   内容
+---------------------------------------
+		PRMSET_FLAG            オブジェクト登録フラグ(*)
+		PRMSET_MODE            モードフラグ値
+		PRMSET_ID              オブジェクトID(*)(HGIMG4のみ)
+		PRMSET_ALPHA           透明度(α値)(HGIMG4のみ)
+		PRMSET_SHADE           シェーディングモード(HGIMG3のみ)
+		PRMSET_TIMER           タイマー値
+		PRMSET_MYGROUP         自身のコリジョングループ
+		PRMSET_COLGROUP        衝突検出するコリジョングループ
+		PRMSET_SHAPE           形状ID(*)(HGIMG4のみ)
+		PRMSET_USEGPMAT        マテリアルID(HGIMG4のみ)
+		PRMSET_USEGPPHY        物理設定ID(*)(HGIMG4のみ)
+		PRMSET_COLILOG         コリジョンログID(*)(HGIMG4のみ)
+		PRMSET_FADE            フェードパラメーター(HGIMG4のみ)
+		PRMSET_SPRID           ソースバッファID(スプライトのみ)(HGIMG4のみ)
+		PRMSET_SPRCELID        ソースのセルID(スプライトのみ)(HGIMG4のみ)
+		PRMSET_SPRGMODE        コピーモード(スプライトのみ)(HGIMG4のみ)
+
+		(*)の項目は読み出しのみ
+^p
+
+%href
+event_prmon
+event_prmoff
+event_prmadd
+newevent
+setevent
+
+
+%index
+event_prmon
+パラメータービット設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,p1,p2
+id      : イベントID
+p1(0)   : パラメーターID(PRMSET_*)
+p2(0)   : 設定されるビット
+%inst
+idで指定しているイベントIDに、パラメータービット設定イベントを追加します。
+パラメータービット設定イベントは、p1で指定されたパラメーターIDにp2のビットを設定します。
+(それまでに設定されていた内容は保持されたまま、新しい値のビットだけが有効になります)
+パラメーターIDの詳細については、event_prmset命令を参照してください。
+
+%href
+event_prmset
+event_prmoff
+newevent
+setevent
+
+
+%index
+event_prmoff
+パラメータービット消去イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,p1,p2
+id      : イベントID
+p1(0)   : パラメーターID(PRMSET_*)
+p2(0)   : 消去されるビット
+%inst
+idで指定しているイベントIDに、パラメータービット消去イベントを追加します。
+パラメータービット消去イベントは、p1で指定されたパラメーターIDから、
+p2のビットだけを消去します。
+パラメーターIDの詳細については、event_prmset命令を参照してください。
+
+%href
+event_prmset
+event_prmon
+newevent
+setevent
+
+
+%index
+event_setpos
+posグループ設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x1,y1,z1,x2,y2,z2
+id         : イベントID
+(x1,y1,z1) : 設定される値(下限値)
+(x2,y2,z2) : 設定される値(上限値)
+%inst
+idで指定しているイベントIDに、グループ設定イベントを追加します。
+グループ設定イベントは、オブジェクトが持っているパラメーターを設定します。
+(x1,y1,z1)と(x2,y2,z2)を指定すると、それぞれの範囲内にある値を乱数で作成します。
+(x2,y2,z2)を省略して、(x1,y1,z1)だけを指定した場合はそのまま値が設定されます。
+
+%href
+event_setang
+event_setangr
+event_setscale
+event_setdir
+event_setefx
+event_setwork
+newevent
+setevent
+
+
+%index
+event_setang
+angグループ設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x1,y1,z1,x2,y2,z2
+id         : イベントID
+(x1,y1,z1) : 設定される値(下限値)
+(x2,y2,z2) : 設定される値(上限値)
+%inst
+idで指定しているイベントIDに、グループ設定イベントを追加します。
+グループ設定イベントは、オブジェクトが持っているパラメーターを設定します。
+(x1,y1,z1)と(x2,y2,z2)を指定すると、それぞれの範囲内にある値を乱数で作成します。
+(x2,y2,z2)を省略して、(x1,y1,z1)だけを指定した場合はそのまま値が設定されます。
+
+%href
+event_setpos
+event_setangr
+event_setscale
+event_setdir
+event_setefx
+event_setwork
+newevent
+setevent
+
+
+%index
+event_setangr
+angグループ設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x1,y1,z1,x2,y2,z2
+id         : イベントID
+(x1,y1,z1) : 設定される値(下限値)
+(x2,y2,z2) : 設定される値(上限値)
+%inst
+idで指定しているイベントIDに、グループ設定イベントを追加します。
+グループ設定イベントは、オブジェクトが持っているパラメーターを設定します。
+(x1,y1,z1)と(x2,y2,z2)を指定すると、それぞれの範囲内にある値を乱数で作成します。
+(x2,y2,z2)を省略して、(x1,y1,z1)だけを指定した場合はそのまま値が設定されます。
+
+%href
+event_setpos
+event_setang
+event_setscale
+event_setdir
+event_setefx
+event_setwork
+newevent
+setevent
+
+
+%index
+event_setscale
+scaleグループ設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x1,y1,z1,x2,y2,z2
+id         : イベントID
+(x1,y1,z1) : 設定される値(下限値)
+(x2,y2,z2) : 設定される値(上限値)
+%inst
+idで指定しているイベントIDに、グループ設定イベントを追加します。
+グループ設定イベントは、オブジェクトが持っているパラメーターを設定します。
+(x1,y1,z1)と(x2,y2,z2)を指定すると、それぞれの範囲内にある値を乱数で作成します。
+(x2,y2,z2)を省略して、(x1,y1,z1)だけを指定した場合はそのまま値が設定されます。
+
+%href
+event_setpos
+event_setang
+event_setangr
+event_setdir
+event_setefx
+event_setwork
+newevent
+setevent
+
+
+%index
+event_setdir
+dirグループ設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x1,y1,z1,x2,y2,z2
+id         : イベントID
+(x1,y1,z1) : 設定される値(下限値)
+(x2,y2,z2) : 設定される値(上限値)
+%inst
+idで指定しているイベントIDに、グループ設定イベントを追加します。
+グループ設定イベントは、オブジェクトが持っているパラメーターを設定します。
+(x1,y1,z1)と(x2,y2,z2)を指定すると、それぞれの範囲内にある値を乱数で作成します。
+(x2,y2,z2)を省略して、(x1,y1,z1)だけを指定した場合はそのまま値が設定されます。
+
+%href
+event_setpos
+event_setang
+event_setangr
+event_setscale
+event_setefx
+event_setwork
+newevent
+setevent
+
+
+%index
+event_setwork
+workグループ設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x1,y1,z1,x2,y2,z2
+id         : イベントID
+(x1,y1,z1) : 設定される値(下限値)
+(x2,y2,z2) : 設定される値(上限値)
+%inst
+idで指定しているイベントIDに、グループ設定イベントを追加します。
+グループ設定イベントは、オブジェクトが持っているパラメーターを設定します。
+(x1,y1,z1)と(x2,y2,z2)を指定すると、それぞれの範囲内にある値を乱数で作成します。
+(x2,y2,z2)を省略して、(x1,y1,z1)だけを指定した場合はそのまま値が設定されます。
+
+%href
+event_setpos
+event_setang
+event_setangr
+event_setscale
+event_setdir
+event_setefx
+newevent
+setevent
+
+
+%index
+event_pos
+posグループ変化イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,frame,x1,y1,z1,sw
+id         : イベントID
+frame      : 変化までのフレーム数
+(x1,y1,z1) : 設定される値
+sw(1)      : 補間オプション
+%inst
+idで指定しているイベントIDに、グループ変化イベントを追加します。
+グループ変化イベントは、オブジェクトが持っているパラメーターの時間による変化を設定します。
+frameで指定したフレーム数が経過した時に(x1,y1,z1)の値になります。
+swの補間オプションは、以下の値を指定することができます。
+^p
+	sw = 0 : リニア補間(絶対値)
+	sw = 1 : スプライン補間(絶対値)
+	sw = 2 : リニア補間(相対値)
+	sw = 3 : スプライン補間(相対値)
+^p
+swを省略した場合には、絶対値スプラインが設定されます。
+swの値に16を加算した場合は、(x1,y1,z1)で設定される値の替わりにオブジェクトが持つworkグループの値を使用して変化を設定します。
+
+%href
+event_ang
+event_angr
+event_scale
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_ang
+angグループ変化イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,frame,x1,y1,z1,sw
+id         : イベントID
+frame      : 変化までのフレーム数
+(x1,y1,z1) : 設定される値
+sw(0)      : 補間オプション
+%inst
+idで指定しているイベントIDに、グループ変化イベントを追加します。
+グループ変化イベントは、オブジェクトが持っているパラメーターの時間による変化を設定します。
+frameで指定したフレーム数が経過した時に(x1,y1,z1)の値になります。
+swの補間オプションは、以下の値を指定することができます。
+^p
+	sw = 0 : リニア補間(絶対値)
+	sw = 1 : スプライン補間(絶対値)
+	sw = 2 : リニア補間(相対値)
+	sw = 3 : スプライン補間(相対値)
+^p
+swを省略した場合には、絶対値リニアが設定されます。
+swの値に16を加算した場合は、(x1,y1,z1)で設定される値の替わりにオブジェクトが持つworkグループの値を使用して変化を設定します。
+(角度の指定は、setang命令と同様で、回転する順番はX->Y->Zとなります。他の順番で回転させるための、event_angy、event_angz命令が用意されています。)
+
+
+%href
+event_pos
+event_angr
+event_scale
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_angr
+angグループ変化イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,frame,x1,y1,z1
+id         : イベントID
+frame      : 変化までのフレーム数
+(x1,y1,z1) : 設定される値
+%inst
+idで指定しているイベントIDに、グループ変化イベントを追加します。
+グループ変化イベントは、オブジェクトが持っているパラメーターの時間による変化を設定します。
+frameで指定したフレーム数が経過した時に(x1,y1,z1)の値になります。
+swの補間オプションは、以下の値を指定することができます。
+^p
+	sw = 0 : リニア補間(絶対値)
+	sw = 1 : スプライン補間(絶対値)
+	sw = 2 : リニア補間(相対値)
+	sw = 3 : スプライン補間(相対値)
+^p
+swを省略した場合には、絶対値リニアが設定されます。
+swの値に16を加算した場合は、(x1,y1,z1)で設定される値の替わりにオブジェクトが持つworkグループの値を使用して変化を設定します。
+
+%href
+event_pos
+event_ang
+event_scale
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_scale
+scaleグループ変化イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,frame,x1,y1,z1,sw
+id         : イベントID
+frame      : 変化までのフレーム数
+(x1,y1,z1) : 設定される値
+sw(0)      : 補間オプション
+%inst
+idで指定しているイベントIDに、グループ変化イベントを追加します。
+グループ変化イベントは、オブジェクトが持っているパラメーターの時間による変化を設定します。
+frameで指定したフレーム数が経過した時に(x1,y1,z1)の値になります。
+swの補間オプションは、以下の値を指定することができます。
+^p
+	sw = 0 : リニア補間(絶対値)
+	sw = 1 : スプライン補間(絶対値)
+	sw = 2 : リニア補間(相対値)
+	sw = 3 : スプライン補間(相対値)
+^p
+swを省略した場合には、絶対値リニアが設定されます。
+swの値に16を加算した場合は、(x1,y1,z1)で設定される値の替わりにオブジェクトが持つworkグループの値を使用して変化を設定します。
+
+%href
+event_pos
+event_ang
+event_angr
+event_dir
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_dir
+dirグループ変化イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,frame,x1,y1,z1,sw
+id         : イベントID
+frame      : 変化までのフレーム数
+(x1,y1,z1) : 設定される値
+sw(0)      : 補間オプション
+%inst
+idで指定しているイベントIDに、グループ変化イベントを追加します。
+グループ変化イベントは、オブジェクトが持っているパラメーターの時間による変化を設定します。
+frameで指定したフレーム数が経過した時に(x1,y1,z1)の値になります。
+swの補間オプションは、以下の値を指定することができます。
+^p
+	sw = 0 : リニア補間(絶対値)
+	sw = 1 : スプライン補間(絶対値)
+	sw = 2 : リニア補間(相対値)
+	sw = 3 : スプライン補間(相対値)
+^p
+swを省略した場合には、絶対値リニアが設定されます。
+swの値に16を加算した場合は、(x1,y1,z1)で設定される値の替わりにオブジェクトが持つworkグループの値を使用して変化を設定します。
+
+%href
+event_pos
+event_ang
+event_angr
+event_scale
+event_efx
+event_work
+newevent
+setevent
+
+
+%index
+event_work
+workグループ変化イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,frame,x1,y1,z1,sw
+id         : イベントID
+frame      : 変化までのフレーム数
+(x1,y1,z1) : 設定される値
+sw(0)      : 補間オプション
+%inst
+idで指定しているイベントIDに、グループ変化イベントを追加します。
+グループ変化イベントは、オブジェクトが持っているパラメーターの時間による変化を設定します。
+frameで指定したフレーム数が経過した時に(x1,y1,z1)の値になります。
+swの補間オプションは、以下の値を指定することができます。
+^p
+	sw = 0 : リニア補間(絶対値)
+	sw = 1 : スプライン補間(絶対値)
+	sw = 2 : リニア補間(相対値)
+	sw = 3 : スプライン補間(相対値)
+^p
+swを省略した場合には、絶対値リニアが設定されます。
+
+%href
+event_pos
+event_ang
+event_angr
+event_scale
+event_dir
+event_efx
+newevent
+setevent
+
+
+%index
+event_addpos
+posグループ加算イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : イベントID
+(x,y,z) : 加算される値
+%inst
+idで指定しているイベントIDに、グループ加算イベントを追加します。
+グループ加算イベントは、オブジェクトが持っているパラメーターに(x,y,z)の値を加算します。
+
+%href
+event_addang
+event_addangr
+event_addscale
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addang
+angグループ加算イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : イベントID
+(x,y,z) : 加算される値
+%inst
+idで指定しているイベントIDに、グループ加算イベントを追加します。
+グループ加算イベントは、オブジェクトが持っているパラメーターに(x,y,z)の値を加算します。
+
+%href
+event_addpos
+event_addangr
+event_addscale
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addangr
+angグループ加算イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : イベントID
+(x,y,z) : 加算される値
+%inst
+idで指定しているイベントIDに、グループ加算イベントを追加します。
+グループ加算イベントは、オブジェクトが持っているパラメーターに(x,y,z)の値を加算します。
+
+%href
+event_addpos
+event_addang
+event_addscale
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addscale
+scaleグループ加算イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : イベントID
+(x,y,z) : 加算される値
+%inst
+idで指定しているイベントIDに、グループ加算イベントを追加します。
+グループ加算イベントは、オブジェクトが持っているパラメーターに(x,y,z)の値を加算します。
+
+%href
+event_addpos
+event_addang
+event_addangr
+event_adddir
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_adddir
+dirグループ加算イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : イベントID
+(x,y,z) : 加算される値
+%inst
+idで指定しているイベントIDに、グループ加算イベントを追加します。
+グループ加算イベントは、オブジェクトが持っているパラメーターに(x,y,z)の値を加算します。
+
+%href
+event_addpos
+event_addang
+event_addangr
+event_addscale
+event_addefx
+event_addwork
+newevent
+setevent
+
+
+%index
+event_addwork
+workグループ加算イベントを追加
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : イベントID
+(x,y,z) : 加算される値
+%inst
+idで指定しているイベントIDに、グループ加算イベントを追加します。
+グループ加算イベントは、オブジェクトが持っているパラメーターに(x,y,z)の値を加算します。
+
+%href
+event_addpos
+event_addang
+event_addangr
+event_addscale
+event_adddir
+event_addefx
+newevent
+setevent
+
+
+%index
+setevent
+オブジェクトにイベントを設定
+%group
+拡張画面制御命令
+%prm
+p1,p2,p3
+p1(0)  : オブジェクトID
+p2(0)  : イベントID
+p3(-1) : イベントスロットID
+%inst
+p1で指定したオブジェクトにp2のイベントを適用します。
+あらかじめ、決まった流れの処理(イベント)を登録したイベントリストを用意しておく必要があります。
+^
+setevent命令によって設定されるイベントは、オブジェクト１つあたり４つまで同時に適用することが可能です。
+p3にイベントを設定するためのイベントスロットID(0から3まで)を指定することができます。
+p3を省略するか、-1を指定した場合には0から順番に空いているイベントスロットIDが使用されます。
+オブジェクトに設定されたイベントを削除する場合には、p3にイベントスロットIDを指定して、p2をマイナス値にしてください。
+^
+イベントの設定に成功した場合には、システム変数statに設定されたイベントスロットIDが代入されます。
+イベントの設定に失敗すると、システム変数statに-1が代入されます。
+
+
+%href
+newevent
+
+
+%index
+delevent
+イベントリストを削除
+%group
+拡張画面制御命令
+%prm
+p1
+p1 : イベントID
+%inst
+p1で指定したイベントリストを削除します。
+
+%href
+newevent
+
+
+%index
+newevent
+イベントリストを作成
+%group
+拡張画面制御命令
+%prm
+p1
+p1 : イベントIDが代入される変数名
+%inst
+新しいイベントIDを取得し、p1で指定した変数に代入します。
+^
+新しくイベントを作成する場合には、必ずnewevent命令でイベントIDを取得しておく必要があります。
+次に、「event_」で始まるイベントリスト追加命令によって多彩な動作を登録しておくことができます。
+一度取得されたイベントIDは、シーンのリセット(hgreset命令)が行なわれるか、
+またはdelevent命令によってイベントリストが削除されるまでは保持されます。
+^
+こうしてできたイベントは、setevent命令によっていつでもオブジェクトに対して適用することができます。
+
+
+%href
+delevent
+setevent
+
+
+%index
+getang
+angグループ情報を取得
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : オブジェクトID
+(x,y,z) : 取得する変数
+
+%inst
+オブジェクトの持つパラメーターを取得します。
+angグループ(表示角度)の内容が(x,y,z)で指定された変数に代入されます。
+(x,y,z)は、実数型の変数として設定されます。
+命令の最後に「i」を付加することで、整数値として値を取得することができます。
+
+%href
+getangi
+getpos
+getangr
+getscale
+getdir
+getefx
+getwork
+
+
+%index
+getangr
+angグループ情報を取得
+%group
+拡張画面制御命令
+%prm
+id,x,y,z
+id      : オブジェクトID
+(x,y,z) : 取得する変数
+
+%inst
+オブジェクトの持つパラメーターを取得します。
+angグループ(表示角度)の内容が(x,y,z)で指定された変数に代入されます。
+(x,y,z)は、整数型の変数として設定されます。
+角度の単位は整数で0〜255で一周する値を使用します。
+
+%href
+getpos
+getang
+getscale
+getdir
+getefx
+getwork
+
+
+%index
+event_delobj
+オブジェクト削除イベントを追加
+%group
+拡張画面制御命令
+%prm
+id
+id         : イベントID
+%inst
+idで指定しているイベントIDに、オブジェクト削除イベントを追加します。
+オブジェクト削除イベントは、現在イベントを実行しているオブジェクトそのものを削除する命令です。
+%href
+event_regobj
+newevent
+setevent
+
+
+%index
+event_uv
+UV設定イベントを追加
+%group
+拡張画面制御命令
+%prm
+p1,p2,p3
+p1    : イベントID
+p2    : Xオフセット
+p3    : Yオフセット
+%inst
+idで指定しているイベントIDに、UV設定イベントを追加します。この命令は、HGIMG3とHGIMG4で仕様が異なります。
+HGIMG3では、2D及び3D(x形式モデルを除く)の単一ポリゴンが持つUVを動的に変更します。
+これは、テクスチャーアニメーションを実現させるためのもので、イベントが実行されると、テクスチャのUV座標が(p2,p3)で指定された値(ドット数)に再設定されます。
+HGIMG4では、2Dスプライトノードとして生成されたオブジェクトのセルIDをp2パラメーターで指定した値に設定します。3Dのノードでは適用されません。
+%href
+newevent
+setevent
+
+
+%index
+getnearobj
+最も近くにあるオブジェクトを検索
+%group
+拡張画面制御命令
+%prm
+var,id,group,range
+var      : 結果が代入される変数名
+id(0)    : 検索元のオブジェクトID
+group(0) : 検索対象となるコリジョングループ
+range(10.0): 検索を行なう距離(実数)
+%inst
+検索元のオブジェクトIDから最も近い場所にある別なオブジェクトを検索します。
+idで指定したオブジェクトの周囲で、最も近い位置にあるオブジェクトを検索して、varで指定された変数にオブジェクトIDを代入します。
+検索の際に、groupで指定したコリジョングループと、rangeで指定した距離を参照します。
+groupで指定するコリジョングループと一致するオブジェクトだけを検索します。
+(あらかじめsetcoli命令等で設定されている衝突対象のグループは参照されません)
+rangeは、どの距離までを検索対象とするかを指定します。
+3Dオブジェクトの場合は座標の距離を、2Dオブジェクトの場合は2D座標上の距離(ドット数)を使用します。
+^
+HGIMG4では、rangeにマイナス値を指定した場合、3Dモデルが持つ衝突範囲(バウンディングボックス)にrangeを掛けた値をもとに衝突検出を行ないます。
+たとえば、-1.5を指定した場合は、衝突範囲を1.5倍に拡大した状態で、衝突検出が行なわれます。また、より正確な衝突の情報を作成するために、gppcontact命令を使用することが可能です。
+
+%href
+getcoli
+findobj
+
+
+

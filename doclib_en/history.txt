@@ -3,7 +3,7 @@ Hot Soup Processor ver3.6                           HSP : Hot Soup Processor
 Update history copyright 1997-2021 (c) onion software
 ------------------------------------------------------------------------------
 
-„Éª Hsp3 related update history
+ÅE Hsp3 related update history
 
 	2021/08/10 3.6
 
@@ -20,10 +20,10 @@ Corrected the delimiter of version information added when creating an executable
 [HGIMG4] Added gpnodeinfo instruction to get hierarchical information of 3D model
 [HSP3Dish] Implemented standard sprite es_setparent instruction
 Fixed a bug that the user color coding setting of the script editor is not reflected in the label
-Fixed that the behavior of mouse instruction was different from the past in Œ≤2 version, added to help
+Fixed that the behavior of mouse instruction was different from the past in É¿2 version, added to help
 [HGIMG4] [Windows] Fixed a memory leak when executing the gpreset instruction
-[HGIMG4] [Windows] Fixed a bug that the window icon is not displayed in Œ≤5 version.
-[HGIMG4] [Windows] Fixed a bug that full screen specification does not work in Œ≤5 version
+[HGIMG4] [Windows] Fixed a bug that the window icon is not displayed in É¿5 version.
+[HGIMG4] [Windows] Fixed a bug that full screen specification does not work in É¿5 version
 [HSP3Dish] Added es_arot command for automatic rotation / zoom with standard sprite
 [HSP3Dish] Added alpha channel fade function to standard sprite es_fade instruction
 [HSP3Dish] Fixed standard sprite es_draw instruction to return a value to stat
@@ -37,14 +37,14 @@ Fixed a bug that an error event is recorded at the end when using the extension 
 Fixed the Windows version of HSP3, HSP3CL, and HSP3Dish so that dirinfo and sysinfo have the same specifications.
 Added F1 key (one-key help) function to the script editor for Linux / Raspberry Pi
 Fixed an error in standard plugins and modules when enabling uninitialized variable errors with #comopt
-[HGIMG4] Fixed a bug that the rendering group setting of the object was not reflected correctly in Á°´5 version.
-[HGIMG4] Fixed a bug that node coordinates could not be obtained when using model shape collision in Á°´5 version.
+[HGIMG4] Fixed a bug that the rendering group setting of the object was not reflected correctly in ó∞5 version.
+[HGIMG4] Fixed a bug that node coordinates could not be obtained when using model shape collision in ó∞5 version.
 [HSP3Dish] [Windows] Fixed a bug that the drawing screen reading of the celbitmap command may fail.
 [HGIMG4] [Windows] Fixed a bug that an error may occur when the application is closed.
 
 	2021/03/03 3.6 beta5
 
-Fixed a bug that the display position of Á°´4 version mes (print) becomes strange when the placement object is displayed.
+Fixed a bug that the display position of ó∞4 version mes (print) becomes strange when the placement object is displayed.
 [hspext] Fixed a bug that computb instruction recognizes small variable buffer size
 [HGIMG4] Added point light, spot light and multi light functions
 [HGIMG4] Added gppcontact, gppinfo, and gppraytest instructions to acquire contact judgment information of physical behavior.
@@ -66,8 +66,8 @@ Fixed a bug that the display position of Á°´4 version mes (print) becomes strang
 [HGIMG4] Fixed the specification of gfilter instruction was different from HSP3Dish standard.
 [HSP3Dish] [hsp3js] Speed up drawing of HGIMG4
 [HSP3Dish] [hsp3js] Added html template selection function
-[HSP3Dish] [android] Fixed a bug that the library folder name of Œ≤4 version was wrong
-[HSP3Dish] Fixed a bug that Y coordinate clipping was not set correctly in Á°´4 version standard sprite.
+[HSP3Dish] [android] Fixed a bug that the library folder name of É¿4 version was wrong
+[HSP3Dish] Fixed a bug that Y coordinate clipping was not set correctly in ó∞4 version standard sprite.
 
 	2020/09/24 3.6 beta4
 
@@ -83,7 +83,7 @@ Exclude logmes instructions from callback routine error checking
 [HSP3Dish] [Windows] Fixed a bug that loop playback such as .mp3 cannot be performed when changing the screen size with the screen command.
 [HSP3Dish] [Windows] Fixed a bug that a path name of 64 characters or more becomes an error in the celload and picload instructions.
 [HSP3Dish] Fixed a bug that the ESDRAW_NOSORT option of the standard sprite was not working properly.
-[HSP3Dish] Fixed a bug that iparam was not set correctly at the time of interrupt after sprite drawing in Á°´3 version standard sprite.
+[HSP3Dish] Fixed a bug that iparam was not set correctly at the time of interrupt after sprite drawing in ó∞3 version standard sprite.
 [HGIMG3] Fixed a bug that may not work properly when the type extension plug-in of HSP3 is specified.
 [HGIMG4] Fixed a bug that caused a memory leak when generating fonts.
 [HGIMG4] [Windows] Read from packfile and temporarily support dpm file (Windows platform only)
@@ -98,8 +98,8 @@ Fixed a bug that the move menu to the last line of the script editor was not wor
 Fixed a bug that hsed_gettext of hsedsdk did not get the last character
 Fixed a bug that the original destructor is not called when assigning another modular variable value to a modular variable
 Added mod_joystick2.as module that works with stick instruction compatibility
-Fixed a bug that the groll instruction was not restricted correctly in the Á°´2 version.
-Fixed a bug that obaq related instructions were not initialized correctly in Á°´2 version
+Fixed a bug that the groll instruction was not restricted correctly in the ó∞2 version.
+Fixed a bug that obaq related instructions were not initialized correctly in ó∞2 version
 Add webdish material in hsptv folder, add hsptv_res.as header
 [hsp3utf] Fixed a bug that the character string may be corrupted by lowercase conversion of getpath instruction.
 [hsp3_64] Fixed the problem that an error occurs when passing label type arguments.
@@ -295,15 +295,15 @@ Fixed a bug that the label list of the script editor may be displayed only halfw
 [HGIMG4] Updated game engine and added some instructions. See hgimg4.txt for details
 [HSP3Dish] [Linux] Linux version added
 [HSP3Dish] [iOS] Updated to project file for XCode8
-[HSP3Dish] [iOS] Supports building of HGIMG4 project (Á°´ compatible)
+[HSP3Dish] [iOS] Supports building of HGIMG4 project (ó∞ compatible)
 [HSP3Dish] [iOS] Fixed a bug that a link error may occur when compiling for an actual machine on XCode.
 [HSP3Dish] [android] Supports firebase-based AdMob, supports display of interstitial ads
 [HSP3Dish] [android] Fixed a bug that an error occurs when building a long source with hsp3dh
 [HSP3Dish] [android] Supports acquisition of acceleration / gyro sensor values
 [HSP3Dish] [android] Fixed a bug that textures are not set correctly on some models.
 [HSP3Dish] [iOS] [android] Fixed a bug that the value may not be obtained correctly when an array is passed as var with #deffunc.
-[HGIMG3] Fixed a bug that the logmes instruction could not be used in the Á°´4 version.
-Fixed a bug that DLL call error was checked at startup in Á°´4 version
+[HGIMG3] Fixed a bug that the logmes instruction could not be used in the ó∞4 version.
+Fixed a bug that DLL call error was checked at startup in ó∞4 version
 Added a function that does not break a line when 1 is specified for the second parameter in the mes / print instruction.
 Fixed an issue where nesting DupPtr would not work properly
 [hsp3_64] Fixed runtime crash in ObjImage
@@ -314,7 +314,7 @@ Fixed an issue where nesting DupPtr would not work properly
 
 	2016/08/08 3.5 beta4a
 
-Fixed a bug that wstr and sptr type parameters passed to external DLL are not working properly. Fixed a bug that oncmd instruction cannot be used correctly in Á°´4 version.
+Fixed a bug that wstr and sptr type parameters passed to external DLL are not working properly. Fixed a bug that oncmd instruction cannot be used correctly in ó∞4 version.
 
 	2016/07/29 3.5 beta4
 
@@ -343,8 +343,8 @@ Reflects OpenHSP bug fixes and enhancements by ue_dai
 [hsp3] Accelerate element expansion of array variables
 [hsp3] Fixed to return the buffer size of the variable to the system variable strsize when executing the varptr function.
 [hsp3_64] Fixed an issue where module variable data (STRUCTPRM) was corrupted
-[hspcmp] Undo the change that Á°´3 preprocessor interprets "{" and "}" as sentence delimiters (because of source incompatibility)
-[hspcmp] Fixed a bug that an error may occur in the Á°´3 compiler.
+[hspcmp] Undo the change that ó∞3 preprocessor interprets "{" and "}" as sentence delimiters (because of source incompatibility)
+[hspcmp] Fixed a bug that an error may occur in the ó∞3 compiler.
 Fixed an issue where the script editor font settings were only applied to ASCII characters
 
 	2016/01/19 3.5 beta3
@@ -356,7 +356,7 @@ Added call stack tab to debug window
 [HSP3Dish] [android] [iOS] Fixed to output number and message when error occurs
 [HSP3Dish] [android] Changed recommended SDK to Android 5.0.1 (API 21)
 [HSP3Dish] [android] Changed to refer to HSP library folder at build time
-[HSP3Dish] [android] Fixed a bug that AdMob build could not be done correctly in Á°´2 version
+[HSP3Dish] [android] Fixed a bug that AdMob build could not be done correctly in ó∞2 version
 [HSP3Dish] [android] Supports projects using HGIM G4
 [HSP3Dish] [android] Supports signatures with JDK 7 or later
 [HSP3Dish] [android] Fixed to check the existence of zipalign tool
@@ -384,7 +384,7 @@ Reflected OpenHSP bug fix by ue_dai
 [HGIMG4] Fixed an issue where freed objects were accessed via the camera and crashed
 [HGIMG4] Added runtime (hsp3gpdx) using DirectX9 API
 [HSP3Dish] Supports setcls and celputm instructions equivalent to HGIMG4
-[HSP3Dish] [Windows] Fixed a bug that wav files may not be played on Á°´1 version.
+[HSP3Dish] [Windows] Fixed a bug that wav files may not be played on ó∞1 version.
 [hspinet] Fixed a bug that memory is not allocated correctly by ftpdirlist instruction.
 Fixed a bug that the value of the 1st parameter is changed when the sysinfo function is used after the 2nd parameter of the instruction.
 Fixed a bug that the objimage instruction does not work properly in beta1
@@ -440,13 +440,13 @@ Added UTF8 output option to hsc_comp instruction of hspcmp.dll plugin
 Fixed the hspsock plugin to allow servers to share the same port
 [HSP3Dish] [android] Fixed a bug that dust is drawn outside the screen frame on some android devices.
 
-	2014/07/04 3.4Œ≤5
+	2014/07/04 3.4É¿5
 
 Fixed a bug that the editor cannot be started when there are many definitions of userdef.as and hspdef.as.
 Fixed a bug that double-byte spaces added to variable names are not ignored.
 [HSP3Dish] [Win] Fixed a bug that hsp3dish.ini file is dropped when it is empty.
-[HSP3Dish] [iOS] Fixed a bug that screen scaling was not set correctly in Á°´4 version.
-[HSP3Dish] [android] Fixed that texture recovery at resume was strange in Á°´3
+[HSP3Dish] [iOS] Fixed a bug that screen scaling was not set correctly in ó∞4 version.
+[HSP3Dish] [android] Fixed that texture recovery at resume was strange in ó∞3
 [HSP3Dish] [android] Modified the compile architecture setting to be ARMv7 as standard (faster floating point arithmetic etc.)
 [HSP3Dish] [android] Fixed a bug that the first sound may be played twice when playing the first sound.
 [HSP3Dish] [android] Added option to search and execute activity name in exec instruction
@@ -456,7 +456,7 @@ Fixed a bug that double-byte spaces added to variable names are not ignored.
 Replaced the beta4 version of obaq.dll with an older version
 Partial modification of the document
 
-	2014/04/25 3.4Œ≤4
+	2014/04/25 3.4É¿4
 
 HSP3 official 3D material "Tamane" is included in the hgimg3 / hgimg4 folder.
 Fixed double-byte spaces in scripts to be ignored like space tabs
@@ -473,10 +473,1051 @@ Added setease instruction, getease, and geteasef functions for easing control as
 [HSP3Dish] [Win] [android] [iOS] Added parameter value of redraw instruction
 Partial modification of the document
 
-	2014/02/01 3.4Œ≤3
+	2014/02/01 3.4É¿3
 
 Added new plugin hspprint for printing images on a printer
 [HGIMG3] Fixed a bug that the window size is not reflected correctly when initializing again with the hgini command after finishing with the hgbye command.
 [HGIMG4] Fixed a bug that hsp3gp.hrt was not executed correctly
 [HSP3Dish] [iOS] Icon, splash resource modified to retina standard
-[HSP3Dish] [iOS] Supports XCî0¯¬«’
+[HSP3Dish] [iOS] Supports XCode5 project output from HSP3Dish helper
+[HSP3Dish] [iOS] Fixed a bug that ads by iAd may not be displayed correctly
+[HSP3Dish] [iOS] Fixed a bug that sometimes dropped when drawing fonts when building with XCode5
+[HSP3Dish] [iOS] Runtime update for XCode 5 and iOS 7
+[HSP3Dish] [iOS] Supports AdMob advertising revenue app
+[HSP3Dish] [Win] Fixed a bug that the volume set before playback is not applied to music files such as mp3.
+[HSP3Dish] [Win] Fixed a bug that the volume returns after loop playback with music files such as mp3.
+[HSP3Dish] [Win] Fixed a bug that the volume set before playback is not applied to music files such as mp3.
+[HSP3Dish] [Win] [android] [iOS] Supports physics engine OBAQ function
+[HSP3Dish] [android] Changed to have runtime as static library
+[HSP3Dish] Fixed a bug that the font of mes instruction is changed when a button exists in the screen.
+[HSP3Dish] Fixed a bug that the clrobj instruction was not working
+[HSP3Dish] Changed the screen size of the sample script to 480x800
+Partial modification of the document
+
+	2013/07/10 3.4É¿2
+
+Fixed a bug that HSP runtime remains in the end session of windows
+on gosub ~ Fixed a bug that the end instruction is not recognized at the specified destination of the instruction (BT # 263)
+[HGIMG4] Includes first version
+[HSP3Dish] Fixed a bug that mp3 volume settings may not be reflected in Windows version.
+[HSP3Dish] [android] Fixed a bug that texture data may not be restored when resuming an app.
+[HSP3Dish] [android] Fixed a bug that new project creation may fail in HSP3Dish helper
+[HSP3Dish] [android] Fixed a bug that PLATFORM_ANDROID could not be acquired correctly with getreq instruction.
+[HSP3Dish] [android] Supports AdMob project with HSP3Dish helper
+[HSP3Dish] [android] Fixed new project of HSP3Dish helper to SDK 4.2.2 standard
+[HSP3Dish] [iOS] Fixed a bug that iAd may not be displayed.
+
+	2013/04/16 3.4É¿1
+
+Fixed a bug that an error occurs in llmod3 / winver.hsp
+[HSP3Dish] [iOS] Supports iAd advertising revenue app
+[HSP3Dish] Added devinfo, devprm, devcontrol instructions for specific device control
+[HSP3Dish] Added mmvol and mmpan instructions related to sound
+[HSP3Dish] Supports multiple playback of Windows version sound (wav)
+[HSP3Dish] Supports multi-touch information acquisition on iOS, Android and Windows 7 or later
+[HSP3Dish] Supports image inversion by specifying the minus size of the gzoom command
+
+	2013/04/16 3.32b
+
+[Script Editor] Fixed a bug that the edit buffer is corrupted when undoing and redoing.
+[HGIMG3] Fixed a bug in fv related instructions and cleanup processing
+[HSP3Dish] Fixed a bug that the process may remain after exiting in Windows version
+
+	2013/03/01 3.32a
+
+Fixed the termination process that sometimes left the process
+Fixed a bug that an error occurs when executing the end instruction in the cleanup module.
+
+	2013/02/18 3.32
+
+Fixed a bug that WM_QUIT message was not passed in the end process
+[HGIMG3] Fixed the conversion method when an invalid character string is input by the str2fv instruction.
+Partial modification of the document
+
+	2013/01/29 3.32RC1
+
+Fixed a bug in ó∞2 window termination processing
+Fixed a bug that cannot be terminated in the user function defined by #defcfunc
+Modify the character string size of the file name specified by the exec instruction to unlimited
+[HGIMG3] Fixed to use DirectSound software buffer by default when playing ogg
+[HGIMG3] Added switch to use DirectSound software buffer during ogg playback
+[HGIMG3] Added stream buffer size setting for ogg playback
+
+	2012/12/18 3.32É¿2
+
+Fixed a bug that window termination processing by onexit go sub does not terminate correctly
+Fixed a bug that it does not work properly when window termination processing by oncmd is inserted.
+Fixed setting to use DirectSound software buffer for ogg playback of HGIM G3 runtime
+[HSP3Dish] [iOS] Fixed iHSP17 folder containing extra files
+[HSP3Dish] [iOS] Fixed a bug that touch coordinates shift in non-Retina display mode
+
+	2012/12/05 3.32É¿1
+
+Fixed a bug that C runtime error occurs when closing a window on Windows 8 (x64)
+[HSP3Dish] Fixed a bug that the touch position shifts when using auto scaling.
+[hsp3dh] Fixed to search source scripts from hsp folder when building Android
+[hsp3dh] Fixed a bug that an internal error occurs in a long Warning when building Android.
+[HSP3Dish] [iOS] Added options for Retina display support
+
+	2012/09/05 3.31
+
+[HSP3Dish] Added support for getting active window ID (ginfo_act) (Windows)
+[HSP3Dish] [iOS] Fixed a bug that getkey instruction could not be acquired correctly
+[HGIMG3] Fixed objshadow sample not working properly
+Added HSP3Dish special instructions (setreq, getreq, gfilter) to help
+Unified hsed3le and hsed3f1 versions to 3.31
+Document minor modifications
+
+	2012/07/13 3.31RC1
+
+Fixed a bug that window response disappears during wait and await execution
+Add free-to-use material files to the hsptv directory
+Added dir_tv, a system macro that points to the hsptv directory (also modified the dirinfo instruction)
+Fixed #pack and #epack instruction files to be searched in the hsptv directory as well.
+[hspda] Fixed a bug that sort may not work properly with sortval instruction (BT # 244)
+[hspinet] Added PASSIVE mode connection option to ftpopen instruction
+[HSP3Dish] Supports getkey instruction (key information acquisition is available only on Windows)
+[HSP3Dish] [iOS] Fixed a bug that noise occurs when drawing a character string by the mes command.
+[HSP3Dish] [iOS] Fixed a bug that a memory leak occurs when drawing a character string.
+[HSP3Dish] [android, iOS] Supports screen size scaling
+[HSP3Dish] [android] Supports release build by HSP3DH
+[HSP3Dish] [android] Fixed a bug that celdiv information is reset when the screen returns.
+[HSP3Dish] [android] Supports storage saving by bsave command
+[HSP3Dish] [android] Fixed the process when destroying an instance to improve stability.
+[HSP3Dish] [android] Fixed HSP3DH ID specification to be unnecessary by default
+[hsp3dh] Fixed a bug that NDK build could fail when the log became long
+
+	2012/07/01 3.31É¿2
+
+Fixed a bug that COM related functions sometimes did not work properly in ó∞1
+Fixed a bug that the search string of strrep instruction is not searched correctly when it starts with double-byte characters.
+Fixed a bug that an error occurs when the newly supported format image is larger than the screen size.
+Added mode 2 option to picload instruction
+[HSP3Dish] Added support for button instruction (Windows, iOS, android)
+[HSP3Dish] Added some support for sysinfo function (Windows, iOS, android)
+[HSP3Dish] [iOS] Added horizontal screen support
+[HSP3Dish] [iOS] Added support for accelerometers
+[HSP3Dish] [iOS] Fine-tune the wait time for await instructions
+[HSP3Dish] [android] Added sound support by OpenSL / ES
+[HSP3Dish] [android] Fixed to be full screen by default
+[HSP3Dish] [android] Supports application switching and texture restoration
+[HSP3Dish] [android] Supports task call by exec command
+[HSP3Dish] [android] Supports task end by end command
+[HSP3Dish] [android] Added Logcat window display to HSP3DH
+[HSP3CNV] Supports button instruction
+[hsp3dh] Fixed a bug that project creation fails when the project folder is other than C:
+[hsp3rd] Updated to the latest test runtime
+
+	2012/06/14 3.31É¿1
+
+HSP3Dish development environment integrated into HSP full set
+HSP Document Library version updated to 1.34
+Added PNG, TGA and PSD formats to readable image formats
+Changed the time wait of the await instruction to processing by the high precision timer
+Fixed a bug that buffer overflow may occur in cnvstow instruction (BT # 245)
+Added strrep instruction to replace the specified string
+Fixed a bug that freezes when the character string recognized as a variable name overflows (BT # 256)
+[HGIMG3] Supports reading x-files that do not include template definitions
+[hspinet] Supports acquisition of binary data by netgetv instruction (BT # 240)
+[hspinet] Fixed a bug that FTP port number specification is ignored (BT # 248)
+[hspinet] Added getenv instruction to get environment variables.
+[hspinet] Added getenvprm instruction to retrieve specific information from a string.
+[hspinet] Added getctime instruction to get date and time in asctime format and RFC1123 format.
+	2011/09/27 3.3a
+
+Fixed a bug that the center coordinates are shifted by the celput instruction of HSPDish runtime (Windows).
+
+	2011/09/13 3.3
+
+[Script Editor] Corrected the display color of URL and email address to be the same as standard text.
+[Script Editor] Fixed a bug that the auto indent setting was not reflected.
+Modification of HSP3 source converter (hsp3cnv)
+Document tweaks
+
+	2011/07/27 3.3RC1
+
+Fixed to display a message when HSP Assistant is started for the first time
+Includes HSP3 source converter (hsp3cnv)
+HSP3Dish function correction and document expansion
+Added standard image for HSPTV compatible programs
+Fine-tuned DPM encryption algorithm for security measures
+[Script Editor] Added "Create DPM from specified folder" tool menu
+[Script Editor] Added "Convert specified file to C source" in the tool menu. Minor corrections to documents and references.
+
+	2011/07/07 3.3É¿3
+
+Includes HSP Dish runtime (Windows)
+Fixed a bug that a negative value of unary may be output as an invalid code in parameter optimization.
+Modified to return -1 when a negative value is specified for the p2 parameter (index) of the instr function.
+Fixed a bug that an error is output when getting a system variable with simple input
+[HGIMG3] Fixed a bug that array information may not be set correctly in the objgetfv instruction.
+[Script Editor] Changed the default value of line spacing to 2.
+
+	2011/05/10 3.3É¿2
+
+Added optimization flag to intermediate code (upward compatible with 3.3ó∞1)
+Fixed a bug that hspda plugin sortval instruction may freeze (BT # 233) Fixed a bug that some plugins do not work on Windows 9x
+[Script Editor] Fixed a bug that the script being created is overwritten by reading the file (BT # 239)
+[Script Editor] Fixed a bug that the mouse cursor disappears on line numbers and URLs.
+[Script Editor] Fixed a bug that DEBUG window display check is not displayed in HSP menu.
+[Script Editor] Fixed a bug that the line spacing option could not be set.
+Fixed a bug that macro __line__ does not work properly (# BT238)
+Replace macro powf with standard math function
+
+	2011/01/13 3.3É¿1
+
+Fixed to output uninitialized variable reference to compile report
+Added varinit option to #cmpopt instruction
+Fixed a bug that changes in the contents of mesbox in objprm are not reflected in variables (BT # 227)
+Fixed a bug that HSP assistant is not displayed at the next startup when it is terminated in the minimized state (BT # 228)
+Fixed a bug that the position of the reported line shifts when an error occurs when using a multi-line character string (BT # 234)
+Fixed that some exes and dlls attached to HSP3.22 did not work on Windows 9x.
+HSP Script Editor Update
+ÅE Replaced with implementation by Footy2 engine
+ÅE Change the default font to MS Gothic
+ÅE Integrate the "View" menu into the settings dialog
+ÅE Integrate the "Cursor" menu into the "Edit" menu
+ÅE Added an option to automatically start HSP Assistant at startup
+ÅE Change the setting save destination registry and ini file name
+ÅE Change of keyword coloring
+ÅE Modified macros defined in hspdef.as to be colored
+
+	2010/10/18 3.22
+
+Reflected OpenHSP bug fix by ue_dai
+BT # 169: Arguments of external tools in the script editor are changed at the end
+BT # 218: Brace correspondence is not checked
+BT # 224: Message interrupt processing does not work as expected when logmes is included
+BT # 226: #func definition is not closed in the module
+BT # 229: Added __line__ and __file__ as reserved keywords
+BT # 231: Abnormal size of stat clone by mref instruction
+BT # 233: I get an error with sortval
+BT # 235: May fall due to special expansion macro
+
+Fixed a bug that a memory leak occurs in the cvsmooth instruction
+Updated USBIO control module (mod_usbio.as)
+Compatible with HIDaspx, control DLL (hidmon.dll) and sample included
+
+	2010/06/27 3.21a2
+
+Fixed a bug that an error may occur when calling the file selection dialog.
+
+	2010/04/30 3.21a
+
+Fixed some bugs related to HGIM G3 (see hgimg3.txt).
+Fixed duplicate d3module help files.
+Minor corrections to documentation and references.
+
+	2010/03/31 3.21
+
+Fixed a bug that freezes when the playback time is taken with dmmstat immediately after playing the ogg stream on some OS.
+From 3.21RC1, there are no changes to HSP3 and the standard runtime.
+(I haven't changed the minor version code either.)
+
+	2010/03/16 3.21RC3
+
+Includes hspusbio plug-in and module made by Mr. K-K.
+Fixed some bugs related to HGIM G3 (see hgimg3.txt).
+Since the operation of the hspogg plugin is unstable, I reverted to the version bundled with hsp3.2.
+
+	2010/02/18 3.21RC2
+
+Includes Artlet2D, SQLele module and sample made by sprocket.
+Added character code conversion (nkf) and JSON support to the hspinet plugin.
+Added Twitter API operation script to hspinet plugin sample.
+Added mod_regexp module.
+Added multi-touch sample script for Windows 7.
+Added settings related to texture interpolation method for direct drawing in HG IMG3 (see hgimg3.txt).
+	2010/01/29 3.21RC1
+
+Fixed some bugs and added features in HGIMG3 (see hgimg3.txt).
+Added obaq plugin sample and tools.
+Added RC4 / BASE64 support to the hspinet plugin.
+Added an email sending script to the hspinet plugin sample.
+BT # 228: Fixed a bug that HSP Assistant is not displayed at the next startup when it is closed in the minimized state.
+BT # 230: Fixed a bug that could cause a crash due to the #define preprocessor argument (lagwn)
+The version notation in the document includes 3.2, but the minor version code is added (hspver = 12808)
+
+	2009/10/19 3.2a
+
+Fixed a bug that Windows Vista and 7 64bit (x64) version can not close window when executing HSP (except end by end command)
+Fixed a bug that CPU utilization may be high in HGIMG3 runtime version
+Sample script, minor correction of help
+The version notation is still 3.2, but the minor version code is added (hspver = 12807)
+
+	2009/08/01 3.2
+
+Fixed a bug that ascending / descending order was not reflected in sortval of hspda.dll.
+Fixed a bug that some labels were not detected in the label list of the script editor.
+Fixed a bug that character string transfer at the time of easy input fails in the environment older than Windows XP
+
+	2009/07/27 3.2rc1
+
+Added HSP Assistant as an HSP peripheral tool.
+Abolished the sample viewer and integrated it into some of the features of the HSP Assistant
+Added preprocessor instruction, modcfunc.
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2009/07/13 3.2b4
+
+It reflects the update up to OpenHSP 2009/07/09.
+The main corrections are as follows. (See OpenHSP Trac for details)
+
+Added new plugin OBAQ.DLL as physics engine
+Fixed M_PI, rad2deg, deg2rad, pow (powf) in hspmath.as to be defined as standard macros Fixed label literals to be used in expressions (fujidig)
+Modified to allow the format of compound assignment "v + (1)" omitting "=" (fujidig)
+Fixed to be able to call the function defined behind (fujidig)
+Updated HSPINET and HSPDA plugins (onitama / fujidig)
+BT # 167: Fixed a bug that an error occurs when writing a minus operator such as "10 * 10 / -a" (fujidig)
+BT # 182: Fixed bug where cvthreshold fails when running cvthreshold in HSPCV grayscale buffer
+BT # 186: Corrected if.aht and aht.txt samples for Peas
+BT # 209: Fixed a bug that sometimes the runtime file for execution could not be found (fujidig)
+BT # 220: Fixed a bug that variable contents are not reflected when changing listbox and combox objects by objprm
+BT # 222: Fixed strf format to use "% I64"
+BT # 223: Fixed behavior when putting a function in strf format
+Fixed array element specification using dots (fujidig)
+Fixed so that the contents of the clipboard are not overwritten by simple input character string input
+Fixed a bug that the initialization of palette mode became an error in ó∞3 version.
+
+	2009/05/22 3.2b3
+
+Added CEL related instructions (celload, celdiv, celput)
+Fixed a bug that an error might occur at the end of ver3.2 ó∞1 ~ ó∞2
+Fixed a bug that the version number (hsp ver) was incorrect in ver3.2 ó∞1 to ó∞2
+Fixed a bug that the release was not done correctly when using another plugin in the HGIMG3 runtime.
+Fixed a bug in HGIMG3 that hgini would fail to initialize again after being released by hgbye.
+Added ldim macro to create label type array variables
+Added newlab instruction to initialize label type variable
+Fixed a bug that occurs in the range comment described when defining a macro (fujidig)
+Fixed not skipping the next LF of CR when p3 = 2 in the input instruction of hsp3cl (fujidig)
+Improvement of internal memory block allocation algorithm (fujidig)
+Added multiple specifications in the filter when selecting a file with the dialog command. (Sharkpp)
+
+	2009/04/10 3.2b2
+
+It reflects the update up to OpenHSP 2009/03/09.
+The main corrections are as follows. (See OpenHSP Trac for details)
+
+BT # 204: Addressed "Functions defined in #func onexit may not be executed" (fuji dig)
+In 3.2beta1, fixed the problem of accessing the freed memory when using the HSP3 specification plugin (sharkpp)
+Changed to release extension plug-in / dll during program termination (naznyark)
+Fixed a possibility of buffer overflow in logmes instruction (fujidig)
+Fixed a bug where windows that were created as non-tool windows and then reinitialized as tool windows left buttons on the task bar (naznyark)
+Fixed a bug that an error occurs when a very long module name is specified (fujidig)
+Fixed a bug where #runtime resets the #cmpopt setting (fujidig)
+Fixed a bug that the last parameter was not considered omitted when writing "macro 1," in macro expansion (fujidig)
+Fixed a bug that line numbers shift when there is a line starting with # in a multi-line comment (fujidig)
+Fixed the behavior that may be strange when there is a multibyte character before the'\\' at the end of the line of the preprocessor instruction (fujidig)
+Fixed a bug that line numbers shift when continuing lines using \\ in some preprocessor instructions (fujidig)
+Fixed to cause an error when executing an instruction such as goto using the initial value of a label type variable (fujidig)
+Changed to make an error when a negative number is specified for offset in memcpy and memset (fujidig)
+Fixed the hspext plugin to be able to specify the 10th (COM10) or higher serial port (sharkpp)
+BT # 208: Fixed a bug that freezes and errors occur in pipeput and pipeget of hspext plugin (sharkpp)
+Fixed broken links and bugs in attached documents (sharkpp, seller)
+Script editor: Implemented the function to display the defined instructions / functions in the label list (sharkpp)
+Script Editor: Update and fix print function of Script Editor (sharkpp)
+Script editor: Fixed scrollbar ON / OFF not working (fujidig)
+Supports in-window playback of wmv format files
+Supports double type \\ (modulo) operation
+Fixed a bug that a memory leak occurs in the cvfacedetect instruction of the hspcv plugin.
+Improved hgimg plugin compatibility
+Removed "Use HSP Extension Macro" item in Script Editor
+BT # 217: Fixed a bug that an error occurs if a space is written immediately after the module name of #module.
+Added strtrim function that removes only specified characters from the string
+Added split instruction to assign the element divided by the specified character string to the variable
+Strict check of placement object ID such as objprm instruction
+Added objenable and objskip instructions to set the behavior of placement objects
+Fixed to select all items by default when keyboard focus is on the input box
+Added gradf instruction to fill rectangle with gradation
+Added gradient fill option to gsquare instruction
+Added objimage command to set a custom button with an image
+Added the ability to return an unused window ID in the ginfo function
+Fixed an issue that caused an error when the hsp3 folder existed in the tools folder when running from the script editor
+
+	2008/06/05 3.2b1
+
+It reflects the update up to OpenHSP 2008/06/04.
+The main corrections are as follows. (See OpenHSP Trac for details)
+
+Fixed a bug that the fixed size tool window has a non-drawing area. (naznyark)
+Fixed a bug that an error occurs when a label type variable is specified in an onxxx instruction. (naznyark)
+BT # 190: Fixed a bug that an access violation occurs when a long character string is specified in the return instruction. (naznyark)
+BT # 113: Fixed a bug that dimtype created modular variables incompletely. (naznyark)
+Fixed to make multiple arguments available in strf function. (fujidig)
+Fixed not to access outside the memory area with strmid function. (fujidig)
+Fixed a bug that an error occurs when a large real number is specified in the return command. (fujidig)
+Added character code conversion module encode.as. (sharkpp)
+Added llmod3 module. (sharkpp)
+Fixed to check buffer overflow in macro expansion of #define. (fujidig)
+BT # 083: Fixed a bug that debug instructions could not be canceled in hspdef.as. (fujidig)
+BT # 198: Fixed a bug that negative numbers are returned for character constants of 0x80 and above.
+The overall operation is speeded up by reviewing the parameter acquisition process. (onitama)
+Increased stack level up to 256. (onitama)
+Fixed OpenHSP license document (HSPLicense.txt). (onitama)
+Fixed to release the DLL handle of HPI registered by #regcmd. (fujidig)
+Added hsp3mt, a multi-threaded runtime. (onitama)
+
+	2007/7/29 3.1
+
+Fixed a bug that it was not initialized correctly when the argument was omitted in the randomize instruction of RC1. (HSPBT # 168)
+Fixed a bug that descending sort was disabled in the sortval instruction of the extension plugin hspda. (HSPBT # 174)
+Corrected some notations and colors in the document.
+Fixed some security features of HSPTV browser.
+Fixed a bug that the process remains when exiting with Alt + F4 in the HSPTV browser.
+Fixed a bug that caused an error when using an exponential format in module space. (HSPBT # 177)
+
+	2007/7/22 3.1RC1
+
+Fixed a bug that the error line is displayed incorrectly in a script with a very long line. (HSPBT # 20)
+Fixed a bug that an error may occur in the name option of AHT comment. (HSPBT # 153)
+Fixed a bug that some lines are connected depending on the kanji at the end of the preprocessor line. (HSPBT # 160)
+Added a specification supplement to the manual that uses "'\\''" for the code notation of "'". (HSPBT # 156) (HSPBT # 163)
+Fixed the number of files returned by the dirlist2 instruction of the extension plugin hspext to be correct. (HSPBT # 154)
+Fixed a bug that an error may occur in real literal notation with an exponent part. (HSPBT # 155)
+Added double option to #const instruction to specify that it is a real number.
+Corrected some function definitions in kernel32.as. (HSPBT # 162)
+Officially removed the functionality of the #setmod instruction.
+
+	2007/6/8 3.1b10
+
+Replaced the extension plugin hspdx with the latest version. (See hspdx.txt for details)
+Added extension plugin hspogg. (See hspogg.txt for details)
+Fixed AngleArc function definition in gdi32.as. (HSPBT # 148)
+Fixed header files and documentation for hspcv plugins. (HSPBT # 149)
+Fixed a bug that an error occurs when using logses in #modterm. (HSPBT # 99)
+Corrected to recognize a form with an exponent part as a representation of a real number. (HSPBT # 145)
+Fixed a bug that the reference pointer of the string type variable created by the dupptr instruction is incorrect. (HSPBT # 76)
+Fixed various bugs that occur in the dirlist2 instruction of the extension plugin hspext. (HSPBT # 89)
+Fixed the sortval instruction of the extension plug-in hspda to support real number array variables. (HSPBT # 147)
+Fixed not to allocate extra memory by specifying the read size of strmid instruction. (HSPBT # 150)
+Corrected some ginfo_winx and ginfo_winy items in the help and added the explanation of ginfo_sx and ginfo_sy. (HSPBT # 152)
+Fixed a bug that the value is not recognized when the name option is specified in the AHT comment. (HSPBT # 153)
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2007/4/21 3.1b9
+
+Fixed a bug that a line break is inserted in a long character string with the mes command of HSPCL (console version).
+Fixed a bug that some plug-in functions were not compatible with the extension of ó∞8 version.
+Corrected the version notation of hspcmp.dll by the hsc_ver instruction. (HSPBT # 142)
+Fixed forgetting to enter the 5th parameter help of getstr instruction.
+Fixed initialized struct type variables to be displayed correctly in the Debug window. (HSPBT # 113)
+Fixed a bug that an error may occur in the struct type array end processing. (HSPBT # 144)
+Changed the HSP3 icon to 256 colors (8bit).
+
+	2007/4/5 3.1b8
+
+Added new extension plugin hspcv. (See hspcv.txt for details)
+Added vload and vsave related instructions (hspda plugin) to read and write variable data to a file at once.
+Fixed a bug that EOF is mistakenly recognized in binary mode by the input command of HSPCL (console version).
+Fixed not to display an error even if additional files (hspdef.as etc.) at compile time do not exist.
+Added an option to the #cmpopt instruction to always output variable name information.
+Fixed to be able to get information about variable ID and variable name from HSPSDK (plug-in) side.
+Fixed the module name of RSS module (mod_rss.as). (HSPBT # 133)
+Fixed GetWindowModuleFileName function definition in user32.as. (HSPBT # 125)
+Fixed a bug that the port of the ftpopen instruction of the extension plug-in hspinet cannot be specified. (HSPBT # 58)
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2007/2/2 3.1b7
+
+Added label type to store label position in variable.
+Fixed a bug that color coding fails when commenting in the script editor. (HSPBT # 42)
+Fixed the search method in the script editor. Added regular expression search. (HSPBT # 53)
+Fixed a bug that the external tool registration of the script editor was not saved. (HSPBT # 73)
+Fixed so that array variables can be specified in the variable specification of the vartype function. (HSPBT # 102)
+Fixed a bug that an infinite loop may be generated by specifying the second parameter of the repeat instruction. (HSPBT # 95)
+Fixed a bug that an error may occur when enabling / disabling with the oncmd command. (HSPBT # 66)
+Fixed a bug that the variable type to which the return value of the function is assigned cannot be changed in the user-defined function. (HSPBT # 90)
+Fixed an error in help. (HSPBT # 97)
+Fixed a bug that type conversion sometimes failed in plugins that extend types.
+Fixed a bug that the instruction specified by the onexit option of #deffunc is invalidated by the optimization function. (HSPBT # 100)
+Added the AHT comment keyword "pure". (See aht.txt for details)
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2006/11/10 3.1b6
+
+Added "Easy Input" item to the right-click menu of the script editor.
+Added basic specification document about HSP Template Tool (AHT).
+Fixed a bug that the color coding of double quotation marks (\\ ") was misrecognized in the script editor.
+Fixed a bug that the comment is not displayed in the label list when there is a comment after the label name in the script editor. (HSPBT # 46)
+Fixed a bug that the correct color is not drawn when the blend transparency is maximum with gsquare, grect command, etc. (HSPBT # 81)
+Fixed a bug that the mask position shifts when copying off the screen in copy mode 7. (HSPBT # 82)
+Fixed so that the warning sound does not come out when the [Enter] key is pressed in the input box by the input command.
+Fixed a bug that may drop when using the same keyword as the module name. (HSPBT # 88)
+Fixed a bug that hspcmp.dll may be dropped when using #usecom command such as when using mod_img.as.
+Added local option to #deffunc and #defcfunc instructions.
+Added global option to #usecom instruction.
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2006/07/18 3.1b5
+
+Fixed a bug that the grottate, gsquare, and grect instructions failed when the screen initialization Y size was larger than the desktop area.
+Fixed a bug that shift operation and comparison operation during macro expansion were not performed correctly after ó∞3. (HSPBT # 74, # 80)
+Fixed so that the contents of module type and COMOBJ type variables are displayed in the debug window.
+Fixed a bug that ended when trying to display a modular array variable in the debug window. (HSPBT # 78)
+Fixed a bug that buffer overflow occurs in csvstr instruction of extension plug-in hspda.dll. (HSPBT # 79)
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2006/07/03 3.1b4
+
+Includes HSPLet 3.0.2. Fixed HSPLet to be selectable by #runtime command.
+Changed the helpman (helpman.exe) runtime to IE component version.
+Fixed a bug that the operation destination window ID was not saved correctly when executing the buffer command in the ó∞3 version.
+Fixed a bug that the screen saver is closed when the wait command is used in the config process. (HSPBT # 70)
+Fixed a bug that a system error occurs when a line outside the range is specified by the note get instruction. (HSPBT # 67)
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2006/04/20 3.1b3
+
+Supports real number operations using #const preprocessor instructions.
+Fixed a bug that 256 characters or more of the character string set in the macro are not recognized. (HSPBT # 36)
+Fixed a bug that the number of lines of run-time error shifts when using preprocessor instructions. (HSPBT # 20)
+Fixed a bug that a syntax error may occur at compile time in ó∞2 version.
+Fixed a bug that the source line is not displayed at the time of compilation error in ó∞2 version.
+Fixed a bug that the stat value returned by the dirlist instruction does not match the number of files.
+Fixed to redraw when the window is initialized by screen and bgscr instructions.
+The input window by the mesbox command was excluded from the focus movement by the tab key.
+Fixed the font specification to be returned to the standard by the cls command.
+Fixed a bug that the p3 parameter of the objsize instruction is not reflected in the winobj and axobj instructions.
+Fixed a bug that an error occurs in the sortnote instruction (HSPDA).
+Fixed a bug that the return code of another routine remains at the message interrupt destination by the oncmd instruction. (HSPBT # 63)
+Changed error message when using function as instruction.
+Changed the helpman manager (helpman.exe) runtime.
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2006/03/09 3.1b2
+
+Fixed a bug that old names could not be opened after saving as a different name in the script editor. (HSPBT # 41)
+Fixed "sky blue" and "dark green" being reversed in the color options of the script editor. (HSPBT # 57)
+Added an optimization function that discards unnecessary module and DLL import information from the object file.
+Added #cmpopt preprocessor instruction to describe compile-time settings in source.
+Fixed not to generate preprocessor output file (hsptmp.i) by default.
+Fixed a bug that an error occurs when there is a half-width character string in a multi-line character string ({" ~"}). (HSPBT # 51)
+Fixed a bug in the menu bar creation module (mod_menu.as).
+Corrected the content of iparam at the time of onkey interrupt to be a character code instead of a key code.
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+
+	2006/01/30 3.1b1
+
+Fixed a bug that the comparison operation of a character string exceeding 64 characters may fail.
+Added features and fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+Fixed to assign -1 to stat instead of an error and exit when the window of axobj instruction is not created normally.
+Abolished the parameter specification (#modterm) passed to the module variable destructor.
+Fixed a bug that the module variable destructor might not be called.
+Fixed a bug in the joystick input module (mod_joystick.as).
+Corrected some mistakes in the document.
+
+	2005/09/07 3.0a
+
+Fixed a bug that an error occurs when expanding a real number type array variable.
+Fixed to invalidate the setting when the parameter is omitted in the comres instruction.
+Fixed COM automation to be able to use interfaces other than IDispatch.
+Fixed a bug that the run instruction is not executed normally when the exe file is running.
+Fixed a bug that the screen is not redrawn when it is reinitialized with the window hiding option of the screen command.
+Fixed a bug that the layout object of the window created by the bgscr instruction is not redrawn.
+Fixed a bug that óØ copy by gmode7 is not working properly.
+Fixed a bug that the correct PVal pointer could not be obtained with the prm_getv function of the HSP2.61 compatible plugin calling convention $ 202. (HSPBT # 34)
+Fixed so that tab (\\ t) is expanded by mes and print instructions.
+Fixed a bug that Windows9x does not automatically return to the original environment after execution is completed when using chgdisp.
+Fixed a bug that a system error occurs when a string type array variable element becomes a large value.
+Fixed a bug that the dbgets instruction of the extension plugin hspdb.dll did not work properly.
+Fixed some bugs in the extension plugin HGIMG3 (see hgimg3.txt for details).
+Fixed a bug in the definition file of WIN32API function.
+Fixed a bug that the operation type is not changed when the type is registered by the plug-in. (HSPBT # 40)
+Added a parameter for type registration to the #regcmd instruction.
+Fixed to be able to use real value for the initial value of #define macro.
+Fixed a bug that the right and bottom dots of the screen are not drawn with the grect, grottate, and gsquare commands.
+Corrected some dialog notation of hsed3le.exe.
+
+	2005/08/01 3.0
+
+Fixed a bug that an error occurs in the print menu of the script editor.
+Fixed a bug that the maximum width of variable size window is not reflected correctly. (HSPBT # 12)
+Fixed to be an error trap even if there is a forced termination.
+Fixed a bug that wparam and lparam are not set correctly by interrupt when an error occurs (HSPBT # 32)
+	2005/07/26 3.0RC2
+
+HSPTV browser is included as standard.
+Fixed ATL.dll and ATL71.dll to be linked only when using ActiveX.
+Added chdpm instruction to set DPM file reading.
+Added the groll command to set the scroll of the drawing area.
+Fixed a bug that the fill code in palette mode cannot be specified with the gsquare command.
+Fixed a bug that the palette is updated even if the update switch of the palette instruction is set to 0.
+Fixed so that 0 (maximum) can be specified as the number of characters that can be entered in the mesbox instruction.
+Fixed a bug that the focus movement key specification of the objmode instruction was not reflected.
+Fixed a bug that the total size of the buffer specified by the memset instruction could not be specified.
+Fixed a bug that the value assigned to strsize was 1 more when writing the character string data of the poke instruction.
+Fixed overflow judgment of character string data writing of poke instruction.
+Fixed a bug that the system variable hspstat was not set correctly.
+Fixed a bug that the global option could not be specified with the #cfunc instruction.
+Fixed system variables ginfo_winx and ginfo_winy to be compatible with HSP2.61.
+Added system variables ginfo_sx and ginfo_sy that indicate the screen initialization size.
+Fixed a bug that command line acquisition may fail when HSP3.EXE is started.
+Fixed a bug that an error occurs when trying to close the window when the error dialog is displayed.
+Fixed so that the title character string is not displayed except when the file name is specified in console mode.
+Fixed a bug that the array variable display in the debug window would drop if there was a long string.
+Fixed a bug that the context menu initialization process of the script editor was not performed correctly.
+Added "Shift + Ins" as a shortcut key for the paste operation of the script editor.
+Fixed a bug that the object is not stored in the first variable by the query com instruction of RC1.
+Fixed a bug that variant type and comobj type variables are not released normally.
+Changed null of external DLL call parameter to nullptr.
+
+	2005/07/18 3.0RC1
+
+Changed the default extension of script files to ".hsp".
+Added sample script viewer as standard tool.
+Added variant type to receive value from COM object.
+Added sarrayconv instruction.
+Changed the modification of the sendmsg instruction made in ó∞11 again.
+If ATL71.dll exists, it is modified to use it to acquire ActiveX.
+Corresponds to the read size parameter of the noteload instruction.
+Fixed a bug that lines are deleted when an empty string is overwritten with the note add instruction.
+Fixed a bug that an error occurs when the clrobj instruction is specified when the object is not displayed.
+Fixed a bug that could give incorrect results when detecting the active window. (HSPBT # 23)
+Fixed a bug that caused a variable containing a long string to be displayed in the debug window.
+Added ftp operation related instructions to the extension plugin hspinet.dll.
+Fixed a bug that the screen update range of the circle command was incorrect.
+Fixed a bug that caused the variable option of DebugWindow to drop when pressed multiple times. (HSPBT # 29)
+Implement the run instruction.
+SDK library :: Fixed so that ObjectWrite is not called when array is not specified.
+Fixed a bug that the strmid function is not processed correctly when the strmid function is used as a parameter of the instr function.
+
+	2005/06/27 3.0É¿11
+
+Fixed a bug that double quotes in multi-line character string ({" ~"}) are not processed correctly. (HSPBT # 24)
+Fixed a bug that Windows shutdown process is always stopped when onexit instruction is executed. (HSPBT # 26)
+Corrected the sendmsg instruction parameter to a format compatible with the HSP2.61 objsend instruction.
+Partially changed the specifications of the come event instruction that creates COM events.
+Fixed to be able to use an array of COM object type variables.
+SDK library :: Function parameter acquisition specification modified.
+Added SDK library :: PVal identification information HSPVAR_SUPPORT_TEMPVAR (temporary variable).
+Added support functions for array variable operations such as SDK library :: HspFunc_dim.
+
+	2005/06/15 3.0É¿10
+
+Changed the registered name of #modinit and #modterm instructions to unnecessary format.
+Fixed a bug that the destructor registered by the #modterm instruction is not executed.
+Added the system variable thismod to indicate its own module variable.
+Fixed the length to be assigned to strsize when a character string is specified as a parameter of the poke instruction.
+Fixed a bug that a system error occurs when starting an object file with a different format.
+Fixed a bug that the automatic extension of the character string type initialized by the sdim instruction in ó∞9 fails.
+Fixed a bug that functions cannot be used for 2.61 compatible array element description in ó∞9.
+Corrected so that an error occurs in the description of a half-finished expression such as "1+".
+Fixed a bug that the first element is ignored in the csvstr instruction of the extension plugin hspda.dll.
+
+	2005/06/02 3.0É¿9
+
+Added #defcfunc instruction to register new function.
+Added #cfunc instruction to define external API call in function format.
+Added libptr function to get address information such as external call command.
+Fixed to recognize hexadecimal numbers such as "$ 1a" when converting from string type to integer type.
+Fixed a bug that continuous assignment may fail in arrays of 2 dimensions or more.
+Fixed a bug that buffer sizes are not aligned when two-dimensional or more arrays are secured with the sdim instruction.
+Fixed a bug that an error occurs when writing using variables in 2.61 compatible array description. (HSPBT # 21)
+Fixed to initialize the memory buffer allocated as a character string type. (HSPBT # 13)
+Fixed a bug where the cleanup module was not called properly.
+Fixed a bug that the p3 parameter of the stick instruction is not reflected.
+Fixed a bug that an error occurs when using window ID32 or later.
+Added system variable refdval.
+Removed wav playback check function of mmplay instruction.
+Changed alloc instruction to macro.
+Includes new hspinet plugin.
+Fixed a bug that the debug window dialog was garbled on Windows 9x.
+Fixed extension plug-in hspda.dll to support HSP3. Added rndf_ * instruction.
+Definition files for major WIN32 API functions are included as standard.
+Updated HSP HELP Browser to ver1.50.
+
+	2005/04/28 3.0É¿8
+
+Supports HSP2.61 extension plug-in conventions of $ 202 and $ 20.
+Added arguments prefstr, pexinfo, and null when registering #func.
+Fixed the initial value of the end ID of the clrobj instruction to be -1.
+Fixed a bug that an error occurs when cnt is used in the array element specification "." Compatible with ver2.61.
+Corrected to make a continuous operator in a parameter expression as an error, such as "= <".
+Fixed hsp3cl.exe not to cause an error even if it is started without command line parameters.
+Added ddim to declare a real type array as a standard macro.
+Fixed a bug that drawing contents may remain when reinitializing the window with the screen command.
+Partially changed the internal operation specifications of COM object type.
+
+	2005/04/12 3.0É¿7
+
+Fixed so that the execution object file name can be specified on the command line of hsp3.exe.
+Implemented screen saver support.
+Implemented memfile instruction.
+Fixed so that the ID is reflected in the system variable stat in the button event placed by the button instruction.
+Fixed a bug that an error might occur in the noteinfo function.
+Corrected the acquisition contents of command line arguments (start option) to comply with 2.61.
+Fixed to reflect options such as window hiding and size at startup.
+Fixed a bug that some plugin calls caused an error in the console version runtime.
+Fixed a bug that freezes when using debug window in console version runtime.
+Fixed the additional specification of the first line by the note add instruction to comply with 2.61.
+Fixed a bug that executable file automatic creation did not work properly in ó∞6.
+
+	2005/03/29 3.0É¿6
+
+Added the display function of the debug window.
+Added assert and logmes instructions for debugging support instructions.
+Fixed not to wait for key input of end and stop instructions when creating an executable file of console version runtime.
+Added dialog and exec instructions to the console version runtime.
+Fixed the input instruction behavior of the console version runtime to conform to 2.61.
+Fixed a bug that array variable elements are ignored by peek and poke instructions.
+Fixed a bug that IDispatch conversion fails in COM object type property reference.
+Fixed to be able to specify the argument of the property reference of COM object type.
+Added comeevent, comevarg instructions, and comevdisp functions to manage COM events.
+Fixed a bug that an error occurs when you specify your own variable name for an array element.
+Fixed to return the return value of the sendmsg instruction to the system variable stat.
+Fixed a bug that the error line number shifts when the end of the instruction parameter is invalid.
+Further fixed symbol acquisition by hspcmp.dll.
+
+	2005/03/04 3.0É¿5
+
+Fixed the method of getting symbols by hspcmp.dll.
+Fixed a bug that error trap by onerror instruction was disabled in ó∞4.
+Fixed a bug that error 10 may appear when calling an HSP2.61 compatible plugin.
+Changed the specification that interrupt registration of oncmd instruction is performed for each window of the operation destination.
+Fixed so that the window ID at the time of interrupt of the oncmd instruction can be obtained by the ginfo function.
+Fixed so that the return value is set by the return instruction from within the subroutine interrupt of the oncmd instruction.
+Fixed to reset looplev and sublev when jumping when an interrupt occurs.
+Fixed a bug that some debug information is generated even when creating an object file.
+Fixed a bug that the window style setting of screen and bgscr instructions is not reflected.
+Fixed a bug that the contents of the button object cannot be changed with the objprm command.
+Implemented object focus movement by [TAB] key.
+Fixed so that key interrupt is applied even when the object has focus.
+
+	2005/02/22 3.0É¿4
+
+Changed stack memory and task management method, slightly faster.
+Fixed so that the memory warning does not appear even if a lot of memory is allocated.
+Added preprocessor instruction #runtime to specify the runtime runtime.
+Fixed to notify by system variable stat when execution of winobj instruction fails.
+Fixed a bug that array elements are invalidated by the parameter of varptr function.
+Fixed a bug that the third parameter is not working in the dirlist instruction.
+Fixed a bug that another event is issued when the input object is placed.
+Fixed a bug that the default value of chkbox object was invalid.
+Fixed a bug that some objects could not be changed by the objprm instruction.
+Fixed so that a character string can be specified in the parameter of the poke instruction.
+Fixed so that the message of dialog command can specify other than character string type.
+Fixed a bug that an error occurs in addition assignment (+ =) after comparing string type variables.
+Changed the wait processing of await instruction from Sleep to MsgWaitForMultipleObjects API.
+Fixed so that the application exit code can be set with the end instruction.
+Fixed so that it can be closed even with a window close box other than ID0.
+Includes hspmath.as macro.
+
+	2004/12/07 3.0É¿3
+
+Deleted the arguments hwnd, hdc, and hinst when registering #func. Added sptr and wptr.
+Added system variables (hwnd, hdc, hintus) to get window information.
+Fixed the operators "<<" and ">>" to have higher precedence than the comparison operator.
+Fixed a bug that the interpretation of negative numbers of real numbers was not performed normally.
+Fixed a bug that an error may occur depending on the description of multi-line comments.
+Fixed a bug that the preprocessor special expansion macro'%%' could not be used.
+Fixed a bug that the size of another ID is changed by the screen command.
+Fixed the bgscr instruction to output a window without a title.
+Fixed a bug that 1 cannot be specified for the number of characters specified in the mesbox instruction.
+Fixed a bug that interrupt ON / OFF specification such as onexit, onerror becomes an error.
+Fixed a bug that the bload command does not load correctly when the offset is specified.
+Fixed a bug that the end of the character string fetched by the strmid instruction is not added.
+Fixed a bug that the operator "<=" was not working properly.
+Fixed a bug that palette mode initialization was not performed correctly in ó∞2.
+Changed the internal processing of real type string conversion from _gcvt to sprintf.
+Fixed the return value when the file name is incorrect with the dirlist instruction to be compatible with ver2.61.
+Fixed a bug that the inside is filled in the outline drawing mode of the circle command.
+Fixed a bug that the window is not resized when the picload command is executed.
+Fixed the error operation of chgdisp instruction to be compatible with ver2.61.
+Fixed a bug that the drawing color is not changed when the pget command is executed.
+Fixed a bug in the window object.
+Fixed a bug that the palette mode screen cannot be created with the buffer command.
+Fixed a bug that error line numbers may be displayed out of alignment.
+Corrected the parameter specifications of the grotate instruction to be compatible with ver2.61.
+Supports character string (BSTR) type and COM type by acquiring the properties of COM objects.
+Added a compres instruction to set the assignment destination of the return value when executing the COM method.
+Added an option to initialize from a pointer to the newcom instruction.
+Fixed a bug that array elements of var argument of definition instruction are not passed correctly.
+Added axobj instruction to place ActiveX object.
+Supports the old plugin convention $ 10 for #func.
+Added noteinfo function instead of notemax function. Changed notemax to macro.
+Supports acquisition of focus ID for objsel instruction.
+Added winobj and sendmsg instructions.
+Supports repeated playback of mmload.
+Implemented local label (* @).
+Updated macro in hspdef.as.
+
+	2004/11/23 3.0É¿2
+
+Added preprocessor instruction #addition.
+Fixed "userdef.as" to be added to the source by default.
+Fixed the path search method with #include and #addition instructions.
+Added a script (hsp261cmp.as) for compatibility with HSP2.61.
+Fixed the coordinate specification parameter of the width command to work.
+Fixed a bug that buffer expansion of string parameters fails.
+Corrected so that it works even if the else instruction is described on the next line of the if instruction.
+Fixed a bug that p4 and p5 parameters of mesbox instruction are not reflected normally.
+Fixed a bug that the onexit instruction is terminated after being interrupted.
+Fixed a bug that an error occurs when "-variable" is specified as a parameter.
+Fixed a bug that the initial position parameter of the window is not reflected.
+Fixed a bug that multi-line comments could not be closed by preprocessor lines.
+Fixed the keyword defined by #func so that it can be specified globally.
+Fixed the screen update range of the circle command being incorrect.
+Fixed a bug that the release process of external DLL may fail.
+Fixed a bug that the division by zero error was not displayed.
+Fixed a bug that the start range of clrobj instruction was not reflected.
+Fixed a bug that the search start position of the instr instruction was not reflected.
+Fixed a memory leak when executing user-defined instructions.
+Fixed a bug that the return value of the callfunc instruction was incorrect.
+Fixed a bug that messages with only line breaks were not recognized correctly.
+Corrected the specification to ignore the line break at the beginning of the multi-line character string.
+Fixed a bug that passing the variable specified by the argument fails during the recursive call.
+
+	2004/11/17 3.0É¿1
+
+First public beta version.
+Implemented objinfo function.
+Fixed so that "\\" is not included at the end of the directory acquired by dirinfo (1).
+Fixed a memory leak when running #modfunc.
+Added parameter specification for return value to return instruction.
+Fixed a bug that the character limit of the mesbox instruction was incorrect.
+
+	2004/11/12 3.0Éø12
+
+Includes a new Footy version of the script editor.
+Fixed a bug that block processing of if instruction may not be performed normally.
+Renamed ws2str function to cnvwtos.
+Renamed the moduse function to varuse. Added functionality.
+Implemented limit and limitf functions.
+Implemented cnvstow instruction.
+Added MANIFEST resource for Windows XP to runtime.
+Supports comparison of COM object type variables (=,! =).
+Supports copying of COM object type variables.
+Supports automatic expansion of str type arrays.
+Includes runtime (hsprt).
+
+	2004/11/06 3.0Éø11
+
+Supports COM automation (IDispatch) (partially implemented temporarily).
+Implemented mcall, exgoto, on ~ goto / gosub, circle, syscolor instructions.
+Implemented hsvcolor, gsquare, grect, grottate instructions as standard.
+Implemented ginfo function.
+Implemented string type comparison operator (=,! =).
+Added mode 7 of image copy.
+Added the function to acquire the playback status to the mmplay command.
+
+	2004/10/25 3.0Éø10
+
+Added #usecom and #comfunc to define COM calls.
+Added parameter types (wstr, hwnd, hdc) when calling external DLL and COM.
+Changed the specifications of the dimtype instruction.
+Implemented newcom, delcom, querycom, mref, memexpand, line instructions.
+Implemented abs, absf, expf, logf, ws2str functions.
+Renamed the sqr function to the sqrt function.
+Renamed the atn function to the atan function and slightly changed the function.
+Added preprocessor instruction #enum.
+Added vartype function and dupptr instruction functions.
+Partially updated the HspVarProc / HSPEXINFO structure of the SDK.
+Fixed a bug that typeID was not set correctly when creating a new variable type.
+Fixed a bug that alias becomes invalid when a subroutine jump is performed from within a user-defined instruction.
+Fixed a bug that temporary variables are corrupted when converting between int and double types.
+Fixed a bug that an error occurs when a function parameter is omitted.
+
+	2004/10/23 3.0Éø9
+
+Optimized int type calculation processing.
+Implemented exec, chgdisp, getstr, memcpy, memset instructions.
+Implemented callfunc, strmid, instr functions.
+Fixed a bug that variable IDs may be duplicated.
+Fixed a bug that the if instruction description of multiple lines causes an error.
+Fixed multi-line string {"~"} not being recognized.
+Fixed a bug that interrupts are not executed normally when multiple interrupts occur.
+Fixed a bug that the stop command is exceeded when returning from an interrupt jump.
+
+	2004/10/15 3.0Éø8
+
+Fixed sdim instruction to be compatible with ver2.x.
+Implemented dimtype, dup, dupptr instructions.
+The foreach instruction also supports ordinary array variables.
+Implemented formatted string conversion (strf instruction).
+Implemented dirinfo, sysinfo, getpath functions.
+Implemented memory notepad instructions.
+Includes hs file (work in progress) for one-key help.
+
+	2004/10/11 3.0Éø7
+
+Implement module variables.
+Implemented DLL call (#uselib, #func).
+Supports int and double type array automatic expansion.
+Updated some of the plugin specifications.
+
+	2004/10/04 3.0Éø6
+
+Implemented module function, instruction definition (#deffunc), and local variables.
+
+	2004/09/30 3.0Éø5
+
+Fixed the storage size of the character string to be variable.
+Temporarily implement file operation instructions and memory operations (poke, peek).
+Includes variable type sample.
+
+	2004/09/26 3.0Éø4
+
+Temporarily implement interrupts and events.
+Updated plugin sample.
+
+	2004/09/22 3.0Éø3
+
+Temporarily implemented some objects.
+Includes plug-in sample.
+
+	2004/09/16 3.0Éø2
+
+Added some drawing related instructions.
+Fixed a bug in basic command operation.
+
+	2004/09/13 3.0Éø1
+
+First released as a preview version of the SDK.
+
+
+ÅE Hsed3.exe update history
+
+2007/07/28 Correction (Onitama)
+
+-Changed the icon image of the script editor.
+
+2006/09/06 Fixed (Lonely Wolf)
+
+-Fixed the problem that the double quotation mark (\\ ") of the escape sequence was misrecognized by color coding.
+-Fixed the problem that if there is a comment after the label name, it is not displayed in the label list.
+
+2005/07/30 Corrected (Onitama)
+
+-Fixed a bug that an error occurred in the print menu.
+-Some of the default option values have been changed.
+
+2005/07/25 Correction (Onitama)
+
+-Fixed the paste operation so that it can also be done with "Shift + Ins".
+-Fixed a bug that the context menu was not initialized.
+-Some of the default option values have been changed.
+
+2005/07/12 Corrected (Onitama)
+
+-Changed the default file extension to ".hsp".
+-Changed the default option value.
+
+2005/05/14 Corrected (Lonely Wolf)
+
+-The operation of auto indent has been partially changed.
+-Eliminates flicker when switching tabs.
+-Eliminates flicker when resizing.
+-Fixed the problem that the current directory became incorrect when opening from the menu.
+-From the menu file or the menu that appears by right-clicking the tab
+The file can be reloaded.
+-It can be opened with a relative path from the command line.
+-Improved the accuracy of the mechanism that prevents the same file from being opened.
+-Implemented the basic part of the mechanism for accessing the editor from an external tool.
+-Fixed a bug that garbled characters occurred when a line break occurred under certain circumstances.
+
+2004/04/11 Revised (Lonely Wolf)
+
+-Fixed a bug in auto indent operation.
+
+2004/04/11 Corrected (Lonely Wolf)
+
+-Fixed the operation of auto indent.
+-Enabled to start external tools.
+
+2004/04/02 Corrected (Lonely Wolf)
+
+-Removed forgetting to debug.
+-When the file is opened from the dialog, the current directory is initialized.
+Fixed a bug that it was returned.
+
+2004/03/25 Fixed (Lonely Wolf)
+
+-Fixed the problem that when opening a file from the menu, it was mistakenly recognized as needing to be saved.
+-It is now possible to select an ini file as the method for saving settings.
+-The tab can be activated from the menu window.
+-When the search (replace) dialog is displayed and the editor is in focus,
+When trying to open the dialog again, the focus was on the dialog.
+-If you search for the next (previous) when the search string in the search (replace) dialog is blank,
+Fixed a bug that opened multiple times.
+-Even if the command line is given at startup, the current directory of the setting is reflected.
+Fixed a bug.
+-When dragging while pressing Ctrl, the dragged character string is copied.
+
+2005/03/19 Corrected (Lonely Wolf)
+
+-Fixed so that the search dialog will be focused when it is not found by the search.
+-Fixed a bug that tab switching in Z order did not work well.
+-Fixed the setting of Footy's undo limit to change from the default 256 times to infinite times.
+-Changed the item name of the setting and added the item.
+
+2005/03/13 Fixed (Lonely Wolf)
+
+-Changed the behavior when clicking the parent category of the setting.
+-When opening a file by command line startup or drag and drop
+The last opened tab was activated.
+-Fixed a bug where some preprocessor instructions were not color coded.
+-Fixed a bug that scrolled to the beginning of the sentence at compile time.
+-Changed the method of saving color settings.
+-The undo buffer is no longer used in auto indentation.
+-Changed the arrangement of help setting items.
+
+2005/02/26 Fixed (Lonely Wolf)
+
+-The selected range is reflected in the search keyword.
+-Fixed the behavior of radio buttons in optional directory settings.
+-The old HSP help settings have been abolished.
+-Command line startup and file opening by drag and drop are not working properly.
+Fixed a bug.
+-Fixed a bug that some keywords were not color-coded (provisional).
+-Added character strings ("~") and preprocessor instructions (# ~) to color-codeable keywords.
+-Implemented the setting initialization function.
+-Fixed a bug that the "non-character" setting was not saved.
+
+2005/02/18 Correction (Onitama)
+
+-Changed the default option value.
+-Temporarily supported the extension (* .hsp) for HSP3.
+-Fixed that the setting was not reflected in the new window.
+
+2004/02/16 Corrected (Lonely Wolf)
+
+-Enabled use of MDI shortcut keys.
+-Ctrl + Enter is used to disable auto-indenting and start a new line.
+-Always have one tab left.
+-Changed to perform graying out of "Select All" in the menu.
+-Changed the font of some dialogs.
+-A bug that the display becomes strange due to buffer overflow when starting from the command line
+ Fixed.
+-Added support for #runtime.
+
+2004/01/03 Corrected (Lonely Wolf)
+
+-Fixed a bug that sometimes caused a forced termination when starting from the command line.
+ Did.
+-If the file is opened while the tab that has not been operated is active
+Expanded to that tab.
+-Fixed the bug that forced termination occurs when trying to display the label list when the tab does not exist.
+-Improved the search function.
+
+2004/11/19 Corrected (Lonely Wolf)
+
+-By upgrading the control library of the edit part that is adopted,
+ÅE When the Home key is pressed in the folded state, it is normal when the first character is 1 byte.
+Fixed a bug that did not work.
+ÅE Fixed a bug that the end is crossed by [Ctrl] + [End].
+-Solved the problem that some dialogs could not be closed with the ESC key.
+-It is now possible to drop multiple files.
+-A flat style has been adopted for the toolbar.
+-Changed the behavior of the link in the version information dialog.
+-Made minor corrections to menu item names.
+-It is now possible to drop even if the tab does not exist.
+-If any tab is canceled at the end, the tab will not be closed.
+-Solved the problem that color coding could not recognize multi-statements.
+-Added support for color coding of functions.
+-Indentation was done step by step at the time of line break, but now indentation is done collectively.
+-If the line is only indented at the time of line break, the indent is deleted.
+
+
+------------------------------------------------------------------------------
+                                                    HISTORY.TXT / end of file 
+------------------------------------------------------------------------------

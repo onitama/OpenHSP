@@ -35,7 +35,7 @@ The #define macro basically registers a replacement string.
 example :
 	#define hyouji mes
 	hyouji "AAAAA..."
-‚Üì (after deployment)
+Å´ (after deployment)
 	mes "AAAAA..."
 ^p
 By inserting "global" immediately after the #define instruction, you can create a macro that can be used permanently in all modules.
@@ -57,7 +57,7 @@ The argument must be specified as "% numerical value", and the numerical value s
 example :
 	#define hyouji(%1) mes "prm="+%1
 	hyouji "AAAAA..."
-‚Üì (after deployment)
+Å´ (after deployment)
 	mes "prm="+"AAAAA..."
 ^p
 You can also set the initial (default) value for the argument.
@@ -67,7 +67,7 @@ example :
 	hyouji "AAA",a
 	hyouji "BBB"
 	hyouji ,b
-‚Üì (after deployment)
+Å´ (after deployment)
 	mes "AAA"+a
 	mes "BBB"+123
 	mes "PRM="+b
@@ -167,7 +167,7 @@ External DLL call instruction registration
 %group
 Preprocessor instructions
 %prm
-New name "function name" type name 1,‚Ä¶
+New name "function name" type name 1,Åc
 
 %inst
 Register a new instruction to call the external DLL.
@@ -242,7 +242,7 @@ External DLL call function registration
 %group
 Preprocessor instructions
 %prm
-New name "function name" type name 1,‚Ä¶
+New name "function name" type name 1,Åc
 
 %inst
 Register a new function to call the external DLL.
@@ -377,7 +377,7 @@ Module start
 %group
 Preprocessor instructions
 %prm
-Module name Variable name 1,‚Ä¶
+Module name Variable name 1,Åc
 Module name: New module name
 Variable name: Module variable name to be registered
 
@@ -418,7 +418,7 @@ Register a new instruction
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: Name of the assigned instruction
 p2 p3 ~: Parameter type name / alias name
 
@@ -493,7 +493,7 @@ Register a new function
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: The name of the function to register
 p2 p3 ~: Parameter type name / alias name
 
@@ -677,7 +677,7 @@ Similar to #define, but #const replaces the result of pre-calculation when repla
 example :
 	#const KAZU 100+50
 	a=KAZU
-‚Üì (after deployment)
+Å´ (after deployment)
 	a=150
 ^p
 If the value to be used in the source is decided in advance, it is effective for speeding up the source. It is also possible to include macros that have already been defined, so
@@ -686,7 +686,7 @@ example :
 	#const ALL 50
 	#const KAZU 100*ALL
 	a=KAZU
-‚Üì (after deployment)
+Å´ (after deployment)
 	a=5000
 ^p
 Can be used like.
@@ -866,7 +866,7 @@ Assign new instruction
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: Name of the assigned instruction
 p2 p3 ~: Parameter type name / alias name
 
@@ -894,7 +894,7 @@ Assign a new function
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: Name of the assigned instruction
 p2 p3 ~: Parameter type name / alias name
 
@@ -922,7 +922,7 @@ Registration of module initialization process
 %group
 Preprocessor instructions
 %prm
-p1 p2,‚Ä¶
+p1 p2,Åc
 p1 p2 ~: Parameter type name / alias name
 
 %inst
@@ -980,4 +980,359 @@ The initialization function name must specify exactly the name exported from the
 For example, if you want to register a function called "hsp3cmdinit" in "hpi3sample.dll",
 ^p
 example :
-	#regcmd "î0¯¬«’
+	#regcmd "_hsp3cmdinit@4","hpi3sample.dll"
+^p
+It looks like.
+When extending a variable type with a plug-in, it is necessary to specify "Variable type extension number".
+To add one type of variable type, specify 1 for the number of variable type extensions. If you do not want to extend the variable type, omit the number of variable type extensions or specify 0. Note that if the variable type extension is not specified correctly, the type registration will be invalid.
+^
+If you specify an integer for the first parameter, the type value to be executed as an internal command is assigned to the keywords defined in the subsequent #cmd.
+The type value is a unique value used inside HSP3. Normally, you do not need to use this feature. Also, if you specify "*" instead of an integer, an empty type value is automatically assigned.
+
+
+%href
+#cmd
+#uselib
+#func
+
+
+%index
+#cmd
+Registration of extended keywords
+%group
+Preprocessor instructions
+%prm
+New keyword sub ID
+New keyword: Keyword to be added
+Sub ID: Sub ID value given by the keyword
+
+%inst
+Register keywords for HSP extension plugins.
+It is necessary to register the plug-in initialization function in advance by using the #regcmd command.
+^p
+example :
+	#cmd newcmd $000
+	#cmd newcmd2 $001
+	#cmd newcmd3 $002
+^p
+In the above example, the keyword "newcmd" is registered as sub-ID0, the keyword "newcmd2" is registered as sub-ID1, and the keyword "newcmd3" is registered as sub-ID2.
+
+
+%href
+#regcmd
+#uselib
+#func
+
+
+
+%index
+#usecom
+Specifying an external COM interface
+%group
+Preprocessor instructions
+%prm
+Interface name "interface IID" "class IID"
+Interface name: Keywords that identify the interface
+"Interface IID": IID string indicating the COM interface
+"Class IID": IID string indicating the class of COM
+
+%inst
+Define the external component (COM).
+Assign class IID and interface IID to the specified interface name to make it available.
+IID can be specified with a string ({~}) similar to the registry.
+Also, "class IID" can be omitted.
+^p
+example :
+	#define CLSID_ShellLink "{00021401-0000-0000-C000-000000000046}"
+	#define IID_IShellLinkA "{000214EE-0000-0000-C000-000000000046}"
+	#usecom IShellLinkA IID_IShellLinkA CLSID_ShellLink
+^p
+By putting "global" immediately before the interface name, you can create an interface that can be used permanently in all modules.
+
+
+%href
+#comfunc
+newcom
+delcom
+querycom
+
+
+
+%index
+#comfunc
+External COM call instruction registration
+%group
+Preprocessor instructions
+%prm
+New name Index type name 1,Åc
+New name: Keyword name recognized as an instruction
+Index: method index value
+Type name: Specify the argument types separated by,
+
+%inst
+Register a new instruction to call the external component (COM).
+#comfunc registers to call the interface method specified by the #usecom instruction as an instruction.
+After that, you can call the component by combining the instruction specified by the new name and the variable of COM object type.
+^
+Write the new name, index, and type separated by a space.
+By putting "global" just before the new name, you can create an instruction that can be used permanently in all modules.
+^
+Describe the details of the argument in the type name.
+As with the #deffunc instruction, specify the argument types separated by ",".
+There is no limit to the number of arguments or the order of the types.
+The character strings that can be used as the argument type are as follows.
+^p
+   Type: Contents
+ -------------------------------------------------------------
+   int: Integer value (32bit)
+   var: Variable data pointer (32bit)
+   str: String pointer (32bit)
+   wstr: unicode string pointer (32bit)
+   double: real number (64bit)
+   float: real number (32bit)
+   pval: Pointer of PVal structure (32bit)
+   bmscr: (*) Pointer of BMSCR structure (32bit)
+   hwnd: (*) Handle of currently selected window (HWND)
+   hdc: (*) Device context of the currently selected window (HDC)
+   hinst: (*) Running HSP instance handle
+^p
+Items marked with (*) indicate parameters that are automatically passed without having to be specified as arguments.
+^p
+example :
+; Class ID of shell link object
+	#define CLSID_ShellLink "{00021401-0000-0000-C000-000000000046}"
+Interface ID of the IShellLink interface
+	#define IID_IShellLinkA "{000214EE-0000-0000-C000-000000000046}"
+
+	#usecom IShellLinkA IID_IShellLinkA CLSID_ShellLink
+	#comfunc IShellLink_SetPath 20 str
+
+	newcom slink, IShellLinkA
+	IShellLink_SetPath slink, "c:\\hsp261\\hsp2.exe"
+^p
+In the above example, IShellLink_SetPath of the IShellLinkA interface is called with a variable called slink.
+Note that the instruction registered with #comfunc will always have the same first argument as a COM object type variable with the same interface.
+
+%href
+#usecom
+newcom
+delcom
+querycom
+
+
+
+%index
+#enum
+List macro name constants
+%group
+Preprocessor instructions
+%prm
+Macro name = p1
+Macro name: Macro name to which a constant is assigned
+p1: Allotted constant
+%inst
+Assigns consecutive values to the specified macro name.
+Similar to the #const instruction, you can define a macro name that indicates a constant.
+^p
+example :
+#enum KAZU_A = 0; KAZU_A becomes 0
+#enum KAZU_B; KAZU_B becomes 1
+#enum KAZU_C; KAZU_C becomes 2
+	a=KAZU_B
+Å´ (after deployment)
+	a=1
+^p
+The constant is initialized by writing "= (equal)" and a numerical value (or expression) after the macro name. After that, the number will increase by 1 each time it is defined with the #enum instruction.
+Use the #enum instruction when you want to define consecutive values by macro.
+The #const command eliminates the need to specify a number one by one, making it easy to add or delete later.
+
+%href
+#const
+%port+
+Let
+
+
+
+
+%index
+#runtime
+Runtime file settings
+%group
+Preprocessor instructions
+%prm
+"Runtime name"
+"Runtime name": Runtime name to be set
+
+%inst
+Sets the runtime file name used to run the script.
+(For the runtime file name, specify the name part of the file without the extension.)
+It is used to set the runtime when executing from the script editor or when creating an executable file.
+If multiple #runtime instructions are set, the last set content will be valid.
+
+%href
+#packopt
+#cmpopt
+%port+
+Let
+%portinfo
+When using HSPLet, specify "hsplet3" as the runtime name.
+
+
+%index
+#cmpopt
+Compile time settings
+%group
+Preprocessor instructions
+%prm
+Option name parameter
+Option name: Option type
+Parameter: Parameter to set
+
+%inst
+Specifies the behavior when compiling the script.
+Parameter with option name, followed by space or TAB
+(In the case of a character string, specify it as "" strings "").
+The keywords that can be specified with #cmpopt are as follows.
+^p
+  Options | Contents | Initial value
+ ------------------------------------------------------
+  ppout | Preprocessor file output | 0
+             | (0 = none / 1 = output) |
+  optcode | Unnecessary code optimization | 1
+             | (0 = none / 1 = optimize) |
+  optinfo | Optimization information log output | 0
+             | (0 = none / 1 = output) |
+  varname | except when debugging | 0
+             | Output of variable name information |
+             | (0 = none / 1 = yes) |
+  varinit | Checking Uninitialized Variables | 0
+             | (0 = warning / 1 = error) |
+  optprm | Parameter code optimization | 1
+             | (0 = none / 1 = optimize) |
+  skipjpspc | Ignore double-byte spaces | 1
+             | (0 = error / 1 = ignore) |
+  utf8 | Output string in UTF-8 format | 0
+             | (0 = invalid / 1 = valid) |
+ ------------------------------------------------------
+^p
+The following example outputs the preprocessor result to a file.
+^p
+example :
+	#cmpopt ppout 1
+^p
+Basically, write the #cmpopt instruction at the beginning of the script.
+If multiple #cmpopt instructions are written, the last setting will take effect for each option. (Same as #packopt option)
+Also, it is not possible to write an option that applies only to a specific range.
+
+%href
+#packopt
+#runtime
+%port+
+Let
+
+
+
+%index
+#bootopt
+Runtime settings
+%group
+Preprocessor instructions
+%prm
+Option name parameter
+Option name: Option type
+Parameter: Parameter to set
+
+%inst
+Make detailed operation settings for the script runtime.
+Enter the value of the setting switch 1 or 0 by inserting a space or TAB after the option name.
+#bootopt can be written anywhere in the script.
+If there are multiple specifications, the last one set will be the overall setting.
+
+The keywords that can be specified with #bootopt are as follows.
+^p
+  Options | Contents | Initial value
+ -----------------------------------------------------------
+  notimer | Use high precision timer | Automatic setting
+             | (0 = use / 1 = not use) |
+  utf8 | Use UTF-8 format strings | Automatic setting
+             | (0 = use / 1 = not use) |
+  hsp64 | Using 64-bit runtime | Automatic configuration
+             | (0 = use / 1 = not use) |
+ -----------------------------------------------------------
+^p
+The following example suppresses the use of the precision timer.
+^p
+example :
+	#bootopt notimer 1
+^p
+
+%href
+#cmpopt
+#runtime
+
+
+
+%index
+#aht
+Describe AHT file header
+%group
+Preprocessor instructions
+%prm
+Setting name p1
+Setting name: The name of the setting item to which the constant is assigned
+p1: Allotted constant
+%inst
+Adds AHT file information to the source script.
+You can assign a string or number to the specified setting name.
+With the #aht command, the source script with the AHT file header added can be referenced as an AHT file from the template manager, etc.
+Can be used as a setting name
+^p
+  Setting name | Contents
+ ------------------------------------------------------------
+  class | Specifies the class name of the AHT file
+  name | Specifies the name of the AHT file
+  author | Specifies the author name of the AHT file
+  ver | Specifies the AHT file version
+  exp | Specifies a description for the AHT file
+  icon | Specifies an icon file specific to the AHT file
+  iconid | AHT Specifies a file-specific icon ID
+ ------------------------------------------------------------
+^p
+For more information on AHT files, please refer to the document "Additional HSP Template & Tools" (aht.txt).
+
+%href
+#ahtmes
+%port+
+Let
+
+
+%index
+#ahtmes
+Output of AHT message
+%group
+Preprocessor instructions
+%prm
+p1
+p1: Output string expression
+%inst
+Outputs a message to the outside during AHT parsing.
+It is mainly used to write the source code added on the editor by "Easy input".
+Like the mes instruction, the #ahtmes instruction can output strings and macros by connecting them with the "+" operator.
+^p
+example :
+#define Variable to assign a ;; str
+#const Random number range 100 ;; help = "occurs from 0 to specified range -1"
+#ahtmes "" + Variable to be assigned + "= rnd ("+ Range of random numbers + ") \\ t \\ t; Variable" + Variable to be assigned + "is assigned a random number."
+^p
+Note that unlike the normal mes instruction, it only connects macros defined on the preprocessor.
+For more information on AHT files, please refer to the document "Additional HSP Template & Tools" (aht.txt).
+
+%href
+#aht
+%port+
+Let
+
+
+
+
+
