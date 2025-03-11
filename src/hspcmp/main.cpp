@@ -43,6 +43,7 @@ static 	char *p[] = {
 	"       -e?   execute/view .ax runtime",
 	"       -r    execute runtime with result",
 	"       -s    output string map",
+	"       -m    compile for Emscripten",
 	"       ---------------------------------",
 	"       -h??? print command help",
 	"       -lk???  print HSP3 keyword list",
@@ -131,6 +132,8 @@ int main( int argc, char *argv[] )
 				cmpopt|=HSC3_MODE_DEBUGWIN; break;
 			case 's':
 				strmap = 1; cmpopt |= HSC3_MODE_STRMAP; break;
+			case 'm':
+				ppopt |= HSC3_OPT_EMSCRIPTEN; break;
 			case 'o':
 				strcpy(oname, argv[b] + 2);
 				break;

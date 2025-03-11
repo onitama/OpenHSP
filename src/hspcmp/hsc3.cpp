@@ -154,6 +154,27 @@ void CHsc3::AddSystemMacros( CToken *tk, int option )
 		tk->RegistExtMacro( "__runtime__", "\"hsp3\"" );
 		if ( option & HSC3_OPT_UTF8IN ) tk->RegistExtMacro("_hsputf8", "");
 		if ( option & HSC3_OPT_DEBUGMODE ) tk->RegistExtMacro( "_debug", "" );
+
+#ifdef HSPWIN		// Windows(WIN32) version flag
+		tk->RegistExtMacro("_hspwin", "");
+#endif
+#ifdef HSPMAC		// Macintosh version flag
+		tk->RegistExtMacro("_hspmac", "");
+#endif
+#ifdef HSPLINUX		// Linux(CLI) version flag
+		tk->RegistExtMacro("_hsplinux", "");
+#endif
+#ifdef HSPIOS		// iOS version flag
+		tk->RegistExtMacro("_hspios", "");
+#endif
+#ifdef HSPNDK		// android NDK version flag
+		tk->RegistExtMacro("_hspndk", "");
+#endif
+#ifdef HSPEMSCRIPTEN	// EMSCRIPTEN version flag
+		tk->RegistExtMacro("_hspemscripten", "");
+#else
+		if (option & HSC3_OPT_EMSCRIPTEN) tk->RegistExtMacro("_hspemscripten", "");
+#endif
 	}
 }
 
@@ -179,7 +200,7 @@ int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 		tk.SetAHTBuffer( ahtbuf );
 	}
 
-	sprintf( mm,"#AHT processor ver%s / onion software 1997-2024(c)", hspver );
+	sprintf( mm,"#AHT processor ver%s / onion software 1997-2025(c)", hspver );
 	tk.Mes( mm );
 	res = tk.ExpandFile( outbuf, fname, fname );
 	if ( res < 0 ) return -1;
@@ -203,6 +224,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 	//					 bit3=read AHT file(on)
 	//					 bit4=write AHT file(on)
 	//					 bit5=UTF8(input)(入力ソースがUTF8であることを示す)
+	//					 bit8=Emscripten mode(ON)(Emscripten向けであることを示す)
 	//
 	int res;
 	char mm[512];
@@ -230,7 +252,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2024(c)", HSC3TITLE, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2025(c)", HSC3TITLE, hspver );
 	tk.Mes( mm );
 
 	if (anabuf) {
@@ -339,7 +361,7 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2024(c)", HSC3TITLE2, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2025(c)", HSC3TITLE2, hspver );
 	tk.Mes( mm );
 
 	if (genmode & HSC3_MODE_LABOUT) {

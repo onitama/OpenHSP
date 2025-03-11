@@ -13,8 +13,9 @@
 #define HSC3_OPT_MAKEPACK 4
 #define HSC3_OPT_READAHT 8
 #define HSC3_OPT_MAKEAHT 16
-#define HSC3_OPT_UTF8IN 32		// UTF8ソースを入力
-#define HSC3_OPT_UTF8OUT 64		// UTF8コードを出力
+#define HSC3_OPT_UTF8IN 32			// UTF8ソースを入力
+#define HSC3_OPT_UTF8OUT 64			// UTF8コードを出力
+#define HSC3_OPT_EMSCRIPTEN 256		// Emscriptenソースとしてコンパイル
 
 #define HSC3_MODE_DEBUG 1
 #define HSC3_MODE_DEBUGWIN 2
