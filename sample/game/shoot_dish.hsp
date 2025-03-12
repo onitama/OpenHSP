@@ -13,12 +13,11 @@ title "Dish Shooting"
 	mmload "explos.wav",0
 	mmload "inject.wav",1
 	mmload "sel.wav",2
-	mmload "cappi08.ogg",3
-	mmload "smart_and_active.mp3",4
+	;mmload "cappi08.ogg",3
+	mmload "smart_and_active.mp3",4,1
 
 *gtitle_start
 	mmstop
-	mmplay 4
 	mmplay 2
 *gtitle
 	;	スタートボタンチェック
@@ -56,7 +55,7 @@ title "Dish Shooting"
 	;	ゲーム開始時の変数リセット
 	;
 	mmstop
-	mmplay 3		; 音楽を鳴らす
+	mmplay 4		; 音楽を鳴らす
 	mmplay 2
 
 	score = 0	; スコア

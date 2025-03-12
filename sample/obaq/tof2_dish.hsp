@@ -1,0 +1,175 @@
+#include "hsp3dish.as"
+
+	;	繧イ繝シ繝繧オ繝ウ繝励Ν
+	;	繧ォ繝シ繧ス繝ォ繧ュ繝シ縺ァ繝励Ξ繧、繝、繝シ亥、ァ縺阪＞荳ク峨ｒ謫堺ス懊＠縲∝シ輔▲蠑オ繧峨ｌ繧九ワ繝ウ繝槭亥ー上＆縺クク峨ｒ螟夊ァ貞ス「縺ォ縺カ縺、縺代ｋ縺ィ蠕礼せ
+	;	繝励Ξ繧、繝、繝シ縺ィ螟夊ァ貞ス「縺後縺、縺九ｋ縺ィ繧イ繝シ繝繧ェ繝シ繝舌
+	;	繧イ繝シ繝繧ェ繝シ繝舌蠕後↓繧ケ繝壹繧ケ縺九Μ繧ソ繝シ繝ウ縺ァ蜀阪せ繧ソ繝シ繝
+	title "tof2"
+
+	randomize			; 荵ア謨ー縺ョ蛻晄悄蛹	screen 0, 640, 480	; 繧ヲ繧」繝ウ繝峨え蛻晄悄蛹
+*init
+	; 蛻晄悄蛹
+	qreset								; OBAQ縺ョ蛻晄悄蛹	qborder -120.0, -60.0, 120.0, 60.0	; 螢√險ュ螳	qgravity 0.0, 0.0					; 驥榊鴨縺ッ辟。縺
+	; 繝励Ξ繧、繝、繝シ縺ョ遘サ蜍慕ッ峇繧定ィュ螳	wallmodel = -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0
+	qaddmodel wall, wallmodel, -1, 80.0, 60.0, 0.0, 72.0, 54.0, colsw_none, 0x04
+	qtype wall, type_bind | type_inner
+	qmat wall, mat_wire, 0xffffff
+
+	; 繝励Ξ繧、繝、繝シ繧貞ョ夂セゥ
+	qaddpoly player, 16, 80.0, 60.0, 0.0, 6.0, 6.0
+	qweight player, 36.0 / 8.0, 36.0 * 36.0
+	qdamper player, 0.7, 0.0
+	qinertia player, 0.995
+	qmat player, mat_wire, 0xffffff
+
+	; 繝上Φ繝槭繧貞ョ夂セゥ
+	qaddpoly hammer, 16, 80.0, 30.0, 0.0, 3.0, 3.0
+	qweight hammer, 9.0 / 8.0, 9.0 * 9.0
+	qdamper hammer, 0.7, 0.0
+	qinertia hammer, 0.995
+	qmat hammer, mat_wire, 0xffffff
+
+	; 繧イ繝シ繝騾イ陦檎畑縺ョ諠⒦ア繧貞ョ夂セゥ
+	score = 0
+	gameover = 0
+	rockCount = 0
+
+*main
+	; 繝。繧、繝ウ繝ォ繝シ繝
+	redraw 0					; 逕サ髱「縺ョ譖エ譁ー繧帝幕蟋
+	; 閭梧勹謠冗判
+	color 0, 0, 0
+	boxf
+
+	qexec						; OBAQ縺ォ繧医ｋ繧ェ繝悶ず繧ァ繧ッ繝医譖エ譁ー
+
+	stick key, 15				; 繧ュ繝シ縺ョ蜿門セ
+	; ESC繧ュ繝シ縺ァ邨ゆコ	if key & 128 {
+		end
+	}
+
+	qgetpos player, px, py, pr	; 繝励Ξ繧、繝、繝シ菴咲スョ繧貞叙蠕
+	; 繝上Φ繝槭縺瑚。晉ェ√＠縺溷、夊ァ貞ス「繧偵荳ョ壽凾髢灘セ後↓豸域サ⒤＆縺帙ｋ
+	qfind 2, stat_active
+	qnext tmprock
+	while tmprock >= 0
+		qgetuser tmprock, damage, dummy1, dummy2
+		if damage > 0 {
+			qmat tmprock, mat_wire, 0xffffff - 0x111111 * damage	; 豸医∴縺九¢縺ヲ縺ｋ濶イ縺ォ
+			damage ++
+		}
+		quser tmprock, damage
+		if damage >= 16 {
+			qdel tmprock	; 豸域サ		}
+		qnext tmprock
+	wend
+
+	; 繧イ繝シ繝邯夊。御クュ縺ョ蜃ヲ逅	if gameover = 0 {
+		qblast px, py, -0.01	; 繝励Ξ繧、繝、繝シ縺ョ菴咲スョ縺ク縲∫黄菴薙邱ゥ繧°縺ォ蠑輔″蟇○繧峨ｌ繧
+		; 繧ォ繝シ繧ス繝ォ繧ュ繝シ縺ァ繝励Ξ繧、繝、繝シ繧呈桃菴		pax = 0.0
+		pay = 0.0
+		par = 0.0
+		qgetspeed player, psx, psy, psr
+		if key & 1 {
+			if psx < 0.0 {
+				pax = -(0.5 + psx) * 0.05	; 髯千阜騾溷コヲ縺ォ霑代▼縺上⊇縺ゥ縲∝刈騾溘蟆上＆縺上↑繧			} else {
+				pax = -0.5 * 0.05			; 繝悶Ξ繝シ繧ュ縺ョ蜉ケ縺阪荳ョ			}
+		}
+		if key & 4 {
+			if psx > 0.0 {
+				pax = (0.5 - psx) * 0.05
+			} else {
+				pax = 0.5 * 0.05
+			}
+		}
+		if key & 2 {
+			if psy < 0.0 {
+				pay = -(0.5 + psy) * 0.05
+			} else {
+				pay = -0.5 * 0.05
+			}
+		}
+		if key & 8 {
+			if psy > 0.0 {
+				pay = (0.5 - psy) * 0.05
+			} else {
+				pay = 0.5 * 0.05
+			}
+		}
+		qspeed player, pax, pay, par
+
+		; 繝上Φ繝槭繧偵繝ャ繧、繝、繝シ縺ォ霑代▼縺代ｋ繧エ繝迥カ縺ョ繝ッ繧、繝、繝シ
+		qgetpos hammer, hx, hy, hr
+		qspeed hammer, (px - hx) / 4096.0, (py - hy) / 4096.0, 0.0
+
+		; 繝励Ξ繧、繝、繝シ縺ィ螟夊ァ貞ス「縺瑚。晉ェ√＠縺溘ｉ繧イ繝シ繝繧ェ繝シ繝舌
+		qcollision player
+		qgetcol tmprock, dummyX, dummyY
+		while tmprock >= 0
+			qgetuser tmprock, damage, dummy1, dummy2
+			if damage = 0 {
+				gameover = 1
+			}
+			qgetcol tmprock, dummyX, dummyY
+		wend
+
+		; 繝上Φ繝槭縺ィ螟夊ァ貞ス「縺瑚。晉ェ√＠縺溘ｉ縲∝、夊ァ貞ス「縺ョ豸域サ⒤き繧ヲ繝ウ繝医ｒ髢句ァ九☆繧		qcollision hammer
+		qgetcol tmprock, dummyX, dummyY
+		while tmprock >= 0
+			qgetuser tmprock, damage, dummy1, dummy2
+			if damage = 0 {
+				quser tmprock, 1
+				score ++
+			}
+			qgetcol tmprock, dummyX, dummyY
+		wend
+
+		; 譎る俣邨碁℃縺ァ螟夊ァ貞ス「縺悟迴セ
+		if rockCount <= 0 {
+			size = 8.0 + rnd(8)
+			qaddpoly tmprock, 3 + rnd(4), -size + rnd(2) * (160.0 + size * 2.0), size + 2.0 + rnd(116.0 - size * 2.0), rnd(256) * M_PI / 256.0, size, size, colsw_active, 0x02, 0x04, 0x05
+
+			if tmprock >= 0 {
+				weight = size * size / 16.0
+				qweight tmprock, weight, weight * size * size / 2.0
+				qdamper tmprock, 0.5, 1.0
+				qinertia tmprock, 1.0
+				quser tmprock, 0
+				qmat tmprock, mat_wire, 0xffffff
+	
+				; 谺。縺ョ螟夊ァ貞ス「蜃コ迴セ縺セ縺ァ縺ョ髢馴囈繧定ィュ螳夲シ0轤ケ莉・髯阪螟峨ｏ繧峨★				rockCount = 180 - score * 6
+				if rockCount < 60 {
+					rockCount = 60
+				}
+			}
+		}
+		rockCount --
+	} else {
+		; 繧イ繝シ繝繧ェ繝シ繝舌蠕後繧ケ繝壹繧ケ縺九Μ繧ソ繝シ繝ウ縺ァ蜀阪せ繧ソ繝シ繝		if key & 48 {
+			goto *init
+		}
+	}
+
+	qdraw 1					; 繧ェ繝悶ず繧ァ繧ッ繝医謠冗判
+
+	color 255, 255, 255		; 譁㍾ュ苓牡繧定ィュ螳	font msgothic, 16		; 譁㍾ュ励ヵ繧ゥ繝ウ繝医ｒ險ュ螳
+	; 繧ケ繧ウ繧「繧定。ィ遉コ
+	pos 8, 4
+	mes "score : " + score
+
+	if gameover {
+		; 繧イ繝シ繝繧ェ繝シ繝舌縺ョ譁㍾ュ励ｒ陦ィ遉コ
+		pos 320 - 9 * 4, 240 - 8
+		mes "game over"
+	} else {
+		; 繝励Ξ繧、繝、繝シ縺ィ繝上Φ繝槭繧堤オ舌繝ッ繧、繝、繝シ繧呈緒逕サ
+		qgetpos hammer, hx, hy, hr
+		qcnvaxis hx, hy, hx, hy
+		qcnvaxis px, py, px, py
+		line hx, hy, px, py
+	}
+
+	redraw 1		; 逕サ髱「縺ョ譖エ譁ー繧堤オゆコ	await 12		; 荳ョ壽凾髢灘セ⒤▽
+
+	goto *main
+

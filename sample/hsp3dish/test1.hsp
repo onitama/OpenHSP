@@ -25,7 +25,7 @@
 
 title "Dish Test"
 
-celload "chr.png",1
+celload "fontchr.png",1
 celdiv 1,16,16,0,0
 
 celload "hsp3dish.png",2

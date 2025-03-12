@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <deque>
 
 #include <unistd.h>
 #include <termios.h>
@@ -26,6 +27,8 @@ static char complog[0x40000];
 static char barmsg[1024];
 static int	text_mod;
 static int	current_line;
+static int	current_offset;
+static int	current_jumpline;
 static gint context_id;
 
 static int jpflag;				// 日本語環境フラグ
@@ -34,7 +37,7 @@ static char langstr[8];
 static GdkColor colorBg;
 static GdkColor colorText;
 
-#define HSED_VER "ver.0.82"
+#define HSED_VER "ver.0.83"
 #define TEMP_HSP "__hsptmp.hsp"
 #define TEMP_AX "__hsptmp.ax"
 #define TEMP_HSPRES ".hspres"
@@ -110,7 +113,135 @@ char *getmes( int id )
 }
 
 /*--------------------------------------------------------------------------------*/
+// Undo
 
+typedef struct {
+	std::string text;
+	int line;
+	int offset;
+} UndoStep;
+
+std::deque<UndoStep> undo_stack;
+std::string previous_text;
+static bool undo_strict = false;
+const int MAX_UNDO_STACK_SIZE = 20;
+gchar *current_text;
+
+gchar *get_current_text( void )
+{
+	GtkTextIter start;
+	GtkTextIter end;
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_get_start_iter(tbuf,&start);
+	gtk_text_buffer_get_end_iter(tbuf,&end);
+	current_text = gtk_text_buffer_get_text(tbuf,&start,&end,TRUE);
+	return current_text;
+}
+
+static void cursor_move_line(GtkWidget *w,int d)
+{
+   GtkTextIter start;
+   GtkTextIter end;
+
+	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_get_iter_at_line( tbuf, &start, d );
+	gtk_text_buffer_place_cursor( tbuf, &start );
+	gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(edit), &start, 0, FALSE, 0, 0);
+	return;
+}
+
+static gint update_edit_jump( gpointer data )
+{
+	g_source_remove( event_timer );
+	cursor_move_line( edit, current_jumpline );
+	return 0;
+}
+
+static void free_current_text( void )
+{
+	g_free(current_text);
+}
+
+static void on_text_changed(GtkTextBuffer *buffer, gpointer data) {
+
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+
+	get_current_text();
+
+    // テキストが前回と同じ場合はスタックを更新しない
+    if (previous_text == current_text) {
+        free_current_text();
+        return;
+    }
+
+	// スタック保持モード
+	if ( undo_strict ) return;
+
+    // スタックのサイズを制限
+    if (undo_stack.size() >= MAX_UNDO_STACK_SIZE) {
+        undo_stack.pop_front();
+    }
+
+    UndoStep step;
+	step.line = current_line;
+	step.offset = current_offset;
+    step.text = current_text;
+    undo_stack.push_back(step);
+
+    // 現在のテキストを前回のテキストとして保存
+    previous_text = current_text;
+
+	free_current_text();
+}
+
+
+static void reset_undo(void) {
+
+	GtkTextIter iter;
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+
+    undo_stack.clear();
+	get_current_text();
+    UndoStep step;
+	step.line = 0;
+	step.offset = 0;
+    step.text = current_text;
+    undo_stack.push_back(step);
+	free_current_text();
+	undo_strict = false;
+}
+
+
+static void edit_undo(GtkWidget *widget, gpointer data) {
+
+    if (undo_stack.size()>1) {
+		GtkTextIter iter;
+        undo_stack.pop_back();
+        UndoStep step = undo_stack.back();
+	    const gchar *current_text = step.text.c_str();
+        previous_text = current_text;
+	    //printf("===%s(%d)\r\n",current_text,undo_stack.size());
+		undo_strict = true;
+		GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
+		gtk_text_buffer_set_text(buffer,current_text,-1);
+		undo_strict = false;
+
+
+		gtk_text_buffer_get_iter_at_offset( buffer, &iter, step.offset );
+		gtk_text_buffer_place_cursor( buffer, &iter );
+		current_jumpline = step.line;
+		//gtk_text_buffer_get_iter_at_line( buffer, &iter, step.line );
+		//gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(edit), &iter, 0, FALSE, 0, 0);
+
+		// 復帰用タイマーをセットする
+		event_timer=g_timeout_add( 50,(GSourceFunc)update_edit_jump, NULL );
+
+    }
+}
+
+/*--------------------------------------------------------------------------------*/
 // dialog
 
 static int dialog_open( gchar *title, gchar *msg )
@@ -205,6 +336,7 @@ static int statusbar_setline( int line )
 static void reset_modified( void )
 {
 	gtk_text_buffer_set_modified( gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit)), FALSE );
+	reset_undo();
 }
 
 static gboolean get_modified( void )
@@ -224,10 +356,15 @@ void update_statusbar(GtkTextBuffer *buffer, gpointer user_data) {
 
   gtk_text_buffer_get_iter_at_mark(buffer,
       &iter, gtk_text_buffer_get_insert(buffer));
+
   current_line = (int)gtk_text_iter_get_line( &iter );
+  current_offset = (int)gtk_text_iter_get_offset( &iter );
   line = current_line + 1;
   statusbar_setline( line );
+
+  on_text_changed(buffer, 0);
 }
+
 
 static void mark_set_callback(GtkTextBuffer *buffer,
     const GtkTextIter *iter, GtkTextMark *mark,
@@ -235,9 +372,11 @@ static void mark_set_callback(GtkTextBuffer *buffer,
 
   int line;
   current_line = (int)gtk_text_iter_get_line( iter );
+  current_offset = (int)gtk_text_iter_get_offset( iter );
   line = current_line + 1;
   statusbar_setline( line );
 }
+
 
 // file
 static int status;
@@ -245,7 +384,7 @@ static int status;
 static void hsed_about(GtkWidget *w,int d)
 {
 	int res;
-	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2021(C) onion software" );
+	res = dialog_open( "About", "HSP Script Editor " HSED_VER "\r\nCopyright 2021-2025(C) onion software" );
 }
 
 void file_dlg_cancel(GtkWidget *widget,GtkWidget *dlg){
@@ -284,7 +423,7 @@ void file_open_read(const char *lpPath)
 	if(fp == NULL)
 		return;
 
-	fseek(fp,0,SEEK_END); //!?
+	fseek(fp,0,SEEK_END);
 	size=ftell(fp);
 	fseek(fp,0,SEEK_SET);
 
@@ -308,17 +447,6 @@ void file_open_read(const char *lpPath)
 	reset_modified();
 }
 
-/*
-void file_open_ok(GtkWidget *widget, GtkFileSelection *fsel)
-{
-	const gchar* fname=gtk_file_selection_get_filename(GTK_FILE_SELECTION(fsel));
-	file_open_read(fname);
-	//g_free(fname);
-
-	status=1;
-	gtk_main_quit();
-}
-*/
 
 void file_save_write(const char *lpPath)
 {
@@ -341,7 +469,6 @@ void file_save_write(const char *lpPath)
 	chdir(cdir);
 	if(p)strcpy(filename,lpPath+p+1);
 
-
 	GtkTextIter start;
 	GtkTextIter end;
 	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
@@ -362,22 +489,6 @@ void file_save_write(const char *lpPath)
 
 	titlebar_set( filename );
 }
-
-/*
-void file_save_ok(GtkWidget *widget, GtkFileSelection *fsel)
-{
-	const gchar* fname=gtk_file_selection_get_filename(GTK_FILE_SELECTION(fsel));
-	strcpy( filename, fname );
-
-	file_save_write(filename);
-	//g_free(fname);
-
-	status=1;
-	reset_modified();
-	text_mod = 0;
-	gtk_main_quit();
-}
-*/
 
 static void file_save(GtkWidget *w,int d)
 {
@@ -405,6 +516,7 @@ static void file_save(GtkWidget *w,int d)
 
 	GtkFileChooser *chooser = GTK_FILE_CHOOSER (fsel);
 	gtk_file_chooser_set_current_folder (chooser,mydir);
+	gtk_file_chooser_set_do_overwrite_confirmation (chooser,TRUE);
 
 	GtkFileFilter *filter = gtk_file_filter_new();
 	gtk_file_filter_set_name (filter , "HSP Script");
@@ -431,21 +543,6 @@ static void file_save(GtkWidget *w,int d)
 	}
 
 	gtk_widget_destroy(fsel);
-/*
-	status=0;
-	fsel=gtk_file_selection_new ("save");
-	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fsel)->ok_button),
-		"clicked", (GtkSignalFunc) file_save_ok, fsel);
-	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION (fsel)->cancel_button),
-		"clicked", (GtkSignalFunc) file_dlg_cancel, fsel);
-	gtk_signal_connect(GTK_OBJECT(fsel), "destroy",
-		(GtkSignalFunc) file_dlg_destroy, fsel);
-	gtk_widget_show(fsel);
-	gtk_grab_add(GTK_WIDGET(fsel));
-	gtk_main();
-	gtk_grab_remove(GTK_WIDGET(fsel));
-	gtk_widget_destroy(GTK_WIDGET(fsel));
-*/
 }
 
 static void file_open(GtkWidget *w,int d)
@@ -495,21 +592,6 @@ static void file_open(GtkWidget *w,int d)
 	}
 
 	gtk_widget_destroy(fsel);
-/*
-	fsel=gtk_file_selection_new ("load");
-
-	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fsel)->ok_button),
-		"clicked", (GtkSignalFunc) file_open_ok, fsel);
-	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION (fsel)->cancel_button),
-		"clicked", (GtkSignalFunc) file_dlg_cancel, fsel);
-	gtk_signal_connect(GTK_OBJECT(fsel), "destroy",
-		(GtkSignalFunc) file_dlg_destroy, fsel);
-	gtk_widget_show(fsel);
-	gtk_grab_add(GTK_WIDGET(fsel));
-	gtk_main();
-	gtk_grab_remove(GTK_WIDGET(fsel));
-	gtk_widget_destroy(GTK_WIDGET(fsel));
-*/
 }
 
 static void file_new(GtkWidget *w,int d)
@@ -573,12 +655,6 @@ static void edit_delete(GtkWidget *w,int d)
 	gtk_text_buffer_delete_selection( tbuf, TRUE, TRUE );
 }
 
-static void edit_undo(GtkWidget *w,int d)
-{
-	//GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
-	//gtk_source_buffer_redo(tbuf);
-}
-
 static void cursor_move(GtkWidget *w,int d)
 {
     GtkTextIter start;
@@ -597,18 +673,6 @@ static void cursor_move(GtkWidget *w,int d)
 	    return;
 	}
 
-}
-
-static void cursor_move_line(GtkWidget *w,int d)
-{
-   GtkTextIter start;
-   GtkTextIter end;
-	GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(edit));
-
-	gtk_text_buffer_get_iter_at_line( tbuf, &start, d );
-	gtk_text_buffer_place_cursor( tbuf, &start );
-	gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(edit), &start, 0, FALSE, 0, 0);
-	return;
 }
 
 /////////////////////////  HSP ///////////////////////////////
@@ -685,7 +749,7 @@ static gint update_edit( gpointer data )
 
 	if ( event_errflag >= 0 ) {
 		char msg[1024];
-		printf("hsed: Jump line [%d].\n", current_line+1 );
+		printf("hsed: Jump line [%d].\r\n", current_line+1 );
 		if ( event_jump >= 0 ) cursor_move_line( edit, current_line );
 
 		sprintf( msg,"#Error %d in line %d\n-->%s", event_errflag, current_line+1,  event_errmsg.c_str() );
@@ -811,6 +875,8 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),FALSE);
 	gtk_widget_set_sensitive( wmenu, FALSE );
+	gtk_window_set_accept_focus(GTK_WINDOW(window), FALSE);
+
 
 	//	HSPランタイム実行
 	p = 0;
@@ -842,6 +908,7 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	if(p){
 		char *errinfo;
+		char *fnameinfo;
 		char str_errid[1024];
 
 		errinfo = strstr2( complog, STR_HSPERROR );
@@ -858,6 +925,11 @@ static void HSP_run(GtkWidget *w,int flag)
 				strsp_get( errinfo, str_errid, 32, 63 );
 				event_jump = atoi( str_errid );
 				current_line = event_jump - 1;
+				strsp_get( errinfo, str_errid, 32, 512 );
+				fnameinfo = strstr2( errinfo, TEMP_HSP );
+				if ( fnameinfo == NULL ) {
+					event_jump = -1;			// 異なるソースコードでエラーが出ている
+				}
 			}
 			errinfo = strstr2( errinfo, STR_HSPERROR3 );
 			if ( errinfo ) {
@@ -867,11 +939,7 @@ static void HSP_run(GtkWidget *w,int flag)
 				event_errmsg = str_errid;
 			}
 
-			errinfo = strstr2( errinfo, TEMP_HSP );
-			if ( errinfo == NULL ) {
-				event_jump = -1;			// 異なるソースコードでエラーが出ている
-			}
-			printf( "hsed: Runtime error %d line %d.\n", event_errflag, current_line+1 );
+			printf( "hsed: Runtime error %d line %d.\r\n", event_errflag, current_line+1 );
 		}
 	}
 
@@ -884,8 +952,11 @@ static void HSP_run(GtkWidget *w,int flag)
 		printf("hsed: Process error.\n");
 	}
 */
+
+	gtk_window_set_accept_focus(GTK_WINDOW(window), TRUE);
+
 	// 復帰用タイマーをセットする
-	event_timer=g_timeout_add( 500,(GSourceFunc)update_edit, NULL );
+	event_timer=g_timeout_add( 250,(GSourceFunc)update_edit, NULL );
 }
 
 
@@ -1034,6 +1105,8 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/File/sep1",		NULL,		NULL, 0, "<Separator>" },
 	{ "/File/_Quit",		"<control>Q",	(GtkSignalFunc)gtk_main_quit, 0, NULL },
 	{ "/_Edit",		NULL,		NULL, 0, "<Branch>" },
+	{ "/Edit/_Undo",	"<control>Z",	(GtkSignalFunc)edit_undo, 0, NULL },
+	{ "/Edit/sep1",		NULL,		NULL, 0, "<Separator>" },
 	{ "/Edit/_Cut",		"<control>X",	(GtkSignalFunc)edit_cut, 0, NULL },
 	{ "/Edit/_Copy",	"<control>C",	(GtkSignalFunc)edit_copy, 0, NULL },
 	{ "/Edit/_Paste",	"<control>V",	(GtkSignalFunc)edit_paste, 0, NULL },
@@ -1059,6 +1132,8 @@ static GtkItemFactoryEntry menu_items_ja[] = {
 	{ "/ファイル/sep1",		NULL,		NULL, 0, "<Separator>" },
 	{ "/ファイル/終了",		"<control>Q",	(GtkSignalFunc)gtk_main_quit, 0, NULL },
 	{ "/編集",		NULL,		NULL, 0, "<Branch>" },
+	{ "/編集/_やり直し",	"<control>Z",	(GtkSignalFunc)edit_undo, 0, NULL },
+	{ "/編集/sep1",		NULL,		NULL, 0, "<Separator>" },
 	{ "/編集/_切り取り",		"<control>X",	(GtkSignalFunc)edit_cut, 0, NULL },
 	{ "/編集/_コピー",	"<control>C",	(GtkSignalFunc)edit_copy, 0, NULL },
 	{ "/編集/_貼り付け",	"<control>V",	(GtkSignalFunc)edit_paste, 0, NULL },
@@ -1170,9 +1245,12 @@ int main(int argc, char *argv[], char *envp[]){
     gtk_widget_modify_base (edit, GTK_STATE_NORMAL, &colorBg);
     gtk_widget_modify_text (edit, GTK_STATE_NORMAL, &colorText);
 
-	 PangoFontDescription *fontDesc = pango_font_description_from_string(conf_fontname);
-
-	gtk_widget_modify_font(edit, fontDesc);
+	if ( conf_fontname[0] != 0 ) {
+		PangoFontDescription *fontDesc = pango_font_description_from_string(conf_fontname);
+		if ( fontDesc != NULL ) {
+			gtk_widget_modify_font(edit, fontDesc);
+		}
+	}
 
 	//g_signal_connect (G_OBJECT(window), "key-press-event",
 	//	G_CALLBACK (event_cb), NULL);
@@ -1199,8 +1277,10 @@ int main(int argc, char *argv[], char *envp[]){
 
 	if(argc>1){
 		file_open_read(argv[1]);
-		printf("%s %s\n",curdir,argv[1]);
+		//printf("%s %s\n",curdir,argv[1]);
 	}
+
+	reset_undo();
 
 	gtk_widget_show(window);
 	gtk_main();

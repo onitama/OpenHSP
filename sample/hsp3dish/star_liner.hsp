@@ -1,6 +1,8 @@
 #include "hsp3dish.as"
 
-; Star Liner
+	; Star Liner
+
+	screen 0,640,480
 
 	m=50
 	dim x,m :dim y,m :dim dx,m :dim dy,m

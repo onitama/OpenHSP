@@ -1,0 +1,39 @@
+#include "hsp3dish.as"
+#include "mod_vpad.as"
+
+	;
+	;	バーチャルパッドで画像を動かす
+	;
+	hspvpad_init 1					; バーチャルパッドの初期化
+
+	celload "face.bmp"				; 元画像ファイル
+	face=stat					; 元画像のIDを保存
+
+	mx=320						; X座標
+	my=240						; Y座標
+	msp=4						; スピード
+*main
+	stick key,256+15				; キー入力
+	hspvpad_key key					; バーチャルパッドのキーを読み取る
+
+	if key&1 : mx=mx-msp
+	if key&4 : mx=mx+msp
+	if key&2 : my=my-msp
+	if key&8 : my=my+msp
+
+	redraw 0					; 描画始め
+
+	color 0,0,64
+	boxf						; 背景を消す
+
+	gmode 2						; 透明色ありの指定
+	pos mx,my					; 表示位置の設定
+	celput face					; 画像コピー
+
+	hspvpad_put mykey				; バーチャルパッドを表示する
+
+	redraw 1					; 描画終わり
+	await 20
+
+	goto *main
+

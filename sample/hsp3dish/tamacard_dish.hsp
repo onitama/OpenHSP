@@ -1,12 +1,17 @@
 #include "hsp3dish.as"
+#pack "tamaface.png"
+#pack "tcard.png"
+
+	; webdish素材(hsptvフォルダ)にある素材は
+	; HSP3Dishでそのまま読み込むことが可能です
 
 	tamaface=ginfo_newid
-	celload dir_tv+"tamaface.png",tamaface		; 素材フォルダから読み込みます
+	celload "tamaface.png",tamaface		; webdish素材フォルダから読み込みます
 	tama_sx=256:tama_sy=256
 	celdiv tamaface,tama_sx,tama_sy
 
 	tcard=ginfo_newid
-	celload dir_tv+"tcard.png",tcard		; 素材フォルダから読み込みます
+	celload "tcard.png",tcard		; webdish素材フォルダから読み込みます
 	card_sx=256:card_sy=384
 	celdiv tcard,card_sx,card_sy
 

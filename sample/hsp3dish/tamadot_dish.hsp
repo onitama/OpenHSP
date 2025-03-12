@@ -1,7 +1,11 @@
 #include "hsp3dish.as"
+#pack "tamadot.png"
+
+	; webdish素材(hsptvフォルダ)にある素材は
+	; HSP3Dishでそのまま読み込むことが可能です
 
 	tamadot=ginfo_newid
-	celload dir_tv+"tamadot.png",tamadot
+	celload "tamadot.png",tamadot
 	tama_sx=64:tama_sy=64
 	celdiv tamadot,tama_sx,tama_sy
 

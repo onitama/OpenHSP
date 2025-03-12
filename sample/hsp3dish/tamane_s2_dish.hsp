@@ -1,0 +1,30 @@
+#include "hsp3dish.as"
+#pack "tamane_s.png"
+
+	;	標準のサイズで表示
+	screen 0,640,480
+
+	; webdish素材(hsptvフォルダ)にある素材は
+	; HSP3Dishでそのまま読み込むことが可能です
+
+	tamas=ginfo_newid
+	celload "tamane_s.png",tamas		; 素材フォルダから読み込みます
+	celdiv tamas,256,512
+
+*main
+	redraw 0
+	color 0,160,160
+	boxf
+
+	gmode 2
+	repeat 5
+	x=rnd(640):y=rnd(480)
+	i=rnd(8)
+	pos x-128,y-256			; 適当な座標に表示
+	celput tamas,i			; ランダムに表情を選ぶ
+	loop
+
+	redraw 1
+	wait 100
+	goto *main
+

@@ -1,0 +1,113 @@
+
+	;
+	;	mod_mahjongモジュールを使った簡易的な一人麻雀です
+	;
+	title "一人麻雀"
+
+#include "hsp3dish.as"
+#include "mod_mahjong.as"
+
+	randomize
+	;screen 0,640,480
+
+	pai=3				; 牌画像のあるID
+	mj_load pai
+	celload "janbg.png",4
+
+*start
+	mj_reset			; 牌のリセット
+
+	;	プレイヤー手配を作成
+	dim hand,MJ_HAND		; 手配
+	dim hand2,MJ_HAND		; チェック用手配
+	repeat 13:mj_draw a:hand(cnt)=a:loop
+	hand(13)=999
+
+	sute=0
+	sutemax=24
+	dim sutekawa,sutemax		; 捨牌
+
+*main
+	mj_handsort hand
+
+	;	基本画面
+	redraw 0
+	gosub *putbg
+	gosub *putsute
+	gosub *puthand
+	redraw 1
+	await 1000/30
+
+*main1
+	;	ツモ
+	if sute>=24 : goto *main4
+	a=hand(MJ_HAND-1)
+	if a=0 : mj_draw hand(MJ_HAND-1)
+
+	;	基本画面
+	redraw 0
+	gosub *putbg
+	gosub *putsute
+	gosub *puthand
+	redraw 1
+
+	;	和了チェック
+	mj_handcopy hand2,hand
+	mj_handsort hand2
+	mj_handchk win
+	if win>0 : goto *main5
+
+*main2
+	;	入力待ちループ
+	stick a,,1
+	if a & 256 : goto *main3
+	await 1000/30:goto *main2
+*main3
+	;	クリックした
+	x=(mousex-48)/36:y=mousey-390
+	if (y<0)|(y>54) : goto *main2
+	if x<0 : goto *main2
+	if x>12 : x=13
+	;
+	selpai=x
+	sutekawa(sute)=hand(selpai)
+	sute++
+	hand(selpai)=999
+	goto *main
+
+*putbg
+	; 基本画面を描画
+	;
+	pos 0,0:celput 4
+	x=48:y=32:pos x,y
+	repeat 13:mj_put MJID_URA:loop
+	repeat 2:y=220-(cnt*20)
+	x=220:pos x,y
+	repeat 6:mj_put MJID_FUSE:loop
+	loop
+	return
+
+*puthand
+	; 手牌を表示
+	x=48:y=390
+	pos x,y
+	repeat MJ_HAND
+		mj_put hand(cnt)
+	loop
+	return
+*putsute
+	; 捨牌の表示
+	x=90:y=280:pos x,y
+	repeat sute
+		if cnt=12 : y+=MJP_SY : pos x,y
+		mj_put sutekawa(cnt)
+	loop
+	return
+
+*main4
+	dialog "流局です。"
+	goto *start
+*main5
+	mj_getwin yaku,syuntu,koutu
+	dialog ""+yaku+"順子="+syuntu+"/刻子="+koutu
+	goto *start

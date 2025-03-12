@@ -96,11 +96,11 @@
 	x2=480:y2=800		; 画面右下の座標
 
 	screen 0,x2,y2
-	title "HSP logo demo"
-
-	max=64
 
 	celload "hsplogo8.png",1
+
+	title "HSP logo demo"
+	max=64
 
 	init_sprite 80,50,max
 	opt_sprite 1,2

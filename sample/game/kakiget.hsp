@@ -45,7 +45,7 @@
 
 		if hp<1 :break
 
-		redraw 1 :await 8
+		redraw 1 :await 1000/60
 	loop
 
 stop

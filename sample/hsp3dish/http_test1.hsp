@@ -37,8 +37,9 @@
 
 	repeat
 	redraw 0
+	color 255,255,255:boxf
 	color 0,0,0:pos 0,0
-	mes "["+fname+"] saved."
+	mes "["+fname+"] saved.("+size+")"
 
 	redraw 1
 	await 33

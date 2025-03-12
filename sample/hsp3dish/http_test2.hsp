@@ -6,7 +6,7 @@
 	;
 
 	;	URLを指定
-	url="http://www.onionsoft.net/hsp/beta/betabbs.cgi"
+	url="http://www.onionsoft.net/hsp/v36/readme.txt"
 
 	;	POST形式でCGIにパラメーターを渡す
 	prm = "mode=find&cond=and&log=0&word=script"
@@ -35,6 +35,7 @@
 
 	repeat
 	redraw 0
+	color 255,255,255:boxf
 	color 0,0,0:pos 0,0
 	mes buf
 

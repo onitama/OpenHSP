@@ -4,7 +4,7 @@
 	; gradf命令サンプル
 	;
 	sx=480: sy=800
-	screen 0,sx,sy
+	;screen 0,sx,sy
 
 	; それぞれの頂点座標と色を配列に代入
 	x(0)=0 : y(0)=0 : col(0)=$0000ff

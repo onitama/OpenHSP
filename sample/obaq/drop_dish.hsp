@@ -5,6 +5,7 @@
 	;
 	;	drop game
 	;
+	;screen 0,640,480
 	name="ドロップパズル"
 	randomize
 	cls 4
@@ -91,7 +92,7 @@
 	pos x-10,y-10:mes "+"
 
 	redraw 1		; 画面の更新を終了
-	await 16		; 一定時間待つ
+	await 1000/60		; 一定時間待つ
 
 	timer--
 	if timer<=0 : goto *demo

@@ -8,8 +8,8 @@
 
 	x1=0:y1=0				; 画面左上の座標
 	x2=ginfo_winx:y2=ginfo_winy		; 画面右下の座標
-
 	;screen 0,x2,y2
+
 	title "ブロック崩し"
 	;cls 4
 *gstart
@@ -37,9 +37,6 @@
 	score = 0
 	gameflag = 0
 *main
-	stick key
-	if key&512 : end
-
 	redraw 0
 	color 0,0,128:boxf
 	color 0,255,255:pos 8,8:mes "SCORE:"+score
@@ -53,6 +50,7 @@
 
 	if gameflag {
 		gosub *gameover
+		stick key
 		if key&256 {
 			if mousey<300 : goto *gstart
 		}

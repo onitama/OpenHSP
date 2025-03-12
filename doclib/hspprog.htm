@@ -15,7 +15,7 @@
 
 	<div id="CONTAINER">
 		<!-- ヘッダー -->
-		<p id="COPY"><a id="top" class="head">HSP : Hot Soup Processor ver3.7 / onion software 1997-2023(c)</a></p>
+		<p id="COPY"><a id="top" class="head">HSP : Hot Soup Processor ver3.7 / onion software 1997-2025(c)</a></p>
 		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
 		<h1>プログラミング・マニュアル</h1>
 
@@ -87,6 +87,7 @@
 					<li><a href="#COM_COMPONENT">COMコンポーネント呼び出し</a></li>
 					<li><a href="#AHT">HSPテンプレート(AHT)機能</a></li>
 					<li><a href="#VAR_EX">変数の初期化と保護<span class="new">（New!）</span></a></li>
+					<li><a href="#HSPDEF2">プラットフォームマクロ定義<span class="new">（New!）</span></a></li>
 				</ol>
 			</li>
 			<li><a href="#HSP_BASIS">HSPの基本動作概念</a>
@@ -3928,6 +3929,33 @@ v("arraycount",n)  : SafeArrayの次元nの要素の要素数</pre>
 			詳しくは、<a href="#DEBUG_VARS">「変数デバッグメッセージ」</a>の項目を参照してください。
 		<br>
 			varprop命令は、assert命令などと同様にデバッグ実行時の支援を行うものです。実行ファイル化したスクリプトや、プラットフォーム変換された環境(iOS,android)では、この命令は無効になりますので注意してください。
+		</p>
+
+
+		<h3 id="HSPDEF2">プラットフォームマクロ定義</h3>
+		<p>
+			HSP3.7β10a以降で、コンパイル時にプラットフォーム固有の情報を識別するための仕組みが導入されています。<br>
+			現在のスクリプトが、どのプラットフォーム上で動作しているかを知るには、hspstatなどのシステム変数を参照したり、sysinfo関数を使用する必要がありました。
+			これにより、実行時に識別することが可能ですが、プラグインや環境の違いなどをコンパイルの時点で分岐させることはできません。<br>
+			プラットフォームマクロ定義は、プラットフォーム固有の情報をコンパイルにあらかじめマクロとして用意する仕組みです。
+			以下のマクロが、それぞれのプラットフォームで設定されます。ユーザーは、#ifdefや#ifndefなどのプリプロセッサ命令を使用してソースを変更することができます。
+		</p>
+		<table class="keywordlist" summary="引数の型を一覧形式でを紹介しています。">
+			<caption>プラットフォームマクロ定義一覧</caption>
+			<tr><th>マクロ名</th><th>プラットフォーム</th></tr>
+			<tr><td>_hspwin</td><td>Windows</td></tr>
+			<tr><td>_hspmac</td><td>MacOS</td></tr>
+			<tr><td>_hsplinux</td><td>Linux</td></tr>
+			<tr><td>_hspios</td><td>iOS</td></tr>
+			<tr><td>_hspndk</td><td>Android</td></tr>
+			<tr><td>_hspemscripten</td><td>Emscripten(html5/js)</td></tr>
+		</table>
+		<p>
+		たとえば、マクロ「_hspwin」が定義されていたらWindowsプラットフォーム上でコンパイルされているということが想定できます。
+		これは、実行しているプラットフォームではないことに注意してください。プラットフォームマクロ定義は、あくまでもスクリプトがコンパイルされた環境を示しています。
+		(Emscripten環境は、HSP3Dish Helperを使用してスクリプト変換を行う際に定義されます)<br>
+		たとえば、LinuxやEmscripten環境では使用できるプラグイン、命令に差異があります。こうした、プラットフォームごとのHSP3環境の違いを吸収するための手段として使用してください。
+		同じスクリプトで、WindowsとLinuxなどで処理を変更したい場合などは、従来の方法で実行時にプラットフォームを識別する必要があります。
 		</p>
 
 

@@ -1,7 +1,7 @@
 #include "hsp3dish.as"
 
-	mmload "../game/smart_and_active.mp3",1
-	mmload "../game/explos.wav",2
+	mmload dir_tv+"smart_and_active.mp3",1
+	mmload dir_tv+"explos.wav",2
 	button "PLAY",*pplay
 	button "STOP",*pstop
 	button "WAV",*pwav

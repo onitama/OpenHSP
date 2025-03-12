@@ -1,0 +1,197 @@
+#include "hsp3dish.as"
+
+world_x = 640; ウィンドウ全体のＸ座標
+world_y = 480;ウィンドウ全体のＹ座標
+bpx = 0 : bpy = 0	; ボールの移動量
+gsx = 128 : gsy = 256	; ゴールのX,Yサイズ
+gx1 = 0 : gy1 = 112	; ゴール1のＸ座標Ｙ座標
+gx2 = 512 : gy2 = 112	; ゴール2のＸ座標Ｙ座標
+kickx = 1.8		; キックでボールが動く強さX
+kicky = 2.0		; キックでボールが動く強さY
+
+randomize
+*menu
+
+screen 0, world_x, world_y
+
+	title "ミニサッカー"
+	repeat
+
+	redraw 0
+	font msgothic, 80, 1
+	pos 80,140 : mes "ミニサッカー"
+	font msgothic, 32, 0
+	pos 170, 300 : mes "Enterキーでスタート"
+	redraw 1
+
+	await 30
+	getkey a, 13 : if a : break
+
+	loop
+
+	cls 4
+	score1 = 0
+	score2 = 0
+
+*main2
+	cls
+
+	bx = world_x / 2
+	bpx = 0 : bpy = 0
+	x1 = 0     : y1 = 208 ; 人1のＸ座標Ｙ座標
+	x2 = 592   : y2 = 208 ; 人2のＸ座標Ｙ座標
+	bx = world_x / 2 : by = world_y / 2 ; ボールのＸ座標Ｙ座標
+	gamef = 0
+
+*main
+
+;全画面を消すところ-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	
+	redraw 0
+	
+	color 0,0,128 : pos 0, 0: boxf ;画面クリア
+	color 0,0,255
+	boxf gx1,gy1,gx1+gsx,gy1+gsy
+	boxf gx2,gy2,gx2+gsx,gy2+gsy
+
+	color 255,255,255
+	pos world_x / 2 - 60, 0 : mes "1P:" + score1 + " .vs. 2P:" + score2
+
+;ボールを表示するところ----------------------------------------------------------------------------
+
+	color 0, 255, 0 ;グリーン 
+	pos bx, by : mes "●"
+
+;人1を表示するところ----------------------------------------------------------------------------
+
+	color 255,255,255 ;白
+
+	pos x1, y1 + 0 * 16 : mes "　○／"
+	pos x1, y1 + 1 * 16 : mes "／１　"
+	pos x1, y1 + 2 * 16 : mes "　ハ　"
+
+;人2を表示するところ----------------------------------------------------------------------------
+
+	color 0,255,255 ;水色
+
+	pos x2, y2 + 0 * 16 : mes "　○／"
+	pos x2, y2 + 1 * 16 : mes "／２　"
+	pos x2, y2 + 2 * 16 : mes "　ハ　"
+
+	redraw 1
+;表示終わりウェイトウェイト-------------------------------------------------------------------
+
+	await 30
+
+;エスケープキーで終了-------------------------------------------------------------------------
+	stick key, 15
+	if key & 128 : end
+
+	if rnd(2)=0 {
+		gosub *p1exec
+		gosub *p2exec
+	} else {
+		gosub *p2exec
+		gosub *p1exec
+	}
+
+;ボールを動かすところ-----------------------------------------------------
+
+	bx = bx + bpx
+	by = by + bpy
+	if bpx>0 : bpx-
+	if bpx<0 : bpx+
+	if bpy>0 : bpy-
+	if bpy<0 : bpy+
+
+;ボールが画面からはみ出しそうになったら補正-----------------------------------------------------
+	if bx < 0 {
+		bx=0
+		if bpx<0 : bpx=-bpx
+		gosub *p1win
+	}
+	if world_x - 16 <= bx {
+		bx = world_x - 16
+		if bpx>0 : bpx=-bpx
+		gosub *p2win
+	}
+	if by < 0 {
+		by = 0
+		if bpy<0 : bpy=-bpy
+	}
+	if world_y - 32 <= by {
+		by = world_y - 32
+		if bpy>0 : bpy=-bpy
+	}
+;--------------------------------------------------------------------------------
+	if gamef=0 : goto *main
+
+	if score1 >= 3 : goto *p1end
+	if score2 >= 3 : goto *p2end
+	goto *main2
+end
+
+*p1exec
+;人を動かすところ-------------------------------------------------------------------------------
+
+	dx1 = 0 : dy1 = 0 ;移動スピードクリア
+
+	getkey a, 'A' : if a : dx1 = -8	;左
+	getkey a, 'W' : if a : dy1 = -8	;上
+	getkey a, 'D' : if a : dx1 = 8		;右
+	getkey a, 'X' : if a : dy1 = 8		;下
+	getkey a, 'S' : if a : x1 = 0 
+
+	x1 += dx1 : y1 += dy1	;人移動
+;ボールを動かす所-------------------------------------------------------------------------------
+	if ( x1 <= bx ) & ( bx < x1 + 48 ) & ( y1 <= by ) & ( by < y1 + 48 ) : bpx = int(kickx*dx1) : bpy = int(kicky*dy1)
+
+	return
+*p2exec
+;人を動かすところ-------------------------------------------------------------------------------
+
+	dx2 = 0 : dy2 = 0 ;移動スピードクリア
+
+	getkey a, 37 : if a : dx2 = -8	;左
+	getkey a, 38 : if a : dy2 = -8	;上
+	getkey a, 39 : if a : dx2 = 8		;右
+	getkey a, 40 : if a : dy2 = 8		;下
+	getkey a, 13 : if a : x2 = 640 - 16 * 3 
+	
+	x2 += dx2 : y2 += dy2	;人移動
+;ボールを動かす所-------------------------------------------------------------------------------
+	if ( x2 <= bx ) & ( bx < x2 + 48 ) & ( y2 <= by ) & ( by < y2 + 48 ) : bpx = int(kickx*dx2) : bpy = int(kicky*dy2)
+
+	return
+
+*p1end
+	mstr = "1Pの勝ち！"
+	gosub *mstrput
+	goto *menu
+*p2end
+	mstr = "2Pの勝ち！"
+	gosub *mstrput
+	goto *menu
+
+*p1win
+	if by<gy1 : return
+	if by>gy1+gsy : return
+	score2 += 1 : gosub *goal
+	gamef = 1
+	return
+*p2win
+	if by<gy2 : return
+	if by>gy2+gsy : return
+	score1 += 1 : gosub *goal
+	gamef = 2
+	return
+
+*goal
+	mstr = "" + score1 + " VS " + score2
+*mstrput
+	i = 60 : repeat 29 
+		redraw 0 : color 0, 0, 128 : pos 0,0 : boxf  
+		font msgothic, i, 0: color 128,128,128 : pos world_x / 2 - 120, world_y / 2 - 60 :mes mstr : redraw 1
+		await 30
+	i += 1 : loop
+	wait 200
+return 	

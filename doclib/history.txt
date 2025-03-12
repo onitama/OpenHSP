@@ -5,10 +5,13 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
-	2025/03/04 3.7 beta10a
+	2025/03/11 3.7 beta10a
 
+	コンパイル時にプラットフォームマクロ(_hspwin、_hsplinux)が定義されるように修正
 	[HSP3Dish] linux,iOS,android,js(WebGL)でviewcalc命令のvptype_translateが正しく設定されない不具合を修正
+	[HSP3Dish] httploadでエラーが発生した際に以降のリクエストができなくなる不具合を修正
 	[HSP3Dish][hsp3js] 大きいフォントが描画されない不具合に対応(zakki)
+	[HSP3Dish][android] β10版のhsp3dhでSDKダウンロードが正しくできなかった不具合を修正
 
 	2025/02/14 3.7 beta10
 
