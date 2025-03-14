@@ -24,7 +24,7 @@ extern HINSTANCE hDllInstance;
 #include "supio.h"
 
 #if (defined HSPUTF8 && defined HSPWIN)
-#pragma execution_character_set("utf-8")
+//#pragma execution_character_set("utf-8")
 #endif
 
 static int dpm_flag = 0;			// 0=none/1=packed
