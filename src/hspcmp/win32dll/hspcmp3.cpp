@@ -199,7 +199,7 @@ EXPORT BOOL WINAPI hsc_objname(BMSCR* bm, char* p1, int p2, int p3)
 EXPORT BOOL WINAPI hsc3_analysis(BMSCR* bm, char* p1, int p2, int p3)
 {
 	//
-	//		hsc3_analysisname "name", mode  (type6)
+	//		hsc3_analysisname "name", mode, line  (type6)
 	//
 	if (*p1 == 0) {
 		analysis_name = NULL;
@@ -209,7 +209,17 @@ EXPORT BOOL WINAPI hsc3_analysis(BMSCR* bm, char* p1, int p2, int p3)
 		analysis_name = analysis_keyword;
 	}
 	analysis_mode = p2;
-	hsc3->InitAnalysisInfo(analysis_mode, analysis_name);
+	hsc3->InitAnalysisInfo(analysis_mode, analysis_name, p3);
+	return 0;
+}
+
+
+EXPORT BOOL WINAPI hsc3_kwlineinfo(char* p1, int p2, int p3, int p4)
+{
+	//
+	//		hsc3_kwlineinfo val, opt (type1)
+	//
+	strcpy(p1, hsc3->GetAnalysisLineInfo(p2));
 	return 0;
 }
 
@@ -279,6 +289,7 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	//			(       4=UTF8 output mode )
 	//			(       8=strmap output mode )
 	//			(      16=keyword list mode )
+	//			(     256=emscripten mode )
 	//			( ppopt = preprocessor option )
 	//			(       0=default/1=ver2.6 mode )
 	//			(       32=UTF8 input mode )
@@ -311,6 +322,7 @@ p1が16(bit4)の場合はキーワード解析リストを出力します
 	ppopt = 0;
 	if (p1 & 1) ppopt |= HSC3_OPT_DEBUGMODE;
 	if (p1 & 4) ppopt |= HSC3_OPT_UTF8OUT;
+	if (p1 & 256) ppopt |= HSC3_OPT_EMSCRIPTEN;
 
 	if ( p2&1 ) ppopt|=HSC3_OPT_NOHSPDEF;
 	if ( p2&4 ) ppopt|=HSC3_OPT_MAKEPACK;
