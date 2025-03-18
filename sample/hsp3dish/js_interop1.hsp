@@ -1,0 +1,34 @@
+#include "hsp3dish.as"
+
+exec {"
+let textbox  = document.createElement("textarea");
+textbox.id = 'textbox1';
+textbox.rows = 5;
+textbox.cols = 80;
+document.body.appendChild(textbox);
+"}
+
+sec = 0
+ms = 0
+sdim s, 1024
+s = "Hello"
+
+*main
+	exec {"
+	const now = new Date();
+	hsp3.lpoke("} + varptr(sec) + {", now.getSeconds());
+	hsp3.lpoke("} + varptr(ms) + {", now.getMilliseconds());
+	let textbox = document.getElementById("textbox1");
+	hsp3.write_str("} + varptr(s) + {", textbox.value, 1024);
+	"}
+
+	redraw 0
+	color 255, 255, 255 : boxf : pos 0,0
+	color 0, 0, 0
+	mes "now " + sec + ":" + ms
+	mes "text:" + s
+
+	redraw 1
+	await 33
+	goto *main
+
