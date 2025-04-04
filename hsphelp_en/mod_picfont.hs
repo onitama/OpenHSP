@@ -14,40 +14,39 @@ onitama
 http://hsp.tv/
 
 %note
-Include mod_picfont.as.
+Be sure to include mod_picfont.as.
 
 %type
-User-defined instructions
+User-defined instruction
 
 %group
-Extended screen control command
+Extended screen control instruction
 
 %port
 Win
 Let
 
-
 %index
 picfont
-Font display preparation using images
+Prepare for image-based font display
 %prm
 id, cx, cy, mode, offset
-id: Buffer ID with the font image
-cx, cy: XY size per font character
-mode: Display mode (gmode mode value)
-offset: Display position offset
+id : Buffer ID containing the font image
+cx,cy  : X and Y size of one font character
+mode   : Display mode (gmode mode value)
+offset : Offset for display position
 
 %inst
-Prepare for font display using images.
-Specify the buffer ID where the font image exists in id.
-In the image, it is necessary to store half-width alphanumeric monospaced characters in 16 characters x 8 columns (character code order) in advance.
-This image is compatible with the one used in the HGIMG3 setfont instruction.
-Specify the character size per character by cx and cy.
-By mode, specify the copy mode (mode value specified by gmode) at the time of display.
-(For example, if 2 is specified, the black background will be displayed transparently.)
-For offset, specify a value that corrects the horizontal position when displaying one character.
-The higher this value, the wider the character spacing, and the smaller this value, the narrower the spacing.
-If 0 is specified, the character feed will be the same as the font size.
+Prepares for image-based font display.
+Specifies the buffer ID where the font image exists with id.
+The image must contain half-width alphanumeric characters of equal width in 16 characters x 8 rows (in character code order) beforehand.
+This image is compatible with the one used by the HGIMG3 setfont command.
+Specify the character size per character with cx and cy.
+Specify the copy mode (mode value specified by gmode) for display with mode.
+(For example, if you specify 2, the background black color will be displayed transparently)
+Specify a value to correct the horizontal position when displaying one character in offset.
+The larger this value, the wider the character spacing, and the smaller the value, the narrower the spacing.
+If you specify 0, the character feed will be the same as the font size.
 The font image initialized by the picfont command can be displayed by the picfprt command.
 
 %href
@@ -56,19 +55,17 @@ picfprt
 
 %index
 picfprt
-Font display using images
+Image-based font display
 %prm
 "message"
-"message": Message to display
+"message" : Message to display
 
 %inst
-The font image initialized by the picfont command is displayed.
-Specify the character string to be displayed in "message". Only single-byte alphanumeric characters can be displayed.
-The position of the displayed character is the current position specified by the pos instruction.
-picfprt recognizes the line feed code.
-Also, after the message is displayed, the current position moves to the line break position.
+Displays the font image initialized by the picfont command.
+Specify the string to display in "message". Only half-width alphanumeric characters can be displayed.
+The position of the displayed character is the current position specified by the pos command.
+picfprt recognizes line feed codes.
+Also, after displaying the message, the current position moves to the line-fed position.
 
 %href
 picfont
-
-

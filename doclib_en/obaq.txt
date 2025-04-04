@@ -1,469 +1,336 @@
+
 ------------------------------------------------------------------------------
-OBAQ for HSP ver3.4 REFERENCE MANUAL                HSP : Hot Soup Processor  
-HSP Extension Extension DLL Reference Copyright 2014 (c) Zener Works / kuni / onitama
+**OBAQ for HSP ver3.4 REFERENCE MANUAL**
+**HSP : Hot Soup Processor**
+**HSP Extension DLL Reference**
+**Copyright 2014 (c) Zener Works/kuni/onitama**
 ------------------------------------------------------------------------------
 
-・ Introduction
+**・Introduction**
 
-This DLL can be used with Hot Soup Processor ver3.2 or later.
-It is a plug-in that allows you to easily use the functions of the physics engine (OBAQ).
-OBAQ contains all the functions in the DLL, as long as it is an environment where HSP can be executed.
-No additional modules or DLLs need to be installed.
+By using this DLL with Hot Soup Processor ver3.2 or later, you can easily utilize the functions of the physics engine (OBAQ). OBAQ contains all functions within the DLL, so you do not need to install additional modules or DLLs as long as the environment can execute HSP.
 
+**・OBAQ Function Overview**
 
-・ Overview of OBAQ functions
+By using OBAQ, you can handle 2D-based rigid body collisions and gravity simulations. OBAQ is specialized for 2D and the settings and commands are simple, so that anyone can easily achieve natural movements through physics calculations. Please consider it as an easy-to-use system to support games, demonstrations, etc., rather than highly accurate technical calculations.
 
-By using OBAQ, collision of rigid bodies by 2D base, gravity simulation
-Can be handled.
-OBAQ makes it easy for anyone to realize natural movements by physics.
-Specializing in 2D, settings and instructions are simply organized so that you can do it.
-Games, demonstrations, etc. rather than highly accurate technical calculations
-Think of it as a handy system to support.
+OBAQ has a built-in sprite manager, so you can easily draw sprites using only standard functions. It also supports display systems using DirectX, etc., by allowing users to manage display coordinates.
 
-OBAQ has a built-in sprite manager and uses only standard features
-You can easily draw sprites. In addition, the user can set the display coordinates.
-By managing it, it is possible to support display systems using DirectX, etc.
+**・Preparation for Use**
 
+OBAQ.DLL is included in the latest HSP3 full set. If the DLL does not work, check if OBAQ.DLL is in the same directory as HSP3.EXE being used for execution. When using OBAQ, be sure to add the line "#include "obaq.as"" to the beginning of the script. This will extend the functionality of HSP, allowing you to use the commands described in this reference. First, try running the sample script (in the sample/obaq folder). You should be able to see simple examples of the extended functionality.
 
-・ Preparation for use
+**・Usage Overview**
 
-OBAQ.DLL is included in the latest HSP3 full set.
-If the DLL does not work, in the same directory as the HSP3.EXE used for execution,
-Check if you have OBAQ.DLL.
-When using OBAQ, be sure to start the script with "#include" obaq.as ""
-Please add the line. With the above, the function of HSP is expanded, and this
-You will be able to use the instructions described in the reference.
-First of all, try running the sample script (in the sample / obaq folder)
-please try.
-You should be able to see a simple usage example of the enhanced functionality.
+OBAQ has built-in management and drawing functions for simple display objects. The smallest unit of management is called an object. Objects can be assigned arbitrary shapes, such as rectangles, triangles, etc. Also, objects can be displayed on the screen and images can be assigned using the drawing function. In OBAQ, the screen is regarded as one space based on the shape assigned to the object, and all collisions and gravity are considered when placing and moving the object. In other words, all objects on the screen have weight and material parameters (friction, repulsion, etc.) as in reality. By setting these appropriately, you can easily reproduce realistic physical behavior.
 
+When using OBAQ, you must first initialize it.
 
-・ Overview of how to use
+`qreset OBAQ initialization`
 
-OBAQ has a built-in simple display management and drawing function.
-The smallest unit managed is called an object.
-Assign any shape to the object, including rectangles and triangles
-can do. In addition, the drawing function allows you to display objects on the screen.
-Images can be assigned.
-In OBAQ, the screen is made into one space based on the shape assigned to the object.
-Assuming that, all collisions and gravity are taken into consideration when arranging and moving.
-In other words, all the objects on the screen are as heavy as they are in reality.
-It has parameters of material (friction, repulsive force, etc.).
-By setting these appropriately, it is possible to easily reproduce realistic physical behavior.
-You will be able to do it.
+The `qreset` command initializes all information and returns it to an empty state. At this time, the window set as the drawing target of HSP will also be the drawing target of OBAQ. When initializing with the `qreset` command, a wall (frame) surrounding the entire screen is automatically set. This is to prevent objects from falling off the screen when they are placed on the screen without any walls. If you want to change the size and position of the wall, please reconfigure it with the `qborder` command.
 
-When using OBAQ, you need to initialize it first.
+Each object has a position (coordinates) set for displaying it. OBAQ has its own coordinate system internally, with the upper left of the screen as (0,0), and the values increase towards the lower right. (The positive direction of X is to the right, and the positive direction of Y is down). When using the drawing function built into OBAQ, the internal coordinates multiplied by 4 are used as the display coordinates (converted to the number of dots on the screen) in the initial settings. This coordinate transformation can be arbitrarily set by the user with the `qview` command, so you can adjust the zoom, reduction, position, etc.
 
-qreset OBAQ initialization
+Once OBAQ is initialized, create a main loop for display. The following is an example of a general loop.
 
-The qreset instruction initializes all the information and leaves it empty.
-At this time, the window that was set as the drawing target of HSP is also OBAQ
-It will be the target of drawing.
-When initialization is performed with the qreset command, the wall (frame) surrounding the entire screen is automatically created.
-It will be set. This puts an object on the screen without any walls
-This is to prevent it from falling off the screen when it is used.
-If you want to change the size or position of the wall, reset it with the qborder command.
-Please go.
+qreset ; Initialize OBAQ
+*main
+    ; Main loop
+    ;
+    redraw 0 ; Start screen update
+    color 0,0,0:boxf ; Clear screen
+    qexec ; Update objects by OBAQ
 
-Each object has its own position (coordinates) for display.
-OBAQ has its own coordinate system internally, with the upper left of the screen as (0,0).
-The value increases toward the lower right. (X positive direction is right, Y positive direction is down)
-When using the drawing function built into OBAQ, at the initial setting stage
-The display coordinates (converted to the number of dots on the screen) are obtained by multiplying the internal coordinates by four.
-This coordinate transformation can be arbitrarily set by the user with the qview instruction.
-You can adjust the zoom, reduction, position, etc.
-I can do it.
+    ; Put your processing here
 
-After OBAQ initialization is complete, create a main loop for display.
-The following is an example of a typical loop.
+    qdraw ; Draw objects
+    redraw 1 ; End screen update
+    await 12 ; Wait a certain amount of time
+    goto *main
 
-qreset; OBAQ initialization
-	*main
-;Main loop
-		;
-redraw 0; Start updating screen
-color 0,0,0: boxf; clear screen
-qexec; Updating objects with OBAQ
+In the main loop, you must update the object's movement with the `qexec` command. When using internal drawing, it is also necessary to update the screen with the `qdraw` command. Drawing with the `qdraw` command uses the Windows system API (GDI), so please clear the screen and update it with the `redraw` command. When performing drawing with other systems (DirectX, etc.), you only need to perform the update with the `qexec` command, then acquire the display position of each object yourself and perform the drawing. (The `qcnvaxis` and `qgetaxis` commands are provided for display coordinate conversion.)
 
-Please put the user's processing here
+You can display objects on the screen by adding objects. In OBAQ, each object is managed by an ID number. Use the following commands to register objects. The `qaddpoly` command can generate arbitrary polygons such as triangles and quadrilaterals. With the `qaddmodel` command, you can generate objects using coordinate data stored in advance in an array variable with more free shapes.
 
-qdraw; drawing an object
-redraw 1; Finish screen update
-await 12; wait for a certain amount of time
-		goto *main
+`qaddpoly Add polygon object`
+`qaddmodel Add freely set object`
 
-In the main loop, always use the qexec instruction to move and update the object.
-You have to do it. When using internal drawing, use the qdraw command
-You will also need to refresh the screen.
-Drawing by the qdraw instruction uses the Windows system API (GDI).
-Therefore, please clear the screen and update with the redraw command.
-When drawing with another system (DirectX etc.), use the qexec command.
-After only updating, get the display position of each object by yourself
-You need to draw. (The qcnvaxis command for converting display coordinates
-The qgetaxis instruction is provided. )
+These commands add an object with the specified shape at an arbitrary location. Since you can receive the ID of the added object with a variable, please save it when changing parameters.
 
-By adding an object, the display will appear on the screen.
-OBAQ manages each object by ID number.
-To register an object, use the following instruction.
-The qaddpoly command can generate arbitrary polygons such as triangles and quadrilaterals.
-I can do it. With the qaddmodel command, a more free shape can be created in advance.
-Object using what is stored as coordinate data in an array variable
-Generate.
+Use the following command to delete (discard) an object.
 
-qaddpoly Add polygon object
-qaddmodel Add free setting object
+`qdel Delete object`
 
-These instructions add an object of the specified shape anywhere.
-Since the ID of the added object can be received as a variable,
-Save it when you change the parameters.
+The `qdel` command deletes individual objects. With the `qreset` command, you can discard all objects and setting information and return to the initial state.
 
-To delete (destroy) an object, use the following command.
+Once an object is registered, it will automatically start moving according to physical behavior. Each object has many parameters, which can be set with the following commands.
 
-delete qdel object
+`qtype Set type parameter`
+`qstat Set stat parameter`
+`qpos Set position/angle parameters`
+`qspeed Set acceleration parameters`
+`qgroup Set group parameter`
+`qweight Set weight parameter`
+`qdamper Set damping parameter`
+`qinertia Set inertia parameter`
+`qmat Set material parameter`
+`qmat2 Set material detailed parameter`
+`qmat3 Set material display parameter`
+`quser Set user-defined data`
+`quser2 Set user-defined data 2`
 
-The qdel instruction deletes an individual object.
-Use the qreset instruction to destroy all objects and configuration information
-You can return to the initial state.
+There are also commands to read the set contents into a variable in a form that is paired with the parameters that can be set.
 
-Once the object is registered, it will automatically move according to the physical behavior.
-start. Each object has many parameters
-It can be set by the following command.
+`qgetpos Get position/angle parameters`
+`qgetweight Get weight parameter`
+`qgetdamper Get damping parameter`
+`qgetinertia Get inertia parameter`
+`qgetspeed Get acceleration parameter`
+`qgetgroup Get group parameter`
+`qgettype Get type parameter`
+`qgetstat Get stat parameter`
+`qgetmat Get material parameter`
+`qgetmat2 Get material detailed parameter`
+`qgetmat3 Get material display parameter`
+`qgetuser Get user-defined data`
+`qgetuser2 Get user-defined data 2`
 
-Set qtype type parameter
-qstat Set stat parameter
-Set qpos position and angle parameters
-qspeed Set acceleration parameters
-qgroup Set group parameters
-qweight Set parameters such as weight
-qdamper Set parameters such as vibration absorption
-qinertia Set parameters such as inertia
-qmat Set material parameters
-qmat2 Set material detail parameters
-qmat3 Set material display parameters
-quser Set user-defined data
-quser2 Set user-defined data 2
-
-In addition, the set contents are used as variables in pairs with the parameters that can be set.
-Instructions for reading are also provided.
-
-qgetpos Get position and angle parameters
-qgetweight Get parameters such as weight
-qgetdamper Get parameters such as vibration absorption
-qgetinertia Get parameters such as inertia
-qgetspeed Get acceleration parameters
-qgetgroup Get group parameters
-get qgettype type parameter
-get qgetstat stat parameter
-get qgetmat material parameters
-qgetmat2 Get material detail parameters
-qgetmat3 Get material display parameters
-qgetuser Get user-defined data
-qgetuser2 Get user-defined data 2
-
-The behavior and display method of the object are all set by these parameters.
-can.
-In the behavior of the object, it is the type and stat that set the basic behavior
-It is a rose meter. These can be set with the qtype and qstat instructions.
-I can do it.
+The behavior and display method of the object can be set by all of these parameters. The type and stat parameters set the basic operation of the object's behavior. These can be set with the `qtype` and `qstat` commands.
 
 The type parameter has the following values:
 
-Macro name value Content
-		---------------------------------------------
-stat_reserve 0 unused object
-stat_sleep 1 Waiting object
-stat_active 2 Appearing objects
+Macro name     Value Content
+---------------------------------------------
+stat_reserve   0     Unused object
+stat_sleep     1     Object waiting to appear
+stat_active    2     Object that is appearing
 
-Registered objects are usually set to stat_active.
-Objects for which stat_sleep is set will blink on the screen.
-No contact judgment is performed.
+Registered objects usually have `stat_active` set. Objects with `stat_sleep` set will flash on the screen and will not be subject to contact detection.
 
 The stat parameter has the following values:
 
-Macro name value Content
-		-----------------------------------------------------------
-type_normal 0 Normal object
-type_inner 1 Object with inverted contact judgment
-type_bindX 0x40 Fixed with X axis in the background
-type_bindY 0x80 Fixed with Y axis in the background
-type_bindR 0x100 Fixed rotation
-type_bind 0x1c0 Completely fixed to the background (no physical behavior)
-type_autowipe 0x100000 Automatically erase when the border range is exceeded
+Macro name      Value      Content
+-----------------------------------------------------------
+type_normal    0          Normal object
+type_inner     1          Object with inverted contact detection
+type_bindX     0x40       X-axis fixed to background
+type_bindY     0x80       Y-axis fixed to background
+type_bindR     0x100      Rotation fixed
+type_bind      0x1c0      Completely fixed to background (no physical behavior)
+type_autowipe  0x100000  Automatically erase when the border is exceeded
 
-For normal objects, type_normal is set and reflects the physical behavior.
-It works.
+Here's a guide to using OBAQ.DLL for HSP3.
 
-You can change the coordinates and angle of the object with the qpos command.
-However, in OBAQ, even when moving an object, the coordinates of the object are basically set.
-Apply force in the direction you want to move instead of changing it, or by using the qgetspeed command
-Please realize by setting the acceleration.
+This DLL expands the functionality of HSP3 to simulate physical behavior of objects. This document explains how to use each command.
 
-The qweight, qdamper, and qinertia instructions relate to the material and behavior of an object.
-You can set the parameters.
-These values are more predictable if you have some understanding of the laws of physics.
-I think it can be attached. If you don't know, refer to the explanation below and set the appropriate value.
-Please set it. For parameters that do not need to be tampered with
-You can use the default value.
+- Physics parameters
 
-qweight num, weight, moment Set parameters such as weight
+Please set the following values as a guide.
+Consider "moment" as a parameter related to ease of rotation.
 
-num (0): Object ID
-weight (6.0): Weight
-moment (1200.0): moment
+  * Disk of radius r: weight * (r ^ 2) / 2.0
+  * Rectangle with sides a, b: weight * ((a ^ 2) + (b ^ 2)) / 12.0
+
+- Commands for setting object parameters:
+
+`qdamper num, damper, friction`  Sets parameters for damping, etc.
+
+  * `num` (0): Object ID
+  * `damper` (0.7): Damping
+  * `friction` (1.0): Friction coefficient
+
+  `damper` (damping) indicates the force that suppresses shaking upon contact. Set a value between 0.0 and 1.0. (Range checking is not performed.)
+  `friction` (friction) is a coefficient of the force that decelerates when objects come into contact. It is multiplied by the friction of the contacting object and used in calculations. Set a value between 0.0 and 1.0. (Range checking is not performed.)
+
+`qinertia num, inertia, gravity` Sets parameters for inertia, etc.
+
+  * `num` (0): Object ID
+  * `inertia` (0.999): Inertia parameter value
+  * `gravity` (1.0): Object gravity value
+
+  `inertia` (inertia) makes the movement sticky as it approaches 0.0 due to increased resistance. Set a value between 0.0 and 1.0. (Range checking is not performed.)
+  `gravity` (object gravity) is multiplied by the gravity set in the space and reflected only on the object. It is used to give different gravity to specific objects. It is effective for character control in games because it gives specific objects zero gravity or anti-gravity in a way that is impossible in reality.
+
+- Commands for setting visual properties (used with `qdraw`):
+
+`qmat` Material parameter settings
+`qmat2` Material detailed parameter settings
+`qmat3` Material display parameter settings
+
+- Commands for storing custom data:
+
+The following commands allow the user to store arbitrary numerical values for each object. `quser` stores three integer values, and `quser2` stores three real values, for a total of six values that can be stored for one object. What to use them for is up to the user.
+
+`quser` Set user-defined data
+`quser2` Set user-defined data 2
+
+The above covers the basic usage.
+
+- Current Version Limitations
+
+The current version has the following limitations. Operation beyond these values is not guaranteed.
+
+  * Maximum number of objects: Maximum 512
+  * Total number of vertices of shape data held by all objects: Up to 16384
+  * Number of custom shapes that can be included in one object: Up to 8
+
+- Display Notes
+
+  Rotation, scaling, and reduction of images by sprite display are less accurate for speed. Please note that exact matching with wireframe outlines may not occur. If more accurate rotation is required, it is necessary to use DirectX, etc.
+  Both wireframe and sprite displays use Windows system API (GDI) for drawing, so movements in units smaller than 1 pixel are truncated. This may cause objects to shake or become unstable. If you are concerned about these parts, please take measures to absorb the blur on the display side as necessary.
+
+- About OBAQ Model Editor
 
-The values in parentheses for each parameter are the initial values (default values).
-weight is the standard specific gravity for a circle with radius r
+  OBAQ Model Editor is a simple tool for editing free-form shapes that can be used with the qaddmodel command.
+  `obaqme.hsp` in the `sample/obaq` folder can be read and executed with the script editor.
+  See the manual (`obaqme.txt`) for detailed usage.
 
-		(r ^ 2) / 32.0
+- HGIMG3 Support
 
-Please set as a guide.
-Think of moment as a parameter related to ease of rotation
-Please.
+  From HGIMG3 ver3.21, a function to display OBAQ objects using DirectX is installed. The script written by the user to the OBAQ plugin can be changed to DirectX display as it is.
+  This makes it possible to display a large number of objects, rotate and reduce high-quality sprites, and improve drawing speed.
 
-Disk with radius r: weight * (r ^ 2) / 2.0
-Rectangle with side lengths a and b: weight * ((a ^ 2) + (b ^ 2)) / 12.0
+- Command List
 
-Set a value like this as a guide.
+  OBAQ.DLL makes the following commands available to HSP.
+  Refer to the help (command reference by F1 key) for how to use each command.
 
-qdamper num, damper, friction Set parameters such as vibration absorption
-
-num (0): Object ID
-damper (0.7): Vibration absorption
-friction (1.0): Friction resistance value
-
-damper (vibration absorption) indicates the ability to suppress shaking when in contact.
-Be sure to set a value between 0.0 and 1.0.
-(No range check)
-Friction is the coefficient of force that decays when objects come into contact with each other.
-The value multiplied by the friction of the contacting object is referenced and calculated.
-Be sure to set a value between 0.0 and 1.0.
-(No range check)
-
-qinertia num, inertia, gravity Set parameters such as inertia
-
-num (0): Object ID
-inertia (0.999): inertia parameter value
-gravity (1.0): Gravity value of the object
-
-Inertia becomes a sticky movement due to resistance generated as it approaches 0.0.
-Become. Be sure to set a value between 0.0 and 1.0.
-(No range check)
-gravity (object gravity) is multiplied by the gravity set in space.
-It is reflected only in the object.
-It is used to apply different gravity only to a specific object.
-Gives weightlessness or antigravity only to specific objects in a way that is impossible in reality
-Therefore, it is effective for character control such as games.
-
-The following command describes the display method when drawing an object with the qdraw command.
-Set.
-
-qmat Set material parameters
-qmat2 Set material detail parameters
-qmat3 Set material display parameters
-
-The following instructions save any number for each user of the object
-Is for. The quser instruction has three integer values, and the quser2 instruction has three integer values.
-It is possible to save 3 real values, a total of 6 values in one object.
-The user is free to decide what to use it for.
-
-quser Set user-defined data
-quser2 Set user-defined data 2
-
-The above is the basic usage.
-
-
-・ Limitations of the current version
-
-The current version has the following restrictions on its use.
-Please note that the operation is not guaranteed when these values are exceeded.
-
-Maximum number of objects: 512
-Total number of vertices of shape data held by all objects: up to 16384
-Number of custom shapes that can be contained in one object: up to 8
-
-
-・ Notes on display
-
-The accuracy of rotating / enlarging / reducing the image by sprite display is low due to the speedup.
-It has become a thing. Sometimes the exact match with the wireframe contour does not occur
-Please note that there is. If you need more precise rotation, DirectX
-It is necessary to take measures such as using.
-Windows system API (GDI) for both wire and sprite display
-Due to the drawing used, movement in units smaller than 1 dot is truncated.
-I will end up. This can cause the object to shake or become unstable.
-If you are concerned about these parts, absorb the blur on the display side if necessary.
-Please take measures such as.
-
-
-・ About OBAQ Model Editor
-
-OBAQ Model Editor is for editing free shapes that can be used with the qaddmodel instruction.
-It's a simple tool.
-obaqme.hsp in the sample / obaq folder with a script editor
-It can be read and executed.
-Please refer to the manual (obaqme.txt) for detailed usage.
-
-
-・ Support with HGIM G3
-
-From ver3.21 of HGIMG3, to display OBAQ object by DirectX
-The function is installed. User writes for OBAQ plugin
-It is possible to change to DirectX display without changing the script.
-This makes it possible to display a large number of objects, reduce the rotation of high-quality sprites, etc.
-In addition, the drawing speed can be improved.
-
-
-・ Instruction list
-
-OBAQ.DLL adds the following instructions to HSP to make it available.
-For the usage of each instruction, refer to the help (instruction reference by F1 key).
-please.
-
-qreset OBAQ initialization
-qterm OBAQ termination processing
-qexec OBAQ frame processing
-qdraw OBAQ drawing process
-qview view settings
-qsetreq system request settings
-qgetreq Get system request
-qgetptr Get system pointer value
-qborder Set the outer wall
-qgravity Set gravity
-qcnvaxis Convert internal coordinates to display coordinates
-qgetaxis Get internal coordinates
-delete qdel object
-qfind object search
-qnext Object search result acquisition
-qcollision Collision acquisition started
-qgetcol Collision acquisition
-qgetcol2 Collision detailed information acquisition
-qgetcol3 Collision detailed information acquisition 2
-qaddpoly Add polygon object
-qaddmodel Add free setting object
-Set qpos position and angle parameters
-qgetpos Get position and angle parameters
-qweight Set parameters such as weight
-qgetweight Get parameters such as weight
-qspeed Set acceleration parameters
-qgetspeed Get acceleration parameters
-qgroup Set group parameters
-qgetgroup Get group parameters
-Set qtype type parameter
-get qgettype type parameter
-qstat Set stat parameter
-get qgetstat stat parameter
-qmat Set material parameters
-get qgetmat material parameters
-qmat2 Set material detail parameters
-qgetmat2 Get material detail parameters
-qmat3 Set material display parameters
-qgetmat3 Get material display parameters
-quser Set user-defined data
-qgetuser Get user-defined data
-quser2 Set user-defined data 2
-qgetuser2 Get user-defined data 2
-qdamper Set parameters such as vibration absorption
-qgetdamper Get parameters such as vibration absorption
-qinertia Set parameters such as inertia
-qgetinertia Get parameters such as inertia
-qpush Empower anywhere
-qblast Gives radial force from anywhere
-qgetversion Get version information
-
-
-揃important point
-
-OBAQ.DLL is a plug-in file that is used at the same time as HSP3.EXE.
-Please use ver3.3 or above as the HSP to use. For HSP ver2.61 and earlier
-Please note that it is not supported.
-Even if you create an EXE file, put OBAQ.DLL in the same directory as the EXE file.
-It will not work unless it is placed in. Also, you cannot add DLLs to the packfile.
-
-
-揃Change log
-
-	2014/04/24 ver3.4β4
-
-Added 2 to the option parameter value of the qspeed instruction.
-Until now, when 1 was specified for the option parameter,
-Twice the specified value was set.
-Therefore, in consideration of compatibility, when 2 is specified in the option value,
-Added the specification that the specified value is set correctly.
-
-	2010/01/28 ver3.21
-
-Added obaqme (simple model creation tool) and samples.
-Added type value, type_autowipe.
-Added qgetptr instruction for OBAQ support in HGIMG3.
-Partially revised copyright and license documents.
-
-	2009/10/19 ver3.2a
-
-Partially modified the sample script.
-
-	2009/8/1 ver3.2
-
-Added mini logo and thumbnail to sample.
-
-	2009/7/24 ver3.2rc1
-
-Fixed a bug that type_inner could not be set correctly in qtype.
-Fixed a bug that loggroup was not reflected in qaddploy.
-Fixed a bug that the color code specified by qmat was not $ RRGGBB.
-Added new sample game, tof2.hsp.
-
-	2009/7/9 ver3.2beta4
-
-First version.
-
-
-揃credit
-
-OBAQ is a physics engine jointly developed by Zener Works, Inc./kuni/onitama.
-If you can help play games that use the laws of physics and give a sense of reality to small movements
-I'm happy.
-By all means, please surprise us by creating something new with OBAQ.
-
-	Zener Works, Inc.
-	http://www.zener.co.jp/
-
-	kuni
-	http://susami.co.jp/
-
-	ONION software
-	http://www.onionsoft.net/
-
-
-・ Copyright and license
-
-OBAQ.DLL is copyrighted by Zener Works, Inc / kuni / onitama.
-In the original software (executable file) created by the user
-When distributing OBAQ.DLL as an attachment, please follow the conditions below.
-
-・ When distributing as free software
-
-You can freely attach OBAQ.DLL and use it.
-It is licensed without the need for reporting or inquiry when using it.
-The copyright notice of the DLL and the OBAQ logo may or may not be displayed.
-
-・ When distributing as a fee (commercially available, shareware)
-
-If the software that uses OBAQ.DLL generates profits that require tax filing,
-You need to obtain a paid license.
-However, it will be distributed only with a small number of distributions and the minimum necessary expenses (media price, etc.).
-In that case, it is considered free of charge, so it is not necessary to obtain a paid license.
-Obtaining a paid license does not always cost money.
-We will individually conclude the specified license agreement according to the number of sales.
-For more information, please email info@hsp.tv.
-
-・ Free / paid common items
-
-We do not guarantee any damage caused by this program.
-Use at your own risk.
-In addition, you can freely modify and publish the attached sample script.
-The OBAQ logo that comes with the sample, regardless of the license type.
-You can freely incorporate (obaqlogo.bmp).
+  `qreset` OBAQ initialization
+  `qterm` OBAQ termination processing
+  `qexec` OBAQ frame processing
+  `qdraw` OBAQ drawing processing
+  `qview` View settings
+  `qsetreq` System request setting
+  `qgetreq` System request acquisition
+  `qgetptr` System pointer value acquisition
+  `qborder` Set the outer wall
+  `qgravity` Set gravity
+  `qcnvaxis` Convert internal coordinates to display coordinates
+  `qgetaxis` Get internal coordinates
+  `qdel` Object deletion
+  `qfind` Object search
+  `qnext` Get object search results
+  `qcollision` Collision acquisition start
+  `qgetcol` Collision acquisition
+  `qgetcol2` Collision detailed information acquisition
+  `qgetcol3` Collision detailed information acquisition 2
+  `qaddpoly` Add polygonal object
+  `qaddmodel` Add free setting object
+  `qpos` Set position and angle parameters
+  `qgetpos` Get position and angle parameters
+  `qweight` Set parameters such as weight
+  `qgetweight` Get parameters such as weight
+  `qspeed` Set acceleration parameters
+  `qgetspeed` Get acceleration parameters
+  `qgroup` Set group parameters
+  `qgetgroup` Get group parameters
+  `qtype` Set type parameters
+  `qgettype` Get type parameters
+  `qstat` Set stat parameters
+  `qgetstat` Get stat parameters
+  `qmat` Set material parameters
+  `qgetmat` Get material parameters
+  `qmat2` Set material detailed parameters
+  `qgetmat2` Get material detailed parameters
+  `qmat3` Set material display parameters
+  `qgetmat3` Get material display parameters
+  `quser` Set user-defined data
+  `qgetuser` Get user-defined data
+  `quser2` Set user-defined data 2
+  `qgetuser2` Get user-defined data 2
+  `qdamper` Set parameters such as damping
+  `qgetdamper` Get parameters such as damping
+  `qinertia` Set parameters such as inertia
+  `qgetinertia` Get parameters such as inertia
+  `qpush` Apply force to an arbitrary location
+  `qblast` Apply force radially from an arbitrary location
+  `qgetversion` Get version information
+
+- Notes
+
+  OBAQ.DLL is a plug-in file that is used simultaneously with HSP3.EXE.
+  Please use HSP ver3.3 or higher. Please note that ver2.61 and earlier HSPs are not supported.
+  Even if you create an EXE file, it will not work unless you place OBAQ.DLL in the same directory as the EXE file. Also, you cannot add DLLs to packfile.
+
+- Update History
+
+  2014/04/24 ver3.4β4
+
+  Added option parameter value 2 to the qspeed command.
+  Until now, when 1 was specified for the option parameter,
+  Twice the specified value was set.
+  For this reason, in consideration of compatibility, when 2 is specified as the option value,
+  Added a specification that the specified value is set correctly.
+
+  2010/01/28 ver3.21
+
+  Added obaame (simple model creation tool) and sample.
+  Added type value, type_autowipe.
+  Added qgetptr command for OBAQ support in HGIMG3.
+  Partially revised copyright and license documents.
+
+  2009/10/19 ver3.2a
+
+  Partially revised the sample script.
+
+  2009/8/1 ver3.2
+
+  Added mini logo and thumbnail to the sample.
+
+  2009/7/24 ver3.2rc1
+
+  Fixed a bug that prevented type_inner from being set correctly with qtype.
+  Fixed a bug that loggroup was not reflected in qaddploy.
+  Fixed a bug that the color code specified by qmat was not $RRGGBB.
+  Added a new sample game, tof2.hsp.
+
+  2009/7/9 ver3.2beta4
+
+  First version.
+
+- Credits
+
+  OBAQ is a physics engine co-developed by Zener Works, Inc./kuni/onitama.
+  We hope that we can help you create games that use the laws of physics and give a sense of realism to small movements.
+  Please surprise us by creating something new with OBAQ.
+
+  Zener Works, Inc.
+  http://www.zener.co.jp/
+
+  kuni
+  http://susami.co.jp/
+
+  ONION software
+  http://www.onionsoft.net/
+
+- Copyright and License
+
+  The copyright of OBAQ.DLL belongs to Zener Works, Inc/kuni/onitama.
+  When distributing OBAQ.DLL attached to the original software (executable file) created by the user, please comply with the following conditions.
+
+  - When distributing as freeware
+
+  You are free to attach and use OBAQ.DLL.
+  It is licensed without the need for reports or inquiries when using it.
+  Displaying the DLL copyright notice and OBAQ logo is optional.
+
+  - When distributing as shareware/commercial software
+
+  If the software using OBAQ.DLL generates profits that require tax filing,
+  A paid license is required.
+  However, if you distribute a small number or only for the minimum necessary expenses (media cost, etc.), we will consider it free of charge, so you do not need to obtain a paid license.
+  Acquiring a paid license does not necessarily require a fee.
+  We will conclude a separate license agreement according to the number of sales.
+  For more information, please contact us by email at info@hsp.tv.
+
+  - Common items for free/paid
+
+  We are not responsible for any damages caused by this program.
+  Please use it at your own risk.
+  You are free to modify and publish the included sample scripts.
+  Regardless of the license type, you are free to incorporate the OBAQ logo (obaqlogo.bmp) included in the sample.
 
 -------------------------------------------------------------------------------
-                                                HSP users manual / end of file 
+                                                HSP users manual / end of file
 -------------------------------------------------------------------------------

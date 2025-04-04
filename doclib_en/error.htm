@@ -1,341 +1,323 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html lang="ja">
+<html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Language" content="en">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
 	<meta name="author" content="OpenHSP3 Project">
-<meta name = "keywords" content = "HSP, HSP3, HotSoupProcessor, HSP3Dish, bug, error">
-<meta name = "description" content = "HSP3 error message">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,HSP3Dish,bug,error">
+	<meta name="description" content="HSP3 Error Messages">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
-<title> HSP3 error message list </title>
+	<title>HSP3 Error Message List</title>
 </head>
 <body>
 	<div id="CONTAINER">
-<!-Header->
+		<!-- Header -->
 		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
 		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
-<h1> HSP3 error message list </h1>
+		<h1>HSP3 Error Message List</h1>
 
-<!-Table of Contents->
+		<!-- Table of Contents -->
 
 
-<!-Body->
+		<!-- Main Content -->
 		<p>
-An error occurred during HSP execution due to a script writing error or a specified error.
-When it is found, the error code and error line number are displayed.
+			When HSP finds an error during execution due to script writing mistakes or specification errors,
+			an error code and error line number will be displayed.
 		</p>
 		<p>
-This document is intended to be used to investigate the cause of an error when it occurs.
-Also, please refer to the following sites.
+			This document is for use in investigating the cause when an error occurs.
+			Please also refer to the following site.
 		</p>
 		<dl>
-<dt> HSP3 FAQ: I don't understand the meaning of the error message and how to deal with it (HSPWiKi) </dt>
+			<dt>HSP3 FAQ: I don't understand the meaning and how to deal with error messages (HSPWiKi)</dt>
 			<dd>
 				<p>
-<a href="http://quasiquote.org/hspwiki/HSP3%e3%81%aeFAQ%3a%e3%82%a8%e3%83%a9%e3%83%bc%e3%83%a1%e3 % 83% 83% e3% 82% bb% e3% 83% bc% e3% 82% b8% e3% 81% ae% e6% 84% 8f% e5% 91% b3% e3% 81% a8% e5% af % be% e5% 87% a6% e6% b3% 95% e3% 81% 8c% e5% 88% 86% e3% 81% 8b% e3% 82% 89% e3% 81% aa% e3% 81% 84 "> http://quasiquote.org/hspwiki/HSP3 FAQ: I don't understand the meaning of the error message and what to do about it </a>
+					<a href="http://quasiquote.org/hspwiki/HSP3%e3%81%aeFAQ%3a%e3%82%a8%e3%83%a9%e3%83%bc%e3%83%a1%e3%83%83%e3%82%bb%e3%83%bc%e3%82%b8%e3%81%ae%e6%84%8f%e5%91%b3%e3%81%a8%e5%af%be%e5%87%a6%e6%b3%95%e3%81%8c%e5%88%86%e3%81%8b%e3%82%89%e3%81%aa%e3%81%84">http://quasiquote.org/hspwiki/HSP3%e3%81%aeFAQ%3a%e3%82%a8%e3%83%a9%e3%83%bc%e3%83%a1%e3%83%83%e3%82%bb%e3%83%bc%e3%82%b8%e3%81%ae%e6%84%8f%e5%91%b3%e3%81%a8%e5%af%be%e5%87%a6%e6%b3%95%e3%81%8c%e5%88%86%e3%81%8b%e3%82%89%e3%81%aa%e3%81%84</a>
 				</p>
 			</dd>
 		</dl>
 		<p>
-The error number and its contents are as follows.
+			The error numbers and their contents are as follows:
 		</p>
 		<dl>
-<dt> 1 "A system error has occurred" </dt>
+			<dt>1 "A system error has occurred"</dt>
 			<dd>
 				<p>
-This error is not normally displayed. If the file is corrupted or
-Displayed when something unexpected happens.
+					This error is usually not displayed. It is displayed when a file is corrupted or
+					an unexpected situation occurs.
 				</p>
 			</dd>
-<dt> 2 "The grammar is wrong" </dt>
+			<dt>2 "Syntax is incorrect"</dt>
 			<dd>
 				<p>
-When the description method of functions and instructions is wrong, or
-Displayed when the variable name or label name is incorrect.
+					Displayed when the description method of functions and commands is incorrect, or
+					when variable names or label names are incorrect.
 				</p>
 			</dd>
-<dt> 3 "The parameter value is abnormal" </dt>
+			<dt>3 "Parameter value is abnormal"</dt>
 			<dd>
 				<p>
-Displayed when the value of the parameter is out of tolerance.
+					Displayed when the parameter value exceeds the allowable range.
 				</p>
 			</dd>
-<dt> 4 "An error occurred in the calculation formula" </dt>
+			<dt>4 "An error occurred in the calculation formula"</dt>
 			<dd>
 				<p>
-Trying to write a calculation formula incorrectly, or try to use a symbol or operation that cannot be used
-It will be displayed when you do.
+					Displayed when the calculation formula is written incorrectly or when trying to use
+					unusable symbols or operations.
 				</p>
 			</dd>
-<dt> 5 "Parameters cannot be omitted" </dt>
+			<dt>5 "Parameter omission is not allowed"</dt>
 			<dd>
 				<p>
-Displayed when the part where the parameter cannot be omitted is omitted.
+					Displayed when a part where parameter omission is not allowed is omitted.
 				</p>
 			</dd>
-<dt> 6 "Parameter type is different" </dt>
+			<dt>6 "Parameter type is different"</dt>
 			<dd>
 				<p>
-The type specified in the parameter (string type, numeric type, etc.) is not specified
-It is displayed at times. If a variable is specified, the variable type is incorrect.
+					Displayed when the type specified for the parameter (string type, numeric type, etc.) is not the specified one.
+					If a variable is specified, the variable type is incorrect.
 				</p>
 			</dd>
-<dt> 7 "Invalid array elements" </dt>
+			<dt>7 "Array element is invalid"</dt>
 			<dd>
 				<p>
-The value specified as an array element is the number set by the dim, sdim instruction, etc.
-It is displayed when it is exceeded.
+					Displayed when the value specified as an array element exceeds the number set by the dim or sdim commands.
 				</p>
 			</dd>
-<dt> 8 "No valid label specified" </dt>
+			<dt>8 "No valid label is specified"</dt>
 			<dd>
 				<p>
-If the parameter to be specified as a label is incorrect, or
-It is displayed when there is nothing after the "*" that indicates the label.
+					Displayed when the parameter that should be specified as a label is incorrect, or
+					when there is nothing after the "*" indicating the label.
 				</p>
 			</dd>
-<dt> 9 "Subroutines and loops are nested too deeply" </dt>
+			<dt>9 "Subroutine or loop is nested too deeply"</dt>
 			<dd>
 				<p>
-It is displayed when the gosub instruction and repeat instruction are executed too many times.
+					Displayed when the gosub command or repeat command is executed too many times.
 				</p>
 			</dd>
-<dt> 10 "Return outside the subroutine is invalid" </dt>
+			<dt>10 "Return outside of subroutine is invalid"</dt>
 			<dd>
 				<p>
-It is displayed when the return instruction is executed even though it is not called by the gosub instruction.
+					Displayed when the return command is executed without being called by the gosub command.
 				</p>
 			</dd>
-<dt> 11 "loop outside repeat is invalid" </dt>
+			<dt>11 "Loop outside of repeat is invalid"</dt>
 			<dd>
 				<p>
-It is displayed when the loop instruction is executed even though there is no repeat instruction.
+					Displayed when the loop command is executed without the repeat command.
 				</p>
 			</dd>
-<dt> 12 "File not found or invalid name" </dt>
+			<dt>12 "File not found or invalid name"</dt>
 			<dd>
 				<p>
-Did the specified file not be found when performing a file operation?
-Or it is displayed when the file is inaccessible.
+					Displayed when the specified file cannot be found or
+					is an inaccessible file when performing file operations.
 				</p>
 			</dd>
-<dt> 13 "No image file" </dt>
+			<dt>13 "Image file not found"</dt>
 			<dd>
 				<p>
-Displayed when the image file to be loaded by the picload command cannot be found.
+					Displayed when the image file to be loaded by the picload command cannot be found.
 				</p>
 			</dd>
-<dt> 14 "Error calling external file" </dt>
+			<dt>14 "Error during external file call"</dt>
 			<dd>
 				<p>
-When something goes wrong when calling an external file with the exec instruction
-It shows.
+					Displayed when a problem occurs when calling an external file with the exec command.
 				</p>
 			</dd>
-<dt> 15 "The description in parentheses is different in the calculation formula" </dt>
+			<dt>15 "Parentheses are incorrectly described in the calculation formula"</dt>
 			<dd>
 				<p>
-The format of the parentheses "(,)" used in the calculation formula is incorrect, or the correspondence is incorrect.
-It is displayed when something is wrong.
+					Displayed when the format of the parentheses "(, )" used in the calculation formula is incorrect, or the correspondence is
+					strange.
 				</p>
 			</dd>
-<dt> 16 "Too many parameters" </dt>
+			<dt>16 "Too many parameters"</dt>
 			<dd>
 				<p>
-Displayed when the number of parameters specified in the instruction is too large.
+					Displayed when there are too many parameters specified for the command.
 				</p>
 			</dd>
-<dt> 17 "The number of characters that can be handled by a string expression has been exceeded" </dt>
+			<dt>17 "Exceeded the number of characters that can be handled in a string expression"</dt>
 			<dd>
 				<p>
-It is displayed when the allowable amount for handling character strings is exceeded.
+					Displayed when the allowable amount for handling strings is exceeded.
 				</p>
 			</dd>
-<dt> 18 "Specifying a variable name that cannot be assigned" </dt>
+			<dt>18 "Specifying a variable name that cannot be assigned to"</dt>
 			<dd>
 				<p>
-Displayed when trying to assign to a system variable or reserved keyword.
+					Displayed when trying to assign to a system variable or reserved keyword.
 				</p>
 			</dd>
-<dt> 19 "Divided by 0" </dt>
+			<dt>19 "Divided by 0"</dt>
 			<dd>
 				<p>
-Displayed when trying to divide by 0.
+					Displayed when trying to divide by 0.
 				</p>
 			</dd>
-<dt> 20 "A buffer overflow has occurred" </dt>
+			<dt>20 "Buffer overflow occurred"</dt>
 			<dd>
 				<p>
-When the size secured by the sdim instruction or the dim instruction is exceeded due to a character string variable,
-Displayed when trying to access beyond the variable buffer.
+					Displayed when the size secured by the sdim command or dim command for a string variable is exceeded, or
+					when trying to access beyond the variable buffer.
 				</p>
 			</dd>
-<dt> 21 "You have selected an unsupported feature" </dt>
+			<dt>21 "Selected an unsupported feature"</dt>
 			<dd>
 				<p>
-When trying to execute a semi-transparent copy in palette mode with the gcopy command, etc.
-Displayed when settings that are not supported as a function are made.
+					Displayed when settings are made that are not supported as functions, such as when trying to perform semi-transparent copying in palette mode with the gcopy command.
 				</p>
 			</dd>
-<dt> 22 "The parentheses in the formula are too deep" </dt>
+			<dt>22 "Calculation formula has too many parentheses"</dt>
 			<dd>
 				<p>
-If the formula is too complicated and stackover occurs during evaluation
-It is displayed when the calculation is not performed correctly for some reason.
-Normally, it is not displayed. If you see this,
-Indicates that the system has encountered a fatal error.
+					Displayed when the calculation formula is too complex and a stack overflow occurs during evaluation, or
+					when the calculation cannot be performed correctly for some reason.
+					Normally, it will not be displayed. If this is displayed, it indicates that a fatal error has occurred in the system.
 				</p>
 			</dd>
-<dt> 23 "Variable name not specified" </dt>
+			<dt>23 "No variable name specified"</dt>
 			<dd>
 				<p>
-If there is an incorrect description in the place where the variable name should be specified as a parameter
-It shows.
+					Displayed when an incorrect description is written in a place where a variable name should be specified as a parameter.
 				</p>
 			</dd>
-<dt> 24 "A non-integer is specified" </dt>
+			<dt>24 "Non-integer value specified"</dt>
 			<dd>
 				<p>
-When another type is found where only integers should be specified for the parameter
-It shows.
+					Displayed when another type is detected in a place where only an integer should be specified as a parameter.
 				</p>
 			</dd>
-<dt> 25 "The element format of the array is incorrect" </dt>
+			<dt>25 "Array element format is incorrect"</dt>
 			<dd>
 				<p>
-If the array element is written incorrectly, or if the array element is written
-It is displayed when it is written in a bad place.
+					Displayed when the way to write array elements is incorrect, or when array elements are written in a place where they should not be written.
 				</p>
 			</dd>
-<dt> 26 "Memory could not be allocated" </dt>
+			<dt>26 "Could not allocate memory"</dt>
 			<dd>
 				<p>
-Displayed when the physical memory of the system could not be secured.
-If this is displayed, it is a fatal error.
+					Displayed when the system cannot allocate physical memory.
+					If this is displayed, it is a fatal error.
 				</p>
 			</dd>
-<dt> 27 "Type initialization failed" </dt>
+			<dt>27 "Type initialization failed"</dt>
 			<dd>
 				<p>
-It is displayed when the initialization of the standard type and the extended type by the plug-in fails.
-If you see this, it means that your system has a fatal error.
-is showing.
+					Displayed when initialization of standard types and extended types by plugins fails.
+					If this is displayed, it indicates that there is a fatal error in the system.
 				</p>
 			</dd>
-<dt> 28 "No arguments set for function" </dt>
+			<dt>28 "No arguments set for function"</dt>
 			<dd>
 				<p>
-Displayed when function parameters are not written correctly.
+					Displayed when function parameters are not written correctly.
 				</p>
 			</dd>
-<dt> 29 "Stack area overflow" </dt>
+			<dt>29 "Stack overflow"</dt>
 			<dd>
 				<p>
-The stack was corrupted during a subroutine call or expression evaluation process
-Will be displayed if. Normally, it is not displayed.
-If you see this, it means that your system has encountered a fatal error.
-is showing.
+					Displayed when the stack is destroyed during subroutine calls or expression evaluation.
+					Normally, it will not be displayed.
+					If this is displayed, it indicates that a fatal error has occurred in the system.
 				</p>
 			</dd>
-<dt> 30 "Invalid name specified for parameter" </dt>
+			<dt>30 "Invalid name specified for parameter"</dt>
 			<dd>
 				<p>
-Displayed when an invalid name is used as a parameter.
-It is also displayed when an alias or local variable that does not exist is referenced.
-You may.
+					Displayed when an invalid name is used as a parameter.
+					It may also be displayed if a non-existent alias or local variable is referenced.
 				</p>
 			</dd>
-<dt> 31 "Assigned to an array variable with a different type" </dt>
+			<dt>31 "Assigned to an array variable with a different type"</dt>
 			<dd>
 				<p>
-When you try to assign a value of a type different from the initialized type to the array
-It shows.
+					Displayed when trying to assign a value of a different type than the initialized type to an array.
 				</p>
 			</dd>
-<dt> 32 "Invalid function parameter description" </dt>
+			<dt>32 "Invalid function parameter description"</dt>
 			<dd>
 				<p>
-When the parameter format of the function is incorrect or when the parentheses are missing
-It shows.
+					Displayed when the function parameter format is incorrect or there are not enough parentheses.
 				</p>
 			</dd>
-<dt> 33 "Too many objects" </dt>
+			<dt>33 "Too many objects"</dt>
 			<dd>
 				<p>
-The object placed in the window has exceeded the set limit
-Will be displayed if.
+					Displayed when the number of objects placed in a window exceeds the set limit.
 				</p>
 			</dd>
-<dt> 34 "Type that cannot be used as an array / function" </dt>
+			<dt>34 "Type cannot be used as array/function"</dt>
 			<dd>
 				<p>
-If you specify an array with a type that does not support arrays, or
-Displayed when trying to use a non-function keyword as a function.
+					Displayed when an array specification is made with a type that does not support arrays, or
+					when trying to use a keyword that is not a function as a function.
 				</p>
 			</dd>
-<dt> 35 "No module variable specified" </dt>
+			<dt>35 "No module variable specified"</dt>
 			<dd>
 				<p>
-Wrong content where module variables should be specified for parameters
-Displayed if written.
+					Displayed when incorrect content is written in a place where a module variable should be specified as a parameter.
 				</p>
 			</dd>
-<dt> 36 "Invalid module variable specification" </dt>
+			<dt>36 "Module variable specification is invalid"</dt>
 			<dd>
 				<p>
-The module variable specified in the parameter is the wrong module
-Displayed if initialized.
-Normally, it is not displayed. If you see this,
-Indicates that the system has encountered a fatal error.
+					Displayed when the module variable specified as a parameter is initialized with the wrong module.
+					Normally, it will not be displayed. If this is displayed, it indicates that a fatal error has occurred in the system.
 				</p>
 			</dd>
-<dt> 37 "Failed to convert variable type" </dt>
+			<dt>37 "Failed to convert variable type"</dt>
 			<dd>
 				<p>
-Unable to convert variable or value type or not supported
-Will be displayed if.
+					Displayed when the type of a variable or value could not be converted or is not supported.
 				</p>
 			</dd>
-<dt> 38 "Failed to call external DLL" </dt>
+			<dt>38 "Failed to call external DLL"</dt>
 			<dd>
 				<p>
-Displayed when the address of the function call destination of the external DLL fails to be obtained.
+					Displayed when the attempt to retrieve the address for the function call to an external DLL fails.
 				</p>
 			</dd>
-<dt> 39 "Failed to call external object" </dt>
+			<dt>39 "Failed to call external object"</dt>
 			<dd>
 				<p>
-Displayed when an error occurs while calling a COM object.
+					Displayed when an error occurs while calling a COM object.
 				</p>
 			</dd>
-<dt> 40 "The return value of the function has not been set." </dt>
+			<dt>40 "No return value set for function."</dt>
 			<dd>
 				<p>
-In the script defined as a user function, with the return instruction
-Displayed when the return value has not been set.
+					Displayed when the return command does not set a return value in a script defined as a user function.
 				</p>
 			</dd>
-<dt> 41 "The function is described as an instruction." </dt>
+			<dt>41 "Describing a function as a command."</dt>
 			<dd>
 				<p>
-Displayed when the keyword defined as a function is described in the instruction format.
-Wrongly written instruction name or wrong functioned name from HSP2
-You may be using it.
+					Displayed when a keyword defined as a function is described in the format of a command.
+					The command name may have been misspelled, or a name that has been functionalized from HSP2 may have been mistakenly
+					used.
 				</p>
 			</dd>
-<dt> 42 "Instruction not available in callback" </dt>
+			<dt>42 "Command cannot be used within callback"</dt>
 			<dd>
 				<p>
-Displayed when an instruction that cannot be used while executing a callback routine such as interrupt or termination processing is described.
-See the programming manual for more information on callback routines.
+					Displayed when a command that cannot be used is described while executing a callback routine such as an interrupt or termination process.
+					Please see the programming manual for details on callback routines.
 				</p>
 			</dd>
-<!-Footer->
+		<!-- Footer -->
 		<ul id="FOOTER">
-<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
-<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="#CONTAINER">Back to the top of this page</a></li>
+			<li><a href="../index.htm">Back to the document list</a></li>
 			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
 		</ul>
 		<a href="https://www.onionsoft.net/hsp/">

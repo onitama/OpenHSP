@@ -1,424 +1,87 @@
-;
-;HELP source file for HSP help manager
-;(Lines beginning with ";" are treated as comments)
-;
-
-%type
-Built-in instructions
-%ver
-3.6
-%note
-ver3.6 standard instruction
-%date
-2009/08/01
-%author
-onitama
-%url
-http://hsp.tv/
-%port
-Win
-Cli
-
-
-
-
-%index
-alloc
-Allocate a buffer
+Special memory assignment to a variable
 %group
-Memory management instructions
+Special assignment instructions
 %prm
-p1,p2
-p1 = variable: variable name to allocate the buffer
-p2 = 1 to (64): Buffer size (in Byte)
+Variable name, Source, Type ID
+Variable name : Variable to assign memory to
+Source : Variable or address to use as source
+Type ID : Variable type to assign (omit: current type)
 
 %inst
-Create a buffer in memory and assign it to a variable.
-The assigned variable will be of type string.
+Assigns special memory to a variable.
+The variable name will be associated with memory that is specified in "Source".
 ^
-This instruction is provided for compatibility with past HSP instructions.
-In general, it is recommended to use the sdim instruction.
+This is used for dynamically manipulating variables, and for data sharing with external DLLs. It is also a more advanced version of the "dup" instruction.
+^p
+(Example)
+	mref a,b		; Make "a" refer to variable "b"
+	mref a,p1,10		; Assign memory address "p1" as a 10-element integer array to "a"
+^p
+When accessing external DLL functions, memory pointers can be received as a variable.
+In that case, memory access using the mref instruction is required, as follows:
+^p
+	; (Example)
+	; "test.dll" sample DLL declaration
+	;
+	; int GetBuffer(int** buffer, int* size);
+	;  buffer  : Address to the buffer (*Receive address in C language)
+	;  size    : Size of the buffer (*Receive size in C language)
+	;
+	#uselib "test.dll"
+	#func GetBuffer "GetBuffer" int, var
+		
+	size = 0
+	GetBuffer varptr, varptr(size)
+	mref buffer, var, 1
+	mes "Buffer Size:"+size
+	mes "Buffer Contents:"+buffer(0)
+^p
+The vartype function returns type IDs.
 ^
-* This instruction is defined in hspdef.as as a macro.
+When type ID is omitted, the current variable type is maintained.
+When a variable is assigned to Source, the variable type will be the same as the Source's type.
+^
+When a variable name is assigned to Source, changes to Source will also affect the contents of the assigned variable.
+The assigned variable will point to the internal buffer of Source, so changing Source (such as string buffer expansion or array resizing) will break the connection.
 
 %href
-sdim
-memexpand
-%port+
-Let
-
-
-
-%index
-dim
-Create array variable
-%group
-Memory management instructions
-%prm
-p1,p2...
-p1 = variable: variable name to which the array is assigned
-p2 = 0 ~: Maximum of element
-
-%inst
-Create an array variable with arbitrary elements.
-^p
-example:
-	dim a,20
-^p
-In the above example, 20 elements of variable a, that is, "a (0)" to "a (19)" are reserved in advance.
-^
-It is also possible to create a multidimensional array by increasing the parameters.
-^p
-example:
-dim a, 10,5: Variable a is a two-dimensional array
-a (0,0) = 1: Substitute 1 for element (0,0)
-a (1,0) = 2: Substitute 2 for element (1,0)
-a (0,1) = 3: Substitute 3 for element (0,1)
-^p
-In the above example, you can use from a (0,0) to a (9,4).
-A multidimensional array can be secured up to 4 dimensions.
-^
-The dim instruction can be defined and redefined anywhere in the script.
-Also, when you create an array variable, all the contents are cleared to 0.
-
-%href
-sdim
-ddim
-ldim
-dimtype
-%port+
-Let
-
-
-
-
-%index
-dimtype
-Create an array variable of the specified type
-%group
-Memory management instructions
-%prm
-p1,p2,p3...
-p1 = variable: variable name to which the array is assigned
-p2 = type type: variable type type
-p3 = 0 ~: Maximum of elements
-
-%inst
-Create an array variable with arbitrary elements.
-It behaves like the dim instruction, but dimtype allows you to specify the type of a variable.
-For p2, you must specify a type type value that indicates the variable type.
-The type type value can be obtained from the type name string with the vartype function.
-^p
-example :
-	dimtype a,vartype("double"),20
-^p
-In the above example, 20 elements of the real number type variable a, that is, "a (0)" to "a (19)" are reserved in advance.
-It is possible to secure a multidimensional array like the dim instruction.
-A multidimensional array can be secured up to 4 dimensions.
-
-%href
-dim
-sdim
-ddim
-ldim
+dup
+dupptr
 vartype
+varptr
+dllfunc
+dllproc
 %port+
 Let
-
-
-
-%index
-poke
-Write 1 byte to the buffer
-%group
-Memory management instructions
-%prm
-p1,p2,p3
-p1 = variable: variable name to which the buffer is allocated
-p2 = 0 ~: Buffer index (in Byte)
-p3 (0): Value to be written to the buffer or character string (in Byte)
-
-%inst
-Rewrites the contents of 1 byte anywhere on the data memory stored in the variable.
-^
-Writes the value of p3 to the index location specified by p2 on the buffer of the variable specified by p1. The value is a 1-byte (8-bit) value from 0 to 255.
-^
-If a character string is specified in p3, the character string data is expanded in memory and the length of the written character string is returned in strsize.
-
-
-%href
-wpoke
-lpoke
-%port+
-Let
-
-
-
-%index
-wpoke
-Write 2 bytes to the buffer
-%group
-Memory management instructions
-%prm
-p1,p2,p3
-p1 = variable: variable name to which the buffer is allocated
-p2 = 0 ~: Buffer index (in Byte)
-p3 = 0 to (0): Value to be written to the buffer (16-bit integer value)
-
-%inst
-Rewrites the contents of 2 bytes anywhere in the data memory stored in the variable.
-^
-Writes the value of p3 to the index location specified by p2 on the buffer of the variable specified by p1. The value is a 2-byte (16-bit) value from 0 to 65535.
-
-%href
-poke
-lpoke
-%port+
-Let
-
-
-
-%index
-lpoke
-Write 4 bytes to the buffer
-%group
-Memory management instructions
-%prm
-p1,p2,p3
-p1 = variable: variable name to which the buffer is allocated
-p2 = 0 ~: Buffer index (in Byte)
-p3 = 0 to (0): Value to be written to the buffer (32-bit integer value)
-
-%inst
-Rewrites the contents of 4 bytes anywhere on the data memory stored in the variable.
-^
-Writes the value of p3 to the index location specified by p2 on the buffer of the variable specified by p1. The value is a 4-byte (32-bit) value from 0 to $ ffffffff.
-
-%href
-poke
-wpoke
-%port+
-Let
-
-
-
-
-%index
-sdim
-Create a string type array variable
-%group
-Memory management instructions
-%prm
-p1,p2,p3...
-p1 = variable: variable name to which the array is assigned
-p2 = 1 ~: Default number of characters
-p3 = 0 ~: Maximum of elements
-
-%inst
-Create a string type array variable.
-The difference from the dim instruction is that the parameter of p2 is "default number of characters in the string", and the maximum number of actual array elements is entered after the parameter of p3.
-^p
-example :
-sdim a, 5000; Variable a pre-allocates memory for 5000 characters
-^p
-In the above example, the variable a reserves memory for 5000 characters and is not an array variable.
-The default number of characters is that by specifying the memory to be reserved in advance, extra processing will not be required during automatic expansion.
-If the default number of characters is small, the string buffer will be reallocated many times each time a long string is assigned, which may reduce efficiency.
-^
-In the case of a multidimensional array, it is possible to secure up to 4 dimensions separately from the number of characters.
-The sdim instruction can be defined and redefined anywhere in the script.
-Also, when you create an array variable, all the contents are cleared to 0.
-
-%href
-dim
-ddim
-ldim
-dimtype
-%port+
-Let
-
-
-
-%index
-ddim
-Create a real array variable
-%group
-Memory management instructions
-%prm
-p1,p2...
-p1 = variable: variable name to which the array is assigned
-p2 = 0 ~: Maximum of element
-
-%inst
-Create a real array variable.
-The parameter specifies the maximum number of elements, similar to the dim instruction.
-^p
-example :
-ddim a, 100; Variable a allocates a real type array from a (0) to a (99)
-^p
-It is possible to secure a multidimensional array in the same way as the dim instruction.
-A multidimensional array can be secured up to 4 dimensions.
-The ddim instruction can be defined and redefined anywhere in the script.
-Also, when you create an array variable, all the contents are cleared to 0.
-^
-* This instruction is defined in hspdef.as as a macro.
-
-%href
-dim
-sdim
-ldim
-dimtype
-%port+
-Let
-
-
-
-%index
-memcpy
-Copy of memory block
-%group
-Memory management instructions
-%prm
-p1,p2,p3,p4,p5
-p1: Copy destination variable
-p2: Copy source variable
-p3: Copy size (1 byte unit)
-p4: Copy destination variable memory offset (default = 0)
-p5: Copy source variable memory offset (default = 0)
-
-%inst
-In the memory area allocated to the variable specified by p1
-Copies the contents of memory allocated to the variable specified by p2.
-The size to be copied (1 byte unit) is specified by p3.
-High-speed memory copy can be performed when a large area is allocated to a variable.
-With p4 and p5, the copy destination and copy source start positions can be adjusted in 1-byte units.
-If a specification that exceeds the area reserved by the variable is specified, a buffer overflow error will occur.
-
-
-%href
-memset
-memexpand
-%port+
-Let
-
-
-%index
-memset
-Clear memory block
-%group
-Memory management instructions
-%prm
-p1,p2,p3,p4
-p1 = variable: variable to write to
-p2 = 0 to 255 (0): Value to clear (1 byte)
-p3 = 0 to (0): Clear size (1 byte unit)
-p4 = 0 to (0): Variable memory offset of write destination
-
-%inst
-Fill the memory block with a fixed value of 1 byte.
-Writes the value specified by p2 to the memory area allocated to the variable specified by p1 by the size of p3. This is useful when you want to write the same value in a large area. With p4, you can adjust the memory start position in 1-byte units.
-If a specification that exceeds the area reserved by the variable is specified, a buffer overflow error will occur.
-
-%href
-memcpy
-memexpand
-%port+
-Let
-
-
-
-%index
-dup
-Create clone variable
-%group
-Special assignment instruction
-%prm
-Variable name 1, variable name 2
-Variable name 1: Variable name to clone
-Variable name 2: Clone source variable name
-
-%inst
-Create a variable that points to the memory of the source variable.
-The clone variable will now function as a variable for referencing the memory information of the clone source.
-^
-If the type of the clone source is changed, the array is expanded, or the string buffer is expanded, the clone operation will not be performed.
-Note that the clone is valid only until the source variable is assigned.
-The dup instruction remains a feature for maintaining compatibility with previous versions and for low-level variable buffer operations.
-There is also a dupptr instruction that creates a clone variable directly from the memory address.
-We do not recommend the dup instruction for beginners.
-%href
-mref
-dupptr
-%port+
-Let
-
-
-
-%index
-dupptr
-Create clone variable from pointer
-%group
-Special assignment instruction
-%prm
-Variable name, p1, p2, p3
-Variable name: Variable name to clone
-p1 = 0 ~: Memory address of clone source
-p2 = 0 ~: Memory size of clone source
-p3 = 1 ~ (4): Clone variable type specification
-
-%inst
-Creates a variable that points to the specified address pointer.
-Clone variables will now act as numeric array variables for referencing information in memory.
-^
-You can specify the type of clone variable created by p3.
-The value of p3 is the same as the value that indicates the type obtained by the vartype function. If p3 is omitted, it will be 4 (integer type).
-^
-Clone variables cannot detect changes in the location of the memory they are pointing to.
-For example, even if you point to the memory address of the data stored in a variable, it cannot be referenced correctly if the variable's type or contents are updated and the memory location changes.
-Use it only for temporary memory references, and handle it with care. The dupptr instruction is provided as a function for performing memory references and low-level variable buffer operations exchanged by external functions such as DLLs.
-We do not recommend the dupptr instruction for beginners.
-
-%href
-mref
-dup
-
-
-
-%index
-mref
-Allocate special memory to variables
-%group
-Special assignment instruction
-%prm
 p1,p2
-p1 = variable name: variable name to be assigned
-p2 = 0 to (0): Resource ID (memory contents to be allocated)
+p1=Variable name : Variable name to be assigned
+p2=0Å`(0) : Resource ID (Memory content to be assigned)
 
 %inst
-Allocates the memory contents specified in p2 to the variables specified in p1.
+Assigns the memory content specified by p2 to the variable specified by p1.
 ^p
-     Value: Corresponding resource
+     Value  : Corresponding resource
  --------------------------------------------------
-   0 to 7: Local parameter # 1 to 8 (numerical value)
-    64: System variable stat
-    65: System variable refstr
-    66: Image data in the window (VRAM)
-    67: Current window information (BMSCR structure)
-    68: HSP system information (HSPCTX structure)
-    69: Palette information
-    96 ~: Information of window ID0 ~ (BMSCR structure)
+   0Å` 7 : Local parameter #1Å`8(Numeric)
+    64   : System variable stat
+    65   : System variable refstr
+    66   : In-window image data (VRAM)
+    67   : Current window information (BMSCR structure)
+    68   : HSP system information (HSPCTX structure)
+    69   : Palette information
+    96Å` : Window ID 0Å` information (BMSCR structure)
 ^p
-If the system variable with resource ID 64,65 is set to "mref a, 64", for example, the variable a becomes equivalent to the system variable stat, and a value can be assigned. This makes it possible to reflect the calculation results in user-defined instructions in system variables and return them to the caller.
+The system variables with resource IDs 64 and 65, for example, "mref a,64", will make the variable a equivalent to the system variable stat, allowing you to assign values to it. This allows you to reflect the calculation results within a user-defined command to the system variable and return it to the caller.
 ^
-The image data (VRAM data) in the window of resource 66 is an array variable containing the displayed image.
-This makes it possible to directly access the image data with the poke, peek commands, etc.
+The in-window image data (VRAM data) of resource 66 becomes an array variable containing the displayed image.
+This allows direct access to image data using poke and peek commands.
 ^
-Resources 67 and above will also give you direct access to HSP internal data, but usually you don't need to use it. It is provided for very limited purposes, such as preparing parameters for passing to a DLL, and should not be used by most people.
+Similarly, resource 67 and later allow direct access to HSP's internal data, but it is usually not necessary to use them. They are prepared for very limited purposes, such as preparing parameters to be passed to DLLs, and most people will not use them.
 ^
-The local parameter is for getting the parameter contents of the newly added instruction by the user-defined instruction (#deffunc).
-It can be obtained according to the parameter type (number, variable, string).
-Local parameter acquisition is provided for compatibility with parameter acquisition methods up to HSP2.x. (Some resource types are not compatible.)
-In HSP3.0 or later, it is recommended to use the alias function of the user-defined instruction (#deffunc).
+Local parameters are used to obtain the parameter content of newly added commands in user-defined commands (#deffunc).
+It is possible to obtain them according to the parameter type (numeric, variable, string).
+Local parameter acquisition is provided for compatibility with parameter acquisition methods up to HSP2.x (some resource types are not compatible).
+For HSP3.0 and later, it is recommended to use the alias function of user-defined commands (#deffunc).
 %href
 dup
 dupptr
@@ -426,42 +89,41 @@ dupptr
 %port+
 Let
 %portinfo
-Only stat / refstr can be used during HSPLet.
-It cannot be used as a function argument, so please use the 3.0 format.
-
+Only stat/refstr can be used when using HSPLet.
+It cannot be used for function arguments, so please use the 3.0 format for receiving values.
 
 %index
 newmod
-Creating modular variables
+Create a module type variable
 %group
-Memory management instructions
+Memory management commands
 %prm
 p1,p2,p3...
-p1: Variable name
-p2: Module name
-p3 ...: Initialization parameters
+p1    : Variable name
+p2    : Module name
+p3... : Initialization parameters
 
 %inst
-Adds an element with the variable specified in p1 as a module type.
-If the variable in p1 is not modular, it will be initialized as modular.
-If it is already modular, add new elements as array variables.
-You can specify the module name already registered in p2, and specify the initialization parameters after p3.
-Module variables provide a new way of storing data that allows you to manage multiple variables and data together.
+Adds an element to the variable specified by p1 as a module type.
+If the variable p1 is not a module type, it is initialized as a module type.
+If it is already a module type, new elements are added as an array variable.
+You can specify a module name that has already been registered in p2, and specify initialization parameters in p3 and later.
+Module variables provide a new data storage method that allows you to manage multiple variables and data together.
 ^p
-example :
+Example:
 	#module a x,y,z
 ^p
-In the above example, a module called a has three variables, x, y, and z.
-A variable with the module type a contains all the variables x, y, and z, and can be handled by the module processing instruction (#modfunc).
+In the above example, the module "a" has three variables: x, y, and z.
+A variable with the module type "a" contains all the variables x, y, and z, and can be handled by module processing commands (#modfunc).
 ^p
-example :
+Example:
 	newmod v,a
 ^p
-The above example initializes the variable v for module "a".
-Now, the variable v contains the entire contents of the module variables x, y, z of the module "a".
-If an initialization instruction (#modinit) is prepared for each module, the parameters after p3 are passed to the initialization instruction.
+In the above example, the variable v for the module "a" is initialized.
+The variable v now contains the entire content of the module variables x, y, and z of the module "a".
+If an initialization command (#modinit) is prepared for each module, the parameters p3 and later are passed to the initialization command.
 ^p
-example :
+Example:
 	#module a x,y,z
 	#modinit int p1,int p2,int p3
 	x=p1:y=p2:z=p3
@@ -469,8 +131,7 @@ example :
 	#global
 	newmod v,a,1,2,3
 ^p
-Modular variables can be manipulated with newmod and delmod instructions, and can handle complex data concisely with foreach instructions.
-
+Elements of module-type variables can be manipulated with the newmod and delmod commands, and complex data can be processed simply with commands such as foreach.
 
 %href
 #modfunc
@@ -479,82 +140,75 @@ Modular variables can be manipulated with newmod and delmod instructions, and ca
 delmod
 foreach
 
-
-
 %index
 delmod
-Delete elements of modular variables
+Delete an element of a module type variable
 %group
-Memory management instructions
+Memory management commands
 %prm
 p1
-p1: Variable name
+p1 : Variable name
 
 %inst
-Deletes the element of the modular variable specified in p1.
-p1 must be a variable that is already set as modular.
+Deletes the element of the module-type variable specified by p1.
+p1 must be a variable that has already been set as a module type.
 ^p
-example :
+Example:
 	delmod v.1
 ^p
-The delmod instruction calls automatically if a release routine (destructor) is defined by the #modterm instruction.
-For more information on modular variables, see the newmod instruction help and programming manual (hspprog.htm).
-
+The delmod command automatically calls the release routine (destructor) if it is defined by the #modterm command.
+For details on module-type variables, please refer to the help for the newmod command and the programming manual (hspprog.htm).
 
 %href
 #modterm
 newmod
 
-
-
 %index
 memexpand
-Reallocate memory blocks
+Reallocate memory block
 %group
-Memory management instructions
+Memory management commands
 %prm
 p1,p2
-p1 = variable: variable of interest
-p2 = 0 to (64): Reserved size (1 byte unit)
+p1 = Variable    : Target variable
+p2 = 0Å`(64) : Reallocation size (in 1-byte units)
 
 %inst
-Reallocates the memory area of the variable specified by p1.
-The system automatically allocates a memory area such as when assigning, but it is used when explicitly changing the size.
-Even if you re-allocate, the previous contents will be retained.
-In p2, specify the reallocated size. If the value of p2 is less than 64, it will be automatically adjusted to 64. If you specify a value smaller than the size already reserved, nothing is done.
-The variable specified by p1 must be of a type that can dynamically change the memory allocation amount, such as the string type (str).
-If the type cannot be reallocated, an error will occur.
+Reallocates the memory area that the variable specified by p1 has.
+Memory area allocation during assignment, etc. is done automatically by the system, but this is used to explicitly change the size.
+Even if reallocation is performed, the previous contents are retained.
+Specify the reallocation size in p2. If the value of p2 is less than 64, it is automatically adjusted to 64. If you specify a value smaller than the already allocated size, nothing is done.
+The variable specified by p1 must be a type that can dynamically change the amount of memory allocated, such as a string type (str).
+An error will occur if the reallocation cannot be performed for the specified type.
 
 %href
 memcpy
 memset
 alloc
 
-
-
 %index
 ldim
 Create a label type array variable
 %group
-Memory management instructions
+Memory management commands
 %prm
 p1,p2...
-p1 = variable: variable name to which the array is assigned
-p2 = 0 ~: Maximum of element
+p1=Variable : Variable name to assign the array to
+p2=0Å`  : Maximum number of elements
 
 %inst
-Create a label type array variable.
-The parameter specifies the maximum number of elements, similar to the dim instruction.
+Creates a label-type array variable.
+The parameters specify the maximum number of elements, just like the dim command.
 ^p
-example :
-ldim a, 100; Variable a allocates a labeled array from a (0) to a (99)
+Example :
+	ldim a,100 ; Variable a secures a label type array from a(0) to a(99)
 ^p
-It is possible to secure a multidimensional array in the same way as the dim instruction.
-A multidimensional array can be secured up to 4 dimensions.
-The ldim instruction can be defined and redefined anywhere in the script.
-Also, when you create an array variable, all the contents are cleared to the "undefined" state.
+It is possible to secure multi-dimensional arrays in the same way as the dim command.
+Multi-dimensional arrays can be secured up to 4 dimensions.
+The ldim command can be defined/redefined anywhere in the script.
+Also, when an array variable is created, all contents are cleared to an "undefined" state.
 ^
-* This instruction is defined in hspdef.as as a macro.
+Å¶This command is defined as a macro in hspdef.as.
 
 %href
 dim
@@ -562,40 +216,33 @@ sdim
 ddim
 dimtype
 
-
-
-
 %index
 newlab
-Initialize label variable
+Initialize label type variable
 %group
-Memory management instructions
+Memory management commands
 %prm
 p1,p2
-p1 = variable: variable name to initialize
-p2 = Source: Referenced label or option
+p1=Variable    : Variable name to initialize
+p2=Reference source  : Label or option to be referenced
 
 %inst
-Initializes a variable of label type to which the specified label is assigned.
-In p1, specify the variable name to be initialized.
-In p2, specify the source of the label stored in the variable.
-If you specify a label for p2, the reference source is the location indicated by the label.
-In this case, the operation is the same as when "variable = * label name" is described.
-If you specify a numerical value for p2, the following operations are performed.
+Initializes a label-type variable with the specified label assigned.
+Specify the variable name to be initialized in p1.
+Specify the reference source of the label to be stored in the variable in p2.
+If you specify a label in p2, the location indicated by the label is used as the reference source.
+In this case, the operation is the same as when "variable=*label name" is written.
+If you specify a numerical value in p2, the following operation is performed.
 ^
-     Value: Referenced label
+     Value  : Label to be referenced
  --------------------------------------------------
-      0 Refer to the position of the program to be executed next
-      1 Refers to the program position executed after skipping the next 1 state
+      0    Refers to the program location to be executed next
+      1    Refers to the program location to be executed after skipping the next statement
 ^
-If p2 is 1, it is assumed that the return instruction exists after the newlab instruction.
-"The position next to the newlab instruction and return instruction" will be referenced.
-The newlab instruction is for initializing a label type variable with a special value.
-If you want to save a simple label, you can use a normal assignment statement.
+If p2 is 1, it is assumed that a return command exists after the newlab command.
+The "location next to the newlab command and return command" will be referenced.
+The newlab command is for initializing label-type variables with special values.
+If you simply want to save a label, you can use a normal assignment statement.
 
 %href
 ldim
-
-
-
-

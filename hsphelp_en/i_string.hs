@@ -1,14 +1,14 @@
 ;
-;HELP source file for HSP help manager
-;(Lines beginning with ";" are treated as comments)
+;	HSP help manageróp HELPÉ\Å[ÉXÉtÉ@ÉCÉã
+;	(êÊì™Ç™Åu;ÅvÇÃçsÇÕÉRÉÅÉìÉgÇ∆ÇµÇƒèàóùÇ≥ÇÍÇ‹Ç∑)
 ;
 
 %type
-Built-in instructions
+Built-in command
 %ver
 3.6
 %note
-ver3.6 standard instruction
+ver3.6 standard command
 %date
 2020/01/07
 %author
@@ -24,37 +24,37 @@ Let
 
 %index
 getstr
-Read a string from the buffer
+Read string from buffer
 %group
-String manipulation command
+String manipulation commands
 %prm
 p1,p2,p3,p4,p5
-p1 = variable: variable name to read the contents
-p2 = variable: variable name to which the buffer is allocated
-p3 = 0 ~: Buffer index (in Byte)
-p4 = 0 to 255: ASCII code of delimiter character
-p5 = 0 to (1024): Maximum number of characters to read
+p1=Variable : Variable name to read the content into
+p2=Variable : Variable name to which the buffer is assigned
+p3=0Å` : Buffer index (in bytes)
+p4=0Å`255 : ASCII code of the delimiter character
+p5=0Å`(1024) : Maximum number of characters to read
 
 %inst
-Reads the contents of any location in the buffer in memory as a string into a variable.
-The character string is read until there is a code 00 or a line feed code. The line feed code is not included in the string.
+Reads the content from an arbitrary location in the memory buffer as a string into a variable.
+The string is read until the code 00 or a newline code is encountered. The newline code is not included in the string.
 ^
-You can also specify a delimiter character code and retrieve a character string delimited by any character.
+It is also possible to specify a delimiter character code to extract a string separated by an arbitrary character.
 ^
-The number of bytes read by this instruction is automatically assigned to a system variable called strsize. strsize is used to get the amount of movement to the next index.
+The number of bytes read by this command is automatically assigned to the system variable strsize. strsize is used to obtain the amount of movement to the next index.
 ^
-For example, if the buffer of variable b contains the data'A',' B',' C',',' D',' E',' F'00 (exit code).
+For example, if the variable b's buffer contains the data 'A' 'B' 'C' ',' 'D' 'E' 'F' 00 (end code),
 ^p
 getstr a,b,0,','
 ^p
-When you execute, the contents of the variable a will be read out from the'A',' B', and'C', and will be the string "ABC", and the strsize will be 4.
+When executed, the variable a's content will be the part 'A' 'B' 'C' read as the string "ABC", and strsize will be 4.
 ^
-The maximum number of characters (bytes) to be read can be specified by the p5 parameter.
-If the p5 parameter is omitted, up to 1024 characters (byte) will be read.
-(Since the buffer of the variable specified by p1 is automatically allocated, it is not necessary to set the buffer with the sdim instruction etc.)
+The p5 parameter allows you to specify the maximum number of characters (bytes) to read.
+If the p5 parameter is omitted, up to 1024 characters (bytes) will be read.
+(The buffer for the variable specified by p1 is automatically allocated, so there is no need to set up the buffer with the sdim command, etc.)
 ^
-This command is for efficiently cutting out text string data containing multiple lines and data separated by specific characters.
-There is another set of memory notepad instructions for working with multi-line text. In addition, a strmid instruction is provided to extract a specific number of characters from a string.
+This command is designed for efficiently cutting out text string data containing multiple lines or data separated by specific characters.
+To handle text containing multiple lines, there are also memory notepad command sets. In addition, the strmid command is available to extract a specific number of characters from a string.
 
 %href
 strmid
@@ -64,27 +64,27 @@ strmid
 
 %index
 noteadd
-Addition / change of specified line
+Add/change specified line
 %group
-String manipulation command
+String manipulation commands
 %prm
 p1,p2,p3
-p1 = Character string: Character string or variable name to be added / changed
-p2 = 0 to (-1): Index to be added
-p3 = 0 to 1 (0): Overwrite mode specification (0 = add / 1 = overwrite)
+p1=String : String or variable name to add or change
+p2=0Å`(-1) : Index to add to
+p3=0Å`1(0) : Overwrite mode specification (0=add, 1=overwrite)
 
 %inst
-Add / change the contents of the memory notepad.
+Adds or changes the contents of the memory notepad.
 ^
-Specify the character string to be added / changed to p1. In p2, specify the target index.
-If you omit the p2 parameter or specify -1, the last line is targeted.
-The p3 parameter specifies whether to add or overwrite. If omitted or specified as 0, the mode is added and the target index and subsequent indexes are shifted one by one.
-If p3 is 1, the overwrite mode is set and the contents of the target index are erased and replaced with the specified character string.
+Specify the string to add or change in p1. Specify the target index in p2.
+If the p2 parameter is omitted or -1 is specified, the last line is targeted.
+Specify whether to add or overwrite with the p3 parameter. If omitted or 0 is specified, it is in add mode, and the index after the target index is shifted by one.
+If p3 is 1, it is in overwrite mode, and the contents of the target index are deleted and replaced with the specified string.
 ^
-noteadd automatically increases the reserved capacity and stores it when trying to add contents to the variable buffer beyond the capacity reserved in advance by the sdim instruction or the like.
-In other words, even if the memory buffer can only store up to 64 characters with "sdim a, 64", the memory size can be automatically adjusted according to the size to be added and stored safely.
+noteadd automatically increases the allocated capacity and stores it when trying to add content beyond the capacity pre-allocated in the variable buffer with the sdim command.
+In other words, even in a memory buffer that can only store up to 64 characters with "sdim a,64", the memory size is automatically adjusted and safely stored according to the size to be added.
 ^
-In order to use the memory notepad instructions (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel instruction.
+In order to use the memory notepad commands (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel command.
 
 %href
 notesel
@@ -103,18 +103,18 @@ notesel
 
 %index
 notedel
-Delete row
+Delete line
 %group
-String manipulation command
+String manipulation commands
 %prm
 p1
-p1 = 0 ~: Index to delete
+p1=0Å` : Index to delete
 
 %inst
-Deletes the specified index on the memory notepad.
-The contents of the index specified by p1 are deleted, and subsequent indexes are shifted one by one.
+Deletes the specified index of the memory notepad.
+The contents of the index specified in p1 are deleted, and the subsequent indexes are shifted by one.
 ^
-In order to use the memory notepad instructions (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel instruction.
+In order to use the memory notepad commands (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel command.
 
 %href
 notesel
@@ -124,21 +124,21 @@ notesel
 
 %index
 noteget
-Read the specified line
+Read specified line
 %group
-String manipulation command
+String manipulation commands
 %prm
 p1,p2
-p1 = variable: variable name of the read destination
-p2 = 0 to (0): Index to read
+p1=Variable : Variable name to read to
+p2=0Å`(0) : Index to read
 
 %inst
-Assigns the contents of the index specified by p2 in the memory notepad to the variable specified by p1. You can read the contents on any line in the memory notepad.
+Assigns the contents of the index specified in p2 in the memory notepad to the variable specified in p1. You can read the contents of any line in the memory notepad.
 ^
-Note that the index starts at 0.
-In the variable specified by p1, if you try to add the contents to the variable buffer beyond the capacity reserved in advance by the sdim instruction etc., the reserved capacity is automatically increased and stored. Also, the variable of p1 is forcibly changed to the string type.
+Note that the index starts from 0.
+If you try to add content beyond the capacity pre-allocated in the variable buffer with the sdim command, the variable specified in p1 automatically increases the allocated capacity and stores it. Also, the p1 variable is forcibly changed to a string type.
 ^
-In order to use the memory notepad instructions (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel instruction.
+In order to use the memory notepad commands (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel command.
 
 %href
 notesel
@@ -155,28 +155,28 @@ notesel
 
 %index
 noteinfo
-Memory notepad information acquisition
+Get memory notepad information
 %group
-String manipulation function
+String manipulation functions
 %prm
 (p1)
-p1 (0): Information acquisition mode
+p1(0) : Information acquisition mode
 
 %inst
-The noteinfo function gets information about the currently targeted memory notepad.
-Specify the information acquisition mode with p1. In addition, macros corresponding to each mode are defined.
+The noteinfo function obtains information about the currently targeted memory notepad.
+Specify the information acquisition mode in p1. Also, macros corresponding to each mode are defined.
 ^p
-   Mode: Macro content
+   Mode : Macro    Content
  -----------------------------------------------------------
-      0: notemax Total number of lines
-      1: notesize Total number of characters (bytes)
+      0   : notemax   Total number of lines
+      1   : notesize  Total number of characters (bytes)
 ^p
-Use the notemax macro when you want to iterate over all lines with a multi-line string.
+The notemax macro is used when you want to perform repetitive processing on all lines in a multi-line string.
 The total number of lines is the number of elements in the memory notepad.
-If there are lines such as "APPLE", "ORANGE", and "GRAPE", it will be 3.
-In this case, the index will be 0-2.
+If there are lines "APPLE", "ORANGE", and "GRAPE", the number will be 3.
+In this case, the indexes will be from 0 to 2.
 ^
-In order to use the memory notepad instructions (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel instruction.
+In order to use the memory notepad commands (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel command.
 
 %href
 notesel
@@ -202,18 +202,18 @@ notesize
 
 %index
 notesel
-Target buffer specification
+Specify target buffer
 %group
-String manipulation command
+String manipulation commands
 %prm
 p1
-p1 = variable: variable name to which the buffer is allocated
+p1=Variable : Variable name to which the buffer is allocated
 
 %inst
-Sets the variable specified in p1 to the memory notepad instruction buffer.
+Sets the variable specified in p1 as the buffer for the memory notepad command.
 ^
-The variable specified in p1 is forcibly changed to the string type.
-In order to use other memory notepad instructions (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel instruction.
+The variable specified in p1 is forcibly changed to a string type.
+In order to use other memory notepad commands (noteget, noteadd, notedel, noteinfo), you must first set the target buffer with the notesel command.
 
 %href
 noteunsel
@@ -234,14 +234,14 @@ stop
 
 %index
 noteunsel
-Return of target buffer
+Restore target buffer
 %group
-String manipulation command
+String manipulation commands
 %prm
 
 %inst
-The noteunsel instruction returns to the buffer setting that was set before the target buffer was set by the notesel instruction.
-It is not always necessary to insert the noteunsel instruction, but by inserting it after using the buffer set by the notesel instruction, it is possible to prevent multiple buffer specifications by notesel.
+The noteunsel command returns the buffer setting to the setting before the target buffer was set with the notesel command.
+The noteunsel command is not always required, but by inserting it after the buffer set by the notesel command is finished being used, it prevents multiple buffer specifications by notesel from occurring.
 
 %href
 notesel
@@ -252,43 +252,43 @@ notesel
 
 %index
 strmid
-Extract a part of the character string
+Extract part of a string
 %group
-String manipulation function
+String manipulation functions
 %prm
 (p1,p2,p3)
-p1 = variable name: variable name that stores the character string to be retrieved
-p2 = -1 ~: Index at the beginning of retrieval
-p3 = 0 ~: Number of characters to retrieve
+p1=Variable name : Variable name storing the original string to extract from
+p2=-1Å` : Index to start extracting from
+p3=0Å` : Number of characters to extract
 %inst
-Returns the character string type variables specified in p1 from which characters have been extracted under the conditions specified in p2 and p3.
-Specifies the index to start fetching with p2. In this case, the first character at the beginning of the character string is set to 0, and the number increases in order of 1, 2, 3 ... Please note that it does not start from 1.
-Specify the number of characters to retrieve with p3. If you specify more than the number of characters actually stored, up to the actual number of characters will be retrieved.
-Also, if -1 is specified for p2, the number of characters specified by p3 is extracted from the right side of the character string.
+Returns the characters extracted from the string variable specified in p1 according to the conditions specified in p2 and p3.
+p2 specifies the index to start extracting from. This is the index where the first character of the string is 0, and it increases sequentially as 1, 2, 3... Note that it does not start from 1.
+p3 specifies the number of characters to extract. If you specify more than the actual number of characters stored, the actual number of characters will be extracted.
+Also, if you specify -1 for p2, only the number of characters specified by p3 will be extracted from the right side of the string.
 %sample
 	b="ABCDEF"
-a = strmid (b, -1,3); Extract 3 characters from the right
-a = strmid (b, 1,3); Extract 3 characters from the 2nd character from the left
+	a=strmid(b,-1,3)   ; Extract 3 characters from the right
+	a=strmid(b,1,3)    ; Extract 3 characters from the second character from the left
 %href
 getstr
 
 
 %index
 instr
-Search for a character string
+Search for a string
 %group
-String manipulation function
+String manipulation functions
 %prm
 (p1,p2,"string")
-p1 = variable name: Character string type variable name that stores the character string to be searched
-p2 = 0 to (0): Index to start searching
-"string": The string to search for
+p1=Variable name : String variable name storing the string to be searched
+p2=0Å`(0) : Index to start searching from
+"string"  : String to search for
 %inst
-Checks if the string specified by "string" exists in the string type variable specified by p1 and returns the index.
+Checks whether the string specified by "string" exists in the string variable specified by p1 and returns the index.
 ^
-If the specified string is found, the index value is returned. This starts with 0 as the first character of the character string and increases in order of 1, 2, 3 ... (similar to the index specified by the strmid instruction).
-Please note that it does not start from 1.
-(If p2 is specified, the index will start from p2 (0).)
+If the specified string is found, the index value is returned. This is the index where the first character of the string is 0, and it increases sequentially as 1, 2, 3... (similar to the index specified in the strmid command).
+Note that it does not start from 1.
+(If p2 is specified, the index is based on p2 as the starting point (0).)
 (If p2 is a negative value, -1 is always returned.)
 If the specified string is not found, -1 is returned.
 %href
@@ -302,14 +302,14 @@ notefind
 notesave
 Save target buffer
 %group
-String manipulation command
+String manipulation commands
 %prm
 "filename"
-"filename": write file name
+"filename" : File name to write to
 %inst
-Memory Saves the contents of the notepad instruction buffer as a text file to the specified file.
-Note that you must first set the target buffer with the notesel instruction.
-The notesave instruction saves the length of the character string contained in the specified buffer.
+Saves the contents of the memory notepad command buffer as a text file to the specified file.
+Note that you must first set the target buffer with the notesel command.
+The notesave command saves according to the length of the string included in the specified buffer.
 
 %href
 notesel
@@ -325,22 +325,23 @@ Let
 
 %index
 noteload
-Read target buffer
+Load target buffer
 %group
-String manipulation command
+String manipulation commands
 %prm
 "filename",p1
-"filename": Read file name
-p1 (-1): Upper limit of read size
+"filename" : File name to load
+p1(-1)     : Upper limit of loading size
 %inst
-Reads the specified file into the memory notepad instruction buffer.
-Normally, the text file is read and the target is read by the memory notepad instruction.
-The buffer for memory notepad instructions automatically adjusts the reserved size according to the file size, so there is no need to specify the buffer size in advance.
-You can specify the maximum size of the file to read with p1.
-If the specification is omitted or a negative value is specified, any size will be read.
-It is also possible to read files other than text files.
-Note that you must first set the target buffer with the notesel instruction.
+Loads the specified file into the memory notepad command buffer.
+Normally, a text file is loaded and targeted for reading with the memory notepad command.
+The memory notepad command buffer automatically adjusts the allocated size according to the file size, so there is no need to specify the buffer size in advance.
+You can specify the maximum size of the file to load in p1.
+If the specification is omitted or a negative value is specified, any size will be loaded.
+It is also possible to load files other than text files.
+Note that you must first set the target buffer with the notesel command.
 %href
+notesel
 notesel
 notesave
 noteget
@@ -351,133 +352,125 @@ notemax
 notesize
 notefind
 
-
 %index
 getpath
-Get part of the path
+Get a part of a path
 %group
-String manipulation function
+String manipulation functions
 %prm
 (p1,p2)
-p1 = character string: Original character string to be extracted
-p2 = 0 ~: Specify information type
+p1=string : The original string from which to extract
+p2=0~    : Information type specification
 %inst
-The character string indicating the file path specified in p1 is converted into the type of information specified in p2 and returned as a character string.
+Returns a string representing the file path specified by p1, converted to the type of information specified by p2.
 ^p
-example :
+Example:
 	a="c:\\disk\\test.bmp"
 	b = getpath(a,8+1)
 	mes b
-Å´ (Result)
-Become "test"
+	Å´(Result)
+	"test"
 ^p
-The details of the type specification are as follows.
+Details of type specification are as follows:
 ^p
-   Type: Content
+   Type : Content
  -----------------------------------------------------------
-     0: Copy of character string (no operation)
-     1: File name excluding extension
-     2: Extension only (.???)
-     8: Remove directory information
-    16: Convert string to lowercase
-    32: Directory information only
+     0    : Copy of string (no operation)
+     1    : File name without extension
+     2    : Extension only (.???)
+     8    : Remove directory information
+    16    : Convert string to lowercase
+    32    : Directory information only
 ^p
-Multiple type values can be specified by totaling.
-If type 16 is specified, all alphabetic strings are converted to lowercase.
+Multiple specifications can be made by summing the type values.
+If type 16 is specified, all English strings will be converted to lowercase.
 %href
 getstr
 instr
-
-
-
-
 
 %index
 strf
 Convert formatted string
 %group
-String manipulation function
+String manipulation functions
 %prm
 ("format",p1...)
-"format": Format string
-p1: Formatting parameters
+"format" : Format specification string
+p1       : Format specification parameter
 %inst
-Returns a string that is an integer or real number converted to a string in the proper format.
-In "format", specify the following format specification string.
+Returns a string with an integer or real value converted to the appropriate format.
+Specify a format specification string such as the following in "format".
 ^p
-example :
+Example:
 	a=123
-mes strf ("decimal [% d]", a)
-mes strf ("hexadecimal [% x]", a)
-mes strf ("with decimal digit number specified [% 05d]", a)
-mes strf ("with specified number of hexadecimal digits [% 05x]", a)
+	mes strf("Decimal[%d]",a)
+	mes strf("Hexadecimal[%x]",a)
+	mes strf("Decimal with digit specification[%05d]",a)
+	mes strf("Hexadecimal with digit specification[%05x]",a)
 	a=sqrt(2)
-mes strf ("decimal real number [% f]", a)
-mes strf ("decimal real number digits specified [% 3.10f]", a)
+	mes strf("Decimal real number[%f]",a)
+	mes strf("Decimal real number with digit specification[%3.10f]",a)
 ^p
-In the part indicating the parameter specified after p1, specify after "%".
-"% D" can display an integer value, "% x" can display a hexadecimal integer value, "% c" can display a character code, and "% f" can display a real value.
-If multiple parameters are specified in the format, separate the parameters with "," and describe the parameters in succession.
-If you want to display the normal "%" symbol, specify "%%".
+For the part indicating the parameter specified after p1, make a specification following "%".
+"%d" can display an integer value, "%x" can display a hexadecimal integer value, "%c" can display a character code, and "%f" can display a real value.
+If multiple parameters are specified in the format, describe the parameters consecutively, separated by "," by the number of parameters.
+To display a normal "%" symbol, specify "%%".
 ^p
-example :
+Example:
 	a=1:b=2.0:c="ABC"
 	mes strf("[%03d] [%f] [%s]",a,b,c)
 ^p
-The format string is similar to the sprintf format supported by the C runtime library.
+The format specification string is almost the same as the sprintf format supported by the C runtime library.
 ^p
 	%[width][.precision][I64]type
 
-width: Minimum number of characters to output
-precision: Maximum number of characters to output
-(If type is f, the number of digits after the decimal point)
-I64: Prefix indicating 64bit value
-type: Type of input parameter
+	width : Minimum number of characters to output
+	precision : Maximum number of characters to output
+	            (number of digits after the decimal point if type is f)
+	I64   : Prefix indicating a 64-bit value
+	type  : Type of parameter to be input
 ^p
-The format is as follows, and the description in [] can be omitted.
-The characters that can be specified by type are as follows.
+The above format is used, and the description in [] can be omitted.
+The characters that can be specified in type are as follows:
 ^p
-Character content
+	Character           Content
 	---------------------------------------------
-c 1-byte character code
-d Signed decimal integer
-i Signed decimal integer
-u unsigned decimal integer
-o unsigned octal integer
-x unsigned hexadecimal integer (lowercase)
-X unsigned hexadecimal integer (uppercase)
-Signed real number in e [sign] dd [d] format
-Signed real number (uppercase) in E [sign] dd [d] format
-f dddd.dddd signed real number
-(The number of digits in the integer part is determined by the absolute value of that number,
-The number of decimal places is determined by the required precision. )
-g Of the signed values output in format f or e
-The shorter format that can represent the specified value and precision
-G Same as format G, using uppercase letters
-p Prints the address pointed to by the hexadecimal argument
-s string
+	  c     1-byte character code
+	  d	Signed decimal integer
+	  i	Signed decimal integer
+	  u	Unsigned decimal integer
+	  o	Unsigned octal integer
+	  x	Unsigned hexadecimal integer (lowercase)
+	  X	Unsigned hexadecimal integer (uppercase)
+	  e	Signed real value in [sign]dd[d] format
+	  E	Signed real value in [sign]dd[d] format (uppercase)
+	  f	Signed real value in dddd.dddd format
+		(The number of digits in the integer part is determined by the absolute value of the number,
+		 and the number of digits in the decimal part is determined by the required precision.)
+	  g	The shorter of the signed values output in format f or e that
+		can express the specified value and precision
+	  G	Same as format G, using uppercase letters
+	  p	Outputs the address pointed to by the hexadecimal argument
+	  s	String
 ^p
-Please note that the format specification string recognizes only strings up to 1023 characters.
+Please note that the format specification string will only recognize strings up to 1023 characters.
 
 %href
 mes
 print
 
-
-
-
 %index
 cnvwtos
-Convert unicode to regular string
+Convert unicode to normal string
 %group
-String manipulation function
+String manipulation functions
 %prm
 (p1)
-p1 = variable: the name of the variable from which the contents are read
+p1=variable : Variable name from which to read the contents
 
 %inst
-Reads the data stored in the variable as unicode (UTF-16) and returns the converted character string.
-It can be used when handling unicode data, data conversion with external DLLs, COM objects, etc.
+Reads the data stored in the variable as unicode (UTF-16) and returns it as a normal string.
+It can be used when handling unicode data or for data conversion with external DLLs or COM objects.
 
 %href
 cnvstow
@@ -487,23 +480,20 @@ str
 %port-
 Let
 
-
-
-
 %index
 cnvstow
-Convert normal strings to unicode
+Convert normal string to unicode
 %group
 String manipulation command
 %prm
 p1,"string"
-p1 = variable: variable name to write the result
-"string": conversion source string
+p1=variable  : Variable name to write the result
+"string" : String to convert
 
 %inst
-Converts the data specified by "character string" to a unicode (UTF-16) character string and saves it in the variable buffer.
-The variable specified by p1 must have a sufficient buffer size for conversion as a character string type in advance.
-It can be used when handling unicode data, data conversion to external DLLs, COM objects, etc.
+Converts the data specified by "string" into a unicode (UTF-16) string and saves it in the variable buffer.
+The variable specified by p1 must have a sufficient buffer size secured in advance as a string type for conversion.
+It can be used when handling unicode data or for data conversion with external DLLs or COM objects.
 
 %href
 cnvwtos
@@ -513,90 +503,87 @@ str
 %port-
 Let
 
-
 %index
 strtrim
-Remove only specified characters
+Remove only the specified characters
 %group
-String manipulation function
+String manipulation functions
 %prm
 (p1,p2,p3)
-p1 = variable: variable to which the original string is assigned
-p2 = 0 to 3 (0): Specify the position to remove
-p3 = 0 to 65535 (32): Character code
+p1=variable : Variable with the original string assigned
+p2=0~3(0) : Specification of the position to remove
+p3=0~65535(32) : Character code
 %inst
-Removes only the specified character from the character string stored in the variable specified by p1.
+Removes only the specified characters from the string stored in the variable specified by p1.
 You can specify the position to remove with p2.
-If p2 is omitted, it will be removed only if both ends of the string are specified characters.
-You can specify the character code to be removed with p3.
+If p2 is omitted, it will only be removed if the specified character is at both ends of the string.
+You can specify the character code to remove with p3.
 If p3 is omitted, it will be a half-width space (32).
 ^p
-example :
+Example:
 	a=" ABC DEF "
 	b = strtrim(a,0,' ')
 	mes b
 ^p
-The details of the value indicating the removal position specified by p2 are as follows.
+Details of the values indicating the removal position specified by p2 are as follows:
 ^p
-   Type: Content
+   Type : Content
  -----------------------------------------------------------
-     0: Remove the specified characters at both ends (default)
-     1: Remove the specified character at the left end
-     2: Remove the specified character at the right end
-     3: Remove all specified characters in the string
+     0    : Remove the specified characters at both ends (default)
+     1    : Remove the specified character on the left end
+     2    : Remove the specified character on the right end
+     3    : Remove all specified characters in the string
 ^p
-For the character code specified in p3, you can specify a 2-byte code that indicates double-byte characters.
+For the character code specified by p3, you can specify a 2-byte code indicating a full-width character.
 ^p
-example :
-s = "Hello, this is full-width characters."
-zenspace = ""; Full-width space
-code = wpeek (zenspace, 0); Get the code for double-byte space
+Example:
+	s="Å@HelloÅ@This is a full-width characterÅ@"
+	zenspace="Å@"				; Full-width space
+	code = wpeek(zenspace,0)		; Get the code for the full-width space
 	mes strtrim(s,3,code)
 ^p
 %href
 strmid
 instr
 
-
-
 %index
 split
-Substitute the element divided from the string
+Assign split elements from a string
 %group
 String manipulation command
 %prm
 p1,"string",p2...
-p1 = variable: variable to which the original string is assigned
-"string": Delimiter string
-p2 = variable: variable to which the split element is assigned
+p1=variable  : Variable with the original string assigned
+"string" : Delimiter string
+p2=variable  : Variable to which the split elements are assigned
 
 %inst
-Assigns the element divided by the specified character string to the variable.
-For example, you can extract the elements of "12", "34", and "56" from a character string separated by "," such as "12,34,56" and assign them to different variables.
-In p1, specify the variable name to which the original string was assigned. (Variable must be of type string)
-Specify the character string to separate to "string".
-After p2, specify the variable name to which the divided element is assigned.
-You can specify any number of variables to be assigned, separated by ",".
-The divided elements are assigned in order from the first specified variable.
+Assigns elements split by a specified string to variables.
+For example, from a string separated by "," like "12,34,56", you can extract the elements "12", "34", and "56" and assign them to separate variables.
+Specify the variable name to which the original string is assigned with p1. (The variable must be a string type)
+Specify the string to delimit in "string".
+Specify the variable names to which the split elements are assigned after p2.
+The variables to be assigned can be specified as many as you like, separated by ",".
+The split elements are assigned in order from the first specified variable.
 ^p
-example :
+Example:
 	buf="12,34,56"
 	split buf, ",", a, b, c
 	mes a
 	mes b
 	mes c
 ^p
-If the number of original elements is less than the number of variables specified, the remaining variables are assigned an empty string ("").
-If there are more divided elements than the specified number of variables, they will be assigned to the specified array of variables.
+If there are fewer original elements than the number of specified variables, an empty string ("") is assigned to the remaining variables.
+If there are more split elements than the number of specified variables, they are assigned to the array of the specified variables.
 ^p
-example :
+Example:
 	buf="12,34,56,78"
 	split buf, ",", results
 	repeat stat
-mes "array (" + cnt + ") =" + results (cnt)
+		mes "Array("+cnt+")="+results(cnt)
 	loop
 ^p
-After execution, the number that can be divided is assigned to the system variable stat.
+After execution, the number of splits is assigned to the system variable stat.
 
 %href
 getstr
@@ -604,53 +591,48 @@ csvnote
 %port-
 Let
 
-
-
 %index
 strrep
-Replace strings
+Replace a string
 %group
 String manipulation command
 %prm
-p1, "Search string", "Replacement string"
-p1 = variable name: Character string type variable name that stores the character string to be searched
-"Search string": Search string
-"Replacement string": The replacement string
+p1,"Search string","Replacement string"
+p1=Variable name : String type variable name where the string to be searched is stored
+"Search string" : String to search for
+"Replacement string" : String to replace with
 %inst
-In all the contents of the string type variable specified by p1
-Replaces the character string specified in "Search character string" with "Replacement character string".
+Replaces the string specified by "Search string" with the "Replacement string" in all contents of the string type variable specified by p1.
 ^
-After execution, the system variable stat is assigned the number of times the string has been replaced.
+After execution, the number of times the string was replaced is assigned to the system variable stat.
 
 %href
 instr
-
-
 
 %index
 notefind
 Memory notepad search
 %group
-String manipulation function
+String manipulation functions
 %prm
 ("string",p1)
-"string": The string to search for
-p1 (0): Search mode
+"string" : String to search for
+p1(0)    : Search mode
 
 %inst
-Searches the currently targeted memory notepad for lines that contain a particular string.
+Searches the current target memory notepad for lines containing a specific string.
 Specify the search mode with p1. Macros corresponding to each mode are defined.
 ^p
-   Mode: Macro content
+   Mode : Macro            Content
  -----------------------------------------------------------
-      0: notefind_match Find the line that exactly matches "string"
-      1: notefind_first Search for lines starting with "string"
-      2: search for lines containing notefind_instr "string"
+      0   : notefind_match    Search for lines that exactly match "string"
+      1   : notefind_first    Search for lines starting with "string"
+      2   : notefind_instr    Search for lines containing "string"
 ^p
-The return value is the line (index) that matches the specified string from all lines in the memory notepad.
-If there are no matching rows in the search, -1 is returned.
+The return value is the line (index) that matches the specified string from all lines of the memory notepad.
+If there are no lines matching the search, -1 is returned.
 ^
-In order to use the notefind function, you must first set the target buffer with the notesel instruction.
+To use the notefind function, you must first set the target buffer with the notesel command.
 
 %href
 notesel
@@ -659,23 +641,20 @@ notedel
 notemax
 notesize
 
-
-
 %index
 cnvatos
-Convert ANSI string to regular string
+Convert ANSI string to normal string
 %note
 Include hsp3utf.as.
 %group
-String manipulation function
+String manipulation functions
 %prm
 (p1)
-p1 = variable: the name of the variable from which the contents are read
+p1=variable : Variable name from which to read the contents
 
 %inst
-Reads the data stored in the variable as an ANSI (Shift JIS) character string and returns the converted character string.
-This instruction only works on the runtime (hsp3utf), which treats UTF-8 as standard string code. Please note that an error will occur with standard HSP3.
-
+Reads the data stored in the variable as an ANSI (ShiftJIS) string and returns it as a normal string.
+This command only works on runtimes (hsp3utf) that treat UTF-8 as the standard string code. Please note that it will be an error with standard HSP3.
 
 %href
 cnvstow
@@ -685,24 +664,22 @@ str
 %port-
 Let
 
-
-
 %index
 cnvstoa
-Convert regular strings to ANSI strings
+Convert normal string to ANSI string
 %note
 Include hsp3utf.as.
 %group
 String manipulation command
 %prm
 p1,"string"
-p1 = variable: variable name to write the result
-"string": conversion source string
+p1=variable  : Variable name to write the result
+"string" : String to convert
 
 %inst
-Converts the data specified by "character string" to an ANSI (Shift JIS) character string and saves it in the variable buffer.
-The variable specified by p1 must have a sufficient buffer size for conversion as a character string type in advance.
-This instruction only works on the runtime (hsp3utf), which treats UTF-8 as standard string code. Please note that an error will occur with standard HSP3.
+Converts the data specified by "string" into an ANSI (ShiftJIS) string and saves it in the variable buffer.
+The variable specified by p1 must have a sufficient buffer size secured in advance as a string type for conversion.
+This command only works on runtimes (hsp3utf) that treat UTF-8 as the standard string code. Please note that it will be an error with standard HSP3.
 
 %href
 cnvstow
@@ -712,33 +689,25 @@ str
 %port-
 Let
 
-
-
-
 %index
 strexchange
-Replace strings in scripts
+Replace strings in the script
 %group
 String manipulation command
 %prm
 "filename",p1
-"filename": File name where the replacement string (strmap) is recorded
-p1 (0): Replacement option
+"filename" : Filename where the replacement string (strmap) is recorded
+p1(0)      : Replacement option
 
 %inst
-Replaces all string data contained in the script at once.
-It is necessary to prepare a file (strmap) in which the replacement character string and hash code are recorded in advance.
-(Strmap can be generated by the hspcmp command or the hspcmp plugin command. See sample / new36 / strex_test1.hsp sample for details)
-The string in the script will be replaced based on the file (strmap) specified by "filename".
+Replaces all string data included in the script in a batch.
+It is necessary to prepare a file (strmap) in which the replacement string and hash code are recorded in advance.
+(strmap can be generated by the hspcmp command or the hspcmp plugin command. For details, refer to the sample/new36/strex_test1.hsp sample)
+The strings in the script are replaced based on the file (strmap) specified by "filename".
 Specify the replacement option with p1.
-If p1 is 0, only the string of the corresponding hash code is converted.
-If p1 is 1, the replacement will not be performed if all the hash codes in the replacement data (strmap) do not match.
-After executing strexchange, the result is assigned to the system variable stat.
-If the system variable stat is 0, it indicates normal completion, otherwise it indicates that there was an error.
-
+If p1 is 0, only the string with the corresponding hash code is converted.
+If p1 is 1, the replacement will not be executed unless all hash codes in the replacement data (strmap) match.
+The result is assigned to the system variable stat after strexchange is executed.
+If the system variable stat is 0, it indicates normal termination; otherwise, it indicates that there was an error.
 %port-
 Let
-
-
-
-

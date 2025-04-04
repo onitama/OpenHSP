@@ -1,12 +1,12 @@
 ;
-;HELP source file for HSP help manager
-;(Lines beginning with ";" are treated as comments)
+; HSP help manager HELP source file
+; (Lines starting with ";" are treated as comments)
 ;
 
 %type
-Extension instructions
+Extended command
 %ver
-3.4
+3.6
 %note
 Include hspsock.as.
 %date
@@ -23,35 +23,35 @@ Win
 
 %index
 sockopen
-Initialize and connect socket
+Initializes a socket and connects to it
 %group
 Communication control command
 %prm
 p1,"url",p2
-p1 = 0 to 31 (0): Socket ID number
-"url": URL specification string
-p2 = 0 to (0): Port number
+p1=0Å`31(0) : Socket ID number
+"url"       : URL specification string
+p2=0Å`(0)   : Port number
 %inst
-Initializes the socket so that it can be used.
-When performing TCP / IP communication, it must be initialized first and connected to the other server.
+Initializes a socket to make it usable.
+When performing TCP/IP communication, it must always be initialized first and connected to the other server.
 ^
 Specify the socket ID number with p1.
 ^
-Specify the URL of the connection destination as a character string with "url". This can be either a domain name such as "www.yahoo.co.jp" or one that directly specifies an IP address such as "202.132.50.7". Do not enter scheme names such as "http: //" or "ftp: //".
+Specify the URL of the connection destination as a string in "url". This can be either a domain name such as "www.yahoo.co.jp" or an IP address such as "202.132.50.7". Do not include scheme names such as "http://" or "ftp://".
 ^
-In p2, specify the port number to connect to. This depends on what kind of server you are connecting to. If you create your own port, make sure you use 1024 or later.
+Specify the port number to connect to in p2. This depends on the type of server to connect to. When creating an original port, use 1024 or higher.
 ^
-The result of executing the sockopen instruction is assigned to the system variable stat.
-If the result is an error, it will be a non-zero value. If an error occurs during initialization, communication will not be possible.
+The result of executing the sockopen command is assigned to the system variable stat.
+If the result is an error, it will be a value other than 0. If an error occurs during initialization, communication cannot be performed.
 ^
 The details of the value of the system variable stat are as follows.
 ^p
-  stat: Error details
+  stat : Error details
  ----------------------------------------------------
-   1: TCP / IP is not installed on Windows
-   2: Socket initialization failed
-   3: Failed to get the server name of the URL
-   4: Could not connect to the server
+   1   : TCP/IP is not installed on Windows
+   2   : Socket initialization failed
+   3   : Failed to get server name from URL
+   4   : Failed to connect to the server
 ^p
 %href
 sockmake
@@ -62,15 +62,15 @@ sockclose
 
 %index
 sockclose
-Disconnect socket
+Disconnects the socket
 %group
 Communication control command
 %prm
 p1
-p1 = 0 to 31 (0): Socket ID number
+p1=0Å`31(0) : Socket ID number
 %inst
-Disconnect the connected socket.
-Be sure to use the sockclose instruction to disconnect the initialized socket.
+Disconnects the connected socket.
+Be sure to disconnect the initialized socket with the sockclose command.
 %href
 sockopen
 sockmake
@@ -80,17 +80,17 @@ sockmake
 
 %index
 sockput
-Send data
+Sends data
 %group
 Communication control command
 %prm
 "message",p1
-"message": Message to send
-p1 = 0 to 31 (0): Socket ID number
+"message"   : Message to send
+p1=0Å`31(0) : Socket ID number
 %inst
-Sends data to the socket. The character string specified in "message" or the contents of the character string type variable are sent as they are.
+Sends data to the socket. The string specified by "message" or the contents of the string type variable is sent as is.
 ^
-If an error occurs during transmission, the system variable stat is assigned a non-zero value.
+If an error occurs during transmission, a value other than 0 is assigned to the system variable stat.
 %href
 sockputc
 sockputb
@@ -100,17 +100,17 @@ sockputb
 
 %index
 sockputc
-Send 1 byte of data
+Sends data 1 byte at a time
 %group
 Communication control command
 %prm
 p1,p2
-p1 = 0 to 255 (0): Message to be sent (1 byte)
-p2 = 0 to 31 (0): Socket ID number
+p1=0Å`255(0) : Message to send (1 byte)
+p2=0Å`31(0)  : Socket ID number
 %inst
-Sends data to the socket. Sends 1 byte of the numerical value specified by p1.
+Sends data to the socket. Sends the number specified by p1 as 1 byte.
 ^
-If an error occurs during transmission, the system variable stat is assigned a non-zero value.
+If an error occurs during transmission, a value other than 0 is assigned to the system variable stat.
 %href
 sockput
 sockputb
@@ -120,24 +120,24 @@ sockputb
 
 %index
 sockputb
-Send buffer data
+Sends buffer data
 %group
 Communication control command
 %prm
 p1,p2,p3,p4
-p1 = variable: variable name where the transmission contents are stored
-p2 = 0 to (0): Buffer offset (in bytes)
-p3 = 0 to (64): Transmission size (byte unit)
-p4 = 0 to 31 (0): Socket ID number
+p1=Variable     : Variable name containing the transmission contents
+p2=0Å`(0)   : Buffer offset (in bytes)
+p3=0Å`(64)  : Transmission size (in bytes)
+p4=0Å`31(0) : Socket ID number
 %inst
-Sends the contents of the variable buffer specified in p1 to the socket as binary data.
-The variable specified by p1 can be either a string type or a numeric type. The contents of the memory allocated by the variable are sent directly.
+Sends the contents of the variable buffer specified by p1 as binary data to the socket.
+The variable specified by p1 can be either a string type or a numeric type. The contents of the memory secured by the variable are sent directly.
 ^
-You can specify the variable buffer offset with p2. For example, if p2 is 100, the content from the 100th byte from the beginning will be sent. If p2 is omitted, it will be 0.
+You can specify the offset of the variable buffer with p2. For example, if p2 is 100, the content from the 100th byte from the beginning will be sent. If p2 is omitted, it becomes 0.
 ^
-Specify the transmission size with p3. The send size must be within the size previously reserved in the variable buffer. If p3 is omitted or 0, 64 (byte) is specified.
+Specify the transmission size with p3. The transmission size must be within the size that has been secured in advance for the variable buffer. If p3 is omitted or 0, 64 (bytes) is specified.
 ^
-After executing the sockputb instruction, the size (byte) actually sent is assigned to the system variable stat. If the content of the system variable stat is 0, it means that the system variable stat has not been sent at all due to a communication error or timeout.
+After the execution of the sockputb command, the actually transmitted size (in bytes) is assigned to the system variable stat. If the contents of the system variable stat is 0, it indicates that no data has been transmitted due to a communication error or timeout.
 (The contents of the variable buffer can be manipulated with the peek command, poke command, etc.)
 %href
 sockput
@@ -147,27 +147,27 @@ sockputc
 
 %index
 sockcheck
-Examine the arrival of data
+Checks for data arrival
 %group
 Communication control command
 %prm
 p1
-p1 = 0 to 31 (0): Socket ID number
+p1=0Å`31(0) : Socket ID number
 %inst
-Checks whether the data that can be acquired by the sockget type instruction has arrived at the specified socket.
-If there is data that can be received, the system variable stat is assigned 0. If no data has arrived, the system variable stat will be 1.
+Checks whether data that can be acquired with the sockget series command has arrived at the specified socket.
+If there is receivable data, 0 is assigned to the system variable stat. If data has not arrived, the system variable stat becomes 1.
 ^
-If a communication error occurs, the system variable stat will be a value of 2 or more. If an error occurs, communication will not be possible.
+If a communication error or the like occurs, the system variable stat will be a value of 2 or more. If an error occurs, communication cannot be performed.
 ^
 The details of the value of the system variable stat are as follows.
 ^p
-  stat: content
+  stat : Content
  ---------------------------------------------------
-   0: Received data has arrived
-   1: Received data has not arrived (timeout)
-   2: An error occurred during communication
+   0   : Received data has arrived
+   1   : Received data has not arrived (timeout)
+   2   : An error occurred during communication
 ^p
-sockcheck only checks the arrival of data. To get the actual data, it must be received by instructions such as sockget, sockgetc, sockgetb.
+sockcheck only checks for data arrival. To actually acquire the data, it is necessary to receive it with commands such as sockget, sockgetc, sockgetb.
 %href
 sockget
 sockgetc
@@ -177,18 +177,18 @@ sockgetb
 
 %index
 sockget
-Receive data
+Receives data
 %group
 Communication control command
 %prm
 p1,p2,p3
-p1 = variable: variable name where the received contents are stored
-p2 = 0 to (64): Receive size (byte unit)
-p3 = 0 to 31 (0): Socket ID number
+p1=Variable     : Variable name where the received content is stored
+p2=0Å`(64)  : Reception size (in bytes)
+p3=0Å`31(0) : Socket ID number
 %inst
 Receives data from the socket and assigns the contents to the string type variable specified by p1. Specify the maximum reception size with p2.
 ^
-If an error occurs during reception, the system variable stat is assigned a non-zero value.
+If an error occurs during reception, a value other than 0 is assigned to the system variable stat.
 %href
 sockgetc
 sockgetb
@@ -198,17 +198,17 @@ sockgetb
 
 %index
 sockgetc
-Receive 1 byte of data
+Receives data 1 byte at a time
 %group
 Communication control command
 %prm
 p1,p2
-p1 = variable: variable name where the received contents are stored
-p2 = 0 to 31 (0): Socket ID number
+p1=Variable     : Variable name where the received content is stored
+p2=0Å`31(0) : Socket ID number
 %inst
-Receives 1 byte of data from the socket and assigns the contents to the numeric variable specified by p1.
+Receives data 1 byte from the socket and assigns the contents to the numeric type variable specified by p1.
 ^
-If an error occurs during reception, the system variable stat is assigned a non-zero value.
+If an error occurs during reception, a value other than 0 is assigned to the system variable stat.
 %href
 sockget
 sockgetb
@@ -218,27 +218,27 @@ sockgetb
 
 %index
 sockgetb
-Receive data in buffer
+Receives data into the buffer
 %group
 Communication control command
 %prm
 p1,p2,p3,p4
-p1 = variable: variable name where the received contents are stored
-p2 = 0 to (0): Buffer offset (in bytes)
-p3 = 0 to (64): Receive size (byte unit)
-p4 = 0 to 31 (0): Socket ID number
+p1=Variable : Variable name where the received content is stored
+p2=0Å`(0)   : Buffer offset (in bytes)
+p3=0Å`(64)  : Reception size (in bytes)
+p4=0Å`31(0) : Socket ID number
 %inst
 Receives data from the socket and stores the contents as binary data in the variable buffer specified by p1.
-The variable specified by p1 can be either a string type or a numeric type. The received contents are read directly into the memory allocated by the variable.
+The variable specified by p1 can be either a string type or a numeric type. The received content is read directly into the memory secured by the variable.
 ^
-With p2, you can specify the offset of the buffer to be stored.
-For example, if p2 is 100, the received data will be stored from the 100th byte from the beginning. If p2 is omitted, it will be 0.
+You can specify the offset of the buffer where the data is stored with p2.
+For example, if p2 is 100, the received data will be stored from the 100th byte from the beginning. If p2 is omitted, it becomes 0.
 ^
 Specify the maximum reception size with p3.
-When specifying the receive size, the memory that can store the specified size in the variable buffer must be secured in advance.
-If p3 is omitted or 0, 64 (byte) is specified.
+When specifying the reception size, the variable buffer must have enough memory secured to store the specified size.
+If p3 is omitted or 0, 64 (bytes) is specified.
 ^
-After executing the sockgetb instruction, the actually received size (byte) is assigned to the system variable stat. If the content of the system variable stat is 0, it means that the system variable stat has not been received at all due to a communication error or timeout.
+After the execution of the sockgetb command, the actually received size (in bytes) is assigned to the system variable stat. If the contents of the system variable stat is 0, it indicates that no data has been received due to a communication error or timeout.
 (The contents of the variable buffer can be manipulated with the peek command, poke command, etc.)
 %href
 sockget
@@ -249,30 +249,30 @@ sockgetc
 
 %index
 sockmake
-Initialize socket as server
+Initializes the socket as a server
 %group
 Communication control command
 %prm
 p1,p2
-p1 = 0 to 31 (0): Socket ID number
-p2 = 0 to (0): Port number
+p1=0Å`31(0) : Socket ID number
+p2=0Å`(0)   : Port number
 %inst
-Initializes the socket so that it can be used as a server.
+Initializes the socket to make it usable as a server.
 Specify the socket ID number with p1.
-Specify the port number on p2. Socket numbers that are already reserved on the system cannot be used. If you define your own protocol, it's a good idea to use numbers after 1024.
+Specify the port number with p2. You cannot use socket numbers that are already reserved by the system. When defining your own protocol, it is best to use a number after 1024.
 ^
-When the sockmake instruction is executed, it is ready as a server.
-After this, in order to actually connect to the client, it is necessary to wait until the client connection is completed with the sockwait instruction.
+When the sockmake command is executed, preparation as a server is completed.
+After this, in order to actually connect with the client, it is necessary to wait for the client's connection to complete with the sockwait command.
 ^
-If the result is an error, it will be a non-zero value. If an error occurs during initialization, communication will not be possible.
+If the result is an error, it will be a value other than 0. If an error occurs during initialization, communication cannot be performed.
 
 The details of the value of the system variable stat are as follows.
 ^p
-  stat: Error details
+  stat : Error details
  ----------------------------------------------------
-   1: TCP / IP is not installed on Windows
-   2: Socket initialization failed
-   3: Socket binding failed
+   1   : TCP/IP is not installed on Windows
+   2   : Socket initialization failed
+   3   : Failed to bind Socket
 ^p
 %href
 sockwait
@@ -284,56 +284,35 @@ sockclose
 
 %index
 sockwait
-Wait for a client to arrive
+Waits for client connection
 %group
 Communication control command
 %prm
 p1,p2
-p1 = 0 to 31 (0): Socket ID number
-p2 = 0 to 31 (0): Alternate socket ID number
+p1=0Å`31(0) : Socket ID number
+p2=0Å`31(0) : Alternate socket ID number
 %inst
-The socket prepared as a server by the sockmake instruction waits for incoming clients.
-The sockwait instruction must always be executed after the sockmake instruction completes successfully.
+Waits for client connection on the socket prepared as a server by the sockmake command.
+The sockwait command must always be executed after the sockmake command has completed normally.
 ^
-The sockwait instruction returns a non-zero value to the system variable stat if there is no incoming client or if an error occurs.
-Only when 0 is assigned to the system variable stat will the connection with the client be successful, and communication such as sockget and sockput instructions will be possible.
+The sockwait command returns a value other than 0 to the system variable stat if there is no client connection or if an error occurs.
+Only when 0 is assigned to the system variable stat, the connection with the client is successful, and it becomes possible to perform communication such as the sockget command and the sockput command.
 ^
-When waiting for an incoming call as a server, initialize the socket as a server with the sockmake instruction, and then loop and wait until the system variable stat becomes 0 with the sockwait instruction. In that case, it is necessary to put a wait or await instruction in the loop to make a gap.
-Otherwise, the task will not go to other Windows applications.
+When waiting for connection as a server, initialize the socket as a server with the sockmake command, and then loop and wait until the system variable stat becomes 0 with the sockwait command. At that time, it is necessary to put a wait or await command in the loop to leave a space.
+Otherwise, tasks will not be distributed to other Windows applications.
 ^
-If p2 is 0 or omitted, it is possible to communicate with the client through the socket ID number specified in p1.
-If you specify a value other than 0 for p2, you can communicate with the incoming client through the alternate socket ID specified in p2.
-In this case, with the socket ID number specified in p1, it is possible to continue server operation with the sockmake instruction. If you want to accept multiple client incoming calls on the same port, be sure to use an alternate socket ID number.
+If p2 is 0 or omitted, it becomes possible to communicate with the client through the socket ID number specified by p1.
+If a value other than 0 is specified in p2, communication with the connected client can be performed through the alternate socket ID specified in p2.
+In this case, the socket ID number specified in p1 can continue to perform server operation with the sockmake command. If you want to accept multiple client connections on the same port, use an alternate socket ID number.
 ^
-If the result is an error, it will be a non-zero value. If an error occurs, communication will not be possible.
+If the result is an error, it will be a value other than 0. If an error occurs, communication cannot be performed.
 
 The details of the value of the system variable stat are as follows.
 ^p
-  stat: Error details
+  stat : Error details
  -----------------------------------------------------
-   1: No connection request from the client
-   2: The server is not ready with the sockmake instruction
-   3: Socket is not in the receiving state
-   4: Failed to put Socket in receive state
-   5: Failed to connect to the client
-^p
-%href
-sockmake
-
-
-
-
-%index
-ipget
-Get the IP address of the host
-%group
-Communication control command
-%prm
-%inst
-Get the IP address of the host and assign it to the system variable refstr.
-^
-If an error occurs while getting the IP address, 1 is assigned to the system variable stat. If the IP address can be obtained normally, the value of the system variable stat will be 0.
-
-
-
-
+1 : No connection requests have been received from the client.
+2 : Server preparation is not complete due to the sockmake command.
+3 : The socket is not in a receiving state.
+4 : Failed to put the socket into a receiving state.
+5 : Failed to connect to the client.

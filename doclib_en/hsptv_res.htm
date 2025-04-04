@@ -1,87 +1,86 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html lang="ja">
+<html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Language" content="en">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
 	<meta name="author" content="OpenHSP3 Project">
 	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSPTV">
-<meta name = "description" content = "Information about HSPTV">
+	<meta name="description" content="Information about HSPTV">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
-<title> HSPTV folder material list </title>
+	<title>HSPTV Folder Material List</title>
 </head>
 <body>
 	<div id="CONTAINER">
-<!-Header->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
-<h1> HSPTV folder material list </h1>
+		<!-- Header -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2022(c)</p>
+		<h1>HSPTV Folder Material List</h1>
 
-<h2 id = "ABOUT"> About the material </h2>
+		<h2 id="ABOUT">About the Materials</h2>
 		<p>
-"HSP TV folder material" is an image and sound data file that can be freely used when presenting a work. With a simple license, it can be used for works other than HSP. <br>
-You can also freely refer to <a href="webdish.html"> "WebDish Service" </a>, which allows you to publish HSP scripts on the Web.
-I hope that many works will be created by utilizing "HSPTV folder material" and "WebDish material".
+The "HSPTV Folder Materials" are image and sound data files that can be freely used when presenting your work. They can be used in works other than HSP with a simple license. <br>
+In addition, they can be freely referenced by the <a href="webdish.html">"WebDish service"</a>, which allows you to publish HSP scripts on the Web.
+		We hope that many works will be created by utilizing the "HSPTV Folder Materials" and "WebDish Materials".
 		</p>
 		<pre>
-HSP3.6 WebDish material data
+		HSP3.6 WebDish Material Data
 		<a href="https://dev.onionsoft.net/seed/webdish_res.html" target="_blank">https://dev.onionsoft.net/seed/webdish_res.html</a>
 		</pre>
 
-<h2 id = "USEAGE"> Material reference </h2>
+		<h2 id="USEAGE">Referencing Materials</h2>
 		<p>
-You can easily refer to the material from the HSP script.
+		You can easily reference materials from HSP scripts.
 		</p>
 		<pre>
-			picload dir_tv+"bg01.jpg"
+			picload "bg01.jpg"
 		</pre>
 		<p>
-The HSPTV folder is referenced by writing the file name after "dir_tv +".
-(HSP3Dish searches the material in the HSPTV folder by default without entering dir_tv.) <br>
-When creating an executable file and distributing it, use the #pack or #epack instruction to distribute only the necessary materials.
-Please note that it needs to be added as a resource. <br>
-In HSP3.6β3 or later, a module for loading resources in a batch is provided.
+		The file with the same name in the HSPTV folder will be referenced.
+		(You can also describe the file name like "picload dir_tv+"bg01.jpg"", putting the macro "dir_tv" indicating the HSPTV material folder.)<br>
+		When creating and distributing an executable file, be careful to add only the necessary materials as resources with the #pack or #epack command.<br>
+		From HSP3.6β3 onwards, a module is available for loading resources collectively.
 		</p>
 		<pre>
 			#include "hsptv_res.as"
 		</pre>
 		<p>
-By writing the above at the beginning of the script, the following instructions will be added.
+		By writing the above description at the beginning of the script, the following commands will be added.
 		</p>
 		<pre>
-hsptv_se _p1 Load sound effects together
-_p1: 1 = Simple sound effect (SE01 ~ SE15)
-_p1: 2 = Real sound effects (SND01 to SND19)
-(After that, it can be played with mmplay SE01 etc.)
+		hsptv_se _p1		Load sound effects collectively
+			_p1 : 1=Simple sound effects (SE01〜SE15)
+			_p1 : 2=Realistic sound effects (SND01〜SND19)
+		(After that, you can play with mmplay SE01, etc.)
 
-hsptv_tamadot _p1 Read Tamane-chan 2D pixel art material
-			_p1 : 0=64�~64 1=32�~32
-(The screen buffer ID is assigned to tamadot)
-(It will be possible to display by ceput tamadot, number)
+		hsptv_tamadot _p1	Load Tamane-chan 2D dot picture material
+			_p1 : 0=64×64 1=32×32
+		(The screen buffer ID is assigned to tamadot)
+		(You can display it with ceput tamadot, number)
 
-hsptv_tamane _p1 Read Tamane-chan 2D standing picture material
-_p1: 0 = 256 x 512 dots, 1-8 = 512 x 1024 dots
-(The screen buffer ID is assigned to tamas)
-(Ceput tamas, can be displayed by number)
+		hsptv_tamane _p1	Load Tamane-chan 2D standing picture material
+			_p1 : 0=256×512 dots, 1〜8=512×1024 dots
+		(The screen buffer ID is assigned to tamas)
+		(You can display it with ceput tamas, number)
 
-hsptv_tamasc _p1 Read Tamane-chan uniform material
-_p1: 1 to 5 (variations)
-(The screen buffer ID is assigned to tamasc)
+		hsptv_tamasc _p1	Load Tamane-chan uniform material
+			_p1 : 1〜5(Variations)
+		(The screen buffer ID is assigned to tamasc)
 
-hsptv_keisc _p1 Read professional student uniform material
-_p1: 1 to 5 (variations)
-(The screen buffer ID is assigned to keisc)
+		hsptv_keisc _p1		Load Pro-Nama-chan uniform material
+			_p1 : 1〜5(Variations)
+		(The screen buffer ID is assigned to keisc)
 
-hsptv_tamawiz _p1 Tamane-chan witch Load material
-_p1: 1 to 10 (variations)
-(The screen buffer ID is assigned to tamawiz)
+		hsptv_tamawiz _p1	Load Tamane-chan wizard material
+			_p1 : 1〜10(Variations)
+		(The screen buffer ID is assigned to tamawiz)
 
-hsptv_keiknight _p1 Read the material of professional student knight
-_p1: 1 to 10 (variations)
-(The screen buffer ID is assigned to keiknight)
+		hsptv_keiknight _p1	Load Pro-Nama-chan knight material
+			_p1 : 1〜10(Variations)
+		(The screen buffer ID is assigned to keiknight)
 		</pre>
 
-<h2 id = "GRAPHICS"> Image list </h2>
+		<h2 id="GRAPHICS">Image List</h2>
 		<pre>
 
 	<a href="../hsptv/baku.png">baku.png</a>
@@ -206,7 +205,7 @@ _p1: 1 to 10 (variations)
 	<a href="../hsptv/yama2.jpg">yama2.jpg</a>
 		</pre>
 
-<h2 id = "SOUND"> Sound list </h2>
+		<h2 id="SOUND">Sound List</h2>
 		<pre>
 
 	<a href="../hsptv/bgm04.mid">bgm04.mid</a>
@@ -267,39 +266,39 @@ _p1: 1 to 10 (variations)
 		</pre>
 
 
-<h2 id = "LICENCE"> Copyright and license </h2>
+		<h2 id="LICENCE">Copyright and License</h2>
 		<p>
 
 		<p>
-The HSPTV folder material is provided as part of the full HSP (Hot Soup Procrssor) set and is copyrighted by onion software.
+		The HSPTV folder materials are provided as part of the HSP (Hot Soup Processor) full set and are copyrighted by onion software.
 		</p>
 		<p>
-The HSPTV folder material can be freely used, modified, and distributed when the user creates the software.
-When writing the copyright, please post as follows.
+		HSPTV folder materials can be freely used, modified, and distributed when users create software.
+		If you are including a copyright notice, please include the following:
 		</p>
 		<pre>
-HSP3.6 WebDish material data
+		HSP3 WebDish material data
 		https://dev.onionsoft.net/seed/webdish_res.html
 		</pre>
 		<p>
-Professional student and professional student collaboration materials are distributed according to the professional student usage guidelines.
+		Proseichan and Proseichan collaboration materials are distributed in accordance with the Proseichan Usage Guidelines.
 		</p>
 		<pre>
 		https://kei.pronama.jp/guideline/
 		(C) Pronama LLC
 		</pre>
 		<p>
-Even if you use the HSPTV folder material, you are not obliged to make a copyright notice.
-However, if you want to use it for commercial purposes or sell the material itself, please contact the author (onion software).
-Except for some data, there is no restriction on the use even for commercial use, so
-We will inform you about the provision of licenses individually.
+		There is no obligation to include a copyright notice even when using HSPTV folder materials.
+		However, if you are using them for commercial purposes or selling the materials themselves, please contact the author (onion software).
+		Except for some data, we do not restrict the use even for commercial purposes, so
+		we will provide individual guidance on licensing.
 		</p>
 
 
-<!-Footer->
+		<!-- Footer -->
 		<ul id="FOOTER">
-<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
-<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="#CONTAINER">Return to the top of this page</a></li>
+			<li><a href="../index.htm">Return to the list of documents</a></li>
 			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
 		</ul>
 		<a href="https://www.onionsoft.net/hsp/">

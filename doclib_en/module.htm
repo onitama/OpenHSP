@@ -1,106 +1,98 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html lang="ja">
+<html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Language" content="en">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
 	<meta name="author" content="OpenHSP3 Project">
-<meta name = "keywords" content = "HSP, HSP3, HotSoupProcessor3, module, module">
-<meta name = "description" content = "Description of module function in HSP3">
+	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor3,module,モジュール">
+	<meta name="description" content="HSP3におけるモジュール機能の説明">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
 	<link href="../single.css" rel="stylesheet" type="text/css" media="all">
-<title> HSP3 Module Function Guide </title>
+	<title>HSP3 Module Function Guide</title>
 </head>
 <body>
 	<div id="CONTAINER">
-<!-Header->
+		<!-- Header -->
 		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
 		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
-<h1> HSP3 Module Function Guide </h1>
+		<h1>HSP3 Module Function Guide</h1>
 
-<!-Table of Contents->
+		<!-- Table of Contents -->
 		<ol>
-<li> <a href="#ABOUT"> About HSP module function </a> </li>
-<li> <a href="#USERDEF"> About user-defined instructions </a> </li>
-<li> <a href="#BASIC"> How to use the module (basic) </a> </li>
-<li> <a href="#APP"> How to use the module (application) </a> </li>
-<li> <a href="#MODDEF"> Module definition instruction </a> </li>
-<li> <a href="#CLEANUP"> About the module cleanup function </a> </li>
-<li> <a href="#MODNAME"> Standard keywords and "@hsp" module names </a> </li>
+			<li><a href="#ABOUT">About HSP Module Function</a></li>
+			<li><a href="#USERDEF">About User-Defined Instructions</a></li>
+			<li><a href="#BASIC">How to Use Modules (Basic)</a></li>
+			<li><a href="#APP">How to Use Modules (Advanced)</a></li>
+			<li><a href="#MODDEF">Module Definition Instructions</a></li>
+			<li><a href="#CLEANUP">About Module Cleanup Function</a></li>
+			<li><a href="#MODNAME">About Standard Keywords and "@hsp" Module Name</a></li>
 		</ol>
 
 		<p>
-This text is supported by Hot Soup Processor ver3.0 or later
-Contains a description of module functionality.
+			This text contains an explanation of the module function supported in Hot Soup Processor ver3.0 and later.
 		</p>
 		<p>
-Modular function is for those who want to use HSP deeper and more advanced.
-This is an extension. However, this feature is not necessary for everyone.
-For beginners and those who are going to use HSP, they haven't learned about modules yet.
-You don't have to. However, intermediate and above are more efficient at source
-It is an important element that can be reused, so please master it.
+			The module function is an extension for those who want to use HSP more deeply and sophisticatedly.
+			However, this function is not necessary for everyone.
+			Beginners or those who are just starting to use HSP do not need to learn about modules yet.
+			However, for intermediate and advanced users, it is an important element that allows more efficient source
+			reuse, so please master it.
 		</p>
 		<p>
-In addition, advanced users can take advantage of more advanced module variable functions.
-The details of module variables are not covered in this guide, so
-See the programming guide for more information.
+			In addition, advanced users can use even more advanced module variable functions.
+			Details about module variables are not explained in this guide, so
+			please refer to the programming guide for details.
 		</p>
 
-<h2 id = "ABOUT"> About HSP module function </h2>
+		<h2 id="ABOUT">About HSP Module Function</h2>
 		<p>
-The module function allows multiple scripts without worrying about label name or variable name collisions.
-It is a mechanism for combining.
+			The module function is a mechanism for combining multiple scripts without worrying about conflicts in label names or variable names.
 		</p>
 		<p>
-This function manages a large number of variable names when creating large-sized scripts.
-It is effective when you do. By utilizing the module function
-You will be able to create more versatile scripts.
+			This function is effective when creating large scripts or managing a large number of variable names.
+			By utilizing the module function,
+			you will be able to write more versatile scripts.
 		</p>
 		<p>
-Also, even if you don't use the module function, other people can use the module function.
-It is possible to use the new instructions added using. This is due to the DLL
-It is the same as the mechanism of the extension plug-in.
+			Also, even those who do not use the module function can use new instructions added by others using the module function.
+			This is no different from the DLL-based
+			extension plug-in mechanism.
 		</p>
 		<p>
-First, let's talk about modules.
-For example, let's say you have a source script called "test1.as".
-Suppose you are using variables a and b in this source script.
-If another person created a source script called "test2.as", there
-What if you had a very useful subroutine?
-If you don't use the names variable a and variable b in "test2.as", there is no problem.
-You may be able to bring just the subroutine as it is.
-However, if "test2.as" also uses variable a and variable b for different purposes,
-It's very troublesome.
+			First, let's explain modules.
+			For example, let's say there is a source script called "test1.as".
+			Suppose this source script uses variable a and variable b.
+			If someone else created a source script called "test2.as" and there was a very useful subroutine in it, what would happen?
+			If "test2.as" does not use the names variable a and variable b, there will be no problem,
+			and you may be able to simply bring in the subroutine.
+			However, if "test2.as" also uses variable a and variable b for other purposes,
+			it is very troublesome.
 		</p>
 		<p>
-If you use the HSP module function, you can create a script from "test1.as" to "test2.as".
-It will be possible to call it, but it is used in "test1.as" and "test2.as"
-Variables that are present are treated as independent (even if they have the same name).
-Also, register the subroutine in this independent script as a new instruction.
-It is possible to pass and receive parameters.
+			Using the HSP module function, you can call the script of "test2.as" from "test1.as", but the variables used in "test1.as" and "test2.as" are treated as independent (even if they have the same name).
+			In addition, the subroutines in this independent script can be registered as new instructions,
+			and parameters can be passed and received.
 		</p>
 		<p>
-Reuse modules created in the past, publish them for people to use,
-Wider application of HSP scripts, such as using modules created by someone else
-It will be possible to do.
+			You can reuse modules you have created in the past, publish them for others to use,
+			use modules created by other people, and apply HSP scripts more widely.
 		</p>
 		<p>
-To master the HSP module, user extension instructions, module in
-You need to use port instructions etc. These are also convenient as a single unit
-An instruction that provides a function. Don't try to remember at once, one from what you know
-Let's master one.
+			In order to master the HSP module, you need to use user extension instructions, module import instructions, etc.
+			These are useful even as stand-alone
+			instructions that provide functions. Don't try to memorize everything at once, but master them one by one, starting with what you understand.
 		</p>
 		
-<h2 id = "USERDEF"> About user-defined instructions </h2>
+		<h2 id="USERDEF">About User-Defined Instructions</h2>
 		<p>
-User-defined instructions are one of the instructions added with the HSP module function.
-The user can add an instruction with a new name at will.
-This is very powerful even if it is used alone apart from the HSP module function.
-Will be.
+			User-defined instructions are one of the instructions added with the HSP module function,
+			and allow the user to arbitrarily add instructions with new names.
+			This will be very powerful even if used as a stand-alone function apart from the HSP module function.
 		</p>
 		<p>
-User-defined instructions are used as follows.
+			User-defined instructions are used as follows.
 		</p>
 		<pre>    goto *main
 
@@ -112,17 +104,16 @@ User-defined instructions are used as follows.
     routine
     stop</pre>
 		<p>
-There is no "routine" in HSP instructions, so until now it was an error
-However, when I actually execute this script, it says "sub-routine".
-Is displayed and the command "routine" is executed.
+			The HSP instruction set does not include "routine", so it would normally result in an error,
+			but when you actually execute this script, the message "sub-routine"
+			is displayed and the "routine" instruction is executed.
 		</p>
 		<p>
-User-defined instructions can be defined by the instruction "#deffunc".
-<code> #deffunc instruction name </code>
-Will add an instruction with a new name.
-After that, if a new command comes out, go to the place where "#deffunc" is.
-Subroutine jump.
-In other words
+			User-defined instructions can be defined by the "#deffunc" instruction.
+			<code>#deffunc instruction name</code>
+			adds a new instruction with the specified name.
+			From then on, when a new instruction appears, the program jumps to the location of "#deffunc".
+			In other words,
 		</p>
 		<pre>    goto *main
 
@@ -133,7 +124,7 @@ In other words
 *main
     gosub *routine</pre>
 		<p>
-Even with a script like
+			A script like this
 		</p>
 		<pre>    goto *main
 
@@ -144,58 +135,52 @@ Even with a script like
 *main
     routine</pre>
 		<p>
-But it's the same.
+			Is the same.
 		</p>
 		<p>
-Also, user-defined instructions can pass parameters to subroutines.
-It is possible.
+			User-defined instructions also make it possible to pass parameters to subroutines.
 		</p>
 		<pre>    goto *main
 
 #deffunc routine int prm1, int prm2
-    mes "Parameter 1 is" ​​+ prm1 + "."
-    mes "Parameter 2 is" + prm2 + "."
+    mes "Parameter 1 is, "+prm1+"."
+    mes "Parameter 2 is, "+prm2+"."
     return
 
 *main
     routine 10,20</pre>
 		<p>
-In the conventional gosub instruction, when passing a value to a subroutine, it is done in advance.
-I had no choice but to put a value in a fixed variable and call it.
-User-defined instructions instead pass values ​​in a smart way
-It is possible.
+			With the previous gosub instruction, when passing a value to a subroutine, it was necessary to first
+			put the value into a predetermined variable before calling it.
+			User-defined instructions allow you to pass values in a smarter way instead.
 		</p>
 		<p>
-Also, the parameters to be passed are not only numerical values, but also character strings, variables (arrays), etc.
-There are many variations. Also, when returning from a subroutine
-Assign a value to the system variable stat or to a variable specified as a parameter
-It is also possible to write back the value.
+			In addition, the parameters to pass are not only numbers, but also strings, variables (arrays), etc.
+			There are many variations. Also, when returning from a subroutine, you can assign a value to the system variable stat, or
+			write a value back to the variable specified as a parameter.
 		</p>
 		<p>
-This parameter, also known as an alias, is indicated by the #deffunc instruction.
-It can be set when defining a new instruction.
+			This parameter is also called an alias, and can be set when defining a new instruction with the #deffunc instruction.
 		</p>
-<pre> #deffunc Instruction name Parameter type alias name,… </pre>
+		<pre>#deffunc instruction name parameter type alias name,…</pre>
 		<p>
-By writing as, to get the specified parameter type,
-You will be able to refer to it by alias name.
-For more information, see #deffunc instruction details.
+			By describing it as , you can acquire the specified parameter type and
+			refer to it by the alias name.
+			For details, see "#deffunc instruction details".
 		</p>
 		<p>
-Also, from HSP3.0, the user can define the function with the #defcfunc instruction.
-It is possible. This is also the same specification as the #deffunc instruction, and you can easily create a function.
-You can add it.
+			Also, from HSP3.0, users can define functions using the #defcfunc instruction.
+			You can easily add functions using the same specifications as the #deffunc instruction.
 		</p>
 
-<h2 id = "BASIC"> How to use the module (basic) </h2>
+		<h2 id="BASIC">How to Use Modules (Basic)</h2>
 		<p>
-A module is a source unit that can handle variable names and label names independently.
-The easiest way to use a module is to have one module part
-Save it as a source script file (as file) and start from another file
-Is to call it as a module.
-For example, write the module source in a file called test1.as.
+			A module refers to a unit of source whose variable names and label names are handled independently.
+			The easiest recommended way to use modules is to put the module part in one
+			source script file (as file) and call it as a module from another file.
+			For example, write the source to be a module in a file named test1.as.
 		</p>
-<pre> // Contents of test1.as
+		<pre>// Contents of test1.as
 
 #module
 #deffunc test1
@@ -203,188 +188,147 @@ For example, write the module source in a file called test1.as.
     return
 #global</pre>
 		<p>
-Modules always start with "#module" and end with "#global"
-Think of it as a promise.
+			Modules must always start with "#module" and end with "#global".
 		</p>
 		<p>
-If you write it like this, it will be called by the instruction "test1" in the module.
-You will have a subroutine that you can do.
-Next, put the source to call this in a file called "test2.as"
-Let's write.
+			If you describe it like this, you will create a subroutine in the module that can be called with the instruction "test1".
+			Next, let's write the source to call this in a file called "test2.as".
 		</p>
-<pre> // Contents of test2.as
+		<pre>// Contents of test2.as
 
 #include "test1.as"
-    mes "test2.as."
+    mes "It's test2.as."
     test1
     stop</pre>
 		<p>
-Source "test1.as" for registering a module with the "#include" instruction
-Now loading.
+			The "#include" instruction reads the source "test1.as" to register the module.
 		</p>
 		<p>
-After this, you will see a line with the command "test1".
-Since this is a user-defined instruction (for details, see "About user-defined instructions".
-(See), the subroutine "test1.as" is called.
-When you actually run this script,
+			After this, the line where the instruction "test1" is written appears.
+			Since this is a user-defined instruction (for details, see "About User-Defined Instructions"),
+			the subroutine of "test1.as" is called.
+			When you actually execute this script,
 		</p>
-<pre> test2.as.
-It is displayed in test1.as. </pre>
+		<pre>It's test2.as.
+Displayed in test1.as.</pre>
 		<p>
-Two lines appeared, and the module of test1.as was called from test2.as.
-I understand this.
+			The two lines appear, and you can see that the module of test1.as is called from test2.as.
 		</p>
 		<p>
-In this basic example, we are only displaying a message, so we use the gosub instruction.
-It hasn't changed much from the subroutine call, and its power as a module is
-It has not been demonstrated.
-But what about the following example?
+			In this basic example, it is only displaying a message, so it is not much different from calling a subroutine using the gosub instruction, and the power of the module is not demonstrated.
+			So, what about the following example?
 		</p>
-<pre> // Contents of test1.as
+		<pre>// Contents of test1.as
 
 #module
 #deffunc test1
     a=456
     mes "In test1,"
-    mes "A =" + a + "."
+    mes "A="+a+"."
     return
 #global</pre>
-<pre> // Contents of test2.as
+		<pre>// Contents of test2.as
 
 #include "test1.as"
     a=123
     test1
     mes "In test2,"
-    mes "A =" + a + "."
+    mes "A="+a+"."
     stop</pre>
 		<p>
-Now when I run "test2.as",
+			If you execute "test2.as" with this,
 		</p>
-<pre> in test1
-A = 456.
-In test2
-A = 123. </pre>
+		<pre>In test1,
+A=456.
+In test2,
+A=123.</pre>
 		<p>
-It will be. Normally, 456 is assigned to the variable a first on the "test1.as" side.
-Since it is, the same value is obtained in "test2.as", but the module
-Since the names are independent inside and outside, even with the same variable a, "test1.as",
-"Test2.as" keeps different contents.
-		</p>
-		<p>
-In this way, even if the names of <em> variables and labels are duplicated, there is no problem at all.
-The basic concept of the module is that each script works </em>
-is.
+			Will be. Normally, since 456 is assigned to the variable a on the "test1.as" side first,
+			the same value should be in "test2.as", but the names are independent inside and outside the module, so even if the variable a is the same,
+			"test1.as" and "test2.as" hold different contents.
 		</p>
 		<p>
-However, there are some problems when variables are independent. Call the module
-Sometimes you want to get some result, or you want to pass a value to a module.
+			In this way, <em>even if variable and label names overlap, each script operates without any problems</em>, which is the basic concept of modules.
 		</p>
 		<p>
-Actually, the function for this is prepared in the user-defined instruction, and another mod
-It can be used to exchange parameters with the tool.
+			However, there are also some problems when variables are independent. Sometimes you want to call a module to get some results, or pass values to a module.
 		</p>
-<pre> // Contents of test1.as
+		<p>
+			Actually, user-defined commands have a function for this, which can be used to exchange parameters with other modules.
+		</p>
+		<pre>// Contents of test1.as
 
 #module
 #deffunc test1 int prm1
-    mes "The parameter is" + prm1 + "."
+    mes "The parameter is, "+prm1+"."
     return 1
 #global</pre>
 
-<pre> // Contents of test2.as
+		<pre>// Contents of test2.as
 
 #include "test1.as"
     a=543
     test1 a
-    mes "STAT is" + stat + "."
+    mes "STAT is, "+stat+"."
     stop</pre>
 		<p>
-In the above example, the call to the user-defined instruction test1 is called "test1 a".
-In the description with parameters, the content of variable a, the value 543, is passed.
-In "test1.as", this passed value is given by the alias name prm1.
-Fetch it, assign the value 1 to the system variable stat, and exit.
+			In the example above, when calling the user-defined command test1, the value 543, which is the content of the variable a, is passed with the parameter-specified description "test1 a". In "test1.as", this passed value is retrieved using the alias name prm1, and then the system variable stat is assigned the value 1 before exiting.
 		</p>
 		<p>
-The important thing is that in "test2.as" the variable name used in "test1.as"
-And so on, you don't have to worry about it.
-Similarly, from "test1.as", the variable name with the caller overlaps.
-You don't have to worry about it.
-Subroutines with independent functions can be completely separated
-It is an HSP module function.
+			The important thing is that "test2.as" does not need to worry about variable names used in "test1.as". Similarly, "test1.as" does not need to worry about overlapping variable names with the caller. The HSP module function completely separates subroutines with independent functions.
 		</p>
 		<p>
-The above is the basic usage of the module.
-See the next section for further applications.
+			The above is the basic usage of modules. See the next section for further applications.
 		</p>
 
-<h2 id = "APP"> How to use the module (application) </h2>
+		<h2 id="APP">How to Use Modules (Advanced)</h2>
 <p>
-In the basic explanation, only one instruction was defined in one module,
-You can also create multiple user-defined instructions in one module.
+	In the basic explanation, only one command was defined in one module, but you can also create multiple user-defined commands in one module.
 </p>
-<pre> // Contents of test1.as
+<pre>// Contents of test1.as
 
 #module
 #deffunc test1
-    mes "Displayed by test1"
+    mes "Displaying with test1."
     return
 
 #deffunc test2
-    mes "Displayed by test2"
+    mes "Displaying with test2."
     return
 #global</pre>
 <p>
-In the above example, the new instructions "test1" and "test2" are added.
-In this case, the variable name and label name are the same between "test1" and "test2".
-Become.
+	In the example above, the commands "test1" and "test2" are newly added. In this case, variable names and label names are the same between "test1" and "test2".
 </p>
 <p>
-If you want to use independent variable names and label names for "test1" and "test2",
+	If you still want to use independent variable names and label names in "test1" and "test2",
 </p>
 <pre>#module
 #deffunc test1
-    mes "Displayed by test1"
+    mes "Displaying with test1."
     return
 #global
 
 #module
 #deffunc test2
-    mes "Displayed by test2"
+    mes "Displaying with test2."
     return
 #global</pre>
 		<p>
-This can be achieved by writing in this way.
-In other words, a module is a section separated by "#module" to "#global".
-I am instructing you to think of the other sections as a completely different world.
-That's what it is.
+			You can achieve this by writing as above. In other words, the module instructs the system to consider the section delimited by "#module" to "#global" and the other sections as completely different worlds.
 		</p>
 		<p>
-In the basic explanation, there are two files, "test1.as" and "test2.as".
-Explain the module and the other part (global area) separately
-I was there. In fact without including "test1.as"
-It is possible to create more and more modules in one file, but
-If possible, use only one module in one file and one source
-It is better to unify the variable name and label name in the script.
-Especially for label names, there are many same labels in one source script.
-It can be confusing.
+			In the basic explanation, modules and non-module parts (global area) were explained separately in two files, "test1.as" and "test2.as". In reality, it is possible to create more and more modules within one file without including "test1.as", but it is better to have only one module per file, and unify variable names and label names in one source script. In particular, having the same label multiple times in one source script can be confusing.
 		</p>
 		<p>
-All variables in a module are basically shared statically.
-In other words, a variable once set loses its contents unless another value is assigned.
-It is not. Therefore, recursive call (calling itself)
-Be careful when doing.
+			Variables in modules are basically all statically shared. That is, once a variable is set, its contents are not lost unless another value is assigned to it. Therefore, care must be taken when performing recursive calls (calling itself).
 		</p>
 		<p>
-Within each definition instruction, a local declaration explicitly sets a local variable.
-You can create it. When making a recursive call, be sure to do it internally
-Make sure the variables you use are local.
-(If you make a local declaration, it's more than usual to create and destroy variables.
-Also keep in mind that there is a cost to run. )
+			Within each definition command, you can explicitly create local variables by using local declarations. When performing recursive calls, be sure to make the variables used internally local. (Note that performing local declarations costs more to execute than usual because of the generation and destruction of variables.)
 		</p>
 		
-<h2 id = "MODDEF"> Module definition instruction </h2>
+		<h2 id="MODDEF">Module Definition Commands</h2>
 		<p>
-The following preprocessor instructions are provided as module definition instructions in HSP3.
+			HSP3 provides the following preprocessor directives as module definition commands.
 		</p>
 		<ul>
 			<li>#module</li>
@@ -393,80 +337,61 @@ The following preprocessor instructions are provided as module definition instru
 			<li>#defcfunc</li>
 		</ul>
 		<p>
-Check the usage of each instruction from the help browser.
+			Please check the help browser for how to use each command.
 		</p>
 		<!--
-Comments for OpenHSP Project:
-Only this section has undergone major changes.
-Almost all of them had the same contents as the hs file, so I'm inviting them to refer to them.
+			OpenHSP Project comment:
+				This section has been significantly changed.
+				Since it was almost the same as the hs file, we are guiding you to refer to it.
 				2008.01.23 eller
-We are planning to revive the explanation.
+				We plan to restore the explanation.
 				2008.03.28 eller
 		-->
 
-<h2 id = "CLEANUP"> About the module cleanup function </h2>
+		<h2 id="CLEANUP">About Module Cleanup Function</h2>
 		<p>
-The cleanup function is a script in the module just before the HSP program ends.
-It is called automatically, and after that, when the function is expanded by a module, etc.
-It allows you to release the system and memory. This is a cleanup function
-calling. To use this feature, when declaring a user-defined instruction in a module,
+			The cleanup function automatically calls the script in the module just before the HSP program ends. This allows for post-processing such as releasing the system and memory when the function is extended by the module. This is called the cleanup function. To use this function, when declaring a user-defined command in the module,
 		</p>
-<pre> #deffunc name onexit </pre>
+		<pre>#deffunc name onexit</pre>
 		<p>
-Please put "onexit" in the part that describes the argument like.
-When the HSP program is finished, the instruction is automatically executed.
-However, note the following points within this instruction:
+			Please put "onexit" in the part where you describe the arguments. When the HSP program ends, that command will be executed automatically. However, please note the following points in this command.
 		</p>
 		<ul>
-<li> End, stop, wait, await, dialog, and other instructions that cause a time wait cannot be used </li>
-<li> Commands such as mes that are output to the screen do not work </li>
+			<li>Commands that cause time delays such as end, stop, wait, await, and dialog cannot be used.</li>
+			<li>Commands that output to the screen such as mes do not function.</li>
 		</ul>
 		<p>
-In other words, only the final work such as releasing the minimum memory and calling the external DLL
-Think of it as a description.
-There is a onexit instruction that works in the same way, but as a system process
+			In other words, it should be considered as only describing the minimum memory release and finally executed work such as calling external DLLs. A similar operation is the onexit command, but the system process is
 		</p>
 		<ol>
-<li> [Interrupt HSP program] </li>
-<li> [Execute the jump destination of the onexit instruction] </li>
-<li> [Run module cleanup destination] </li>
-<li> [Complete destruction of HSP resources] </li>
+			<li>[Interrupt HSP program]</li>
+			<li>[Execute jump destination of onexit command]</li>
+			<li>[Execute module cleanup destination]</li>
+			<li>[Complete disposal of HSP resources]</li>
 		</ol>
 		<p>
-It is in the order.
-At the jump destination of the onexit instruction, it is also possible to interrupt the program itself.
-Yes, but you can't interrupt the cleanup feature.
-Also, if multiple modules or multiple cleanup instructions are registered,
-It will be executed one after another by following the order in which it was registered.
+			is the order. In the jump destination of the onexit command, it is possible to cancel the interruption of the program itself, but in the case of the cleanup function, interruption is not possible. Also, when multiple modules or multiple cleanup commands are registered, they are executed one after another in the reverse order of registration.
 		</p>
 
-<h2 id = "MODNAME"> Standard keywords and "@hsp" module name </h2>
+		<h2 id="MODNAME">About Standard Keywords and "@hsp" Module Name</h2>
 		<p>
-Standard keywords are assigned to the space with the module name "@hsp".
-This means that the name "mes @ hsp" is the official name for the mes instruction, for example.
-However, names without "@hsp" are also registered as aliases so that they can be used in normal global spaces.
-You can use it as it is with the same instruction name as before.
+			Standard keywords are assigned to the space of the module name "@hsp". This means that, for example, the formal name of the mes command is "mes@hsp". However, since the name without "@hsp" is also registered as an alias so that it can be used in the normal global space, you can continue to use the command name as before.
 		</p>
 		<p>
-For example, for the mes instruction, "#define global mes mes @ hsp" is the same as being defined from the beginning.
-(After preprocessor processing, standard keywords are expanded to canonical names with "@hsp".
-You can see it by opening "hsptmp.i" which can be output at compile time depending on the settings. )
+			For example, in the case of the mes command, it is the same as "#define global mes mes@hsp" being defined from the beginning. (After preprocessor processing, standard keywords are expanded to their regular names with "@hsp". You can see this by opening "hsptmp.i", which can be output during compilation depending on the settings.)
 		</p>
 		<p>
-As a result, the name itself registered as a standard keyword can be used as an alias.
-Allows the user to redefine.
-The following is an example of replacing the mes instruction with a macro.
+			This makes it possible to alias the name itself that is registered as a standard keyword, or for the user to redefine it. The following is an example of replacing the mes command with a macro.
 		</p>
 		<pre>#undef mes
 #define mes(%1) mes@hsp "MES-&gt;"+%1
-    mes "Message." // "MES- & gt; Message." Is displayed.
+    mes "This is a message."  // Displays "MES-&gt;This is a message."
     stop</pre>
 		<p>
-The keyword "mes" is redefined after being canceled by the #undef instruction.
-All standard keywords used by HSP can be canceled and redefined as well.
+			The keyword "mes" is canceled by the #undef command and then redefined. All standard keywords used in HSP can be similarly canceled and redefined.
 		</p>
 		<p>
-The following is an example of replacing the mes instruction with a user-defined instruction.
+			The following is an example of replacing the mes command with a user-defined command.
 		</p>
 	<pre>#undef mes
 #module
@@ -482,15 +407,15 @@ The following is an example of replacing the mes instruction with a user-defined
     mes@hsp _p1
     return
 #global
-    mes "I tried to make the mes instruction a shadow character." </Pre>
+    mes "I tried to make the mes command shadowed."</pre>
 		<p>
-Use the standard keyword redefinition with caution as it affects all subsequent keywords.
+			Please be careful when redefining standard keywords because it affects all keywords thereafter.
 		</p>
 
-<!-Footer->
+		<!-- Footer -->
 		<ul id="FOOTER">
-<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
-<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="#CONTAINER">Back to the top of this page</a></li>
+			<li><a href="../index.htm">Back to the document list</a></li>
 			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
 		</ul>
 		<a href="https://www.onionsoft.net/hsp/">

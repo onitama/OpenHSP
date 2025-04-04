@@ -1,739 +1,785 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html lang="ja">
+<html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Language" content="en">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
 	<meta name="author" content="OpenHSP3 Project">
 	<meta name="keywords" content="HSP,HSP3,HotSoupProcessor,HSP3Dish,android,ndk,google">
-<meta name = "description" content = "Information about HSP3Dish android (NDK) version">
+	<meta name="description" content="Information about HSP3Dish android(NDK) version">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
-<title> Standard Sprite Programming Guide </title>
+	<title>Standard Sprite Programming Guide</title>
 </head>
 <body>
 	<div id="CONTAINER">
-<!-Header->
-	<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
-<h1> Standard Sprite Programming Guide </h1>
+	<!-- Header -->
+	<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2024(c)</p>
+	<h1>Standard Sprite Programming Guide</h1>
 
 	<p><img src="hsp3dish/es_test5.jpg"></p>
 
-<!-Table of Contents->
+	<!-- Table of Contents -->
 	<ol>
-<li> <a href="#ABOUT"> Introduction </a> </li>
-<li> <a href="#USAGE"> How to use </a> </li>
-<li> <a href="#HSPDXDIFF"> Differences from the HSPDX plugin </a> </li>
-<li> <a href="#ABOUT_SPRITE"> What is a sprite </a> </li>
-<li> <a href="#SPRITE_INIT"> Initialization and character pattern registration </a> </li>
-<li> <a href="#ADD_SPRITE"> Sprite registration </a> </li>
-<li> <a href="#MOVE_SPRITE"> Move sprites </a> </li>
-<li> <a href="#INFO_SPRITE"> Sprite parameters </a> </li>
-<li> <a href="#PRIORITY_SPRITE"> Sprite display priority </a> </li>
-<li> <a href="#MANAGE_SPRITE"> Sprite management instructions </a> </li>
-<li> <a href="#ANIMATION"> Animation </a> </li>
-<li> <a href="#EFFECT_SPRITE"> Sprite deformation and effects </a> </li>
-<li> <a href="#CALLBACK_SPRITE"> Sprite callback </a> </li>
-<li> <a href="#MAP_SPRITE"> BG map drawing function </a> </li>
+		<li><a href="#ABOUT">Introduction</a></li>
+		<li><a href="#USAGE">How to Use</a></li>
+		<li><a href="#HSPDXDIFF">Differences from HSPDX Plugin</a></li>
+		<li><a href="#ABOUT_SPRITE">What is a Sprite?</a></li>
+		<li><a href="#SPRITE_INIT">Initialization and Registering Character Patterns</a></li>
+		<li><a href="#ADD_SPRITE">Registering a Sprite</a></li>
+		<li><a href="#MOVE_SPRITE">Moving a Sprite</a></li>
+		<li><a href="#BORDER_SPRITE">Sprite Valid Area</a></li>
+		<li><a href="#INFO_SPRITE">Sprite Parameters</a></li>
+		<li><a href="#PRIORITY_SPRITE">Sprite Display Priority</a></li>
+		<li><a href="#MANAGE_SPRITE">Sprite Management Commands</a></li>
+		<li><a href="#ANIMATION">Animation</a></li>
+		<li><a href="#EFFECT_SPRITE">Sprite Transformation and Effects</a></li>
+		<li><a href="#CALLBACK_SPRITE">Sprite Callback</a></li>
+		<li><a href="#MAP_SPRITE">BG Map Drawing Function</a></li>
+		<li><a href="#DRAWBUFFER">Sprite Drawing to Different Buffers</a></li>
+		<li><a href="#SPFLIPPAT">Controlling Sprite Direction Patterns</a><span class="new">（New!）</span></a></li>
+		<li><a href="#SPGRAVITY">Setting Sprite Gravity</a><span class="new">（New!）</span></a></li>
+		<li><a href="#BGMAPATTR">Setting BG Map Attributes</a><span class="new">（New!）</span></a></li>
+		<li><a href="#BGMAPHIT">BG Map Collision Detection</a><span class="new">（New!）</span></a></li>
+		<li><a href="#SPLINK">Setting Sprite Parent</a><span class="new">（New!）</span></a></li>
+		<li><a href="#BGMAPEVENT">BG Map Event Information</a><span class="new">（New!）</span></a></li>
+		<li><a href="#DECOSP">Decoration Sprite Settings</a><span class="new">（New!）</span></a></li>
+		<li><a href="#SPROPT">Sprite Drawing Option Settings</a><span class="new">（New!）</span></a></li>
 	</ol>
 
 
-<h2 id = "ABOUT"> Introduction </h2>
+	<h2 id="ABOUT">Introduction</h2>
 	<p>
-A standard sprite is a handy instruction set that can be used for drawing such as 2D games.
-It provides a mechanism for managing images used in games, etc., such as moving them together and searching them.
-The standard sprite instructions are compatible with the instructions that were added as the hspdx plugin,
-It is possible to handle 2D drawing easily. <br>
-So far, there have been several ways to use sprites (rectangular images) when drawing in 2D with HSP3.
+	Standard sprites refer to a simple set of commands that can be used for drawing in 2D games, etc.
+	It provides a mechanism to manage images used in games, such as moving them together and searching.
+	The standard sprite commands are compatible with the commands that were added as the hspdx plugin,
+	making it easy to handle 2D drawing.<br>
+	Until now, there have been several ways to use sprites (rectangular images) when performing 2D drawing in HSP3.
 	</p>
 	<pre class="quote">
-・ HSPDX plug-in
-・ HGIMG / HGIM GX plug-in
-・ HGIM G3 plug-in
-・ HGIM G4 plug-in
-・ Mod_sprite module </pre>
+	・HSPDX plugin
+	・HGIMG/HGIMGX plugin
+	・HGIMG3 plugin
+	・HGIMG4 plugin
+	・mod_sprite module</pre>
 	<p>
-Among them, the plug-ins up to HSPDX, HGIMG, and HGIMGX are from the HSP2 era, and development has already been completed.
-It is difficult to operate with the current OS and environment. <br>
-The HGIMG3 / HGIMG4 plug-in has 3D functionality as well as a highly functional 2D sprite.
-It also has functions, but instead of managing all coordinates with real numbers and having many functions
-There was a lot of content to learn and it was difficult to handle easily. <br>
-So, the HSPDX plug-in that has the longest history and has been used by many users
-Based on the instructions, the standard sprite is prepared as a simple and easy-to-use 2D-only sprite. <br>
-Sprites can be displayed with simple commands, and sprite images can be freely registered.
-It is equipped with a flexible system. Also, sprite callbacks, map drawing, etc.
-A unique mechanism has also been introduced, making it more convenient than the original HSPDX plugin. <br>
-Coordinates are also managed by integers, making it easy to handle in 2D games and UI displays.
-Of course, you can also use the conventional plug-in for autonomous movement by event list and cooperation with 3D. <br>
-Standard sprites work on all platforms supported by HSP3Dish and HGIMG4, as well as
-We plan to support it in the HSP3 standard runtime as well. <br>
+	Among these, the HSPDX, HGIMG, and HGIMGX plugins are from the HSP2 era, and development has already ended,
+	making it difficult to operate them in the current OS and environment.<br>
+	The HGIMG3/HGIMG4 plugins have advanced 2D sprite functions along with 3D functions,
+	but all coordinates are managed as real numbers, and although there are many functions,
+	the amount of content to learn increases, making it difficult to handle easily.<br>
+	Therefore, standard sprites were prepared as simple and easy-to-use 2D-only sprites based on
+	the commands of the HSPDX plugin, which has the longest history and has been used by many users.<br>
+	It has a flexible system that allows sprites to be displayed with simple commands and sprite images to be registered freely. In addition,
+	unique mechanisms such as sprite callbacks and map drawing have been introduced, improving convenience over the original HSPDX plugin.<br>
+	Coordinates are also managed as integers, making it easy to handle in 2D games and UI displays.
+	Of course, you can also use conventional plugins for autonomous movement using event lists and cooperation with 3D.<br>
+	Standard sprites run on all platforms supported by HSP3Dish and HGIMG4, and
+	are also planned to be supported by the HSP3 standard runtime.<br>
+	</p>
+	<p>
+	In addition, the <a href="dotfw.html">"Tamaoto Dot Framework"</a> is available to support more advanced processing such as games.
+	This is a game-specific framework created using the standard sprite functions.
 	</p>
 
 
-<h2 id = "USAGE"> How to use </h2>
+	<h2 id="USAGE">How to Use</h2>
 	<p>
-Standard sprite instructions are integrated into the HSP3Dish and HGIM G4 runtimes.
-Add the line "#include" hsp3dish.as "" to the beginning of the script
-If you specify the HSP3Dish runtime, you can also use standard sprite instructions.
+	Standard sprite commands are integrated into the HSP3Dish and HGIMG4 runtimes.
+	Add the line "#include "hsp3dish.as"" at the beginning of the script to
+	specify the HSP3Dish runtime, and you will be able to use standard sprite commands.
 	</p>
 	<pre>
-#include "hsp3dish.as"; Use HSP3Dish runtime </pre>
+		#include "hsp3dish.as"	; Use HSP3Dish runtime</pre>
 	<p>
-HGIMG4, an extension of the HSP3Dish runtime, can use standard sprite instructions as well.
-Of course, the drawing function of HSP3Dish / HGIMG4 runtime and all HSP3 instructions are also available.
+	You can also use standard sprite commands in HGIMG4, which is an extended version of the HSP3Dish runtime.
+	Of course, you can use all the drawing functions of the HSP3Dish/HGIMG4 runtime and the HSP3 commands.
 	</p>
 
 
-<h2 id = "HSPDXDIFF"> Difference from HSPDX plug-in </h2>
+	<h2 id="HSPDXDIFF">Differences from HSPDX Plugin</h2>
 	<p>
-Standard sprite instructions are often compatible with HSPDX plug-in instructions,
-Not all instructions are fully compatible. <br>
-The HSPDX plug-in was developed in the HSP2 era, such as screen initialization and palette usage.
-Specifications that matched the display driver at that time were also included.
-Standard sprites are related to palettes, taking into account the current display driver specifications.
-The function has been removed. Also, the instructions related to screen initialization (es_screen, etc.) are
-It will use the mechanism (screen instruction) of the HSP3Dish side. <br>
-Also, in the HSPDX plug-in, the screen was updated by the es_sync command,
-This instruction is obsolete (recognized as a keyword, but nothing is done),
-It will be done according to the drawing of HSP3Dish. <br>
-In many cases, scripts for past HSPDX plugins will need to be reworked, so
-Please note that it is not compatible at all.
-However, regarding sprite and character settings, HSPDX plugin instructions starting with es_ ~
-Almost all are supported. Also, the HSPDXfix plugin that was extended later has
-It also includes expressions such as special effects and rotation enlargement / reduction.
-Since the constants and internal structure are also in a format similar to the HSPDX plug-in, some modifications can be made.
-It should work in the latest environment. <br>
-The HSPDX plugin was only supported on Windows platforms,
-By replacing with standard sprites, web browsers, smartphones, Linux, Raspberry Pi, etc.
-It opens the way for many devices to work.
+	Standard sprite commands are often compatible with HSPDX plugin commands, but
+	not all commands are fully compatible.<br>
+	The HSPDX plugin was developed in the HSP2 era, and included specifications that matched the display drivers of the time, such as screen initialization and palette use.
+	In standard sprites, palette-related functions are deleted in consideration of the specifications of current display drivers.
+	In addition, commands related to screen initialization (such as es_screen) will use the mechanism of HSP3Dish (screen command).<br>
+	Also, in the HSPDX plugin, the screen was updated by the es_sync command,
+	but this command has been abolished (it is recognized as a keyword, but nothing is done),
+	and it will be performed in accordance with the drawing of HSP3Dish.<br>
+	In many cases, scripts for past HSPDX plugins need to be modified, so please note that they are not directly compatible.
+	However, regarding sprite and character settings, almost all commands of the HSPDX plugin starting with es_~ are supported.
+	In addition, it also includes special effects (effects) and expressions such as rotation, scaling, and reduction that the later extended HSPDXfix plugin had.
+	Since constants and internal structures are also in a format close to the HSPDX plugin, it should be possible to operate in the latest environment by making some modifications.<br>
+	The HSPDX plugin only supported the Windows platform, but
+	by replacing it with standard sprites, you can open up the path to run on many devices such as web browsers, smartphones, Linux, and Raspberry Pi.
 	</p>
 
 
-<h2 id = "ABOUT_SPRITE"> What is a sprite? </H2>
+	<h2 id="ABOUT_SPRITE">What is a Sprite?</h2>
 	<p>
-Sprites can be placed anywhere on the screen and display your favorite images.
-It is a rectangle (quadrangle). Just put the square panel with the picture on the screen one by one
-It's like pasting. <br>
-For example, the shooting game's own machine and enemy characters also display figures.
-You can think of it as a sprite. In addition, missiles, explosion marks, etc.
-Sprites are the smallest unit that produces all images. in this way,
-A container that displays a fixed figure anywhere on the screen is called a sprite.
+	A sprite is a rectangle that can be placed freely on the screen and display your favorite images.
+	It's like pasting square panels with pictures on the screen, one by one.<br>
+	For example, the player's own aircraft and enemy characters in a shooting game can also be thought of as sprites that display figures.
+	Furthermore, the smallest unit that outputs all images, such as missiles and explosion marks, can be said to be a sprite. In this way,
+	the container that displays a fixed figure at an arbitrary location on the screen is called a sprite.
 	</p>
 	<p><img src="hsp3dish/i_sprite.png"></p>
 	<p>
-Sprites are just containers, so you need to have a picture to display.
-We call it a character pattern.
-Character patterns are from image files with a transparent background (such as .PNG files)
-You can cut out a part and bring it.
+	Since a sprite is just a container, you need to prepare a picture to display.
+	This is called a character pattern.
+	Character patterns can be obtained by cutting out a portion of an image file with a transparent background (such as a .PNG file).
 	</p>
 	<p><img src="hsp3dish/i_sprite2.png"></p>
 	<p>
-Sprites are managed by a number called sprite number, and each one has a separate image.
-You can display it. Character pattern displayed as a sprite
-Is also managed by the number of the character No. <br>
-For the character pattern, read the image file in advance and read one part of it.
-It is necessary to cut out and register. <br>
-That's all you can do with sprites.
-One character pattern can be assigned to one sprite,
-You can change it on the way. In addition, multiple character patterns are displayed for a certain period of time.
-Switch each time to make it look like an animation, or assign it to a sprite
-You can also transform the character pattern and change the composition method.
+	Sprites are managed by numbers called Sprite No., and different images can be displayed on each one. Character patterns displayed as sprites
+	are also managed by numbers called Character No.<br>
+	Character patterns need to be read in from an image file in advance,
+	cut out a portion of it, and registered.<br>
+	That's all a sprite can do.
+	One character pattern can be assigned to one sprite,
+	and it can be changed on the way. You can also switch multiple character patterns at regular intervals
+	to make them look like animations, transform character patterns assigned to sprites, and change the compositing method.
 	</p>
 
 
-<h2 id = "SPRITE_INIT"> Initialization and character pattern registration </h2>
+	<h2 id="SPRITE_INIT">Initialization and Registering Character Patterns</h2>
 	<p>
-By managing sprites, you can create games etc. more easily and simply.
-Let's actually write a script and try it.
-Declare the use of the runtime with the #include instruction to use the functionality of standard sprites.
+	By managing sprites, you can create games more easily and simply.
+	Let's actually write a script and try it.
+	To use the standard sprite function, declare the use of the runtime with the #include command.
 	</p>
 	<pre>
-#include "hsp3dish.as"; Use HSP3Dish runtime </pre>
+		#include "hsp3dish.as"	; Use HSP3Dish runtime</pre>
 	<p>
-Normally, use HSP3Dish. When using the 3D function together, "#include" hgimg4.as ""
-But it doesn't matter.
-In addition, if you want to use sprites, you must first initialize the sprite system. <br>
-Initialize the system with the es_ini instruction.
+	Normally, HSP3Dish is used. If you want to use 3D functions together, "#include "hgimg4.as""
+	is also fine.
+	Furthermore, when using sprites, you need to initialize the sprite system first.<br>
+	System initialization is performed with the es_ini command.
 	<pre>
-es_ini; Sprite initialization </pre>
+		es_ini	; Initialize sprites</pre>
 	<p>
-After initializing the sprite, you can display the sprite.
-If you don't enter this instruction first, when you try to execute an instruction related to sprites
-Please note that you will get the error "You have selected an unsupported feature". <br>
-Sprites are managed by a number called sprite number, and each one has a separate image.
-You can display it. The image displayed as a sprite is called a character pattern.
-This is also managed by a number called character number. <br>
-How many sprite numbers and character numbers can be registered
-It can be specified at the time of initialization by the es_ini instruction.
+	Once the sprite is initialized, it can be displayed.
+	If you don't include this command first, you will get an error saying "Unsupported function selected" when you try to execute a command related to sprites, so please be careful.<br>
+	Sprites are managed by numbers called Sprite No., and different images can be displayed on each one. The image displayed as a sprite is called a character pattern,
+	which is also managed by a number called Character No.<br>
+	You can specify how many Sprite No.s and Character No.s can be registered during initialization with the es_ini command.
 	</p>
 	<pre>
-es_ini p1, p2, p3 System initialization
-p1 = maximum number of sprites
-p2 = maximum number of character definitions
-p3 = Circumference accuracy </pre>
+		es_ini p1,p2,p3,p4			Initialize the system
+			p1=Maximum number of sprites
+			p2=Maximum number of character definitions
+			p3=Circumference precision
+			p4=Maximum number of map definitions</pre>
 	<p>
-If the parameter is omitted, the number of sprites is up to 512 and the number of character definitions is 1024.
-Initialize the sprite with a lap accuracy of 64 degrees per lap. <br>
-The es_ini instruction can be executed any number of times, so sprites
-It can also be used when you want to clear everything.
-Also, there is an upper limit to sprite and character parameters.
-Therefore, by specifying a large number, the maximum number of sprites and characters can be set.
-You can increase it freely. However, it consumes a lot of memory.
-(Conversely, HSP3Dish does not allocate any extra memory unless you execute the es_ini instruction.)
+	If parameters are omitted, the system will initialize sprites with a maximum of 512 sprites, a maximum of 1024 character definitions, and a circumference precision of 64 degrees per rotation.<br>
+	The es_ini command can be executed any number of times, so it can also be used when you want to clear all sprites.
+	In addition, the es_ini command allows you to freely increase the maximum number of sprites and characters.
+	However, this will consume more memory.
+	(Conversely, HSP3Dish does not allocate any unnecessary memory unless the es_ini command is executed.)
 	<br>
 	<br>
-Register the character pattern in preparation for using the sprite
-is needed.
-First of all, how to register the character pattern
+	As preparation for using sprites, it is necessary to register character patterns.
+	The method of registering character patterns is as follows:
 	</p>
 	<pre>
-es_size p1, p2, p3, p4 Character size specification
-p1 = X size of character
-p2 = Y size of character
-p3 = hit check area (%) (initial value = 100)
-p4 = Specify special effect (EP value) </pre>
+		es_size p1,p2,p3,p4			Specify character size
+			p1=Character X size
+			p2=Character Y size
+			p3=Hit check area (%) (default=100)
+			p4=Special effect (EP value) specification</pre>
 	<p>
-Specify the character size with. (p1, p2) is the character's X, Y size (dot unit)
-Will be. In p3, the hit check area when making a hit judgment is what percentage of the total
-Specify whether it will be. If you specify 100, it will fill the size specified in (p1, p2).
-Performs a hit check. (The default value is 100%) <br>
-p4 is the default setting for special effects (EP values). Normally, you can omit it.
-Special effects (EP values) will be explained later. <br>
-There are no particular restrictions on the X and Y sizes of the character, but they may extend beyond the image.
-The character pattern specification is invalid.
-The setting of the es_size instruction is valid for all subsequent character definitions. <br>
-After setting the size with this, register the character pattern with the es_pat instruction.
+	Specify the character size with (p1, p2) representing the X and Y sizes of the character (in pixels).
+	p3 specifies what percentage of the whole (p1, p2) size is used for the hit check area when performing hit detection. Specifying 100 will perform hit checking on the entire size specified by (p1, p2). (The default value is 100%)<br>
+	p4 is the default setting for special effects (EP value). Normally, you can omit this.
+	Special effects (EP values) will be explained later.<br>
+	There are no particular restrictions on the X and Y sizes of characters, but specifying character patterns that protrude from the image will be invalid.
+	The es_size command settings remain effective for all subsequent character definitions.<br>
+	Once you have set the size, register the character pattern using the es_pat command.<br>
+	The es_sizeex command is also available for more detailed character size settings.
 	</p>
 	<pre>
-es_pat p1, p2, p3, p4, p5 Character pattern definition
-p1 = Character No.
-p2 = Upper left X coordinate of the character pattern
-p3 = Upper left Y coordinate of the character pattern
-p4 = number of display frames (0)
-p5 = window buffer ID </pre>
+		es_sizeex p1,p2,p3,p4,p5,p6,p7,p8,p9	Specify character size in detail
+			p1(16)=Character X size
+			p2(16)=Character Y size
+			p3($3ff)=p4=Special effect (EP value) specification
+			p4(0)=Hit check X size
+			p5(0)=Hit check Y size
+			p6(0)=Hit check offset X
+			p7(0)=Hit check offset Y
+			p8(0)=Display offset X
+			p9(0)=Display offset Y
+	</pre>
 	<p>
-For the character number of p1, with the coordinates of (p2, p3) as the upper left,
-The character pattern of the size set by es_size is registered.
-The target image here is pre-used with the picload command or celload command.
-Must have been read into the window buffer.
-If the window buffer ID is specified in p5, from that window buffer,
-If p5 is omitted, from the window buffer corresponding to the current operation destination,
-Cut out a part of the image and register it as a character pattern. <br>
-The character pattern is registered in the specified character number with one es_pat command.
-If you need a lot of character patterns, you need to register that much.
-If the p1 parameter is omitted or set to a negative value, it is automatically free.
-A character number is assigned. After executing this instruction, the system variable stat
-Since the assigned character number is assigned, which number is assigned accordingly.
-You can know if it was used. <br>
-The parameters of p4 are the settings for character animation.
-Normally, you can omit it.
+	Defines a character pattern based on the specified character size.
 	</p>
 	<pre>
-es_ini; Initialize sprites
-buffer 3; Create window buffer ID 3
-picload "testchr.png"; Load the image file
-es_size 64,64; Specify 64 × 64 dot size
-es_pat 0, 0,0; Assign image from (0,0) to character No.0
-gsel 0; Return the operation destination ID to 0 </pre>
+		es_pat p1,p2,p3,p4,p5			Define character pattern
+			p1=Character No.
+			p2=X coordinate of the upper left corner of the character pattern
+			p3=Y coordinate of the upper left corner of the character pattern
+			p4=Number of display frames (0)
+			p5=Window buffer ID
+	</pre>
 	<p>
-In the above example, the image file "testchr.png" is read into the window buffer ID3 and loaded.
-The 64x64 dot image from (0,0) is defined as character No.0.
-	</p>
-	<p>
-There is also an es_patanim instruction for defining multiple character patterns together.
-With this command, it is possible to define including animation.
+	The character pattern with the size set by es_size, with the coordinates (p2, p3) as the upper left corner, is registered for character No. p1.
+	The target image must be loaded into the window buffer in advance using the picload or celload command.
+	If the window buffer ID is specified in p5, the image is extracted from that window buffer.
+	If p5 is omitted, a part of the image is extracted from the window buffer that is currently the destination of operations and registered as a character pattern.<br>
+	One es_pat command registers a character pattern to the specified character No.
+	If you need many character patterns, you need to register that many.
+	If the p1 parameter is omitted or set to a negative value, an available character No. is automatically assigned. After executing this command, the assigned character No. is assigned to the system variable stat, so you can know which No. was used.<br>
+	The p4 parameter is for setting up character animations.
+	Normally, you can omit it.
 	</p>
 	<pre>
-es_patanim p1, p2, p3, p4, p5 Collectively character image definition
-p1 (-1) = Character No.
-p2 = number to define
-p3 = Upper left X coordinate of the character pattern
-p4 = Upper left Y coordinate of the character pattern
-p5 (0) = number of display frames (0)
-p6 = window buffer ID </pre>
+		es_ini		; Initialize sprites
+		buffer 3	; Create window buffer ID 3
+		picload "testchr.png"	; Load the image file
+		es_size 64,64		; Specify 64 x 64 dot size
+		es_pat 0, 0,0		; Assign the image from (0,0) to character No. 0
+		gsel 0			; Restore the operation target ID to 0</pre>
 	<p>
-After the character number specified in p1, the number of character patterns specified in p2 will be registered. Use the es_pat instruction to define a single character number. <br>
-The character pattern to be registered is the continuous side-by-side area in the image. The character is registered as if the patterns are lined up to the right with the size set by es_size from the coordinates of (p3, p4). <br>
-The target image here must be read into the window buffer in advance with the picload command or celload command. <br>
-In p5, if the window buffer ID is specified, it is cut out from the window buffer, and if p5 is omitted, a part of the image is cut out from the window buffer corresponding to the current operation destination and registered as a character pattern. I will. <br>
-If the p1 parameter is omitted or set to a negative value, a free character number is automatically assigned. After executing this instruction, the character number assigned to the system variable stat is assigned, so you can know which number was used. <br>
-The parameters of p5 are the settings for character animation. <br>
-If 0, there is no animation. If it is 1 or more, the character is displayed for the specified number of frames, and then the next character (character No. + 1) is displayed. <br>
-Normally, an animation is defined in which the number of patterns specified by the p2 parameter is repeated in the waiting frame of p5. <br>
-Defines a pattern that disappears after animating multiple patterns when ESSPPAT_1SHOT ($ 1000) is added to the p2 parameter.
+	In the above example, the image file "testchr.png" is loaded into window buffer ID 3, and
+	a 64 x 64 dot image from (0,0) is defined as character No. 0.
+	</p>
+	<p>
+	The es_patanim command is also available for defining multiple character patterns at once.
+	This command allows you to define patterns including animations.
+	</p>
+	<pre>
+		es_patanim p1,p2,p3,p4,p5		Define character images in bulk
+			p1(-1)=Character No.
+			p2=Number of definitions
+			p3=X coordinate of the upper left corner of the character pattern
+			p4=Y coordinate of the upper left corner of the character pattern
+			p5(0)=Number of display frames (0)
+			p6=Window buffer ID</pre>
+	<p>
+	Character patterns are registered from the character No. specified in p1, by the number specified in p2. Use the es_pat command to define a single character No.<br>
+	The character patterns that are registered are consecutive horizontal areas in the image. Character patterns are registered from the coordinates (p3, p4) with the size set by es_size, assuming that the patterns are arranged to the right.<br>
+	The target image must be loaded into the window buffer in advance using the picload or celload command.<br>
+	If the window buffer ID is specified in p5, the image is extracted from that window buffer.
+	If p5 is omitted, a part of the image is extracted from the window buffer that is currently the destination of operations and registered as a character pattern.<br>
+	If the p1 parameter is omitted or set to a negative value, an available character No. is automatically assigned. After executing this command, the assigned character No. is assigned to the system variable stat, so you can know which No. was used.<br>
+	The p5 parameter is for setting up character animations.<br>
+	If it is 0, there is no animation. If it is 1 or more, the character is displayed for the specified number of frames, and then the next character (character No.+1) is displayed.<br>
+	Normally, an animation is defined in which the number of patterns specified in the p2 parameter is repeated with the waiting frames of p5.<br>
+	If you add ESSPPAT_1SHOT($1000) to the p2 parameter, you define a pattern that disappears after displaying multiple patterns in animation.
 	</p>
 
 
-<h2 id = "ADD_SPRITE"> Sprite registration </h2>
+	<h2 id="ADD_SPRITE">Sprite Registration</h2>
 	<p>
-After registering the character pattern, register the sprite next.
-The basic usage is
+	Once you have registered the character pattern, the next step is to register the sprite.
+	The basic usage is:
 	</p>
 	<pre>
-es_set p1, p2, p3, p4, p5 sprite settings
-p1 = Sprite No.
-p2 = sprite X coordinate
-p3 = sprite Y coordinate
-p4 = Character No.
-p5 = option value
-p6 = Priority (-32768 to 32767) </pre>
+		es_set p1,p2,p3,p4,p5		Sprite settings
+			p1=Sprite No.
+			p2=Sprite X coordinate
+			p3=Sprite Y coordinate
+			p4=Character No.
+			p5=Option value
+			p6=Priority (0〜32767)</pre>
 	<p>
-You can register sprites with. <br>
-p1 is the sprite number, and (p2, p3) is the coordinates of the sprite on the screen.
-With this coordinate as the upper left, the character number specified in p4 is displayed. <br>
-If p1 is omitted or set to a negative value, a free sprite number is automatically assigned.
-In this case, the sprite number set after the instruction is executed is assigned to the system variable stat.
+	You can register a sprite with this command.<br>
+	p1 is the sprite No., and (p2, p3) are the coordinates of the sprite on the screen.
+	The character No. specified by p4 is displayed with these coordinates as the upper left corner.<br>
+	If p1 is omitted or set to a negative value, an available sprite No. is automatically assigned.
+	In this case, the sprite No. set after the command execution is assigned to the system variable stat.
 	<br><br>
-Sprite coordinates can be set in the range of -32767 to 32767.
-Normally, it is displayed in the range of screen resolution with the upper left of the screen as (0,0), but this is
-You can also change it.
+	Sprite coordinates can be set in the range of -32767 to 32767.
+	Normally, the upper left corner of the screen is (0,0) and it is displayed within the screen resolution, but this
+	can also be changed.
 	<br><br>
-p5 sets an option value that the user can freely use.
-(See the Sprite Parameters section for more information on option values.)
+	p5 sets an option value that the user can freely use.
+	(For details on the option value, refer to the <a href="#INFO_SPRITE">Sprite Parameters</a> section.)
 	<br><br>
-Specify the sprite priority with p6. The smaller the priority, the closer to the front
-It will be displayed, and if the values ​​are the same, the smaller sprite has priority.
-You can also draw in ascending order of sprite number as before.
+	Specify the priority of the sprite with p6. This value is referenced when priority sorting is enabled in the es_draw command.
+	Normally, sprites with smaller sprite Nos. are drawn in front.
+	If it is not particularly necessary, the p5 and p6 parameters can be omitted.
 	<br><br>
-Now you are ready to view the sprites.
-The actual drawing is done when the sprite drawing command is executed in the main loop.
-For example, configure the following main loop:
+	This completes the preparation for displaying the sprite.
+	The actual drawing is performed when the sprite drawing command is executed in the main loop.
+	For example, construct a main loop like the following:
 	</p>
 	<pre>
 	*gmain
-redraw 0; clear screen
-es_draw; sprite drawing
-redraw 1; screen refresh
-await 1000/60; wait for time (1/60 seconds)
+		redraw 0	; Clear the screen
+		es_draw		; Sprite drawing
+		redraw 1	; Update the screen
+		await 1000/60	; Wait time (1/60 seconds)
 		goto *gmain</pre>
 	<p>
-It is common to HSP3Dish to describe drawing commands between redraw 0 and redraw 1.
-It becomes a rule.
-By writing the es_draw instruction there, the standard sprite manages it.
-The sprite is drawn. <br>
-If you want to display sprites, put the es_draw command at the right time
-Please draw.
-You can also enter normal drawing commands, so you can use mes commands, boxf commands, etc.
-If you write it after the es_draw command, it will be drawn before the sprite,
-If you write it before the es_draw instruction, it will be the background of the sprite.
+	It is a common HSP3Dish
+	rule to describe drawing commands between redraw 0 and redraw 1.
+	By describing the es_draw command there, the drawing of sprites managed by the standard sprite is performed.<br>
+	When displaying sprites, insert the es_draw command at an appropriate timing and
+	perform drawing.
+	Normal drawing commands can also be inserted, so if you describe the mes command or boxf command etc.
+	after the es_draw command, it will be drawn in front of the sprite, and if you describe it
+	before the es_draw command, it will be the background of the sprite.
 	<br><br>
-Be sure to put a certain waiting time in the loop with the await instruction.
-"Await 1000/60" is said to loop in 1/60 second units (rewrite the screen)
-The result is.
+	Be sure to include a certain waiting time in the loop with the await command.
+	"await 1000/60" means that the loop (rewrites the screen) in 1/60 second units.
 	<br><br>
-In this way, all pre-registered sprites are displayed by the es_draw command.
-Draw.
-If many sprites overlap at the same time,
-The smaller the sprite number, the closer it is displayed (higher priority).
+	In this way, the es_draw command draws all sprites that have been registered in advance.
+	When many sprites are displayed overlapping at the same time,
+	the smaller the sprite No. is, the more it is displayed in front (higher priority).<br>
+	Also, if you want to set the priority for each sprite, you can specify the priority with the es_setpri command.
 	<br><br>
-There are several instructions for changing sprite settings.
+	Several commands are available for changing the settings of the sprite.
 	</p>
 	<pre>
-es_chr p1, p2 chr value setting
-es_type p1, p2 type value setting
-es_flag p1, p2 flag value setting </pre>
+			es_chr p1,p2				Set chr value
+			es_type p1,p2				Set type value
+			es_flag p1,p2				Set flag value</pre>
 	<p>
-For these, specify the sprite number with p1 and specify the value with p2.
-The es_chr instruction changes the character number.
-The es_type instruction specifies a value (type value) for sprite identification.
-The es_flag instruction specifies the sprite flag value (flag value).
-(For details on flag value and type value, refer to the item of sprite parameter.)
+	These specify the sprite No. with p1 and the value with p2.
+	The es_chr command changes the character No.
+	The es_type command specifies the value for sprite identification (type value).
+	The es_flag command specifies the sprite flag value (flag value).
+	(For details on the flag value and type value, refer to the <a href="#INFO_SPRITE">Sprite Parameters</a> section.)
 	</p>
 
-<h2 id = "MOVE_SPRITE"> Move sprites </h2>
+	<h2 id="MOVE_SPRITE">Sprite Movement</h2>
 
 	<p>
-If you want to change the coordinates of the sprite
+	To change the coordinates of a sprite, use:
 	</p>
 	<pre>
-es_pos p1, p2, p3, p4 Sprite coordinate settings
-p1 = Sprite No.
-p2 = sprite X coordinate
-p3 = sprite Y coordinate
-p4 = configuration options </pre>
+		es_pos p1,p2,p3,p4			Set sprite coordinates
+			p1=Sprite No.
+			p2=Sprite X coordinate
+			p3=Sprite Y coordinate
+			p4=Setting options</pre>
 	<p>
-Use the. Specify the sprite number with p1 and set the X and Y coordinates with (p2, p3).
-es_pos is an instruction to change only the coordinates of the set sprite.
+	Specify the sprite number with p1, and set the X and Y coordinates with (p2, p3).
+	es_pos is a command that only changes the coordinates of a sprite that has already been set.
 	<br><br>
-It is also possible to automatically move the coordinates of the sprite for each frame.
-The following instructions are available.
+	It is also possible to automatically move the coordinates of a sprite every frame.
+	The following commands are available:
 	</p>
 	<pre>
-es_apos p1, p2, p3 Sprite movement settings
-p1 = Sprite No.
-p2 = 1 Number of dots moving in the X direction in the frame
-p3 = 1 Number of dots moving in the Y direction in the frame
-p4 = Movement speed (%) </pre>
+		es_apos p1,p2,p3			Sprite movement settings
+			p1=Sprite No.
+			p2=Number of dots to move in the X direction per frame
+			p3=Number of dots to move in the Y direction per frame
+			p4=Movement speed (%)</pre>
 	<p>
-Specify the sprite number with p1 and the increment in the X and Y directions with p2 and p3.
-Specify the movement speed in% with p4. If p4 is omitted or 100 is specified,
-It becomes 100% speed and keeps moving in one frame by the increment specified by (p2, p3). <br>
-If the movement speed is set to 50 (%) and the increment is specified as (+4, -2),
-In reality, it is an increment of (+2, -1). The unit of increment is 1 dot or less
-Move accurately. For example, move (1,0) by 10% in one frame.
-Even if you do it in, it will be calculated to move 1 dot after 10 frames.
+	Specify the sprite number with p1, and the increments in the X and Y directions with p2 and p3.
+	Specify the movement speed as a percentage with p4. If p4 is omitted or 100 is specified,
+	the speed will be 100%, and the sprite will continue to move by the increments specified by (p2, p3) per frame.<br>
+	For example, if the movement speed is set to 50(%) and the increment is specified as (+4, -2),
+	the actual increment will be (+2, -1). Even if the unit of increment is less than 1 dot, it will still move accurately.
+	For example, even if you move (1, 0) by 10% in 1 frame, it will be calculated to move 1 dot after 10 frames.
 	</p>
 	<pre>
-es_adir p1, p2, p3 Sprite movement direction setting
-p1 = Sprite No.
-p2 = direction of movement
-p3 = Movement speed (%) </pre>
+		es_adir p1,p2,p3			Set sprite movement direction
+			p1=Sprite No.
+			p2=Direction to move
+			p3=Movement speed (%)</pre>
 	<p>
-The es_adir instruction is set to automatically move sprites like the es_apos instruction.
-Although it is an instruction to determine, the es_adir instruction moves by specifying the direction.
-Specify the sprite number with p1 and the direction with p2. The direction is the value set in es_ini
-Specify up to. 0 is directly below and increases counterclockwise.
-Specify the movement speed in% with p3. When p3 is omitted or 100 (%) is specified
-Moves a dot distance per frame in the specified direction.
+	The es_adir command is a command that sets the sprite to move automatically, just like the es_apos command,
+	but the es_adir command specifies the direction to move.
+	Specify the sprite number with p1 and the direction with p2. The direction is specified up to the numerical value set by es_ini.
+	0 is directly below, and increases counterclockwise.
+	Specify the movement speed as a percentage with p3. If p3 is omitted or 100(%) is specified,
+	the distance moved is 1 dot per frame in the specified direction.
 	</p>
 	<pre>
-es_aim p1, p2, p3, p4 Sprite reference coordinate setting
-p1 = Sprite No.
-p2 = X coordinate of destination
-p3 = Y coordinate of destination
-p4 = Movement speed (%) </pre>
+		es_aim p1,p2,p3,p4			Set sprite reference coordinates
+			p1=Sprite No.
+			p2=X coordinate of the destination
+			p3=Y coordinate of the destination
+			p4=Movement speed (%)</pre>
 	<p>
-The es_aim instruction moves the sprite in the specified direction like the es_adir instruction.
-Is for. In the es_aim command, the X and Y coordinates that are the targets to move instead of the direction are set.
-Specify. The sprite will change the direction from the current coordinates to the target coordinates.
-Calculate and start moving. <br>
-This command, for example, a missile launched from an enemy moves toward the player
-It is useful when you want to do it.
-Specify the movement speed in% with p4. When p3 is omitted or 100 (%) is specified
-Moves a dot distance per frame in the specified direction.
-	<br><br>
-One of the useful features you should know about moving sprites is sprites.
-There is an automatic deletion function. This can be used to set off-screen coordinates or sprites
-It is a function that automatically deletes things that have gone out of the screen by automatic movement. <br>
-For this reason, a sprite-enabled area is set up.
-Only sprites within the sprite-enabled area will be enabled,
-Sprites that come out of that range are automatically deleted. <br>
-Normally, the sprite effective area is within 128 dots outside the display range of the window in which the es_ini command is executed.
-For example, in the case of (640 x 480) dots, the range of coordinates that the sprite can take is from (-128, -128).
-It will be up to (768,608).
-The instruction to change this sprite effective area is the es_area instruction.
-	</p>
-	<pre>
-es_area p1, p2, p3, p4 Sprite effective area setting
-p1 = Upper left X coordinate of valid area
-p2 = Upper left Y coordinate of valid area
-p3 = lower right X coordinate of the effective area
-p4 = Lower right Y coordinate of the effective area </pre>
-	<p>
-Sets the effective area of ​​the sprite.
-If the sprite coordinates are not within the range (p1, p2)-(p3, p4), they will be automatically deleted.
+	The es_aim command is for moving a sprite in a specified direction, just like the es_adir command.
+	In the es_aim command, the target X and Y coordinates to move to are specified instead of the direction.
+	The sprite calculates the direction from the current coordinates to the target coordinates and starts moving.<br>
+	This command is useful when you want a missile fired from an enemy to move towards the player, for example.
+	Specify the movement speed as a percentage with p4. If p3 is omitted or 100(%) is specified,
+	the distance moved is 1 dot per frame in the specified direction.
 	</p>
 
-<h2 id = "INFO_SPRITE"> Sprite parameters </h2>
+
+	<h2 id="BORDER_SPRITE">Sprite Valid Area</h2>
 
 	<p>
-Various parameters are stored in one sprite,
-It can be read and written as needed. <br>
-The following macros are provided to show the sprite parameters.
+	If a sprite goes out of the specified valid area, it is automatically deleted.
+	This is a function to prevent sprites with coordinates outside the screen or sprites that have gone outside the screen due to automatic sprite movement from remaining.<br>
+	For this purpose, a sprite valid area is set in advance.
+	Only sprites within the sprite valid area are valid, and sprites that go out of that area are automatically deleted.<br>
+	Normally, the sprite valid area is within 128 dots outside the display range of the window when the es_ini command is executed.
+	For example, in the case of (640 x 480) dots, the range of coordinates that can be taken by a sprite is from (-128, -128) to (768, 608).
+	The command to change this sprite valid area is the es_area command.
 	</p>
 	<pre>
-Value macro content
+		es_area p1,p2,p3,p4			Set sprite valid area
+			p1=X coordinate of the upper left of the valid area
+			p2=Y coordinate of the upper left of the valid area
+			p3=X coordinate of the lower right of the valid area
+			p4=Y coordinate of the lower right of the valid area</pre>
+	<p>
+	Sets the valid area for sprites.
+	Sprites whose coordinates are not within the range of (p1, p2) - (p3, p4) are automatically deleted.<br>
+	If you want to intentionally disable the automatic deletion of sprites, you can disable it by setting a flag.
+	</p>
+	<pre>
+		es_flag スプライトNo., ESSPFLAG_STATIC+ESSPFLAG_NOWIPE
+	</pre>
+	<p>
+	In this case, be careful not to leave sprites outside the screen.
+	Also, by setting the ESSPFLAG_XBOUNCE and ESSPFLAG_YBOUNCE flags, you can reverse the direction of movement if you try to move outside the valid area.
+	In the case of ESSPFLAG_XBOUNCE, the X direction is reversed, and in the case of ESSPFLAG_YBOUNCE, the Y direction is reversed. It is also possible to specify both as follows.
+	</p>
+	<pre>
+	es_flag スプライトNo. , ESSPFLAG_STATIC+ESSPFLAG_XBOUNCE+ESSPFLAG_YBOUNCE
+	</pre>
+
+
+	<h2 id="INFO_SPRITE">Sprite Parameters</h2>
+
+	<p>
+	Various parameters are stored in one sprite, and it is
+	possible to read and write them as needed.<br>
+	The following macros are available to indicate sprite parameters.
+	</p>
+	<pre>
+	Value     Macro           Content
 	----------------------------------------------------------
-0 ESI_FLAG flag value (function status setting)
-1 ESI_POSX X coordinates
-2 ESI_POSY Y coordinate
-3 ESI_SPDX X Move value
-4 ESI_SPDY Y Move value
-5 ESI_PRGCOUNT Progress count value ((unused)
-6 ESI_ANIMECOUNT animation counter
-7 ESI_CHRNO Character No.
-8 ESI_TYPE type value (user-configured attribute)
-9 ESI_ACCELX X Acceleration (for falling)
-10 ESI_ACCELY Y Acceleration (for falling)
-11 ESI_BOUNCEPOW Repulsive force (for falling)
-12 ESI_BOUNCEFLAG Repulsion setting (for falling)
-13 ESI_OPTION option value (depending on user settings)
-14 ESI_PRIORITY Display priority
-15 ESI_ALPHA Special effect (EP value)
-16 ESI_FADEPRM Fade parameters
-17 ESI_ZOOMX X Display magnification
-18 ESI_ZOOMY Y Display magnification
-19 ESI_ROTZ Rotation angle </pre>
-	<p>
-All information is stored as a 32-bit integer.
-The following commands are provided to read and set the set information.
-	</p>
-	<pre>
-es_get p1, p2, p3 Sprite information acquisition
-p1 = variable name to which information is assigned
-p2 = Sprite No.
-		p3=info number</pre>
-	<p>
-In this instruction, the sprite number information of p2 is assigned to the variable name specified by p1.
-Su. The type of information is specified by the info number on p3. For more information, order referral
-Please refer to
-	</p>
-	<pre>
-es_setp p1, p2, p3 Sprite information settings
-p1 = Sprite No.
-		p2=info number
-p3 = value to change </pre>
-	<p>
-With this instruction, you can set the sprite number information of p1.
-The type of information is specified by the info number on p2. <br>
-Most parameters have separate instructions to set, so
-There is no need to use the es_get and es_setp instructions.
-In addition, the coordinates, acceleration, magnification, etc. are fixed decimal values, so they may differ from the actual values.
-Therefore, es_pos and es_getpos instructions are provided for input / output related to coordinates.
-	</p>
-	<pre>
-	es_pos p1,p2,p3,p4
-p1 = Sprite No.
-p2 = sprite X coordinate
-p3 = sprite Y coordinate
-p4 (0) = configuration options </pre>
-	<p>
-The es_pos instruction sets the coordinates of the sprite number specified in p1 to the value of (p2, p3).
-You can select the coordinates that can be set by the option of p4.
-	</p>
-	<pre>
-p4 macro name Contents
-	--------------------------------------------------
-0 ESSPSET_POS Sprite X, Y coordinates
-1 ESSPSET_ADDPOS Sprite X, Y moving component
-2 ESSPSET_FALL Sprite X, Y Fall speed
-3 ESSPSET_BOUNCE Sprite bound coefficient
-4 ESSPSET_ZOOM Sprite X, Y Display magnification
-0x1000 ESSPSET_DIRECT Set 32bit value directly
-0x2000 ESSPSET_MASKBIT Hold fixed fractional part
+	 0     ESI_FLAG        flag value (function state setting)
+	 1     ESI_POSX        X coordinate
+	 2     ESI_POSY        Y coordinate
+	 3     ESI_SPDX        X movement value
+	 4     ESI_SPDY        Y movement value
+	 5     ESI_PRGCOUNT    Progress count value (unused)
+	 6     ESI_ANIMECOUNT  Animation counter
+	 7     ESI_CHRNO       Character No.
+	 8     ESI_TYPE        Type value (attribute by user setting)
+	 9     ESI_ACCELX      X acceleration (for falling)
+	10     ESI_ACCELY      Y acceleration (for falling)
+	11     ESI_BOUNCEPOW   Repulsive force (for falling)
+	12     ESI_BOUNCEFLAG  Repulsion setting (for falling)
+	13     ESI_OPTION      Option value (by user setting)
+	14     ESI_PRIORITY    Display priority
+	15     ESI_ALPHA       Special effect (EP value)
+	16     ESI_FADEPRM     Fade parameter
+	17     ESI_ZOOMX       X display magnification
+	18     ESI_ZOOMY       Y display magnification
+	19     ESI_ROTZ        Rotation angle
+	20     ESI_SPLINK      Sprite No. to link to (-1=none)
+	21     ESI_TIMER       Timer value
+	22     ESI_TIMERBASE   Timer value (master)
+	23     ESI_PROTZ       Rotation angle (addition value)
+	24     ESI_PZOOMX      X display magnification (addition value)
+	25     ESI_PZOOMY      Y display magnification (addition value)
+	26     ESI_MAPHIT      Map collision detection flag (ESSPMAPHIT_*)
+	27     ESI_STICKSP     Sprite No. to stick to (-1=none)
+	28     ESI_STICKX      X distance to stick to
+	29     ESI_STICKY      Y distance to stick to
+	30     ESI_MOVERES     Map collision detection result during movement
+	31     ESI_XREVCHR     X direction inverted character offset value
+	32     ESI_YREVCHR     Y direction inverted character offset value
+	33     ESI_MULCOLOR    Multiplication color setting (-1=none)
 	</pre>
 	<p>
-The coordinate value set by the es_pos instruction is internally a fixed 16-bit decimal number. Normally, the conversion is done automatically, but adding ESSPSET_DIRECT to the configuration option disables the conversion. <br>
-Also, by adding ESSPSET_MASKBIT, the decimal part up to that point will be retained when converting 16-bit fixed decimals. <br>
-Similarly, to get the coordinates of a sprite, use the es_getpos instruction.
+	All information is stored as 32-bit integers.
+	The following commands are available to read or set the configured information.
 	</p>
 	<pre>
-	es_getpos p1,p2,p3,p4
-p1 = Sprite No.
-variable name to which p2 = X coordinates are assigned
-variable name to which the p3 = Y coordinate is assigned
-p4 (0) = configuration options </pre>
+		es_get p1,p2,p3				Get sprite information
+			p1=Variable name to store the information
+			p2=Sprite No.
+			p3=info number</pre>
 	<p>
-It gets X, Y information such as sprite coordinates and assigns them to two variables.
-Specify the sprite number with p1 and set the variables to be assigned with the p2 and p3 parameters. <br>
-The configuration options for p4 are similar to those for the es_pos instruction.
-	</p>
-	<p>
-The sprite flag value determines whether the sprite is enabled or disabled, the basic behavior, etc.
-This is an important parameter. An es_flag instruction is provided to set this value.
+	This command stores the information of sprite No. p2 in the variable name specified by p1.
+	The type of information is specified by the info number in p3.
+	You can specify the change option with the p4 parameter. The option values operate as follows.
 	</p>
 	<pre>
-	es_flag p1,p2
-p1 = Sprite No.
-p2 = flag value </pre>
+		 Value   Content
+		----------------------------------
+		  0   Set the specified value
+		  1   Add the bits of the specified value
+		  2   Delete the bits of the specified value
+	</pre>
 	<p>
-The flag value is automatically set to $ 100 (256) when sprites are enabled.
-Normally, you don't need to mess with it.
-The values ​​indicated by the flag values ​​are as follows. The name in [] is the defined macro name.
+	Can be used for bitwise setting and resetting.
+	See the command reference for details.
 	</p>
 	<pre>
-0: Sprite unregistered
-bit 0-6: 1 to 127 countdown timer
-bit 7: Countdown disappears SWITCH
-bit 8: $ 100 Sprite display ON [ESSPFLAG_STATIC]
-bit 9: $ 200 Sprite move ON [ESSPFLAG_MOVE]
-bit10: $ 400 Free fall movement ON [ESSPFLAG_GRAVITY]
-bit11: Move by linking with $ 800 BG (not implemented) [ESSPFLAG_BGLINK]
-bit12: $ 1000 Border erasure disabled ON [ESSPFLAG_NOWIPE]
-bit13: $ 2000 Inverted at border X SWITCH [ESSPFLAG_XBOUNCE]
-bit14: $ 4000 Inverted at border Y SWITCH [ESSPFLAG_YBOUNCE]
-bit15: $ 8000 Flashing at countdown timer SWITCH [ESSPFLAG_BLINK]
-bit16: $ 10000 Hidden SWITCH [ESSPFLAG_NODISP]
+		es_setp p1,p2,p3,p4			Set sprite information
+			p1=Sprite No.
+			p2=info number
+			p3=Value to change
+			p4(0)=Change option</pre>
+	<p>
+	This command allows you to set the information of sprite No. p1.
+	The type of information is specified by the info number in p2.<br>
+	Since most parameters have separate commands for setting them,
+	there is no need to use the es_get and es_setp commands.
+	Also, coordinates, acceleration, magnification, etc. are fixed-point values, so they differ from the actual values.
+	Therefore, the es_pos and es_getpos commands are available for inputting and outputting coordinates.
+	</p>
+	<pre>
+		es_pos p1,p2,p3,p4
+			p1=Sprite No.
+			p2=Sprite X coordinate
+			p3=Sprite Y coordinate
+			p4(0)=Setting options</pre>
+	<p>
+	The es_pos command sets the coordinates of the sprite No. specified by p1 to the value of (p2, p3).
+	You can select the coordinates that can be set with the p4 option.
+	</p>
+	<pre>
+		   p4    Macro name        Content
+		--------------------------------------------------
+		      0  ESSPSET_POS     Sprite X,Y coordinates
+		      1  ESSPSET_ADDPOS  Sprite X,Y movement component
+		      2  ESSPSET_FALL    Sprite X,Y falling speed
+		      3  ESSPSET_BOUNCE  Sprite bounce coefficient
+		      4  ESSPSET_ZOOM    Sprite X,Y display magnification
+		      8  ESSPSET_ADDPOS2 Sprite X,Y movement component (relative specification)
+		      9  ESSPSET_POS2    Sprite X,Y coordinates (relative specification)
+		 0x1000  ESSPSET_DIRECT  Set the 32-bit value directly
+		 0x2000  ESSPSET_MASKBIT Keep the fixed-point decimal part
+	</pre>
+	<p>
+The coordinate values set by the es_pos command are internally 16-bit fixed-point numbers. Normally, they are automatically converted, but the conversion is disabled by adding ESSPSET_DIRECT to the setting options.<br>
+Also, by adding ESSPSET_MASKBIT, the decimal part up to that point will be retained when converting the 16-bit fixed-point number.<br>
+	Similarly, to get the coordinates of a sprite, use the es_getpos command.
+	</p>
+	<pre>
+		es_getpos p1,p2,p3,p4
+			p1=Sprite No.
+			p2=Variable name to store the X coordinate
+			p3=Variable name to store the Y coordinate
+			p4(0)=Setting options</pre>
+	<p>
+	This retrieves X and Y information such as sprite coordinates and stores them in two variables.
+	Specify the sprite number with p1 and set the variables to be stored with the p2 and p3 parameters.<br>
+	The p4 setting options are the same as those for the es_pos command.
+	</p>
+	<p>
+	The flag value of a sprite is an important parameter that determines whether the sprite is valid or invalid, and its basic behavior.
+	The es_flag command is available to set this value.
+	</p>
+	<pre>
+		es_flag p1,p2
+			p1=Sprite No.
+			p2=flag value</pre>
+	<p>
+	If the sprite is valid, $100 (256) is automatically set as the flag value.
+	Normally, there is no need to touch this value.
+	The values indicated by the flag value are as follows. The values in [] are the defined macro names.
+	</p>
+	<pre>
+		  0    : Sprite not registered
+		  bit 0-7 : 1〜127 Countdown timer (HSPDX compatible)
+		  bit 8 :  $100 Sprite display ON [ESSPFLAG_STATIC]
+		  bit 9 :  $200 Sprite movement ON [ESSPFLAG_MOVE]
+		  bit10 :  $400 Free fall movement ON [ESSPFLAG_GRAVITY]
+		  bit11 :  $800 Move linked to parent [ESSPFLAG_SPLINK]
+		  bit12 : $1000 Border erase invalid ON [ESSPFLAG_NOWIPE]
+		  bit13 : $2000 Border X bounce SWITCH [ESSPFLAG_XBOUNCE]
+		  bit14 : $4000 Border Y bounce SWITCH [ESSPFLAG_YBOUNCE]
+		  bit15 : $8000 Countdown timer time blink SWITCH [ESSPFLAG_BLINK]
+		  bit16 : $10000 Non-display SWITCH [ESSPFLAG_NODISP]
+		  bit17 : $20000 Countdown timer time fade-in SWITCH [ESSPFLAG_FADEIN]
+		  bit18 : $40000 Countdown timer time fade-out SWITCH [ESSPFLAG_FADEOUT]
+		  bit19 : $80000 Countdown timer end time disappearance SWITCH [ESSPFLAG_TIMERWIPE]
+		  bit20 : $100000 Countdown timer time disappearance SWITCH2 [ESSPFLAG_BLINK2]
+		  bit21 : $200000 Countdown timer time tail fade SWITCH [ESSPFLAG_EFADE]
+		  bit22 : $400000 Countdown timer time tail fade SWITCH2 [ESSPFLAG_EFADE2]
+		  bit23 : $800000 Enable addition of rotation/zoom values [ESSPFLAG_MOVEROT]
+		  bit24 : $1000000 Display as decoration sprite on the frontmost layer [ESSPFLAG_DECORATE]
 	</pre>
 
+	<pre>
+		es_type p1,p2
+			p1=Sprite No.
+			p2=type value</pre>
 	<p>
-Sprite type values ​​can be used effectively when identifying objects in games, etc.
-I can do it. The type value can be set with the es_type instruction. <br>
-This value is an identification value that you can set as you like. Setting
-The value that can be set is
+	The sprite's type value can be used effectively to identify objects in games, etc.
+	The type value can be set with the es_type command.<br>
+	This value is an identification value that the user can set as they like. The values that can be set are:
 	</p>
 	<pre>
-1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768… </pre>
+		1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768…</pre>
 	<p>
-It will double. Up to 32 types can be used in total. <br>
-Immediately after setting the sprite with the es_set instruction, the type value is 1.
-This value is used to specify collision detection and sprite search targets.
-The main usage is to register the type of object indicated by the sprite.
+	It increases in multiples. Up to 32 types can be used.<br>
+	Immediately after setting a sprite with the es_set command, the type value is 1.
+	This value is used to specify collision detection and sprite search targets.
+	The main use is to register the type of object that the sprite represents.
 	<br><br>
-For example, in a shooting game, your ship is type 1, your enemy is type 2, and your enemy's missile is type 2.
-When you sprite the type value like type4, your missile is type8, etc.
-Set to. <br>
-In this way, it is determined whether the aircraft is an enemy or is colliding with an enemy missile.
-It will be easier to check if. In the es_check instruction, multiple type values ​​are used at the same time.
-In this example, it can be judged as an enemy (type 2) against your own sprite.
-You can decide whether you are alive or dead by checking if an enemy missile (type 4) is colliding.
-I will. <br>
-Also, when determining whether your missile is colliding with an enemy, first
-The es_find command searches only type 8 sprites, and each one is an enemy (type 2).
-You just have to determine if it collides with.
+	For example, in a shooting game, the player's ship is type1, the enemy is type2, the enemy's missile is
+	type4, and the player's missile is type8. You set the type value when you display the sprite. <br>
+	By doing this, you can easily check whether the player's ship is colliding with an enemy or an enemy missile.
+	With the es_check command, multiple type values can be judged simultaneously, so in this example, for the player's sprite, you can check whether it is colliding with an enemy (type2) or an enemy missile (type4) to determine whether the player is alive or dead.<br>
+	Also, to determine whether the player's missile is colliding with an enemy, first,
+	search for only sprites of type8 with the es_find command, and then determine whether each one is colliding with an enemy (type2).
+	</p>
+	<p>
+	The sprite's option value (ESI_OPTION) is a value that the user can freely set.
+	It can be used to store sprite-specific information and numerical values.
+	The system does not perform operations that refer to the option value.
 	</p>
 
 
-<h2 id = "PRIORITY_SPRITE"> Sprite display priority </h2>
+	<h2 id="PRIORITY_SPRITE">Sprite display priority</h2>
 
 	<p>
-Sprites are usually displayed closer as the Sprite No. value is smaller.
-However, by setting the sprite display priority parameter,
-You can apply any priority for each sprite. <br>
-Sprite priority setting is done by the es_setpri instruction.
+	Sprites are normally displayed closer to the front as the sprite No. value is smaller.
+	However, by setting the sprite's display priority parameter,
+	you can apply arbitrary priority for each sprite.<br>
+	Sprite priority setting is done with the es_setpri command.
 	</p>
 	<pre>
-es_setpri p1, p2 Sprite priority setting
-p1 (0) = Sprite No.
-p2 (0) = Priority (0 ~) </pre>
+		es_setpri p1,p2			Sprite priority setting
+			p1(0)=Sprite No.
+			p2(0)=Priority (0〜)</pre>
 	<p>
-Sets the value specified in p2 to the sprite specified in p1. <br>
-To actually draw according to the priority, it is necessary to specify the priority setting parameter of the sprite to be displayed by the es_draw command.
+	Sets the value specified by p2 to the sprite specified by p1.<br>
+	When actually drawing according to the priority, it is necessary to specify the priority setting parameter of the sprite to be displayed with the es_draw command. (If the parameter is omitted or a negative value, the priority setting value is not referred to)
 	</p>
 	<pre>
-es_draw p1, p2, p3, p4, p5 sprite drawing
-p1 = Start drawing Sprite No.
-p2 (-1) = number of sprites to draw
-p3 (0) = Processing hold flag
-p4 (-1) = priority start value
-p5 (-1) = Priority end value </pre>
+		es_draw p1,p2,p3,p4,p5		Sprite drawing
+			p1=Drawing start sprite No.
+			p2(-1)=Number of sprites to draw
+			p3(0)=Processing hold flag
+			p4(-1)=Priority start value
+			p5(-1)=Priority end value</pre>
 	<p>
-The es_draw instruction has many parameters.
-If you want to draw only a part of the registered sprites, specify the start sprite No. in p1 and the number to draw in p2. <br>
-If p1 and p2 are omitted, all sprites will be drawn. <br>
-The p3 parameter allows you to suspend internal processing.
+	The es_draw command has many parameters.
+	If you want to draw only a part of the registered sprites, specify the starting sprite No. in p1 and the number of sprites to draw in p2.<br>
+	If the specification of p1 and p2 is omitted, all sprites will be drawn.<br>
+	Internal processing can be suspended by the p3 parameter.
 	</p>
 	<pre>
-Value macro name content
+		 Value     Macro name          Content
 		------------------------------------------------------------------------
-0 ESDRAW_NORMAL Perform all processing
-1 ESDRAW_NOMOVE Hold move processing
-2 ESDRAW_NOANIM Hold animation
-4 Hold the ESDRAW_NOCALLBACK callback routine
-8 ESDRAW_NODISP Hold display
-16 ESDRAW_NOSORT Hold sort </pre>
+		  0  ESDRAW_NORMAL        Executes all processing
+		  1  ESDRAW_NOMOVE        Suspends movement processing
+		  2  ESDRAW_NOANIM        Suspends animation processing
+		  4  ESDRAW_NOCALLBACK    Suspends callback routine
+		  8  ESDRAW_NODISP        Suspends display
+		 16  ESDRAW_NOSORT        Suspends sorting</pre>
 	<p>
-Normally, when an instruction is executed, sprite movement-> animation processing-> display processing-> callback processing is executed, but each processing can be put on hold. <br>
-The ESDRAW_NO * macros can be specified at the same time by adding them.
-This allows you to temporarily stop moving or animating. Normally, you can safely omit the p3 parameter. <br>
-When the p4 and p5 parameters are specified, the priority specified by the es_set and es_setpri instructions is referenced, and the sprites are drawn by sorting in the order of the values. At that time, it is possible to draw only the range from p3 to p4. <br>
-If you specify the p4 and p5 parameters, the sprites are sorted according to their priority, and the one with the highest priority value is displayed in the foreground. (However, if ESDRAW_NOSORT is specified in the processing hold flag, sorting is disabled.)
-If the p4 and p5 parameters are negative or omitted, the priority value is ignored, and the smaller the sprite number, the closer it is displayed.
+	Normally, when the command is executed, sprite movement → animation processing → display processing → callback processing are executed, but each processing can be suspended.<br>
+	ESDRAW_NO* macros can be specified simultaneously by adding them.
+	This allows you to temporarily stop movement and animation. Normally, there is no problem if you omit the p3 parameter.<br>
+	If you specify the p4 and p5 parameters, the priority specified by the es_set command or es_setpri command will be referenced, and the one with the larger value will be drawn closer to the front. (However, if ESDRAW_NOSORT is specified for the processing hold flag, sorting will be disabled.)<br>
+	If the p4 and p5 parameters are negative or omitted, the priority value will be ignored, and the smaller the sprite No., the closer to the front the display will be.
 	</p>
 
 
-<h2 id = "MANAGE_SPRITE"> Sprite management instruction </h2>
+	<h2 id="MANAGE_SPRITE">Sprite management commands</h2>
 
 	<p>
-Instructions are provided to manage multiple sprites together.
-Make good use of these instructions to manage your sprites properly.
+	Commands are available to manage multiple sprites together.
+	Use these commands well to manage your sprites appropriately.
 	</p>
 	<pre>
-es_new p1, p2 Get new sprites
-p1 = variable name to which the new No. is assigned
-p2 = Start search Sprite No. </pre>
+		es_new p1,p2				Acquire new sprite
+			p1=Variable name to which the new No. is assigned
+			p2=Sprite No. to start searching</pre>
 	<p>
-This instruction searches for unused numbers in sprite numbers.
-Substitutes the number with space after the number specified in p2 to the variable specified in p1. Sky
-If not, -1 is substituted. <br>
-This instruction is left for compatibility with previous versions. previous
-Use the es_exnew instruction except when running scripts created using the version
-Please use it.
+	This command searches for an unused No. among the sprite Nos.
+	Assigns an available No. after the No. specified by p2 to the variable specified by p1.
+	If there is no free No., -1 is assigned.<br>
+	This command is left for compatibility with previous versions.
+	Use the es_exnew command unless you are running a script created using a previous version.
 	</p>
 	<pre>
-es_exnew p1, p2, p3, p4 Get new sprites
-p1 = variable name to which the new No. is assigned
-p2 = Start search Sprite No.
-p3 = Sprite No. to end the search
-p4 = Incremental </pre>
+		es_exnew p1,p2,p3,p4			Acquire new sprite
+			p1=Variable name to which the new No. is assigned
+			p2=Sprite No. to start searching
+			p3=Sprite No. to end searching
+			p4=Increment</pre>
 	<p>
-This instruction searches for unused numbers in sprite numbers.
-Assigns a number with a space between the numbers specified in p2 to p3 to the variable specified in p1.
-If there is no space, -1 is assigned. <br>
-For p4, specify the increment of the sprite number to search. If omitted, it will be from p2 and p3.
-Since it is set dynamically, it usually does not need to be specified. <br>
-* If you want to perform the same processing as the es_new command, specify -1 for p3.
+	This command searches for an unused No. among the sprite Nos.
+	Assigns an available No. between the Nos. specified by p2 and p3 to the variable specified by p1.
+	If there is no free No., -1 is assigned.<br>
+	Specify the increment of the sprite No. to search in p4. If omitted, it will be set automatically from p2 and p3, so normally there is no need to specify it explicitly.<br>
+	*If you want to perform the same processing as the es_new command, specify -1 for p3.
 	</p>
 	<pre>
-es_find p1, p2, p3 sprite search
-p1 = variable name to which sprite number is assigned
-p2 = type value to be searched
-p3 = Start search Sprite No.
-p4 = Sprite No. to end the search
-p5 = Incremental </pre>
+		es_find p1,p2,p3			Sprite search
+			p1=Variable name to which the sprite No. is assigned
+			p2=Type value to be searched
+			p3=Sprite No. to start searching
+			p4=Sprite No. to end searching
+			p5=Increment</pre>
 	<p>
-Although this instruction has the type value specified in the registered sprite
-Search for sprite numbers. <br>
-Multiple types can be specified for the type value of p2 at the same time.
-For example, if you want to target type1 and type4, specify 5 for 1 + 4.
+	This command searches for the sprite No. of the sprite that has the specified type value among the registered sprites.<br>
+	You can specify multiple types at the same time for the type value of p2.
+	For example, to target type1 and type4, specify 5 with 1+4.
 	<br><br>
-If p2 is omitted or 0 is specified, sprites with all type values ​​will
-It will be searched.
+	If p2 is omitted or 0 is specified, all sprites with all type values will be searched.
 	<br><br>
-The search is performed in order from the sprite number specified by p3 to the number specified by p4.
-I will continue.
-If this is omitted, all sprites will be searched from No.0.
-When the appropriate sprite is found, substitute the result for p1 and finish.
-If the result of the search does not find the corresponding sprite, -1 is assigned.
+	The search goes in order from the sprite No. specified by p3 to the No. specified by p4.
+	If this is omitted, all sprites will be searched from No. 0.
+	When a matching sprite is found, the result is assigned to p1 and the process ends.
+	If there is no matching sprite as a result of the search, -1 is assigned.
 	<br><br>
-p5 specifies the increment of the sprite number to be searched, and if omitted, from p3 and p4
-It is set automatically, so you do not usually need to specify it.
+	p5 specifies the increment of the sprite No. to be searched, and if it is omitted, it will be set automatically from p3 and p4, so you don't normally need to specify it.
 	</p>
 	<pre>
-es_check p1, p2, p3, p4, p5, p6 Collision detection acquisition
-p1 = variable name to which the result is assigned
-p2 = Sprite No. to be checked
-p3 = type value to be searched
-p4 = Judgment flag (0 = Do not consider rotation, 1 = Consider rotation)
-p5 = Start search Sprite No.
-p6 = Sprite No. </pre> to end the search
+		es_check p1,p2,p3,p4,p5,p6	Collision detection acquisition
+			p1=Variable name to which the result is assigned
+			p2=Sprite No. to be checked
+			p3=Type value to be searched
+			p4=Judgment flag (0=Does not consider rotation, 1=Considers rotation) (Not implemented)
+			p5=Sprite No. to start searching
+			p6=Sprite No. to end searching</pre>
 	<p>
-The es_check command is a command that determines collisions between sprites.
-Search for sprites that collide (overlap) with the sprite number specified in p2,
-Assigns the result to the variable specified in p1. <br>
-You can specify the type value that is the target of collision detection with p3.
-If p3 is omitted or 0, it determines collisions with all sprites. <br>
-Multiple types can be specified for the type value of p3 at the same time.
-For example, if you want to target type1 and type4, specify 5 for 1 + 4.
-For collision detection, the hit check area specified when the character pattern was registered
-The region (%) is used. Even if the images actually overlap, in the hit check area
-It is not considered a collision unless the ranges overlap. <br>
-The result is assigned to the variable specified by p1. If there are any sprites colliding
-If it is, -1 is used.
-Is substituted. If there are multiple sprites colliding, the sprites
-The one with the smallest number is given priority.
+	The es_check command is a command that performs collision detection between sprites.
+	Searches for sprites that are colliding (overlapping) with the sprite No. specified by p2, and
+	assigns the result to the variable specified by p1.<br>
+	You can specify the type value to be targeted for collision detection in p3.
+	If p3 is omitted or 0, collisions with all sprites are judged.<br>
+	You can specify multiple types at the same time for the type value of p3.
+	For example, to target type1 and type4, specify 5 with 1+4.<br>
+	For collision detection, the hit check area (%) specified when registering the character pattern is used.
+	Even if the images actually overlap, they will not be considered a collision unless the hit check areas overlap.<br>
+	The p4 parameter is prepared for future expansion and is currently not implemented. Sprite scaling is reflected in the collision range, but note that the rectangular collision range does not change even when rotated.<br>
+	You can specify the range of sprite Nos. to search for collisions with the p5 and p6 parameters. Specify the starting sprite No. with p5 and the ending sprite No. with p6 (the No. specified with p6 is also included in the search target). If you specify a negative value for p6, the end No. will be set. If you omit the parameters, all sprites will be targeted for detection.<br>
+	The result is assigned to the variable specified by p1. If there are no colliding sprites,
+	-1 is assigned, and if there are colliding sprites, that sprite No.
+	is assigned. If there are multiple colliding sprites, the one with the smaller sprite No.
+	is prioritized.
 	<br><br>
-To delete (delete) a sprite that has been set once, use the following command.
+	To erase (delete) a sprite once it has been set, use the following commands.
 	</p>
 	<pre>
-es_kill p1 Sprite removal
-p1 = Sprite No. </pre>
+		es_kill p1					Delete sprite
+			p1=Sprite No.</pre>
 	<p>
-The sprite number specified in p1 will be deleted and will not be registered.
+	The sprite No. specified by p1 is deleted and becomes unregistered.
 	</p>
 	<pre>
-es_clear p1, p2 Delete multiple sprites
-p1 = Sprite No.
-p2 = number to be deleted </pre>
+		es_clear p1,p2				Delete multiple sprites
+			p1=Sprite No.
+			p2=Number of sprites to delete</pre>
 	<p>
-Sprites after the sprite number specified in p1 will be deleted and will not be registered.
-You can specify the number of sprites that will be deleted by p2. <br>
-If you omit p1 and p2, all sprites will be deleted.
+	The sprites starting from the sprite No. specified by p1 are deleted and become unregistered.
+	You can specify the number of sprites to delete with p2.<br>
+	If you omit the specification of p1 and p2, all sprites are deleted.
 	</p>
 
-<h2 id = "ANIMATION"> Animation </h2>
+	<h2 id="ANIMATION">Animation</h2>
 
 	<p>
-Normally, only one character number can be specified for a sprite.
-This means that you are always pasting a still image on your sprite.
-However, in many cases, such as games, the image should be animated. <br>
-In standard sprites, when defining a character pattern, the animation
-It is possible to make settings.
-The character number of the animated character changes automatically,
-Just register the sprite and the image will be automatically displayed as an animation.
+	Normally, only one character No. can be specified for a sprite.
+	This means that a still image is always pasted to the sprite.
+	However, in many cases, such as in games, the image is animated. <br>
+	With standard sprites, you can set the animation when defining the character pattern.
+	Characters with animation settings automatically change their character No.,
+	and the image is automatically displayed with animation just by registering the sprite.
 	<br><br>
-For example, the character number will automatically change to 1-> 2-> 3-> 4.
-To set
+	For example, to set the character No. to change automatically like 1→2→3→4,
 	</p>
 	<pre>
 		es_size 32,32
@@ -742,32 +788,29 @@ To set
 		es_pat 3,64,0,8
 		es_pat 4,96,0</pre>
 	<p>
-It can be set as follows. First, use the es_size instruction to create 32x32 dots.
-Set the character and define the characters from 1 to 4 with the es_pat instruction.
-Animation when 1 or more is specified for the 4th parameter of the es_pat instruction
-Wait for the specified number of frames and then switch to the next number.
-I will change it. In other words, in the above example, character No. 1 is displayed, and 8 frames later.
-Character No. 2 is displayed in. And again, eight frames later,
-It will be Lacta No.3. After switching to character No. 4 after 8 frames
-The fall will remain the same. <br>
-Specify the number of waiting frames for animation with consecutive numbers like this.
-It is possible to change the character number one after another with.
+	You can set it like this. First, set the character size of 32x32 dots with the es_size command,
+	and define characters 1 to 4 with the es_pat command.
+	If you specify 1 or more in the fourth parameter of the es_pat command, it will be an animation
+	character, and switch to the next number after waiting the specified number of frames.
+	In other words, in the above example, character No. 1 is displayed, and after 8 frames,
+	character No. 2 is displayed. And after another 8 frames, it becomes character No. 3.
+	After another 8 frames, it switches to character No. 4 and remains as it is thereafter.<br>
+	By specifying the number of wait frames for animation with continuous numbers like this,
+	it is possible to change the character No. one after another.
 	<br><br>
-However, in the above example, it stays stopped when the character number reaches 4.
-I will do it. This is repeated endlessly like 1-> 2-> 3-> 4-> 1-> 2->…
-It is also possible to set it to be mated.
+	However, in the above example, the character No. remains stopped at 4.
+	It is also possible to set it to animate infinitely, repeating 1→2→3→4→1→2→… like this.
 	</p>
 	<pre>
-es_link p1, p2 animation settings
-p1 = Character No.
-p2 = Loop animated character No. </pre>
+		es_link p1,p2				Animation settings
+			p1=Character No.
+			p2=Character No. to loop animation</pre>
 	<p>
-The es_link command specifies the character number to be displayed next in the animation.
-It is an instruction for. <br>
-After the character number specified in p1 displays only the specified frame, in p2
-Set to switch to the specified character number.
+	The es_link command is a command for specifying the character No. to be displayed next in animation. <br>
+	After the character No. specified by p1 is displayed for the specified number of frames,
+	the settings are made to switch to the character No. specified by p2.
 	<br><br>
-Therefore, if you want to set 1-> 2-> 3-> 4-> 1-> 2->…,
+	Therefore, to set it to 1→2→3→4→1→2→…,
 	</p>
 	<pre>
 		es_size 32,32
@@ -777,158 +820,697 @@ Therefore, if you want to set 1-> 2-> 3-> 4-> 1-> 2->…,
 		es_pat 4,96,0,8
 		es_link 4,1</pre>
 	<p>
-If you write a script like this, it's OK.
+	It's OK to write the script like this. <br>
+	The es_patanim command is also available for registering such animation patterns at once.
 	</p>
 
 
-<h2 id = "EFFECT_SPRITE"> Sprite deformation and effects </h2>
+	<h2 id="EFFECT_SPRITE">Sprite Transformation and Effects</h2>
 
 	<p>
-There are special effects for sprites and instructions for changing them.
-These features are not supported by the original HSPDX plug-in.
+	Commands for special effects and changes to sprites are available.
+	These functions were not supported by the original HSPDX plugin.
 	</p>
 	<pre>
-es_setrot p1, p2, p3, p4 Sprite rotation angle / display magnification setting
-p1 = Sprite No.
-p2 (0) = angle value
-p3 (-1) = Display magnification in the X direction (%)
-p4 (-1) = Display magnification in Y direction (%) </pre>
+		es_setrot p1,p2,p3,p4		Sprite rotation angle/display magnification settings
+			p1=Sprite No.
+			p2(0)=Angle value
+			p3(-1)=Display magnification in X direction (%)
+			p4(-1)=Display magnification in Y direction (%)</pre>
 	<p>
-Changes the sprite rotation angle and display magnification specified in p1.
-The sprite is rotated to the angle specified by p2. The value of p2 is an integer of 0 or more, and the larger the value, the more clockwise the rotation. The value that the angle goes around is specified by the es_ini instruction. <br>
-The display magnification in the X and Y directions is changed by the (p3, p4) parameter.
-If the value of p3 or p4 is omitted or a negative value, the previous magnification is retained unchanged.
-The display magnification is converted from 100% as 1x. If 250 is specified, it will be 2.5 times.
-Immediately after setting the sprite with the es_set instruction, the angle is 0 and the magnification is 100%. <br>
-In addition, the es_effect instruction has the following parameters to set the effect related to sprite composition.
+	Changes the rotation angle and display magnification of the sprite specified by p1.
+	The sprite is rotated to the angle specified by p2. The value of p2 is an integer greater than or equal to 0, and the larger the value, the more it rotates clockwise. The value for one rotation is specified by the es_ini command.<br>
+	The display magnification in the X and Y directions is changed by the (p3, p4) parameters.
+	If the value of p3 or p4 is omitted or is a negative value, the previous magnification is retained without changing it.
+	The display magnification is calculated with 100% as 1x. If 250 is specified, it will be 2.5x.
+	Immediately after setting a sprite with the es_set command, the angle is 0 and the magnification is 100%. <br>
+	Also, the es_effect command has the following parameters for setting the effects related to sprite compositing.
 	</p>
 	<pre>
-es_effect p1, p2, p3 Sprite special effect settings
-p1 = Sprite No.
-p2 ($ 3ff) = Effect parameter (EP value)
-p3 (-1) = Light color RGB value (0 to $ ffffff) (not implemented) </pre>
+		es_effect p1,p2,p3		Sprite special effect settings
+			p1=Sprite No.
+			p2($3ff)=Effect parameter (EP value)
+			p3(-1)=Color RGB value (0〜$ffffff)</pre>
 	<p>
-Set the effect (special effect) when drawing a sprite.
-The value specified by p2 is called the EP value and has the following meanings.
+	Sets the effect (special effect) when drawing a sprite.
+	The value specified by p2 is called the EP value and has the following meaning.
 	</p>
 	<pre>
-EP value content
+		  EP value     Content
 		-----------------------------------------------------------
-0 to 255 α channel value (0 = transparent, 255 = opaque)
-+ $ 300 Enables alpha channel synthesis (equivalent to gmode 3)
-+ $ 500 Additive synthesis is performed on the original image (equivalent to gmode 5)
-+ $ 600 Subtractive synthesis on the original image (equivalent to gmode6) </pre>
+		  0〜255   α channel value (0=transparent, 255=opaque)
+		  +$300    Enable compositing with α channel (equivalent to gmode3)
+		  +$500    Perform additive compositing on the original image (equivalent to gmode5)
+		  +$600    Perform subtractive compositing on the original image (equivalent to gmode6)</pre>
 	<p>
-This value is the sum of the alpha channel value and the composite parameters of the gmode instruction. <br>
-The EP value is the mode value set in gmode multiplied by 256 ($ 100 in hexadecimal) plus the translucency rate (alpha channel value).
-The default value is set to $ 3ff (alpha channel = 255, equivalent to gmode3). <br>
-The p3 parameter allows you to multiply a specific light color when drawing a sprite. This parameter is currently unimplemented.
-	</p>
-
-
-<h2 id = "CALLBACK_SPRITE"> Sprite callback </h2>
-
-	<p>
-Sprite callbacks are the ability to call a specific label when a sprite is displayed.
-This allows you to write only the necessary processing as a subroutine for each valid sprite.
+	This value is a combination of the α channel value and the compositing parameters by the gmode command. <br>
+	The mode value set in gmode is multiplied by 256 (hexadecimal $100), and the semi-transparent rate (α channel value) is added to it to get the EP value.
+	The default value is $3ff (α channel = 255, equivalent to gmode3). <br>
+	The p3 parameter allows you to multiply a specific color when drawing a sprite. If the parameter is omitted or -1 is specified, the normal white ($ffffff) will be used.
 	</p>
 	<pre>
-es_setgosub p1, p2 Sprite display callback settings
-p1 = Sprite No.
-p2 = Subroutine label to set </pre>
+		es_fade p1,p2,p3		Sprite blinking/fade settings
+			p1(0)=Sprite No.
+			p2(1)=Fade mode
+			p3(30)=Timer initial value</pre>
 	<p>
-Sets the display callback for the sprite specified in p1. <br>
-Specify the subroutine label with p2. After that, every time the sprite is displayed, the subroutine is called like the gosub instruction. <br> <br>
-When the subroutine is actually called, the sprite number is set in the system variable iparam.
-The type value is assigned to wparam, and the character number is assigned to lparam. <br>
-The subroutine that makes the call acts as a callback routine.
-Please note that some instructions such as waiting for time cannot be executed. For more information, see <a href="hspprog.htm#CALLBACK"> Callback Routines </a> in the programming manual.
-	</p>
-
-<h2 id = "MAP_SPRITE"> BG map drawing function </h2>
-
-	<p>
-The BG map drawing function draws tile-shaped planes together. It can be used independently of sprites.
-With the BG map, you can manage the background where parts are combined and the text area where standard size character fonts are arranged. <br>
-There are three commands for drawing a BG map. The es_bgmap instruction is an instruction to initialize the BG map.
+	You can set special actions such as blinking and fading for each sprite.
+	Sets a timer for the sprite specified by p1, and executes blinking and fading for a certain period of time.
+	Sets the fade mode with p2. If omitted, 1 is selected.
 	</p>
 	<pre>
-es_bgmap p1, p2, p3, p4, p5, p6, p7, p8 Initialize BG map
-p1 = BGNo. (0 to 15)
-p2 = variable name to store map data
-p3 (16) = X size of the entire map
-p4 (16) = Y size of the entire map
-p5 (16) = X size of map display part
-p6 (16) = X size of map display part
-p7 (0) = Screen buffer ID to store map parts
-p8 (0) = configuration options </pre>
-	<p>
-Initialize a BG map with any size.
-Specify the BG No. to be initialized with p1. BG No. can be specified from 0 to 15. <br>
-Specify the variable to store the map data in p2.
-This variable must be initialized with the dim instruction in advance as an array variable that has the element "X size of the entire map x Y size of the entire map". <br>
-Specify the X and Y sizes of the entire map with (p3, p4).
-Specify the X and Y sizes of the part where the map is displayed with (p5, p6).
-All parameters from p3 to p6 are units of map parts.
-In the p7 parameter, specify the screen buffer ID in which the image of the map part is loaded. Images must be loaded into this buffer in advance using the picload or celload instructions. (For the map part image, set the part size with the celdiv command.) <br>
-Set the behavior of the BG map with the setting option of p8. This item is for future expansion and is not currently implemented.
-	</p>
-	<pre>
-mapsx = 4: mapsy = 4; map size
-dim map, mapsx * mapsy; map data variables
-celdiv 3,64,64; Map cell settings
-es_bgmap 0, map, mapsx, mapsy, mapsx, mapsy, 3; Map registration </pre>
-	<p>
-In the above example, assuming that the overall size is 4x4, the variable map initialized with "dim map, 4 * 4" is specified. <br>
-This variable has the contents of the map data directly, and if the value is 0, the map part (cell ID) is 0, and the part ID can be assigned or referenced as it is.
-	</p>
-	<pre>
-map (0) = 1: map (5) = 6; Set map data
+		 Fade mode  Macro              Content
+		------------------------------------------------------------------------------------
+		    1            ESSPF_TIMEWIPE      Disappears when the timer time has elapsed
+		    2            ESSPF_BLINK         Blink, ends when the timer time has elapsed
+		    3            ESSPF_BLINKWIPE     Blink, disappears when the timer time has elapsed
+		    4            ESSPF_BLINK2        Blink slowly, ends when the timer time has elapsed
+		    5            ESSPF_BLINKWIPE2    Blink slowly, disappears when the timer time has elapsed
+		    6            ESSPF_FADEOUT       Fades out in timer time
+		    7            ESSPF_FADEOUTWIPE   Fades out in timer time, then disappears
+		    8            ESSPF_FADEIN        Fades in in timer time
+		    9            ESSPF_FADEINWIPE    Fades in in timer time, then disappears
+		   10            ESSPF_EFADE         Fades out at the end of the timer time
+		   11            ESSPF_EFADEWIPE     Fades out at the end of the timer time, then disappears
+		   12            ESSPF_EFADE2        Fades out slowly at the end of the timer time
+		   13            ESSPF_EFADEWIPE2    Fades out slowly at the end of the timer time, then disappears
 	</pre>
 	<p>
-The es_bgmap instruction registers the map display settings internally.
-Map information is categorized by BG No. from 0 to 15, and 16 types of maps can be held at the same time. (Map information is retained until it is initialized with the es_ini instruction) <br>
-The actual map display is performed with the es_putbg instruction.
-	</p>
-	<pre>
-es_putbg p1, p2, p3, p4, p5 Display BG map
-p1 = BGNo. (0 to 15)
-p2 (0) = Display start X coordinate
-p3 (0) = Display start Y coordinate
-p4 (0) = Display start map X position
-p5 (0) = Display start map Y position </pre>
-	<p>
-The es_putbg instruction displays the BG map of the specified BG No.
-It is necessary to initialize the size and parts information of the BG map with the es_bgmap command in advance. <br>
-Specify the display start position (upper left) on the screen with the (p2, p3) parameter.
-Specify the map display start position (upper left) with the (p4, p5) parameter.
-Normally, the map is displayed from the (0,0) position in the entire map.
-By specifying the map display start position, you can change the position of the map that corresponds to the upper left when a part of the entire map is displayed. <br>
-This makes it possible to scroll the BG map. <br>
-It is possible to display a fixed size alphabet font using a BG map.
-You can use the es_bgmes instruction instead of the mes instruction.
-	</p>
-	<pre>
-es_bgmes p1, p2, p3, "str", p4 Write a string to the BG map
-p1 (0) = BGNo. (0 to 15)
-p2 (0) = map X position
-p3 (0) = map Y position
-"str" ​​= write string
-p4 (0) = character code offset value </pre>
-	<p>
-Writes the code of the character string specified by "str" ​​to the BG map of the specified BG No.
-It is necessary to initialize the size and parts information of the BG map with the es_bgmap command in advance.
-The es_bgmes instruction operates on the assumption that the character font in ASCII code order can be displayed as a BG map. <br>
-From the position of the map specified by (p2, p3), the character code included in the character string is written to the right. <br>
-Specify the offset value for the character code with the p4 parameter. Normally, it can be 0 or omitted. For example, the letter "A" has the character code 65 and writes the value 65 to the map.
-If it contains a line feed code, move to the next line.
+	Specify the timer time (number of frames) with p3. When this number of frames has elapsed, the blinking and fading operation ends. <br>
+	ESSPF_FADEOUT/ESSPF_FADEIN fades over the entire specified timer time, while ESSPF_EFADE and ESSPF_EFADEWIPE2 fade out at a constant rate regardless of the timer time. <br>
+	If -1 is set in p3, the count will be infinite.
 	</p>
 
 
-<!-Footer->
+	<h2 id="CALLBACK_SPRITE">Sprite Callback</h2>
+
+	<p>
+	The sprite callback is a function that calls a specific label when a sprite is displayed.
+	This allows you to describe only the necessary processing as a subroutine for each valid sprite.
+	</p>
+	<pre>
+		es_setgosub p1,p2		Sprite display callback setting
+			p1=Sprite No.
+			p2=Label of the subroutine to set</pre>
+	<p>
+	Sets the display callback of the sprite specified by p1. <br>
+	Specify the label of the subroutine with p2. After that, the subroutine is called in the same way as the gosub command each time the sprite is displayed. <br><br>
+	When the subroutine is actually called, the system variable iparam is assigned the sprite No.,
+	wparam is assigned the type value, and lparam is assigned the character No. <br>
+	The subroutine when calling functions as a callback routine.
+	Note that some commands, such as time waiting, cannot be executed. For details, refer to <a href="hspprog.htm#CALLBACK">Callback Routine</a> in the Programming Manual.
+	</p>
+
+	<h2 id="MAP_SPRITE">BG Map Drawing Function</h2>
+
+	<p>
+	The BG map drawing function is for drawing tiled planes collectively. It can be used independently of sprites.
+	With BG maps, you can manage backgrounds that combine cells (parts cut out from an image) and text areas that arrange fixed-size character fonts. <br>
+	Three commands are available for BG map drawing. The es_bgmap command is a command for initializing the BG map.
+	</p>
+	<pre>
+		es_bgmap p1,p2,p3,p4,p5,p6,p7,p8	Initialize BG map
+			p1=BGNo.(0〜15)
+			p2=Variable name to store map data
+			p3(16)=X size of the entire map
+			p4(16)=Y size of the entire map
+			p5(16)=X size of the map display area
+			p6(16)=X size of the map display area
+			p7(0)=Screen buffer ID to store map cells
+			p8(0)=Setting options</pre>
+	<p>
+	Initializes a BG map with an arbitrary size.
+	Specify the BGNo. to initialize with p1. BGNo. can be specified from 0 to 15. <br>
+	Specify the variable to store the map data in p2.
+	This variable must be initialized in advance with the dim command as an array variable with "X size of the entire map × Y size of the entire map" elements. <br>
+	Specify the X and Y sizes of the entire map with (p3, p4).
+	Specify the X and Y sizes of the area to display the map with (p5, p6). <br>
+	The parameters p3 to p6 are all in units of map cells. For example, if the overall size is 4 x 4, specify a variable initialized with "dim map, 4 * 4".
+	This variable directly has the contents of the map data, and if the value is 0, the cell No. of the map is 0, and so on, and stores the cell No. as is.
+	(The cell No. is the same as the divided image No. specified by the celput command). <br>
+	Specify the screen buffer ID in which the image of the map cell is loaded with p7. You must load the image into this buffer in advance with the picload or celload command. (Set the cell size for the map cell image with the celdiv command).
+	Set the behavior of the BG map with the p8 setting options.
+	</p>
+	<pre>
+		     p8  Macro Name          Content
+		-----------------------------------------------------------------------
+		      1  ESBGOPT_NOTRANS   Do not use transparency when drawing cells
+		  0x100  ESBGOPT_USEMASK   Use a mask pattern for cell images (not implemented)
+	</pre>
+	<p>
+	Normally, cell No. 0 (the first cell) is treated as blank and skipped from drawing.
+	If the "ESBGOPT_NOTRANS" option is set, cell No. 0 is also drawn as an opaque image.
+	</p>
+	<pre>
+	mapsx=4:mapsy=4				; Map size
+	dim map,mapsx*mapsy			; Map data variable
+	celdiv 3,64,64				; Map cell settings
+	es_bgmap 0,map,mapsx,mapsy,mapsx,mapsy,3	; Map registration</pre>
+	<p>
+	In the example above, assuming the overall size is 4x4, the variable map initialized with "dim map,4*4" is specified.<br>
+	This variable directly holds the content of the map data. A value of 0 means the map part (cell No.) is 0. You can directly substitute or refer to cell No.s in this way.
+	</p>
+	<pre>
+	map(0)=1:map(5)=6			; Set map data
+	</pre>
+	<p>
+	The es_bgmap command registers settings related to map display internally.
+	Map information is classified by BGNo. from 0 to 15, allowing you to hold 16 types of maps simultaneously. (Map information is retained until it is initialized by the es_ini command).<br>
+	The actual map display is done by the es_putbg command.
+	</p>
+	<pre>
+		es_putbg p1,p2,p3,p4,p5			Display BG map
+			p1=BGNo.(0〜15)
+			p2(0)=Display start X coordinate
+			p3(0)=Display start Y coordinate
+			p4(0)=Display start map X position
+			p5(0)=Display start map Y position</pre>
+	<p>
+	The es_putbg command displays the BG map of the specified BGNo.
+	You must initialize the BG map's size and cell information using the es_bgmap command beforehand.<br>
+	The (p2,p3) parameters specify the display start position (top left) on the screen.
+	The (p4,p5) parameters specify the map's display start position (top left).
+	Normally, the map is displayed from the (0,0) position within the entire map.
+	By specifying the map's display start position, you can change the map's position at the top left when displaying a part of the overall map.<br>
+	This allows you to scroll the BG map.<br>
+	You can use BG maps to display fixed-size alphanumeric fonts.
+	You can use the es_bgmes command instead of the mes command.
+	</p>
+	<pre>
+		es_bgmes p1,p2,p3,"str",p4		Write a string to a BG map
+			p1(0)=BGNo.(0〜15)
+			p2(0)=Map X position
+			p3(0)=Map Y position
+			"str"=String to write
+			p4(0)=Character code offset value</pre>
+	<p>
+	Writes the code of the string specified by "str" to the specified BGNo.'s BG map.
+	You must initialize the BG map's size and cell information using the es_bgmap command beforehand.
+	The es_bgmes command operates on the assumption that the BG map can display ASCII code-ordered character fonts.<br>
+	It writes the character codes contained in the string, starting from the map position specified by (p2, p3), moving to the right.<br>
+	The p4 parameter specifies the offset value for the character code. Usually, you can set it to 0 or omit it. For example, the character "A" has a character code of 65, and the value 65 is written to the map.
+If a newline character is included, it moves to the next line.
+	</p>
+	<p>
+	You can set attribute values for each cell No. in the BG map. See the <a href="#BGMAPATTR">BG Map Attribute Settings</a> and <a href="#BGMAPHIT">BG Map Collision Detection</a> sections for details.
+	</p>
+
+
+	<h2 id="DRAWBUFFER">Drawing Sprites to Different Buffers</h2>
+
+	<p>
+	The HGIMG4 runtime allows you to draw sprites to off-screen buffers.
+	<br>
+	You can use the gsel command to specify an off-screen buffer and then use the es_draw command to draw. However, be aware that if the resolution is different from the main screen (buffer ID 0), you need to reset the resolution.
+	</p>
+	<pre>
+		es_screen p1,p2			Sprite drawing resolution setting
+			p1(0)=Drawing resolution in the X direction
+			p2(0)=Drawing resolution in the Y direction
+	</pre>
+	<p>
+	The es_screen command resets the sprite drawing resolution.<br>
+	The size specified by the p1, p2 parameters is set as the screen drawing resolution.
+	If you specify 0 or a negative value for the p1, p2 parameters, the size of the current drawing destination screen is used.
+	</p>
+	<pre>
+		es_ini
+		buffer 1, 320, 240, screen_offscreen
+		gsel 1
+		es_screen		; Reset the sprite drawing resolution
+		redraw 0
+		es_draw
+		redraw 1
+	</pre>
+	<p>
+	By setting the resolution as above, you can correctly draw sprites to an off-screen buffer with a resolution different from the main screen (buffer ID 0).<br>
+	Note that when the sprite drawing resolution is reset with the es_screen command, the sprite valid area is also automatically reset.
+	</p>
+
+
+	<h2 id="SPFLIPPAT">Controlling Sprite Direction Patterns</h2>
+
+	<p>
+	If sprite movement is set by the es_apos or es_adir command, you can change the character No. that is set according to the direction of movement.<br>
+	You can set the ESI_XREVCHR and ESI_YREVCHR parameter values for each sprite to easily set the character No. according to the direction.
+	</p>
+	<pre>
+		es_setp SpriteNo. , ESI_XREVCHR , 4	;	 X-direction reverse character offset value
+	</pre>
+	<p>
+	In the example above, if the character is moving in the right direction (X coordinate is positive), it displays the set character No. plus 4.<br>
+	In this case, if it is stationary or moving to the left, the originally set character No. is displayed.
+	By default, 0 is set, and the character No. is not changed depending on the direction of movement.
+	Also, if you set -4, the set character No. plus 4 will be displayed when it is stationary or moving to the left.
+	</p>
+	<pre>
+		es_setp SpriteNo. , ESI_YREVCHR , 8	;	 X-direction reverse character offset value
+	</pre>
+	<p>
+	In the example above, if the character is moving in the down direction (Y coordinate is positive), it displays the set character No. plus 8.<br>
+	In this case, if it is stationary or moving upwards, the originally set character No. is displayed.
+	By default, 0 is set, and the character No. is not changed depending on the direction of movement.
+	Also, if you set -8, the set character No. plus 8 will be displayed when it is stationary or moving upwards.<br>
+	If you set ESI_XREVCHR and ESI_YREVCHR at the same time, their values will be added together, but basically, use it by specifying only the X or Y direction.
+	</p>
+
+
+	<h2 id="SPGRAVITY">Sprite Gravity Settings</h2>
+
+	<p>
+	The es_gravity command allows you to set gravity for sprites to express falling movement.
+	</p>
+	<pre>
+		es_gravity p1,p2,p3			Set falling acceleration
+			p1(0)=Sprite No.(-1〜)
+			p2(0)=Acceleration in the X direction (-32767〜32767)
+			p3(0)=Acceleration in the Y direction (-32767〜32767)
+	</pre>
+	<p>
+	The es_gravity command sets the acceleration when performing free-fall movement.
+	The p2 and p3 parameters are the amount of movement added each frame, with 256 being 1 dot.
+	Also, if you specify -1 for the p1 parameter, you can set the default gravity value.<br>
+	The gravity default value is the value that is automatically set when the es_set command is executed. The initial value is 0 for both the X and Y direction acceleration.<br>
+	For example, if you set "es_gravity 0, 0, 98", sprite 0 will be set with an acceleration of X=0, Y=98/256.
+	As a result, the Y direction will move in the positive direction (downward) every frame.
+	Since the X and Y direction accelerations can be freely specified, the direction of gravity can be set to various directions other than down.<br>
+	The sprite's acceleration is effective when the automatic movement flag (ESSPFLAG_MOVE) is set in the flag value.
+	</p>
+	<p>
+	*ESSPFLAG_GRAVITY (free-fall movement ON), which is set in the sprite's flag value, is a value left for HSPDX compatibility. It is not necessary to set this flag value for normal gravity settings.
+	</p>
+
+
+	<h2 id="BGMAPATTR">BG Map Attribute Settings</h2>
+
+	<p>
+	A BG map draws data in block units to which cell No.s are assigned.
+	This cell No. is the same as the divided image No. specified by the celput command, and is the number automatically assigned when an image is divided into specified sizes.<br>
+	The BG map function allows you to set attribute values for each cell No.
+	The es_bgattr and es_getbgattr commands allow you to read and write attribute values.
+	</p>
+	<pre>
+		es_bgattr p1,p2,p3,p4			Set BG map attribute value
+			p1(0)=BGNo.(0〜15)
+			p2(0)=Cell No.(Start)
+			p3($ffff)=Cell No.(End)
+			p4(0)=Attribute value(0〜65535)
+
+		es_getbgattr p1,p2,p3			Get BG map attribute value
+			p1=Variable name to which the attribute value is assigned
+			p2(0)=BGNo.(0〜15)
+			p3(0)=Cell No.
+	</pre>
+	<p>
+	The es_bgattr command sets the BG map's attribute value.
+	The attribute value is auxiliary information set for each cell No. used by the BG map.<br>
+	Specify the BGNo. with p1. You can specify BGNo.s from 0 to 15.
+	The value specified by p4 is set as the attribute value for the range of cell No.s specified by p2 and p3.<br>
+	You can set attribute values from 0 to 65535 (16bit). This information is used for collision detection with the BG by the es_bghit and es_bghitpos commands.
+	Macros are defined to represent attribute values. They have the following meanings:
+	</p>
+	<pre>
+		      Value　Macro Name          Content
+		--------------------------------------------------
+		       0  ESMAP_ATTR_NONE   Place where intrusion is possible (default)
+		      16  ESMAP_ATTR_NOTICE Intrusion possible with collision detection (notification item)
+		      32  ESMAP_ATTR_ANIM   Cell animation flag
+		      64  ESMAP_ATTR_EVENT  Intrusion possible with collision detection (event item)
+		     128  ESMAP_ATTR_HOLD   Intrusion possible but becomes foothold
+		     192  ESMAP_ATTR_WALL   Impassable wall
+		  0x1000  ESMAP_ATTR_MAX    Maximum value of cell No.
+	</pre>
+	<p>
+	The es_getbgattr command retrieves the attribute value of the BG map set by the es_bgattr command.<br>
+	Specify the BGNo. with p2. BGNo. can be specified from 0 to 15.
+	The attribute value set for the cell No. specified by p3 is assigned to the variable specified by p1. The variable of p1 is automatically set as an integer type.
+	</p>
+	<p>
+	Bits 0-3 (values 0-15) of the attribute value store group information.
+	This can be used as a bit to display or hide only specific groups.<br>
+	Also, values from bit 8 to 15 can be set as arbitrary values as Option values.
+	The information within this 16-bit range is called the attribute value.
+	</p>
+	<pre>
+		  bit15-8        bit7    bit6   bit5   bit4       bit3-0
+		-------------------------------------------------------------
+		  Option         Hold    Event  Anim   Notice     Group   
+	</pre>
+	<p>
+	Group information and Option values are referenced when using the es_putbg command.
+	Also, detailed behavior can be managed by the es_bgparam command, which configures the BG map.
+	</p>
+
+
+	<h2 id="BGMAPHIT">BG Map Collision Detection</h2>
+
+	<p>
+	It is possible to perform collision detection between sprites and the BG map based on the value set in the BG map attribute.
+	The following functions are available for BG maps:
+	</p>
+	<pre>
+		・Detection of BG map cells that the sprite touches and movement support
+		・Setting of sprites as replacements for BG map cells
+		・Acquisition of event information set in BG map cells
+		・BG map cell pixel-by-pixel collision detection support (not implemented)
+	</pre>
+	<p>
+	The attribute value of the BG map stores the following information. These are set by the es_bgattr command by the es_getbgattr command.
+	</p>
+	<pre>
+		  bit15-8        bit7    bit6   bit5   bit4       bit3-0
+		-------------------------------------------------------------
+		  Option         Hold    Event  Anim   Notice     Group   
+	</pre>
+	<p>
+	Among these, the Hold and Event flags are used for collision detection.
+	</p>
+	<pre>
+		      Value　Macro Name          Content
+		--------------------------------------------------
+		       0  ESMAP_ATTR_NONE   Enterable location (default)
+		      64  ESMAP_ATTR_EVENT  Enterable and has collision detection (event item)
+		     128  ESMAP_ATTR_HOLD   Enterable but becomes a foothold
+		     192  ESMAP_ATTR_WALL   Impassable wall
+	</pre>
+	<p>
+	Normally, 0 (enterable location) is set, but if other attribute values are set, it is detected as a colliding location (cell).<br>
+	The commands that perform collision detection with the BG map are es_bghit and es_bghitpos commands.
+	</p>
+	<pre>
+		es_bghit p1				Executes collision detection between the BG map and the sprite
+			p1(0)=Sprite No. to be judged
+
+		es_bghitpos p1,p2,p3,p4,p5,p6,p7,p8	Executes collision detection with the BG map
+			p1(0)=BGNo.(0〜15)
+			p2(0)=X coordinate on the BG to be judged (in dots)
+			p3(0)=Y coordinate on the BG to be judged (in dots)
+			p4(0)=X size to be judged (in dots)
+			p5(0)=Y size to be judged (in dots)
+			p6(0)=Amount of movement in the X direction
+			p7(0)=Amount of movement in the Y direction
+			p8(0)=Coordinate mode switch (0=16bit/1=32bit)
+	</pre>
+	<p>
+	The es_bghit command detects whether a specified sprite collides with the BG map when it moves and moves it to an appropriate coordinate.
+	The es_bghitpos command detects whether the BG map collides when moving from arbitrary coordinates regardless of the sprite.<br>
+	Both execute collision detection with the sprite based on the attribute value set in the BG map.
+	The es_bghitpos command determines whether a character on the BG map comes into contact when an arbitrary rectangle is moved, and creates a list of results.<br>
+	The list of collision detection results can be obtained with the es_getbghit command.
+	</p>
+	<pre>
+		es_getbghit p1,p2,p3			Gets the collision detection result with the BG map
+			p1=Variable name to which the collision detection result is assigned
+			p2(0)=BGNo.(0〜15)
+			p3(0)=Judgment result index (0〜)
+	</pre>
+	<p>
+	Specify the BGNo. with the p2 parameter. BGNo. can be specified from 0 to 15.
+	Specify the judgment result index with the p3 parameter. This is an index value when multiple judgment results are created, starting from 0.<br>
+	After executing the es_getbghit command, the information is assigned to the variable specified by the p1 parameter. The variable of p1 is automatically set as an integer array variable.
+	The result is assigned to array elements 0 to 6 of the variable. For example, in the case of a variable named result, the result is assigned to result(0) to result(6).
+	</p>
+	<pre>
+		    Array element　Content
+		----------------------------------------------------------
+		         (0)  Judgment result (ESMAPHIT_*)
+		         (1)  Character No. that touched
+		         (2)  Attribute value of the character No. that touched
+		         (3)  X coordinate of the map that touched
+		         (4)  Y coordinate of the map that touched
+		         (5)  Upper left X coordinate of the judged coordinate
+		         (6)  Upper left Y coordinate of the judged coordinate
+	</pre>
+	<p>
+	The content of variable (0) is the judgment result. This value is defined by the macro ESMAPHIT_*.
+	The following value is assigned based on the attribute value.
+	</p>
+	<pre>
+		      Value　Macro Name        Content
+		--------------------------------------------------
+		       0  ESMAPHIT_NONE   No contact (movable)
+		       1  ESMAPHIT_HITX   Contact when moving in the X direction
+		       2  ESMAPHIT_HITY   Contact when moving in the Y direction
+		       4  ESMAPHIT_EVENT  Contact information (event item) exists (movable)
+		       5  ESMAPHIT_NOTICE Contact information (notification item) exists (movable)
+		       6  ESMAPHIT_SPHIT  Contact with sprite (ESSPMAPHIT_BGOBJ is set)
+	</pre>
+	<p>
+	If you specify a negative value for the p3 parameter, you can get the number of judgment results.
+	To check all judgment results, you need to create the following script.
+	</p>
+	<pre>
+	es_getbghit numinfo,bgno,-1
+	repeat numinfo
+		es_getbghit hitinfo,0,cnt
+		if hitinfo=ESMAPHIT_HITX {
+			; There was a collision when moving in the X direction
+		}
+		if hitinfo=ESMAPHIT_HITY {
+			; There was a collision when moving in the Y direction
+		}
+		if hitinfo=ESMAPHIT_EVENT {
+			; Contact with the event cell
+		}
+		if hitinfo=0 {
+			; Final destination coordinates
+			x=hitinfo(5)
+			y=hitinfo(6)
+		}
+	loop
+	</pre>
+	<p>
+	With the es_bghit command, all processing is executed simply by specifying the sprite No. in parameter p1.<br>
+	The sprite specified here must have BG collision detection enabled in advance.
+	To enable sprite BG collision detection, set the map collision detection flag (ESI_MAPHIT) and set the referenced BG map as the parent. This can be set with the es_setp command or the es_bglink command.<br>
+	The es_bglink command automatically sets the BG map as the parent when a new sprite is set.<br>
+	</p>
+	<pre>
+		es_bglink p1,p2				New sprite map reference setting
+			p1(0)=BGNo.(0〜15)
+			p2(0)=MAPHIT setting option (ESSPMAPHIT_*)
+	</pre>
+	<p>
+	The es_bglink command sets the BG map reference setting for sprites newly set with the es_set command.<br>
+	With this command, it is possible to easily register sprites that synchronize their coordinates with the scrolling BG map.
+	(It becomes similar to the state linked to the BG map by the es_setparent command)<br>
+	Also, the MAPHIT setting option is added in the same way. The following values can be specified for the MAPHIT setting option.
+	</p>
+	<pre>
+		      Value　Macro Name             Content
+		------------------------------------------------------------------
+		   0x100  ESSPMAPHIT_BGHIT     Performs collision detection based on the attribute value of the map
+		   0x400  ESSPMAPHIT_BLOCKBIT  Judges the attribute that matches the block bit setting value as a wall
+		   0x800  ESSPMAPHIT_HITWIPE   Automatically deletes the sprite when it touches the map
+		  0x1000  ESSPMAPHIT_WIPEEVENT Deletes the attribute when acquiring map event information
+		 0x10000  ESSPMAPHIT_BGOBJ     Adds the same contact judgment as the map to the sprite
+		 0x20000  ESSPMAPHIT_STICKSP   Adheres to sprites that have contact judgment as a map
+	</pre>
+	<p>
+	The MAPHIT setting option determines the operation related to collision detection with the BG map, which is set for each sprite.
+	When performing collision detection with the BG map, you must set the ESSPMAPHIT_BGHIT flag at a minimum.<br>
+	It is also possible to read and write this value using the es_setp/es_get command.<br>
+	ESSPMAPHIT_BGOBJ is used for special purposes. A sprite with this set has the same function as a cell on a BG map with collision detection. In other words, it is possible to have only the parts that become walls or footholds as sprites and move them. (In the case of a sprite that becomes a foothold, the sprite with ESSPMAPHIT_STICKSP set can ride on it and move.)
+	</p>
+	<p>
+	When the sprite moves with the es_bghit command, it determines whether it touches a cell on the map and moves it to an appropriate coordinate.
+	In this case, it is necessary to set the direction and distance of movement in advance with commands such as es_adir and es_apos.
+	Even if the amount of movement is 0, the direction of movement is automatically set if there are settings such as gravity.<br>
+	Even if the es_bghit command is not executed, the MAPHIT-set sprite takes into account the collision detection with the BG map when the es_draw or es_move command is executed and moves to an appropriate coordinate.<br>
+	In other words, if you want to explicitly execute the sprite movement process, you can use the es_bghit command to get the list of results, and the same process will be performed in the sprite movement process even if you don't. (Sprites moved by the es_bghit command are canceled for movement processing with the es_draw and es_move commands.)<br>
+	Also, the sprite parameter "ESI_MOVERES" that can be acquired with the es_get command stores an overview of the results in the MAPHIT-set sprite. Bits 0 to 7 (0 to 255) of this value store the map attribute Option value (bits 8 to 15) of the area overlapping with itself.<br>
+	This value has the following flags, so it can be used as a simple collision detection result.
+	</p>
+	<pre>
+		      Value　Macro Name          Content
+		--------------------------------------------------
+		    0x100 ESSPRES_XBLOCK    Collision detected in the X direction
+		    0x200 ESSPRES_YBLOCK    Collision detected in the Y direction
+		    0x400 ESSPRES_GROUND    Grounded on a foothold in the direction of gravity
+		    0x800 ESSPRES_EVENT     Event attribute present
+	</pre>
+	<p>
+	BG Map collision detection supports many features and is highly functional, but mastering it requires remembering various elements. It is best to start with simple functions and gradually use them.
+	</p>
+
+
+
+	<h2 id="SPLINK">Sprite Parent Setting</h2>
+
+	<p>
+	When displaying a sprite, you can set a parent object.
+	This allows you to display the sprite at relative coordinates from a specific sprite, or as coordinates within the BG Map.<br>
+	The es_setparent command is used with the following format.
+	</p>
+	<pre>
+		es_setparent p1,p2,p3			Set Sprite Parent
+			p1(0)=Sprite No.
+			p2(0)=Parent Sprite No. (or BGNo.)
+			p3(0)=Setting Options
+	</pre>
+	<p>
+	The es_setparent command sets the parent sprite or BG Map of the specified sprite.<br>
+	By setting the parent sprite No. in the p2 parameter, the sprite will be displayed at coordinates relative to the parent's coordinates.<br>
+	If you specify a negative value for p2, the parent sprite setting will be canceled and the sprite will return to normal sprite display.<br>
+	The setting option for the p3 parameter should normally be set to 0.
+	By specifying 1 for the p3 parameter, the sprite will be set to display with the BG Map as its parent. In that case, you can specify the BGNo. for the p2 parameter.
+	Displaying within the BG Map is an essential function when performing displays linked to scrolling BG Maps.
+	For this reason, a setting for linking with the BG Map by default and an es_bglink command for detailed BG Map settings are provided.
+	If a sprite with a parent setting has another parent, the coordinates will be searched recursively.<br>
+	</p>
+
+
+	<h2 id="BGMAPEVENT">BG Map Event Information</h2>
+
+	<p>
+	Attribute values set in the BG Map can incorporate not only obstacle settings but also event and notification information.
+	</p>
+	<pre>
+		  bit15-8        bit7    bit6   bit5   bit4       bit3-0
+		-------------------------------------------------------------
+		  Option         Hold    Event  Anim   Notice     Group   
+	</pre>
+	<p>
+	The attribute value stores the above information, and the Event and Notice flags are used to store information.<br>
+	If a sprite or other object moves to a cell containing the Event flag, it will be notified as one of the pieces of information obtained by the es_getbghit command. This can be used to indicate information such as items placed at the destination or areas with special functions.
+	Also, if ESSPMAPHIT_EVENTWIPE is set in the sprite's MAPHIT setting option (ESSPMAPHIT_*), the cell No. will be erased (No. 0 state) when the information is acquired.
+	</p>
+	<p>
+	When a BG Map is displayed with the es_putbg command, cells containing the Event or Notice flags can be recorded. The settings for this are specified with the es_bgparam command.
+	</p>
+	<pre>
+		es_bgparam 0, ESMAP_PRM_OPTION, ESMAP_OPT_GETEVENT	; Information acquisition flag during drawing
+	</pre>
+	<p>
+	The following values can be used for the value specified for ESMAP_PRM_OPTION.
+	</p>
+	<pre>
+		      Value　Macro Name               Content
+		--------------------------------------------------
+		       1  ESMAP_OPT_WIPENOTICE   Erase when acquiring the Notice flag
+		       2  ESMAP_OPT_GETEVENT     Acquire the Event flag
+		       4  ESMAP_OPT_WIPEEVENT    Erase when acquiring the Event flag
+	</pre>
+	<p>
+	The Notice flag is always recorded. To record the Event flag, you must set ESMAP_OPT_GETEVENT.<br>
+	Also, ESMAP_OPT_WIPENOTICE and ESMAP_OPT_WIPEEVENT are available as settings for erasing when acquiring flags. These can be specified simultaneously by adding them together.<br>
+	The information recorded when the es_putbg command is executed can be acquired with the es_getbghit command. This information can be used to notify that a specific position on the map has been displayed.<br>
+	Also, even outside the display area, it is possible to check whether a cell containing the Notice flag exists in an adjacent area with the es_bgfetch command.
+	</p>
+	<pre>
+		es_bgfetch p1,p2,p3,p4			Acquire the attribute value in the BG Map area
+			p1(0)=BGNo.(0〜15)
+			p2(1)=Search target position (0=Down, 1=Right, 2=Up, 3=Left, 4=Entire)
+			p3(1)=Search cell size
+			p4(0)=Event type specification (Not implemented)
+	</pre>
+	<p>
+	This command acquires event attribute information within the map display area displayed by the es_putbg command, and in areas hidden above, below, left, and right.<br>
+	It is used to acquire event attribute information set in cells of a map slightly ahead when a wide map is scroll-displayed. For example, by setting information such as the occurrence of enemies as an event attribute, it can be detected and generated when the screen scroll approaches.<br>
+	Specify the BGNo. with the p1 parameter and the area with the p2 parameter. You can specify a value from 0=Down, 1=Right, 2=Up, 3=Left, 4=Entire from the displayed scroll position.<br>
+	Specify the area size of the cells to be searched with the p3 parameter. For example, if you specify 1 (Right), the event attribute information will be searched for the size specified by p3 on the right side that is not displayed on the screen.<br>
+	The event attribute information searched is ESMAPHIT_NOTICE and ESMAPHIT_EVENT, similar to when the es_putbg command is executed.
+	The searched event attribute information can be acquired with the es_getbghit command.
+	</p>
+
+
+	<h2 id="DECOSP">Decoration Sprite Setting</h2>
+
+	<p>
+	Decoration sprites are used for temporary decorations and disappear after a certain period of time. They can be used as effects such as explosions and smoke.<br>
+After registering a pattern of how decoration sprites are displayed with the es_regdeco command, they are displayed at arbitrary coordinates with the es_setdeco command.<br>
+	Once registered, the same pattern can be displayed at any time with the es_regdeco command.
+	First, register the decoration sprite with the es_regdeco command.
+	</p>
+	<pre>
+		es_regdeco p1,p2,p3,p4,p5,p6		Register a decoration sprite
+			p1(0)=Character No.
+			p2(0)=Setting Option Value
+			p3(-1)=Movement Direction
+			p4(-1)=Movement Speed (%)
+			p5(30)=Display Frame Count
+			p6(-1)=Decoration No.
+	</pre>
+	<p>
+	Specify the character No. to be displayed with the p1 parameter.
+	Specify the setting options for the p2 parameter. You can specify the following values (by adding them together you can set them simultaneously).
+	</p>
+	<pre>
+		      Value　Macro Name             Content
+		------------------------------------------------------------------
+		       1  ESDECO_FRONT         Display on the frontmost layer
+		       2  ESDECO_MAPHIT        Enable map collision detection
+		       4  ESDECO_GRAVITY       Reflect gravity if set
+		       8  ESDECO_ZOOM          Display while zooming in
+		      16  ESDECO_ROTATE        Display while rotating
+		      32  ESDECO_BOOST         Double the movement distance
+		      64  ESDECO_SCATTER       Set the initial rotation angle randomly
+		   0x100  ESDECO_MULTI4        Sprite x 4
+		   0x200  ESDECO_MULTI8        Sprite x 8
+		   0x400  ESDECO_MULTI16       Sprite x 16
+		  0x1000  ESDECO_CHR2          Set character No. to 2 random values
+		  0x2000  ESDECO_CHR4          Set character No. to 4 random values
+		  0x4000  ESDECO_EPADD         Perform additive composition during display
+		  0x8000  ESDECO_FADEOUT       Fade out when disappearing
+	</pre>
+	<p>
+	ESDECO_MULTI4, ESDECO_MULTI8, and ESDECO_MULTI16 are options for simultaneously displaying multiple sprites. In this case, the rotation angle is assigned according to the number of sprites displayed at the same time.<br>
+	Specify the movement direction with the p3 parameter. This value is the same as the movement direction parameter of the es_adir command.
+	If the specification is omitted or a negative value is used, it will be determined randomly from all directions.<br>
+	Specify the movement direction with the p4 parameter. This value is the same as the movement speed parameter of the es_adir command.
+	If the specification is omitted or a negative value is used, it will be determined randomly from 50 to 200%.<br>
+	Specify the number of display frames with the p5 parameter. The decoration sprite will be erased after this number of frames has elapsed.<br>
+	Specify the decoration No. to overwrite with the p6 parameter. This is used when overwriting an already registered decoration No. Normally, a new decoration No. will be assigned by omitting the specification or using a negative value.<br>
+	There are no restrictions on registering decoration Nos. Also, decoration Nos. cannot be deleted until the sprite is initialized with the es_ini command.<br>
+	After the command is executed, the registered decoration No. is assigned to the system variable stat.
+	You can display the decoration sprite by calling the es_setdeco command based on this number.
+	</p>
+	<pre>
+		es_setdeco p1,p2,p3			Display a decoration sprite
+			p1(0)=Sprite X coordinate
+			p2(0)=Sprite Y coordinate
+			p3(0)=Decoration No.
+	</pre>
+	<p>
+	The es_setdeco command displays the decoration sprite registered by the es_regdeco command.<br>
+	The sprite is displayed at the specified coordinates according to the pattern registered in advance.
+	Decoration sprites are used for temporary decorations and disappear after a certain period of time.
+	</p>
+
+	<h2 id="SPROPT">Sprite Drawing Option Setting</h2>
+
+	<p>
+	Sprite drawing options can be set with the es_spropt command.
+	</p>
+	<pre>
+		es_spropt p1,p2				Sprite drawing option setting
+			p1(0)=Drawing time offset scaling setting
+			p2(0)=Drawing time clipping setting
+	</pre>
+	<p>
+	The p1 parameter configures offset scaling when drawing sprites.<br>
+	With standard sprites, when registering a character using the es_sizeex command, you can register a "display offset X,Y" parameter to change the origin point of the coordinates where the sprite is displayed.<br>
+	For example, when registering a character with a size of 128 x 128 dots, the character is normally displayed with the specified coordinates as the upper left, but by setting the display offset to (-64, -64), X and Y are shifted by 64 in the negative direction, respectively. In other words, the center position of the character can be used as the origin for display.<br>
+	By using this function, you can change the center position of rotation and scaling (enlargement/reduction).<br>
+	The offset scaling setting during drawing determines whether the size of this display offset itself is changed by scaling.<br>
+<br>
+	If the p1 parameter is 0, the display offset is scaled according to the sprite's magnification (set by the es_setrot command, etc.). This is the default setting.<br>
+	If the p1 parameter is 1, the sprite's magnification does not affect the display offset. Drawing is always performed with the determined display offset.<br>
+	This setting can be used selectively at any time.<br>
+<br>
+	The drawing clipping setting determines whether or not to perform clipping processing internally performed when drawing sprites.<br>
+	If the p2 parameter is 0, the drawing process is canceled when coordinates outside the screen are specified during sprite drawing. This eliminates unnecessary drawing costs. This is the default setting.<br>
+	If the p2 parameter is 1, the drawing process is performed even when coordinates outside the screen are specified. This allows the drawing process to be executed even when a position different from the coordinates originally drawn by the viewcalc command, etc., is specified.<br>
+Normally, the drawing clipping setting is fine in the default state, but it is provided for setting in special situations.<br>
+<br>
+	When initialized with the es_ini command, both the scaling setting and the drawing clipping setting are initialized and set to 0.
+	</p>
+
+
+	<!-- フッター -->
 	<ul id="FOOTER">
-<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
-<li> <a href="../index.htm"> Return to index </a> </li>
+		<li><a href="#CONTAINER">Return to the top of this page</a></li>
+		<li><a href="../index.htm">Return to index</a></li>
 	</ul>
 	<a href="https://www.onionsoft.net/">
 		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
@@ -936,4 +1518,3 @@ If it contains a line feed code, move to the next line.
 </div><!-- container -->
 </body>
 </html>
-

@@ -1,113 +1,101 @@
+
 ------------------------------------------------------------------------------
-HSP3 official 2D / 3D material "Tamane"
+HSP3 Official 2D/3D Asset "Tamane"
 copyright 2014 (c) Ogawa Kosaku (Team GrisGris) / HSPTV!
 ------------------------------------------------------------------------------
 
-■ HSP3 official 3D material "Tamane"
+■ HSP3 Official 3D Asset "Tamane"
 
-HSP3 Official 3D Material "Tamane" is an official material that can be used with Hot Soup Processor (HSP).
-Contains all the data and scripts that can be displayed by HSP3, as well as the original data.
-The directory structure is as follows for each category.
+The HSP3 Official 3D Asset "Tamane" is an official asset that can be used with Hot Soup Processor (HSP).
+It contains data and scripts that can be displayed with HSP3, as well as the original data.
+The directory structure is organized by category as follows.
 This data can be incorporated into your own software.
-See the Copyright and License section for more information.
+Please see the "Copyright and License" section for details.
 
-Check out the latest information on "Tamane" on the official page!
+Check out the official page for the latest information on "Tamane"!
 http://hsp.tv/make/tamane3d.html
 
+■ HSP3 Official 2D Asset "Tamane"
 
-■ HSP3 official 2D material "Tamane"
-
-2D material that can be displayed by HSP3 is recorded as standard.
-"Tamaface.bmp" and "tamaface.png" for cards of Tamane,
-Pixel art animation patterns ("tamadot.bmp" and "tamadot.png"), etc.
-Materials that can be widely used are provided.
-In addition, sample games such as "Jump Up of Tamane ♪", "Drop Puzzle", and "Card Battle" are also included.
-Check out the latest information on 2D materials on the official page!
+2D assets that can be displayed with HSP3 are included as standard.
+These include "tamaface.bmp" and "tamaface.png" for Tamane card designs,
+dot-art animation patterns ("tamadot.bmp" and "tamadot.png"), and
+other versatile assets.
+Sample games such as "Tamane's Jump Up♪", "Drop Puzzle", and "Card Battle" are also included.
+Check out the official page for the latest information on 2D assets!
 http://hsp.tv/make/tamane2d.html
 
+■ Running the Samples
 
-■ About sample execution
+When running samples from HSP3, be sure to use the latest version (HSP3.4 or later).
 
-When running the sample from HSP3, be sure to use the latest version (HSP3.4 or later).
-
-Information and downloads of Hot Soup Processor (HSP) are available on the official page below.
+Information and downloads for Hot Soup Processor (HSP) are available on the official page:
 http://hsp.tv/
 
-The folder structure is as follows.
+The folder structure is as follows:
 
-+ --- hsptv 2D material data (BMP, PNG format)
++---hsptv			2D Asset Data (BMP, PNG format)
 +---sample
-        + --- hgimg3 HGIM G3 runtime data & scripts
+        +---hgimg3		HGIMG3 Runtime Data & Scripts
         |
-        + --- hgimg4 HGIM G4 runtime data & scripts
-              + --- fbx 3D data (FBX format)
+        +---hgimg4		HGIMG4 Runtime Data & Scripts
+              +---fbx		3D Data (FBX format)
 
+■ Copyright and License
 
-■ Copyright and license
+The 3D asset "Tamane" was created by Ogawa Kosaku (Team GrisGris) and is published by onion software.
+onion software does not guarantee any damages caused by this data.
+Use it at your own risk.
 
-The 3D material "Tamane" is made by Mr. Kosaku Ogawa (Team GrisGris).
-It is published by onion software.
-onion software does not guarantee any damage caused by this data.
-Use at your own risk.
-
-The copyright of the 3D material "Tamane" belongs to Mr. Kosaku Ogawa (Team GrisGris).
-The data of the 3D material "Tamane" and the accompanying sample script data are available.
-It can be attached, duplicated, reorganized, or redistributed under a modified BSD license, whether for a fee or for free.
+The copyright of the 3D asset "Tamane" belongs to Ogawa Kosaku (Team GrisGris).
+The data of the 3D asset "Tamane" and its associated sample scripts and data can be attached, copied, modified, and redistributed, whether for commercial or non-commercial purposes, under the modified BSD license.
 No license fee is required.
 
-The rights of the original software (executable file) created by the user by incorporating the 3D material "Tamane" are
-It belongs to the user who created it.
-Notation regarding the copyright of material data is not mandatory.
-If you want to specify it in the document etc., please use the following format.
+The rights to original software (executable files) created by users incorporating the 3D asset "Tamane" belong to the user who created them.
+Indication of copyright regarding the asset data is not required.
+If you would like to specify it in documents, etc., please use the following format:
 ------------------------------------------------------------------------------
-HSP3 official 3D material "Tamane"
+HSP3 Official 3D Asset "Tamane"
 copyright 2014-2016 (c) Ogawa Kosaku (Team GrisGris)
 http://www.gris2.com/
 ------------------------------------------------------------------------------
 
+■ fbx Folder
 
-■ fbx folder
+Contains the original 3D data in FBX format.
+This data cannot be directly loaded from HSP3.
 
-The original 3D data is recorded in FBX format.
-This data cannot be read directly from HSP3.
+	high_school_girl ・・・ Standard body type model
+	high_school_girlSD ・・ Deformed body type model
 
-high_school_girl ・ ・ ・ Normal body model
-high_school_girlSD ・ ・ Deformed model
-
-
-■ hgimg3 folder
+■ hgimg3 Folder
 
 Contains data and scripts that run on the hgimg3 runtime.
-samples 1 to 4 are sample scripts.
-From a simple model display to a demo running around rugged terrain.
-The model files (.x format) that can be read are as follows.
+sample1 to 4 are sample scripts.
+Includes demos ranging from simple model display to running around on undulating terrain.
+The loadable model files (.x format) are as follows:
 
-tamane_s.x "Tamane" Standby pose
-tamane_w.x "Tamane" walking pose
-tamane_r.x "Tamane" Running pose
+	tamane_s.x	"Tamane" Idle Pose
+	tamane_w.x	"Tamane" Walking Pose
+	tamane_r.x	"Tamane" Running Pose
 
-tamane2_s.x Deformed version "Tamane" Standby pose
-tamane2_w.x Deformed version "Tamane" walking pose
-tamane2_r.x Deformed version "Tamane" running pose
+	tamane2_s.x	Deformed version "Tamane" Idle Pose
+	tamane2_w.x	Deformed version "Tamane" Walking Pose
+	tamane2_r.x	Deformed version "Tamane" Running Pose
 
-
-■ hgimg4 folder
+■ hgimg4 Folder
 
 Contains data and scripts that run on the hgimg4 runtime.
-(Even if you create an executable file, the data contained under the res folder is always required.)
-hgimg4 is a plugin under development and will be a preview version of the model display and animation.
-Future versions support finer animation control (motion blending, etc.)
-Will be done.
-The model files (.x format) that can be read are as follows.
+(When creating an executable file, the data contained in the res folder is also required.)
+hgimg4 is a plugin under development and is a preview version for model display and animation.
+Future versions will support more detailed animation control (motion blending, etc.).
+The loadable model files (.gpb format) are as follows:
 
-tamane.gpb "Tamane" Standby pose
-tamane2.gpb Deformed version "Tamane" Standby pose
-
+	tamane.gpb	"Tamane" Idle Pose
+	tamane2.gpb	Deformed version "Tamane" Idle Pose
 
 ■ Acknowledgments
 
-We would like to thank Mr. Kosaku Ogawa (Team GrisGris) for creating a wonderful model.
-The site of Team GrisGris, represented by Mr. Kosaku Ogawa, is here.
+We would like to thank Ogawa Kosaku (Team GrisGris) for creating the wonderful model.
+Here is the website of Team GrisGris, represented by Ogawa Kosaku:
 http://www.gris2.com/
-
-

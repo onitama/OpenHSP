@@ -1,13 +1,13 @@
 %type
-System definition macro
+System-defined macro
 %ver
-3.6
+3.7
 %date
-2019/04/09
+2025/01/22
 %note
 This macro is defined in hspdef.as.
 %group
-Standard definition macro
+Standard Definition Macro
 %author
 onitama
 %port
@@ -15,13 +15,12 @@ Win
 Mac
 Cli
 
-
 %index
 gmode_sub
-Color subtractive composite copy mode
+Color Subtraction Composition Copy Mode
 
 %inst
-The screen copy mode can be set to the color subtractive composite copy mode by specifying it in the first argument of gmode.
+Specifying this for the first argument of the gmode command sets the screen copy mode to color subtraction composition copy mode.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -47,10 +46,10 @@ gmode_rgb0alpha
 gmode_pixela
 %index
 gmode_add
-Color additive synthesis copy mode
+Color Addition Composition Copy Mode
 
 %inst
-The screen copy mode can be set to the color additive synthesis copy mode by specifying it in the first argument of gmode.
+Specifying this for the first argument of the gmode command sets the screen copy mode to color addition composition copy mode.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -76,11 +75,11 @@ gmode_rgb0alpha
 gmode_pixela
 %index
 gmode_gdi
-Normal copy mode
+Normal Copy Mode
 
 %inst
-You can set the screen copy mode to normal copy mode by specifying it in the first argument of gmode.
-You can omit it because the same result will be obtained.
+Specifying this for the first argument of the gmode command sets the screen copy mode to the normal copy mode.
+The same result can be obtained by omitting it, so you can omit it if you wish.
 
 %sample
 	buffer 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -102,10 +101,10 @@ gmode_rgb0alpha
 gmode_pixela
 %index
 gmode_rgb0
-Transparent colored copy mode
+Transparent Color Copy Mode
 
 %inst
-You can set the screen copy mode to transparent colored copy mode by specifying it in the first argument of gmode.
+Specifying this for the first argument of the gmode command sets the screen copy mode to transparent color copy mode.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -127,10 +126,10 @@ gmode_rgb0alpha
 gmode_pixela
 %index
 gmode_mem
-Memory-to-memory copy mode
+Memory-to-Memory Copy Mode
 
 %inst
-You can set the screen copy mode to the memory-to-memory copy mode by specifying it in the first argument of gmode.
+Specifying this for the first argument of the gmode command sets the screen copy mode to memory-to-memory copy mode.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -152,10 +151,10 @@ gmode_rgb0alpha
 gmode_pixela
 %index
 gmode_alpha
-Semi-transparent composite copy mode
+Semi-Transparent Composition Copy Mode
 
 %inst
-You can set the screen copy mode to semi-transparent composite copy mode by specifying it in the first argument of gmode.
+Specifying this for the first argument of the gmode command sets the screen copy mode to semi-transparent composition copy mode.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -181,10 +180,10 @@ gmode_rgb0alpha
 gmode_pixela
 %index
 gmode_rgb0alpha
-Translucent composite copy mode with transparent color
+Transparent Color Semi-Transparent Composition Copy Mode
 
 %inst
-By specifying it as the first argument of gmode, you can set the screen copy mode to the translucent composite copy mode with transparent color.
+Specifying this for the first argument of the gmode command sets the screen copy mode to transparent color semi-transparent composition copy mode.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -211,10 +210,10 @@ gmode_sub
 gmode_pixela
 %index
 gmode_pixela
-Pixel alpha blend copy mode
+Pixel Alpha Blend Copy Mode
 
 %inst
-You can set the screen copy mode to pixel alpha blend copy mode by specifying it as the first argument of gmode.
+Specifying this for the first argument of the gmode command sets the screen copy mode to pixel alpha blend copy mode.
 
 %sample
 	screen 1 : picload dir_exe + "/sample/demo/logop.bmp"
@@ -245,10 +244,10 @@ Get mode and option data
 
 %prm
 (p1)
-p1 = 0 ~: Window object ID
+p1=0Å` : Window object ID
 
 %inst
-Returns the mode and option data for the specified window object.
+Returns the mode and option data of the specified window object.
 
 %sample
 	button goto "sample", *dummy
@@ -265,21 +264,21 @@ objinfo_hwnd
 objinfo_bmscr
 %index
 objinfo_bmscr
-Get a pointer to the BMSCR structure where the object is located
+Get the pointer to the BMSCR structure where the object is placed
 
 %prm
 (p1)
-p1 = 0 ~: Window object ID
+p1=0Å` : Window object ID
 
 %inst
-Returns a pointer to the BMSCR structure where the specified window object is located.
+Returns the pointer to the BMSCR structure where the specified window object is placed.
 
 %sample
 	button goto "sample", *dummy
 	p_bmscr = objinfo_bmscr( stat )
-mes "Pointer to the BMSCR structure where the object is located:" + p_bmscr
+	mes "Pointer to the BMSCR structure where the object is placed : " + p_bmscr
 	mref bmscr, 67
-mes "equivalent to the value obtained by mref (" + varptr (bmscr) + ")"
+	mes "Equivalent to the value obtained by mref (" + varptr( bmscr ) + ")"
 
 *dummy
 	stop
@@ -290,11 +289,11 @@ objinfo_mode
 objinfo_hwnd
 %index
 objinfo_hwnd
-Get the handle of a window object
+Get the handle of the window object
 
 %prm
 (p1)
-p1 = 0 ~: Window object ID
+p1=0Å` : Window object ID
 
 %inst
 Returns the handle of the specified window object.
@@ -302,7 +301,7 @@ Returns the handle of the specified window object.
 %sample
 	button goto "sample", *dummy
 	obj_hwnd = objinfo_hwnd( stat )
-mes "Window object handle:" + obj_hwnd
+	mes "Window object handle : " + obj_hwnd
 
 *dummy
 	stop
@@ -313,17 +312,17 @@ objinfo_mode
 objinfo_bmscr
 %index
 screen_normal
-Create a regular window
+Create a normal window
 
 %inst
-You can create a normal window by specifying it in the 4th argument of the screen instruction.
-You can omit it because the same result will be obtained.
+Specifying this for the 4th argument of the screen command creates a normal window.
+The same result can be obtained by omitting it, so you can omit it if you wish.
 
 %sample
-// Create a regular window with window ID 0
+// Create a normal window with window ID 0
 	screen 0, 640, 480, screen_normal
 
-// Same result can be obtained even if omitted
+// The same result can be obtained by omitting it
 	screen 1, 320, 240
 	stop
 
@@ -340,8 +339,8 @@ screen_palette
 Create a window in palette mode
 
 %inst
-You can create a window in palette mode by specifying it in the 4th argument of the screen instruction.
-When specifying in combination with other macros, specify the sum or logical sum.
+Specifying this for the 4th argument of the screen command creates a window in palette mode.
+When specifying in combination with other macros, specify the sum or logical sum of them.
 
 %sample
 // Create a window with window ID 0 in palette mode
@@ -358,14 +357,14 @@ screen_frame
 
 %index
 screen_hide
-Create hidden window
+Create a hidden window
 
 %inst
-You can create a hidden window by specifying it in the 4th argument of the screen instruction.
-When specifying in combination with other macros, specify the sum or logical sum.
+Specifying this for the 4th argument of the screen command creates a hidden window.
+When specifying in combination with other macros, specify the sum or logical sum of them.
 
 %sample
-// Create a hidden window with window ID 0
+// Create a window with window ID 0 in hidden mode
 	screen 0, 640, 480, screen_hide
 	stop
 
@@ -378,14 +377,14 @@ screen_tool
 screen_frame
 %index
 screen_fixedsize
-Create fixed size window
+Create a fixed-size window
 
 %inst
-You can create a fixed-size window by specifying it in the 4th argument of the screen instruction.
-When specifying in combination with other macros, specify the sum or logical sum.
+Specifying this for the 4th argument of the screen command creates a fixed-size window.
+When specifying in combination with other macros, specify the sum or logical sum of them.
 
 %sample
-// Create a window with window ID 0 with a fixed size
+// Create a window with window ID 0 in fixed size
 	screen 0, 640, 480, screen_fixedsize
 	stop
 
@@ -398,11 +397,11 @@ screen_tool
 screen_frame
 %index
 screen_tool
-Create tool window
+Create a tool window
 
 %inst
-You can create a tool window by specifying it in the 4th argument of the screen instruction.
-When specifying in combination with other macros, specify the sum or logical sum.
+Specifying this for the 4th argument of the screen command creates a tool window.
+When specifying in combination with other macros, specify the sum or logical sum of them.
 
 %sample
 // Create a tool window with window ID 0
@@ -419,14 +418,14 @@ screen_frame
 
 %index
 screen_frame
-Create a window with deep edges
+Create a window with a deep edge
 
 %inst
-You can create a window with a deep edge by specifying it in the 4th argument of the screen instruction.
-When specifying in combination with other macros, specify the sum or logical sum.
+Specifying this for the 4th argument of the screen command creates a window with a deep edge.
+When specifying in combination with other macros, specify the sum or logical sum of them.
 
 %sample
-// Create a window with a deep edge of the window ID
+// Create a window with a deep edge with window ID
 	screen 0, 640, 480, screen_frame
 	stop
 
@@ -440,20 +439,20 @@ screen_tool
 
 %index
 font_normal
-Font settings in normal style
+Set font with normal style
 
 %inst
-By specifying it in the third argument of the font command, you can set the font in the normal style.
-You can omit it because the same result will be obtained.
+Specifying this for the 3rd argument of the font command sets the font with a normal style.
+The same result can be obtained by omitting it, so you can omit it if you wish.
 
 %sample
-// Set size 12 MS Gothic
+// Set MS Gothic with size 12
 	font msgothic, 24, font_normal
-mes "MS Gothic of size 24 (normal style)"
+	mes "MS Gothic with size 24 (normal style)"
 
-// Same result can be obtained even if omitted
+// The same result can be obtained by omitting it
 	font msgothic, 24
-mes "MS Gothic of size 24 (normal style)"
+	mes "MS Gothic with size 24 (normal style)"
 	stop
 
 %href
@@ -465,20 +464,20 @@ font_strikeout
 font_antialias
 %index
 font_bold
-Bold font setting
+Set font with bold style
 
 %inst
-You can set the bold font by specifying it in the third argument of the font command.
-When specifying in combination with other macros, specify the sum or logical sum.
+Specifying this for the 3rd argument of the font command sets the font with a bold style.
+When specifying in combination with other macros, specify the sum or logical sum of them.
 
 %sample
-// Set size 24 MS Gothic
+// Set MS Gothic with size 24
 	font msgothic, 24, font_normal
-mes "MS Gothic of size 24 (normal style)"
+	mes "MS Gothic with size 24 (normal style)"
 
-// Set size 24 and bold MS Gothic
+// Set bold MS Gothic with size 24
 	font msgothic, 24, font_bold
-mes "MS Gothic (bold) of size 24"
+	mes "MS Gothic with size 24 (bold)"
 	stop
 
 %href
@@ -490,20 +489,20 @@ font_strikeout
 font_antialias
 %index
 font_italic
-Font settings in italics
+Set font with italic style
 
 %inst
-Italic font can be set by specifying it in the third argument of the font command.
-When specifying in combination with other macros, specify the sum or logical sum.
+Specifying this for the 3rd argument of the font command sets the font with an italic style.
+When specifying in combination with other macros, specify the sum or logical sum of them.
 
 %sample
-// Set size 24 MS Gothic
+// Set MS Gothic with size 24
 	font msgothic, 24, font_normal
-mes "MS Gothic of size 24 (normal style)"
+mes "MS Gothic, size 24 (regular style)"
 
-// Set italic MSms Gothic at size 24
+// Set MS Gothic, size 24, in italics
 	font msgothic, 24, font_italic
-mes "MS Gothic (italic) size 24"
+	mes "MS Gothic, size 24 (italic)"
 	stop
 
 %href
@@ -515,20 +514,19 @@ font_strikeout
 font_antialias
 %index
 font_underline
-Underlined font settings
+Set font with underline
 
 %inst
-You can set the underlined font by specifying it in the third argument of the font command.
-When specifying in combination with other macros, specify the sum or logical sum.
+You can set an underlined font by specifying it as the third argument of the font command. If you specify it in combination with other macros, specify the sum or logical OR of them.
 
 %sample
-// Set size 24 MS Gothic
+// Set MS Gothic, size 24
 	font msgothic, 24, font_normal
-mes "MS Gothic of size 24 (normal style)"
+	mes "MS Gothic, size 24 (regular style)"
 
-// Set underlined MS Gothic at size 24
+// Set underlined MS Gothic, size 24
 	font msgothic, 24, font_underline
-mes "MS Gothic of size 24 (underlined)"
+	mes "MS Gothic, size 24 (underlined)"
 	stop
 
 %href
@@ -540,20 +538,19 @@ font_strikeout
 font_antialias
 %index
 font_strikeout
-Font settings with strikethrough
+Set font with strikethrough
 
 %inst
-You can set a font with strikethrough by specifying it in the third argument of the font command.
-When specifying in combination with other macros, specify the sum or logical sum.
+You can set a font with a strikethrough by specifying it as the third argument of the font command. If you specify it in combination with other macros, specify the sum or logical OR of them.
 
 %sample
-// Set size 24 MS Gothic
+// Set MS Gothic, size 24
 	font msgothic, 24, font_normal
-mes "MS Gothic of size 24 (normal style)"
+	mes "MS Gothic, size 24 (regular style)"
 
-// Set MS Gothic with strikethrough at size 24
+// Set MS Gothic, size 24, with strikethrough
 	font msgothic, 24, font_strikeout
-mes "MS Gothic of size 24 (with strikethrough)"
+	mes "MS Gothic, size 24 (strikethrough)"
 	stop
 
 %href
@@ -565,20 +562,19 @@ font_underline
 font_antialias
 %index
 font_antialias
-Font setting with antialiasing
+Set font with anti-aliasing
 
 %inst
-You can set the antialiasing font by specifying it in the third argument of the font command.
-When specifying in combination with other macros, specify the sum or logical sum.
+You can set an anti-aliased font by specifying it as the third argument of the font command. If you specify it in combination with other macros, specify the sum or logical OR of them.
 
 %sample
-// Set size 24 MS Gothic
+// Set MS Gothic, size 24
 	font msgothic, 24, font_normal
-mes "MS Gothic of size 24 (normal style)"
+	mes "MS Gothic, size 24 (regular style)"
 
-// Set antialiasing MS Gothic at size 24
+// Set anti-aliased MS Gothic, size 24
 	font msgothic, 24, font_antialias
-mes "MS Gothic (antialiasing) of size 24"
+	mes "MS Gothic, size 24 (anti-aliased)"
 	stop
 
 %href
@@ -595,17 +591,16 @@ objmode_normal
 Set HSP standard font
 
 %inst
-By specifying it in the first argument of the objmode instruction, the font used in the object control instruction can be set to the HSP standard font.
-You can omit it because the same result will be obtained.
+By specifying it as the first argument of the objmode command, you can set the font used by object control commands to the HSP standard font. You can omit it and get the same result.
 
 %sample
-s = "Sample font used in object control instructions"
+	s = "Sample of font used in object control commands"
 
-// Set the font used for object control instructions to HSP standard font
+// Set the font used in object control commands to the HSP standard font
 	objmode objmode_normal
 	mesbox s, ginfo_winx, ginfo_winy / 2
 
-// Same result can be obtained even if omitted
+// Omitting it yields the same result
 	objmode objmode_normal
 	mesbox s, ginfo_winx, ginfo_winy / 2
 
@@ -622,12 +617,12 @@ objmode_guifont
 Set default GUI font
 
 %inst
-By specifying it in the first argument of the objmode instruction, the font used in the object control instruction can be set as the default GUI font.
+By specifying it as the first argument of the objmode command, you can set the font used by object control commands to the default GUI font.
 
 %sample
-s = "Sample font used in object control instructions"
+	s = "Sample of font used in object control commands"
 
-// Set the font used in the object control instruction to the default GUI font
+// Set the font used in object control commands to the default GUI font
 	objmode objmode_guifont
 	mesbox s, ginfo_winx, ginfo_winy
 
@@ -642,15 +637,15 @@ objmode_usecolor
 
 %index
 objmode_usefont
-Set the font selected by the font command
+Set font selected by font command
 
 %inst
-By specifying it in the first argument of the objmode instruction, the font used in the object control instruction can be set to the font selected by the font instruction.
+By specifying it as the first argument of the objmode command, you can set the font used by object control commands to the font selected by the font command.
 
 %sample
-s = "Sample font used in object control instructions"
+	s = "Sample of font used in object control commands"
 
-// Set the font used in the object control instruction to the font selected in the font instruction
+// Set the font used in object control commands to the font selected by the font command
 	objmode objmode_usefont
 
 	font msmincho, 24
@@ -670,10 +665,10 @@ objmode_usecolor
 
 %index
 objmode_usecolor
-Set the color selected by the objcolor command
+Set color selected by objcolor command
 
 %inst
-By specifying it in the first argument of the objmode instruction, the color used in the object control instruction can be set to the color specified in the color instruction and objcolor instruction.
+By specifying it as the first argument of the objmode command, you can set the color used by object control commands to the color specified by the color command or the objcolor command.
 
 %href
 objmode
@@ -685,14 +680,13 @@ objmode_usefont
 
 %index
 msgothic
-MS gothic font
+MS Gothic font
 
 %group
-System variables
+System variable
 
 %inst
-A keyword that indicates the font that indicates MS Gothic.
-It can be used as the font name specified by the font command.
+This is a keyword indicating the MS Gothic font. It can be used as the font name specified in the font command.
 
 %href
 msmincho
@@ -703,11 +697,10 @@ msmincho
 MS Mincho font
 
 %group
-System variables
+System variable
 
 %inst
-A keyword that indicates the font that indicates MS Mincho.
-It can be used as the font name specified by the font command.
+This is a keyword indicating the MS Mincho font. It can be used as the font name specified in the font command.
 
 %href
 msgothic
@@ -715,13 +708,13 @@ msgothic
 ;---------------------------------------------------------------------
 %index
 and
-Logical product (operator)
+Logical AND (operator)
 
 %group
-Standard definition macro
+Standard defined macro
 
 %inst
-A macro that can be used in the same way as the operator "&" that indicates the logical product.
+This is a macro that can be used in the same way as the operator "&" that indicates logical AND.
 
 %href
 or
@@ -731,13 +724,13 @@ not
 ;---------------------------------------------------------------------
 %index
 or
-OR (operator)
+Logical OR (operator)
 
 %group
-Standard definition macro
+Standard defined macro
 
 %inst
-A macro that can be used in the same way as the operator "|" that indicates the logical sum.
+This is a macro that can be used in the same way as the operator "|" that indicates logical OR.
 
 %href
 and
@@ -750,10 +743,10 @@ xor
 Exclusive OR (operator)
 
 %group
-Standard definition macro
+Standard defined macro
 
 %inst
-A macro that can be used in the same way as the operator "^" that indicates the exclusive OR.
+This is a macro that can be used in the same way as the operator "^" that indicates exclusive OR.
 
 %href
 and
@@ -766,10 +759,10 @@ not
 Negation (operator)
 
 %group
-Standard definition macro
+Standard defined macro
 
 %inst
-A macro that can be used in the same way as the negation operator "!".
+This is a macro that can be used in the same way as the operator "!" that indicates negation.
 
 %href
 and
@@ -782,7 +775,7 @@ M_PI
 Pi
 
 %inst
-A constant that represents pi. 3.14159265358979323846 is defined.
+This is a constant representing pi. 3.14159265358979323846 is defined.
 
 %group
 Mathematical constant
@@ -799,15 +792,14 @@ Convert radians to degrees
 
 %prm
 (p1)
-p1: Angle to convert to degrees (radians)
+p1 : Angle to convert to degrees (radians)
 
 %inst
-Converts the unit of angle from radians to degrees.
-It can also be said to convert the angle expressed in the radian method to the angle in the degree method.
+Converts the unit of angle from radians to degrees. It can also be said that it converts an angle expressed in radians to an angle in degrees.
 
 %sample
 	tmp = M_PI
-mes str (tmp) + "Radian is" + rad2deg (tmp) + "ëÆ."
+	mes str(tmp) + " radians is " + rad2deg(tmp) + "ëÆ."
 	stop
 
 %href
@@ -822,19 +814,16 @@ Convert degrees to radians
 
 %prm
 (p1)
-p1: Angle to convert to radians (degrees)
+p1 : Angle to convert to radians (degrees)
 
 %inst
-Converts the unit of angle from degrees to radians.
-It can also be said that the angle expressed in the degree method is converted into the angle in the radian method.
+Converts the unit of angle from degrees to radians. It can also be said that it converts an angle expressed in degrees to an angle in radians.
 
 %sample
 	tmp = 90
-mes str (tmp) + "ëÆ is" + deg2rad (tmp) + "radians."
+	mes str(tmp) + "ëÆ is " + deg2rad(tmp) + " radians."
 	stop
 
 %href
 M_PI
 rad2deg
-
-

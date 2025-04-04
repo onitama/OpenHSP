@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="en">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="Tamamap,Map Editor,HSP,HSP3,HotSoupProcessor,HSP3Dish,android,ndk,google">
+	<meta name="description" content="Information on HSP3Dish android(NDK) version">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>Map Editor Tamamap Manual</title>
+</head>
+<body>
+	<div id="CONTAINER">
+	<!-- Header -->
+	<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 2023-(c)</p>
+	<h1>Map Editor Tamamap Manual</h1>
+
+	<p><img src="hsp3dish/tamamap.jpg" width="720"></p>
+
+	<!-- Table of Contents -->
+	<ol>
+		<li><a href="#ABOUT">Introduction</a></li>
+		<li><a href="#USAGE">How to Use</a></li>
+		<li><a href="#TOOLSCR">Explanation of the Tool Screen</a></li>
+		<li><a href="#MAPAREA">Map Area</a></li>
+		<li><a href="#MAPNAVI">Map Navigation</a></li>
+		<li><a href="#TOOLAREA">Tool Area</a></li>
+		<li><a href="#CELAREA">Cell Area</a></li>
+		<li><a href="#MENU">Menu Screen</a></li>
+		<li><a href="#COPYRIGHT">Copyright and License</a></li>
+	</ol>
+
+
+	<h2 id="ABOUT">Introduction</h2>
+	<p>
+	Tamamap is a tool (map editor) for editing 2D-based cell (tile) maps that can be used with the <a href="dotfw.html">Tamane Dot Framework</a>.<br>
+	It has the following features:
+	</p>
+	<pre class="quote">
+	・Edit 2D maps of arbitrary size
+	・Cell attribute settings and editing
+	・Integration with Tamane Dot Framework
+	・Map file (.tmap format) loading, saving, and merging
+	・Because it is a tool made with HSP3Dish base, it can also operate in Linux, Raspberry Pi environment</pre>
+	<p>
+	It has various functions to easily construct a wide world.
+	</p>
+
+
+	<h2 id="USAGE">How to Use</h2>
+	<p>
+	Tamamap can be launched from the menu of the standard script editor.
+	Tamamap will be launched by selecting the "Open Map Editor" item in the "Tool" menu.<br>
+	</p>
+	<pre class="quote">
+		hspsdk/tamamap/tamamap.hsp</pre>
+	<p>
+	Since the source code is included in the above location of the HSP full package, it can also be used by reading and executing this file from the HSP script editor.
+	</p>
+
+
+	<h2 id="TOOLSCR">Explanation of the Tool Screen</h2>
+	<p><img src="hsp3dish/tamamap_inst.jpg" width="720"></p>
+	<p>
+	The tool screen is largely divided into four areas. These are called <a href="#MAPAREA">Map Area</a>, <a href="#MAPNAVI">Map Navigation</a>, <a href="#TOOLAREA">Tool Area</a>, and <a href="#CELAREA">Cell Area</a>, respectively.<br>
+	Edit the map while properly using the functions in one window.
+	</p>
+
+	<h2 id="MAPAREA">Map Area</h2>
+	<p>
+	The area where the map being edited is displayed. A portion of the large map is displayed by scrolling.<br>
+	In addition to being able to adjust the currently displayed position with <a href="#MAPNAVI">Map Navigation</a>, it is also possible to scroll with the up, down, left, and right cursor keys. The display magnification can also be changed with the buttons in the <a href="#TOOLAREA">Tool Area</a>.<br>
+	You can set the map at the cursor position with a left click of the mouse. The cell to be set is the cell selected in the <a href="#CELAREA">Cell Area</a>.<br>
+	You can refer to and select the cell on the map at the cursor position by right-clicking the mouse.
+	</p>
+
+
+	<h2 id="MAPNAVI">Map Navigation</h2>
+	<p>
+	Guides the position and size that the <a href="#MAPAREA">Map Area</a> is displaying within the entire map.<br>
+	You can directly change the position being scrolled by left-clicking the mouse.
+	</p>
+
+
+	<h2 id="TOOLAREA">Tool Area</h2>
+	<p><img src="hsp3dish/cmdarea.png"></p>
+	<p>
+		Displays information about the current cursor position and selected cell.<br>
+		The interface for selecting the functions of the map editor is also summarized.
+		Each has the following functions.
+	</p>
+	<dl>
+		<dt>MENU button</dt>
+		<dd><p>Opens the <a href="#MENU">Menu Screen</a>.</p></dd>
+		<dt>UNDO button</dt>
+		<dd><p>Returns to the previous state, it is possible to return only one step</p></dd>
+		<dt>COPY button</dt>
+		<dd><p>Copies a part of the map (rectangle). Select the upper left block to be copied first, and then select the lower right block to enter the mode to copy that rectangular range. After that, by pressing the left button, the map of the copy source is copied to the cursor position.</p></dd>
+		<dt>×1〜×8 buttons</dt>
+		<dd><p>Specifies the magnification of the map area</p></dd>
+		<dt>+、- buttons</dt>
+		<dd><p>Moves the bank (display position) of the cell area</p></dd>
+		<dt>SET button</dt>
+		<dd><p>Sets the Op value, Gr value, and A, N, E, H flag states for the cell selected in the cell area. If multiple cells are selected, the same content is set for all cells</p></dd>
+		<dt>Op value</dt>
+		<dd><p>Enter the Op (Option) value directly. This value is a value that can be used generically in the script.</p></dd>
+		<dt>Gr value</dt>
+		<dd><p>Enter the Gr (Group) value directly. In the Tamane Dot Framework, it is used for setting the priority. 0 is normal display, and if it is set to 1, the background is displayed in front of the sprite.</p></dd>
+		<dt>A (Animation) flag</dt>
+		<dd><p>Applies 4 patterns of animation display to the map cell</p></dd>
+		<dt>N (Notice) flag</dt>
+		<dd><p>Enables the notification (Notice) flag when displaying map cells</p></dd>
+		<dt>E (Event) flag</dt>
+		<dd><p>Enables the event (Event) flag when map cells collide</p></dd>
+		<dt>H (Hold) flag</dt>
+		<dd><p>Enables the Hold flag when map cells collide, which makes it impossible to enter when colliding from above. If the H (Hold) flag and the E (Event) flag are set at the same time, it will be a wall that cannot be entered from all directions.</p></dd>
+	</dl>
+
+
+	<h2 id="CELAREA">Cell Area</h2>
+	<p>
+	Displays the cells (images that are parts) that are the source of the map, and allows you to select some of them.<br>
+	The selected cell can be placed in the <a href="#MAPAREA">Map Area</a>.
+	The attributes of the selected cell can also be set in the <a href="#TOOLAREA">Tool Area</a>.<br>
+	You can select the cell at the cursor position by left- or right-clicking the mouse in the cell area.
+	You can select multiple cells by selecting a range while holding down the right mouse button.
+	</p>
+
+
+	<h2 id="MENU">Menu Screen</h2>
+	<p><img src="hsp3dish/tamamap_menu.png" width="720"></p>
+	<p>
+	On the menu screen, you can perform file operations and change tool options.
+	</p>
+	<dl>
+		<dt>&lt;&lt</dt>
+		<dd><p>Exits the menu and returns to the editor screen</p></dd>
+		<dt>Load</dt>
+		<dd><p>Loads a file so that you can edit the map</p></dd>
+		<dt>Save</dt>
+		<dd><p>Saves the map being edited to a file</p></dd>
+		<dt>Save as...</dt>
+		<dd><p>Saves the map being edited to a file with a different name</p></dd>
+		<dt>New</dt>
+		<dd><p>Discards the map being edited and initializes a new map</p></dd>
+		<dt>Merge</dt>
+		<dd><p>Merges (synthesizes) a part of the map from another file into the map currently being edited</p></dd>
+		<dt>Label</dt>
+		<dd><p>Edits the label information of the map to be used generically. The value specified here can be referenced from the script when loading the map data</p></dd>
+		<dt>Web</dt>
+		<dd><p>Displays related web pages</p></dd>
+		<dt>Option</dt>
+		<dd><p>Edits the tool options</p></dd>
+	</dl>
+
+
+	<h2 id="COPYRIGHT">Copyright and License</h2>
+	<p>
+		The copyright and license of Tamamap are the same as the "HSP Development System".
+		You are free to modify, alter, and publish the source code.
+	</p>
+
+
+	<!-- Footer -->
+	<ul id="FOOTER">
+		<li><a href="#CONTAINER">Return to the top of this page</a></li>
+		<li><a href="../index.htm">Return to the index</a></li>
+	</ul>
+	<a href="https://www.onionsoft.net/">
+		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+	</a>
+</div><!-- container -->
+</body>
+</html>

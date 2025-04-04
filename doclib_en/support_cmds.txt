@@ -1,4 +1,5 @@
-HSP3Dishサポート済みコマンド
+
+**HSP3Dish Supported Commands**
 
 goto	,sys|func
 gosub	,sys|func
@@ -88,7 +89,7 @@ celputm	,sys|func
 rgbcolor,sys|func
 viewport,sys|func
 
-HSP3Dishサポート済みシステム変数・関数
+**HSP3Dish Supported System Variables and Functions**
 
 system	,sys|func
 hspstat	,sys|func
@@ -151,8 +152,7 @@ geteasef	,sys|func
 strrep	,sys|func
 dirinfo	,sys|func
 
-
-HSP3Dishサポート済みプリプロセッサ命令
+**HSP3Dish Supported Preprocessor Directives**
 
 #addition	,pre|func
 #const	,pre|func
@@ -175,8 +175,7 @@ HSP3Dishサポート済みプリプロセッサ命令
 #undef	,pre|func
 #cmpopt	,pre|func
 
-
-HSP3Dishサポート済みマクロ
+**HSP3Dish Supported Macros**
 
 __hspver__	,sys|macro
 __hsp30__	,sys|macro
@@ -242,9 +241,8 @@ deg2rad	,sys|macro
 mes	,sys|func
 print	,sys|func
 
-
-HSP3Dish非互換コマンド
-(これらの命令はデバイスにより異なる仕様が含まれています)
+**HSP3Dish Incompatible Commands**
+*(These commands may have different specifications depending on the device)*
 
 screen	,sys|func
 bgscr	,sys|func
@@ -270,9 +268,8 @@ mkdir	,sys|func
 chdir	,sys|func
 dirlist	,sys|func
 
-
-HSP3Dish非互換コマンド
-(これらの命令はWindows上でのみ動作し、他のデバイスでは無視されます)
+**HSP3Dish Incompatible Commands**
+*(These commands only operate on Windows and will be ignored on other devices)*
 
 chdpm	,sys|func
 memfile	,sys|func
@@ -330,25 +327,18 @@ delmod	,sys|func
 split	,sys|func
 
 #usecom	,pre|func
-#defint	,pre|func
-#defdouble	,pre|func
-#defnone	,pre|func
 #modfunc	,pre|func
 #modcfunc	,pre|func
 #modinit	,pre|func
 #modterm	,pre|func
 
+**HSP3Dish Unsupported Commands**
 
-HSP3Dishサポート外コマンド
-
-resume	,sys|func
-yield	,sys|func
 pget	,sys|func
 groll	,sys|func
 
-
-HSP3Dish非互換ステム変数・関数・マクロ
-(これらはWindows上でのみ動作し、他のデバイスでは無視されます)
+**HSP3Dish Incompatible System Variables, Functions, and Macros**
+*(These only operate on Windows and will be ignored on other devices)*
 
 hwnd	,sys|func
 hinstance	,sys|func
@@ -372,8 +362,7 @@ font_antialias	,sys|macro
 msgothic	,sys|macro
 msmincho	,sys|macro
 
-
-HSP3Dishサポート外システム変数・関数・マクロ
+**HSP3Dish Unsupported System Variables, Functions, and Macros**
 
 ginfo_paluse	,sys|macro
 ginfo_wx1	,sys|macro
@@ -381,4 +370,10 @@ ginfo_wy1	,sys|macro
 ginfo_wx2	,sys|macro
 ginfo_wy2	,sys|macro
 
+**Notes:**
 
+*   `sys|func`, `sys|macro`, `pre|func`, `sys|func|1` notations after the command names likely indicate the command's type and origin (system, function, macro, preprocessor, and potential Windows-specific function flags).
+*   "Incompatible" means that the commands may not function correctly, or at all, on devices other than Windows, or may have different behavior.
+*   "Unsupported" means that these commands are explicitly not available in the HSP3Dish environment.
+
+This translation should give you a clear understanding of the HSP3Dish command set and its limitations.

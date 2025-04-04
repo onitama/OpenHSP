@@ -1,4 +1,6 @@
 
 ;	このディレクトリに置かれたasファイルは、
 ;	「#include」命令で読み込むことができます。
+;	files placed in this directory can be read with the "#include" function.
+;
 

@@ -1,10 +1,10 @@
 ;
-;HELP source file for HSP help manager
-;(Lines beginning with ";" are treated as comments)
+;	HELP source file for HSP help manager
+;	(Lines starting with ";" are treated as comments)
 ;
 
 %type
-Extension instructions
+Extended command
 %ver
 3.4
 %note
@@ -21,18 +21,18 @@ http://hsp.tv/
 %port
 Win
 %group
-Extended I / O control instructions
+Extended Input/Output Control Command
 
 
 %index
 qreset
-OBAQ initialization
+OBAQ Initialization
 %inst
-All the information that OBAQ has is initialized.
-When the qreset command is used for initialization, the wall (frame) that surrounds the entire screen is automatically set.
+All information held by OBAQ is initialized.
+When initialized by the qreset command, a wall (frame) enclosing the entire screen is automatically set.
 If you want to change the size or position of the wall, reset it with the qborder command.
-The window that was set as the drawing target of HSP when qreset is executed is also the drawing target of OBAQ.
-If you want to change the window to be drawn, use the qview instruction.
+When qreset is executed, the window set as the drawing target of HSP is also set as the drawing target of OBAQ.
+To change the window to be drawn, use the qview command.
 %href
 qview
 qborder
@@ -41,44 +41,43 @@ qterm
 
 %index
 qterm
-OBAQ termination processing
+OBAQ Termination Process
 %inst
-Discards all information that OBAQ has.
-It is called internally when the program ends.
-Normally you do not need to call it.
+Discards all information held by OBAQ.
+It is called internally when the program ends, etc.
+Normally, it is not necessary to call this.
 %href
 qreset
 
 
 %index
 qexec
-OBAQ frame processing
+OBAQ Frame Processing
 %inst
-Performs frame-by-frame physics.
-This will update all object coordinates.
-In the main loop, it is necessary to move and update the object by using the qexec instruction.
-Also, when using internal drawing, it is necessary to update the screen with the qdraw command.
+Executes physics calculations for each frame.
+This updates the coordinates of all objects.
+In the main loop, it is essential to update the object's movement by using the qexec command.
+Also, if you are using internal drawing, you need to update the screen with the qdraw command.
 %href
 qdraw
 
 
 %index
 qdraw
-OBAQ drawing process
+OBAQ Drawing Process
 %prm
 mode
-mode (0): Debug display mode setting (0 = ON / 1 = OFF)
+mode(0) : Debug display mode setting (0=ON/1=OFF)
 %inst
-Performs object drawing processing by OBAQ.
-Appropriate display is performed based on the material information set for each object.
-You can set ON / OFF of the debug display by setting the mode.
-During debug display, you can check the shape, center position, group, etc. of the object by wireframe.
-Use the qview command to change the display destination window and set the display magnification and display position offset.
-Drawing by the qdraw command uses the Windows system API (GDI), so
-It is also necessary to clear the screen and update with the redraw command.
-When drawing with another system (DirectX, etc.), only update with the qexec command, and then update.
-You need to get the display position of each object by yourself and draw it.
-(Qcnvaxis and qgetaxis instructions are provided for converting display coordinates.)
+Performs drawing processing of objects by OBAQ.
+Displays objects appropriately based on the material information set for each object.
+You can set the ON/OFF of debug display with the mode setting.
+During debug display, you can check the shape of the object by wireframe, the center position, and the group.
+To change the display window, magnification, and display position offset, use the qview command.
+Drawing by the qdraw command uses the Windows system API (GDI), so you need to clear the screen and update it with the redraw command.
+When drawing with other systems (DirectX, etc.), update only with the qexec command,
+and then get the display position of each object and draw it yourself.
+(The qcnvaxis command and qgetaxis command are prepared for converting display coordinates.)
 
 %href
 qview
@@ -89,18 +88,18 @@ qgetaxis
 
 %index
 qview
-View settings
+View Settings
 %prm
 zoomx,zoomy,ofsx,ofsy
-zoomx (4.0): Zoom magnification in the X direction (real number)
-zoomy (4.0): Zoom magnification in the Y direction (real number)
-ofsx (0.0): Display offset in the X direction (real number)
-ofsy (0.0): Display offset in the Y direction (real number)
+zoomx(4.0) : Zoom magnification in the X direction (real number)
+zoomy(4.0) : Zoom magnification in the Y direction (real number)
+ofsx(0.0)  : Display offset in the X direction (real number)
+ofsy(0.0)  : Display offset in the Y direction (real number)
 %inst
-Set the display when drawing with the qdraw command.
-Set the display magnification (magnification when reflecting the internal coordinates of OBAQ on the screen) with zoomx and zoomy.
-The display position offset can be set by ofsx, ofsy.
-Also, when qview is executed, the window that was set as the drawing target of HSP will be reset as the drawing target.
+Sets the display settings when drawing with the qdraw command.
+Set the display magnification (the magnification when reflecting OBAQ internal coordinates on the screen) with zoomx and zoomy.
+You can set the display position offset with ofsx and ofsy.
+Also, when qview is executed, the window set as the drawing target of HSP is reset as the drawing target.
 
 %href
 qdraw
@@ -109,25 +108,25 @@ qreset
 
 %index
 qsetreq
-System request settings
+System Request Settings
 %prm
 reqid,val
-reqid (0): Request ID
-val (0.0): Set value (real number)
+reqid(0) : Request ID
+val(0.0) : Setting value (real number)
 %inst
-Make various system settings for OBAQ.
+Performs various system settings for OBAQ.
 The following symbols can be specified by the reqid value.
 ^p
-Symbol name Contents
+	Symbol name        	Content
 ------------------------------------------------------------------------
-REQ_PHYSICS_RATE Number of physics calculations per frame
-REQ_MAXOBJ Maximum number of objects (within 512) (*)
-REQ_MAXLOG Maximum number of collision logs (*)
-REQ_DEFAULT_WEIGHT Default weight
-REQ_DEFAULT_MOMENT Default moment
-REQ_DEFAULT_FRICTION Default friction
+	REQ_PHYSICS_RATE	Number of physics calculations per frame
+	REQ_MAXOBJ		Maximum number of objects (up to 512) (*)
+	REQ_MAXLOG		Maximum number of collision logs (*)
+	REQ_DEFAULT_WEIGHT	Default weight
+	REQ_DEFAULT_MOMENT	Default moment
+	REQ_DEFAULT_FRICTION	Default friction
 
-The contents of the (*) symbol are not reflected until the qreset instruction is executed.
+(*) symbols are not reflected until the qreset command is executed.
 ^p
 
 %href
@@ -136,27 +135,27 @@ qgetreq
 
 %index
 qgetreq
-Get system request
+Get System Request
 %prm
 var,reqid
-var: Variable to get the contents
-reqid (0): Request ID
+var      : Variable to get the content
+reqid(0) : Request ID
 %inst
-Gets the OBAQ system settings.
-Reads the contents into the variable specified by var.
-Variables in var are automatically set to real type.
+Gets the system settings of OBAQ.
+Reads the content into the variable specified by var.
+The var variable is automatically set to a real number type.
 The following symbols can be specified by the reqid value.
 ^p
-Symbol name Initial value Contents
+	Symbol name            Initial value	Content
 ------------------------------------------------------------------------------
-REQ_PHYSICS_RATE 4 Number of physics calculations per frame
-REQ_MAXOBJ 512 Maximum number of objects (within 512) (*)
-REQ_MAXLOG 256 Maximum number of collision logs (*)
-REQ_DEFAULT_WEIGHT 6.0 Default weight
-REQ_DEFAULT_MOMENT 1200.0 Default moment
-REQ_DEFAULT_FRICTION 1.0 Default friction
+	REQ_PHYSICS_RATE	4	Number of physics calculations per frame
+	REQ_MAXOBJ		512	Maximum number of objects (up to 512) (*)
+	REQ_MAXLOG		256	Maximum number of collision logs (*)
+	REQ_DEFAULT_WEIGHT	6.0	Default weight
+	REQ_DEFAULT_MOMENT	1200.0	Default moment
+	REQ_DEFAULT_FRICTION	1.0	Default friction
 
-The contents of the (*) symbol are not reflected until the qreset instruction is executed.
+(*) symbols are not reflected until the qreset command is executed.
 ^p
 
 %href
@@ -165,32 +164,31 @@ qsetreq
 
 %index
 qborder
-Set the outer wall
+Set Outer Wall
 %prm
 x1,y1,x2,y2
-x1 (-100): Upper left X coordinate (real number)
-y1 (-100): Upper left Y coordinate (real number)
-x2 (100): Lower right X coordinate (real number)
-y2 (100): Lower right Y coordinate (real number)
+x1(-100) : Upper left X coordinate (real number)
+y1(-100) : Upper left Y coordinate (real number)
+x2(100)  : Lower right X coordinate (real number)
+y2(100)  : Lower right Y coordinate (real number)
 %inst
-Resets the standard exterior wall size.
-Specify the upper left and lower right coordinates (OBAQ internal coordinates) with the center of the screen as (0,0).
-The outer wall is when an object is placed on the screen without any wall.
-This is to prevent it from falling off the screen.
+Resets the size of the standard outer wall.
+Specify the coordinates (OBAQ internal coordinates) of the upper left and lower right, with the center of the screen as (0,0).
+The outer wall is used to prevent objects from falling out of the screen when placing objects on the screen without any walls.
 %href
 qreset
 
 
 %index
 qgravity
-Set gravity
+Set Gravity
 %prm
 gx,gy
-gx (0.0): Gravity in the X direction (real number)
-gy (0.005): Gravity in the Y direction (real number)
+gx(0.0)   : Gravity in the X direction (real number)
+gy(0.005) : Gravity in the Y direction (real number)
 %inst
 Sets the gravity of space.
-The initial value is set to (0,0.005).
+The initial value is (0,0.005).
 
 %href
 qreset
@@ -198,26 +196,26 @@ qreset
 
 %index
 qcnvaxis
-Convert X, Y coordinate values
+Convert X, Y Coordinates
 %prm
 var_x,var_y,x,y,opt
-var_x: Variable to get X
-var_y: Variable to get Y
-x (0.0): X coordinate of conversion source (real number)
-y (0.0): Y coordinate of conversion source (real number)
-opt (0): Conversion mode
+var_x  : Variable to get X
+var_y  : Variable to get Y
+x(0.0) : X coordinate of the conversion source (real number)
+y(0.0) : Y coordinate of the conversion source (real number)
+opt(0) : Conversion mode
 %inst
-Converts the X and Y coordinate values according to the specified method.
-If the conversion source coordinates are specified by (x, y), the converted X and Y coordinate values are assigned to var_x and var_y, respectively.
-The following values can be selected for the conversion mode specified by opt.
+Converts X, Y coordinates according to the specified method.
+If you specify the coordinates of the conversion source as (x, y), the converted X, Y coordinate values are assigned to var_x, var_y, respectively.
+You can select the following values for the conversion mode specified by opt.
 ^p
-Conversion mode contents
+	Conversion mode        	Content
 ------------------------------------------------------------------------
-0 Convert internal coordinates to on-screen coordinates
-1 Convert on-screen coordinates to internal coordinates
+	0                       Convert internal coordinates to screen coordinates
+	1                       Convert screen coordinates to internal coordinates
 ^p
-Conversion mode 0 (or default) converts the internal coordinates to the on-screen coordinates displayed by the qdraw instruction. (var_x and var_y are set to integer type.)
-Conversion mode 1 converts the on-screen coordinates displayed by the qdraw command to internal coordinates. (var_x and var_y are set to real type.)
+Conversion mode 0 (or when omitted) converts internal coordinates to screen coordinates displayed by the qdraw command. (var_x, var_y are set to integer type.)
+Conversion mode 1 converts screen coordinates displayed by the qdraw command to internal coordinates. (var_x, var_y are set to real number type.)
 
 %href
 qgetaxis
@@ -225,25 +223,25 @@ qgetaxis
 
 %index
 qgetaxis
-Get internal coordinates
+Get Internal Coordinates
 %prm
 num,var_x,var_y,type
-num (0): Object ID
-var_x: Variable to get X
-var_y: Variable to get Y
-type (0): acquisition type
+num(0) : Object ID
+var_x  : Variable to get X
+var_y  : Variable to get Y
+type(0): Acquisition type
 %inst
-Read the internal coordinates and display parameters of the OBAQ object into variables.
+Reads the internal coordinates and display parameters of the OBAQ object into a variable.
 var_x and var_y are automatically set as integer types.
-The contents that can be specified by type are as follows.
+The following contents can be specified by type.
 ^p
-Acquisition type Contents
+	Acquisition type        	Content
 ------------------------------------------------------------------------
-0 Upper left coordinate of the object
-1 Lower right coordinate of the object
-2 Object X, Y size (*)
+	0                       Upper left coordinates of the object
+	1                       Lower right coordinates of the object
+	2			X, Y size of the object (*)
 
-For the (*) symbol, the size (number of dots) on the display screen is returned.
+(*) The size (number of dots) on the display screen is returned
 ^p
 
 %href
@@ -252,13 +250,13 @@ qcnvaxis
 
 %index
 qdel
-Delete object
+Delete Object
 %prm
 num
-num (0): Object ID
+num(0) : Object ID
 %inst
 Deletes the specified object.
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qaddpoly
@@ -267,40 +265,40 @@ qaddmodel
 
 %index
 qaddpoly
-Add polygon object
+Add Polygon Object
 %prm
 var,shape,x,y,r,sx,sy,colsw,mygroup,exgroup,loggroup
-var: Variable to get the object ID
-shape (3): Number of vertices
-x (0.0): Placement X coordinate (real number)
-y (0.0): Placement Y coordinate (real number)
-r (0.0): Placement angle (real number) (unit is radian)
-sx (10.0): Placement X size (real number)
-sy (10.0): Placement Y size (real number)
-colsw (1): Placement check mode
-mygroup (1): Collision group to which you belong
-exgroup (0): Group to exclude collisions
-loggroup (0): Group that creates collision logs
+var      : Variable to get the object ID
+shape(3) : Number of vertices
+x(0.0)   : X coordinate of placement (real number)
+y(0.0)   : Y coordinate of placement (real number)
+r(0.0)   : Placement angle (real number) (unit is radian)
+sx(10.0) : X size of placement (real number)
+sy(10.0) : Y size of placement (real number)
+colsw(1) : Placement check mode
+mygroup(1)  : Collision group to which you belong
+exgroup(0)  : Collision exclusion group
+loggroup(0) : Collision log creation group
 %inst
-Add a polygonal object to the OBAQ.
-An object with the vertices specified by shape will be created.
-(The number of vertices in the shape must be 3 or more.)
-Specify the coordinates of the placement with (x, y). (Set the internal coordinates of OBAQ.)
-Specify the placement angle (+ direction is clockwise) with r. The unit is radians.
-Use (sx, sy) to specify the size at the time of placement. By default, the size (10,10) is used.
-mygroup, exgroup, loggroup are the group values set for collision detection.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
-You can select the mode of placement check with colsw.
+Adds a polygon object to OBAQ.
+An object with the number of vertices specified by shape is generated.
+(The number of vertices of shape must be 3 or more.)
+Specify the placement coordinates with (x, y). (Set the OBAQ internal coordinates.)
+Specify the placement angle with r (+ direction is clockwise). The unit is radians.
+Specify the size at the time of placement with (sx, sy). By default, a size of (10, 10) is used.
+mygroup, exgroup, and loggroup are group values set for collision detection.
+The group value is indicated by a value (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768...) where one of the 32 bits is 1.
+You can select the placement check mode with colsw.
 ^p
-Mode value Contents
+	Mode        Value	Content
 ------------------------------------------------------------------------
-colsw_none 0 No collision check when appearing
-colsw_active 1 Avoid contact with active rocks when spawning
-colsw_all 2 Avoid contact with rocks other than reserve when spawning
+	colsw_none     0        No collision check at appearance
+	colsw_active   1        Avoid contact with active rocks at appearance
+	colsw_all      2        Avoid contact with rocks other than the reserve state at appearance
 ^p
-When the object is added successfully, the object ID value is assigned to the variable specified by var. (Variables are automatically integer type.)
-If no object is added due to the registration limit, -1 is assigned to the variable specified by var.
-If no object is added due to collision detection, -2 is assigned to the variable specified by var.
+When the object is added successfully, the object ID value is assigned to the variable specified by var. (The variable is automatically set to integer type.)
+If the object is not added due to the registration limit, -1 is assigned to the variable specified by var.
+If the object is not added for collision detection, -2 is assigned to the variable specified by var.
 
 %href
 qaddmodel
@@ -308,58 +306,59 @@ qaddmodel
 
 %index
 qaddmodel
-Free setting object added
+Add Freely Configured Object
 %prm
 var,shape_var,nvertex,x,y,r,sx,sy,colsw,mygroup,exgroup,loggroup
-var: Variable to get the object ID
-shape_var: Array variable to which shape data is assigned
-nvertex (-1): Number of shape data
-x (0.0): Placement X coordinate (real number)
-y (0.0): Placement Y coordinate (real number)
-r (0.0): Placement angle (real number) (unit is radian)
-sx (10.0): Placement X size (real number)
-sy (10.0): Placement Y size (real number)
-colsw (1): Placement check mode
-mygroup (1): Collision group to which you belong
-exgroup (0): Group to exclude collisions
-loggroup (0): Group that creates collision logs
+var      : Variable to get the object ID
+shape_var: Array variable in which shape data is assigned
+nvertex(-1) : Number of shape data
+x(0.0)   : X coordinate of placement (real number)
+y(0.0)   : Y coordinate of placement (real number)
+r(0.0)   : Placement angle (real number) (unit is radian)
+sx(10.0) : X size of placement (real number)
+sy(10.0) : Y size of placement (real number)
+colsw(1) : Placement check mode
+mygroup(1)  : Collision group to which you belong
+exgroup(0)  : Collision exclusion group
+loggroup(0) : Collision log creation group
 %inst
-Add an object with a freely set shape to OBAQ.
-Common polygons can be generated with the qaddpoly command.
-With the qaddmodel command, you can register more free forms by specifying the vertices individually.
-It is necessary to specify the array variable to which the shape data is assigned to shape_var.
-Store the coordinates in the array variable in the order of x1, y1, x2, y2 ...
-The coordinates must be specified counterclockwise and must be convex.
+Adds an object with a freely configured shape to OBAQ.
+General polygons can be generated by the qaddpoly command.
+With the qaddmodel command, you can register more free shapes by individually specifying the vertices.
+You need to specify an array variable in which shape data is assigned to shape_var.
+Store the coordinates in the array variable in the order of x1, y1, x2, y2...
+The coordinates must be specified counterclockwise and must be a convex body.
 It is also possible to include multiple convex bodies in one object.
-In that case, after making the end of the coordinates specified counterclockwise the same as the first coordinates and making it a closed form,
-Be sure to specify a new, different form of coordinates.
+In that case, close the shape by making the last of the counterclockwise coordinates the same as the first coordinate, and then
+specify the coordinates of a new, different shape.
 ^
-Specify the number of data (not the number of vertices) with nvertex.
-If nvertex is negative or omitted, the number of elements set in the array will be used.
-Either real type or integer type can be used for the array variable that stores the shape data.
-Please note that it is not possible to handle data that exceeds the specified number of vertices. See the OBAQ.DLL documentation for more information.
+
+nvertex specifies the number of data points (not the number of vertices).
+If nvertex is a negative value or omitted, the number of elements set in the array will be used.
+Either real or integer type can be used for the array variable that stores shape data.
+Please note that you cannot handle data exceeding the specified number of vertices. For details, please refer to the OBAQ.DLL manual.
 ^p
-Added free-form model
+	;	Add a model with a free shape
 	;
 	model=-1.0,-1.0, -1.0,2.0, 2.0,1.0, 1.0,-1.0
 	qaddmodel i,model,-1, 30,64,0
 ^p
-Specify the coordinates of the placement with (x, y). (Set the internal coordinates of OBAQ.)
-Specify the placement angle (+ direction is clockwise) with r. The unit is radians.
-Use (sx, sy) to specify the size at the time of placement. By default, the size (10,10) is used.
-mygroup, exgroup, loggroup are the group values set for collision detection.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
-You can select the mode of placement check with colsw.
+Specify the placement coordinates with (x, y). (Sets the internal coordinates of OBAQ.)
+Specify the placement angle with r (the + direction is clockwise). The unit is radians.
+Specify the size at the time of placement with (sx, sy). The default size of (10, 10) is used.
+mygroup, exgroup, and loggroup are group values that are set for collision detection.
+The group value is indicated by a value (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768...) in which any of the 32 bits is 1.
+You can select the placement check mode with colsw.
 ^p
-Mode value Contents
+	Mode        Value	Content
 ------------------------------------------------------------------------
-colsw_none 0 No collision check when appearing
-colsw_active 1 Avoid contact with active rocks when spawning
-colsw_all 2 Avoid contact with rocks other than reserve when spawning
+	colsw_none     0        No collision check on appearance
+	colsw_active   1        Avoid contact with active rocks on appearance
+	colsw_all      2        Avoid contact with rocks other than in the reserve state on appearance
 ^p
-When the object is added successfully, the object ID value is assigned to the variable specified by var. (Variables are automatically integer type.)
-If no object is added due to the registration limit, -1 is assigned to the variable specified by var.
-If no object is added due to collision detection, -2 is assigned to the variable specified by var.
+When an object is successfully added, the object ID value will be assigned to the variable specified by var. (The variable automatically becomes an integer type.)
+If the object cannot be added due to the registration limit, -1 is assigned to the variable specified by var.
+If the object cannot be added due to collision detection, -2 is assigned to the variable specified by var.
 
 %href
 qaddpoly
@@ -367,40 +366,39 @@ qaddpoly
 
 %index
 qtype
-Set type parameter
+Set the type parameter
 %prm
 num,type,option
-num (0): Object ID
-type (0): set value
-option (0): Configuration option
+num(0)    : Object ID
+type(0)   : Setting value
+option(0) : Setting option
 %inst
-Sets the type parameter for the specified object.
-The following contents can be specified for the type parameter.
+Sets the type parameter of the specified object.
+You can specify the following contents for the type parameter.
 ^p
-Macro name value Content
+	Macro Name    Value	Content
 -----------------------------------------------------------
-type_normal 0 Normal object
-type_inner 1 Object with inverted contact judgment
-type_bindX 0x40 Fixed with X axis in the background
-type_bindY 0x80 Fixed with Y axis in the background
-type_bindR 0x100 Fixed rotation
-type_bind 0x1c0 Completely fixed to the background (no physical behavior)
-type_autowipe 0x100000 Automatically erase when the border range is exceeded
+	type_normal	0	Normal object
+	type_inner	1	Object with inverted contact judgment
+	type_bindX	0x40	X-axis fixed to the background
+	type_bindY	0x80	Y-axis fixed to the background
+	type_bindR	0x100	Rotation fixed
+	type_bind	0x1c0	Completely fixed to the background (no physical behavior)
+	type_autowipe	0x100000  Automatically delete when crossing the border range
 ^p
-type_inner is used when creating the outer wall.
-Used for the default wall (the shape created by the qborder instruction),
-Be careful not to use it for any other purpose.
-type_autowipe is a flag to automatically delete objects that are outside the border area (frame) set by the qborder command.
+type_inner is used to create outer walls.
+It is used for the default walls (shapes created with the qborder command), but be careful not to use it for any other purpose.
+type_autowipe is a flag to automatically erase objects that go beyond the border area (frame) set by the qborder command.
 ^
-With option, you can specify how to set the type value.
+You can specify the setting method of the type value with option.
 ^p
-option content
+	option       	Content
 ------------------------------------------------------------------------
-0 type Set the value (set)
-1 Add type value (or)
-2 Exclude type value (not)
+	0               Set the type value (set)
+	1               Add the type value (or)
+	2               Exclude the type value (not)
 ^p
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
 
 %href
 qgettype
@@ -409,28 +407,27 @@ qborder
 
 %index
 qstat
-Set stat parameter
+Set the stat parameter
 %prm
 num,stat,sleepcount
-num (0): Object ID
-stat (0): set value
-sleepcount (0): sleep count value
+num(0)        : Object ID
+stat(0)       : Setting value
+sleepcount(0) : Sleep count value
 %inst
-Sets the stat parameter and sleep count value for the specified object.
-The following contents can be specified for the stat parameter.
+Sets the stat parameter and sleep count value of the specified object.
+You can specify the following contents for the stat parameter.
 ^p
-Macro name value Content
+	Macro Name    Value	Content
 -------------------------------------------------------------------
-stat_reserve 0 unused object
-stat_sleep 1 Waiting object
-stat_active 2 Appearing objects
+	stat_reserve 	0	Unused object
+	stat_sleep 	1	Object waiting to appear
+	stat_active 	2	Object appearing
 ^p
-With option, you can specify how to set the type value.
-The sleep count value is the value that is referenced when stat_sleep is specified for stat.
-Objects that are in stat_sleep will blink as many times as the sleep count value.
-Will appear. (If the sleep count value is 0, it will not appear and will remain ready.)
+You can specify the setting method of the type value with option.
+The sleep count value is a value that is referred to when stat_sleep is specified for stat.
+Objects that are in the stat_sleep state will blink for the number of times of the sleep count value and appear. (If the sleep count value is 0, it will not appear and will remain in the standby state.)
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
 
 %href
 qgetstat
@@ -441,20 +438,18 @@ qpos
 Set position and angle parameters
 %prm
 num,x,y,angle
-num (0): Object ID
-x (0.0): X coordinate setting value (real number)
-y (0.0): Y coordinate setting value (real number)
-angle (0.0): Angle setting value (real number) (radian)
+num(0)     : Object ID
+x(0.0)     : X coordinate setting value (real number)
+y(0.0)     : Y coordinate setting value (real number)
+angle(0.0) : Angle setting value (real number) (radians)
 %inst
 Sets the position and angle parameters of the specified object.
-Specify the reference position (center coordinates) of the object with (x, y).
-Specify the object rotation angle (+ direction is clockwise) with angle. The unit is radians.
-In OBAQ, even when you move an object, you can directly change the coordinates of the object.
-Apply force in the direction you want to move instead of changing it, or by the qgetspeed command
-Please realize by setting the acceleration.
+(x, y) specifies the reference position (center coordinates) of the object.
+angle specifies the object rotation angle (the + direction is clockwise). The unit is radians.
+In OBAQ, even when moving an object, basically, do not directly change the coordinates of the object, but add force in the direction you want to move or use the qgetspeed command to set the acceleration.
 If you forcibly change the coordinates, the physical behavior may not be correct.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
 
 %href
 qgetpos
@@ -465,26 +460,26 @@ qspeed
 Set speed parameters
 %prm
 num,px,py,pr,option
-num (0): Object ID
-px (0.0): X direction setting value (real number)
-py (0.0): Y direction setting value (real number)
-pr (0.0): Rotation speed parameter (real number)
-option (0): Configuration option
+num(0)     : Object ID
+px(0.0) : X direction setting value (real number)
+py(0.0) : Y direction setting value (real number)
+pr(0.0) : Rotation speed parameter (real number)
+option(0) : Setting option
 %inst
-Sets the velocity parameter for the specified object.
+Sets the speed parameters of the specified object.
 (px, py) specifies the moving speed of the object in the X and Y directions.
-Specify the speed for rotation with pr.
+pr specifies the speed for rotation.
 You can specify the setting method with option.
 ^p
-option content
+	option       	Content
 ------------------------------------------------------------------------
-0 Add velocity value (add)
-1 Overwrite speed value x 2 (set)
-2 Overwrite speed value (set)
+	0               Add speed values (add)
+	1               Overwrite speed values x 2 (set)
+	2               Overwrite speed values (set)
 ^p
-If execution fails, a non-zero value is assigned to the system variable stat.
-If the option value is 2, the specified value is set.
-Note that if the option value is 1, it will be set to twice the specified value.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
+If the option (setting option) value is 2, the specified value will be set.
+If the option (setting option) value is 1, please note that twice the specified value will be set.
 
 %href
 qgetspeed
@@ -495,24 +490,23 @@ qweight
 Set parameters such as weight
 %prm
 num,weight,moment
-num (0): Object ID
-weight (6.0): Weight value (real number)
-moment (1200.0): Moment value (real number)
+num(0) : Object ID
+weight(6.0)    : Weight value (real number)
+moment(1200.0) : Moment value (real number)
 %inst
-Sets parameters such as weight, moment, and friction for the specified object.
-weight is the standard specific gravity for a circle with radius r
+Sets parameters such as weight, moment, and friction of the specified object.
+The guideline for weight is: for a circle with radius r and standard specific gravity:
 ^p
 	(r ^ 2) / 32.0
 ^p
-Please set as a guide.
-Think of moment as a parameter related to ease of rotation.
+Please think of moment as a parameter related to the ease of rotation.
 ^p
-Disk with radius r: weight * (r ^ 2) / 2.0
-Rectangle with side lengths a and b: weight * ((a ^ 2) + (b ^ 2)) / 12.0
+	Disk with radius r: weight * (r ^ 2) / 2.0
+	Rectangle with sides of length a, b: weight * ((a ^ 2) + (b ^ 2)) / 12.0
 ^p
-Set a value like this as a guide.
+Please use values like the above as a guideline.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
 
 %href
 qgetweight
@@ -523,18 +517,18 @@ qdamper
 Set parameters such as vibration absorption
 %prm
 num,damper,friction
-num (0): Object ID
-damper (0.7): Vibration absorption parameter value (real number)
-friction (1.0): Friction resistance value (real number)
+num(0) : Object ID
+damper(0.7)    : Vibration absorption parameter value (real number)
+friction(1.0)  : Friction resistance value (real number)
 %inst
-Sets parameters such as vibration damping, inertia, and gravitational constant for the specified object.
-Damper indicates the ability to suppress shaking when in contact.
-Be sure to set a value between 0.0 and 1.0. (No range check)
-Friction is the coefficient of force that decays when objects come into contact with each other.
-The value multiplied by the friction of the contacting object is referenced and calculated.
-Be sure to set a value between 0.0 and 1.0. (No range check)
+Sets parameters such as vibration absorption, inertia, and gravity coefficient of the specified object.
+damper (vibration absorption) indicates the force that suppresses shaking upon contact.
+Be sure to set a value from 0.0 to 1.0. (Range checking is not performed)
+friction (friction) is the coefficient of force that attenuates when objects come into contact with each other.
+The value obtained by multiplying it by the friction of the object that comes into contact is referred to and calculated.
+Be sure to set a value from 0.0 to 1.0. (Range checking is not performed)
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
 
 %href
 qgetdamper
@@ -545,19 +539,18 @@ qinertia
 Set parameters such as inertia
 %prm
 num,inertia,gravity
-num (0): Object ID
-inertia (0.999): Inertia parameter value (real number)
-gravity (1.0): Gravity value (real number) of the object
+num(0) : Object ID
+inertia(0.999) : Inertia parameter value (real number)
+gravity(1.0)   : Object's gravity value (real number)
 %inst
-Sets parameters such as the inertia of the specified object and the gravitational constant.
-Inertia becomes a sticky movement due to resistance generated as it approaches 0.0.
-Become. Be sure to set a value between 0.0 and 1.0. (No range check)
-gravity (object gravity) is multiplied by the gravity set in space.
-It is reflected only in the object.
-It is used to apply different gravity only to a specific object.
-It is effective for character control such as games because it gives weightlessness and antigravity only to specific objects in a form that is impossible in reality.
+Sets parameters such as inertia and gravity coefficient of the specified object.
+The closer inertia (inertia) is to 0.0, the more resistance occurs, resulting in a sticky movement.
+Be sure to set a value from 0.0 to 1.0. (Range checking is not performed)
+gravity (object's gravity) is reflected only on the object in a form that is multiplied by the gravity set in the space.
+It is used to give different gravity only to specific objects.
+It is effective for character control in games, etc., because it gives zero gravity or anti-gravity only to specific objects in a way that is impossible in reality.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
 
 %href
 qgetinertia
@@ -568,16 +561,16 @@ qgroup
 Set group parameters
 %prm
 num,mygroup,exgroup,loggroup
-num (0): Object ID
-mygroup (1): Collision group value to which you belong
-exgroup (0): Group value to exclude collisions
-loggroup (0): Group value that creates the collision log
+num(0)      : Object ID
+mygroup(1)  : Collision group value to which you belong
+exgroup(0)  : Group value to exclude from collisions
+loggroup(0) : Group value to create a collision log
 %inst
-Sets the group parameters for the specified object.
-Group parameters are used to identify conflicting objects, such as when identifying them.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
+Sets the group parameters of the specified object.
+Group parameters are used for identification, such as when specifying a colliding partner object.
+The group value is indicated by a value (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768...) in which any of the 32 bits is 1.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 will be assigned to the system variable stat.
 
 %href
 qgetgroup
@@ -590,37 +583,33 @@ qmat
 Set material parameters
 %prm
 num,type,id,subid
-num (0): Object ID
-type (0): Material type value
-id (0): Reference id value
-subid (0): Reference subid value
+num(0)   : Object ID
+type(0)  : Material type value
+id(0)    : Reference id value
+subid(0) : Reference subid value
 %inst
-Sets the material parameters for the specified object.
+Sets the material parameters of the specified object.
 Material parameters are reflected when drawing with the qdraw command.
-The material type value allows you to choose how to display it.
+You can select the display method according to the material type value.
 ^p
-Type Value Content
+	Type          Value	Content
 -------------------------------------------------------------------
-mat_none 0 Do nothing (hidden)
-mat_spr 1 sprite
-mat_spr2 2 Sprite (with size setting)
-mat_wire 3 wireframe
-mat_wire2 4 Wireframe (with contour)
-mat_delay 0x1000 Draw after
+	mat_none	0	Do nothing (hide)
+	mat_spr		1	Sprite
+	mat_spr2	2	Sprite (with size setting)
+	mat_wire	3	Wireframe
+	mat_wire2	4	Wireframe (with outline)
+	mat_delay	0x1000	Draw later
 ^p
-Sprites are pasted with a rectangle that covers the entire shape.
-In the case of wireframe, connect each vertex with a line.
-If mat_spr or mat_spr2 is selected, it will be displayed as a sprite in id.
-Specify the split image number in the window ID and subid of the image.
-The window ID and split image number are the parameters used in the celput instruction.
-Similarly, you can refer to the image that is the material divided by the celdiv command.
-If mat_wire or mat_wire2 is selected, the wire color code with id
-(24bit value packed with RGB), set the outline color code with subid.
-The object obtained by adding mat_delay (0x1000) to the material type value is
-It will be drawn later.
-This can be used for display using translucency.
+A rectangle is pasted in a form that covers the entire shape for sprites.
+In the case of a wireframe, each vertex is connected by a line.
+If you select mat_spr or mat_spr2, specify the window ID of the image to display as a sprite in id, and the divided image No. in subid.
+The window ID and divided image No. are the same as the parameters used in the celput command, and can refer to images that have been divided using the celdiv command.
+If you select mat_wire or mat_wire2, set the wire color code (24-bit value packed with RGB) in id and the outline color code in subid.
+Objects with mat_delay (0x1000) added to the material type value will be drawn later.
+This can be used for display using transparency, etc.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qgetmat
@@ -633,16 +622,16 @@ qmat2
 Set material detail parameters
 %prm
 num,offsetx,offsety,zoomx,zoomy
-num (0): Object ID
-offsetx (0): X-direction display offset
-offsety (0): Y direction display offset
-zoomx (1.0): X-direction display magnification (real number)
-zoomy (1.0): Y-direction display magnification (real number)
+num(0)   : Object ID
+offsetx(0) : X-direction display offset
+offsety(0) : Y-direction display offset
+zoomx(1.0) : X-direction display magnification (real number)
+zoomy(1.0) : Y-direction display magnification (real number)
 %inst
-Sets the material detail parameters for the specified object.
-The material detail parameters are reflected when drawing with the qdraw command.
+Sets the material detail parameters of the specified object.
+Material detail parameters are reflected when drawing with the qdraw command.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qgetmat2
@@ -655,17 +644,17 @@ qmat3
 Set material display parameters
 %prm
 num,gmode,rate
-num (0): Object ID
-gmode (0): copy mode
-rate (256): translucent rate
+num(0)   : Object ID
+gmode(0) : Copy mode
+rate(256): Transparency rate
 %inst
-Sets the material display parameters for the specified object.
-The material display parameters are reflected when drawing with the qdraw command.
-gmode specifies the copy mode when drawing the sprite.
-This is the same as the mode value specified by the HSP gmode instruction.
-Also, rate (semi-transparent rate) has the same result as when specified by the gmode instruction.
+Sets the material display parameters of the specified object.
+Material display parameters are reflected when drawing with the qdraw command.
+gmode specifies the copy mode when drawing a sprite.
+This is the same as the mode value specified by the HSP gmode command.
+Also, rate (transparency rate) will have the same result as when specified with the gmode command.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 gmode
@@ -679,16 +668,16 @@ quser
 Set user-defined data
 %prm
 num,user1,user2,user3
-num (0): Object ID
-user1 (0): User-defined data 1
-user2 (0): User-defined data 2
-user3 (0): User-defined data 3
+num(0)   : Object ID
+user1(0) : User-defined data 1
+user2(0) : User-defined data 2
+user3(0) : User-defined data 3
 %inst
 Sets the user-defined data for the specified object.
-User-defined data is a value that can be saved for each object, and the user can freely decide what to use it for.
-User-defined data 1 to 3 can store integer type values.
+User-defined data is a value that can be stored for each object, and the user is free to decide what to use it for.
+User-defined data 1 to 3 can store integer values.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qgetuser
@@ -700,16 +689,16 @@ quser2
 Set user-defined data 2
 %prm
 num,user4,user5,user6
-num (0): Object ID
-user4 (0.0): User-defined data 4 (real number)
-user5 (0.0): User-defined data 5 (real number)
-user6 (0.0): User-defined data 6 (real number)
+num(0)     : Object ID
+user4(0.0) : User-defined data 4 (real number)
+user5(0.0) : User-defined data 5 (real number)
+user6(0.0) : User-defined data 6 (real number)
 %inst
 Sets the user-defined data for the specified object.
-User-defined data is a value that can be saved for each object, and the user can freely decide what to use it for.
-User-defined data 4 to 6 can store real-type values.
+User-defined data is a value that can be stored for each object, and the user is free to decide what to use it for.
+User-defined data 4 to 6 can store real number values.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qgetuser2
@@ -721,20 +710,20 @@ qfind
 Object search
 %prm
 group,stat
-group (-1): Group value to search
-stat (0): stat value specification
+group(-1) : Group value to search for
+stat(0)   : stat value specification
 %inst
-Search for registered objects with arbitrary conditions.
-First, you need to specify the condition with the qfind instruction and then receive the result with the qnext instruction.
-Specify the collision group value to search by group.
-If the group specification is omitted or -1, all groups are targeted.
+Searches registered objects according to arbitrary conditions.
+First, you must specify the conditions with the qfind command, and then receive the results with the qnext command.
+Specify the collision group value to search for with group.
+If the group is omitted or -1, all groups are targeted.
 (However, objects with a group value of 0 are excluded)
-When specifying multiple groups, specify the value obtained by adding the values of each group.
-By specifying stat, it is possible to search only a specific state.
-If stat is 0, all states are covered.
-If you specify stat_sleep (1) or stat_active (2) for stat, only objects with the same value are targeted.
+If you want to specify multiple groups, specify the value that is the sum of each group value.
+By specifying stat, you can search for only specific states.
+If stat is 0, all states are targeted.
+If stat_sleep(1) or stat_active(2) is specified for stat, only objects with the same value are targeted.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qnext
@@ -742,18 +731,18 @@ qnext
 
 %index
 qnext
-Object search result acquisition
+Get object search result
 %prm
 var
-var: Variable to get search results
+var : Variable to get the search result
 %inst
-Get the result of the search by the qfind instruction.
-First, you need to specify the condition with the qfind instruction and then receive the result with the qnext instruction.
-The object ID value is assigned to the variable specified by var. (Variables are automatically integer type.)
-You can retrieve the search results each time you execute the qnext instruction.
-If there are no more search results, -1 will be substituted.
+Gets the result of the search by the qfind command.
+First, you must specify the conditions with the qfind command, and then receive the results with the qnext command.
+The object ID value is assigned to the variable specified by var. (The variable automatically becomes an integer type.)
+You can retrieve search results each time you execute the qnext command.
+If there are no more search results, -1 is assigned.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qfind
@@ -761,20 +750,20 @@ qfind
 
 %index
 qcollision
-Collision acquisition started
+Start collision acquisition
 %prm
 num, target
-num (0): Object ID
-target (-1): Object ID of the target to get the collision
+num(0)     : Object ID
+target(-1) : Object ID of the object to acquire collisions for
 %inst
-Starts getting information about collisions between objects.
-First, you need to specify the object with the qcollision instruction and then receive the result with the qgetcol instruction.
-In target, the object ID for which you want to get a collision.
-If target is -1 or omitted, all information related to the object specified by num is retrieved.
-When acquiring a collision, it is necessary to set the collision group.
-Please note that only the parameters of the object specified by num that are in the collision log creation group will be acquired.
+Starts acquiring information about collisions between objects.
+First, you must specify the object with the qcollision command, and then receive the results with the qgetcol command.
+target specifies the object ID of the object for which to get the collision.
+If target is -1 or omitted, all information related to the object specified by num is acquired.
+When performing collision acquisition, you must always set the collision group.
+Note that only objects whose parameters specified by num are in the collision log creation group will be acquired.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qgroup
@@ -788,20 +777,20 @@ qgetcol
 Collision acquisition
 %prm
 var_id,var_x,var_y
-var_id: Variable to get the object ID
-var_x: Variable to get the X coordinate
-var_y: Variable to get the Y coordinate
+var_id : Variable to get the object ID
+var_x  : Variable to get the X coordinate
+var_y  : Variable to get the Y coordinate
 %inst
-Acquires the result of the search by the qcollision command.
-First, you need to specify the condition with the qcollision instruction and then receive the result with the qgetcol instruction.
-Furthermore, if necessary, additional information can be obtained with the qgetcol2 and qgetcol3 instructions.
-The ID value of the object in which the collision was detected is assigned to the variable specified by var_id. (Variables are automatically integer type.)
-The variable specified by var_x is assigned the X coordinate where the collision was detected. (Variables are automatically real type.)
-The Y coordinate where the collision was detected is assigned to the variable specified by var_y. (Variables are automatically real type.)
-You can retrieve the search results each time you execute the qgetcol instruction.
-If there are no more search results, -1 will be assigned as the object ID.
+Gets the result of the search by the qcollision command.
+First, you must specify the conditions with the qcollision command, and then receive the results with the qgetcol command.
+Furthermore, you can acquire additional information with the qgetcol2 command and qgetcol3 command as needed.
+The ID value of the object where a collision was detected is assigned to the variable specified by var_id. (The variable automatically becomes an integer type.)
+The X coordinate where a collision was detected is assigned to the variable specified by var_x. (The variable automatically becomes a real number type.)
+The Y coordinate where a collision was detected is assigned to the variable specified by var_y. (The variable automatically becomes a real number type.)
+You can retrieve search results each time you execute the qgetcol command.
+If there are no more search results, -1 is assigned as the object ID.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qfind
@@ -811,19 +800,19 @@ qgetcol3
 
 %index
 qgetcol2
-Collision detailed information acquisition
+Collision detail information acquisition
 %prm
 var_depth,var_nx,var_ny
-var_depth: Variable to get the depth of collision
-var_nx: Variable to get the X normal of the collision
-var_ny: Variable to get the Y normal of the collision
+var_depth : Variable to get the depth of the collision
+var_nx    : Variable to get the X normal of the collision
+var_ny    : Variable to get the Y normal of the collision
 %inst
-Acquires the result of the search by the qcollision command.
-Be sure to get the information after receiving the result with the qgetcol instruction.
-The collision depth (distance sunk into the contact surface) is assigned to the variable specified by var_depth. (Variables are automatically real type.)
-The normal (x, y) at the time of collision is assigned to the variable specified by var_nx, var_ny. (Variables are automatically real type.)
+Gets the result of the search by the qcollision command.
+Be sure to acquire information after receiving the results with the qgetcol command.
+The depth of the collision (distance of intrusion into the contact surface) is assigned to the variable specified by var_depth. (The variable automatically becomes a real number type.)
+The normals (x, y) at the time of collision are assigned to the variables specified by var_nx, var_ny. (The variables automatically become real number types.)
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qfind
@@ -833,18 +822,18 @@ qgetcol3
 
 %index
 qgetcol3
-Collision detailed information acquisition 2
+Collision detail information acquisition 2
 %prm
 var_bound,var_slide
-var_bound: Variable to get the vertical velocity
-var_slide: Variable to get the horizontal velocity
+var_bound : Variable to get the vertical velocity
+var_slide : Variable to get the horizontal velocity
 %inst
-Acquires the result of the search by the qcollision command.
-Be sure to get the information after receiving the result with the qgetcol instruction.
-The variable specified by var_bound is assigned the velocity in the direction perpendicular to the contact surface (bounce) (the plus side is the sinking direction). (Variables are automatically real type.)
-The variable specified by var_slide is assigned the velocity in the horizontal (dragging) direction with the contact surface. (Variables are automatically real type.)
+Gets the result of the search by the qcollision command.
+Be sure to acquire information after receiving the results with the qgetcol command.
+The velocity perpendicular (bouncing direction) to the contact surface (the positive side is the intrusion direction) is assigned to the variable specified by var_bound. (The variable automatically becomes a real number type.)
+The velocity horizontal (dragging direction) to the contact surface is assigned to the variable specified by var_slide. (The variable automatically becomes a real number type.)
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qfind
@@ -854,15 +843,15 @@ qgetcol2
 
 %index
 qgettype
-Get type parameter
+Get the type parameter
 %prm
 num,var_type
-num (0): Object ID
-var_type: variable to get the type parameter
+num(0)    : Object ID
+var_type  : Variable to get the type parameter
 %inst
-Gets the parameters of the specified object in a variable.
-The type parameter value is assigned to the variable specified by var_type. (Variables are automatically integer type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Gets the parameters of the specified object into a variable.
+The type parameter value is assigned to the variable specified by var_type. (The variable automatically becomes an integer type.)
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qtype
@@ -870,18 +859,17 @@ qtype
 
 %index
 qgetstat
-Get stat parameter
+Get the stat parameter
 %prm
 num,var_stat,var_sleepcount
-num (0): Object ID
-var_stat: stat Variable to get the setting value
+num(0)        : Object ID
+var_stat      : Variable to get the stat setting value
 var_sleepcount: Variable to get the sleep count value
 %inst
-Gets the parameters of the specified object in a variable.
-The stat parameter value is assigned to the variable specified by var_stat. (Variables are automatically integer type.)
-The sleep count value is assigned to the variable specified by var_sleepcount. (Variables are automatically integer type.)
-Please note that the sleep count value is not the value set by qstat, but the value according to the number of internal physical calculation executions.
-If execution fails, a non-zero value is assigned to the system variable stat.
+Gets the parameters of the specified object into a variable.
+The stat parameter value is assigned to the variable specified by var_stat. (The variable automatically becomes an integer type.)
+Note that the sleep count value is not the value set by qstat, but the value corresponding to the internal number of physical calculation executions.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qstat
@@ -892,18 +880,18 @@ qgetpos
 Get position and angle parameters
 %prm
 num,var_x,var_y,var_angle
-num (0): Object ID
-var_x: Variable to get the X coordinate setting value
-var_y: Variable to get the Y coordinate setting value
-var_angle: Variable to get the angle setting value
+num(0)     : Object ID
+var_x      : Variable to get the X coordinate setting value
+var_y      : Variable to get the Y coordinate setting value
+var_angle  : Variable to get the angle setting value
 %inst
-Gets the parameters of the specified object in a variable.
-The X coordinate setting value is assigned to the variable specified by var_x. (Variables are automatically real type.)
-The Y coordinate setting value is assigned to the variable specified by var_y. (Variables are automatically real type.)
-The angle setting value is assigned to the variable specified by var_angle. (Variables are automatically real type.)
-Please note that the acquired X and Y coordinates are internal coordinates used by OBAQ, not on-screen coordinates.
-Use the qcnvaxis instruction to convert internal coordinate values to on-screen coordinates.
-If execution fails, a non-zero value is assigned to the system variable stat.
+Gets the parameters of the specified object into a variable.
+The X coordinate setting value is assigned to the variable specified by var_x. (The variable automatically becomes a real number type.)
+The Y coordinate setting value is assigned to the variable specified by var_y. (The variable automatically becomes a real number type.)
+The angle setting value is assigned to the variable specified by var_angle. (The variable automatically becomes a real number type.)
+Note that the acquired X and Y coordinates are not the coordinates on the screen, but the internal coordinate values used by OBAQ.
+To convert internal coordinate values to screen coordinates, use the qcnvaxis command.
+If the execution fails, a non-zero value is assigned to the system variable stat.
 
 %href
 qpos
@@ -912,37 +900,36 @@ qcnvaxis
 
 %index
 qgetspeed
-Get speed parameters
+Get the speed parameters
 %prm
 num,var_px,var_py,var_pr
-num (0): Object ID
-var_px: Variable to get the velocity value in the X direction
-var_py: Variable to get the velocity value in the Y direction
-var_pr: Variable to get the rotation speed value
+num(0) : Object ID
+var_px : Variable to get the X-direction speed value
+var_py : Variable to get the Y-direction speed value
+var_pr : Variable to get the rotational speed value
 %inst
-Gets the parameters of the specified object in a variable.
-The X-direction velocity value is assigned to the variable specified by var_px. (Variables are automatically real type.)
-The Y-direction velocity value is assigned to the variable specified by var_py. (Variables are automatically real type.)
-The rotation speed value is assigned to the variable specified by var_pr. (Variables are automatically real type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
-
+Gets the parameters of the specified object into a variable.
+The X-direction speed value is assigned to the variable specified by var_px. (The variable automatically becomes a real number type.)
+The Y-direction speed value is assigned to the variable specified by var_py. (The variable automatically becomes a real number type.)
+The rotational speed value is assigned to the variable specified by var_pr. (The variable automatically becomes a real number type.)
+If the execution fails, a non-zero value is assigned to the system variable stat.
 %href
 qspeed
 
 
 %index
 qgetweight
-Get parameters such as weight
+Get weight and other parameters.
 %prm
 num,var_weight,var_moment
-num (0): Object ID
-var_weight: Variable to get the weight value
-var_moment: Variable to get the moment value
+num(0)     : Object ID
+var_weight : Variable to store the weight value
+var_moment : Variable to store the moment value
 %inst
-Gets the parameters of the specified object in a variable.
-The weight value is assigned to the variable specified by var_weight. (Variables are automatically real type.)
-The moment value is assigned to the variable specified by var_moment. (Variables are automatically real type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The weight value is assigned to the variable specified by var_weight. (The variable is automatically converted to a real number type.)
+The moment value is assigned to the variable specified by var_moment. (The variable is automatically converted to a real number type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qweight
@@ -950,17 +937,17 @@ qweight
 
 %index
 qgetdamper
-Get parameters such as vibration absorption
+Get vibration absorption and other parameters.
 %prm
 num,var_damper,var_friction
-num (0): Object ID
-var_damper: Variable to get the vibration absorption parameter value
-var_friction: Variable to get the friction resistance value
+num(0) : Object ID
+var_damper   : Variable to store the vibration absorption parameter value
+var_friction : Variable to store the frictional resistance value
 %inst
-Gets the parameters of the specified object in a variable.
-The vibration absorption parameter value is assigned to the variable specified by var_damper. (Variables are automatically real type.)
-The frictional resistance value is assigned to the variable specified by var_friction. (Variables are automatically real type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The vibration absorption parameter value is assigned to the variable specified by var_damper. (The variable is automatically converted to a real number type.)
+The frictional resistance value is assigned to the variable specified by var_friction. (The variable is automatically converted to a real number type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qdamper
@@ -968,17 +955,17 @@ qdamper
 
 %index
 qgetinertia
-Get parameters such as inertia
+Get inertia and other parameters.
 %prm
 num,var_inertia,var_gravity
-num (0): Object ID
-var_inertia: Variable to get the inertia parameter value
-var_gravity: Variable to get the gravity value of the object
+num(0) : Object ID
+var_inertia : Variable to store the inertia parameter value
+var_gravity : Variable to store the object's gravity value
 %inst
-Gets the parameters of the specified object in a variable.
-The inertia parameter value is assigned to the variable specified by var_inertia. (Variables are automatically real type.)
-The gravity value of the object is assigned to the variable specified by var_gravity. (Variables are automatically real type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The inertia parameter value is assigned to the variable specified by var_inertia. (The variable is automatically converted to a real number type.)
+The object's gravity value is assigned to the variable specified by var_gravity. (The variable is automatically converted to a real number type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qinertia
@@ -986,19 +973,19 @@ qinertia
 
 %index
 qgetgroup
-Get group parameters
+Get group parameters.
 %prm
 num,var_mygroup,var_exgroup,var_loggroup
-num (0): Object ID
-var_mygroup: Variable to get the collision group value to which you belong
-var_exgroup: Variable to get the group value to exclude collisions
-var_loggroup: Variable to get the group value that creates the collision log
+num(0)      : Object ID
+var_mygroup : Variable to store the collision group value to which the object belongs
+var_exgroup : Variable to store the group value to exclude from collisions
+var_loggroup: Variable to store the group value for creating collision logs
 %inst
-Gets the parameters of the specified object in a variable.
-The collision group value to which you belong is assigned to the variable specified by var_mygroup. (Variables are automatically integer type.)
-The variable specified by var_exgroup is assigned the group value that excludes collisions. (Variables are automatically integer type.)
-The variable specified by var_loggroup is assigned the group value that creates the collision log. (Variables are automatically integer type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The collision group value to which the object belongs is assigned to the variable specified by var_mygroup. (The variable is automatically converted to an integer type.)
+The group value to exclude from collisions is assigned to the variable specified by var_exgroup. (The variable is automatically converted to an integer type.)
+The group value for creating collision logs is assigned to the variable specified by var_loggroup. (The variable is automatically converted to an integer type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qgroup
@@ -1008,19 +995,19 @@ qcollision
 
 %index
 qgetmat
-Get material parameters
+Get material parameters.
 %prm
 num,var_type,var_id,var_subid
-num (0): Object ID
-var_type: Variable to get the material type value
-var_id: Variable to get the reference id value
-var_subid: Variable to get the reference subid value
+num(0)    : Object ID
+var_type  : Variable to store the material type value
+var_id    : Variable to store the reference ID value
+var_subid : Variable to store the reference sub ID value
 %inst
-Gets the parameters of the specified object in a variable.
-The material type value is assigned to the variable specified by var_type. (Variables are automatically integer type.)
-The reference id value is assigned to the variable specified by var_id. (Variables are automatically integer type.)
-The reference subid value is assigned to the variable specified by var_subid. (Variables are automatically integer type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The material type value is assigned to the variable specified by var_type. (The variable is automatically converted to an integer type.)
+The reference ID value is assigned to the variable specified by var_id. (The variable is automatically converted to an integer type.)
+The reference sub ID value is assigned to the variable specified by var_subid. (The variable is automatically converted to an integer type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qmat
@@ -1030,24 +1017,24 @@ qgetmat3
 
 %index
 qgetmat2
-Get material detail parameters
+Get detailed material parameters.
 %prm
 num,var_offsetx,var_offsety,var_zoomx,var_zoomy
-num (0): Object ID
-var_offsetx: Variable to get the X-direction display offset value
-var_offsety: Variable to get the Y-direction display offset value
-var_zoomx: Variable to get the X-direction display magnification value
-var_zoomy: Variable to get the Y-direction display magnification value
+num(0)   : Object ID
+var_offsetx : Variable to store the X-direction display offset value
+var_offsety : Variable to store the Y-direction display offset value
+var_zoomx   : Variable to store the X-direction display magnification value
+var_zoomy   : Variable to store the Y-direction display magnification value
 %inst
-Gets the parameters of the specified object in a variable.
-The X-direction display offset value is assigned to the variable specified by var_offsetx. (Variables are automatically integer type.)
-Gets the parameters of the specified object in a variable.
-The Y-direction display offset value is assigned to the variable specified by var_offsety. (Variables are automatically integer type.)
-Gets the parameters of the specified object in a variable.
-The X-direction display magnification value is assigned to the variable specified by var_zoomx. (Variables are automatically real type.)
-Gets the parameters of the specified object in a variable.
-The Y-direction display magnification value is assigned to the variable specified by var_zoomy. (Variables are automatically real type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The X-direction display offset value is assigned to the variable specified by var_offsetx. (The variable is automatically converted to an integer type.)
+Retrieves the parameters of the specified object into variables.
+The Y-direction display offset value is assigned to the variable specified by var_offsety. (The variable is automatically converted to an integer type.)
+Retrieves the parameters of the specified object into variables.
+The X-direction display magnification value is assigned to the variable specified by var_zoomx. (The variable is automatically converted to a real number type.)
+Retrieves the parameters of the specified object into variables.
+The Y-direction display magnification value is assigned to the variable specified by var_zoomy. (The variable is automatically converted to a real number type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qmat2
@@ -1057,17 +1044,17 @@ qgetmat3
 
 %index
 qgetmat3
-Get material display parameters
+Get material display parameters.
 %prm
 num,var_gmode,var_rate
-num (0): Object ID
-var_gmode: Variable to get the copy mode value
-var_rate: Variable to get the translucent rate value
+num(0)   : Object ID
+var_gmode : Variable to store the copy mode value
+var_rate  : Variable to store the transparency rate value
 %inst
-Gets the parameters of the specified object in a variable.
-The copy mode value is assigned to the variable specified by var_gmode. (Variables are automatically integer type.)
-The translucent rate value is assigned to the variable specified by var_rate. (Variables are automatically integer type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The copy mode value is assigned to the variable specified by var_gmode. (The variable is automatically converted to an integer type.)
+The transparency rate value is assigned to the variable specified by var_rate. (The variable is automatically converted to an integer type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qmat3
@@ -1077,19 +1064,19 @@ qgetmat2
 
 %index
 qgetuser
-Get user-defined data
+Get user-defined data.
 %prm
 num,var_user1,var_user2,var_user3
-num (0): Object ID
-var_user1: Variable to get the value of user-defined data 1.
-var_user2: Variable to get the value of user-defined data2
-var_user3: Variable to get the value of user-defined data 3
+num(0)   : Object ID
+var_user1 : Variable to store the value of user-defined data 1
+var_user2 : Variable to store the value of user-defined data 2
+var_user3 : Variable to store the value of user-defined data 3
 %inst
-Gets the parameters of the specified object in a variable.
-The value of user-defined data 1 is assigned to the variable specified by var_user1. (Variables are automatically integer type.)
-The value of user-defined data 2 is assigned to the variable specified by var_user2. (Variables are automatically integer type.)
-The value of user-defined data 3 is assigned to the variable specified by var_user3. (Variables are automatically integer type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The value of user-defined data 1 is assigned to the variable specified by var_user1. (The variable is automatically converted to an integer type.)
+The value of user-defined data 2 is assigned to the variable specified by var_user2. (The variable is automatically converted to an integer type.)
+The value of user-defined data 3 is assigned to the variable specified by var_user3. (The variable is automatically converted to an integer type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 quser
@@ -1098,19 +1085,19 @@ qgetuser2
 
 %index
 qgetuser2
-Get user-defined data 2
+Get user-defined data 2.
 %prm
 num,var_user4,var_user5,var_user6
-num (0): Object ID
-var_user4: Variable to get the value of user-defined data 4
-var_user5: Variable to get the value of user-defined data 5
-var_user6: Variable to get the value of user-defined data 6.
+num(0)     : Object ID
+var_user4 : Variable to store the value of user-defined data 4
+var_user5 : Variable to store the value of user-defined data 5
+var_user6 : Variable to store the value of user-defined data 6
 %inst
-Gets the parameters of the specified object in a variable.
-The value of user-defined data 4 is assigned to the variable specified by var_user4. (Variables are automatically real type.)
-The value of user-defined data 5 is assigned to the variable specified by var_user5. (Variables are automatically real type.)
-The value of user-defined data 6 is assigned to the variable specified by var_user6. (Variables are automatically real type.)
-If execution fails, a non-zero value is assigned to the system variable stat.
+Retrieves the parameters of the specified object into variables.
+The value of user-defined data 4 is assigned to the variable specified by var_user4. (The variable is automatically converted to a real number type.)
+The value of user-defined data 5 is assigned to the variable specified by var_user5. (The variable is automatically converted to a real number type.)
+The value of user-defined data 6 is assigned to the variable specified by var_user6. (The variable is automatically converted to a real number type.)
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 quser2
@@ -1119,26 +1106,26 @@ qgetuser
 
 %index
 qpush
-Empower anywhere
+Apply force to an arbitrary location.
 %prm
 num,xw,yw,ax,ay,sw
-num (0): Object ID
-xw (0.0): X coordinate (real number)
-yw (0.0): Y coordinate (real number)
-ax (0.0): Force in the X direction (real number)
-ay (0.0): Force in Y direction (real number)
-sw (1): configuration options
+num(0)     : Object ID
+xw(0.0) : X coordinate (real number)
+yw(0.0) : Y coordinate (real number)
+ax(0.0) : Force in the X direction (real number)
+ay(0.0) : Force in the Y direction (real number)
+sw(1)   : Setting option
 %inst
-Apply force to the specified object from the position of (xw, yw) with the strength of (ax, ay).
-The posture and speed of the object change according to the applied force.
-You can specify the setting method with sw.
+Applies a force of strength (ax, ay) from the position (xw, yw) to the specified object.
+The object's attitude and speed will change according to the applied force.
+sw can be used to specify the setting method.
 ^p
-sw content
+	sw     	Contents
 --------------------------------------------------
-0 Not reflected in the speed of the object
-1 Reflect in the speed of the object
+	0       Do not reflect in the object's speed
+	1       Reflect in the object's speed
 ^p
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qblast
@@ -1146,22 +1133,22 @@ qblast
 
 %index
 qblast
-Radially apply force from anywhere
+Apply force radially from an arbitrary location.
 %prm
 xw,yw,power,near,far
-xw (0.0): X coordinate (real number)
-yw (0.0): Y coordinate (real number)
-power (1.0): magnitude of force (real number)
-near (1.0): closest distance (real number)
-far (9999.0): Farthest distance (real number)
+xw(0.0)    : X coordinate (real number)
+yw(0.0)    : Y coordinate (real number)
+power(1.0) : Force magnitude (real number)
+near(1.0)  : Closest distance (real number)
+far(9999.0): Furthest distance (real number)
 %inst
-Radially apply force to all objects from anywhere.
-A force that is inversely proportional to the distance is applied around (xw, yw).
+Applies force radially from an arbitrary location to all objects.
+A force that is inversely proportional to the distance is applied with (xw, yw) as the center.
 power is the magnitude of the force applied at a distance of 1.0.
-Positions closer to near are not inversely proportional and have the same force as near.
-No force is applied if it is farther than far.
+The force at positions closer than near does not decrease proportionally, but remains the same as the force at near.
+No force is applied if the object is further than far.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 qpush
@@ -1169,39 +1156,38 @@ qpush
 
 %index
 qgetversion
-Get version information
+Get version information.
 %prm
 var
-var: Variable to get version information
+var : Variable to store version information.
 %inst
-Get OBAQ version information.
-Version information is assigned as a character string to the variable specified by var.
+Gets OBAQ version information.
+The version information is assigned as a string to the variable specified by var.
 
 %href
 
 
 %index
 qinner
-Get if the coordinates are in the object
+Get whether a coordinate is inside an object.
 %prm
 var,x,y,num
-var: Variable to get the result
-x (0.0): X coordinate (real number)
-y (0.0): Y coordinate (real number)
-num (-1): Object ID
+var     : Variable to store the result
+x(0.0)  : X coordinate (real number)
+y(0.0)  : Y coordinate (real number)
+num(-1) : Object ID
 %inst
-Checks if the coordinates specified by (x, y) are inside the object shape.
+Checks whether the coordinate specified by (x, y) is inside the object shape.
 Specify the ID of the object you want to check with num.
-If num is negative or omitted, it spans all valid objects
-Check if the coordinates are inside.
+If num is a negative value or is omitted, it checks all valid objects to see
+if the coordinate is inside.
 If it is inside, the object ID value is assigned to the variable specified by var.
 If it is not inside, -1 is assigned to the variable specified by var.
-The variable specified by var is automatically an integer type.
-The coordinates specified by (x, y) are the internal coordinate values used by OBAQ, not the coordinates on the screen.
-If you want to get the result from the coordinates on the screen, convert it to the internal coordinate value with the cnvaxis command etc.
-Please note that you need to do it.
+The variable specified by var is automatically converted to an integer type.
+Note that the coordinates specified by (x, y) are not the coordinates on the screen, but the internal coordinate values used by OBAQ.
+To get the result from the coordinates on the screen, you need to convert them to internal coordinate values using the cnvaxis command, etc.
 ^
-If execution fails, a non-zero value is assigned to the system variable stat.
+If the execution fails, a value other than 0 is assigned to the system variable stat.
 
 %href
 cnvaxis
@@ -1212,16 +1198,18 @@ qgetptr
 Get system pointer value
 %prm
 var,option
-var: Variable to get the contents
-option (0): option value
+var       : Variable to store the content
+option(0) : Option value
 %inst
 Gets the OBAQ system pointer value.
-This system pointer value is used to access OBAQ's internal data from external applications, plugins, etc.
-For normal use, no system pointer value is needed.
+This system pointer value is used to access OBAQ's internal data from external applications or plugins, etc.
+In normal use, the system pointer value is not necessary.
 You can set the option value with the option parameter.
-Currently, the option parameter has no non-zero value.
+Currently, option parameters other than 0 are invalid.
+Please provide more context. "hgobaq" alone doesn't translate directly into English. Without knowing what it *means* in the context of HSP3, I can only offer guesses. Here are some possibilities, depending on the context:
 
-%href
-hgobaq
+*   **If it's a variable name or a function name:**  There's no direct translation. It remains "hgobaq". In programming, names are often arbitrary.  I would need to see more code to infer its *purpose* and describe that in English (e.g., "This variable stores the number of objects," rather than translating the variable's name).
+*   **If it's an error message or part of an error message:** The translation depends on what the error *means*.  Again, context is crucial.  I would need the full error message or surrounding code to understand the error.
+*   **If it's a misspelling or abbreviation:** I would need to guess the intended word and translate *that*.
 
-
+**Therefore, please provide the surrounding code or sentence(s) where "hgobaq" appears.  This will allow me to provide an accurate and meaningful translation.**

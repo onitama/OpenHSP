@@ -1,0 +1,331 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="en">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP,HSP3,Hot Soup Processor,Update Information,Update">
+	<meta name="description" content="Published update information for HSP">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HSP3.7 New Feature Highlights</title>
+</head>
+<body>
+	<div id="CONTAINER">
+		<!-- Header -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2024(c)</p>
+		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
+		<h1>HSP3.7 New Feature Highlights</h1>
+
+		<!-- Table of Contents -->
+		<ol>
+			<li><a href="#HSP3UPDATE">HSP3.7 Update Overview</a></li>
+			<li><a href="#USE">About the Preprocessor Command, "#use"</a></li>
+			<li><a href="#HSP3C">About the Compact (hsp3c) Runtime</a></li>
+			<li><a href="#HGIMG4TOOL">About HGIMG4 Tool Updates</a></li>
+			<li><a href="#HSP3DISH_DRAW">About HSP3Dish's boxf Drawing Command Fixes</a></li>
+			<li><a href="#PACKFILE_DPM">About Packing Multiple Files in DPM2 Format</a></li>
+			<li><a href="#HSP3DISH_HELPER">About the HSP3Dish Support Tool</a></li>
+			<li><a href="#DOTFW">About the Tamane Dot Framework</a></li>
+			<li><a href="#OGGFILE">About HSP3Dish Sound Playback</a></li>
+			<li><a href="#CELLOAD">About celload Command ID Allocation</a></li>
+		</ol>
+		
+		<!-- Body -->
+	<h2 id="HSP3UPDATE">HSP3.7 Update Overview</h2>
+		<p>
+		HSP3.7 can be used in the same way as HSP3.6, without any particular changes to be aware of.
+		The outline of the items changed in HSP3.7 is as follows. See <a href="history.txt">"history.txt"</a> for detailed corrections.
+		</p>
+
+		<dl>
+
+			<dt>
+			DPM File and File Encryption Embedding Function Updates
+			</dt><br>
+			<dd>
+			<p>
+			The file embedding function (PACKFILE) up to HSP3.6 had restrictions on the length of file names and did not support folder hierarchies.<br>
+			HSP3.7 updates the file embedding function to support folder structures, renew encryption, and support HGIMG4.
+			In addition, it can be used more conveniently than before by using it with HSP3Dish and strengthening the corresponding tools.
+			For details, please see <a href="hspprog.htm#PACKFILE">Programming Manual "File Packing and Encryption"</a>.<br>
+			</p>
+			</dd>
+
+			<dt>
+			Variable Name Management and Debug Function Expansion
+			</dt><br>
+			<dd>
+			<p>
+			HSP3.7 introduces new mechanisms for variable management and debugging to safely write large-scale scripts.<br>
+			Normally, variables defined in the script can be freely read and written after that.
+			If the scale of the script becomes large and the number of variables to be handled becomes enormous, there is a possibility that the contents of an already used variable will be overwritten by mistake, or an unexpected operation will occur due to a typo in the variable name.<br>
+			To avoid such problems, an option to display an error when a variable is referenced without initialization, and preprocessor commands such as #var, #varint, #varstr, #vardouble, etc. to explicitly initialize variables have been prepared.
+			By fixing the variable type or prohibiting assignment, it is possible to prevent unintended variable initialization or value overwrites. In addition, debugging functions for discovering problems related to variables have been expanded.<br>
+			For details, please see <a href="hspprog.htm#VAR_EX">Programming Manual "Variable Initialization and Protection"</a>.<br>
+			Furthermore, a variable debugging function has been added to record the contents in the debug log when a value is assigned to a specific variable.
+			For details, please see <a href="hspprog.htm#DEBUG_VARS">Programming Manual "Variable Debug Messages"</a>.
+			</p>
+			</dd>
+
+			<dt>
+			Source Analysis Function of Script Editor
+			</dt><br>
+			<dd>
+			<p>
+			HSP3.7 allows you to analyze the source being edited on the script editor and quickly access related variables, labels, user-defined commands/functions, etc.<br>
+			By using the <a href="hspprog.htm#GOTODEFINE">"Keyword Definition Jump Function"</a>,
+			<a href="hspprog.htm#ALLREFERENCE">"All References Search Function"</a>,
+			<a href="hspprog.htm#LABELLIST">"Label List Function"</a>,
+			you can properly grasp the flow even with a large script file. This is also a powerful support when checking the operation of samples or scripts created by other people.
+			</p>
+			</dd>
+
+			<dt>
+			Update Function Updates
+			</dt><br>
+			<dd>
+			<p>
+			HSP3.7 includes the HSP3 Updater (HSP3Update). This allows you to select and install necessary functions, extended plug-ins, materials, samples, etc.
+			This is an easy-to-use function that allows you to manage a wide range of installation packages, including updates published by users.<br>
+			From HSP3.7 beta 8 onwards, some functions are divided into packages so that necessary functions can be expanded from the minimum development set.
+			</p><pre>
+				hsp37 base package     Basic development functions for Windows
+				hsp37mp package         Functions for performing multi-platform development on Windows
+				hsp37hgimg3 package     Functions for performing HGIMG3 (legacy system) development on Windows
+				hsp37hgimg4dx package   Functions for performing HGIMG4 (DirectX updated version) development on Windows
+			</pre><p>
+			The HSP3 full set version includes the base package, multi-platform development, and HGIMG3.<br>
+			
+			For information on how to use the HSP3 Updater (HSP3Update), please see the <a href="hsp3update.html">HSP3 Updater (HSP3Update) Manual</a>.<br>
+			</p>
+			</dd>
+
+			<dt>
+			Addition of New Modules/Plug-ins
+			</dt><br>
+			<dd>
+			<p>
+			Various modules for expanding new functions have been expanded.
+			<a href="plugin.htm#mod_vpad">mod_vpad module</a> that supports virtual pads,
+			<a href="hspvoicevox.html">hspvoicevox plug-in</a> that supports various speech synthesis,
+			<a href="plugin.htm#mod_mmaudio">mod_mmaudio module</a> for acquiring Windows volume settings and volume level meters,
+			mod_mahjong module that summarizes simple mahjong processing,
+			mod_tamakeisd module for displaying Tamane-chan/Pro-Nama-chan SD upper body collaboration materials,
+			and many other new functions are available.
+			</p>
+			</dd>
+
+			<dt>
+			HSP3Dish Android Version Build Function Fixes
+			</dt><br>
+			<dd>
+			<p>
+			We have greatly changed the build function for android for <a href="hsp3dish_prog.htm">HSP3Dish</a>.<br>
+			The build method using the latest Gradle has been changed from the build using the ant tool up to HSP3.6.
+			This makes it possible to build aab format files necessary for distribution on the Google Play Store.<br>
+			You can use the HSP3Dish Helper tool, which supports conversion to devices as before, but please note that it is not compatible with existing projects, so you need to create a new one.<br>
+			In addition, the new HSP3Dish Helper adds functions such as creating and executing android emulators, managing release versions, and automatic execution after building.
+			</p>
+			</dd>
+
+			<dt>
+			HSP3 Bug Fixes
+			</dt><br>
+			<dd>
+			<p>
+			Several bugs reported after the HSP3.6 release have been fixed in the HSP3 interpreter core.<br>
+			Bugs in the assignment of module-type array variables, and bugs in which the number of significant digits of double-type real values defined by #const was small have been fixed.
+			</p>
+			</dd>
+
+			<dt>
+			Abolition of Legacy Functions
+			</dt><br>
+			<dd>
+			<p>
+			Some of the old HSP3 runtimes and tools have been discontinued.<br>
+			The "Compact (hsp3c) version runtime" and "Peas Editor" will be supported until HSP3.6.
+			</p>
+			</dd>
+
+		</dl>
+
+
+	<h2 id="USE">About the Preprocessor Command, "#use"</h2>
+		<p>
+		In HSP3.7, you can use the preprocessor command "#use" instead of the conventional "#include".<br>
+		The #use command combines separate script files in the same way as "#include", but allows you to easily specify files. For example, "#include "hsp3dish.as"" can be written as "#use hsp3dish". (Both are functionally the same result)
+		<br>
+		The #use command does not specify a string like ""hsp3dish.as"", but only a name with the extension removed, such as "hsp3dish". (The name specified by the parameter must be a character written in the same rules as variables.)<br>
+		A script file with ".as" added to the name specified by the parameter is combined.
+If a file with the extension ".as" does not exist, a file with the extension ".hsp" is searched.
+If a file with either extension does not exist, an error will occur.
+		<br>
+		Also, in the #use command, it is possible to describe multiple names in succession by separating them with the "," symbol.
+		</p>
+		<pre>
+		#use strict,hsp3dish,mod_appconfig
+		</pre>
+		<p>
+		In this way, you can call and specify files more concisely than before.
+		</p>
+
+
+	<h2 id="HSP3C">About the Compact (hsp3c) Runtime</h2>
+		<p>
+		The compact version runtime (hsp3c) up to HSP3.6 has been discontinued from HSP3.7.<br>
+		The compact version runtime used an old compiler to support operation after Windows 98,
+		The compact version runtime had few advantages other than a slight reduction in file size, and its execution efficiency on the current OS was poor, so we decided to discontinue it.<br>
+		Users who have been using hsp3c should continue to use the standard HSP3 runtime.
+		</p>
+
+
+	<h2 id="HGIMG4TOOL">About HGIMG4 Tool Updates</h2>
+		<p>
+		The following fixes have been made to HGIMG4.
+		</p>
+		<dl>
+
+			<dt>
+			HGIMG4 Tool (gpbconv) Function Fixes
+			</dt><br>
+			<dd>
+			<p>
+			Functionality of the HGIMG4 tool (gpbconv) used for 3D model conversion in <a href="hgimg4.html">HGIMG4</a> has been revised.<br>
+			In addition to the implemented preview function for converted 3D data, an option has been added to correct material names when they contain non-English characters, such as Japanese. This is because such names were not being correctly recognized during 3D model conversion.
+			Furthermore, an option has been added to combine animation data prepared in a separate FBX file with the model file.
+			</p>
+			</dd>
+
+			<dt>
+			Modifications to the getnearobj and getcoli commands
+			</dt><br>
+			<dd>
+			<p>
+			The getcoli command now allows you to set the range of IDs to be searched.
+			In addition, the getnearobj command, which searches for the nearest object, has been added.
+			<br>For details, please see the help file and the <a href="hgimg4.html">HGIMG4 manual</a>.<br>
+			</p>
+			</dd>
+
+			<dt>
+			Modifications to the gppraytest and gppsweeptest commands
+			</dt><br>
+			<dd>
+			<p>
+			The gppsweeptest command, which performs collision testing after moving a physically configured object, has been added.
+			In addition, an option has been added to the gppraytest command to perform collision group-based judgment.
+			<br>For details, please see the help file and the <a href="hgimg4.html">HGIMG4 manual</a>.<br>
+			</p>
+			</dd>
+
+		</dl>
+
+
+	<h2 id="HSP3DISH_DRAW">About the Correction of the boxf Drawing Command in HSP3Dish</h2>
+		<p>
+		A bug has been fixed in HSP3.7硫2 where the fill range of the boxf command in the Windows version of HSP3Dish differed from the standard runtime.<br>
+		The one pixel on the right and bottom that were not being drawn until now have been corrected to the normal behavior.
+		We believe this will not cause problems in most cases, but please note that the drawing results may differ in scripts that were created based on the previous behavior.
+		It is possible to return to the conventional drawing method by system request. In that case, please describe the setreq command as follows.
+		</p>
+		<pre>
+			setreq SYSREQ_OLDBOXF,1		; Maintain the boxf operation of HSP3.6
+		</pre>
+		<p>
+		</p>
+
+
+	<h2 id="PACKFILE_DPM">About Packing Multiple Files in DPM2 Format</h2>
+		<p>
+		From HSP3.7, the format of the data packed and embedded has become a new one called DPM2.
+		This allows for more flexible file packing and encryption with fewer restrictions than before.
+		In HSP3.7, multiple .dpm files can be used simultaneously, and the restrictions on file name length and size have been relaxed.
+		<br>
+		<b>*The specifications for file packing have been changed between HSP3.7硫3 and HSP3.7硫4 and later versions. The #pack and #epack commands now operate compatibly with HSP3.6, and the addition of folder structures and wildcards has been newly added as the #packdir and #epackdir commands.<br>
+		We apologize to those who have described their code according to the specifications of HSP3.7硫3, but please modify them to use the #packdir and #epackdir commands.</b>
+		<br>
+		For details, please refer to the <a href="hspprog.htm#PACKFILE">"File Packing and Encryption"</a> section.
+		</p>
+
+
+	<h2 id="HSP3DISH_HELPER">About HSP3Dish Support Tools</h2>
+		<p>
+		Tools have been newly added to support project settings and the creation of dpm files in HSP3Dish.
+		The following support tools can be launched from HSP3Dish Helper or the HSP script editor.
+		</p>
+		<pre>
+		Tool Name                         How to Launch
+		--------------------------------------------------------------------------
+		Dish P Helper                    From the HSP3Dish Helper Android tab
+		#packopt List Creation Tool         From the Script Editor "Tools" Menu
+		#pack List Creation Tool            From the Script Editor "Tools" Menu
+		Android/iOS Icon Creation Tool    From the HSP3Dish Helper Android/iOS tab
+		dotfw Map Editor              From the Script Editor "Tools" Menu
+		</pre>
+		<p>
+		</p>
+
+
+	<h2 id="DOTFW">About Tamane Dot Framework</h2>
+		<p>
+		"Tamane (珠音) Dot Framework" is a set of dot picture HSP3 official materials and libraries that can be used on HSP3Dish.
+		You can easily start creating retro-style original games with a simple instruction set specialized for games and an all-in-one material package. The created games can be released not only on Windows but also on the Web, Raspberry Pi, Linux, Android, and iOS.
+		Sample scripts are available in the "sample/dotfw" folder, so please try them out.
+		<br>
+		For details, please refer to the <a href="dotfw.html">Tamane Dot Framework Manual</a>.
+		</p>
+
+
+	<h2 id="OGGFILE">About Sound Playback in HSP3Dish</h2>
+		<p>
+		The sound playback in the Windows version of HSP3Dish and HGIMG4 has been updated.
+		A function has been added to separate the built-in sound system and use external sound-related plugins.
+		This allows you to play ogg files using the hspogg plugin.
+		In addition, the HGIMG3 and hspogg plugins have been modified to play ogg files in memory.
+		<br>
+		It is now possible to read sound data from the file system handled by HSP3, including encrypted dpm files and embedded data. You can also select the conventional method of playback by streaming, so you can use it depending on the situation.
+		</p>
+		<pre>
+		File Type                     Playback Method
+		--------------------------------------------------------------------------
+		wave format (extension .wav)             In-memory playback (embedded data support)
+		ogg vorbis format (extension .ogg)       In-memory playback (embedded data support)
+		ogg vorbis format (extension .s)         Streaming playback (embedded data not supported)
+		</pre>
+		<p>
+		For details, please refer to the <a href="hspogg.txt">hspogg manual</a>.
+		</p>
+
+
+	<h2 id="CELLOAD">About ID Assignment of the celload Command</h2>
+		<p>
+		From HSP3.7β4, the behavior when omitting (or specifying a negative value) the specification of the read window ID with the celload command and automatically assigning an ID has been modified.<br>
+		If the window ID parameter of the ceload command is omitted, if the same file name as an already loaded image file is specified, the loaded window ID will be reused.
+		This behavior applies to all platforms, including the standard HSP3 runtime and the HSP3Dish runtime.
+		<br>
+		This allows you to share resources and save memory when trying to load duplicate images.
+		It prevents resource duplication when using images in external modules or when reusing sources.
+		(In existing versions, a new ID is always assigned even if duplicate images are loaded.)
+		<br>
+		Due to this change, ID mismatches may occur in existing scripts that load duplicate image files into multiple different window IDs.
+		If you do not want to reuse the window ID, specify celid_auto (or -1) as a parameter, such as "celload "a.png",celid_auto".
+		<br>
+		For details, please refer to <a href="hspprog.htm#CEL_FUNCTION">About CEL related commands</a>.
+		</p>
+
+
+		<!-- フッター -->
+		<ul id="FOOTER">
+			<li><a href="#CONTAINER">Back to the top of this page</a></li>
+			<li><a href="../index.htm">Return to the list of documents</a></li>
+			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
+		</ul>
+		<a href="https://www.onionsoft.net/hsp/">
+			<img src="img/onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+		</a>
+	</div><!-- container -->
+</body>
+</html>

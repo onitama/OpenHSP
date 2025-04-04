@@ -1,107 +1,104 @@
 ------------------------------------------------------------------------------
-OBAQ Model Editor ver0.1 MANUAL                     HSP : Hot Soup Processor  
-HSP Support Tool Reference copyright 2014 (c) onion software
+OBAQ Model Editor ver0.1 MANUAL                     HSP : Hot Soup Processor
+HSP Support Tool Reference          copyright 2014 (c) onion software
 ------------------------------------------------------------------------------
 
-繝サ Introduction
+・Introduction
 
-OBAQ Model Editor is available with HSP plugin obaq.dll
-It is a tool that can easily create a 2D shape and output it as a data file.
+	OBAQ Model Editor is a tool for easily creating 2D shapes that can be used with the
+	HSP plugin obaq.dll and outputting them as data files.
 
-It is an editor for creating polygonal shapes while checking them on the screen.
-The created data is saved and recalled in a special format called ".qvd".
-You can do it. Also, create the created data from the HSP3 script.
-A module for loading is also included.
-It has only simple functions.
-Since the source script is attached, anyone can reorganize and add
-You can distribute it.
-
-
-ツキstarting method
-
-obaqme.hsp in the sample / obaq folder with a script editor
-Please read and execute.
-If necessary, press the [F9] key (automatic executable file creation) to create an exe file.
-You can create and run (obaqme.exe).
+	It is an editor for creating polygonal shapes while checking them on the screen.
+	The created data can be saved and loaded in a dedicated format called ".qvd".
+	A module for loading the created data from HSP3 scripts is also included.
+	It only has basic functions.
+	The source script is included, so anyone can modify, add to, and
+	distribute it.
 
 
-揃Change log
+・How to Launch
+
+	Load obaqme.hsp, located in the sample/obaq folder, with a script editor and
+	execute it.
+	If necessary, you can create an executable file (obaqme.exe) by pressing the
+	[F9] key (automatic executable file creation) and execute it.
+
+
+・Update History
 
 	2010/1/28 ver0.1
 
-First version.
+		Initial version.
 
 
-揃basic operation
+・Basic Operation
 
-The one created on the edit screen will be loaded and saved as one model.
-On the edit screen, left-click to set the vertices and create the shape.
-The red dot in the center is the center of gravity.
+	What is created on the editing screen becomes the target of loading and saving as a single model.
+	Create shapes by setting vertices with left-clicks on the editing screen.
+	The red dot in the center is the center of gravity.
 
-* Be sure to place the apex "counterclockwise" (counterclockwise).
+	※Be sure to place vertices in a "counter-clockwise" direction.
 
-When creating a shape, be sure to go around and return to the same location as the first vertex. When it returns to the first vertex, it is considered as one polygon (closed shape).
+	When creating a shape, be sure to go around once and return to the same location as the first vertex.
+	A polygon (closed shape) is recognized at the point when you return to the first vertex.
 
-You can combine multiple polygons in one model.
+	A single model can combine multiple polygons.
 
-The only polygon that OBAQ can handle is a convex body.
-Complex shapes do not try to create one polygon, but multiple polygons
-Please try to combine.
-
-
-繝サ Vertex editing
-
-Press the [ctrl] key to enter vertex edit mode.
-If you press the [ctrl] key on an existing vertex, that vertex will be edited.
-Become. If you press the [ctrl] key in an empty space, you edited it before.
-The vertices are subject to editing.
-(The vertices to be edited can be changed with the left and right cursor keys)
-
-By holding down [ctrl] and clicking a new location with the left button,
-You can change the coordinates of the vertex you are editing.
-Also, hold down [ctrl] and click the right button to delete the vertices.
-can.
-However, it is safe to delete vertices, so the cursor will move to the target vertex.
-It will only be executed when it is pointing.
-
-ツキpreview
-
-By pressing the "TEST" button, the model currently being edited can be selected.
-You can check it by displaying it in a separate window.
+	The only types of polygons that OBAQ can handle are convex.
+	Do not try to create complex shapes with a single polygon, but combine multiple
+	polygons.
 
 
-・ Load and save
+・Vertex Editing
 
-By pressing the "SAVE" and "LOAD" buttons, the data currently being edited can be displayed.
-You can save and load to a file.
-Saved files have a ".qvd" extension.
+	Pressing the [ctrl] key enters vertex editing mode.
+	If you press the [ctrl] key on an existing vertex, that vertex becomes the target of editing.
+	If you press the [ctrl] key in an empty space, the previously edited
+	vertex becomes the target of editing.
+	(The vertex to be edited can be changed with the left and right cursor keys.)
 
+	By clicking a new location with the left button while holding down [ctrl], you can
+	change the coordinates of the vertex being edited.
+	Also, you can delete a vertex by clicking the right button while holding down [ctrl].
+	However, for safety, vertex deletion is only performed when the cursor is
+	pointing at the target vertex.
 
-・ Convert
+・Preview
 
-By pressing the "CONVERT" button, in a form available from the script
-Create a binary file.
-The file created here will have the extension ".qvb" added.
-Unnecessary for editing, unlike the format used for loading and saving tools
-The data has been removed.
-
-
--Read module
-
-Script .qvb files by using "mod_qvb.as"
-It can be read.
-A sample (qvbtest.hsp) is also included, so please refer to it.
+	By pressing the "TEST" button, you can view the currently edited model
+	in a separate window to check it.
 
 
-・ Copyright and license
+・Load, Save
 
-The copyright of OBAQ Model Editor belongs to ONION software / onitama.
-OBAQ Model Editor is available under a BSD license, whether paid or free.
-It can be attached, duplicated, reorganized and redistributed.
-Data created by the user using the tool, and generated scripts
-The right belongs to the user who created it.
+	By pressing the "SAVE" and "LOAD" buttons, you can save and load the data
+	you are currently editing to a file.
+	The saved file will have the ".qvd" extension.
+
+
+・Convert
+
+	By pressing the "CONVERT" button, you can create a binary file in a form that can be used from a script.
+	The file created here has the extension ".qvb".
+	Unlike the format used for loading and saving in the tool, unnecessary
+	data for editing is removed.
+
+
+・Loading Module
+
+	By using "mod_qvb.as", you can load .qvb files into a script.
+	A sample (qvbtest.hsp) is also included, so please refer to it.
+
+
+・Copyright and License
+
+	The copyright for OBAQ Model Editor is held by ONION software/onitama.
+	OBAQ Model Editor can be attached, copied, modified, and redistributed
+	under the BSD license, whether for commercial or non-commercial purposes.
+	The rights to data created by the user using the tool and the generated scripts
+	belong to the user who created them.
 
 
 -------------------------------------------------------------------------------
-                                                HSP users manual / end of file 
+                                                HSP users manual / end of file
 -------------------------------------------------------------------------------

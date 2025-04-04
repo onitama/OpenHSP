@@ -1,10 +1,10 @@
 ;
-;HELP source file for HSP help manager
-;(Lines beginning with; are treated as comments)
+; HELP source file for HSP help manager
+; (Lines starting with ; are treated as comments)
 ;
 
 %type
-Extension instructions
+Extended command
 %ver
 3.6
 %note
@@ -23,19 +23,19 @@ Win
 
 %index
 bmppalette
-Read bmp image palette information
+Read BMP image palette information
 %group
-Extended screen control command
+Extended screen control commands
 %prm
-"file name"
-"File name": BMP image file name to extract the palette
+"Filename"
+"Filename": The BMP image filename from which to extract the palette.
 
 %inst
-Reads the palette information included in the 8-bit format bmp image file and retrieves it as an HSP palette.
-Normally, when loading an image in palette mode using the picload command, the palette information attached to the file cannot be loaded.
-It can be used when you need the palette information in the file, such as the hspdx extension plugin.
-Only 8BIT format BMP files can be specified as files.
-If any other file or incorrect format is specified, nothing will be done.
+Reads the palette information contained in an 8-bit BMP image file and retrieves it as an HSP palette.
+Normally, the picload command in palette mode cannot read the palette information attached to the file.
+This command can be used when file palette information is required, such as with the hspdx extended plugin.
+Only 8-bit BMP files can be specified as files.
+If any other file or an incorrect format is specified, nothing is performed.
 
 %href
 palette
@@ -47,13 +47,13 @@ getpal
 gettimestr
 Get the current time as a string
 %group
-Extended I / O control instructions
+Extended input/output control commands
 %prm
 p1
-p1: Variable name to get the character string
+p1: The variable name to store the string.
 
 %inst
-Gets the current time and assigns it to the variable as a string format of "hh: mm: ss".
+Retrieves the current time and assigns it to a variable as a string in "hh:mm:ss" format.
 
 %href
 getdatestr
@@ -64,13 +64,13 @@ getdatestr
 getdatestr
 Get the current date as a string
 %group
-Extended I / O control instructions
+Extended input/output control commands
 %prm
 p1
-p1: Variable name to get the character string
+p1: The variable name to store the string.
 
 %inst
-Gets the current date and assigns it to a variable in the string format "yyyy / mm / dd".
+Retrieves the current date and assigns it to a variable as a string in "yyyy/mm/dd" format.
 
 %href
 gettimestr
@@ -79,19 +79,19 @@ gettimestr
 
 %index
 text
-Set the waiting time for displaying qualified characters
+Set the waiting time for decorated text display
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1
-p1 (0): Display wait time (ms)
+p1(0): Display waiting time (ms)
 
 %inst
-Sets the waiting time for characters displayed by the emes instruction.
+Sets the waiting time for characters displayed by the emes command.
 Specify the waiting time (in milliseconds) for each character with p1.
-If you specify a value of 0 or less for p1, it will be displayed all at once without waiting for each character.
-The text instruction is treated as an extension instruction using a module instead of the standard from HSP3.
-Note that unlike HSP2.x, the waiting time specified by the text instruction is reflected in the emes instruction.
+If p1 is set to a value less than or equal to 0, it will be displayed at once without waiting for each character.
+The text command is treated as an extended command using a module instead of being standard from HSP3.
+Please note that, unlike HSP2.x, the waiting time specified by the text command is reflected in the emes command.
 
 %href
 textmode
@@ -100,25 +100,25 @@ emes
 
 %index
 textmode
-Set modifier character display
+Set decorated text display
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1,p2
-p1 (0): Modifier mode
-p2 (0): Adjustment parameters
+p1(0): Decoration character mode
+p2(0): Adjustment parameter
 
 %inst
-Set the modifier characters displayed by the emes command.
-Specify the mode with p1. The mode values are as follows.
+Sets the decoration characters displayed by the emes command.
+Specify the mode with p1. The mode values are as follows:
 ^p
 Mode 0: Normal display
 Mode 1: Shadowed display
-Mode 2: Contoured display
+Mode 2: Outlined display
 ^p
-When modes 1 and 2 are specified, the color set at the time of executing the textmode command is used for shadows and contours.
-You can also modify the shadow and contour distances by setting adjustment parameters on p2.
-If the adjustment parameter is 0, the minimum distance (1 dot) is set and the distance increases as the value increases.
+If mode 1 or 2 is specified, the color set at the time of executing the textmode command will be used for shadows or outlines.
+Also, you can modify the shadow or outline distance by setting the adjustment parameter to p2.
+If the adjustment parameter is 0, the minimum distance (1 dot) is used, and the distance increases as the value increases.
 
 %href
 text
@@ -128,18 +128,18 @@ emes
 
 %index
 emes
-Show modifier characters
+Display decorated characters
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 "strings"
-"strings": Messages or variables to display
+"strings": Message or variable to display
 
 %inst
-Displays modifier characters.
-The emes command displays a character string on the screen in the same way as the mes command, but at that time, the characters can be modified or displayed slowly one character at a time.
-You can use the textmode instruction to set modifier characters.
-In addition, the display speed of modifier characters can be specified with the text instruction.
+Displays decorated characters.
+The emes command displays strings on the screen in the same way as the mes command, but at that time, the characters can be decorated or displayed slowly one by one.
+The decoration character settings can be made with the textmode command.
+Also, the display speed of decoration characters can be specified with the text command.
 
 %href
 textmode
@@ -152,20 +152,20 @@ text
 gfade
 Fade the screen
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1,p2,p3,p4,p5
-p1 (0): Fade level (0 to 256)
-(p2, p3): Upper left X, Y coordinates to fade
-(p4, p5): X, Y size to fade
+p1(0): Fade level (0-256)
+(p2,p3): X,Y coordinates of the upper left corner to fade
+(p4,p5): X,Y size to fade
 
 %inst
-Performs a fixed color fade on the specified area for a full-color screen.
-This command is for fading in, fading out, etc. by changing the fade level every hour.
-Specify the fade level with p1. If it is 0, the screen will not be affected.
-When p1 is 256, it will be completely filled with the specified color.
-Specify the upper left X and Y coordinates to fade with (p2, p3). If omitted, it will be (0,0).
-Specify the X and Y sizes to fade with (p4, p5). If omitted, the size of the entire screen is used.
+Fades a specified area of the full-color screen with a fixed color fade.
+This command is for changing the fade level over time to perform fade-in, fade-out, etc.
+Specify the fade level with p1. If it is 0, it has no effect on the screen.
+When p1 is 256, it is completely filled with the specified color.
+Specify the X,Y coordinates of the upper left corner to fade with (p2, p3). If omitted, (0,0) is used.
+Specify the X,Y size to fade with (p4, p5). If omitted, the entire screen size is used.
 
 %href
 
@@ -176,19 +176,19 @@ Specify the X and Y sizes to fade with (p4, p5). If omitted, the size of the ent
 statictext
 Place static text
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 "strings",p1,p2
-"strings": Static text strings
-p1 (0): X size
-p2 (0): Y size
+"strings": Static text string
+p1(0): X size
+p2(0): Y size
 
 %inst
 Generates static text as a placement object from the current current position.
-The placed object ID is assigned to the system variable stat.
-You can specify the size of the object to be placed with (p1, p2).
-If you want to change the contents of the placed static text, use the statictext_set instruction.
-Note that the objprm instruction cannot be used.
+The ID of the placed object is assigned to the system variable stat.
+The size of the placed object can be specified by (p1, p2).
+To change the contents of the placed static text, use the statictext_set command.
+Note that the objprm command cannot be used.
 
 %href
 statictext_set
@@ -199,15 +199,15 @@ statictext_set
 statictext_set
 Change static text
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1,"strings"
-p1 (0): Object ID
-"strings": Static text strings
+p1(0): Object ID
+"strings": Static text string
 
 %inst
-Change the content of static text placed by the statictext instruction.
-You can specify the object ID in p1 and specify the newly set static text string in "strings".
+Changes the contents of the static text placed with the statictext command.
+You can specify the object ID in p1 and specify the string of the static text to be newly set in "strings".
 
 %href
 statictext
@@ -217,22 +217,22 @@ statictext
 
 %index
 scrollbar
-Place scroll bar
+Place a scroll bar
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1,p2
-p1 (0): X size
-p2 (0): Y size
+p1(0): X size
+p2(0): Y size
 
 %inst
 Generates a scroll bar as a placement object from the current current position.
-The placed object ID is assigned to the system variable stat.
-You can specify the size of the object to be placed with (p1, p2).
-This instruction supports creating a scrollbar as a placement object.
-Sending and receiving messages to the placed scroll bar must be performed separately with the sendmsg command.
-In that case, a separate document related to the scroll bar message of WIN32API is required.
-Also note that the objprm instruction cannot be used for placed objects.
+The ID of the placed object is assigned to the system variable stat.
+The size of the placed object can be specified by (p1, p2).
+This command supports generating scroll bars as placement objects.
+Message transmission/reception to/from the placed scroll bar must be performed separately by the sendmsg command.
+In that case, documentation on WIN32API scroll bar messages is required separately.
+Also, note that the objprm command cannot be used for the placed object.
 
 %href
 
@@ -244,18 +244,18 @@ Also note that the objprm instruction cannot be used for placed objects.
 progbar
 Place a progress bar
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1,p2
-p1 (0): X size
-p2 (0): Y size
+p1(0): X size
+p2(0): Y size
 
 %inst
 Generates a progress bar as a placement object from the current current position.
-The placed object ID is assigned to the system variable stat.
-You can specify the size of the object to be placed with (p1, p2).
-Use the progbar_set and progbar_step instructions to advance the placed progress bar.
-Also note that the objprm instruction cannot be used for placed objects.
+The ID of the placed object is assigned to the system variable stat.
+The size of the placed object can be specified by (p1, p2).
+To advance the placed progress bar, use the progbar_set and progbar_step commands.
+Also, note that the objprm command cannot be used for the placed object.
 
 %href
 progbar_set
@@ -267,17 +267,17 @@ progbar_step
 progbar_set
 Set the progress bar step increment
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1,p2
-p1 (0): Object ID
-p2 (0): Incremental value
+p1(0): Object ID
+p2(0): Increment value
 
 %inst
-By specifying the object ID in p1, you can set the step-by-step increment of the progress bar placed by the progbar instruction.
+By specifying the object ID in p1, you can set the increment for each step of the progress bar placed by the progbar command.
 The progress bar has a value from 0 to 100 as a counter by default.
-On the other hand, increments are added step by step.
-If you do not specify an increment, the default value is 10.
+The increment is added to this for each step.
+The default value when the increment is not specified is 10.
 
 %href
 progbar_step
@@ -287,16 +287,16 @@ progbar
 
 %index
 progbar_step
-Take the progress bar one step
+Advance the progress bar by one step
 %group
-Extended screen control command
+Extended screen control commands
 %prm
 p1
-p1 (0): Object ID
+p1(0): Object ID
 
 %inst
-By specifying the object ID in p1, the progress bar placed by the progbar instruction is advanced by one step.
-The step-by-step increment can be specified with the progbar_set instruction.
+By specifying the object ID in p1, you can advance the progress bar placed by the progbar command by one step.
+The increment for each step can be specified by the progbar_set command.
 
 %href
 progbar_set
@@ -309,16 +309,16 @@ progbar
 note2array
 Convert multi-line string to array
 %group
-Extended I / O control instructions
+Extended input/output control commands
 %prm
 p1,p2
 p1: Variable to assign the converted array
-p2: Variable to which a multi-line character string is assigned
+p2: Variable in which the multi-line string is assigned
 
 %inst
-Divide a multi-line string into lines and assign them to each element of the array variable.
-Converts the multi-line character string specified in p2 to the variable specified in p1 and assigns it.
-The variable of p1 is always a character string type one-dimensional array variable.
+Divides a multi-line string into lines and assigns them to each element of the array variable.
+The multi-line string specified in p2 is converted and assigned to the variable specified in p1.
+The variable p1 is always a string-type one-dimensional array variable.
 
 %href
 array2note
@@ -330,17 +330,17 @@ arrayload
 
 %index
 array2note
-Convert an array to a multi-line string
+Convert array to multi-line string
 %group
-Extended I / O control instructions
+Extended input/output control commands
 %prm
 p1,p2
-p1: Variable that substitutes the converted character string
-p2: Variable whose string is assigned to the array
+p1: Variable to assign the converted string
+p2: Variable in which the string is assigned to the array
 
 %inst
-Converts a one-dimensional array variable of character string type to a multi-line character string.
-Converts the contents of the character string type one-dimensional array variable specified by p2 and assigns it to the variable specified by p1.
+Converts a string-type one-dimensional array variable into a multi-line string.
+The contents of the string-type one-dimensional array variable specified in p2 are converted and assigned to the variable specified in p1.
 
 %href
 note2array
@@ -351,18 +351,18 @@ arrayload
 
 %index
 arraysave
-Write a string type array variable to a file
+Write string-type array variable to file
 %group
-Extended I / O control instructions
+Extended input/output control commands
 %prm
-"Filename", p1
-"File name": File name to export
-p1: Original variable to export
+"Filename",p1
+"Filename": Filename to write to
+p1: Variable to write from
 
 %inst
-Converts the character string type one-dimensional array variable specified in p1 to a multi-line character string, and then writes it out with the specified file name.
+The string-type one-dimensional array variable specified in p1 is converted to a multi-line string and written to the specified filename.
 Only one-dimensional arrays can be handled.
-The exported file can be read by the arrayload command.
+The written file can be read by the arrayload command.
 
 %href
 note2array
@@ -373,24 +373,20 @@ arrayload
 
 %index
 arrayload
-Read a string type array variable from a file
+Load string-type array variable from file
 %group
-Extended I / O control instructions
+Extended input/output control commands
 %prm
-"Filename", p1
-"File name": The name of the file to be read
-p1: Variable to read
+"Filename",p1
+"Filename": Filename to read from
+p1: Variable to read to
 
 %inst
-The file written by the arraysave command is read into the variable specified by p1.
-This command converts a line of a multi-line character string contained in a file into an array element and substitutes it, and the created array array becomes a one-dimensional array.
+Reads the file written by the arraysave command into the variable specified by p1.
+This command converts the lines of the multi-line string contained in the file into array elements and assigns them, and the created array is a one-dimensional array.
 
 
 %href
 note2array
 array2note
 arraysave
-
-
-
-

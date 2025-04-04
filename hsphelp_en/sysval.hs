@@ -1,20 +1,20 @@
 ;
-;HELP source file for HSP help manager
-;(Lines beginning with ";" are treated as comments)
+;	HELP source file for HSP help manager
+;	(Lines starting with ";" are treated as comments)
 ;
 
 %type
-HSP system variables
+HSP System Variables
 %ver
-3.6
+3.7
 %note
-ver3.6 standard
+ver3.7 standard
 %date
-2017/09/16
+2025/01/22
 %author
 onitama
 %url
-http://www.onionsoft.net/
+https://www.onionsoft.net/
 %port
 Win
 Cli
@@ -24,21 +24,21 @@ Let
 ;---------------------------------------------------------------------
 %index
 hspstat
-HSP runtime information
+HSP Runtime Information
 
 %group
-System variables
+System Variables
 
 %inst
-HSP runtime information is assigned as an integer value. All of the following information is the sum of the values.
+Information about the HSP runtime is assigned as an integer value. This value is the sum of all the following information:
  Debug mode = 1
- When the screen saver is started = 2
+ Screen saver active = 2
  Console mode = 16
- Macintosh version HSP = $ 80
+ Macintosh version of HSP = $80
  HSP3Dish = $100
- Linux version HSP = $ 1000
- UTF8 string runtime = $ 20000
- 64-bit runtime = $ 40000
+ Linux version of HSP = $1000
+ UTF8 string runtime = $20000
+ 64-bit runtime = $40000
 
 %href
 _debug
@@ -46,13 +46,13 @@ _debug
 ;---------------------------------------------------------------------
 %index
 hspver
-HSP version number
+HSP Version Number
 
 %group
-System variables
+System Variables
 
 %inst
-The HSP version number is assigned as an integer value. It is the value of version code + minor version code. (3.0 becomes $ 3 ???)
+The HSP version number is assigned as an integer value.  It is the value of the version code + minor version code (3.0 will be $3???).
 
 %href
 __hspver__
@@ -60,13 +60,13 @@ __hspver__
 ;---------------------------------------------------------------------
 %index
 cnt
-Loop counter
+Loop Counter
 
 %group
-System variables
+System Variables
 
 %inst
-The repeat to loop loop counter is assigned as an integer value.
+The counter for the repeatÅ`loop loop is assigned as an integer value.
 
 %href
 repeat
@@ -76,13 +76,13 @@ loop
 ;---------------------------------------------------------------------
 %index
 err
-HSP error code
+HSP Error Code
 
 %group
-System variables
+System Variables
 
 %inst
-HSP error code. Please refer to the separate manual (error.htm) for the correspondence between error codes and messages.
+The HSP error code. See the separate manual (error.htm) for the correspondence between error codes and messages.
 
 
 %href
@@ -92,13 +92,13 @@ onerror
 ;---------------------------------------------------------------------
 %index
 stat
-Status values for various instructions
+Status Value of Various Commands
 
 %group
-System variables
+System Variables
 
 %inst
-The result (status) of executing various instructions is assigned as an integer value.
+The result (status) of executing various commands is assigned as an integer value.
 
 %href
 return
@@ -108,16 +108,16 @@ mref
 ;---------------------------------------------------------------------
 %index
 mousex
-X coordinate of mouse cursor
+Mouse Cursor X Coordinate
 
 %group
-System variables
+System Variables
 
 %inst
 The X coordinate of the mouse cursor is assigned as an integer value.
 
 %sample
-Draw a line along the movement of the mouse pointer
+	; Draw a line following the movement of the mouse pointer
 	repeat
 		line mousex, mousey
 		wait 1
@@ -131,16 +131,16 @@ ginfo_mx
 ;---------------------------------------------------------------------
 %index
 mousey
-Y coordinate of mouse cursor
+Mouse Cursor Y Coordinate
 
 %group
-System variables
+System Variables
 
 %inst
 The Y coordinate of the mouse cursor is assigned as an integer value.
 
 %sample
-Draw a line along the movement of the mouse pointer
+	; Draw a line following the movement of the mouse pointer
 	repeat
 		line mousex, mousey
 		wait 1
@@ -155,13 +155,13 @@ ginfo_my
 ;---------------------------------------------------------------------
 %index
 mousew
-Mouse cursor wheel value
+Mouse Cursor Wheel Value
 
 %group
-System variables
+System Variables
 
 %inst
-The amount of movement of the mouse with a wheel is assigned as an integer value.
+The amount of movement of a mouse with a wheel is assigned as an integer value.
 
 %href
 mousex
@@ -172,13 +172,13 @@ Let
 ;---------------------------------------------------------------------
 %index
 strsize
-Number of bytes to read
+Number of Bytes Read
 
 %group
-System variables
+System Variables
 
 %inst
-The number of bytes read by the getstr, exist, bload command, etc. is assigned.
+The number of bytes read by commands such as getstr, exist, and bload is assigned.
 
 %href
 bload
@@ -188,14 +188,14 @@ getstr
 ;---------------------------------------------------------------------
 %index
 refstr
-Status strings for various instructions
+Status String of Various Commands
 
 
 %group
-System variables
+System Variables
 
 %inst
-The character string as a result of executing various instructions is assigned.
+The string result of executing various commands is assigned.
 
 %href
 return
@@ -205,13 +205,13 @@ mref
 ;---------------------------------------------------------------------
 %index
 looplev
-Nested level of repeat
+Repeat Nesting Level
 
 %group
-System variables
+System Variables
 
 %inst
-The nesting level of repeat ~ loop is assigned.
+The nesting level of repeatÅ`loop is assigned.
 
 %href
 repeat
@@ -221,13 +221,13 @@ loop
 ;---------------------------------------------------------------------
 %index
 sublev
-Subroutine nesting level
+Subroutine Nesting Level
 
 %group
-System variables
+System Variables
 
 %inst
-The nesting level of the subroutine (or user-defined instruction, function) is assigned.
+The nesting level of subroutines (or user-defined commands and functions) is assigned.
 
 %href
 gosub
@@ -236,15 +236,15 @@ return
 ;---------------------------------------------------------------------
 %index
 iparam
-A value that indicates the interrupt factor
+Value Indicating Interrupt Cause
 
 %group
-System variables
+System Variables
 
 %inst
-A value indicating the interrupt factor is assigned.
-When interrupted by the oncmd instruction, the interrupt message ID is assigned.
-At the end interrupt by the onexit instruction, 0 is assigned if the end is due to a normal window close, and 1 is assigned if the end is due to a system notification such as shutdown.
+A value indicating the cause of the interrupt is assigned.
+When interrupted by the oncmd command, the ID of the interrupt message is assigned.
+When exiting with the onexit command, 0 is assigned if it is a normal window close, and 1 is assigned if it is a system notification such as shutdown.
 
 
 %href
@@ -260,7 +260,7 @@ oncmd
 	onkey goto *lab
 	stop
 *lab
-mes "key code:" + wparam + ", character code:" + iparam
+	mes "Key Code : "+wparam+", Character Code : "+iparam
 	stop
 %port-
 Let
@@ -268,13 +268,13 @@ Let
 ;---------------------------------------------------------------------
 %index
 wparam
-WParam at interrupt
+wParam at Interrupt Time
 
 %group
-System variables
+System Variables
 
 %inst
-The Windows system value (wParam) saved on interrupt is assigned.
+The Windows system value (wParam) saved at the time of the interrupt is assigned.
 
 %href
 onkey
@@ -290,7 +290,7 @@ oncmd
 	stop
 *lab
 	a = lparam>>24&1
-mes "key code:" + wparam + ", extended key flag:" + a
+	mes "Key Code : "+wparam+", Extended Key Flag : "+a
 	stop
 %port-
 Let
@@ -298,13 +298,13 @@ Let
 ;---------------------------------------------------------------------
 %index
 lparam
-LParam on interrupt
+lParam at Interrupt Time
 
 %group
-System variables
+System Variables
 
 %inst
-The Windows system value (lParam) that is saved on interrupt is assigned.
+The Windows system value (lParam) saved at the time of the interrupt is assigned.
 
 %href
 onkey
@@ -320,7 +320,7 @@ oncmd
 	stop
 *lab
 	a = lparam>>24&1
-mes "key code:" + wparam + ", extended key flag:" + a
+	mes "Key Code : "+wparam+", Extended Key Flag : "+a
 	stop
 %port-
 Let
@@ -328,14 +328,14 @@ Let
 ;---------------------------------------------------------------------
 %index
 hwnd
-Current window handle
+Current Window Handle
 
 %group
-System variables
+System Variables
 
 %inst
 The handle (pointer) of the currently selected window is assigned.
-It is mainly referred to when it is necessary for external calls such as DLLs.
+It is mainly referenced when necessary for external calls such as DLLs.
 
 %href
 mref
@@ -343,14 +343,14 @@ mref
 ;---------------------------------------------------------------------
 %index
 hdc
-Current device context
+Current Device Context
 
 %group
-System variables
+System Variables
 
 %inst
 The device context (pointer) of the currently selected window is assigned.
-It is mainly referred to when it is necessary for external calls such as DLLs.
+It is mainly referenced when necessary for external calls such as DLLs.
 
 %href
 mref
@@ -358,14 +358,14 @@ mref
 ;---------------------------------------------------------------------
 %index
 hinstance
-Current instance handle
+Current Instance Handle
 
 %group
-System variables
+System Variables
 
 %inst
 The instance handle (pointer) of the currently running application is assigned.
-It is mainly referred to when it is necessary for external calls such as DLLs.
+It is mainly referenced when necessary for external calls such as DLLs.
 
 %href
 mref
@@ -375,13 +375,13 @@ Let
 ;---------------------------------------------------------------------
 %index
 refdval
-Status real value of various instructions
+Status Real Value of Various Commands
 
 %group
-System variables
+System Variables
 
 %inst
-The real value of the result of executing various instructions is assigned.
+The real number result of executing various commands is assigned.
 
 %href
 return
@@ -389,15 +389,15 @@ return
 ;---------------------------------------------------------------------
 %index
 thismod
-Currently valid module variables
+Current Valid Module Variable
 
 %group
-System variables
+System Variables
 
 %inst
-In user-defined instructions / functions for module variable processing
-It can be used as a name to indicate the passed module variable itself.
-It can be used when calling another instruction / function from the routine defined by #modfunc.
+Within user-defined commands/functions for module variable processing,
+it can be used as a name indicating the module variable itself that was passed.
+It can be used when calling another command/function from a routine defined by #modfunc.
 
 %href
 newmod
@@ -408,16 +408,16 @@ Let
 ;---------------------------------------------------------------------
 %index
 notemax
-Number of lines in the memory notepad
+Number of Lines in Memory Notepad
 
 %group
-System variables
+System Variables
 
 %inst
-It can be used as a system variable to indicate the total number of rows in the currently selected memory notepad.
-Similar information can be obtained with the noteinfo function.
+Can be used as a system variable that indicates the number of lines in the currently selected memory notepad.
+Similar information can also be obtained with the noteinfo function.
 ^
-* This system variable is defined in hspdef.as as a macro.
+*This system variable is defined as a macro within hspdef.as.
 
 %href
 noteinfo
@@ -425,17 +425,17 @@ noteinfo
 ;---------------------------------------------------------------------
 %index
 notesize
-Number of characters in memory notepad
+Number of Characters in Memory Notepad
 
 %group
-System variables
+System Variables
 
 %inst
-Indicates the total number of characters (bytes) of the currently selected memory notepad
-It can be used as a system variable.
-Similar information can be obtained with the noteinfo function.
+Indicates the total number of characters (bytes) in the currently selected memory notepad.
+Can be used as a system variable.
+Similar information can also be obtained with the noteinfo function.
 ^
-* This system variable is defined in hspdef.as as a macro.
+*This system variable is defined as a macro within hspdef.as.
 
 %href
 noteinfo
@@ -443,16 +443,16 @@ noteinfo
 ;---------------------------------------------------------------------
 %index
 ginfo_mx
-Mouse cursor X coordinates on screen
+Mouse Cursor X Coordinate on Screen
 
 %group
-System variables
+System Variables
 
 %inst
-The X coordinate of the mouse cursor on the screen has been assigned.
-The screen coordinate system is the coordinates seen from the entire desktop screen, not the coordinates in the window used by the pos command.
+The X coordinate of the mouse cursor on the screen is assigned.
+The screen coordinate system is not the coordinate within the window used by the pos command, but the coordinate seen from the entire desktop screen.
 ^
-* This system variable is defined in hspdef.as as a macro.
+*This system variable is defined as a macro within hspdef.as.
 
 %href
 ginfo
@@ -461,16 +461,16 @@ ginfo_my
 ;---------------------------------------------------------------------
 %index
 ginfo_my
-Mouse cursor Y coordinate on screen
+Mouse Cursor Y Coordinate on Screen
 
 %group
-System variables
+System Variables
 
 %inst
-The Y coordinate of the mouse cursor on the screen has been assigned.
-The screen coordinate system is the coordinates seen from the entire desktop screen, not the coordinates in the window used by the pos command.
+The Y coordinate of the mouse cursor on the screen is assigned.
+The screen coordinate system is not the coordinate within the window used by the pos command, but the coordinate seen from the entire desktop screen.
 ^
-* This system variable is defined in hspdef.as as a macro.
+*This system variable is defined as a macro within hspdef.as.
 
 %href
 ginfo
@@ -479,16 +479,16 @@ ginfo_mx
 ;---------------------------------------------------------------------
 %index
 ginfo_act
-Active window ID
+Active Window ID
 
 %group
-System variables
+System Variables
 
 %inst
-The currently active window ID has been assigned.
+The ID of the currently active window is assigned.
 If the active window is other than HSP, it will be -1.
 ^
-* This system variable is defined in hspdef.as as a macro.
+*This system variable is defined as a macro within hspdef.as.
 
 %href
 ginfo
@@ -496,15 +496,15 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_sel
-Operation destination window ID
+Operation Target Window ID
 
 %group
-System variables
+System Variables
 
 %inst
-The operation destination window ID of the screen specified by the gsel instruction is assigned.
+The operation target window ID specified by the gsel command is assigned.
 ^
-* This system variable is defined in hspdef.as as a macro.
+*This system variable is defined as a macro within hspdef.as.
 
 %href
 gsel
@@ -513,16 +513,17 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_wx1
-Top left X coordinate of the window
+X Coordinate of the Upper Left of the Window
 
 %group
-System variables
+System Variables
 
 %inst
-The upper left X coordinate of the current window is assigned in the screen coordinate system.
-The screen coordinate system is the coordinates seen from the entire desktop screen, not the coordinates in the window used by the pos command.
+The X coordinate of the upper left of the current window is assigned in the screen coordinate system.
+The screen coordinate system is not the coordinate within the window used by the pos command, but the coordinate seen from the entire desktop screen.
 ^
-* This system variable is defined in hspdef.as as a macro.
+*This system variable is defined as a macro within hspdef.as.
+*This value cannot be obtained in systems such as html5, iOS, and android.
 
 %href
 ginfo_wy1
@@ -533,17 +534,17 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_wy1
-Upper left Y coordinate of the window
+Y Coordinate of the Upper Left of the Window
 
 %group
-System variables
+System Variables
 
 %inst
-The upper left Y coordinate of the current window is assigned in the screen coordinate system.
-The screen coordinate system is the coordinates seen from the entire desktop screen, not the coordinates in the window used by the pos command.
+The Y coordinate of the upper left of the current window is assigned in the screen coordinate system.
+The screen coordinate system is not the coordinate within the window used by the pos command, but the coordinate seen from the entire desktop screen.
 ^
-* This system variable is defined in hspdef.as as a macro.
-
+*This system variable is defined as a macro within hspdef.as.
+*This value cannot be obtained in systems such as html5, iOS, and android.
 %href
 ginfo_wx1
 ginfo_wx2
@@ -553,16 +554,17 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_wx2
-Lower right X coordinate of the window
+Right-bottom X coordinate of the window
 
 %group
-System variables
+System Variable
 
 %inst
-The lower right X coordinate of the current window is assigned in the screen coordinate system.
-The screen coordinate system is the coordinates seen from the entire desktop screen, not the coordinates in the window used by the pos command.
+The X coordinate of the bottom right corner of the current window in screen coordinates is stored.
+Screen coordinates are not the coordinates within the window used by the pos command, but the coordinates seen from the entire desktop screen.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_wy2
@@ -573,16 +575,17 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_wy2
-Lower right Y coordinate of the window
+Right-bottom Y coordinate of the window
 
 %group
-System variables
+System Variable
 
 %inst
-The lower right Y coordinate of the current window is assigned in the screen coordinate system.
-The screen coordinate system is the coordinates seen from the entire desktop screen, not the coordinates in the window used by the pos command.
+The Y coordinate of the bottom right corner of the current window in screen coordinates is stored.
+Screen coordinates are not the coordinates within the window used by the pos command, but the coordinates seen from the entire desktop screen.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_wx2
@@ -596,14 +599,15 @@ ginfo_vx
 Window scroll X coordinate
 
 %group
-System variables
+System Variable
 
 %inst
-The scroll X coordinate of the current destination window has been assigned.
-This is a value that indicates how much the coordinates displayed in the upper left are scrolled when the window size is smaller than the initialization size.
-In the normal state without scrolling, it will be (0,0).
+The scroll X coordinate of the current operation target window is stored.
+This value indicates how much the coordinates displayed in the upper left corner are scrolled when the window size is smaller than the initialization size.
+In the normal state where it is not scrolled, it will be (0,0).
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_vy
@@ -615,14 +619,15 @@ ginfo_vy
 Window scroll Y coordinate
 
 %group
-System variables
+System Variable
 
 %inst
-The scroll Y coordinate of the current destination window has been assigned.
-This is a value that indicates how much the coordinates displayed in the upper left are scrolled when the window size is smaller than the initialization size.
-In the normal state without scrolling, it will be (0,0).
+The scroll Y coordinate of the current operation target window is stored.
+This value indicates how much the coordinates displayed in the upper left corner are scrolled when the window size is smaller than the initialization size.
+In the normal state where it is not scrolled, it will be (0,0).
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_vx
@@ -631,16 +636,17 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_sizex
-X size of the entire window
+Overall X size of the window
 
 %group
-System variables
+System Variable
 
 %inst
-The width of the current operation window is assigned.
-This is the size including the window frame, title bar, etc.
+The width of the current operation target window is stored.
+This is the size including the window frame and title bar.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_sizey
@@ -649,16 +655,17 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_sizey
-Y size of the entire window
+Overall Y size of the window
 
 %group
-System variables
+System Variable
 
 %inst
-The vertical width of the current operation window is assigned.
-This is the size including the window frame, title bar, etc.
+The height of the current operation target window is stored.
+This is the size including the window frame and title bar.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_sizex
@@ -667,16 +674,16 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_winx
-Screen drawing area X size
+Drawing area X size of the screen
 
 %group
-System variables
+System Variable
 
 %inst
-The width size of the current window drawing area has been assigned.
-(If the screen is created by the buffer command, the screen size will be initialized.)
+The horizontal width of the current window drawing area is stored.
+(In the case of a screen created with the buffer command, this will be the initialized screen size.)
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_winy
@@ -685,16 +692,16 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_winy
-Screen drawing area Y size
+Drawing area Y size of the screen
 
 %group
-System variables
+System Variable
 
 %inst
-The vertical size of the current window drawing area has been assigned.
-(If the screen is created by the buffer command, the screen size will be initialized.)
+The vertical width of the current window drawing area is stored.
+(In the case of a screen created with the buffer command, this will be the initialized screen size.)
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_winx
@@ -703,16 +710,16 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_sx
-Screen initialization X size
+Initialization X size of the screen
 
 %group
-System variables
+System Variable
 
 %inst
-The initialization X size of the current destination window has been assigned.
-(The screen size is initially initialized by the screen, bgscr, and buffer instructions.)
+The initialization X size of the current operation target window is stored.
+(This is the screen size initially initialized with the screen, bgscr, or buffer command.)
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_sy
@@ -721,16 +728,16 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_sy
-Screen initialization Y size
+Initialization Y size of the screen
 
 %group
-System variables
+System Variable
 
 %inst
-The initialization Y size of the current destination window has been assigned.
-(The screen size is initially initialized by the screen, bgscr, and buffer instructions.)
+The initialization Y size of the current operation target window is stored.
+(This is the screen size initially initialized with the screen, bgscr, or buffer command.)
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_sx
@@ -742,15 +749,15 @@ ginfo_mesx
 Message output X size
 
 %group
-System variables
+System Variable
 
 %inst
-Finally, the X size of the message output by the mes and print commands is assigned.
+The X size of the message output by the last mes or print command is stored.
 The size indicates how many dots were drawn in the X coordinate.
-Please note that it is not the absolute coordinates on the screen.
-Also, if you output a character string with multiple lines, the size corresponding to the last line will be acquired.
+Note that this is not an absolute coordinate on the screen.
+Also, if you output a multi-line string, the size of the last line will be acquired.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_mesy
@@ -762,15 +769,15 @@ ginfo_mesy
 Message output Y size
 
 %group
-System variables
+System Variable
 
 %inst
-Finally, the Y size of the message output by the mes and print commands is assigned.
+The Y size of the message output by the last mes or print command is stored.
 The size indicates how many dots were drawn in the Y coordinate.
-Please note that it is not the absolute coordinates on the screen.
-Also, if you output a character string with multiple lines, the size corresponding to the last line will be acquired.
+Note that this is not an absolute coordinate on the screen.
+Also, if you output a multi-line string, the size of the last line will be acquired.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_mesx
@@ -782,13 +789,13 @@ ginfo_r
 Currently set color code R
 
 %group
-System variables
+System Variable
 
 %inst
-The red color code (luminance) specified by the color command etc. is substituted.
-The color code can be an integer value from 0 to 255.
+The red color code (brightness) specified by the color command, etc., is stored.
+The color code is an integer value from 0 to 255.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_g
@@ -801,13 +808,13 @@ ginfo_g
 Currently set color code G
 
 %group
-System variables
+System Variable
 
 %inst
-The green color code (luminance) specified by the color command etc. is assigned.
-The color code can be an integer value from 0 to 255.
+The green color code (brightness) specified by the color command, etc., is stored.
+The color code is an integer value from 0 to 255.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_r
@@ -820,13 +827,13 @@ ginfo_b
 Currently set color code B
 
 %group
-System variables
+System Variable
 
 %inst
-The blue color code (luminance) specified by the color command etc. is substituted.
-The color code can be an integer value from 0 to 255.
+The blue color code (brightness) specified by the color command, etc., is stored.
+The color code is an integer value from 0 to 255.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_r
@@ -839,13 +846,13 @@ ginfo_paluse
 Desktop color mode
 
 %group
-System variables
+System Variable
 
 %inst
-The current desktop color mode (color mode) has been assigned.
-Returns 0 for full color mode and 1 for palette mode.
+The current desktop color mode is stored.
+0 is returned for full color mode, and 1 is returned for palette mode.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo
@@ -853,15 +860,16 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_dispx
-X size of the entire desktop
+Overall X size of the desktop
 
 %group
-System variables
+System Variable
 
 %inst
-The size of the entire desktop (screen resolution) is substituted.
+The overall size of the desktop (screen resolution) is stored.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_dispy
@@ -870,15 +878,16 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_dispy
-Y size of the entire desktop
+Overall Y size of the desktop
 
 %group
-System variables
+System Variable
 
 %inst
-The size of the entire desktop (screen resolution) has been substituted.
+The overall size of the desktop (screen resolution) is stored.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 ginfo_dispx
@@ -887,15 +896,15 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_cx
-X coordinate of current position
+X coordinate of the current position
 
 %group
-System variables
+System Variable
 
 %inst
-The X coordinate of the current position set by the pos command is assigned.
+The X coordinate of the current position set by the pos command is stored.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_cy
@@ -907,12 +916,12 @@ ginfo_cy
 Y coordinate of the current position
 
 %group
-System variables
+System Variable
 
 %inst
-The Y coordinate of the current position set by the pos command is assigned.
+The Y coordinate of the current position set by the pos command is stored.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo_cx
@@ -921,15 +930,16 @@ ginfo
 ;---------------------------------------------------------------------
 %index
 ginfo_intid
-Window ID at the time of message interrupt
+Window ID during message interrupt
 
 %group
-System variables
+System Variable
 
 %inst
-The window ID at the time of message interrupt set by the oncmd command is assigned.
+The window ID during message interrupt set by the oncmd command is stored.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
+* This value cannot be obtained in systems such as html5, iOS, and Android.
 
 %href
 oncmd
@@ -941,88 +951,160 @@ ginfo_newid
 Unused window ID
 
 %group
-System variables
+System Variable
 
 %inst
-An unused window ID that has not been initialized by the screen instruction or buffer instruction is returned.
+Returns an unused window ID that has not been initialized with the screen or buffer command.
 ^
-* This system variable is defined in hspdef.as as a macro.
+* This system variable is defined as a macro in hspdef.as.
 
 %href
 ginfo
 
 ;---------------------------------------------------------------------
 %index
-ginfo_accx
-Accelerometer value (X)
+ginfo_accelx
+Acceleration sensor value (X)
 
 %group
-System variables
+System Variable
 
 %inst
-Get the sensor value in an environment where the accelerometer is available.
-The acceleration with respect to the X axis is obtained in the range of -1.0 to +1.0.
-In an environment where the accelerometer cannot be used, 0.0 is obtained.
+Acquires the value from the acceleration sensor in an environment where it is available.
+This is the acceleration with respect to the X axis, obtained as a real number (m/s^2). (The value includes the gravitational acceleration of 9.8 m/s^2.)
+In environments where the acceleration sensor is not available, 0.0 is obtained.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
+Å¶It may not be obtainable depending on the device in HSP3Dish.
+Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
-ginfo_accy
-ginfo_accz
+ginfo_accely
+ginfo_accelz
 
 ;---------------------------------------------------------------------
 %index
-ginfo_accy
-Accelerometer value (Y)
+ginfo_accely
+Accelerometer Value (Y)
 
 %group
-System variables
+System Variables
 
 %inst
-Get the sensor value in an environment where the accelerometer is available.
-The acceleration with respect to the Y axis is obtained in the range of -1.0 to +1.0.
-In an environment where the accelerometer cannot be used, 0.0 is obtained.
+Acquires the accelerometer value in environments where the accelerometer is available.
+This is the acceleration with respect to the Y-axis, obtained as a real number (m/s^2). (The value includes the gravitational acceleration of 9.8 m/s^2.)
+If the accelerometer is not available, 0.0 is returned.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
+Å¶It may not be obtainable depending on the device.
+Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
-ginfo_accx
-ginfo_accz
+ginfo_accelx
+ginfo_accelz
 
 ;---------------------------------------------------------------------
 %index
-ginfo_accz
-Accelerometer value (Z)
+ginfo_accelz
+Accelerometer Value (Z)
 
 %group
-System variables
+System Variables
 
 %inst
-Get the sensor value in an environment where the accelerometer is available.
-The acceleration with respect to the Z axis is obtained in the range of -1.0 to +1.0.
-In an environment where the accelerometer cannot be used, 0.0 is obtained.
+Acquires the accelerometer value in environments where the accelerometer is available.
+This is the acceleration with respect to the Z-axis, obtained as a real number (m/s^2). (The value includes the gravitational acceleration of 9.8 m/s^2.)
+If the accelerometer is not available, 0.0 is returned.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
+Å¶It may not be obtainable depending on the device.
+Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
-ginfo_accy
-ginfo_accx
+ginfo_accely
+ginfo_accelx
+
+;---------------------------------------------------------------------
+%index
+ginfo_gyrox
+Tilt Sensor Value (X)
+
+%group
+System Variables
+
+%inst
+Acquires the tilt sensor value in environments where the tilt sensor is available.
+This is the tilt angle with respect to the X-axis, obtained in degrees.
+If the tilt sensor is not available, 0.0 is returned.
+^
+Å¶This system variable is defined as a macro within hspdef.as.
+Å¶It may not be obtainable depending on the device.
+Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+
+%href
+ginfo
+ginfo_gyroy
+ginfo_gyroz
+
+;---------------------------------------------------------------------
+%index
+ginfo_gyroy
+Tilt Sensor Value (Y)
+
+%group
+System Variables
+
+%inst
+Acquires the tilt sensor value in environments where the tilt sensor is available.
+This is the tilt angle with respect to the Y-axis, obtained in degrees.
+If the tilt sensor is not available, 0.0 is returned.
+^
+Å¶This system variable is defined as a macro within hspdef.as.
+Å¶It may not be obtainable depending on the device.
+Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+
+%href
+ginfo
+ginfo_gyrox
+ginfo_gyroz
+
+;---------------------------------------------------------------------
+%index
+ginfo_gyroz
+Tilt Sensor Value (Z)
+
+%group
+System Variables
+
+%inst
+Acquires the tilt sensor value in environments where the tilt sensor is available.
+This is the tilt angle with respect to the Z-axis, obtained in degrees.
+If the tilt sensor is not available, 0.0 is returned.
+^
+Å¶This system variable is defined as a macro within hspdef.as.
+Å¶It may not be obtainable depending on the device.
+Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+
+%href
+ginfo
+ginfo_gyroy
+ginfo_gyrox
 
 ;---------------------------------------------------------------------
 %index
 dir_cur
-Current directory (folder)
+Current Directory (Folder)
 
 %group
-System variables
+System Variables
 
 %inst
-The path of the current current directory (folder) is assigned as a character string.
+The path of the current directory (folder) is assigned as a string.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1030,15 +1112,15 @@ dirinfo
 ;---------------------------------------------------------------------
 %index
 dir_exe
-Directory (folder) containing the executable file
+Directory (Folder) where the Executable File is Located
 
 %group
-System variables
+System Variables
 
 %inst
-The path of the directory (folder) where the runtime executable file is located is assigned as a character string.
+The path of the directory (folder) where the runtime executable file is located is assigned as a string.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1046,15 +1128,15 @@ dirinfo
 ;---------------------------------------------------------------------
 %index
 dir_win
-Windows directory (folder)
+Windows Directory (Folder)
 
 %group
-System variables
+System Variables
 
 %inst
-The path of the directory (folder) where Windows is installed is assigned as a character string.
+The path of the directory (folder) where Windows is installed is assigned as a string.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1062,15 +1144,15 @@ dirinfo
 ;---------------------------------------------------------------------
 %index
 dir_sys
-Windows system directory (folder)
+Windows System Directory (Folder)
 
 %group
-System variables
+System Variables
 
 %inst
-The path of the Windows system directory (folder) is assigned as a character string.
+The path of the Windows system directory (folder) is assigned as a string.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1078,15 +1160,15 @@ dirinfo
 ;---------------------------------------------------------------------
 %index
 dir_cmdline
-Command line string
+Command Line String
 
 %group
-System variables
+System Variables
 
 %inst
-The command line string passed at run time is assigned.
+The command line string passed at execution time is assigned.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1094,15 +1176,15 @@ dirinfo
 ;---------------------------------------------------------------------
 %index
 dir_desktop
-Desktop directory (folder)
+Desktop Directory (Folder)
 
 %group
-System variables
+System Variables
 
 %inst
-The path of the desktop directory (folder) is assigned as a character string.
+The path of the desktop directory (folder) is assigned as a string.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1113,12 +1195,12 @@ dir_mydoc
 My Documents Directory (Folder)
 
 %group
-System variables
+System Variables
 
 %inst
-The path of the My Documents directory (folder) is assigned as a character string.
+The path of the My Documents directory (folder) is assigned as a string.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1126,19 +1208,17 @@ dirinfo
 ;---------------------------------------------------------------------
 %index
 dir_tv
-HSPTV directory (folder)
+HSPTV Directory (Folder)
 
 %group
-System variables
+System Variables
 
 %inst
-The path of the HSPTV directory (folder) is assigned as a character string.
-It can be used to refer to the resources provided as standard in the HSPTV directory.
-dir_tv is retrieved only during debug execution and returns an empty string ("") if it is running as an run (.exe) file. Note that when creating an executable file for software that uses files in the HSPTV directory, it is necessary to specify the required files with the #pack command.
+The path of the HSPTV directory (folder) is assigned as a string.
+It can be used to refer to resources that are standardly prepared in the HSPTV directory.
+dir_tv is only acquired during debug execution, and returns an empty string ("") when running as an executable (.exe) file. When creating an executable file for software that uses files in the HSPTV directory, be careful to specify the necessary files using the #pack command.
 ^
-* This system variable is defined in hspdef.as as a macro.
+Å¶This system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
-
-;---------------------------------------------------------------------

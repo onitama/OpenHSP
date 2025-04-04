@@ -1,281 +1,275 @@
 ;
-;HELP source file for HSP help manager
-;(Lines beginning with ";" are treated as comments)
+; HSP help manageróp HELPÉ\Å[ÉXÉtÉ@ÉCÉã
+; (êÊì™Ç™Åu;ÅvÇÃçsÇÕÉRÉÅÉìÉgÇ∆ÇµÇƒèàóùÇ≥ÇÍÇ‹Ç∑)
 ;
 
 %type
-Built-in instructions
+Built-in command
 %ver
-3.6
+3.7
 %note
-ver3.6 standard instruction
+ver3.7 standard command
 %date
-2013/12/09
+2024/06/04
 %author
 onitama
 %url
-http://hsp.tv/
+https://hsp.tv/
 %port
 Win
 Cli
 Let
 
-
-
 %index
 await
-Wait for a certain amount of time
+Wait for a specified time
 %group
-Program control instructions
+Program control commands
 %prm
 p1
-p1 = 0 to (0): Waiting time (1ms unit)
+p1=0Å`(0) : Wait time (in milliseconds)
 
 %inst
-Suspends program execution for a certain period of time.
+Pauses the execution of the program for a specified time.
 ^
-Similar to the wait instruction, but the await instruction specifies the wait time since the last wait. This will prevent the time from passing too fast due to differences in drawing speed. It is used to keep the speed of screens that are updated in real time constant.
+Similar to the wait command, the await command specifies the waiting time from the last wait. This prevents the time from passing too quickly due to differences in drawing speed, etc. It is used to keep the speed of real-time updated screens constant.
 ^
-HSP recommends putting wait or await instructions where long loops can occur to pass processing time to other Windows tasks. If you run a program that loops for a long time inside an instruction that does not have a wait or await instruction, it may be difficult to drag the window or it may take a long time to move to another task.
+The p1 parameter is in milliseconds (ms). If you specify 1000, the wait time will be 1 second.
+^
+The await command allows for more precise and finer waits than the wait command, but it consumes more CPU tasks than the wait command.
+If you are not processing images in real-time, using the wait command will put less strain on the CPU (Windows).
+It is best to use the wait command for accessories that are always placed on the desktop, and the await command for game applications, etc.
+^
+In HSP, it is recommended to insert wait or await commands where long time loops may occur in order to give processing time to other Windows tasks. If you run a program that loops for a long time without wait or await commands, it will be difficult to drag windows or it will take a long time to switch to other tasks.
+^
+The p1 parameter is in milliseconds (ms). If you specify 1000, the wait time will be 1 second.
+The waiting time specified as a parameter does not guarantee strict execution in 1ms units. Please note that errors may occur if CPU tasks or interrupt processing occur.
+In particular, if you are progressing with precise time like a stopwatch or clock, be sure to acquire absolute time using the gettime command or the like.
 
 %href
 wait
 
-
-
-
 %index
 exec
-Run Windows files
+Execute a Windows file
 %group
-Program control instructions
+Program control commands
 %prm
 "filename",p1,"command"
-"filename": Target file name
-p1 = 0 to (0): File execution mode
-"command": Context menu operation name
+"filename" : Target filename
+p1=0Å`(0)  : File execution mode
+"command"  : Context menu operation name
 
 %inst
-exec runs the application with the filename specified by "filename".
-If the extension is EXE, you can omit the extension.
-You can select the run-time mode with p1. If p1 is omitted, it will be 0.
+exec executes the application with the filename specified by "filename".
+If the extension is EXE, the extension can be omitted.
+You can choose the execution mode with p1. If p1 is omitted, it defaults to 0.
 ^p
- Mode 0: HSP normal execution
- Mode 2: Run in minimized mode
- Mode 16: Run the associated application
- Mode 32: Print the specified file
+ Mode 0  : HSP normal execution
+ Mode 2  : Execute minimized
+ Mode 16 : Execute associated application
+ Mode 32 : Print the specified file
 ^p
-If "command" is specified, it will be the context menu operation name for the file or folder name specified in "filename".
-The context menu operation name is a character string that specifies the action registered in the registry, and the following are provided as standard.
+If "command" is specified, it will be the context menu operation name for the file or folder name specified by "filename".
+The context menu operation name is a string that specifies the action registered in the registry, and the following are provided as standard.
 ^p
-  Operation name | Explanation
- ---------------------------------------------------------------------
-  edit | Open the editor and edit.
-  Select the explore | folder to launch Explorer.
-  open | Open the file in the associated application.
-  print | Print the file with the associated application.
-  properties | View the properties of a file or folder.
+ Operation name | Explanation
+---------------------------------------------------------------------
+ edit       | Open the editor and edit.
+ explore    | Select a folder and launch Explorer.
+ open       | Open the file with the associated application.
+ print      | Print the file with the associated application.
+ properties | Show file or folder properties.
 ^p
-If "command" is specified, file execution modes 16 and 32 are disabled. In addition, a value indicating the execution result is returned in the system variable stat.
+If "command" is specified, file execution modes 16 and 32 are disabled. The value indicating the execution result is returned to the system variable stat.
 ^
-In normal execution, the window of the newly launched application becomes active and the input focus shifts, but in multitasking, HSP continues to execute without quitting.
+Normal execution activates the newly launched application window and moves the input focus to it, but HSP continues to run without exiting in a multitasking environment.
 ^p
-example :
-exec "calc"; Start Windows Calculator
+Example :
+ exec "calc"  ; Launch Windows calculator
 ^p
-You can also write parameters after the file name.
+You can also write parameters after the filename.
 ^p
-example :
-exec "notepad hsp.txt"; open hsp.txt with notepad
+Example :
+ exec "notepad hsp.txt"  ; Open hsp.txt with Notepad
 ^p
-Mode 2 runs with the specified application minimized.
-When executing a DOS application, it can be executed in the back without blocking the HSP screen.
+Mode 2 executes the specified application in a minimized state.
+You can run DOS applications in the background without obscuring the HSP screen.
 ^
-Mode 16 specifies a data file, not an executable file, to run the application associated with that extension.
+Mode 16 specifies a data file instead of an executable file, and executes the application associated with that extension.
 ^p
-example :
-exec "hsp.txt", 16; open hsp.txt with associated application
+Example :
+ exec "hsp.txt",16  ; Open hsp.txt with the associated application
 ^p
-In the above example, "hsp.txt" will be opened in the associated application.
-(Usually notepad.exe)
-In mode 16, it can also be used as an internet shortcut by specifying the internet URL.
+In the example above, "hsp.txt" is opened with the associated application.
+(Normally, notepad.exe)
+In Mode 16, you can also use the Internet URL to use it as an Internet shortcut.
 ^p
-example :
-Open internet page
-	exec "http://www.onionsoft.net/hsp/",16
+Example :
+ ;Open an internet page
+ exec "http://www.onionsoft.net/hsp/",16
 ^p
-Mode 32 prints to the printer via the application associated with the specified file.
-for example,
+In mode 32, printing to a printer is done via an application associated with the specified file.
+For example,
 ^p
-example :
-exec "hsp.txt", 32; print hsp.txt with printer
+Example :
+ exec "hsp.txt",32  ; Print hsp.txt with the printer
 ^p
-Automatically prints "hsp.txt" in the application associated with "txt". All printing options, etc. will be those specified in the associated application.
+automatically prints "hsp.txt" with the application associated with "txt". All printing options are those specified by the associated application.
 ^
-Multiple modes can be specified at the same time.
-For example, if you specify mode 2 and mode 16 at the same time, add the respective values to get 18. In this case, it would be "Run associated application in minimized mode".
+Multiple modes can be specified simultaneously.
+For example, if you specify mode 2 and mode 16 at the same time, the value will be 18 by adding the values of each. In this case, it will be "Execute the associated application in minimized mode".
 ^
-* Mode 1 (waiting for task execution), which was supported up to HSP2.61, is not supported by HSP3. Monitor the started process or use the pipeexec instruction for console applications.
+* Mode 1 (task execution wait), which was supported until HSP2.61, is not supported in HSP3. Use the pipeexec command to monitor the launched process or, in the case of a console application.
 
 %href
 pipeexec
 %portinfo
-At HSPLet, it is used to display HTML pages.
-It is not recommended to use this instruction directly because the meaning of the third argument is different from the original HSP.
-We recommend that you use the showPage fileName, target instructions defined in letutil.hsp instead.
-
-
+In HSPLet, this command is used to display HTML pages.
+Because the meaning of the third argument is different from the original HSP, it is not recommended to use this command directly.
+Instead, it is recommended to use the showPage fileName, target command defined in letutil.hsp.
 
 %index
 end
-The end of the program
+End program
 %group
-Program control instructions
+Program control commands
 %prm
 p1
-p1 (0): Exit code
+p1(0) : Exit code
 %inst
-Quit the HSP program.
-The end instruction can be anywhere in the script.
-When the end instruction is executed, the application will be terminated.
+Ends the HSP program.
+The end command can be anywhere in the script.
+When the end command is executed, the application exits.
 ^
-You can specify the exit code of the application with the parameter p1. If p1 is omitted, 0 is the application exit code.
-The application exit code is used to notify other processes and batch files. Normally, it is okay to omit (0).
+You can specify the application exit code with the parameter p1. If p1 is omitted, 0 will be the application exit code.
+The application exit code is used to notify other processes or batch files. Normally, it is omitted (0) and there is no problem.
 
 %href
 stop
 
-
-
-
-
 %index
 gosub
-Subroutine jump to the specified label
+Subroutine jump to specified label
 %group
-Program control instructions
+Program control commands
 %prm
 *label
-* label: Label name
+*label : Label name
 
 %inst
-Make a subroutine jump.
-The gosub instruction jumps to the location specified by * label.
-After that, if there is a return instruction, it returns to the next line of the gosub instruction and continues execution.
-gosub ~ return can be nested.
-(Maximum number of nesting depends on the amount of stack memory of HSP)
+Makes a subroutine jump.
+The gosub command jumps to the location specified by *label.
+After that, if there is a return command, it will return to the next line of the gosub command and continue execution.
+gosubÅ`return can be nested.
+(The maximum number of nesting depends on the amount of stack memory that HSP has)
 
 %href
 goto
 return
 
-
-
-
 %index
 goto
-Jump to the specified label
+Jump to specified label
 %group
-Program control instructions
+Program control commands
 %prm
 *label
-* label: Label name
+*label : Label name
 
 %inst
-Unconditionally jumps to the specified label.
-After that, execution continues from the location specified by the label name.
+Jumps unconditionally to the specified label.
+From then on, execution continues from the location specified by the label name.
 
 %href
 gosub
 
-
-
-
-
 %index
 if
-If the condition is met, the instruction on that line is executed.
+Execute the command on that line if the condition is met
 %group
-Program control instructions
+Program control commands
 %prm
 p1
-p1: Conditional expression
+p1 : Conditional expression
 
 %inst
-If the conditional expression of p1 is satisfied, the subsequent instructions are executed. If not, move to the next line.
-Note that unlike BASIC, you must put a: (colon) between the next instruction on that line.
+If the condition expression of p1 is met, the subsequent command is executed. If it is not met, the process moves to the next line.
+Unlike BASIC, be careful to insert a : (colon) between the if and the next command on that line.
 ^p
-example :
-	a=10
-if a = 10: mes "a is 10."
+Example :
+ a=10
+ if a=10 : mes "a is 10."
 ^p
-In the above example, the "a = 10" part is the conditional expression. Mainly for conditional expressions
+In the example above, "a=10" is the conditional expression. The conditional expression mainly includes:
 ^p
-a = b: a and b are equal
-a! b: a and b are not equal
-a <b: a is less than b
-a> b: a is greater than b
-a <= b: a is less than or equal to b
-a> = b: a is greater than or equal to b
+ a=b  : a is equal to b
+ a!b  : a is not equal to b
+ a<b  : a is less than b
+ a>b  : a is greater than b
+ a<=b : a is less than or equal to b
+ a>=b : a is greater than or equal to b
 ^p
-Is used. After the if + conditional expression, separate it with a: (colon), and then write the part to be executed when the condition is met.
-(Similar to C language and Java, "=" and "!" Can be described as "==" and "! =") If you want to change the flow of the program depending on the conditions,
+Use it. After if + conditional expression, separate with: (colon) and then write the part that will be executed if the condition is met.
+(You can also write "= " "!" like "==" "!=" as in C and Java.) If you want to change the flow of the program depending on the conditions,
 ^p
-example :
-	a=10
-	if a>10 : goto *over10
-mes "a is less than or equal to 10."
-	stop
+Example :
+ a=10
+ if a>10 : goto *over10
+ mes "a is 10 or less."
+ stop
 *over10
-mes "a is greater than 10."
-	stop
+ mes "a is greater than 10."
+ stop
 ^p
-As shown above, it is also possible to skip to another label with the goto command.
-It is also possible to use the else instruction to write the processing when the condition is not met on the same line.
+As above, you can jump to another label with the goto command.
+You can also use the else command to write the process when the condition is not met on the same line.
 ^p
-example :
-	a=10
-mes "a is"
-if a = 10: mes "10.": else: mes "not 10."
-	stop
+Example :
+ a=10
+ mes "a is, "
+ if a=10 : mes "10." : else : mes "It is not 10."
+ stop
 ^p
-In this case, up to a certain part of the else instruction is executed when the condition is satisfied, and after the else instruction, it is executed when the condition is not satisfied.
-The following lines will be executed normally regardless of the conditions.
+In this case, up to the part with the else command is executed if the condition is met, and the else command and subsequent commands are executed if the condition is not met.
+From the next line onwards, the process is executed as usual regardless of the conditions.
 ^
-You can also use logical expressions to make more complex conditional decisions.
+To make more complex conditional judgments, you can also use logical expressions.
 ^p
-   a & b: both a and b are correct (and)
-   a | b: Either a or b is correct (or)
+ a&b  : a and b are both true (and)
+ a|b  : either a or b is true (or)
 ^p
 This allows you to write multiple conditions at once.
 ^p
-example :
-	a=10:b=20
-if (a = 10) | (b = 10): mes "either a or b is 10."
+Example :
+ a=10:b=20
+ if (a=10)|(b=10) : mes "Either a or b is 10."
 ^p
-In the above example, the conditional expressions "a = 10" and "b = 10" are connected with | (or) so that if either is correct, the result will be correct.
-Logical operations can be described by the strings "or" and "and" in addition to the symbols "|" and "&".
+In the above example, the conditional expressions "a=10" and "b=10" are connected by |(or), and if either is true, a true result is output.
+For logical operations, you can write the symbols "| " "&" as well as the strings "or " "and".
 ^p
-example :
-if (a = 10) or (b = 10): mes "either a or b is 10."
+Example :
+ if (a=10)or(b=10) : mes "Either a or b is 10."
 ^p
-If you write it as above, the result will be the same.
+The result will be the same if you write it as above.
 ^
-If you want to write a script that is executed when the conditions of the if instruction are correct over multiple lines,
+If you want to describe the script that is executed when the if command condition is true over multiple lines,
 ^p
-example :
-	a=10
-	if a>5 {
-		mes "TRUE"
-		mes "(MULTILINE IF)"
-	}
+Example :
+ a=10
+ if a>5 {
+  mes "TRUE"
+  mes "(MULTILINE IF)"
+ }
 ^p
-Specify the part that starts with "{" and ends with "}" like.
-(In the above example, TAB is inserted at the beginning of the line in C language style for easy viewing, but it is not necessary. Please write it so that it is easy for the user to see.)
-^
-You can also specify multiple lines with the else command.
+Specify the part from the beginning with "{" and ending with "}".
+(In the example above, TAB is inserted at the beginning of the line in C language style to make it easier to see, but it is not particularly necessary. Write it so that it is easy for the user to see.)
+%href
+else
+
+The else command can also specify multiple lines.
 ^p
-example :
+Example:
 	a=10
 	if a>5 {
 		mes "TRUE"
@@ -287,76 +281,62 @@ example :
 	}
 	return
 ^p
-However, please note that if you do not write "{" after else, it will not be multiple lines.
-
-
-
-%href
-else
-
-
-
-
+Note that you must include "{" after else for it to apply to multiple lines.
 
 %index
 loop
 Return to the beginning of the loop
 %group
-Program control instructions
+Program control commands
 %inst
-Specifies the end of the loop specified by the repeat / foreach instruction.
-See the repeat instruction section for details.
+Specifies the end of the loop defined by the repeat/foreach commands.
+See the repeat command section for details.
 
 %href
 repeat
 foreach
 
-
-
-
 %index
 onexit
-Jump at the end
+Jump on exit
 %group
-Program control instructions
+Program control commands
 %prm
 goto/gosub *label
-* label: Label name
+*label : Label name
 
 %inst
-Specifies where to jump automatically when you press the close box (the exit button at the top right of the window).
+Specifies a location to automatically jump to when the close box (exit button in the upper right corner of the window) is pressed.
 ^
-After onexit, specify the goto or gosub keyword before writing the label.
-In the case of goto, a simple program jump. In the case of gosub, a subroutine jump is performed.
-If the goto / gosub keyword is omitted, the operation is the same as the goto keyword.
+Following onexit, specify the goto or gosub keyword, then write a label.
+goto performs a simple program jump. gosub performs a subroutine jump.
+If the goto/gosub keyword is omitted, it behaves the same as the goto keyword.
 ^p
-example :
-onexit gosub * exit_routine; call on exit
+Example:
+	onexit gosub *exit_routine  ; Exit time call
 ^p
-Normally, pressing the close box will force it to terminate at any time, but after this instruction is executed, pressing the close box will jump to the label specified by the onexit instruction and continue execution from there. Will be.
+Normally, pressing the close box will force a program termination in any circumstance. However, after this command is executed, pressing the close box will jump to the label specified in the onexit command, and execution will continue from there.
 ^
-Use this when you want to display a confirmation message when you are finished, or when you want to save the data when you are finished.
+This is used when you want to display a confirmation message when exiting, or when you want to save data when exiting, etc.
 ^
-When this instruction is executed, the execution of the script cannot be stopped except for the end instruction, so use it with caution.
+Once this command is executed, the script cannot be stopped except by the end command, so be careful when using it.
 ^
-If you have created multiple windows, the exit button in one of the windows will cause an interrupt. At this time, the window ID notified of the end is assigned to the system variable wparam.
+When multiple windows are created, an interrupt will occur with the exit button in any of the windows. At this time, the system variable wparam is assigned the window ID of the window that received the termination notification.
 ^
-Immediately after jumping with onexit, the termination factor is saved as a value in the system variable iparam.
-If iparam is 0, the program is terminated at the user's will.
-If iparam is 1, it is terminated by shutting down Windows (restarting or turning off the power). For termination processing when Windows shuts down, if an idle time (waiting time) is generated in the system by await, wait, stop instructions, etc., shut down.
-Cancels processing (does not shut down).
-If it ends with the end instruction without using the await, wait, and stop instructions, the shutdown process continues as it is.
+Immediately after jumping with onexit, the exit factor is stored as a value in the system variable iparam.
+If iparam is 0, the program is terminated by the user's intention.
+If iparam is 1, the program is terminated due to Windows shutdown (reboot or power OFF). For termination processing during Windows shutdown, if you generate idle time in the system (waiting time) with await, wait, or stop commands, the shutdown processing will be stopped (not shut down).
+If you end with the end command without using the await, wait, or stop commands, the shutdown processing will continue as is.
 ^
-It is also possible to temporarily turn on / off the jump at the end.
+It is also possible to temporarily turn ON/OFF the exit time jump.
 ^p
 	onexit 0
 ^p
-Temporarily stops the interrupt with.
+Temporarily stops the interrupt.
 ^p
 	onexit 1
 ^p
-You can resume the interrupt that was paused with.
-
+Allows to resume the interrupted interruption.
 
 %href
 onkey
@@ -365,23 +345,21 @@ onerror
 %port-
 Let
 
-
-
 %index
 return
 Return from subroutine
 %group
-Program control instructions
+Program control commands
 %prm
 p1
-p1: System variable assignment value
+p1 : System variable assignment value
 %inst
-Terminates a subroutine called by a gosub instruction or a user-defined instruction. The return instruction returns the stack and returns to the caller.
-By specifying p1, the value can be reflected in the system variable from the subroutine.
-If a numerical value is specified for p1, it will be assigned to the system variable stat.
-If a character string is specified for p1, it will be assigned to the system variable refstr.
-If you specify a real value for p1, it is assigned to the system variable refdval.
-If p1 is omitted, system variables will not be assigned.
+Ends a subroutine called by the gosub command or a user-defined command. The return command restores the stack and returns to the caller.
+By specifying p1, a value can be reflected from the subroutine to the system variable.
+If a numeric value is specified for p1, it is assigned to the system variable stat.
+If a string is specified for p1, it is assigned to the system variable refstr.
+If a real number value is specified for p1, it is assigned to the system variable refdval.
+If the specification of p1 is omitted, the system variable will not be assigned.
 
 %href
 gosub
@@ -391,114 +369,101 @@ stat
 refstr
 refdval
 
-
-
-
 %index
 run
 Transfer control to the specified file
 %group
-Program control instructions
+Program control commands
 %prm
 "filename","cmdline"
-"filename": HSP object file name to execute
-"cmdline": A string assigned to the system variable dir_cmdline
+"filename" : Name of the HSP object file to execute
+"cmdline"  : String assigned to the system variable dir_cmdline
 %inst
-Run the HSP program written in another file.
-The file you specify must be an HSP object file (extension AX).
-The object file can be created by "Create object file" in the script editor.
+Executes an HSP program written in another file.
+The specified file must be an HSP object file (extension AX).
+Object files can be created using the "Create Object File" in the script editor.
 ^p
-example :
+Example:
     run "MENU2.AX","-s"
 ^p
-When is executed, the existing program disappears and the program in the file "MENU2.AX" is executed from the beginning.
-The screen state is maintained, but all variables and memory buffer contents are initialized. Also, execution starts with the string "-s" assigned to the system variable dir_cmdline.
+When executed, the previous program will be gone and the program in the "MENU2.AX" file will be executed from the beginning.
+The state of the screen, variables, and memory buffer contents are all initialized. Also, execution starts with the string "-s" assigned to the system variable dir_cmdline.
 ^
-If the "cmdline" parameter is omitted, the contents of the system variable dir_cmdline will be
-It will be empty. Also, the system variable dir_cmdline stores up to 1024 characters.
+If the "cmdline" parameter is omitted, the contents of the system variable dir_cmdline will be empty. Also, the system variable dir_cmdline can save up to 1024 characters.
+^
+The run command only works with object files targeting the same runtime. Also, operation on the HSP3Dish runtime is not currently supported.
 %href
-
-
-
-
-
 
 %index
 stop
 Program interruption
 %group
-Program control instructions
+Program control commands
 %inst
-Suspends program execution.
-It is used when waiting for the button to be clicked.
+Temporarily suspends program execution.
+Use when waiting for a button to be clicked, etc.
 
 %href
 end
 
-
-
-
-
 %index
 wait
-Suspend execution for a certain period of time
+Interrupt execution for a certain time
 %group
-Program control instructions
+Program control commands
 %prm
 p1
-p1 (100): Waiting time (10ms unit)
+p1(100) : Waiting time (in 10ms units)
 
 %inst
-Suspends program execution for a certain period of time.
+Interrupts program execution for a certain period of time.
 ^
-Specify the length of the waiting time in p1. The unit is 10 milliseconds. (1 millisecond = 1/1000 second)
-All models have the same latency, regardless of CPU speed.
-;If 0 is specified for p1 or omitted, wait for the same time as the previous time.
+Specify the length of the wait time in p1. The unit is 10 milliseconds. (1 millisecond = 1/1000 seconds)
+Regardless of the CPU speed, the waiting time will be the same on any model.
+;If p1 is specified as 0, or omitted, the wait will be for the same amount of time as the previous time.
 ^
-The await instruction allows for more precise and finer weights than the wait instruction, but consumes more CPU tasks than the wait instruction.
-Unless it is a process such as rewriting an image in real time, using the wait command will reduce the load on the CPU (Windows).
-It's a good idea to use the wait instruction for accessories that are always placed on the desktop, and the await instruction for game applications.
+The await command allows for finer-grained waiting with higher precision than the wait command, but it consumes more CPU tasks than the wait command.
+Unless you are processing real-time image rewriting, using the wait command puts less burden on the CPU (Windows).
+It is a good idea to use the wait command for accessories that are always placed on the desktop, and the await command for game applications, etc.
 ^
-HSP recommends putting wait or await instructions where long loops can occur to pass processing time to other Windows tasks.
-If you run a program that loops for a long time inside an instruction that does not have a wait or await instruction, it may be difficult to drag the window or it may take a long time to move to another task.
+In HSP, it is recommended to include a wait or await command in places where long time loops may occur in order to give processing time to other Windows tasks.
+If you execute a program that loops for a long time in commands that do not have wait or await commands, it will be difficult to drag windows, or it will take time to switch to other tasks.
+^
+Note that the waiting time specified as a parameter does not guarantee strict execution. Errors may occur when CPU tasks or interrupt processing occur.
+In particular, if you are proceeding with precise time such as a stopwatch or clock, be sure to acquire the absolute time with the gettime command and process it.
 
 %href
 await
 
-
-
-
-
-
 %index
 repeat
-Indicates where the loop begins
+Indicates the beginning of a loop
 %group
-Program control instructions
+Program control commands
 %prm
 p1,p2
-p1 = 1 ~ (-1): Number of loops
-p2 = 0 to (0): Start value of system variable cnt
+p1=1Å`(-1) : Number of loops
+p2=0Å`(0)  : Start value of system variable cnt
 
 %inst
-Executes repeatedly between repeat and loop.
-The repeat instruction indicates the starting point of the repeat.
-The loop instruction returns to the last repeat instruction passed. in short,
+Repeatedly executes the section between the repeatÅ`loop commands.
+The repeat command indicates the starting point of the repetition.
+The loop command returns to the repeat command that was last passed. In other words,
 ^p
 	repeat 5
-print "Yaho"
+		print "Yahoo!"
 	loop
 ^p
-A program like this will display "Yaho" 5 times.
-You can specify the number of repeats with the parameter of the repeat instruction, p1. If you omit the number of times or specify a negative value, an infinite loop will occur.
-If the number of iterations is 0, the iteration part is not executed and jumps to the corresponding loop instruction.
+A program like this will display "Yahoo!" 5 times.
+The parameter p1 of the repeat command can be used to specify the number of repetitions. If the number of times is omitted, or if a negative value is specified, it becomes an infinite loop.
+If the number of repetitions is 0, the repeat portion is not executed and jumps to the corresponding loop command.
 ^
-You can also write a nested structure that further loops the part containing repeat ~ loop. However, if you normally exit through the loop instruction without looping, the nested structure will be strange, so please do not make it a structure that forcibly exits from the loop.
+A nested structure in which the part including repeatÅ`loop is further looped can also be described. However, if you exit the loop without passing through the loop command normally, the nested structure will be messed up, so avoid structures that force you to exit the loop.
 ^
-You can refer to the system variable cnt when you want to check the number of loops or when you want to use the counter. cnt usually starts at 0 and increments by 1 each time the loop instruction loops.
-However, it is also possible to change the value at which the counter starts with p2 of the repeat instruction. For example, if you specify repeat 3,1, the value of the variable cnt changes in the order of 1,2,3.
+The system variable cnt can be referenced to check the number of loops or to use a counter. cnt normally starts from 0 and increases by 1 each time it loops with the loop command.
+However, it is also possible to change the number from which the counter starts with p2 of the repeat command. For example, if you specify repeat 3,1, the value of the variable cnt will change in the order of 1, 2, 3.
 ^
-If you want to force the loop out inside the loop, use the break instruction. There is also a continue instruction to move to the next loop.
+Use the break command to forcibly exit the loop from within the loop. The continue command is also available to move to the next loop.
 
 %href
 loop
@@ -506,25 +471,23 @@ break
 continue
 foreach
 
-
-
 %index
 break
-Get out of the loop
+Exit the loop
 %group
-Program control instructions
+Program control commands
 %inst
-Forcibly breaks out of the loop between repeat and loop.
+Forcibly exits from the loop between the repeatÅ`loop commands.
 ^p
 	repeat 5
 		if cnt=2 : break
-mes "Repeat [" + cnt + "]"
+		mes "Repeat["+cnt+"]"
 	loop
 ^p
-In the above example, when the system variable becomes 2, that is, when it becomes the third loop, the break instruction is executed according to the judgment of the if instruction.
-When the break instruction is executed, even if the number of repetitions still remains, it is forced to break out of the repetition and continue execution from the instruction following the loop instruction.
-After the break instruction (mes instruction in the above example) is not executed.
-Using this instruction, you can create the following script, for example.
+In the above example, the break command is executed by the judgment of the if command when the system variable becomes 2, that is, on the 3rd loop.
+When the break command is executed, even if there are still repetitions remaining, it forcibly exits the repetition and continues execution from the command next to the loop command.
+The break command and later (mes command in the above example) are not executed.
+By using this command, you can create scripts such as the following.
 ^p
 	repeat
 		getkey a,1
@@ -532,8 +495,8 @@ Using this instruction, you can create the following script, for example.
 		await 10
 	loop
 ^p
-In the script above, it's a loop that waits until you press the left mouse button.
-If you omit the number of repeat instructions, an infinite loop will occur, so you can use it to repeat the same process until the button status becomes 1. When the button is pressed, the break instruction is executed to break out of the iteration.
+The above script is a loop that waits until the left mouse button is pressed.
+If the number of times specification of the repeat command is omitted, it becomes an infinite loop, so it is used to repeat the same place until the button state becomes 1. When the button is pressed, the break command is executed and exits the repetition.
 
 %href
 repeat
@@ -541,27 +504,25 @@ loop
 continue
 foreach
 
-
-
 %index
 continue
 Redo the loop
 %group
-Program control instructions
+Program control commands
 %prm
 p1
-p1 = 0 ~: Repeat counter change value
+p1 = 0Å` : Repetition counter change value
 
 %inst
-Repeat The loop between loop is repeated.
-When the continue instruction is executed, it returns to the repeat instruction and executes the next iteration.
+Redoes the loop between repeatÅ`loop commands.
+When the continue command is executed, it returns to the repeat command and executes the next repetition.
 ^p
 	repeat 5
 		if cnt=2 : continue
 		mes "cnt="+cnt
 	loop
 ^p
-In the above example, the continue instruction is executed when the system variable cnt becomes 2.
+In the above example, the continue command is executed when the system variable cnt becomes 2.
 When the above script is executed,
 ^p
 	cnt=0
@@ -569,24 +530,10 @@ When the above script is executed,
 	cnt=3
 	cnt=4
 ^p
-You can see that the mes instruction is not executed only when the system variable cnt is 2.
-It may be confusing at first, but the continue instruction is not the location of the loop instruction, but it works the same as the loop instruction.
-The repeat counter is incremented by 1 when the continue instruction is executed, just like the loop instruction.
-If the continue instruction is executed at the last iteration, execution will continue from the state where repeat ~ loop is finished, that is, the instruction following the loop instruction.
-^
-There is another way to specify parameters in the continue instruction.
-You can change the contents of the system variable cnt, which indicates a repeat counter, by specifying a numeric or numeric variable after continue.
-For example, if "continue 1" is specified, the content of the system variable cnt becomes 1, and the repeat instruction is repeated with that value.
-If you omit the parameter and just "continue", the process is the same as the loop instruction, and if you specify a numerical value, the counter value will be changed and the process will be repeated.
-So
-^p
-	repeat 1
-		await 10
-		getkey a,1
-		if a=0 : continue 0
-	loop
-^p
-In such a script, repeat ~ loop is repeated, which should normally be executed only once, but if the left mouse button is not pressed, the counter is returned to 0 and an infinite loop is entered. Now you have to wait until you press the button.
+The display will be like this, and you can see that the mes command is not executed only when the system variable cnt is 2.
+It may be difficult to understand at first, but the continue command can also be said to work the same as the loop command, but not in the same location as the loop command.
+The repetition counter increases by 1 in the same way as the loop command even when the continue command is executed.
+If the continue command is executed in the last repetition, the repeatÅ`loop ends, that is, execution continues from the command after the loop command.
 
 %href
 repeat
@@ -594,179 +541,174 @@ foreach
 loop
 break
 
-
 %index
 onkey
-Key interrupt execution specification
+Specify key interrupt execution
 %group
-Program control instructions
+Program control command
 %prm
 goto/gosub *label
-* label: Label name
+*label : Label name
 
 %inst
-Specifies where to jump automatically when you press the keyboard.
+Specifies the location to automatically jump to when a key is pressed.
 ^
-After onkey, specify the goto or gosub keyword before writing the label. In the case of goto, a simple program jump. In the case of gosub, a subroutine jump is performed.
-If the goto / gosub keyword is omitted, the operation is the same as the goto keyword.
+After `onkey`, specify the `goto` or `gosub` keyword, followed by a label. `goto` performs a simple program jump. `gosub` performs a subroutine jump.
 ^
-If you specify a label with the onkey instruction, it will jump to the label specified by * label every time there is a key input when the HSP window is active.
+If the `goto/gosub` keyword is omitted, it behaves the same as the `goto` keyword.
 ^
-The interrupt jump accepts an interrupt and jumps when it is stopped by the stop instruction and the wait or await instruction.
-In addition, the system variables iparam, wparam, and lparam are set after jumping by interrupt.
+When a label is specified with the `onkey` command, from then on, whenever a key is pressed while the HSP window is active, the program jumps to the label specified by `*label`.
+^
+Interrupt jumps are accepted and performed when the program is stopped with the `stop` command or during `wait` and `await` commands.
+After an interrupt jump, the system variables `iparam`, `wparam`, and `lparam` are set.
 ^p
-   Interrupt factor | iparam | wparam | lparam
+   Interrupt Cause | iparam     | wparam | lparam
  ---------------------------------------------------------
-    onkey | Character code | wParam | lParam
+    onkey       | Character code | wParam | lParam
 ^p
-Parameters for each interrupt factor are assigned to the system variable iparam.
-In addition, wparam and lparam store the parameters passed as Windows messages as they are.
-It is also possible to temporarily turn ON / OFF the execution of event interrupts.
+The system variable `iparam` is assigned the parameter for each interrupt cause.
+Also, `wparam` and `lparam` contain the parameters passed as Windows messages.
+It is also possible to temporarily turn ON/OFF event interrupt execution.
 ^p
 	onkey 0
 ^p
-Temporarily stops the key interrupt with.
+temporarily stops key interrupts.
 ^p
 	onkey 1
 ^p
-You can resume the key interrupt that was paused with.
-
+restarts temporarily stopped key interrupts.
 
 %href
 onclick
 onexit
 onerror
 
-
 %index
 onclick
-Click interrupt execution specification
+Specify click interrupt execution
 %group
-Program control instructions
+Program control command
 %prm
 goto/gosub *label
-* label: Label name
+*label : Label name
 
 %inst
-Specifies where to jump automatically when the mouse button is pressed.
+Specifies the location to automatically jump to when a mouse button is pressed.
 ^
-After onclick, specify the goto or gosub keyword before writing the label. In the case of goto, a simple program jump. In the case of gosub, a subroutine jump is performed.
-If the goto / gosub keyword is omitted, the operation is the same as the goto keyword.
+After `onclick`, specify the `goto` or `gosub` keyword, followed by a label. `goto` performs a simple program jump. `gosub` performs a subroutine jump.
 ^
-If you specify a label with the onclicky command, it will jump to the label specified by * label every time there is a mouse click on the HSP window.
+If the `goto/gosub` keyword is omitted, it behaves the same as the `goto` keyword.
 ^
-The interrupt jump accepts an interrupt and jumps when it is stopped by the stop instruction and the wait or await instruction.
-In addition, the system variables iparam, wparam, and lparam are set after jumping by interrupt.
+When a label is specified with the `onclick` command, from then on, whenever there is a mouse click on the HSP window, the program jumps to the label specified by `*label`.
+^
+Interrupt jumps are accepted and performed when the program is stopped with the `stop` command or during `wait` and `await` commands.
+After an interrupt jump, the system variables `iparam`, `wparam`, and `lparam` are set.
 ^p
-   Interrupt factor | iparam | wparam | lparam
+   Interrupt Cause | iparam         | wparam | lparam
  -------------------------------------------------------
-   onclick | Mouse button ID | wParam | lParam
+   onclick      | Mouse button ID | wParam | lParam
 ^p
-Parameters for each interrupt factor are assigned to the system variable iparam.
-In addition, wparam and lparam store the parameters passed as Windows messages as they are.
-It is also possible to temporarily turn ON / OFF the execution of event interrupts.
+The system variable `iparam` is assigned the parameter for each interrupt cause.
+Also, `wparam` and `lparam` contain the parameters passed as Windows messages.
+It is also possible to temporarily turn ON/OFF event interrupt execution.
 ^p
 	onclick 0
 ^p
-Temporarily stops the interrupt with.
+temporarily stops interrupts.
 ^p
 	onclick 1
 ^p
-You can resume the interrupt that was paused with.
-
+restarts temporarily stopped interrupts.
 
 %href
 onkey
 onexit
 onerror
-
 
 %index
 onerror
 Jump when an error occurs
 %group
-Program control instructions
+Program control command
 %prm
 goto/gosub *label
-* label: Label name
+*label : Label name
 %inst
-Specifies where to jump automatically when an error occurs inside the HSP due to a script.
+Specifies the location to automatically jump to when an error occurs within HSP due to the script.
 ^
-After onerror, specify the goto or gosub keyword before writing the label. In the case of goto, a simple program jump. In the case of gosub, a subroutine jump is performed.
-If the goto / gosub keyword is omitted, the operation is the same as the goto keyword.
+After `onerror`, specify the `goto` or `gosub` keyword, followed by a label. `goto` performs a simple program jump. `gosub` performs a subroutine jump.
 ^
-Normally, the system error message dialog is displayed when an error occurs, but instead it is set to jump to the specified label. After the jump, the information is assigned to the following system variables.
+If the `goto/gosub` keyword is omitted, it behaves the same as the `goto` keyword.
+^
+Normally, a system error message dialog is displayed when an error occurs, but instead, the program is set to jump to the specified label. After the jump, the following system variables are assigned information:
 ^p
-wparam: error number
-lparam: Error line number
-iparam: 0 (none)
+	wparam : Error number
+	lparam : Error line number
+	iparam : 0 (none)
 ^p
-Even if you specify the processing after the error by the onerror instruction, when the necessary processing is completed, do not restart the application execution as it is, but end it with the end instruction as much as possible.
-The onerror instruction does not recover from an error.
-Depending on the cause of the error, the HSP system itself may become unstable or fail. As a scene to use the onerror instruction, if you want to display your own error on the application side when an error occurs when creating an executable file, or if you want to display for debugging only when a specific error occurs, you can think of it. Can be done.
+Even if processing after an error is specified with the `onerror` command, after the necessary processing is completed, do not resume execution of the application and instead, terminate it with the `end` command.
+The `onerror` command is not for recovering from errors.
+Depending on the cause of the error, the HSP system itself may become unstable or malfunctions may occur. The `onerror` command can be used when you want the application to display its own error message when an error occurs during executable file creation, or when you want to display debugging information only when a specific error occurs.
 ^
-It is also possible to temporarily turn on / off the jump at the end.
+It is also possible to temporarily turn ON/OFF the end-time jump.
 ^p
 	onerror 0
 ^p
-Temporarily stops the interrupt with.
+temporarily stops interrupts.
 ^p
 	onerror 1
 ^p
-You can resume the interrupt that was paused with.
-
+restarts temporarily stopped interrupts.
 
 %href
 onkey
 onclick
 onexit
 
-
 %index
 exgoto
-Conditional jump to the specified label
+Conditional jump to specified label
 %group
-Program control instructions
+Program control command
 %prm
 var,p1,p2,*label
-var: Variables used for comparison
-p1: Comparison flag
-p2: Comparison value
-* label: Label name
+var    : Variable used for comparison
+p1     : Comparison flag
+p2     : Comparison value
+*label : Label name
 %inst
-The value assigned to the variable specified by var and the label specified by the comparison value of p2 are jumped conditionally.
-The comparison method is to jump when (var value> = p2) is satisfied when the comparison flag of p1 is 0 or more (positive value), and (var value <=) when p1 is -1 or less (negative value). Jump when p2) is established.
-The variable specified by var must be of type integer. If it is initialized with a different type, an error will occur at runtime.
-This instruction is provided to speed up some macro processing such as for.
-Although the exgoto instruction can be used alone, it is recommended to perform normal conditional branching by the if instruction from the viewpoint of script visibility.
+Conditionally jumps to the specified label based on the value assigned to the variable specified by `var` and the comparison value of `p2`.
+For the comparison method, if the comparison flag of `p1` is 0 or greater (positive value), the program jumps when (var's value >= p2) is true, and if `p1` is -1 or less (negative value), the program jumps when (var's value <= p2) is true.
+The variable specified by `var` must be an integer type. If it is initialized with a different type, an error will occur at runtime.
+This command is provided to speed up some macro processing, such as `for`.
+You can use the `exgoto` command alone, but from the perspective of script visibility, it is recommended to use normal conditional branching with the `if` command.
 %href
 goto
 if
 
-
 %index
 on
-Numerical branch
+Branching by number
 %group
-Program control instructions
+Program control command
 %prm
-p1 goto / gosub Label 0, Label 1Åc
-p1 = 0 to (0): Value for branching
-Label 0 to: Label name of branch destination
+p1 goto/gosub Label0,Label1Åc
+p1=0Å`(0) : Value for branching
+Label0Å` : Branch destination label name
 %inst
-The on instruction selects the branch destination according to the value specified by p1 being 0, 1, 2 ...
-You can write one or more labels separated by "," in a format such as "on number goto" or "on number gosub".
-If the specified number is 0, label 0 will be the target of branching, and if the number is 1, label 1 will be the target of branching. After that, describe any number of labels corresponding to 2, 3, 4 ... Is possible.
-In the case of "on numeric goto", the same simple branch as the goto instruction is performed, and in the case of "on numeric gosub", the same subroutine jump as the gosub instruction is performed.
-If the number is negative or no corresponding label is specified, no branching will occur and the next line will proceed.
-Please note that unlike the n88 series BASIC, the first label corresponds to the number 0. (In n88 series BASIC, the number 1 is the first label)
+The `on` command selects a branch destination according to the value specified by `p1` (0, 1, 2...).
+In the format "on number goto" or "on number gosub", you can then write one or more branch destination labels separated by ",".
+If the specified number is 0, Label0 is the branch target, and if the number is 1, Label1 is the branch target. You can write any number of corresponding labels after 2, 3, 4...
+"on number goto" is the same as a simple branch with the `goto` command, and "on number gosub" is the same as a subroutine jump with the `gosub` command.
+If the number is a negative value or the corresponding label is not specified, branching does not occur and the program proceeds to the next line.
+Please note that unlike N88-BASIC, the first label corresponds to the number 0. (In N88-BASIC, the number 1 is the first label.)
 %href
 goto
 gosub
 %sample
 	a=1
 	on a goto *a0,*a1,*a2
-mes "Other": stop
+	mes "Other":stop
 *a0
 	mes "A=0":stop
 *a1
@@ -774,126 +716,120 @@ mes "Other": stop
 *a2
 	mes "A=2":stop
 
-
 %index
 while
-while iterative start
+Start while loop
 %group
 Program control macro
 %prm
 p1
-p1 = Conditional expression (1): Condition to repeat
+p1=Conditional expression(1) : Condition for looping
 %inst
-Repeats from while to end only as long as the conditions following while are met.
-If the condition is not met, while to wend will not be executed.
-If the condition following while is omitted, it will be repeated infinitely.
+The section from `while` to `wend` is repeated only while the condition following `while` is met.
+If the condition is not met, the section from `while` to `wend` is not executed.
+If the condition following `while` is omitted, the program loops infinitely.
 ^p
 	a=0
 	while a<5
 	a=a+1:mes "A="+a
-wend; repeat while and below only while a is 5 or less
+	wend     ; Repeats while A is less than or equal to 5
 ^p
-You can also restart and escape with the _continue and _break macros.
-While-wend control is realized by using the macro function of the preprocessor.
-Please use it when you want to write something similar to C or Java.
-For beginners, we recommend repeating the description with the repeat ~ loop instruction or the if instruction.
+Also, it is possible to resume and exit using the `_continue` and `_break` macros.
+The `while` to `wend` control is implemented using the preprocessor's macro function.
+Please use this if you want to write code similar to C or Java.
+For beginners, we recommend the `repeat` to `loop` commands, or a loop description using the `if` command.
 %href
 _continue
 _break
 wend
 
-
 %index
 wend
-while iteratively ends
+End while loop
 %group
 Program control macro
 %inst
-Specifies the end of the repeating interval specified by while.
-See the while macro section for details.
+Specifies the end of the loop section specified by `while`.
+See the `while` macro section for more information.
 %href
 while
 
-
 %index
 until
-do repeat end
+End do loop
 %group
 Program control macro
 %prm
 p1
-p1 = Conditional expression (1): Condition to repeat
+p1=Conditional expression(1) : Condition for looping
 %inst
-Repeat the part from do to until until the conditions following until are met.
-Execute in do ~ until at least once even if the conditions are met.
-If the condition following until is omitted, the process will not be repeated.
+The section from `do` to `until` is repeated until the condition following `until` is met.
+Even if the condition is met, the `do` to `until` section is executed at least once.
+If the condition following `until` is omitted, the program does not loop.
 ^p
 	a=0
 	do
 	a=a+1:mes "A="+a
-until a> 5; repeat do or less until a is 5 or more
+	until a>5    ; Repeats do until A is greater than 5
 ^p
-You can also restart and escape with the _continue and _break macros.
-Do ~ until control is realized by using the macro function of the preprocessor.
-Please use it when you want to write something similar to C or Java.
-For beginners, we recommend the repeat ~ loop instruction or the repeated description that combines the goto instruction and the if instruction.
+Also, it is possible to resume and exit using the `_continue` and `_break` macros.
+The `do` to `until` control is implemented using the preprocessor's macro function.
+Please use this if you want to write code similar to C or Java.
+For beginners, we recommend the `repeat` to `loop` commands, or a loop description using the `goto` command in combination with the `if` command.
 %href
 _continue
 _break
 do
 
-
 %index
 do
-do repeat start
+Start do loop
 %group
 Program control macro
 %inst
-Specifies the beginning of the repeating interval until until.
-The repeat condition is described by the until macro.
-See the until macro section for more information.
+Specifies the beginning of the loop section up to `until`.
+The loop condition is described by the `until` macro.
+See the `until` macro section for more information.
 %href
 until
 
-
 %index
 for
-Start repeating specified number of times
+Start specified number of loops
 %group
 Program control macro
 %prm
 p1,p2,p3,p4
-p1: Variable name
-p2 (0): Initial value
-p3 (0): Closing price
-p4 (1): Increment
+p1    : Variable name
+p2(0) : Initial value
+p3(0) : End value
+p4(1) : Increment
 %inst
-If you specify a variable name, initial value, closing price, increment, etc. as parameters, it repeats between for and next a specified number of times.
-Values in parentheses are omitted. The variable name cannot be omitted.
-The specified variable is used as a counter, starting from the initial value and incrementing each time it is repeated. When the closing price is reached, it exits the iteration (the closing price is not included in the loop).
-If the closing price condition is met from the beginning, the iteration will not be executed.
-You can also restart and escape with the _continue and _break macros.
-^p
+When a variable name, initial value, end value, increment, etc. are specified as parameters, the section between `for` and `next` is repeated the specified number of times.
+Values in parentheses are the default values. The variable name cannot be omitted.
+The specified variable is used as a counter, starting from the initial value, and the increment is added each time the loop is repeated. The loop is exited when the end value is reached (the end value is not included in the loop).
+If the end value condition is met from the beginning, the loop is not executed.
+Also, it is possible to resume and exit using the `_continue` and `_break` macros.
 	for a,0,5,1
 	mes "A="+a
-next; a repeats between 0 and 4 (5 times)
+	next    ; Repeats 5 times while a is between 0 and 4
 ^p
-In this example, the variable a repeats 0,1,2,3,4 5 times to end the loop.
-You can also specify a negative value for the increment.
+In this example, the variable a repeats 5 times with the values 0, 1, 2, 3, and 4 before the loop ends.
+It is also possible to specify a negative value for the increment.
 ^p
 	for a,5,0,-1
 	mes "A="+a
-next; a repeats between 5 and 1 (5 times)
+	next    ; Repeats 5 times while a is between 5 and 1
 ^p
-In this case, the variable a repeats 5,4,3,2,1 5 times to end the loop.
+In this case, the variable a repeats 5 times with the values 5, 4, 3, 2, and 1 before the loop ends.
 ^
-It is necessary to specify an integer for the initial value and closing price specified by the for macro.
-If you specify any other type, an error will occur.
-Also note that depending on the increment or closing price specified, an infinite loop may occur.
+The initial value and final value specified in the for macro must be integers.
+Specifying other types will result in an error.
+Also, be careful as an infinite loop may occur depending on the specified increment or final value.
 ^
-For ~ next control is realized by using the macro function of the preprocessor.
-Please use it when you want to write something similar to C or Java.
-For beginners, we recommend repeating the description with the repeat ~ loop instruction or the if instruction. The for macro internally generates a special program control instruction exgoto after macro expansion.
+The for~next control is implemented using the preprocessor's macro function.
+Please use it when you want to write code similar to C or Java.
+We recommend repeat~loop commands or repetitive descriptions using if commands for beginners. The for macro internally generates a special program control command exgoto after macro expansion.
 %href
 _continue
 _break
@@ -903,11 +839,11 @@ exgoto
 
 %index
 next
-Ends repeating the specified number of times
+Ends the specified number of repetitions
 %group
 Program control macro
 %inst
-Specifies the end of the repeating interval specified by for.
+Specifies the end of the repetition interval specified by for.
 See the for macro section for details.
 %href
 for
@@ -915,46 +851,46 @@ for
 
 %index
 switch
-Comparison block start
+Start comparison block
 %group
 Program control macro
 %prm
 p1
-p1: Comparison source
+p1 : Comparison source
 %inst
-switch ~ case ~ swend is a syntax that allows you to write multiple conditional judgments and processes together in a block.
-The comparison source parameter specified by p1 can be a variable or an expression. After the switch,
+switch~case~swend is a construct that allows you to write multiple conditional judgments and processing together in a block.
+The comparison source parameter specified by p1 can be a variable or an expression. After switch,
 ^
-case comparison value
+case Comparison value
 ^
-By putting, you can describe the content to be processed when the "comparison source" is the same as the "comparison value" after this.
-Multiple cases can be described in the block, and the processing for each comparison value can be specified. If the case comparison is correct, execute subsequent instructions until swbreak exists. Also, instead of case
+By placing this, you can describe the content to be processed if the "comparison source" is the same as the "comparison value" thereafter.
+Multiple cases can be described in a block, and processing for each comparison value can be specified. If the case comparison is correct, the subsequent instructions are executed until swbreak exists. Also, instead of case
 ^
 default
 ^
-If is set, the following will be executed if the condition does not apply to any of the comparison values specified in case.
+If you place this, the following will be executed if none of the comparison values specified in case match.
 ^
-If the switch block is finished
+When the switch block is finished,
 ^
 swend
 ^
-Must be written at the end.
-The following is an example script using the switch macro.
+Must be written at the end without fail.
+The following is an example of a script using the switch macro.
 ^p
 	a=0
-switch a; compare a
-case 0; if a is 0
+	switch a               ; a is the comparison target
+	case 0                 ; If a is 0
 		mes "A=0"
-swbreak; Condition execution end of case0
-case 1; if a is 1
+		swbreak            ; End case 0 condition execution
+	case 1                 ; If a is 1
 		mes "A=1"
-default; if a is non-zero
+	default                ; If a is other than 0
 		mes "A!=0"
 		swbreak
 	swend
 ^p
-In this example, conditional branching is performed depending on whether the content of variable a is 0, 1 or something else.
-After "case 0", up to "swbreak" is executed, but in the case of "case 1", since "swbreak" does not exist, "mes" A! = 0 "" executed after "default" Please note that it will be executed including.
+In this example, conditional branching is performed based on whether the content of variable a is 0, 1, or something else.
+After "case 0", the execution continues until "swbreak", but in the case of "case 1", "swbreak" does not exist, so the "mes "A!=0"" that is executed after "default" is also executed. Please note this.
 %href
 case
 default
@@ -964,12 +900,12 @@ swend
 
 %index
 swend
-Comparison block end
+End comparison block
 %group
 Program control macro
 %inst
-Specifies the end of the comparison block specified by the switch.
-See the switch macro section for more details.
+Specifies the end of the comparison block specified by switch.
+See the switch macro section for details.
 %href
 switch
 case
@@ -983,8 +919,8 @@ Default comparison specification
 %group
 Program control macro
 %inst
-In the comparison block of switch to swend, specify the process to be executed when the conditions do not apply to the previous cases.
-See the switch macro section for more details.
+Within the switch~swend comparison block, specifies the processing that is executed when the condition does not match any of the previous cases.
+See the switch macro section for details.
 %href
 switch
 case
@@ -999,10 +935,10 @@ Comparison value specification
 Program control macro
 %prm
 p1
-p1: Comparison value
+p1 : Comparison value
 %inst
-In the comparison block of switch to swend, specify the condition with the comparison source and specify the process to be executed when it is correct.
-See the switch macro section for more details.
+Within the switch~swend comparison block, specifies the condition with the comparison source and specifies the processing to be executed if the condition is correct.
+See the switch macro section for details.
 %href
 switch
 default
@@ -1012,12 +948,12 @@ swend
 
 %index
 swbreak
-Comparison execution escape designation
+Comparison execution exit specification
 %group
 Program control macro
 %inst
-Escape from the comparison block of switch ~ swend.
-See the switch macro section for more details.
+Exits from within the switch~swend comparison block.
+See the switch macro section for details.
 %href
 switch
 default
@@ -1031,9 +967,8 @@ Redo the macro loop
 %group
 Program control macro
 %inst
-Repeating macros defined by standard macros,
-Redo the loop between while ~ wed, do ~ until, and for ~ next.
-It does not execute in the repeating block after the present, and restarts from the next repeating.
+Restarts the loop between the standard macro-defined repetition macros: while~wend, do~until, for~next.
+The current and subsequent blocks within the repetition are not executed, and the next repetition is restarted.
 %href
 _break
 while
@@ -1046,13 +981,12 @@ next
 
 %index
 _break
-Escape the macro loop
+Exit the macro loop
 %group
 Program control macro
 %inst
-Repeating macros defined by standard macros,
-Break out of the loop between while ~ wend, do ~ until, and for ~ next.
-It does not execute in the repeating block after the present, and resumes from the instruction next to the loop.
+Breaks out of the standard macro-defined repetition macros: while~wend, do~until, for~next.
+The current and subsequent blocks within the repetition are not executed, and the command after the loop is restarted.
 %href
 _continue
 while
@@ -1067,26 +1001,26 @@ next
 
 %index
 foreach
-Repeat for the number of elements of the variable
+Repeats as many times as the number of elements in the variable
 %group
-Program control instructions
+Program control command
 %prm
 p1
-p1 = variable name: variable to be looped
+p1=Variable name : Variable to be looped
 
 %inst
-Iterate as many times as there are elements stored in the array variable.
-Foreach is described at the loop start location like the repeat instruction, and the loop instruction is described at the loop end location.
-The difference from the repeat instruction is that the number of elements of the specified array variable is the number of repetitions, and in the case of modular variables, the elements deleted by the delmod instruction do not execute the loop contents.
+Repeats as many times as the number of elements stored in the array variable.
+foreach is written at the loop start location like the repeat command, and the loop command is written at the loop end location.
+The difference from the repeat command is that the number of elements of the specified array variable is the number of repetitions, and in the case of a module type variable, the loop content is not executed for elements deleted by the delmod command.
 ^p
-example :
+Example :
 	dim a,10
 	foreach a
 	mes "#"+cnt+":"+a.cnt
 	loop
 ^p
-By specifying the system variable cnt as an array element in a loop, you can concisely write a process that causes all elements to be executed repeatedly.
-Also, the break and continue instructions function in the same way as when using the repeat instruction.
+By specifying the system variable cnt as an array element in the loop, you can simply write processing that repeatedly executes all elements.
+Also, the break and continue commands function the same way as when using the repeat command.
 
 %href
 repeat
@@ -1100,50 +1034,59 @@ continue
 oncmd
 Windows message interrupt execution specification
 %group
-Program control instructions
+Program control command
 %prm
 goto/gosub *label,p1
-* label: Label name
-p1: Message ID
+*label : Label name
+p1     : Message ID
 
 %inst
-Specifies where to jump automatically when the specified window message is sent.
+Specifies the location to automatically jump to when the specified window message is sent.
 ^
-After oncmd, specify the goto or gosub keyword before writing the label.
-In the case of goto, a simple program jump. In the case of gosub, a subroutine jump is performed.
-If the goto / gosub keyword is omitted, the operation is the same as the goto keyword.
+After oncmd, specify the goto or gosub keyword followed by a label.
+In the case of goto, it is a simple program jump. In the case of gosub, a subroutine jump is performed.
+If the goto/gosub keyword is omitted, it will operate the same as the goto keyword.
 ^
-If you specify a label with the oncmd instruction, it will jump to the label specified by * label when the p1 message is sent to the HSP window after that.
-The oncmd instruction applies only to the current operation window.
-If multiple windows are created, each window can be registered using the oncmd command.
+When a label is specified by the oncmd command, from then on, when a message with p1 is sent to the HSP window, it jumps to the label specified by *label.
+The oncmd command only targets the current operation window.
+If you are creating multiple windows, you can register using the oncmd command for each window.
 ^
-If a window message that has already been registered is specified, the previous registration will be invalidated.
-Also, interrupt registration is out of sync with window initialization.
-Once registered, interrupts are valid until the application is closed.
+If a window message that has already been registered is specified, the previous registration is invalidated.
+Also, interrupt registration is not synchronized with window initialization.
+Once an interrupt is registered, it remains valid until the application is terminated.
 ^
-The interrupt jump accepts an interrupt and jumps when it is stopped by the stop instruction and the wait or await instruction.
-In addition, the system variables iparam, wparam, and lparam are set after jumping by interrupt.
-The window ID where the interrupt occurred can be obtained by using the ginfo function.
+The interrupt jump accepts interrupts and jumps when it is stopped by the stop command and the wait, await commands.
+Also, after performing a jump due to an interrupt, the system variables iparam, wparam, and lparam are set.
+The window ID in which the interrupt occurred can be obtained using the ginfo function.
 ^p
-   Interrupt factor | iparam | wparam | lparam
+   Interrupt factor | iparam       | wparam | lparam
  ---------------------------------------------------------------------
-   oncmd | Message ID | wParam | lParam
+   oncmd        | Message ID | wParam | lParam
 ^p
-The sent message ID is assigned to the system variable iparam.
-In addition, wparam and lparam store the parameters passed as Windows messages as they are.
-If a subroutine jump occurs due to the gosub keyword in the interrupt settings, the return value can be set with the return instruction.
-For "return number", specify the value returned by the window procedure.
-If no parameter is specified in the return instruction, processing is passed to the default window procedure.
+The system variable iparam is assigned the ID of the sent message.
+Also, wparam and lparam store the parameters passed as Windows messages as is.
+When a subroutine jump occurs due to the gosub keyword in the interrupt setting, it is possible to set a return value using the return command.
+Specify the value to be returned by the window procedure with "return numeric value".
+If no parameters are specified for the return command, the processing is passed to the default window procedure.
 ^
-It is also possible to temporarily turn ON / OFF the execution of event interrupts.
+It is also possible to temporarily turn ON/OFF the event interrupt execution.
+^p
+	oncmd 0, Message ID
+^p
+Temporarily stops the interrupt with the specified message ID.
+^p
+	oncmd 1, Message ID
+^p
+Restarts the temporarily stopped interrupt.
+It is also possible to turn ON/OFF event interrupt execution collectively.
 ^p
 	oncmd 0
 ^p
-Temporarily stops the interrupt with.
+Stops Windows message interrupts entirely.
 ^p
 	oncmd 1
 ^p
-You can resume the interrupt that was paused with.
+Restarts Windows message interrupts entirely.
 
 
 %href
@@ -1155,20 +1098,19 @@ onerror
 
 %index
 else
-If the condition is not met, execute the instruction on that line
+Execute the command on that line if the condition is not met
 %group
-Program control instructions
+Program control command
 %inst
-Used in combination with the if instruction.
-For details, refer to the explanation of the if instruction.
+Used in combination with the if command.
+See the explanation of the if command for details.
 
 %sample
 if a == 0 {
-mes "a is 0."
+	mes "a is 0."
 } else {
-mes "a is not 0."
+	mes "a is not 0."
 }
 
 %href
 if
-

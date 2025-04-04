@@ -1,124 +1,123 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html lang="ja">
+<html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="Content-Language" content="ja">
+	<meta http-equiv="Content-Language" content="en">
 	<meta http-equiv="Content-Style-Type" content="text/css">
 	<meta http-equiv="Content-Script-Type" content="text/javascript">
 	<meta name="author" content="OpenHSP3 Project">
-<meta name = "keywords" content = "HSP3, HotSoupProcessor3, string, character code">
-<meta name = "description" content = "Materials related to character strings handled by HSP3">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,string,character code">
+	<meta name="description" content="Materials about strings handled by HSP3">
 	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
 	<link href="../single.css" rel="stylesheet" type="text/css" media="all">
-<title> HSP3 String Secrets (TIPS) </title>
+	<title>HSP3 Secrets of Strings (TIPS)</title>
 </head>
 <body>
 	<div id="CONTAINER">
-<!-Header->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<!-- Header -->
+		<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-(c)</p>
 		<img src="hsp3ttl.jpg" alt="title" width="640" height="200">
-<h1> HSP3 string secret (TIPS) </h1>
+		<h1>HSP3 Secrets of Strings (TIPS)</h1>
 
-<!-Table of Contents->
+		<!-- Table of Contents -->
 		<ol>
-<li> <a href="#FIRST"> Introduction </a> </li>
-<li> <a href="#BASIC"> String basics </a> </li>
-<li> <a href="#WHATIS"> What is a string? </a> </li>
-<li> <a href="#BUF"> Strings and buffers </a> </li>
-<li> <a href="#ABOUTSTRING"> How strings work </a> </li>
-<li> <a href="#ABOUTTEXT"> How text files work </a> </li>
-<li> <a href="#ABOUTMULTILINE"> How multi-line strings work </a> </li>
-<li> <a href="#ABOUTMEMNOTE"> How memory notepad instructions work </a> </li>
-<li> <a href="#FUNC"> String manipulation function </a> </li>
-<li> <a href="#ABOUTJPN"> How Japanese strings work </a> </li>
-<li> <a href="#LAST"> Finally </a> </li>
+			<li><a href="#FIRST">Introduction</a></li>
+			<li><a href="#BASIC">Basics of Strings</a></li>
+			<li><a href="#WHATIS">What is a String?</a></li>
+			<li><a href="#BUF">Strings and Buffers</a></li>
+			<li><a href="#ABOUTSTRING">String Mechanism</a></li>
+			<li><a href="#ABOUTTEXT">Text File Mechanism</a></li>
+			<li><a href="#ABOUTMULTILINE">Multiline String Mechanism</a></li>
+			<li><a href="#ABOUTMEMNOTE">Memory NotePad Command Mechanism</a></li>
+			<li><a href="#FUNC">String Manipulation Functions</a></li>
+			<li><a href="#ABOUTJPN">Japanese String Mechanism</a></li>
+			<li><a href="#LAST">Conclusion</a></li>
 		</ol>
 
-<h2 id = "FIRST"> Introduction </h2>
+		<h2 id="FIRST">Introduction</h2>
 		<p>
-HSP can hold types such as numeric type and string type as the contents of variables.
-In this document, I will explain how string types are handled by HSP.
-The details of each instruction and its application are explained.
+			HSP can hold data types such as numeric types and string types as variable contents.
+			This document explains how string types are processed in HSP, detailing
+			each command and its applications.
 		</p>
 		<p>
-By understanding the handling of strings, you should be able to operate strings in more detail.
-Also, there are parts related to memory management and file handling, so it may be useful to know it.
-Will come.
+			Understanding how to handle strings allows for more detailed string manipulation.
+			It also relates to memory management and file handling, so knowing it will surely be useful
+			someday.
 		</p>
 		
-<h2 id = "BASIC"> String basics </h2>
+		<h2 id="BASIC">Basics of Strings</h2>
 		<p>
-First, let's review the basics of handling strings in HSP.
-A character string is a collection of characters enclosed in "(half-width double quotation marks).
-HSP uses character strings in all situations such as displaying messages and file names.
+			First, let's review the basics of handling strings in HSP.
+			A string is a collection of characters enclosed in " (double quotes).
+			In HSP, strings are used in various situations such as displaying messages and file names.
 		</p>
 		<p>
-For example, <code> mes "TEST MESSAGE" </code>
-In the command, the character string "TEST MESSAGE" enclosed in "" "is displayed on the screen.
+			For example, in the command <code>mes "TEST MESSAGE"</code>,
+			the string "TEST MESSAGE" enclosed in " is displayed on the screen.
 		</p>
 		<p>
-You can also store a character string in a variable.
-For example, if you write <code> a = "TEST MESSAGE" </code>, the variable a will contain the string "TEST MESSAGE".
-It will be remembered. That way, instead of specifying a string like <code> mes a </code>
-You can specify the variable name and use the character string stored in the variable as a parameter.
+			You can also store strings in variables.
+			For example, if you write <code>a="TEST MESSAGE"</code>, the string "TEST MESSAGE" is stored in the variable a.
+			Then, instead of specifying the string directly, like <code>mes a</code>, you can
+			specify the variable name and use the string stored in the variable as a parameter.
 		</p>
 		<p>
-The above is basic, but as an application of this, it is possible to add expressions to strings.
+			The above is basic, but as an application of this, you can add expressions to strings.
 		</p>
 		<p>
-For example, in the command <code> a = "TEST" + "MESSAGE" </code>, the string "TEST" and
-The character string "MESSAGE" is added with "+".
-If it is a numerical calculation, it will be added, but if you add the character strings, the character strings will be concatenated.
-In other words, the two strings are connected to form the string "TEST MESSAGE".
-The only expression that can be used in a character string is addition, but you can connect multiple expressions like <code> a = "ABC" + "DEF" + "GHI" </code>.
-You can, or you can put a variable in between, like <code> a = "ABC" + b + "DEF" + c </code>. So
+			For example, in the command <code>a="TEST"+" MESSAGE"</code>, the string "TEST" and
+			the string " MESSAGE" are added together using "+".
+			In the case of numerical calculation, they would be added, but when strings are added, they are concatenated.
+			In other words, the two strings are joined to become the string "TEST MESSAGE".
+			The only expression that can be used with strings is addition, but you can connect as many as you like, such as <code>a="ABC"+"DEF"+"GHI"</code>,
+			and you can also insert variables in between, such as <code>a="ABC"+b+"DEF"+c</code>. So,
 		</p>
 		<pre>    a="TEST"
     b=" AND "
     c="MESSAGE"
     print a+b+c</pre>
 		<p>
-If you do, the contents of the three variables will be concatenated and the string "TEST AND MESSAGE" will appear on the screen.
-It shows. If this is not a string type variable, but a numeric type variable that stores a numerical value is in the middle
-What happens if you add them together?
+			The contents of the three variables are concatenated and the string "TEST AND MESSAGE" is displayed on the screen.
+			What happens if, instead of string type variables, you add a numeric type variable in the middle?
 		</p>
 		<p>
-HSP has the following promises.
+			HSP has the following rules:
 		</p>
 		<ul>
-<li> When "numeric type" is added to "character string type", "numerical value" is converted into a character string and concatenated. </li>
-<li> When "character string type" is added to "numeric type", "character string" is converted to a numerical value and added. </li>
+			<li>If a "numeric type" is added to a "string type", the "number" is converted to a string and concatenated.</li>
+			<li>If a "string type" is added to a "numeric type", the "string" is converted to a number and added.</li>
 		</ul>
 		<p>
-In other words, it automatically matches the type that is the first term in the formula. So
+			In other words, it automatically matches the type of the first term in the calculation. So,
 		</p>
 		<pre>    a="TEST "
     b=12345
     c=" MESSAGE"
     print a+b+c</pre>
 		<p>
-Even if there is a numeric type variable like, the display will be "TEST 12345 MESSAGE", which is
-It is treated as a character string to the last.
+			Even if a numeric type variable is in the middle, the display will be "TEST 12345 MESSAGE", and this will be
+			treated as a string.
 		</p>
 
-<h2 id = "WHATIS"> What is a string? </H2>
+		<h2 id="WHATIS">What is a String?</h2>
 		<p>
-How does HSP manage strings?
-As I said before, a string is a collection of characters of indefinite length.
-String variables can store an unlimited number of characters as long as memory allows.
-Here, if you know the relationship between "character string" and "buffer", the handling of character strings will be handled.
-It will be more refreshing.
+			How does HSP manage strings?
+			As mentioned before, a string is a collection of characters of indefinite length.
+			String type variables can store an unlimited number of characters, as much as memory allows.
+			Here, understanding the relationship between "strings" and "buffers" will make handling strings
+			clearer.
 		</p>
 		<p>
-HSP manages each character of the character string by handling it as a numerical value called "code".
-This is because any computer is internally managed numerically.
-Take a look at the table below.
+			In HSP, each character in a string is handled and managed as a number called "code".
+			This is because any computer manages it internally as a number.
+			Please see the table below.
 		</p>
 		<table class="keywordlist">
-<caption> ASCII code table </caption>
+		<caption>ASCII Code Table</caption>
 		<tr>
-<th> Code (decimal) </th>
-<th> Code (hexary) </th>
+			<th>Code (Decimal)</th>
+			<th>Code (Hexadecimal)</th>
 			<th>0</th>
 			<th>1</th>
 			<th>2</th>
@@ -139,7 +138,7 @@ Take a look at the table below.
 		<tr>
 			<th>32</th>
 			<th>$20</th>
-<td> </td>
+			<td>　</td>
 			<td>!</td>
 			<td>"</td>
 			<td>#</td>
@@ -254,126 +253,122 @@ Take a look at the table below.
 			<td>|</td>
 			<td>}</td>
 			<td>~</td>
-<td> </td>
+			<td>　</td>
 		</tr>
 		</table>
 		
 		<p>
-This is called the <em> ASCII code table </em>.
-Every character has a corresponding number (code). Among them, it is used as standard,
-ASCII code with only half-width alphabets and symbols extracted
-			( ASCII : American Standard Code for Information Interchange )
-It's called. This is enough in English, but in Japanese there are many other double-byte characters,
-Each also has a code.
+			This is called the <em>ASCII code table</em>.
+			Every character has a corresponding number (code). Among these, the standard
+			alphanumeric characters and symbols are called ASCII code
+			( ASCII : American Standard Code for Information Interchange ).
+			This is sufficient for English, but Japanese has many other full-width characters,
+			each of which also has a code.
 		</p>
 		<p>
-This is not a difficult concept, simply the letter "A" is code 65 (decimal) and "$" is
-It's just that you can convert it to a number like 36 (decimal number).
+			This is not a difficult concept; it simply means that the character "A" can be converted to the code 65 (decimal), and "$" can be
+			converted to 36 (decimal).
 		</p>
 		<p>
-The way to read this table is, for example, if it is "@", it will be "64" according to the numerical value in the "code" on the left.
-After that, it will increase by 1 each time it shifts to the right. In other words, "A" is 65, "B" is 66, and so on.
-Decimal numbers and hexadecimal numbers are written in the "code" section, but in the computer world, they are hexadecimal numbers.
-Decimal numbers are fine for HSP, and of course hexadecimal numbers are OK because the delimiters are good.
-(In HSP, hexadecimal numbers are written with $ at the beginning, such as "$ 48")
-So "N" is 78 in decimal and $ 6e in hexadecimal. I'm in trouble if I get confused, so here
-Unless otherwise stated, the code will be treated as a decimal number.
+			To read this table, for example, "@" has a value of "64" as shown in the "Code" on the left,
+			and increases by 1 each time you move to the right. In other words, "A" is 65, "B" is 66, and so on.
+			The "Code" section has decimal and hexadecimal numbers, and in the computer world, hexadecimal numbers have
+			good breaks, so in HSP, you can use decimal or hexadecimal.
+			(In HSP, hexadecimal numbers are written with a $ at the beginning, such as "$48".)
+			Therefore, "N" is 78 in decimal and $6e in hexadecimal. To avoid confusion, we will use decimal numbers here
+			unless otherwise specified.
 		</p>
 		<p>
-By the way, the space that comes out when you press the space key is code 32.
-There are other spaces, but they are not normally used.
+			By the way, the space that appears when you press the space key has code 32.
+			There are other places that are spaces, but they are not usually used.
 		</p>
 		<p>
-Now, a string can be thought of as a collection of this code.
-The code can be a number from 0 to 255. In other words, it can represent 256 types of characters.
-That's why. However, if you include Japanese kanji, the amount will be enormous, and 256 types are not enough.
-So, in HSP, Japanese uses two codes, 256 types x 256 types = 65536 types (although not so much).
-I'm going to use the code.
+			Now, a string can be thought of as a collection of these codes.
+			Codes are numbers from 0 to 255. In other words, we can represent 256 types of characters.
+			However, if we include Japanese kanji and other characters, the amount becomes enormous, and 256 types are not enough.
+			Therefore, in HSP, Japanese uses two codes, resulting in 256 types x 256 types = 65536 types (not that many though).
 		</p>
 		<p>
-Japanese characters are called full-width characters, and English characters are called half-width characters.
-This is because the English characters (ASCII code) are half the size of the Japanese characters.
-There are various ways to represent Japanese codes, but the one used by HSP is
-It is called Shift JIS (SJIS). This document also provides explanations based on Shift JIS.
+			The reason why Japanese characters are called full-width and English characters are called half-width is that
+			English characters (ASCII code) are half the size of Japanese characters.
+			There are various ways to represent Japanese code, but HSP uses
+			something called Shift-JIS (SJIS). This document also provides explanations based on Shift-JIS.
 		</p>
 		<p>
-First of all, it is said that "a character string is a line of several codes that represent characters".
-Remember here. You'll soon see what this helps.
+			First of all, please remember here that "a string is a series of codes representing characters".
+			You will soon see how this is useful.
 		</p>
 		
 		
-<h2 id = "BUF"> Strings and buffers </h2>
+		<h2 id="BUF">Strings and Buffers</h2>
 		<p>
-It turns out that the characters can be codes that are represented by numbers from 0 to 255.
-This number of 256 types is a unit of 1 byte (byte) that often appears in the computer world.
-Become. A byte is a basic unit for storing a numerical value in the memory of a computer.
-A number from 0 to 255 can be stored in 1 byte. 1 megabyte of memory
-When converted to bytes, it is roughly 1,000,000 bytes, which is a very small unit.
+			We now know that characters can be represented by codes that are numbers from 0 to 255.
+			This number, 256, is a unit often found in the computer world called 1 byte.
+			A byte is the basic unit for storing numbers in computer memory, and
+			one byte can store numbers from 0 to 255. A megabyte of memory is roughly
+			1,000,000 bytes when converted to bytes, so it is a very small unit.
 		</p>
 		<p>
-The reason why I talked about this kind of hardware is not because I want to make it difficult.
-This 1 byte, numerical value from 0 to 255, refers to HSP's poke instruction and peek function.
-I wanted you to remember it.
+			I brought up this rather hardware-oriented topic not to make things difficult.
+			I wanted to remind you of HSP's poke command and peek function with this 1 byte, a value from 0 to 255.
 		</p>
 		<p>
-The poke instruction and peek function are instructions for reading and writing the memory buffer, and what is a character string?
-I feel unrelated. However, the location where the contents of the <em> variable are also stored
-It's one of the memory buffers </em>.
+			The poke command and peek function are commands for reading and writing memory buffers, which seems a bit
+			unrelated to strings. However, <em>the place where variable contents are stored is also one of the memory buffers</em>.
 		</p>
 		<p>
-This is an important concept that is useful to know. A character string stored in a character string type variable
-The contents of, numeric variables, and even arrays can be read and written by the peek function and poke instruction.
-about it. Similarly, all instructions that target the memory buffer (bload instruction and bsave instruction)
-Can be used for regular variables.
+			This is an important concept to know. The contents of strings stored in string-type variables,
+			numeric variables, and even arrays can be read and written with the peek function and poke command.
+			Similarly, commands targeting memory buffers (bload command and bsave command) can all be used
+			on ordinary variables.
 		</p>
 		<p>
-To try here,
+			Here, try the following:
 		</p>
 		<pre>    a="*"
     b=peek(a,0)
     mes "b="+b</pre>
 		<p>
-Try running the script. The character string "*" assigned to the variable a is stored.
-One byte is taken out from the buffer and displayed, but the numerical value 42, which is the character code of "*"
-Has been taken out. In this way, by using the poke command and peek function, the stored character string can be displayed.
-On the other hand, you will be able to access more finely.
+			Execute this script. It retrieves and displays 1 byte from the buffer where the string "*" assigned to the variable a is stored,
+			and the value 42, which is the character code of "*", is retrieved. In this way, by using the poke command and peek function,
+			you can access the stored string in more detail.
 		</p>
 		<p>
-Now let's talk about the details of the detailed access.
+			Now, let's start explaining the details of that fine-grained access.
 		</p>
 		
 		
-<h2 id = "ABOUTSTRING"> How strings work </h2>
+		<h2 id="ABOUTSTRING">String Mechanism</h2>
 		<p>
-There are certain rules for buffers that store strings.
-First of all, remember this important rule first.
+			There are certain rules for the buffer where strings are stored.
+			First of all, please remember these important rules first.
 		</p>
 		<ul>
-<li> One character code is placed consecutively per byte. </li>
-At the very end of the <li> string, 0 is placed as the end code. </li>
+			<li>The code for one character is placed consecutively per byte.</li>
+			<li>The very end of the string has 0 placed as a code indicating the end.</li>
 		</ul>
 		<p>
-Once you understand these two rules, it doesn't matter how you play with the buffer according to them.
-There is none. First, suppose you have the following script as a simple example.
+			Once you understand these two rules, there is no problem how you manipulate the buffer according
+			to these rules. First, as a simple example, suppose there is the following script.
 		</p>
 		<pre>a="ABCDE"</pre>
 		<p>
-When this is done, the buffer that stores the contents of variable a looks like this:
+			When this is executed, the buffer where the contents of variable a are stored will be as follows.
 		</p>
 		
 		<table class="keywordlist">
-<caption> Buffer contents </caption>
+			<caption>Buffer Contents</caption>
 			<tr>
-<th> string </th>
+				<th>String</th>
 				<td>A</td>
 				<td>B</td>
 				<td>C</td>
 				<td>D</td>
 				<td>E</td>
-<td> Exit code </td>
+				<td>End Code</td>
 			</tr>
 			<tr>
-<th> Buffer contents </th>
+				<th>Buffer Contents</th>
 				<td>65</td>
 				<td>66</td>
 				<td>67</td>
@@ -383,39 +378,39 @@ When this is done, the buffer that stores the contents of variable a looks like 
 			</tr>
 		</table>
 		<p>
-The character string "ABCDE" is changed to the numbers "65", "66", "67", "68", "69", and "0" in the buffer.
-Will be remembered.
+			The string "ABCDE" will be stored as the numerical values "65", "66", "67", "68", "69", "0"
+			inside the buffer.
 		</p>
 		<p>
-The peek function is 1 byte from any place in the buffer,
-This is an instruction that can retrieve data. According to the help
+			The peek function is a command that allows you to retrieve 1 byte of data from any location
+			within the buffer. According to the help file,
 		</p>
-<pre class = "quote"> read 1 byte from peek (p1, p2) buffer
+		<pre class="quote">peek(p1,p2)          Read 1 byte from buffer
 
-p1 = variable: variable name to which the buffer is allocated
-p2 = 0 ~: Buffer index (in Byte) </pre>
+p1=variable : Variable name to which the buffer is assigned
+p2=0〜 : Buffer index (in bytes) </pre>
 		
 		<p>
-So that's why
+			So,
 		</p>
 		<pre>    a="ABCDE"
     b=peek(a,2)</pre>
 		<p>
-Then, the code of the character in the third character of the variable a can be read.
-The reason why it is the third character is that the second parameter of the peek instruction starts from 0 and is 1 byte.
-Since it is specified for each, if 2 is specified, the code corresponding to the third character is taken out in the order of 0, 1, and 2.
-Because it is.
+			then you can read the character code located at the 3rd character of variable a.
+			The reason why it becomes the 3rd character is that the second parameter of the peek command
+			starts from 0 and is specified in 1-byte increments, so specifying 2 retrieves the code
+			corresponding to the 3rd character in the order of 0, 1, and 2.
 		</p>
 		<p>
-On the contrary, the poke instruction is an instruction to write data to the buffer. According to the help
+			The poke command is, conversely, a command for writing data to the buffer. According to the help file,
 		</p>
-<pre class = "quote"> poke p1, p2, p3 Write 1 byte to the buffer
+		<pre class="quote">poke p1,p2,p3            Write 1 byte to buffer
 
-p1 = variable: variable name to which the buffer is allocated
-p2 = 0 ~: Buffer index (in Byte)
-p3 = 0 to 255: Value to be written to the buffer or character string (in Byte) </pre>
+p1=variable : Variable name to which the buffer is assigned
+p2=0〜 : Buffer index (in bytes)
+p3=0〜255 : Value or string to write to buffer (in bytes) </pre>
 		<p>
-So, for example,
+			So, for example,
 		</p>
 		<pre>    a=""
     poke a,0,65
@@ -424,315 +419,292 @@ So, for example,
     poke a,3,0
     mes a</pre>
 		<p>
-If so, the data is sent directly to the buffer even though no string is assigned to the variable a.
-Because I wrote it, the string "ABC" is remembered.
+			then, even though no string is assigned to variable a, the string "ABC" is stored because data is written directly to the buffer.
 		</p>
 		<p>
-Don't forget to put 0 at the end as the end code.
-HSP interprets the contents of the buffer as a string until 0 appears. If you forget 0
-Add extra data to the string, or in the worst case, keep memory until you get a general protection error
-I will continue to read.
+			What you must not forget is to put 0 as a code indicating the end.
+			HSP interprets the contents of the buffer as a string until 0 appears. If you forget 0,
+			it may add extra data to the string, or in the worst case, it will continue to read memory until a general protection error occurs.
 		</p>
 		<p>
-You can also take the code that marks this end and do the following:
+			You can also take advantage of this code indicating the end to do the following.
 		</p>
 		<pre>    a="ABCDEF"
     poke a,3,0
     mes a</pre>
 		<p>
-In this script, the string "ABCDEF" is assigned to the variable a, but after that, the poke command
-The exit code is written in the middle. As a result, there is an exit code after "ABC"
-Therefore, the string is judged to be finished there, and only the string "ABC" is displayed.
+			In this script, the string "ABCDEF" is assigned to variable a, but then the poke command
+			writes an end code in the middle. As a result, since there is an end code after "ABC",
+			the string is judged to end there, and only the string "ABC" is displayed.
 		</p>
 		<p>
-By understanding how strings work in this way, you can access each character in a string.
-It will be easier.
+			In this way, understanding the string mechanism makes it easier to access each character
+			of the string.
 		</p>
 		<p>
-There are some points to be aware of when reading or writing in the buffer.
-You can assign an unlimited number of strings to the variable buffer, but start with a large buffer
-I can't prepare it. Therefore, reserve a small area at first, and if necessary
-The area is expanding.
+			There are points to be aware of when reading or writing inside the buffer.
+			Strings can be assigned to variable buffers without limit, but it is not possible to prepare
+			a large-sized buffer from the beginning. Therefore, a small area is secured at first, and
+			the area is expanded as needed.
 		</p>
 		<p>
-When declaring a character string with the sdim instruction, you can specify the area size to be allocated first.
-The expansion of the area is done automatically, but if you know that you will use a large string from the beginning, or
-If you want to use an array with two or more dimensions, it is a good idea to specify it.
+			When declaring a string with the sdim command, you can specify the area size to be secured
+			first. The area is expanded automatically, but if you know that you will be using a large-sized
+			string from the beginning, or if you are using a two-dimensional or higher array, you should
+			specify it.
 		</p>
 		<p>
-However, even if you reserve a 256-byte buffer, you can only use up to 255 characters.
-This is because we need a place to put the exit code 0 at the end. "Sdim a, 256" is 255 characters + exit code
-Up to means to secure an area.
+			However, even if you secure a 256-byte buffer, you can only use up to 255 characters.
+			This is because you need a place to put the end code 0 at the end. "sdim a,256" means that
+			it secures an area up to 255 characters + end code.
 		</p>
 		<p>
-The peek function and poke instruction can only be used within the currently reserved area.
-For example, if you have reserved a 256-byte buffer like "sdim a, 256",
-Please note that only the range 0-255 is available.
+			The peek function and poke command can only be used within the currently secured area.
+			For example, if you have secured a 256-byte buffer like "sdim a,256", you can only use
+			the range of 0 to 255, so please be careful.
 		</p>
 		<p>
-It is not possible to take out a part of the character string as a character code, or conversely make the character code a character string
-It is convenient to have it at some time. Here are two templates that I often use.
+			It is sometimes useful to extract part of a string as a character code, or conversely, to convert a character code into a string.
+			Here are two commonly used templates.
 		</p>
-<pre> // Example 1: (Retrieve character code)
-    b = peek (a, 0); Assign the first character code of variable a to variable b </pre>
+		<pre>//Example 1: (Extract character code)
+    b=peek(a,0)  ; Assign the first character code of variable a to variable b</pre>
 		
-<pre> // Example 2: (Character code is a string)
+		<pre>//Example 2: (Convert character code to string)
     a="_"
     b=65
-    poke a, 0, b; Put the character code of the variable b in the string type variable a </pre>
+    poke a,0,b  ; Put the character code of variable b into string-type variable a</pre>
 		<p>
-In Example 2, the numerical value assigned to the variable b is written as a character code with the poke instruction.
-This overwrites the first letter of variable a. Variable a is initially assigned only one character, "_"
-However, this "_" disappears and it is replaced with a new character code.
-The ending code (0) at the end of the string is already set with the first "a =" _ "", so
-You don't have to write it again. With this procedure, the character code is a one-character string type variable.
-Can be converted to.
+			In Example 2, the numerical value assigned to variable b is written as a character code using the poke command.
+			This overwrites the first character of variable a. Variable a is initially assigned only one character "_",
+			but this "_" disappears and is overwritten with a new character code.
+			The end code (0) at the end of the string has already been set with the initial "a="_"",
+			so there is no need to write it again. With this procedure, you can convert a character code into a 1-character string-type variable.
 		</p>
 		<p>
-For those who use Microsoft N-BASIC, these examples are functions such as ASC and CHR $.
-Speaking of similar work, it may be easy to understand. Handling character codes is
-It's usually rare, but it's a good idea to remember it as a quick turn in the event of an emergency.
+			These examples may be easier to understand if you say that they work like the ASC and CHR$ functions used in Microsoft's N-BASIC.
+			Handling character codes is usually not very common, but it is a good idea to remember it as a flexible means in case of emergency.
 		</p>
 		<p>
-Let me give you another useful example.
-If you use the peek function, you can fetch one character anywhere in the string as a code.
-I can do it. However, it is only the code (numerical value) that is taken out, and the ASCII code table
-It's a hassle to match up.
+			Let me introduce another useful example.
+			By using the peek function, you can retrieve 1 character at any location in the string as a code.
+			However, what is extracted is only a code (numerical value), and it is troublesome to compare it with an ASCII code table each time.
 		</p>
 		<p>
-"'(Half-width single quotation mark)" is convenient to use in such a case.
-It is a notation by. It is used by enclosing one character in "'", such as "'A'". This way
-"'A'" has the same meaning as "65". In other words, it will convert the characters enclosed in "'" into a code.
-It is. So
+			What is useful to use at such times is the notation using " ' " (single quote).
+			This is used by enclosing 1 character with " ' " like " 'A' ". By doing this,
+			" 'A' " has the same meaning as "65". In other words, it converts a character enclosed in " ' " into a code.
+			Therefore,
 		</p>
 		<pre>    a="***TEST"
     b=peek(a,0)
-    if b ='*': mes "* was there" </pre>
+    if b='*' : mes "*がありました"</pre>
 		<p>
-Then, you can easily check whether the first character of the variable a is the code of "*".
-"'" Is similar to "" (double quotes), which deals with strings, but it actually indicates a number.
-So please do not make a mistake.
+			Then you can easily check whether the first character of variable a is the code of "*".
+			" ' " is similar to " " (double quotes) that handles strings, but it actually indicates a numerical value,
+			so be careful not to make a mistake.
 		</p>
 		<p>
-Finally, let me review the contents explained here.
+			Finally, to recap what has been explained here,
 		</p>
 		<ul>
-The contents of the string can be retrieved as code with the <li> peek function. </li>
-You can rewrite a part of the character string to the specified code with the <li> poke instruction. </li>
+			<li>You can extract the contents of a string as a code with the peek function.</li>
+			<li>You can rewrite part of a string to a specified code with the poke command.</li>
 		</ul>
 		<p>
-It means that.
-You just need to know this concept and the existence of character codes.
+			That is what it means.
+			I think it is enough to know this concept and the existence of character codes.
 		</p>
 
 
-<h2 id = "ABOUTTEXT"> How text files work </h2>
+		<h2 id="ABOUTTEXT">Text File Mechanism</h2>
 		<p>
-It is a text file that is opened and saved with Notepad or a text editor,
-HSP can also read and create this text file.
+			Text files that are opened and saved with Notepad or text editors, etc.,
+			can also be read and created with HSP.
 		</p>
 		<p>
-What is a text file? In fact, a text file is a string
-It's just a file of the contents.
-As explained so far, the character string stored in the variable is called a code in the buffer in the memory.
-It is remembered in the form. If you save this content as it is to a file with the bsave instruction,
-You will have a text file. Conversely, the content of the text file is just a string
-It is nothing but.
+			What are text files? In fact, a text file is just a file that contains the contents of a string as is.
+			As I have explained so far, the string stored in a variable is stored in the form of a code
+			in a buffer in memory. If you save this content as a file using the bsave command,
+			a text file is created. Conversely, the contents of a text file are nothing more than a string.
 		</p>
 		<p>
-For example
+			For example,
 		</p>
 		<pre>    a="TEXT FILE."
     bsave "test.txt",a</pre>
 		<p>
-You can also create a text file with the content "TEXT FILE." With a script like.
-However, with this alone, the file size becomes the same as the buffer size, which is wasteful.
-I can do it. If you save only the part used as a character string in the file
-it is perfect. Therefore,
+			Even with a script like this, you can create a text file with the content "TEXT FILE.".
+			However, with this alone, the file size becomes the same as the buffer size, which is wasteful.
+			It would be perfect if you could save only the part that is used as a string to a file. Therefore,
 		</p>
 		<pre>    a="TEXT FILE."
     size=strlen(a)
     bsave "test.txt",a,size</pre>
 		<p>
-As shown above, use the strlen function to check the length of the string, and then save only that size.
-This will result in a text file of the appropriate length.
+			As shown above, by examining the string length using the strlen function and then saving only that size,
+			you can create a text file of an appropriate length.
 		</p>
 		<p>
-In the same way, you can also read a text file with the bload command.
-For example
+			In the same way, you can also read text files using the bload command.
+			For example,
 		</p>
 		<pre>    sdim a,32000
     bload "test.txt",a
     mes a</pre>
 		<p>
-The script looks like this. The first sdim instruction is a text file to read
-Since it may be large, we have secured a buffer for about 32000 characters. This is 32000 bytes
-It is possible to read up to the file. Read the text file with the bload command and
-Finally, the contents are displayed with the mes command.
+			This would be the script. The first sdim command secures a buffer for about 32000 characters because the text file to be read in
+			may be large. With this, you can read files up to 32000 bytes. The bload command reads the text file,
+			and finally, the mes command displays its contents.
 		</p>
 		<p>
-Since the buffer is initialized as a character string type variable with the sdim instruction, the buffer is used with the mes instruction.
-Simply display the content as a string. The text file read into the buffer is also
-Since it is the same as a character string, it will be displayed properly as it is.
+			Since the sdim command initializes the buffer as a string-type variable, the mes command simply displays the contents of the buffer as a string.
+			The text file read into the buffer is also the same as a string, so it is displayed properly as is.
 		</p>
 		<p>
-I've said that a text file is a file of a buffer of string variables,
-Actually, there is only one difference. It <em> doesn't contain code 0 at the end of the string </em>
-That is the point. This means that the size saved in the file is the size of the string
-So you don't need the code to mark the end.
-(However, the exit code is also included in the text file for clarity in some text editors.
-There is something that will put you in. But this is a code called [EOF], not 0,
-It will be 26. )
+			Text files have been said to be string-type variable buffers made into files,
+			but there is actually one difference. That is, *there is no code 0 at the end to indicate the end of the string*.
+			This is because the size saved in the file is the size of the string, so there is no need for a code to indicate the end.
+			(However, some text editors may include an end code in text files for clarity. However, this is a code called [EOF], not 0,
+			but 26.)
 		</p>
 		<p>
-If you can read a text file with HSP, you need to put 0 at the end, but it is as it is
-It is usable. There is a deep reason for this.
+			When a text file is read in HSP, it can be used as is, even though it is necessary to insert 0 at the end. There is a deep reason for this.
 		</p>
 		<p>
-The reason is that, like the sdim instruction, the contents are all immediately after the variable buffer is allocated.
-It is cleared at 0. A text file that does not contain an exit code in this buffer
-Even if it is read, the end code 0 is always included in the continuation of the read data.
+			The reason is that, immediately after a variable's buffer is secured, such as with the sdim command, its contents are all
+			cleared to 0. Even if you read a text file without an end code into this buffer, the end code 0 will always be present
+			after the read data.
 		</p>
 		<p>
-It wasn't that deep. Therefore, in the buffer where the text file has been read once,
-When I read another text file again, it was smaller than the previous text file
-In that case, the previous data will remain.
-To prevent this, be sure to use the sdim instruction to buffer the text file before reading it.
-You need to secure it and clear it with 0.
+			It wasn't that deep of a reason after all. Therefore, if you read another text file into a buffer that has already been read from a text file,
+			and the new text file is smaller than the previous text file, the previous data will remain.
+			To prevent this from happening, you must always secure a buffer with the sdim command before reading a text file,
+			and clear it with 0.
 		</p>
 		<p>
-In fact, there is a simpler way to read a text file.
-If you use a mechanism called "memory notepad instruction", you don't have to worry about the size or the end code.
-It can handle text files. We'll see how to do this later.
+			In fact, there is a simpler way to read text files.
+			You can use a mechanism called the "memory notepad command" to handle text files without worrying about size or end codes.
+			This method will be explained later.
 		</p>
 
 
-<h2 id = "ABOUTMULTILINE"> How multi-line strings work </h2>
+		<h2 id="ABOUTMULTILINE">Mechanism of Multiline Strings</h2>
 		<p>
-Character strings handled by HSP are roughly divided into simple character strings with only one line and character strings containing multiple lines.
-can do. There is no particular difference in processing between the two. Simply script
-It's just something that the creator should be aware of.
+			Strings handled by HSP can be broadly divided into simple strings with only one line and strings containing multiple lines.
+			There is no particular difference between these two in terms of processing. It is simply something that users who create scripts
+			should be aware of.
 		</p>
 		<p>
-A multi-line string is a string that contains line breaks. A line break is the next line after that.
-It's like a sign to take.
-as a trial,
+			Multiline strings are strings that contain line breaks. A line break is a mark that moves everything after it to the next line.
+			For example,
 		</p>
 		<pre>    a="ABC\nDEF"
     mes a</pre>
 		<p>
-When I run the script,
+			If you run the script,
 		</p>
 		<pre>ABC
 DEF</pre>
 		<p>
-The message is displayed across the two lines.
-This is because the variable a contains a newline sign "\\ n".
+			The message is displayed over two lines.
+			This is because the variable a contains a line break mark called "\n".
 		</p>
 		<p>
-Until now, characters have codes and are stored in the buffer in the form of numbers.
-As I said, what about line breaks?
-In the script given in the above example, the contents of variable a are in the buffer,
+			We have been saying that characters have codes and are stored in the buffer in numerical form, but what about line breaks?
+			In the case of the script given above, the contents of variable a in the buffer are:
 		</p>
 		<table class="keywordlist">
-<caption> Buffer contents </caption>
+			<caption>Buffer Contents</caption>
 			<tr>
-<th> string </th>
+				<th>String</th>
 				<td>A</td><td>B</td><td>C</td>
 				<td colspan="2">\n</td>
 				<td>D</td><td>E</td><td>F</td>
-<td> Exit code </td>
+				<td>End Code</td>
 			</tr>
 			<tr>
-<th> Buffer contents </th>
+				<th>Buffer Contents</th>
 				<td>65</td><td>66</td><td>67</td>
 				<td>13</td><td>10</td><td>68</td>
 				<td>69</td><td>70</td><td>0</td>
 			</tr>
 		</table>
 		<p>
-Contains the data. "\\ N" indicates a line break, but that part is "13" and "10".
-There are two codes. And this is exactly the "line feed code".
-Line feed code cannot be entered from the keyboard, so in HSP, use the character "\\ n" instead.
-I try to represent it, but in reality, there are two codes "13" and "10" in the character string.
-It is placed.
+			"\n" indicates a line break, but that part is made up of two codes: "13" and "10".
+			And this is exactly the "line break code".
+			Line break codes cannot be entered from the keyboard, so HSP represents them with the characters "\n" instead,
+			but in reality, the two codes "13" and "10" are placed in the string.
 		</p>
 		<p>
-The trouble is that there are several dialects for line feed codes. "13" "10" on MS-DOS and Windows
-However, it is only "13" on MacOS of Macintosh. Also, in UNIX, it is set to "10".
-It has become. In HSP, as a line feed code, in addition to MS-DOS and Windows "13" and "10",
-It also supports MacOS "13" only, but does not support UNIX line feed codes.
-In the first place, the Japanese code is different in many UNIX, so you can use a converter to DOS format etc.
-It's a good idea to convert the entire text in advance.
+			Unfortunately, there are several dialects of line break codes. In MS-DOS and Windows, the codes are "13" and "10",
+			but in Macintosh's MacOS, it is only "13". Also, in UNIX, it is "10". HSP supports not only "13" and "10" for MS-DOS and Windows,
+			but also "13" alone for MacOS, but does not support UNIX line break codes.
+			Since many UNIX systems also have different Japanese codes, it is better to convert the entire text in advance using a converter to DOS format.
 		</p>
 		
-<h2 id = "ABOUTMEMNOTE"> How memory notepad instructions work </h2>
+		<h2 id="ABOUTMEMNOTE">Mechanism of Memory Notepad Command</h2>
 		<p>
-The inclusion of a line feed code makes the string very convenient, but adds complexity.
-The text file will of course have a lot of lines with line breaks and
-You can also insert line breaks in the input box with the HSP mesbox instruction.
-In addition, the line feed code is also included in the character string used in the dirlist instruction, listbox instruction, and combox instruction.
-is. By inserting a line feed code, you can organize a lot of information, but on the other hand,
-Handling as a character string becomes more and more difficult.
+			The inclusion of line break codes makes strings very convenient, but it also increases complexity.
+			Text files will naturally contain line break codes and have many lines,
+			and the input box with the HSP's mesbox command also allows you to insert line breaks.
+			Also, the strings used by the dirlist, listbox, and combox commands contain line break codes.
+			By inserting line break codes, a lot of information can be organized, but on the other hand,
+			handling as strings becomes increasingly difficult.
 		</p>
 		<p>
-Therefore, in HSP, a line feed code is set by a series of instruction sets called memory notepad instructions.
-It makes it relatively easy to handle the included character string. Text with multiple lines
-The problem when dealing with it is when you want to check something line by line, or when you want to check the character string line by line.
-If you want to operate it. In this line-by-line work, if you divide it into two processes
-Work is refreshing. In other words
+			Therefore, HSP uses a series of commands called the memory notepad command to make it relatively easy to handle strings that contain line break codes.
+			The problem when handling text with multiple lines is when you want to check something for each line, or when you want to manipulate
+			strings on a line-by-line basis. This line-by-line work can be simplified by dividing it into two processes:
 		</p>
 		<ul>
-<li> Extract only the contents of any line from multiple lines </li>
-<li> Check or process the extracted character string </li>
-<li> If necessary, put it back on the original line </li>
+			<li>Extracting the contents of an arbitrary line from multiple lines</li>
+			<li>Checking or processing the extracted string</li>
+			<li>If necessary, returning it to the original line</li>
 		</ul>
 		<p>
-In this way, from the character string data of multiple lines, a character string that does not include the line feed code of only one line can be obtained.
-If the procedure is to take it out, work on it, and then return the result again, the line feed code
-It eliminates the need for troublesome checks and improves efficiency.
+			In this way, if you extract a string that does not contain line break codes from multiple lines of string data, work on it, and then return the result,
+			there is no need to perform troublesome checks on line break codes, and efficiency is improved.
 		</p>
 		<p>
-The instruction set for that is the memory notepad instruction.
-It consists of the following instructions:
+			The command set for that is the memory notepad command.
+			It consists of the following commands:
 		</p>
 		<table class="keywordlist">
-<caption> Memory notepad instruction list </caption>
-<tr> <th> Instructions </th> <th> Main Functions </th> <th> Remarks </th> </tr>
-<tr> <td> notesel </td> <td> Specify variables to be treated as memory notepads </td> <td> </td> </tr>
-<tr> <td> notemax </td> <td> Get the total number of lines </td> <td> Use as a system variable </td> </tr>
-<tr> <td> notesize </td> <td> Get the entire size </td> <td> Use as a system variable </td> </tr>
-<tr> <td> noteload </td> <td> Read text file </td> <td> </td> </tr>
-<tr> <td> notesave </td> <td> Export text file </td> <td> </td> </tr>
-<tr> <td> noteadd </td> <td> Add content to specified line </td> <td> Insert / overwrite mode available </td> </tr>
-<tr> <td> noteget </td> <td> Read the contents of the specified line </td> <td> </td> </tr>
-<tr> <td> notedel </td> <td> Delete specified line </td> <td> </td> </tr>
-<tr> <td> notefind </td> <td> String search </td> <td> </td> </tr>
+			<caption>Memory Notepad Command List</caption>
+			<tr><th>Command</th><th>Main Function</th><th>Remarks</th></tr>
+			<tr><td>notesel</td><td>Specifies the variable to be treated as a memory notepad</td><td></td></tr>
+			<tr><td>notemax</td><td>Gets the total number of lines</td><td>Used as a system variable</td></tr>
+			<tr><td>notesize</td><td>Gets the total size</td><td>Used as a system variable</td></tr>
+			<tr><td>noteload</td><td>Reads a text file</td><td></td></tr>
+			<tr><td>notesave</td><td>Writes a text file</td><td></td></tr>
+			<tr><td>noteadd</td><td>Adds content to the specified line</td><td>Insertion/Overwrite mode available</td></tr>
+			<tr><td>noteget</td><td>Reads the content of the specified line</td><td></td></tr>
+			<tr><td>notedel</td><td>Deletes the specified line</td><td></td></tr>
+			<tr><td>notefind</td><td>Searches for a string</td><td></td></tr>
 		</table>
 		<p>
-There are many instructions, but it's not difficult to use.
-Basically, first specify the variable name to be the target of the character string operation with the notesel instruction.
-Then, if you want to read one line, use the noteget command, and if you want to change or add the contents of the line, use the noteget command.
-Use the noteadd instruction.
+			There are many commands, but they are not difficult to use.
+			Basically, you first specify the variable name to be manipulated with the notesel command.
+			Then, if you want to read one line, use the noteget command, and if you want to change or add content to a line,
+			use the noteadd command.
 		</p>
 		<p>
-For example, a variable a that contains a string with multiple lines, on the first line
-If you want to retrieve the string,
+			For example, if you want to extract the string on the first line from the variable a containing a multiline string,
 		</p>
 		<pre>    a="ABC\nDEF"
     notesel a
     noteget b,0
     mes b</pre>
 		<p>
-It looks like. At this time, what you have to be careful about is specified by the note get instruction.
-The row index starts at 0, which means that the first row is specified as 0.
-And, in detail, the noteget instruction always sets the variable to be read to the string type.
-In the above example, even if the variable b is a numeric type, after executing the noteget instruction,
-It means that it will be a character string type.
+			like this. At this time, you must be careful that the line index specified by the noteget command
+			starts from 0, so specifying the first line is 0.
+			And in detail, the noteget command always sets the variable to be read to as a string type.
+			In the example above, even if variable b was a numerical type, it will become a string type after executing the noteget command.
 		</p>
 		<p>
-Efficient processing for all lines by using notemax and repeat ~ loop instructions
-Can be described. For example
+			By using the notemax and repeat〜loop commands, you can efficiently
+			describe processing for all lines. For example,
 		</p>
 		<pre>    a="ABC\nDEF\nGHI"
     notesel a
@@ -741,169 +713,161 @@ Can be described. For example
         mes "["+b+"]"
     loop</pre>
 		<p>
-In this script, the contents of all lines of variable a are displayed in parentheses.
-notemax can be used as a system variable to find out how many rows there are and return it to a variable.
-Loop with the repeat ~ loop instruction as many times as you check here. During this loop
-Since the system variable cnt increases in order from 0, read it with the note get instruction.
-If you use the system variable cnt to specify the row index, you can retrieve each row in turn.
+			This script displays the contents of all lines of variable a enclosed in parentheses.
+			notemax can be used as a system variable that checks how many lines there are and returns the variable.
+			You loop the number of times you have checked here with the repeat〜loop command. During this loop,
+			the system variable cnt increases from 0 in order, so if you use the system variable cnt to specify the line index to read with the noteget command,
+			you can extract each line in order.
 		</p>
 		<p>
-It is also possible to handle text files with the memory notepad instructions.
-The noteload command is used when reading a text file.
-The notesave instruction is used to save a text file.
-For example
+			You can also handle text files with the memory notepad command.
+			The noteload command is used to read text files, and the
+			notesave command is used to save text files.
+			For example,
 		</p>
 		<pre>    a="ABC\nDEF\nGHI"
     notesel a
     notesave "a.txt"</pre>
 		<p>
-In this script, the content assigned to the variable a is used as a text file named "a.txt".
-you save. It's easy.
+			This script saves the content assigned to the variable "a" as a text file named "a.txt". Easy, isn't it?
 		</p>
 		<p>
-Conversely, when reading a text file into a variable, use it as follows.
+			Conversely, to read a text file into a variable, use the following:
 		</p>
 		<pre>    notesel a
     noteload "a.txt"
     mes a</pre>
 		<p>
-The noteload instruction loads the specified file into the variable specified by the notesel instruction.
-The exit code of the end of the string and the buffer area of ​​the variable are also automatically taken into consideration.
+			The noteload command reads the specified file into the variable specified by the notesel command.
+			The end-of-string termination code and the variable's buffer area are also automatically taken into account.
 		</p>
 
-<h2 id = "FUNC"> String manipulation function </h2>
+		<h2 id="FUNC">String Manipulation Functions</h2>
 		<p>
-HSP has some instructions and functions to handle strings conveniently.
-Here, we will introduce the instr function for searching and the strmid function for extracting a part of the character string.
-If you read this document, you can see that the same process can be achieved with the peek function and poke instruction.
-As you can see, it's decided that the function should be supported from the beginning, isn't it?
+			HSP has several commands and functions available for conveniently handling strings.
+			Here, we will introduce the instr function for searching, and the strmid function for extracting parts of a string.
+			Reading this document, you'll realize that similar processing can be achieved with the peek function and poke command,
+			but it's definitely better to have the functionality supported from the start.
 		</p>
 		<p>
-First, the strmid function looks like this:
+			First, the strmid function is roughly as follows:
 		</p>
-<pre class = "quote"> strmid (p1, p2, p3) Extract a part of the string
+		<pre class="quote">strmid(p1,p2,p3)         Extracts a portion of a string
 
-p1 = variable name: variable name that stores the character string to be retrieved
-p2 = 0 to (0): Index at the beginning of retrieval
-p3 = 0 ~ (0): Number of characters to extract </pre>
+p1=Variable Name  : The name of the variable containing the original string to extract from
+p2=0〜(0)  : The starting index for extraction
+p3=0〜(0)  : The number of characters to extract</pre>
 		<p>
-If you have used Microsoft N-BASIC, you can retrieve the character string.
-You may remember that there were three functions, LEFT $, RIGHT $, and MID $.
-These are "n characters from the left", "n characters from the right", and "n2 characters from the n1st character" of the character string, respectively.
-Was to take out and return its contents, but the strmid function has three functions.
-It is a combined command.
+			If you have used Microsoft's N-BASIC, you may remember the three functions
+			LEFT$, RIGHT$, and MID$ for string extraction.
+			These respectively extracted the "n characters from the left," "n characters from the right," and "n2 characters starting from the n1th character"
+			of a string and returned the content. The strmid function combines all three of these functions.
 		</p>
 		<p>
-Specify the variable name that stores the original character string to be retrieved in p1
-Character index to start fetching with p2 (starting from 0), number of characters to fetch with p3
-It is to specify. It should be noted that the p3 character index is
-The first character is 0, the second character is 1 ..., and so on.
-Now, for example, if you want to retrieve a part of variable a
-When extracting "n characters from the left", it becomes <code> strmid (a, 0, n) </code>.
-In the case of "n characters from the right", it becomes <code> strmid (a, -1, n) </code>.
-"N1 to n2 characters" becomes <code> strmid (a, n1-1, n2) </code>.
+			Specify the name of the variable in p1 that stores the original string to extract from,
+			the character index (starting from 0) to start extracting from in p2, and the number of characters to extract in p3.
+			It is important to note that the character index in p3 starts from 0, where the first character is 0, the second character is 1, and so on.
+			For example, to extract a part of variable a,
+			"n characters from the left" would be <code>strmid( a,0,n )</code>,
+			"n characters from the right" would be <code>strmid( a,-1,n )</code>, and
+			"n2 characters starting from the n1th character" would be <code>strmid( a,n1-1,n2 )</code>.
 		</p>
 		<p>
-The other is to check if the specified string is included in the string.
-The instr function. This is in help
+			The other one is the instr function, which checks whether a specified string is included in a string.
+			In the help documentation, it is described as:
 		</p>
-<pre class = "quote"> instr (p1, p2, "string") Search for strings
+		<pre class="quote">instr(p1,p2,"string")        Searches for a string
 
-p1 = variable name: Character string type variable name that stores the character string to be searched
-p2 = 0 to (0): Index to start searching
-"string": Search string </pre>
+p1=Variable Name  : The name of the string type variable containing the string to be searched
+p2=0〜(0)  : The starting index for the search
+"string"   : The string to search for</pre>
 		<p>
-It is like that.
-Check if there is a character string specified by "string" in the character string type variable specified by p1.
-Returns the character index.
-Note that the result is a number. In the character index
-The first character at the beginning of the character string is set to 0, and the number increases in order of 1, 2, 3 ...
-(Similar to the index specified by the strmid function).
-If not found, -1 is substituted.
+			It checks whether the string specified by "string" exists in the string type variable specified by p1,
+			and returns the character index.
+			Note that the result will be a numerical value. In the character index,
+			the first character of the string is 0, and it increases sequentially as 1, 2, 3...
+			(similar to the index specified in the strmid function).
+			If it is not found, -1 will be assigned.
 		</p>
 		<p>
-You can also specify the character index to start looking at on p2 (skip the specification).
-If you do, it will start from (0) at the beginning).
-In this case, the search results will be indexed from where you started looking.
-be careful. It is no longer the index from the beginning of the string.
+			Also, you can specify the character index to start searching from in p2 (if omitted,
+			it will start from the beginning (0)).
+			In this case, be aware that the search result will return the index from where the search started, not the index from the beginning of the string.
 		</p>
 		<p>
-In addition to this, the following functions are provided as standard.
-For details, refer to the instruction help for each.
+			In addition to these, the following functions are also provided as standard.
+			For details, please refer to the help documentation for each command.
 		</p>
-<table class = "keywordlist" summary = "Introduces commands and functions that handle character strings in list format.">
-<caption> Instructions / functions that handle character strings </caption>
-<tr> <th> Keywords </th> <th> Functions </th> </tr>
-<tr> <td> getstr </td> <td> Read string from buffer </td> </tr>
-<tr> <td> getpath </td> <td> Get part of the path </td> </tr>
-<tr> <td> strf </td> <td> Convert to formatted string </td> </tr>
-<tr> <td> strtrim </td> <td> Remove only specified characters </td> </tr>
-<tr> <td> split </td> <td> Substitute the element split from the string </td> </tr>
-<tr> <td> strrep </td> <td> Replace a specific string </td> </tr>
-<tr> <td> cnvwtos </td> <td> Convert unicode to regular string </td> </tr>
-<tr> <td> cnvstow </td> <td> Convert normal strings to unicode </td> </tr>
+		<table class="keywordlist" summary="Introduces string handling commands and functions in a list format.">
+		<caption>String Handling Commands and Functions</caption>
+			<tr><th>Keyword</th><th>Function</th></tr>
+			<tr><td>getstr</td><td>Read string from buffer</td></tr>
+			<tr><td>getpath</td><td>Get part of path</td></tr>
+			<tr><td>strf</td><td>Convert to formatted string</td></tr>
+			<tr><td>strtrim</td><td>Remove only specified characters</td></tr>
+			<tr><td>split</td><td>Assign divided elements from string</td></tr>
+			<tr><td>strrep</td><td>Replace specific string</td></tr>
+			<tr><td>cnvwtos</td><td>Convert unicode to normal string</td></tr>
+			<tr><td>cnvstow</td><td>Convert normal string to unicode</td></tr>
 		</table>
 
 
 
 
-<h2 id = "ABOUTJPN"> How Japanese strings work </h2>
+		<h2 id="ABOUTJPN">Mechanism of Japanese Strings</h2>
 		<p>
-What I have explained so far is a half-width character string for the time being. It's about the characters in the ASCII code table.
-All the commands related to character string operations prepared by HSP are in half-width characters.
-There is no problem if the character string to be handled is only English characters.
+			Everything explained so far is, for the time being, about half-width characters, i.e., characters in the ASCII code table.
+			All the string manipulation commands prepared in HSP are also based on half-width characters as the unit of character handling.
+			There are no problems if you only handle strings consisting of English characters.
 		</p>
 		<p>
-However, it gets a little tricky if it contains Japanese double-byte characters.
-As I said before, Japanese cannot be expressed in 1 byte (256 types), so
-It is expressed using 2 bytes.
-In other words, two English characters are equivalent to one Japanese character. But these can be mixed
-Therefore, there are some complicated rules. The rules are as follows.
+			However, it becomes a bit tricky when it contains full-width Japanese characters.
+			As mentioned before, Japanese cannot be represented with 1 byte (256 types),
+			so it is expressed using 2 bytes or more of data.
+			In other words, one Japanese character requires multiple English characters. Moreover, because they can be mixed, there are somewhat complex rules. <br>
+			The rules for indicating Japanese character codes are called "encoding." There are multiple types of encoding, which further adds to the confusion. In HSP3, the encoding rules differ depending on the platform. The Windows version of HSP3 has the following rule:
 		</p>
 		<ul>
-If the <li> code is in the range of 129 to 159 or 224 to 252, it becomes a one-character full-width code together with the next 1 byte. </li>
+			<li>If the code is in the range of 129-159 or 224-252, it is a full-width code consisting of 1 byte combined with the next 1 byte.</li>
 		</ul>
 		<p>
-In other words, only when the numerical value of the code is within a certain range, we have created a special rule that makes one for two characters.
-This is a valid rule on Windows and MS-DOS, with text brought from other operating systems and the internet.
-It may not work.
+			In other words, there is a special rule that only when the numerical value of the code is within a certain range, it is treated as one character with 2 bytes.
+			This is a rule that is valid in Windows and MS-DOS, and may not work with text brought from other OSs or the Internet.
 		</p>
 		<p>
-Such Japanese character codes are usually called "Shift JIS codes". Japanese is,
-Since 2 bytes are 1 character, if you want to retrieve the Japanese character code, either perform the peek function twice or
-You need to use the wpeek function. However, the wpeek function is "$ 81" and "$ 24" (each in hexadecimal).
-If there is a 2-byte code, reverse the 2-byte code, such as "$ 2481" (hexabyte).
-Please note that it will be a single number.
+			Such Japanese character codes are usually called "Shift JIS (SJIS) encoding." Since Japanese is
+			2 bytes per character, to retrieve Japanese character codes, you need to perform the peek function twice, or
+			use the wpeek function. However, be aware that the wpeek function can reverse the 2 bytes
+			and combine them into a single numerical value, like "$2481" (hexadecimal), when there are 2-byte codes like "$81" and "$24" (hexadecimal, respectively).
 		</p>
 		<p>
-As such, handling Japanese codes is a bit more difficult than English characters.
-However, if you put restrictions such as not mixing English characters and Japanese, it will always be 1 character in 2 bytes.
-It will be a rule and will be easier when extracting characters and checking the length.
+			So, handling Japanese code is a bit more troublesome than English characters.
+			However, if you set restrictions such as not mixing English and Japanese characters, it will always follow the rule that 1 character is 2 bytes,
+			making it easier to extract characters or check the length.
 		</p>
 		<p>
-Recently, Japanese character strings are increasingly handled in unicode format.
-HSP can handle unicode (UTF-8) format by HSPUTF runtime.
-However, many text files that have been handled in Windows for a long time are still in Shift JIS.
-Since it is not compatible with unicode, it is desirable to use it properly depending on the situation.
-(In environments such as android, iOS, Linux, html5, unicode (UTF-8) format is used as standard.)
+			Recently, Japanese strings are increasingly being handled in unicode format.
+			In HSP, unicode (UTF-8) format can be handled by the HSPUTF runtime.
+			However, since text files that have been used on Windows for a long time are often still in Shift JIS and are
+			not compatible with unicode, it is desirable to use them properly depending on the situation.
+			(In environments such as android, iOS, Linux, and html5, unicode (UTF-8) format is used as standard.)
 		</p>
 
 
-<h2 id = "LAST"> Finally </h2>
+		<h2 id="LAST">Finally</h2>
 		<p>
-In this document, you can work with strings more finely and efficiently by understanding how strings work.
-I've explained how to do it.
+			In this document, we have explained how to manipulate strings more precisely and efficiently by understanding the mechanism of strings.
 		</p>
 		<p>
-Approach to strings without line feed code and add memory notepad instructions to it
-By doing so, I think that even a character string that spans multiple lines can be processed efficiently.
-I hope this document will make that task a little easier.
+			By approaching strings that do not contain line feed codes and adding the memory notepad command to them,
+			you should be able to efficiently process strings that span multiple lines.
+			I hope this document makes that task a little easier.
 		</p>
 
-<!-Footer->
+		<!-- Footer -->
 		<ul id="FOOTER">
-<li> <a href="#CONTAINER"> Return to top of this page </a> </li>
-<li> <a href="../index.htm"> Return to list of documents </a> </li>
+			<li><a href="#CONTAINER">Back to the top of this page</a></li>
+			<li><a href="../index.htm">Back to the list of documents</a></li>
 			<li><a href="https://hsp.tv/">Go to HSPTV page</a></li>
 		</ul>
 		<a href="https://www.onionsoft.net/hsp/">

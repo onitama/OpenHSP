@@ -1,14 +1,14 @@
 ;
-;HELP source file for HSP help manager
-;(Lines beginning with ";" are treated as comments)
+;	HSP help manageróp HELPÉ\Å[ÉXÉtÉ@ÉCÉã
+;	(êÊì™Ç™Åu;ÅvÇÃçsÇÕÉRÉÅÉìÉgÇ∆ÇµÇƒèàóùÇ≥ÇÍÇ‹Ç∑)
 ;
 
 %type
-Built-in instructions
+Built-in command
 %ver
 3.6
 %note
-ver3.6 standard instruction
+ver3.6 Standard command
 %date
 2020/06/04
 %author
@@ -22,31 +22,31 @@ Let
 
 %index
 button
-Button display
+Display Button
 %group
-Object control instructions
+Object Control Commands
 %prm
 goto/gosub "name",*label
-"name": The name of the button
-* label: Label name to jump when pressed
+"name" : Button name
+*label : Label name to jump to when pressed
 
 %inst
-Places a pushbutton as an object at the current position.
-The character string specified by "name" is written on the button, and when the button is clicked with the mouse, the control of the program is transferred to the location specified by * label.
+Places a button as an object in the current position.
+The button displays the string specified by "name", and when the button is clicked with the mouse, the program control moves to the location specified by *label.
 ^
-If you write button goto, jump to the label. If you write button gosub, a subroutine jump is performed on the label. If the goto and gosub keywords are omitted, the operation is the same as goto.
+If you write button goto, it jumps to the label. If you write button gosub, it performs a subroutine jump to the label. If the goto or gosub keyword is omitted, it behaves the same as goto.
 ^p
-example :
-button gosub "button", * aaa; Create a button to call * aaa
+Example :
+	button gosub "Button",*aaa  ; Create a button that calls *aaa
 ^p
 ^
-The size of the object can be specified with the objsize command. When you place the button, the current position automatically moves to the next line.
+The size of the object can be specified with the objsize command.  After placing the button, the current position automatically moves to the next line.
 ^
 In the program that jumps and executes when the button is pressed, the object ID is assigned as the initial value of the system variable stat.
 ^
-Normally, the shape of the button used is the one provided by the Windows system.
-However, if the custom button using the image is set by the objimage command, you can make it look free.
-See the objimage instruction section for custom button settings.
+Normally, the button shape is the one provided by the Windows system.
+However, if a custom button setting using an image is performed by the objimage command, it can have a free appearance.
+See the objimage command section for custom button settings.
 
 
 %href
@@ -57,21 +57,21 @@ objimage
 
 %index
 chkbox
-Check box display
+Display Checkbox
 %group
-Object control instructions
+Object Control Commands
 %prm
 "strings",p1
-"strings": Checkbox content display string
-p1 = variable: variable that holds the state of the checkbox
+"strings" : Checkbox content display string
+p1=variable   : Variable to hold the checkbox state
 
 %inst
-Places a checkbox as an object at the current position.
-The check box is an object with a switch on the left side of the character string specified by "strings" that can be switched ON / OFF with the cursor.
+Places a checkbox as an object in the current position.
+The checkbox is an object that has a switch that can be turned ON/OFF with the cursor on the left side of the string specified by "strings".
 ^
-The size of the checkbox is the size specified by objsize and the background is gray.
+The size of the checkbox is the size specified by objsize, and the background is gray.
 ^
-If the content of the numeric variable specified by p1 is 0, the check is OFF, and if it is 1, it is ON. When the ON / OFF of the check is changed, the contents of the variable also change at the same time.
+If the content of the numeric variable specified by p1 is 0, the check is OFF, and if it is 1, it is ON. When the check is turned ON/OFF, the content of the variable also changes.
 
 %href
 objsize
@@ -81,48 +81,47 @@ objsize
 
 %index
 clrobj
-Clear the object
+Clear object
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2
-p1 = 0 to (0): Object ID to be erased (start)
-p2 = -1 to (-1): Object ID to be erased (End) (If -1, the final ID is specified.
-Will be)
+p1=0Å`(0)   : Object ID to delete (start)
+p2=-1Å`(-1) : Object ID to delete (end) (If -1, the final ID is specified)
 
 %inst
-Deletes the object issued by the button command or mesbox command.
+Deletes objects displayed by button, mesbox, etc.
 ^
-If you omit p1 and p2 and execute only clrobj, all the objects on the screen will be deleted. If you want to delete only some objects, specify the first ID in p1 and the last ID in p2, and only the objects from p1 to p2 will be deleted. The specified object ID is the same as the ID specified by the objprm instruction.
+If you omit p1 and p2 and execute only clrobj, all objects on the screen will be deleted. If you want to delete only some objects, specify the first ID in p1 and the last ID in p2 to delete only the objects from p1 to p2. The object ID to specify is the same as the ID specified by the objprm command.
 ^
-The ID of the deleted object will be reused when placing a new object.
+The ID of the deleted object is reused when placing a new object.
 
 
 
 %index
 combox
-Combo box display
+Display Combo Box
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2,p3
-p1 = variable: A numeric variable that holds the state of the combo box
-p2 = 0 ~ (100): Extended Y size
-p3 = "strings": Strings indicating the contents of the combo box
+p1=variable      : Numeric variable holding the state of the combo box
+p2=0Å`(100)  : Extended Y size
+p3="strings" : String indicating the content of the combo box
 
 %inst
-Place the combo box as an object at the current position.
-A combo box is an input object that allows you to select one of multiple string elements.
-The size of the object will be the size set by the objsize command. However, the p2 parameter must specify the Y size for list display when selected. (Usually 100-150 is suitable)
+Places a combo box as an object in the current position.
+A combo box is an input object that allows you to select one from multiple string elements.
+The size of the object is the size set by the objsize command. However, you must specify the Y size for the list display at the time of selection with the p2 parameter. (Usually about 100 to 150 is appropriate)
 ^
-You can set the element to be selected by specifying the character string separated by "\\ n" with p3.
-For example, if you specify the character string "APPLE \\ nORANGE \\ nGRAPE", it becomes a combo box to select one from "APPLE", "ORANGE", and "GRAPE".
-Each element is indexed starting from 0. In the previous example, "APPLE" is numbered with index 0, "ORANGE" is numbered with index 1, "GRAPE" is numbered with index 2, and so on.
+By specifying a string delimited by "\n" in p3, you can set the elements to select.
+For example, specifying the string "APPLE\nORANGE\nGRAPE" creates a combo box that allows you to select one of "APPLE", "ORANGE", and "GRAPE".
+Each element is assigned an index number starting from 0. In the previous example, "APPLE" has index 0, "ORANGE" has index 1, and "GRAPE" has index 2.
 ^
-The data format separated by "\\ n" is the same as the multi-line text data handled by the memory notepad instruction. The data created by the memory notepad instruction can be used as it is for the combox instruction.
+This data format of delimiting with "\n" is the same as the multi-line text data handled by the memnote command. The data created by the memnote command can be used directly for the combox command.
 ^
-When the user makes a selection, the index number is assigned to the numeric variable specified in p1.
-When the combo box is placed for the first time, the index indicated by the variable set in p1 will be selected. (When the index number is -1, it will be in the non-selected state)
+When the user makes a selection, the index number is assigned to the numeric variable specified by p1.
+When the combo box is first placed, the index indicated by the variable set by p1 is selected. (When the index number is -1, it is unselected)
 
 %href
 objsize
@@ -137,27 +136,27 @@ objsize
 
 %index
 input
-Input box display
+Display Input Box
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2,p3,p4
-p1 = variable: variable for input
-p2, p3: Message box size (in dots)
-p4 = 0 ~: Maximum number of characters that can be entered
+p1=variable : Variable for input
+p2,p3   : Message box size (in dots)
+p4=0Å`  : Maximum number of characters that can be entered
 
 %inst
-Place the input box as an object at the current position. Specify the size with p2 and p3, and the location will be from the current position. If p2 and p3 are omitted, the size specified by objsize will be used.
+Places an input box as an object in the current position. Specify the size with p2, p3, and the location is from the current position. If p2 and p3 are omitted, the size specified by objsize is used.
 ^
-The input box is a small window that allows you to type directly from the keyboard. You will be able to enter parameters from the keyboard with the cursor raised by clicking the input box with the mouse.
-The entered value is assigned to the variable specified by p1. If the variable of p1 is a character string type, the entered character string is reflected in the variable, and if it is a numeric type, the entered value is reflected in the variable as it is.
+An input box is a small window that you can type directly from the keyboard. You can click on the input box with the mouse to bring up the cursor and enter parameters from the keyboard.
+The value entered is assigned to the variable specified by p1. If the variable p1 is a string type, the entered string is reflected, and if it is a numeric type, the entered value is reflected as is in the variable.
 ^
-In the initial state of the input box, the value assigned to the variable specified by p1 is displayed in the box.
+In the initial state, the input box displays the value that was assigned to the variable specified by p1.
 ^
-You can specify the maximum number of characters that can be entered with p4. If p4 is omitted, the maximum number of characters that can be stored in the variable specified by p1 is automatically assigned. (If the variable is not a string type, it will default to 32 characters.)
-If p4 is specified as 0, the maximum number of characters that can be handled by that version of Windows can be entered.
+You can specify the maximum number of characters that can be entered with p4. If p4 is omitted, the maximum number of characters that can be stored in the variable specified by p1 is automatically assigned. (If the variable is not a string type, the default is up to 32 characters.)
+If p4 is set to 0, the maximum number of characters that can be handled by that version of Windows can be entered.
 ^
-When you place the input box, the current position automatically moves to the next line.
+After placing the input box, the current position automatically moves to the next line.
 
 %href
 mesbox
@@ -168,28 +167,28 @@ objsize
 
 %index
 listbox
-List box display
+Display List Box
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2,p3
-p1 = variable: Numeric variable that holds the state of the list box
-p2 = 0 ~ (100): Extended Y size
-p3 = "strings": Strings indicating the contents of the list box
+p1=variable      : Numeric variable holding the state of the list box
+p2=0Å`(100)  : Extended Y size
+p3="strings" : String indicating the content of the list box
 
 %inst
-Place the list box as an object at the current position.
-A list box is an input object that allows you to select one of multiple string elements.
-The size of the object will be the size set by the objsize command. However, the p2 parameter must specify the Y size for list display when selected. (Usually 100-150 is suitable)
+Places a list box as an object in the current position.
+A list box is an input object that allows you to select one from multiple string elements.
+The size of the object is the size set by the objsize command. However, you must specify the Y size for the list display at the time of selection with the p2 parameter. (Usually about 100 to 150 is appropriate)
 ^
-You can set the element to be selected by specifying the character string separated by "\\ n" with p3.
-For example, if you specify the character string "APPLE \\ nORANGE \\ nGRAPE", it becomes a list box to select one from "APPLE", "ORANGE", and "GRAPE".
-Each element is indexed starting from 0. In the previous example, "APPLE" is numbered with index 0, "ORANGE" is numbered with index 1, "GRAPE" is numbered with index 2, and so on.
+By specifying a string delimited by "\n" in p3, you can set the elements to select.
+For example, specifying the string "APPLE\nORANGE\nGRAPE" creates a list box that allows you to select one of "APPLE", "ORANGE", and "GRAPE".
+Each element is assigned an index number starting from 0. In the previous example, "APPLE" has index 0, "ORANGE" has index 1, and "GRAPE" has index 2.
 ^
-The data format separated by "\\ n" is the same as the multi-line text data handled by the memory notepad instruction. The data created by the memory notepad instruction can be used as it is for the listbox instruction.
+This data format of delimiting with "\n" is the same as the multi-line text data handled by the memnote command. The data created by the memnote command can be used directly for the listbox command.
 ^
-When the user makes a selection, the index number is assigned to the numeric variable specified in p1.
-When the list box is placed for the first time, the index indicated by the variable set in p1 will be selected. (When the index number is -1, it will be in the non-selected state)
+When the user makes a selection, the index number is assigned to the numeric variable specified by p1.
+When the list box is first placed, the index indicated by the variable set by p1 is selected. (When the index number is -1, it is unselected)
 
 %href
 objsize
@@ -204,32 +203,32 @@ objsize
 
 %index
 mesbox
-Message box display
+Display Message Box
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2,p3,p4,p5
-p1 = variable: String variable to which the display message is assigned
-p2, p3: Message box size (in dots)
-p4 = 0 to (1): Message box style
-p5 = 0 to (-1): Maximum number of characters that can be entered
+p1=variable    : String variable with the display message assigned
+p2,p3      : Message box size (in dots)
+p4=0Å`(1)  : Message box style
+p5=0Å`(-1) : Maximum number of characters that can be entered
 
 %inst
-Place a message box (window for displaying messages) as an object on the window. Specify the size with p2 and p3, and the location will be from the current position.
-The value (p4) to be set for the message box style is as follows.
+Places a message box (window for displaying messages) as an object on the window. Specify the size with p2, p3, and the location is from the current position.
+The values to set for the message box style (p4) are as follows.
 ^p
-   Value: Corresponding key
+   Value : Corresponding key
  ---------------------------------------------------------------
-     0: Scrollable edit box (non-rewritable)
-    +1: Scrollable edit box (rewritable)
-    +4: Add a horizontal scroll bar
-    +8: Disable automatic wrapping
+     0  : Scrollable edit box (not writable)
+    +1  : Scrollable edit box (writable)
+    +4  : Add a horizontal scroll bar
+    +8  : Disable auto-wrap (folding)
 ^p
-Creating a rewritable edit box makes it a simple text editor where users can type whatever they want. For +4 (with horizontal scroll bar) and +8 (disable automatic wrap), you can specify multiple values at the same time by adding each value to p4.
+Creating a writable edit box creates a simple text editor in which the user can freely enter characters. +4 (add a horizontal scroll bar) and +8 (disable auto-wrap) can be specified simultaneously by adding each value to p4.
 ^
 You can specify the maximum number of characters that can be entered with p5.
-If p5 is 0, it is the maximum number of characters that can be handled by that version of Windows.
-If p5 is omitted or has a negative value, the maximum number of characters that can be stored in the variable specified by p1 is automatically assigned.
+If p5 is 0, the maximum number of characters that can be handled by that version of Windows will be used.
+If p5 is omitted or a negative value, the maximum number of characters that can be stored in the variable specified by p1 is automatically assigned.
 
 %href
 input
@@ -239,35 +238,35 @@ input
 
 %index
 objprm
-Change the contents of the object
+Change object content
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2
-p1 = 0 to (0): Object ID specification
-p2: Contents of the parameter to be changed
+p1=0Å`(0) : Object ID specification
+p2        : Contents of the parameter to be changed
 
 %inst
-Use the button command, input, mesbox command, etc. to change the contents and parameters of the object placed on the screen.
+Changes the content and parameters of objects placed on the screen with the button, input, mesbox, etc. commands.
 ^
-For p1, specify the object ID. The object ID is a number assigned to each object displayed on the screen in order from 0.
-The object ID is assigned to the system variable stat after the instruction to place the object is executed (usually, the numbers 0, 1, 2 ... are assigned in the order in which they are placed).
+Specify the object ID in p1. The object ID is a number assigned to each object displayed on the screen, starting from 0.
+The object ID is assigned to the system variable stat after executing the command to place the object (usually the numbers 0, 1, 2... are assigned in the order they are placed).
 ^
-Changes the object specified here with the parameters specified in p2.
-The parameters specified in p2 differ depending on the object type. Depending on the object, there are those that specify a character string and those that specify a numerical value. See the table below for details.
+Here, modify the object specified here with the parameters specified in p2.
+The parameters specified in p2 vary depending on the type of object. Some objects require a string, while others require a number. See the table below for details.
 ^p
-     Object: p2 specification
+     Object               : p2 specification
  ----------------------------------------------------------
-  Button: Change button string (string)
-  Input box (numerical value): Change input contents (numerical value)
-  Input box (character string): Change input contents (character string)
-  Check box: Check ON / OFF (numerical value)
-  Combo box: Change the contents of the combo box (character string)
-  List box: Change the contents of the list box (character string)
+  Button                 : Change button text (String)
+  Input Box (Numeric)    : Change input content (Numeric)
+  Input Box (String)     : Change input content (String)
+  Checkbox               : Check ON/OFF (Numeric)
+  Combobox               : Change combobox content (String)
+  Listbox                : Change listbox content (String)
 ^p
-For example, if you specify an ID that indicates a check box and then specify 1 for the parameter of p2, the check box is forcibly changed to the ON state. In this case, the value of the variable that holds the contents of the checkbox is also automatically rewritten.
+For example, if you specify the ID of a checkbox and then specify 1 for the p2 parameter, the checkbox will be forcibly set to the ON state. In this case, the value of the variable holding the checkbox content is also automatically rewritten.
 ^
-If you change the contents of the input box, the input focus is automatically set in the input box and the cursor is displayed in the box.
+When you change the contents of an input box, the input box is automatically focused and the cursor is displayed inside the box.
 
 %href
 button
@@ -281,21 +280,21 @@ layerobj
 
 %index
 objsize
-Object size setting
+Set object size
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2,p3
-p1 = 0 to (64): The size of the object in the X direction (in dots)
-p2 = 0 to (24): Object size in Y direction (in dots)
-p3 = 0 to (0): Minimum reserved line size in Y direction (in dots)
+p1=0Å`(64)  : Object width (in dots)
+p2=0Å`(24)  : Object height (in dots)
+p3=0Å`(0)   : Minimum number of lines to secure in the Y direction (in dots)
 
 %inst
-Set the size of the object when arranging buttons, input boxes, etc.
+Sets the size of the object when placing buttons and input boxes.
 ^
-You can specify the minimum amount that the current position will move after the button or message is placed on p3. This will allow space of the same size when the buttons and messages are placed in succession.
+p3 allows you to specify the minimum amount that the current position moves after a button or message is placed. This ensures that buttons and messages placed in succession have the same amount of space between them.
 ^
-When the screen is cleared, the object size will automatically return to the default.
+When the screen is cleared, the object size automatically returns to the default.
 
 %href
 button
@@ -309,55 +308,55 @@ listbox
 
 %index
 objsel
-Set input focus on object
+Set input focus to object
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1
-p1 = 0 to (0): Object ID specification
+p1=0Å`(0) : Object ID specification
 
 %inst
-Focuses the input on the object ID specified by p1.
-By focusing the input, you can put the input cursor (caret) in the input box placed by the mesbox command or the input command.
-This command is for performing processing such as when you want to focus the input on any location in multiple input boxes, or when you move to the next input box by key input.
-If you specify -1 for p1, the object ID that is currently in focus is assigned to the system variable stat.
+Sets the input focus to the object ID specified by p1.
+By setting the input focus, you can display an input cursor (caret) in input boxes placed with the mesbox command or input command.
+This command is used to set the input focus to an arbitrary location in multiple input boxes, or to perform processing such as moving to the next input box with key input.
+Also, if you specify -1 for p1, the object ID that currently has the input focus is assigned to the system variable stat.
 
 
 
 %index
 objmode
-Object mode setting
+Set object mode
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2
-p1 = 0 to (0): Object font setting mode specification
-p2 = 0 to 1: Focus movement key specification (0 = OFF / 1 = ON)
+p1=0Å`(0) : Object font setting mode specification
+p2=0Å`1   : Focus movement key specification (0=OFF/1=ON)
 %inst
-This command is used to set the style used in object control commands such as button, input, and mesbox.
-You can specify font settings and style-related modes with p1.
-This will change the style settings when executing subsequent object placement instructions.
-The mode values and contents are as follows.
+This command is used to set the styles, etc. used by object control commands such as button, input, and mesbox.
+You can specify the font settings and style-related modes with p1.
+This changes the style settings when subsequent object placement commands are executed.
+The values and contents of the mode are as follows.
 ^p
-   p1: Macro name: Mode
+   p1 : Macro Name          : Mode
  ------------------------------------------------------------
-    0: objmode_normal Use HSP standard font
-    1: objmode_guifont Use default GUI font
-    2: Use the font selected by the objmode_usefont font command
-    4: Use the color of the objmode_usecolor color instruction / objcolor instruction
+    0 : objmode_normal      : Use HSP standard font
+    1 : objmode_guifont     : Use default GUI font
+    2 : objmode_usefont     : Use the font selected by the font command
+    4 : objmode_usecolor    : Use the color specified by the color command/objcolor command
 ^p
-Immediately after the window is initialized, it is set to mode 1.
+Immediately after the window is initialized, mode 1 is set.
 ^
-If you change to mode 2, the font specified by the font instruction will be used. This uses the set font when the object control instruction is executed. Note that it is not the font at the time the objmode instruction was executed.
+If you change to mode 2, the font specified by the font command will be used. Note that the font that is set at the time the object control command is executed will be used. It is not the font at the time the objmode command was executed.
 ^
-Mode 4 (objmode_usecolor) can be used together by adding it to other modes. If "objmode_usefont + objmode_usecolor" is specified, both modes are enabled.
+Mode 4 (objmode_usecolor) can be used in combination by adding it to other modes. If "objmode_usefont+objmode_usecolor" is specified, both modes will be enabled.
 ^
-Use p2 to turn ON / OFF the focus movement mode of the object with the [TAB] key. When p2 is specified as 1, the input focus of the displayed object can be moved with the [TAB] key. If the mode specification of p2 is omitted, the previous mode is inherited.
+With p2, you can turn ON/OFF the object focus movement mode using the [TAB] key. If p2 is set to 1, the input focus of the displayed object can be moved with the [TAB] key. If the mode specification of p2 is omitted, the previous mode is inherited.
 ^p
-  p2: mode
+  p2 : Mode
  --------------------------------------------------------------
-  0: Disable [TAB]
-  1: The focus of the object can be moved by pressing the [TAB] key (standard)
+  0  : Disable [TAB]
+  1  : [TAB] key allows object focus movement (standard)
 ^p
 %href
 button
@@ -375,19 +374,19 @@ objcolor
 
 %index
 objcolor
-Object color settings
+Set object color
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2,p3
-p1, p2, p3 = 0 to 255 (0): Color code (brightness of R, G, B)
+p1,p2,p3=0Å`255(0) : Color code (R,G,B brightness)
 
 %inst
 Sets the color used by the object.
-p1, p2, and p3 are the brightness of R, G, and B, respectively. The values you specify are 0 for the darkest and 255 for the brightest. (0,0,0 is black and 255,255,255 is white.)
+p1, p2, and p3 are the brightness of R, G, and B, respectively. The value to specify is 0 for the darkest and 255 for the brightest. (0,0,0 is black, and 255,255,255 is white.)
 ^
-The color specified by the objcolor instruction is valid only when the objmode_usecolor option of the objmode instruction is specified.
-With the objmode_usecolor option, it is possible to specify the text color and background color when arranging objects.
+The color specified by the objcolor command is valid only when the objmode_usecolor option of the objmode command is specified.
+The objmode_usecolor option allows you to specify the text color and background color when placing objects.
 
 %href
 objmode
@@ -399,20 +398,20 @@ objmode_usecolor
 
 %index
 objenable
-Enable / disable the object
+Set object enabled/disabled
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2
-p1 = 0 to (0): Object ID specification
-p2 = 0 to (1): Invalid if 0, valid if other than 0
+p1=0Å`(0) : Object ID specification
+p2=0Å`(1) : 0 if disabled, other than 0 is enabled
 
 %inst
-Changes the state of the object ID specified in p1.
-If the value specified in p2 is 0, the object is invalidated.
-The invalidated object will be present on the screen, but will change color and become inoperable.
-If you specify a value other than 0 for the value specified in p2, the object will be valid as usual.
-You can enable / disable all objects such as input boxes and buttons.
+Changes the state of the object ID specified by p1.
+If the value specified by p2 is 0, the object is disabled.
+Disabled objects exist on the screen, but their color is changed and they cannot be operated.
+If the value specified by p2 is other than 0, the object is normally enabled.
+You can enable or disable all objects, such as input boxes and buttons.
 %href
 objgray
 
@@ -422,29 +421,29 @@ Let
 
 %index
 objskip
-Set the focus movement mode of the object
+Set object focus movement mode
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2
-p1 = 0 to (0): Object ID specification
-p2 = 1 ~ (2): Focus movement mode
+p1=0Å`(0) : Object ID specification
+p2=1Å`(2) : Focus movement mode
 
 %inst
-Sets the focus movement mode for the object ID specified in p1.
-The focus movement mode specifies the behavior when moving the object placed by the [TAB] key for each object.
+Sets the focus movement mode of the object ID specified by p1.
+The focus movement mode specifies the behavior for each object when moving the placed objects with the [TAB] key.
 Specify the mode value with p2. The details of the mode value are as follows.
 ^p
-  p2: Focus movement mode
+  p2 : Focus movement mode
  --------------------------------------------------------------
-   1: You can move the focus to the next object with the [TAB] key (standard)
-   2: It is not possible to move the focus to the next object by pressing the [TAB] key.
-   3: Do not move the focus to the object with the [TAB] key (skip)
-  +4: Select all text when moving focus (input box only)
+   1 : Focus can be moved to the next object with the [TAB] key (standard)
+   2 : Focus cannot be moved to the next object with the [TAB] key
+   3 : Focus movement to objects with the [TAB] key is not performed (skip)
+  +4 : Select all text when moving focus (input box only)
 ^p
-Normally, the optimum mode is set when the object is placed, so there is no need to reset the focus movement mode.
-Use this when you change the focus movement mode only for objects that play a special role, or when you add a new system-defined object using the winobj command.
-Note that the focus movement is not performed by pressing the [TAB] key when the focus movement mode function is turned off by the objmode command.
+Normally, the optimal mode is set when the object is placed, so there is no need to reset the focus movement mode.
+Use it only when changing the focus movement mode for objects that play a special role, or when adding a system-defined object by the winobj command.
+Note that if the focus movement mode function is turned OFF by the objmode command, focus movement by the [TAB] key will not be performed.
 
 %href
 winobj
@@ -458,29 +457,29 @@ Let
 objimage
 Custom button settings
 %group
-Object control instructions
+Object Control Commands
 %prm
 id,x1,y1,x2,y2,x3,y3
-id: Custom button reference buffer ID
-x1, y1: Custom button reference coordinates 1 (normal time)
-x2, y2: Reference coordinate 2 of custom button (when pressed down)
-x3, y3: Custom button reference coordinates 3 (when mouse over)
+id    : Custom button reference buffer ID
+x1,y1 : Custom button reference coordinates 1 (normal)
+x2,y2 : Custom button reference coordinates 2 (pressed)
+x3,y3 : Custom button reference coordinates 3 (mouse over)
 
 %inst
-Make settings for placing custom buttons.
-Custom buttons can replace the object appearance of pushbuttons created by the button command with any image.
-In order to create a custom button, you need to prepare an image to be displayed as a button in advance.
+Performs settings for placing custom buttons.
+Custom buttons can replace the appearance of push button objects created with the button command with arbitrary images.
+To create a custom button, you must prepare an image to display as a button in advance.
 ^
-In the id parameter, specify the screen buffer ID that stores the image of the custom button.
-If you omit the id parameter or specify -1, the custom button setting is disabled and the button provided by a normal Windows system is used.
-In (x1, y1), specify the upper left coordinates of the image to be displayed as a normal button. (If the parameter is omitted, (0,0) is specified.)
-(x2, y2) specifies the upper left coordinates of the image to be displayed on the button when the button is pressed. (If the parameter is omitted, (0,0) is specified.)
-In (x3, y3), specify the upper left coordinates of the image to be displayed on the button when the mouse hovers over the button (mouse over). (If the parameter is omitted, the same value as x1 and y1 is used.)
+The id parameter specifies the screen buffer ID in which the custom button image is stored.
+If you omit the id parameter or specify -1, the custom button setting is disabled, and the button provided by the normal Windows system is used.
+Specify the upper left coordinates of the image to display as a normal button at (x1,y1). (If the parameter is omitted, (0,0) is specified.)
+(x2,y2) specifies the upper left coordinates of the image to display on the button when the button is pressed. (If the parameter is omitted, (0,0) is specified.)
+(x3,y3) specifies the upper left coordinates of the image to display on the button when the mouse is over the button (mouse over). (If the parameter is omitted, the same value as x1, y1 is used.)
 ^
-After the custom button is set by the objimage command, the setting is applied to all the buttons placed by the button command.
-Custom buttons change their appearance by copying the specified image to the location where the button is located.
-The range to be copied is the same size as the button (set by the objsize command).
-The behavior other than the appearance is the same as a normal button. Character display on the button, focus movement, etc. are also supported.
+After the custom button settings are made by the objimage command, the settings are applied to all buttons placed with the button command.
+Custom buttons change their appearance by copying the specified image to the location where the button is placed.
+The copied range is the same size as the button (set by the objsize command).
+The behavior other than the appearance is the same as a normal button. Character display on the button, focus movement, etc. are also supported in the same way.
 Custom button settings are cleared when the screen is initialized (when the cls command or screen command is executed).
 
 %href
@@ -494,39 +493,39 @@ Let
 layerobj
 Add layer object
 %group
-Object control instructions
+Object Control Commands
 %prm
 p1,p2,p3,*label,p4
-p1, p2; XY size of layer object (in dots)
-p3 (0): Layer ID
-* label: Layer object processing subroutine
-p4 = 0 to (0): Option value
+p1,p2     ; Layer object XY size (in dots)
+p3(0)     : Layer ID
+*label    : Layer object processing subroutine
+p4=0Å`(0) : Option value
 
 %inst
-Place the layer object at the current position.
-Layer objects are user-defined placement objects.
-By registering a subroutine that draws on the screen in advance, drawing can be executed at the specified timing (layer).
-In order to notify the layer object of the drawing area, it is necessary to specify the X and Y sizes in dots in p1 and p2. If p1 and p2 are omitted, the size of the entire screen will be used.
-Now, the current positions X and Y are treated as the upper left coordinates, and the size specified by p1 and p2 is treated as a layer object.
-The p3 parameter specifies the layer to draw.
+Place a layer object at the current position.
+Layer objects are placement objects defined by the user.
+By registering a subroutine that performs drawing on the screen in advance, you can execute drawing at a specified timing (layer).
+To notify the layer object of the drawing area, you need to specify the X and Y sizes in dots with the p1 and p2 parameters. If you omit the p1 and p2 specifications, the size of the entire screen is used.
+This treats the current position X, Y as the upper left coordinates and the size specified by p1, p2 as a layer object.
+The p3 parameter specifies the layer to draw on.
 ^p
-  p3: Layer to draw
+ p3 : Layer to draw on
  --------------------------------------------------------------
-    0: Do not draw (objlayer_min)
-    1: Background layer (objlayer_bg)
-    2: Normal drawing layer (objlayer_normal)
-    3: GUI layer (objlayer_posteff)
-    4: Foreground drawing layer (objlayer_max)
- +256: Allow duplicate registration of layer objects (objlayer_multi)
+    0 : Do not draw (objlayer_min)
+    1 : Background layer (objlayer_bg)
+    2 : Normal drawing layer (objlayer_normal)
+    3 : GUI layer (objlayer_posteff)
+    4 : Foremost drawing layer (objlayer_max)
+ +256 : Allow duplicate registration of layer objects (objlayer_multi)
 ^p
-The * label parameter specifies the processing subroutine for the layer object.
-This subroutine must be provided by the user.
-The p4 parameter can be set to any integer value set on the layer object.
+*The *label* parameter specifies the processing subroutine for the layer object.
+You must provide this subroutine yourself.
+The p4 parameter allows you to set an arbitrary integer value for the layer object.
 ^
-It's all up to the user-created subroutines to do what the layer object does.
-The subroutine is called with the system variables iparam, wparam, lparam set. Based on this information, the user should describe the process, including drawing the layer object.
-In the layer object processing subroutine, it is necessary to perform only drawing and immediately end the processing with the return instruction. You cannot write an instruction to stop a task such as wait / await / redraw.
-For details on how to use layer objects, refer to the programming manual.
+What the layer object does is entirely up to the user-created subroutine.
+The subroutine is called with the system variables iparam, wparam, and lparam set. Based on this information, the user must write the processing, including the drawing of the layer object.
+Within the layer object processing subroutine, you must only draw and immediately terminate the processing with a return statement. Instructions that stop tasks, such as wait/await/redraw, cannot be written.
+Refer to the programming manual for detailed information on using layer objects.
 
 
 %href
@@ -534,5 +533,3 @@ objprm
 
 %port-
 Let
-
-

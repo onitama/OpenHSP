@@ -1,0 +1,385 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Language" content="en">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta name="author" content="OpenHSP3 Project">
+	<meta name="keywords" content="HSP3,HotSoupProcessor3,HSP3Dish,WebGL,JavaScript,hsp3dish.js">
+	<meta name="description" content="HSP3Dish hsp3dish.js版に関する情報を掲載">
+	<link href="../main.css" rel="stylesheet" type="text/css" media="all">
+	<title>HSP3Dish WebGL/html5 Version (hsp3dish.js) Programming Guide</title>
+</head>
+<body>
+	<div id="CONTAINER">
+	<!-- Header -->
+	<p id="COPY">HSP : HSP3Dish / onion software 2025(c)</p>
+	<img src="hsp3dish.jpg" width="640" height="200" alt="title">
+	<h1>hsp3dish.js (WebGL/html5 Version)<br><br>Programming Guide</h1>
+
+	<!-- Table of Contents -->
+	<ol>
+		<li><a href="#ABOUT">hsp3dish.js Overview</a></li>
+		<li><a href="#LOGIC">hsp3dish.js Mechanism</a></li>
+		<li><a href="#CONVERT">Conversion with HSP3Dish Helper</a></li>
+		<li><a href="#BROWSE">Execution on a Browser</a></li>
+		<li><a href="#SCRSIZE">Scaling Display Size</a></li>
+		<li><a href="#MEDIA">Media File Playback</a></li>
+		<li><a href="#EXEC">Browser Control with exec, dialog Commands</a></li>
+		<li><a href="#SENSOR">Acquiring Sensor Information <span class="new">(New!)</span></a></li>
+		<li><a href="#NOTICE">Restrictions/Known Issues</a></li>
+		<li><a href="#FUTURE">Future Plans</a></li>
+		<li><a href="#LICENSE">License/Acknowledgements</a></li>
+	</ol>
+
+	<h2 id="ABOUT">hsp3dish.js Overview</h2>
+	<p>
+	hsp3dish.js is a runtime for HSP3Dish that operates on WEB browsers supporting WebGL.
+	It is possible to reproduce many of the functions supported by the Windows version of HSP3Dish on various WEB browsers.
+	This allows operation not only on Windows but also on various OSs such as MacOS and Linux, making it easy to execute HSP applications without the hassle of installation.
+	<br>
+	This manual describes how to use the hsp3dish.js version, precautions, etc.
+	<br>
+	<br>
+	A WebGL-compatible browser is required for operation. Operation has been confirmed in the following environments:
+	<UL>
+	<LI>Chrome
+	<LI>Firefox
+	<LI>Safari
+	<LI>Internet Explorer 11 (with limitations)
+	<LI>Microsoft Edge
+	<LI>Firefox Mobile Browser (Android)
+	</UL>
+	<br>
+	The HSP3Dish Helper tool is included to assist with the conversion of HSP3Dish scripts.
+	This allows for relatively smooth conversion to hsp3dish.js.
+	(To confirm operation, you will need a homepage that you can upload to, or a WEB server that runs locally.)
+	</p>
+
+	<h2 id="LOGIC">hsp3dish.js Mechanism</h2>
+	<p>
+	hsp3dish.js uses the	<a href="https://llvm.org/" target="_blank">llvm compiler</a> and <a href="https://github.com/kripken/emscripten" target="_blank">Emscripten</a>
+	to convert the HSP3 runtime to JavaScript and WebAssembly.
+	Because it is based on the original HSP3 source, it has high operational compatibility and is an easy-to-update system.
+	<br>
+	The iOS and Android versions of HSP3Dish convert HSP scripts to native code before executing them,
+	but hsp3dish.js operates as an interpreter (sequential execution) based on the intermediate code output from HSP scripts (the .ax object file). This is the same program as the Windows version of HSP3Dish, and has extremely high compatibility.
+	<br>
+	The execution speed of the script depends on the CPU speed of the machine running the browser and the VM speed, but it operates within a practical range on recent PCs.
+	</p>
+
+	<h2 id="CONVERT">Conversion with HSP3Dish Helper</h2>
+	<p>
+	Start the HSP3Dish Helper (hsp3dh.exe) located in the HSP installation folder (must be updated with the latest HSP3Dish development set).
+	<br>
+	</p>
+	<ul><img src="hsp3dish/s_js1.jpg"><br></ul>
+	<br>
+	<p>
+	Press the "hsp3dish.js" button at the bottom to switch to hsp3dish.js conversion mode. It should look like the display above.
+	<br>
+	Set the necessary information in this dialog and press the "Convert" button to create all the files needed for operation on the web browser. The items to set in the dialog are as follows.
+	</p>
+	<ul>
+	<li>Source Script</li><br><p>
+	Specifies the HSP script (.hsp) to be converted. It must be a script written for HSP3Dish. You can open a file selection dialog by pressing the "Browse" button.<br>
+	Be sure to use a <b>"filename containing only alphanumeric characters (without Japanese (full-width) characters)"</b> for the script file name.<br>
+	The generated screen size will use the settings in the hsp3dish.ini file in the same folder as the source script. See the "<a href="hsp3dish_prog.htm#INIFILE">About the startup configuration file</a>" section for information on the settings in the hsp3dish.ini file.
+	</p>
+	<li>Data Folder</li><br><p>
+	The data folder is for preparing files (including image data, sound data, etc.) that are read in the script, such as picload commands and bload commands.<br>
+	The "data" folder under the folder specified by "Source Script" is recognized as the data folder.
+	Files read from the script should be stored together in the data folder.<br>
+	All files in the data folder are packed as data files (with the .data extension). If unnecessary files are included, they will waste capacity, so be sure to include only the necessary files.<br>
+	Be sure to use a <b>"filename containing only alphanumeric characters (without Japanese (full-width) characters)"</b> for the files included in the data folder. Also, only the specified data folder is searched, and subfolders are not included.
+	If you do not need a data file, you can leave it blank.
+	</p>
+	<li>Memory Size</li><br><p>
+	You can set the upper limit of the memory block allocated at the time of browser execution.
+	If blank, the default value (200 megabytes) is used.
+	Normally, the default value is fine, but if you are using a large script or a large amount of data, specify a value greater than 100. (If you specify 500, it will be 500 megabytes.)<br>
+	(If you see "Cannot enlarge memory arrays." in the hsp3dish.js console when running the browser, try adjusting the upper limit of the memory block.)
+	</p>
+	<li>Use HGIMG4</li><br><p>
+	Converts HGIMG4 scripts. "hsp3dish-gp.js" is required for execution.<br>
+	The data used by HGIMG4 should be placed in "res" and "res/shaders" under the folder specified by "Source Script". (Located in sample/hgimg4)
+	</p>
+	<li>Use WebAssembly</li><br><p>
+	Converts to WebAssembly format. An additional ".wasm" file is required for execution.<br>
+	Converting to WebAssembly format can be expected to speed up loading and execution.
+	However, Web browser support is limited, so it is still an experimental implementation.
+	</p>
+	<li>Output Debug Information</li><br><p>
+	Generates data including debug information when converting the script.<br>
+	By outputting debug information, when an error occurs during execution on the browser,
+	You can refer to the line number and source script file name.
+	If you don't know where the error occurred when running the browser, try outputting debug information to check.
+	</p>
+	<li>Use Sensor</li><br><p>
+	Check this box if the script you are running uses motion sensor information.<br>
+	Information can be obtained when executed on devices equipped with motion sensors, such as iOS and Android.<br>
+	It is not necessary to set anything in particular if you do not use the motion sensor.
+	</p>
+	</ul>
+	<p>
+	Once you have configured the settings, press the "Convert" button.
+	At that time, you can select the type of html template in the combo box above. Currently, you can select the standard html (white background) and the black background html.
+	<br>
+	By performing the conversion, the script and data files are generated for hsp3dish.js.<br>
+	The files that are generated are as follows.
+	</p>
+	<ul>
+	<li>(Source Script Name).html File</li>
+	<li>(Source Script Name).data File</li>
+	<li>hsp3dish.js File (hsp3dish-gp.js when using HGIMG4)</li>
+	<li>hsp3dish.wasm File (only when using WebAssembly) (hsp3dish-gp.wasm when using HGIMG4)</li>
+	</ul>
+	<p>
+	These files should be generated in the folder where the original source script is located.
+	(For example, if you convert block3.hsp, block3.html and block3.data will be generated.)<br>
+	You can execute it on a WEB browser simply by uploading the files generated here to the WEB.<br>
+	The .html file is an HTML file to open from a WEB browser.
+	For example, if you upload to a location such as "www.onionsoft.net/hsp/hsp3js/",
+	"https://www.onionsoft.net/hsp/hsp3js/block3.html" will be the URL for execution.<br>
+	The .data file is a data file read from JavaScript in the HTML file, and contains all the data necessary for execution.
+	<br>
+	The "hsp3dish.js" and "hsp3dish-gp.js" files are the core parts of the HSP runtime, and are always required when executing HSP3Dish on the WEB.
+	Since this is the same for all scripts, it can be shared even if multiple .html and .data files are placed in the same folder.<br>
+	If you convert to WebAssembly format, the hsp3dish.wasm file (hsp3dish-gp.wasm when using HGIMG4) will be generated. (Normally it is not generated)
+	Please upload this file to the server as well as "hsp3dish.js".
+	</p>
+
+
+	<h2 id="BROWSE">Execution on a Browser</h2>
+	<p>
+	<a href="https://www.onionsoft.net/hsp/hsp3js/block3.html" target="_blank"><img src="hsp3dish/s_js2.jpg" style="float:right;"></a>
+	By uploading the .html file, .data file, and hsp3dish.js file generated from HSP3Dish Helper to the web, you can run them in a browser.
+	Opening the local .html file will not start it. Be sure to place the files on a web server.
+	<br>
+	You can check the actual operation of the block3.hsp script from <a href="https://www.onionsoft.net/hsp/hsp3js/block3.html" target="_blank">this page</a>.
+	<br>
+	The default generated html file includes "Resize Canvas", "Lock/hide mouse pointer" checkboxes, and a "Fullscreen" button.
+	<br>
+	A console (system message display area) for hsp3dish.js is placed at the bottom of the execution screen.
+	<br>
+	You are free to modify the html file as you wish. Please adjust the layout, placement, etc. as desired.
+	<br>
+
+	</p>
+	<br clear="all">
+
+
+	<h2 id="SCRSIZE">Scaling Display Size</h2>
+	<p>
+	You can edit the html file to set the display size, scaling, and other settings.
+	Open the generated .html file with a text editor and edit the following location:
+	</p>
+	<ul><pre>
+	    Module.preRun.push(function() {
+	        ENV.HSP_WX = "480";//Script's operating resolution
+	        ENV.HSP_WY = "800";
+	        ENV.HSP_SX = "480";//Display resolution
+	        ENV.HSP_SY = "800";
+	        ENV.HSP_AUTOSCALE = "0";//Scaling mode
+	        ENV.HSP_FPS = "0";//Frame rate
+	        ENV.HSP_LIMIT_STEP = "15000";//Number of execution steps before returning processing to the browser
+	    });
+	</pre></ul>
+	<p>
+	The numbers specified in "ENV.HSP_WX" and "ENV.HSP_WY" are the script's operating resolution size (X, Y).
+	This is the value obtained from the hsp3dish.ini file during script conversion.<br>
+	The numbers specified in "ENV.HSP_SX" and "ENV.HSP_SY" are the resolution size (X, Y) actually displayed on the web browser.
+	The "ENV.HSP_AUTOSCALE" item is used to set the scaling (enlargement/reduction) when the script's operating resolution and display resolution are different. "0" is specified by default, but you can set the following values.
+	</p>
+	<ul><pre>
+		0 : Optimal size to fit the entire screen (aspect ratio maintained)
+		1 : Scale based on the X-axis size (aspect ratio maintained)
+		2 : Scale based on the Y-axis size (aspect ratio maintained)
+		3 : Display on the entire screen, ignoring the aspect ratio
+	</pre></ul>
+	<p>
+	Other options can also be set as follows.<br>
+	Specify a fixed frame rate with "HSP_FPS". In the case of 30, it will be updated at 30FPS (30/1000 seconds). In the case of 0 (default), the number of frames is left to the browser (requestAnimationFrame).<br>
+	"HSP_LIMIT_STEP" specifies the number of execution steps before forcibly returning processing to the browser. "15000" is specified by default. Note that if this value is too large, the browser may become unresponsive if there is a problem with the script or the processing system.
+	</p>
+
+
+	<h2 id="MEDIA">Media File Playback</h2>
+	<p>
+	In the current version, support for media file playback is experimental.
+	</p>
+	<ul><pre>
+		・Supports playback of wav and mp3 formats (mmload, mmplay commands)
+		・ogg format is only supported by some browsers (mmload, mmplay commands)
+		・Operation has been confirmed on Chrome and Firefox
+		・Does not work on IE11 (does not result in an error)
+		・mci command is not supported
+		・Video playback is not supported
+	</pre></ul>
+	<p>
+	The formats that can be loaded with the mmload command are ".wav", ".mp3", and ".ogg".<br>
+	Because media files can be huge in size as resources, the current resource management method of loading everything into memory at startup is not suitable for processes that play a large number of songs.
+	We would like to improve this point in future versions.
+	</p>
+
+
+	<h2 id="EXEC">Browser Control by exec,dialog commands</h2>
+	<p>
+	You can display standard browser dialogs with the dialog command.
+	(Common dialogs other than standard dialogs are not supported)
+	<br>
+	You can control the browser at a more detailed level with the exec command.
+	The normal exec command is a function to call OS commands, but
+	in hsp3dish.js, it has the role of directly executing JavaScript code.
+	</p>
+	<ul><pre>
+		exec "alert('TEST');"
+	</pre></ul>
+	<p>
+	This allows you to call the functions that JavaScript has from within the HSP script.
+	However, please note that if an error occurs in the JavaScript syntax, the browser may stop with an error.<br>
+	By specifying 16 as the option value of the exec command, you can specify the URL of a newly opened page.
+	</p>
+	<ul><pre>
+		exec "https://hsp.tv",16
+	</pre></ul>
+	<p>
+	In this example, the URL "https://hsp.tv" is opened in a new browser.
+	<br>
+	By using the exec command, it becomes possible to open web pages and change the browser display in cooperation with the HSP program.
+	</p>
+
+
+	<h2 id="SENSOR">Acquiring Sensor Information</h2>
+	<p>
+	On devices equipped with acceleration and gyro sensors, sensor values can be obtained using the following macros.<br>
+	When using sensors, be sure to check the "Use Sensor" item when converting the script with HSP3Dish Helper.<br>
+	Not all browsers support motion sensor information. Also, please note that values may differ depending on the device and browser type.<br>
+	Also, an https connection is required when checking the operation. Also, Safari browsers on iOS (iPhone, iPad) require confirmation when using sensors. (Users must press the "Allow Sensor" button on the bottom left to approve before sensor values can be acquired.)<br>
+	When actually using sensor information, please use the following macros.
+	</p>
+	<ul><pre>
+	ginfo_accelx	Acceleration sensor value (X)
+	ginfo_accely	Acceleration sensor value (Y)
+	ginfo_accelz	Acceleration sensor value (Z)
+	</pre></ul>
+	<p>
+	Acquires the sensor value in an environment where the acceleration sensor is available.
+	This is the acceleration acquired in each coordinate axis as a real number (m/s^2). (The numerical value including the gravitational acceleration of 9.8m/s^2 is acquired.)<br>
+	0.0 is acquired in environments where the acceleration sensor is not available.
+	</p>
+	<ul><pre>
+	ginfo_gyrox	Gyro sensor value (X)
+	ginfo_gyroy	Gyro sensor value (Y)
+	ginfo_gyroz	Gyro sensor value (Z)
+	</pre></ul>
+	<p>
+	Acquires the sensor value in an environment where the gyro sensor is available.
+	This is the tilt angle (Degree) obtained for each coordinate axis.
+	0.0 is acquired in environments where the gyro sensor is not available.
+	</p>
+
+
+	<h2 id="NOTICE">Restrictions and Known Issues</h2>
+	<p>
+	The current version has the following restrictions.
+	Other functions are basically the same as HSP3Dish.
+	</p>
+	<ul><pre>
+		・Media-related functions (restrictions due to browser and file type)
+		・Static saving to local files using the bsave command, etc. is not possible
+	</pre></ul>
+	<p>
+	Also, the following has been reported as a known issue.
+	</p>
+	<ul><pre>
+		・Multimedia-related commands do not work on IE11
+	</pre></ul>
+	<p>
+	In addition, since it operates on a web browser, different operations and displays may occur.
+	Currently, data files are loaded all at once, so please note that large-scale applications (such as those that use a large number of images) may become heavy or unable to process.
+	</p>
+
+
+	<h2 id="FUTURE">Future Plans</h2>
+	<p>
+	hsp3dish.js is planned to expand its functions in the future as an environment where HSP can be easily executed on the web.
+	The following are functions that are being considered for future version upgrades.
+	In future versions, we would like to aim for higher compatibility and improved functionality.
+	</p>
+	<ul><pre>
+		・Implementation of network extension processing
+		・Cooperation function with SoupSeed
+		・Code editing and compilation execution on the web
+	</pre></ul>
+
+
+	<h2 id="LICENSE">License and Acknowledgements</h2>
+	<p>
+	Users can use hsp3dish.js/hsp3dish-gp.js under the <a href="hsp3dish_prog.htm#LICENCE">same license as HSP3Dish (BSD license)</a>.
+	The following license notation is included in the file, so please upload the hsp3dish.js/hsp3dish-gp.js file to your homepage as is without modifying it.
+	There is no obligation to display information about the license and author in other locations. Also, no license fee is required for use, whether for commercial or non-commercial purposes.
+	</p>
+	<p>
+	If you are directly linking to hsp3dish.js/hsp3dish-gp.js, please use "https://www.onionsoft.net/hsp/v36/hsp3js/hsp3dish.js" or "https://www.onionsoft.net/hsp/v36/hsp3js/hsp3dish-gp.js".
+	(However, please note that the content may be changed if a high load occurs or if there are security concerns, etc., that hinder operation.)
+	</p>
+	<ul><pre>
+	Copyright (C) 1997-, Onion Software/onitama.
+	Copyright (C) 2014-, zakki, K-s.
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	Redistributions of source code must retain the above copyright notice, this
+	list of conditions and the following disclaimer.  Redistributions in binary
+	form must reproduce the above copyright notice, this list of conditions and
+	the following disclaimer in the documentation and/or other materials provided
+	with the distribution.  Neither the name of the Onion Software nor the names
+	of its contributors may be used to endorse or promote products derived from
+	this software without specific prior written permission.
+	</pre></ul>
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+	</pre></ul>
+	<p>
+	hsp3dish.js/hsp3dish-gp.js is based on the Emscripten version of HSP3Dish implemented by <a href="https://github.com/zakki" target="_blank">zakki</a>.
+	K-s assisted in improving multimedia and drawing functions.
+	We would like to thank zakki for developing this wonderful system and the many people who provided feedback.
+	<br>
+	The Emscripten version of HSP3Dish is a derivative of OpenHSP. The source code can be obtained from the OpenHSP repository.
+	</p>
+	<ul><pre>
+		OpenHSP Development
+		<a href="https://dev.onionsoft.net/trac/openhsp/" target="_blank">https://dev.onionsoft.net/trac/openhsp/</a>
+
+		Emscripten version of HSP3Dish WiKi
+		<a href="https://dev.onionsoft.net/trac/openhsp/wiki/DirTrunk/Hsp3dish/Emscripten" target="_blank">https://dev.onionsoft.net/trac/openhsp/wiki/DirTrunk/Hsp3dish/Emscripten</a>
+
+		zakki
+		<a href="https://x.com/k_matsuzaki" target="_blank">https://x.com/k_matsuzaki</a>
+	</pre></ul>
+
+	<!-- Footer -->
+	<ul id="FOOTER">
+		<li><a href="#CONTAINER">Return to the top of this page</a></li>
+		<li><a href="../index.htm">Return to Index</a></li>
+	</ul>
+	<a href="https://www.onionsoft.net/">
+		<img src="onibtn.gif" width="147" height="50" alt="ONION software" id="ONIBTN">
+	</a>
+</div><!-- container -->
+</body>
+</html>
