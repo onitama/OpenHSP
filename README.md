@@ -23,11 +23,13 @@ The latest beta test version can be downloaded from this link.
 https://www.onionsoft.net/wp/archives/category/hsp/download
 
 
-# Linux installation
+# Linux and RaspberryPi installation
 
 It works in the Linux GUI environment (X Window System). Some features work using OpenGL and SDL libraries. If you can connect to the network, get the repository directly with the git command.
 
 	git clone https://github.com/onitama/OpenHSP
+ 	cd OpenHSP
+	./setup.sh
 
 If you have an archive, extract the contents to any directory and compile the source. To compile, you need an environment where you can run gcc and make. The following libraries are required when compiling, so please check in advance.
 
@@ -50,16 +52,15 @@ For Debian (Ubuntu), you can install the library from the package manager as fol
 	sudo apt install -y libffi-dev
 
 The repository contains only the source, so you need to compile it with make. (If it doesn't compile correctly depending on your Linux version or distribution, you'll need to fix it.)
+Use “setup.sh” for install the library and build or or try make from command line.
 
-	cd OpenHSP
 	make
 
 The necessary tools have been compiled and HSP3 is ready for use.
 
 
-# Raspberry Pi installation
+# Regacy Raspberry Pi installation
 
-It runs on Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi4, Raspberry Pi5, Raspberry Pi zeo.
 It runs on RaspberryPi OS.
 Please use it with Raspbian running and a keyboard and mouse connected in advance.
 hsp3dish, hsp3gp (HGIMG4) and hsed (script editor) only work in GUI environment.
