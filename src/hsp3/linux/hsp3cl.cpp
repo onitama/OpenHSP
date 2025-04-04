@@ -18,6 +18,7 @@
 
 #include "hsp3cl.h"
 #include "hsp3ext_sock.h"
+#include "hsp3extlib_ffi.h"
 
 /*----------------------------------------------------------*/
 
@@ -225,6 +226,7 @@ static void hsp3cl_bye( void )
 	//		HSP関連の解放
 	//
 	delete hsp;
+	DllManager().free_all_library();
 }
 
 

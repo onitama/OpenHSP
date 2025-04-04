@@ -1,0 +1,75 @@
+#use hsp3dish
+
+;
+;	疑似3D sprite sample 1
+;
+;	2Dスプライトを使った疑似3Dの表示を行うサンプルです
+;	カーソルキーで上下左右、[A][D]キーでZ方向に移動します
+;	320×224画面を4倍のドットで表示しています
+;
+
+#define ZMUL (128)		; 3D座標計算の基準値
+
+#define G_SHIP (3)		; 画像を読み込むバッファID(自機)
+#define CHR_SHIP (1)		; キャラクタNo.(自機)
+#define SPR_SHIP (1)		; スプライトID(自機)
+
+	sx=320:sy=224				; ゲーム全体のサイズ
+	zoom=4					; 4倍に拡大して表示する
+	wx=sx*zoom:wy=sy*zoom			; ウインドウサイズを求める
+	hsx=sx/2:hsy=sy/2			; 画面の中央座標を求める
+	screen 0,wx,wy				; ウインドウを設定する
+
+	celload "myship.png",G_SHIP		; 画像読み込み
+
+	es_ini					; スプライト初期化
+	es_spropt 1,1				; スケールとクリップのオプションを設定
+
+	;	キャラクターの登録
+	es_sizeex 128,128,,,,,,-64,-64		; 全体サイズと中心座標を設定
+	es_pat CHR_SHIP, 0,0,0,G_SHIP		; CHR_SHIPとしてキャラクタを登録
+	es_set SPR_SHIP, hsx,hsy, CHR_SHIP	; SPR_SHIPとしてスプライトを登録
+	es_flag SPR_SHIP,ESSPFLAG_NOWIPE,1	; 画面外で消去されないように設定
+
+	;	自機の座標を初期化
+	myx=0:myy=10:myz=60:myr=0
+
+*main
+	;	キーボードで動かす
+	stick key,$1ffff
+	if key&128 : end
+	if key&1 : myx--
+	if key&4 : myx++
+	if key&2 : myy--
+	if key&8 : myy++
+	if key&$4000 : myz--
+	if key&$10000 : myz++
+
+	redraw 0		; 画面更新の開始
+	rgbcolor $00a1ff:boxf			; 背景をクリア
+
+	viewcalc vptype_2d,zoom,zoom,0		; ズームを適用する
+	viewcalc vptype_translate,hsx,hsy	; 座標(0,0)を画面中央に設定する
+
+	;	3Dの計算
+	zdiv=myz
+	if zdiv=0 : zdiv=1	; 0で除算しないように
+	x=myx*zmul/zdiv		; X座標を求める
+	y=myy*zmul/zdiv		; Y座標を求める
+	px=30*zmul/zdiv		; 全体のサイズを求める
+	es_pos SPR_SHIP, x,y		; スプライト座標設定
+	es_setrot SPR_SHIP,myr,px,px	; スプライト回転拡大設定
+
+	es_draw			; スプライト描画
+
+	viewcalc vptype_2d,1,1,0		; ズームを元に戻す
+	viewcalc vptype_translate,0,0		; 座標(0,0)を左上に設定する
+
+	;	X,Y,Z座標を表示する
+	rgbcolor -1
+	pos 0,0:mes "("+myx+","+myy+","+myz+")"
+
+	redraw 1		; 画面の更新
+	await 1000/60
+
+	goto *main

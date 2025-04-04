@@ -33,12 +33,13 @@
 #include "../sysreq.h"
 #include "../hsp3ext.h"
 #include "../../hsp3/strnote.h"
+#include "../../hsp3/hsp3utfcnv.h"
 
 #include "../../hsp3/win32gui/hsp3extlib.h"
 
 #ifndef HSP_COM_UNSUPPORTED
-#include "hspvar_comobj.h"
-#include "hspvar_variant.h"
+#include "../../hsp3/win32gui/hspvar_comobj.h"
+#include "../../hsp3/win32gui/hspvar_variant.h"
 #endif
 
 typedef BOOL (CALLBACK *HSP3DBGFUNC)(HSP3DEBUG *,int,int,int);
@@ -259,9 +260,10 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	case WM_MOUSEWHEEL:
 		if (exinfo != NULL) {
 			Bmscr* bm;
+			int x, y;
 			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
-			bm->savepos[BMSCR_SAVEPOS_MOSUEZ] = LOWORD(wParam);
-			bm->savepos[BMSCR_SAVEPOS_MOSUEW] = HIWORD(wParam);
+			x = LOWORD(wParam); y = HIWORD(wParam);
+			bm->SetMouseWheel(x, y);
 		}
 		return 0;
 
@@ -270,13 +272,12 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		Bmscr *bm;
 		int x,y;
 		if ( exinfo != NULL ) {
-			bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
 			x = LOWORD(lParam); y = HIWORD(lParam);
-			hgio_cnvview((BMSCR *)bm, &x, &y);
-			bm->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
-			bm->savepos[BMSCR_SAVEPOS_MOSUEY] = y;
-			bm->UpdateAllObjects();
+			bm->SetMousePosition(x, y);
 			if ( bm->tapstat ) {
+				x = bm->savepos[BMSCR_SAVEPOS_MOSUEX];
+				y = bm->savepos[BMSCR_SAVEPOS_MOSUEY];
 				if ( mt_flag ) {
 					if( GetMessageExtraInfo() == 0 ) {
 						bm->setMTouchByPointId( -1, x, y, true );
@@ -292,11 +293,8 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		{
 		Bmscr *bm;
 		if ( exinfo != NULL ) {
-			bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
-			bm->tapstat = 0;
-			bm->savepos[BMSCR_SAVEPOS_MOSUEX] = -1;
-			bm->savepos[BMSCR_SAVEPOS_MOSUEY] = -1;
-			bm->UpdateAllObjects();
+			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+			bm->SetMouseRelease();
 			if ( mt_flag ) {
 				if( GetMessageExtraInfo() == 0 ) {
 					bm->setMTouchByPointId( -1, -1, -1, false );
@@ -308,44 +306,44 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		break;
 		}
 	case WM_LBUTTONUP:
-		{
-		Bmscr *bm;
-		if ( exinfo != NULL ) {
-			bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
-			bm->tapstat = 0;
-			bm->UpdateAllObjects();
-			if ( mt_flag ) {
-				if( GetMessageExtraInfo() == 0 ) {
-					bm->setMTouchByPointId( -1, -1, -1, false );
+	{
+		Bmscr* bm;
+		if (exinfo != NULL) {
+			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+			bm->SetMousePress(0);
+			if (mt_flag) {
+				if (GetMessageExtraInfo() == 0) {
+					bm->setMTouchByPointId(-1, -1, -1, false);
 				}
-			} else {
-				bm->setMTouchByPointId( -1, -1, -1, false );
+			}
+			else {
+				bm->setMTouchByPointId(-1, -1, -1, false);
 			}
 		}
 		break;
-		}
+	}
 	case WM_LBUTTONDOWN:
-		{
-		Bmscr *bm;
-		if ( exinfo != NULL ) {
-			bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
-			bm->tapstat = 1;
-			bm->UpdateAllObjects();
-			if ( mt_flag ) {
-				if( GetMessageExtraInfo() == 0 ) {
-					bm->setMTouchByPointId( -1, bm->savepos[BMSCR_SAVEPOS_MOSUEX], bm->savepos[BMSCR_SAVEPOS_MOSUEY], true );
+	{
+		Bmscr* bm;
+		if (exinfo != NULL) {
+			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
+			bm->SetMousePress(1);
+			if (mt_flag) {
+				if (GetMessageExtraInfo() == 0) {
+					bm->setMTouchByPointId(-1, bm->savepos[BMSCR_SAVEPOS_MOSUEX], bm->savepos[BMSCR_SAVEPOS_MOSUEY], true);
 				}
-			} else {
-				bm->setMTouchByPointId( -1, bm->savepos[BMSCR_SAVEPOS_MOSUEX], bm->savepos[BMSCR_SAVEPOS_MOSUEY], true );
+			}
+			else {
+				bm->setMTouchByPointId(-1, bm->savepos[BMSCR_SAVEPOS_MOSUEX], bm->savepos[BMSCR_SAVEPOS_MOSUEY], true);
 			}
 
 			// WM_MOUSELEAVE メッセージの登録処理
 			TRACKMOUSEEVENT tme;
-			tme.cbSize = sizeof( TRACKMOUSEEVENT );
+			tme.cbSize = sizeof(TRACKMOUSEEVENT);
 			tme.dwFlags = TME_LEAVE;
 			tme.hwndTrack = hwnd;
 			tme.dwHoverTime = HOVER_DEFAULT;
-			_TrackMouseEvent( &tme );
+			_TrackMouseEvent(&tme);
 		}
 		if (code_isirq(HSPIRQ_ONCLICK)) {
 #ifdef HSPERR_HANDLE
@@ -360,7 +358,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #endif
 		}
 		break;
-		}
+	}
 
 	case WM_TOUCH:
 		{
@@ -378,16 +376,20 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 
 		res = i_GetTouchInputInfo( ti, num, touchinput, sizeof(TOUCHINPUT) );
 		if ( res ) {
+			int x, y;
 			tdata = touchinput;
 			for(i=0;i<num;i++) {
 				touchpos.x = tdata->x / 100;
 				touchpos.y = tdata->y / 100;
-				ScreenToClient( hwnd, &touchpos );
-				if ( tdata->dwFlags & ( TOUCHEVENTF_DOWN|TOUCHEVENTF_MOVE) ) {
-					bm->setMTouchByPointId( tdata->dwID, touchpos.x, touchpos.y, true );
-				} else {
-					if ( tdata->dwFlags & TOUCHEVENTF_UP ) {
-						bm->setMTouchByPointId( tdata->dwID, touchpos.x, touchpos.y, false );
+				ScreenToClient(hwnd, &touchpos);
+				x = touchpos.x; y = touchpos.y;
+				hgio_cnvview((BMSCR*)bm, &x, &y);
+				if (tdata->dwFlags & (TOUCHEVENTF_DOWN | TOUCHEVENTF_MOVE)) {
+					bm->setMTouchByPointId(tdata->dwID, x, y, true);
+				}
+				else {
+					if (tdata->dwFlags & TOUCHEVENTF_UP) {
+						bm->setMTouchByPointId(tdata->dwID, x, y, false);
 					}
 				}
 				tdata++;
@@ -438,6 +440,10 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 			int iparam = (int)MapVirtualKey(wparam, 2);
 			bool notice = false;
 
+			if (lParam & HSPOBJ_NOTICE_KEY_EXTKEY) {
+				iparam = 0;		// 拡張キーの場合
+			}
+
 			if (iparam != 0) {
 				if ((wparam >= 'A') && (wparam <= 'Z')) {
 					if (GetKeyState(VK_CONTROL) < 0) {
@@ -463,10 +469,6 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 			}
 			else {
 				switch (wparam) {
-				case HSPOBJ_NOTICE_KEY_DEL:
-				case HSPOBJ_NOTICE_KEY_INS:
-					notice = true;
-					break;
 				case HSPOBJ_NOTICE_KEY_F1:
 				case HSPOBJ_NOTICE_KEY_F2:
 				case HSPOBJ_NOTICE_KEY_F3:
@@ -482,6 +484,8 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 					notice = true;
 					wparam += HSPOBJ_NOTICE_KEY_CTRLADD;
 					break;
+				case HSPOBJ_NOTICE_KEY_DEL:
+				case HSPOBJ_NOTICE_KEY_INS:
 				case HSPOBJ_NOTICE_KEY_LEFT:
 				case HSPOBJ_NOTICE_KEY_UP:
 				case HSPOBJ_NOTICE_KEY_RIGHT:
@@ -491,6 +495,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 				case HSPOBJ_NOTICE_KEY_SCROLL_UP:
 				case HSPOBJ_NOTICE_KEY_SCROLL_DOWN:
 					notice = true;
+					wparam += HSPOBJ_NOTICE_KEY_EXTKEY;
 					if (GetKeyState(VK_SHIFT) < 0) wparam += HSPOBJ_NOTICE_KEY_SHIFTADD;
 					break;
 				default:
@@ -538,7 +543,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	return DefWindowProc (hwnd, uMessage, wParam, lParam) ;
 }
 
-static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int yy, int style)
+static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int yy, int style, int hidesw)
 {
 #ifdef HSPDEBUG
 	char* windowtitle = "HSPDish ver" hspver;
@@ -564,11 +569,11 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 
 	// スクリーンタイプごとのウィンドウスタイルの設定。
 	if (style & 0x10100) {
-		m_dwWindowStyle = WS_POPUP | WS_CLIPCHILDREN | WS_VISIBLE;			// bgscr window
+		m_dwWindowStyle = WS_POPUP | WS_CLIPCHILDREN;			// bgscr window
 	}
 	else {
 		m_dwWindowStyle = WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX
-			| WS_BORDER | WS_CLIPCHILDREN | WS_VISIBLE;
+			| WS_BORDER | WS_CLIPCHILDREN;
 		if (style & 0x08) {	// ツールウィンドウ。
 			exstyle |= WS_EX_TOOLWINDOW;
 		}
@@ -581,7 +586,7 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 	SetRect(&rc, 0, 0, sx, sy);
 
 	if (m_hWndParent) {
-		m_dwWindowStyle = WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE;
+		m_dwWindowStyle = WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 
 	}
 	else {
@@ -597,6 +602,10 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 								(yy != -1 ? yy : CW_USEDEFAULT),
 								(rc.right-rc.left), (rc.bottom-rc.top), m_hWndParent,
 								NULL, hInstance, 0 );
+
+	SetWindowPos(m_hWnd, HWND_TOP, 0, 0, 0, 0,
+		(hidesw & 1 ? SWP_NOACTIVATE | SWP_NOZORDER : SWP_SHOWWINDOW) |
+		SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 
 	// 描画APIに渡す
 	hgio_init( 0, sx, sy, m_hWnd );
@@ -711,6 +720,10 @@ static int hsp3dish_devprm(char *name, char *value)
 
 static int hsp3dish_devcontrol(char *cmd, int p1, int p2, int p3)
 {
+	if (strcmp(cmd, "mmsystem") == 0) {
+		hsp3excmd_init_mmsystem(p1);
+		return 0;
+	}
 	return -1;
 }
 
@@ -883,10 +896,10 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 				if ( code_exec_await( tick ) != RUNMODE_RUN ) {
 					MsgWaitForMultipleObjects(0, NULL, FALSE, hspctx->waittick - tick, QS_ALLINPUT );
 				} else {
-					tick = timeGetTime();
-					while( tick < hspctx->waittick ) {	// 細かいwaitを取る
-						Sleep(1);
+					while (1) {						// 細かいwaitを取る
 						tick = timeGetTime();
+						if (code_exec_await(tick) == RUNMODE_RUN) break;
+						Sleep(1);
 					}
 					hspctx->lasttick = tick;
 					hspctx->runmode = RUNMODE_RUN;
@@ -916,6 +929,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 		{
 			//		画面サイズを変更して再構築する
 			Bmscr* bm;
+			HWND bak_hwnd;
 			int hsp_fullscr;
 			bm = (Bmscr*)exinfo->HspFunc_getbmscr(0);
 			hsp_wx = bm->sx;
@@ -937,14 +951,15 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 				hgio_term();
 				// デバイスコンテキスト解放
 				//ReleaseDC(m_hWnd, __hdc);
-				DestroyWindow(m_hWnd);
+				bak_hwnd = m_hWnd;
+				//DestroyWindow(m_hWnd);
 				m_hWnd = NULL;
 			}
 			if (game != NULL) {
 				delete game;
 			}
 
-			hsp3dish_initwindow(m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle);
+			hsp3dish_initwindow(m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle, 0);
 
 			game = new gamehsp;
 			gameplay::Logger::set(gameplay::Logger::LEVEL_INFO, logfunc);
@@ -962,6 +977,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			HSP3DEVINFO *devinfo = hsp3extcmd_getdevinfo();
 			hsp3dish_setdevinfo(devinfo);
 			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+			DestroyWindow(bak_hwnd);
 
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
 			hspctx->runmode = RUNMODE_RUN;
@@ -990,7 +1006,7 @@ static void hsp3dish_savelog( void )
 		GetModuleFileName(NULL, fname, _MAX_PATH);
 		getpath(fname, fname, 32);
 		changedir(fname);
-		mem_save("hsp3gp.log", (void *)logs, (int)strlen(logs), -1);
+		hsp3_binsave("hsp3gp.log", (void *)logs, (int)strlen(logs), -1);
 	}
 }
 
@@ -1169,8 +1185,9 @@ int hsp3dish_reset(void)
 
 	//		Initalize Window
 	//
-	hsp3dish_initwindow( m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy,hsp_wstyle);
-
+	int hidesw = hsp_wd & 1;
+	hsp3dish_initwindow( m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy,hsp_wstyle, hidesw);
+	hsp_wd = 0;
 
 #ifndef HSP_COM_UNSUPPORTED
 	HspVarCoreRegisterType( TYPE_COMOBJ, HspVarComobj_Init );
@@ -1220,8 +1237,8 @@ int hsp3dish_reset(void)
 
 	//		Initalize external DLL System
 	//
-	hsp3typeinit_dllcmd(code_gettypeinfo(TYPE_DLLFUNC));
-	hsp3typeinit_dllctrl(code_gettypeinfo(TYPE_DLLCTRL));
+	//hsp3typeinit_dllcmd(code_gettypeinfo(TYPE_DLLFUNC));
+	//hsp3typeinit_dllctrl(code_gettypeinfo(TYPE_DLLCTRL));
 
 	exinfo = ctx->exinfo2;
 
@@ -1283,6 +1300,7 @@ void hsp3dish_bye(void)
 #ifdef HSPERR_HANDLE
 	try {
 #endif
+		hsp3gr_cleanup();
 		hsp->Dispose();
 #ifdef HSPERR_HANDLE
 	}
@@ -1304,16 +1322,15 @@ void hsp3dish_bye(void)
 	//
 	if (h_dbgwin != NULL) { FreeLibrary(h_dbgwin); h_dbgwin = NULL; }
 #endif
-
-	//		HSP関連の解放
-	//
-	if (hsp != NULL) { delete hsp; hsp = NULL; }
-
 	if (m_hWnd != NULL) {
 		hgio_term();
 		DestroyWindow(m_hWnd);
 		m_hWnd = NULL;
 	}
+
+	//		HSP関連の解放
+	//
+	if (hsp != NULL) { delete hsp; hsp = NULL; }
 
 	//		gameplay関連の解放
 	//

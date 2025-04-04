@@ -1,0 +1,69 @@
+#include "hsp3dish.as"
+#include "mod_tamakeisd.as"
+
+	;	アニメーション表示
+
+	;	珠音ちゃん・プロ生ちゃん SD 上半身コラボ素材（イラスト: らぐほのえりか）
+	;	HSP3用スクリプトサンプル( https://hsp.tv/ )
+	;	(実際の画像データはpngフォルダに入っています)
+	;
+	;	暮井 慧（プロ生ちゃん）(C) Pronama LLC
+	;	珠音ちゃん (C) オガワコウサク(チームグリグリ)/HSPTV!/onion software
+	;	※このスクリプト及びサンプルデータは、ガイドラインのもと自由にお使い頂けます
+	;	https://github.com/onitama/tamakei_ragho
+	;
+	screen 0,640,960
+
+	chr=1			; キャラID
+	chk_dir=1		; 方向フラグ
+	chk_santa=0		; サンタフラグ
+	chk_icon=0		; アイコン付加フラグ
+	sdchr_loadicon		; アイコン(漫符)の読み込み
+
+*start
+	;	SDキャラの準備
+	;	sdchr_load p1, p2, p3
+	;
+	;	p1(0) : キャラID(0=慧/1=珠音/2=フィネス/3=千由莉)
+	;	p2(0) : 向き(0=右/1=左)
+	;	p3(0) : サイズ%(0=100%)
+	;
+	cls
+	sdchr_load chr,chk_dir,0	; 素材の指定
+	prev_dir=chk_dir
+
+	button "キャラ変更",*chrchange
+	chkbox 	"向き",chk_dir
+	chkbox 	"サンタ",chk_santa
+	chkbox 	"アイコン",chk_icon
+
+	mepati=0		; 目のアニメーション
+
+*main
+	redraw 0
+
+	pos 0,0
+
+	mepati++:i=mepati\30
+	if i>2 : i=0
+	sdchr_put chr,0,i,0		; 素材の表示
+	if chk_santa {
+		sdchr_putsanta		; サンタ帽を表示
+	}
+	if chk_icon {
+		sdchr_puticon 1		; アイコン表示
+	}
+
+	redraw 1
+	await 1000/12
+	if prev_dir!=chk_dir : goto *start
+	goto *main
+
+*chrchange
+	;	キャラ変更
+	chr++
+	if chr>3 : chr=0
+	goto *start
+*bousi
+
+

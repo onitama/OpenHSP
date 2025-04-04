@@ -91,7 +91,9 @@ int texmesPos::getPosX(int id)
 	//
 	if (length == 0) return 0;
 	if (id < 0) return 0;
-	if (id >= length) return (int)pos[length];
+	if (id >= length) {
+		return (int)pos[length];
+	}
 	return (int)pos[id];
 }
 

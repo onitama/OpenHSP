@@ -1,4 +1,4 @@
-HSP3Dishサポート済みコマンド
+HSP3Dish�T�|�[�g�ς݃R�}���h
 
 goto	,sys|func
 gosub	,sys|func
@@ -88,7 +88,7 @@ celputm	,sys|func
 rgbcolor,sys|func
 viewport,sys|func
 
-HSP3Dishサポート済みシステム変数・関数
+HSP3Dish�T�|�[�g�ς݃V�X�e���ϐ��E�֐�
 
 system	,sys|func
 hspstat	,sys|func
@@ -152,7 +152,7 @@ strrep	,sys|func
 dirinfo	,sys|func
 
 
-HSP3Dishサポート済みプリプロセッサ命令
+HSP3Dish�T�|�[�g�ς݃v���v���Z�b�T����
 
 #addition	,pre|func
 #const	,pre|func
@@ -176,7 +176,7 @@ HSP3Dishサポート済みプリプロセッサ命令
 #cmpopt	,pre|func
 
 
-HSP3Dishサポート済みマクロ
+HSP3Dish�T�|�[�g�ς݃}�N��
 
 __hspver__	,sys|macro
 __hsp30__	,sys|macro
@@ -243,8 +243,8 @@ mes	,sys|func
 print	,sys|func
 
 
-HSP3Dish非互換コマンド
-(これらの命令はデバイスにより異なる仕様が含まれています)
+HSP3Dish��݊��R�}���h
+(�����̖��߂̓f�o�C�X�ɂ��قȂ�d�l���܂܂�Ă��܂�)
 
 screen	,sys|func
 bgscr	,sys|func
@@ -271,8 +271,8 @@ chdir	,sys|func
 dirlist	,sys|func
 
 
-HSP3Dish非互換コマンド
-(これらの命令はWindows上でのみ動作し、他のデバイスでは無視されます)
+HSP3Dish��݊��R�}���h
+(�����̖��߂�Windows��ł̂ݓ��삵�A���̃f�o�C�X�ł͖�������܂�)
 
 chdpm	,sys|func
 memfile	,sys|func
@@ -339,7 +339,7 @@ split	,sys|func
 #modterm	,pre|func
 
 
-HSP3Dishサポート外コマンド
+HSP3Dish�T�|�[�g�O�R�}���h
 
 resume	,sys|func
 yield	,sys|func
@@ -347,8 +347,8 @@ pget	,sys|func
 groll	,sys|func
 
 
-HSP3Dish非互換ステム変数・関数・マクロ
-(これらはWindows上でのみ動作し、他のデバイスでは無視されます)
+HSP3Dish��݊��X�e���ϐ��E�֐��E�}�N��
+(������Windows��ł̂ݓ��삵�A���̃f�o�C�X�ł͖�������܂�)
 
 hwnd	,sys|func
 hinstance	,sys|func
@@ -373,7 +373,7 @@ msgothic	,sys|macro
 msmincho	,sys|macro
 
 
-HSP3Dishサポート外システム変数・関数・マクロ
+HSP3Dish�T�|�[�g�O�V�X�e���ϐ��E�֐��E�}�N��
 
 ginfo_paluse	,sys|macro
 ginfo_wx1	,sys|macro

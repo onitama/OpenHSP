@@ -37,8 +37,15 @@
 #define HSPVAR_SUPPORT_NOCONVERT 64				// 代入時の型変換を無効にする
 #define HSPVAR_SUPPORT_VARUSE 128				// varuse関数のチェックを有効にする
 #define HSPVAR_SUPPORT_TEMPVAR 256				// テンポラリ変数として使用する
+#define HSPVAR_SUPPORT_FIXEDTYPE 0x400			// (debug)型固定変数
+#define HSPVAR_SUPPORT_FIXEDVALUE 0x800			// (debug)値固定変数
+#define HSPVAR_SUPPORT_SETNOTICE 0x1000			// (debug)代入時に通知
+#define HSPVAR_SUPPORT_ARRAYNOTICE 0x2000		// (debug)代入時に通知(すべての配列)
 #define HSPVAR_SUPPORT_USER1 0x4000				// ユーザーフラグ1
 #define HSPVAR_SUPPORT_USER2 0x8000				// ユーザーフラグ2
+
+#define HSPVAR_SUPPORT_DEBUGVAR 0x3C00			// (debug)varprop命令で設定されるフラグ群
+#define HSPVAR_SUPPORT_ASSERTVAR 0x3000			// (debug)変数logで使用されるフラグ群
 
 #define HSPVAR_SUPPORT_MISCTYPE (HSPVAR_SUPPORT_ARRAYOBJ)
 
@@ -208,10 +215,13 @@ HspVarProc *HspVarCoreSeekProc( const char *name );
 //
 void HspVarCoreDup( PVal *pval, PVal *arg, APTR aptr );
 void HspVarCoreDupPtr( PVal *pval, int flag, void *ptr, int size );
-void HspVarCoreClear( PVal *pval, int flag );
+void HspVarCoreClear(PVal* pval, int flag);
+void HspVarCoreClearWC(PVal* pval, int flag);
 void HspVarCoreClearTemp( PVal *pval, int flag );
 void HspVarCoreDim( PVal *pval, int flag, int len1, int len2, int len3, int len4 );
 void HspVarCoreDimFlex( PVal *pval, int flag, int len0, int len1, int len2, int len3, int len4 );
+void HspVarCoreDimWC(PVal* pval, int flag, int len1, int len2, int len3, int len4);
+void HspVarCoreDimFlexWC(PVal* pval, int flag, int len0, int len1, int len2, int len3, int len4);
 void HspVarCoreReDim( PVal *pval, int lenid, int len );
 void *HspVarCoreCnvPtr( PVal *pval, int flag );
 PDAT *HspVarCorePtrAPTR( PVal *pv, APTR ofs );

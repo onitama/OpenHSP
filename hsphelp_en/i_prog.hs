@@ -750,7 +750,7 @@ Numerical branch
 %group
 Program control instructions
 %prm
-p1 goto / gosub Label 0, Label 1‚Ä¶
+p1 goto / gosub Label 0, Label 1Åc
 p1 = 0 to (0): Value for branching
 Label 0 to: Label name of branch destination
 %inst

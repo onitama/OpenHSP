@@ -9,6 +9,7 @@
 
 #runtime "hsp3gp"
 #addition "dish_enhance.as"
+#addition "dish_sysreq.as"
 
 #define global screen_offscreen (32)
 #define global screen_usergcopy (64)
@@ -40,6 +41,9 @@
 
 #const global OBJ_BHIDE 0x8000
 
+#const global GPOBJ_ID_MATFLAG  (0x200000)
+#const global GPOBJ_ID_SRCFLAG  (0x400000)
+
 #const global GPOBJ_SCENE  0x100001
 #const global GPOBJ_CAMERA 0x100002
 #const global GPOBJ_LIGHT  0x100003
@@ -56,6 +60,8 @@
 #const global GPOBJ_MATOPT_MIRROR (512)
 #const global GPOBJ_MATOPT_CUBEMAP (1024)
 #const global GPOBJ_MATOPT_NODISCARD (2048)
+#const global GPOBJ_MATOPT_UVOFFSET (4096)
+#const global GPOBJ_MATOPT_UVREPEAT (8192)
 
 #enum global PRMSET_FLAG = 2
 #enum global PRMSET_MODE
@@ -95,16 +101,26 @@
 #enum global GPPSET_LINEAR_VELOCITY
 #enum global GPPSET_MASS_CENTER
 
+#const global FVDIR_ROTORDER_ZYX (0)
+#const global FVDIR_ROTORDER_XYZ (1)
+#const global FVDIR_ROTORDER_YXZ (2)
+#const global FVDIR_HALFVECTOR (4)
+#const global FVDIR_REFRECTION (5)
+#const global FVDIR_MIRROR (6)
+
 #const global GPPAPPLY_FORCE (0)
 #const global GPPAPPLY_IMPULSE (1)
 #const global GPPAPPLY_TORQUE (2)
 #const global GPPAPPLY_TORQUE_IMPULSE (3)
+#const global GPPAPPLY_FORCE_POS (4)
+#const global GPPAPPLY_IMPULSE_POS (5)
 
 #const global GPDRAW_OPT_OBJUPDATE (1)
 #const global GPDRAW_OPT_DRAWSCENE (2)
 #const global GPDRAW_OPT_DRAW2D (4)
 #const global GPDRAW_OPT_DRAWSCENE_LATE (8)
 #const global GPDRAW_OPT_DRAW2D_LATE (16)
+#const global GPDRAW_OPT_DEBUG_PHY (0x10000)
 
 #const global GPACT_STOP (0)
 #const global GPACT_PLAY (1)
@@ -140,82 +156,13 @@
 
 #const global GPNODEINFO_NODE (0)
 #const global GPNODEINFO_MODEL (1)
+#const global GPNODEINFO_MATNUM (2)
+#const global GPNODEINFO_MATERIAL (0x80)
 #const global GPNODEINFO_NAME (0x100)
 #const global GPNODEINFO_CHILD (0x101)
 #const global GPNODEINFO_SIBLING (0x102)
 #const global GPNODEINFO_SKINROOT (0x103)
-
-;
-;	system request
-;
-#enum global SYSREQ_MAXMODEL=1
-#enum global SYSREQ_MAXOBJ
-#enum global SYSREQ_MAXTEX
-#enum global SYSREQ_MAXMOC
-#enum global SYSREQ_DXMODE
-#enum global SYSREQ_DXHWND
-#enum global SYSREQ_DXWIDTH
-#enum global SYSREQ_DXHEIGHT
-#enum global SYSREQ_COLORKEY
-#enum global SYSREQ_RESULT
-#enum global SYSREQ_RESVMODE
-#enum global SYSREQ_PKTSIZE
-#enum global SYSREQ_MAXEVENT
-#enum global SYSREQ_PTRD3D
-#enum global SYSREQ_PTRD3DDEV
-#enum global SYSREQ_MDLANIM
-#enum global SYSREQ_CALCNORMAL
-#enum global SYSREQ_2DFILTER
-#enum global SYSREQ_3DFILTER
-#enum global SYSREQ_OLDCAM
-#enum global SYSREQ_QUATALG
-#enum global SYSREQ_DXVSYNC
-#enum global SYSREQ_DEFTIMER
-#enum global SYSREQ_NOMIPMAP
-#enum global SYSREQ_DEVLOST
-#enum global SYSREQ_MAXEMITTER
-#enum global SYSREQ_THROUGHFLAG
-#enum global SYSREQ_OBAQMATBUF
-#enum global SYSREQ_2DFILTER2
-#enum global SYSREQ_FPUPRESERVE
-#enum global SYSREQ_CLSMODE
-#enum global SYSREQ_CLSCOLOR
-#enum global SYSREQ_CLSTEX
-#enum global SYSREQ_TIMER
-#enum global SYSREQ_PLATFORM
-#enum global SYSREQ_FPS
-#enum global SYSREQ_VSYNC
-#enum global SYSREQ_MAXMATERIAL
-
-#enum global SYSREQ_PHYSICS_RATE
-#enum global SYSREQ_MAXOBAQ
-#enum global SYSREQ_MAXLOG
-#enum global SYSREQ_DEFAULT_WEIGHT
-#enum global SYSREQ_DEFAULT_MOMENT
-#enum global SYSREQ_DEFAULT_DAMPER
-#enum global SYSREQ_DEFAULT_FRICTION
-
-#enum global SYSREQ_MESCACHE_MAX
-#enum global SYSREQ_DLIGHT_MAX
-#enum global SYSREQ_PLIGHT_MAX
-#enum global SYSREQ_SLIGHT_MAX
-#enum global SYSREQ_LOGWRITE
-#enum global SYSREQ_FIXEDFRAME
-
-#enum global SYSREQ_DRAWNUMOBJ
-#enum global SYSREQ_DRAWNUMPOLY
-#enum global SYSREQ_USEGPBFONT
-
-#const global PLATFORM_WINDOWS 0
-#const global PLATFORM_IOS 1
-#const global PLATFORM_ANDROID 2
-#const global PLATFORM_WEBGL 3
-
-#define global SYSREQ_DEBUG $10000
-
-#define global ginfo_accx ginfo(0x100)
-#define global ginfo_accy ginfo(0x101)
-#define global ginfo_accz ginfo(0x102)
+#const global GPNODEINFO_MATNAME (0x10000)
 
 ;
 ;	http value
@@ -336,6 +283,7 @@
 #cmd setcoli $da
 #cmd getobjcoli $db
 #cmd objexist $dc
+#cmd getnearobj $de
 
 #cmd fvset $e0
 #cmd fvadd $e1
@@ -454,6 +402,12 @@
 #cmd gppinfo $157
 #cmd gppraytest $158
 #cmd gpnodeinfo $159
+#cmd gpmatprm2 $15a
+#cmd gpmatprmp $15b
+#cmd gpsetprmon $15c
+#cmd gpsetprmoff $15d
+#cmd gpmatprmf $15e
+#cmd gppsweeptest $15f
 
 #define fsin(%1,%2) %1=sin(%2)
 #define fcos(%1,%2) %1=cos(%2)
@@ -462,140 +416,4 @@
 
 #endif
 
-;
-;	es sprite header for HSP3Dish
-;
-#ifndef __essprite__
-#define __essprite__
-
-#regcmd 9
-#cmd es_ini $200
-#cmd es_window $201
-#cmd es_area $202
-#cmd es_size $203
-#cmd es_pat $204
-#cmd es_link $205
-#cmd es_clear $206
-#cmd es_new $207
-#cmd es_get $208
-#cmd es_setp $209
-#cmd es_find $20a
-#cmd es_check $20b
-#cmd es_offset $20c
-#cmd es_set $20d
-#cmd es_flag $20e
-#cmd es_chr $20f
-#cmd es_type $210
-#cmd es_kill $211
-#cmd es_pos $212
-#cmd es_setrot $213
-#cmd es_apos $214
-#cmd es_setgosub $215
-#cmd es_adir $216
-#cmd es_aim $217
-#cmd es_draw $218
-#cmd es_gravity $219
-#cmd es_bound $21a
-#cmd es_fade $21b
-#cmd es_effect $21c
-#cmd es_move $21d
-#cmd es_setpri $21e
-#cmd es_put $21f
-#cmd es_ang $220
-#cmd es_sin $221
-#cmd es_cos $222
-#cmd es_dist $223
-#cmd es_opt $224
-#cmd es_exnew $225
-#cmd es_patanim $226
-#cmd es_getpos $227
-#cmd es_bgmap $228
-#cmd es_putbg $229
-#cmd es_bgmes $22a
-#cmd es_setparent $22b
-#cmd es_modaxis $22c
-#cmd es_arot $22d
-
-#define global es_fmes mes
-#define global es_bye
-
-#define global ESI_FLAG 0
-#define global ESI_POSX 1
-#define global ESI_POSY_2
-#define global ESI_SPDX 3
-#define global ESI_SPDY 4
-#define global ESI_PRGCOUNT 5
-#define global ESI_ANIMECOUNT 6
-#define global ESI_CHRNO 7
-#define global ESI_TYPE 8
-#define global ESI_ACCELX 9
-#define global ESI_ACCELY 10
-#define global ESI_BOUNCEPOW 11
-#define global ESI_BOUNCEFLAG 12
-#define global ESI_OPTION 13
-#define global ESI_PRIORITY 14
-#define global ESI_ALPHA 15
-#define global ESI_FADEPRM 16
-#define global ESI_ZOOMX 17
-#define global ESI_ZOOMY 18
-#define global ESI_ROTZ 19
-#define global ESI_SPLINK 20
-#define global ESI_TIMER 21
-#define global ESI_TIMERBASE 22
-#define global ESI_PROTZ 23
-#define global ESI_PZOOMX 24
-#define global ESI_PZOOMY 25
-
-#define global ESSPFLAG_NONE (0)
-#define global ESSPFLAG_STATIC (0x100)
-#define global ESSPFLAG_MOVE (0x200)
-#define global ESSPFLAG_GRAVITY (0x400)
-#define global ESSPFLAG_SPLINK (0x800)
-#define global ESSPFLAG_NOWIPE (0x1000)
-#define global ESSPFLAG_XBOUNCE (0x2000)
-#define global ESSPFLAG_YBOUNCE (0x4000)
-#define global ESSPFLAG_BLINK (0x8000)
-#define global ESSPFLAG_NODISP (0x10000)
-#define global ESSPFLAG_FADEIN (0x20000)
-#define global ESSPFLAG_FADEOUT (0x40000)
-#define global ESSPFLAG_TIMERWIPE (0x80000)
-#define global ESSPFLAG_BLINK2 (0x100000)
-#define global ESSPFLAG_EFADE (0x200000)
-#define global ESSPFLAG_EFADE2 (0x400000)
-#define global ESSPFLAG_MOVEROT (0x800000)
-
-#define global ESSPPAT_1SHOT (0x1000)
-
-#define global ESSPSET_POS (0)
-#define global ESSPSET_ADDPOS (1)
-#define global ESSPSET_FALL (2)
-#define global ESSPSET_BOUNCE (3)
-#define global ESSPSET_ZOOM (4)
-#define global ESSPSET_ADDZOOM (5)
-#define global ESSPSET_DIRECT (0x1000)
-#define global ESSPSET_MASKBIT (0x2000)
-
-#define global ESDRAW_NORMAL (0)
-#define global ESDRAW_NOMOVE (1)
-#define global ESDRAW_NOANIM (2)
-#define global ESDRAW_NOCALLBACK (4)
-#define global ESDRAW_NODISP (8)
-#define global ESDRAW_NOSORT (16)
-
-#define global ESSPF_TIMEWIPE (1)
-#define global ESSPF_BLINK (2)
-#define global ESSPF_BLINKWIPE (3)
-#define global ESSPF_BLINK2 (4)
-#define global ESSPF_BLINKWIPE2 (5)
-#define global ESSPF_FADEOUT (6)
-#define global ESSPF_FADEOUTWIPE (7)
-#define global ESSPF_FADEIN (8)
-#define global ESSPF_FADEINWIPE (9)
-#define global ESSPF_EFADE (10)
-#define global ESSPF_EFADEWIPE (11)
-#define global ESSPF_EFADE2 (12)
-#define global ESSPF_EFADEWIPE2 (13)
-
-#endif
-
-
+#addition "dish_sprite.as"

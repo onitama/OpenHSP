@@ -102,6 +102,13 @@ int	WebTask::Request( char *url, char *post )
 	//	( url:リクエストするURL )
 	//	( post:NULLの場合はGET、文字列の場合はPOSTで渡す )
 	//
+	if ( mode == CZHTTP_MODE_ERROR ) {
+ 		if (hSession == NULL) {
+ 			Reset();
+ 		} else {
+ 			mode = CZHTTP_MODE_READY;
+ 		}
+ 	}
 	if ( mode != CZHTTP_MODE_READY ) {
 		return -1;
 	}

@@ -42,12 +42,12 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 //#include <GL/glut.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_opengl.h"
 
-#include <SDL/SDL_ttf.h>
-#define TTF_FONTFILE "/ipaexg.ttf"
+//#include <SDL/SDL_ttf.h>
+//#define TTF_FONTFILE "/ipaexg.ttf"
 
 extern bool get_key_state(int sym);
 extern SDL_Window *window;
@@ -77,7 +77,9 @@ extern SDL_Window *window;
 #include "../hsp3ext.h"
 
 #ifdef HSPWIN
+#include "../win32/filedlg.h"
 void hgio_fontsystem_win32_init(HWND wnd);
+int hgio_dialog_ex(HSPCTX* ctx, Bmscr* bmscr, int mode, char* str1, char* str2);
 #endif
 
 #define RELEASE(x) 	if(x){x->Release();x=NULL;}
@@ -106,6 +108,7 @@ void hgio_fontsystem_win32_init(HWND wnd);
 extern gamehsp *game;
 extern gameplay::Platform *platform;
 
+//	グラフィックス設定
 static int		mouse_x;
 static int		mouse_y;
 static int		mouse_btn;
@@ -115,6 +118,11 @@ static float _scaleX;	// スケールX
 static float _scaleY;	// スケールY
 static float _rateX;	// 1/スケールX
 static float _rateY;	// 1/スケールY
+static int _sizex, _sizey;	//初期サイズ
+static int   _flipMode;	//フリップ
+static int _uvfix;		// UVFix
+
+
 
 #ifdef HSPNDK
 static engine	*appengine;
@@ -333,7 +341,7 @@ static		float linebasex,linebasey;
 static		MATRIX mat_proj;	// プロジェクションマトリクス
 static		MATRIX mat_unproj;	// プロジェクション逆変換マトリクス
 
-#define CIRCLE_DIV 16
+#define CIRCLE_DIV 32
 #define DEFAULT_FONT_NAME ""
 //#define DEFAULT_FONT_NAME "Arial"
 #define DEFAULT_FONT_SIZE 16
@@ -377,14 +385,18 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	_center_sx = (float)sx / 2;
 	_center_sy = (float)sy / 2;
 
-#if defined(HSPNDK) || defined(HSPIOS) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+	//背景サイズ
 	_originX = 0;
 	_originY = 0;
+	_sizex = sx;
+	_sizey = sy;
 	_scaleX = 1.0f;
 	_scaleY = 1.0f;
 	_rateX = 1.0f;
 	_rateY = 1.0f;
-#endif
+	_uvfix = 0;
+
+
 	GeometryInit();
 
 	//		infovalをリセット
@@ -612,6 +624,42 @@ int hgio_getHeight( void )
 }
 
 
+int hgio_getSizeX( void )
+{
+	return _sizex;
+}
+
+
+int hgio_getSizeY( void )
+{
+	return _sizey;
+}
+
+
+float hgio_getWidthRate( void )
+{
+	return _scaleX;
+}
+
+
+float hgio_getHeightRate( void )
+{
+	return _scaleY;
+}
+
+
+int hgio_getWidthOffset( void )
+{
+	return _originX;
+}
+
+
+int hgio_getHeightOffset( void )
+{
+	return _originY;
+}
+
+
 int hgio_getDesktopWidth( void )
 {
 #ifdef HSPLINUX
@@ -823,6 +871,38 @@ int hgio_redraw( BMSCR *bm, int flag )
 }
 
 
+#ifdef HSPWIN
+int hgio_dialog_ex(HSPCTX* ctx, Bmscr* bmscr, int mode, char* str1, char* str2)
+{
+	HWND hwnd;
+	int i, res;
+	i = 0;
+
+	hwnd = master_wnd;
+
+	if (mode >= 64) {
+		return 0;
+	}
+	if (mode & 16) {
+		res = fd_dialog(hwnd, mode & 3, str1, str2);
+		if (res == 0) {
+			ctx->refstr[0] = 0;
+		}
+		else {
+			strncpy(ctx->refstr, fd_getfname(), HSPCTX_REFSTR_MAX - 1);
+		}
+		return res;
+	}
+	if (mode & 32) {
+		i = (int)fd_selcolor(hwnd, mode & 1);
+		if (i == -1) return 0;
+		bmscr->Setcolor2(i);
+		return 1;
+	}
+	return hgio_dialog(mode, str1, str2);
+}
+#endif
+
 int hgio_dialog( int mode, char *str1, char *str2 )
 {
 	//		dialog表示
@@ -897,6 +977,24 @@ int hgio_texload( BMSCR *bm, char *fname )
 	bm->sy = mat->_sy;
 
 	return 0;
+}
+
+
+char* hgio_texmaskbuffer(BMSCR* bm, char* resname)
+{
+	//		マスクバッファ作成
+	//
+	char* p;
+	int xsize, ysize;
+	p = game->getPixelMaskBuffer(resname, &xsize, &ysize);
+	CloseMemFilePtr();
+	if (p) {
+		if ((xsize == bm->sx) || (ysize == bm->sy)) {
+			return p;
+		}
+		free(p);
+	}
+	return NULL;
 }
 
 
@@ -1166,6 +1264,29 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) return;
 	if (drawflag == 0) hgio_render_start();
 
+	rate = M_PI * 2.0f / (float)CIRCLE_DIV;
+	sx = abs(x2 - x1); sy = abs(y2 - y1);
+	rx = sx * 0.5f;
+	ry = sy * 0.5f;
+	x = x1 + rx;
+	y = y1 + ry;
+
+	if (mode == 0) {
+		float xx, yy;
+		for (int i = 0; i <= CIRCLE_DIV; i++) {
+			xx = x + cos((float)i * rate) * rx;
+			yy = y + sin((float)i * rate) * ry;
+			if (i == 0) {
+				hgio_line(bm, xx, yy);
+			}
+			else {
+				hgio_line2(xx, yy);
+			}
+		}
+		hgio_line(NULL, 0.0f, 0.0f);
+		return;
+	}
+
 	float *v;
 	float *v_master = game->startPolyColor2D();
 	float r_val = bm->colorvalue[0];
@@ -1173,13 +1294,6 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 	float b_val = bm->colorvalue[2];
 	float a_val = game->setPolyColorBlend( 0, 0 );
 	game->setPolyDiffuse2D( r_val, g_val, b_val, a_val );
-
-	rate = M_PI * 2.0f / (float)CIRCLE_DIV;
-	sx = abs(x2-x1); sy = abs(y2-y1);
-	rx = sx * 0.5f;
-	ry = sy * 0.5f;
-	x = x1 + rx;
-	y = y1 + ry;
 
 	for(int i = 1; i<=CIRCLE_DIV; i ++) {
 
@@ -1762,7 +1876,6 @@ void hgio_draw_all(Bmscr *bmscr, int option)
 }
 
 
-#ifdef HSPNDK
 //
 //		FILE I/O Service
 //
@@ -1771,6 +1884,7 @@ static char my_storage_path[256+64];
 
 int hgio_file_exist( char *fname )
 {
+#ifdef HSPNDK
 	int size;
 	AAssetManager* mgr = appengine->app->activity->assetManager;
 	if (mgr == NULL) return -1;
@@ -1780,11 +1894,14 @@ int hgio_file_exist( char *fname )
     AAsset_close(asset);
 	//Alertf( "[EXIST]%s:%d",fname,size );
     return size;
+#endif
+    return -1;
 }
 
 
 int hgio_file_read( char *fname, void *ptr, int size, int offset )
 {
+#ifdef HSPNDK
 	int readsize;
 	AAssetManager* mgr = appengine->app->activity->assetManager;
 	if (mgr == NULL) return -1;
@@ -1796,9 +1913,57 @@ int hgio_file_read( char *fname, void *ptr, int size, int offset )
 	AAsset_read( asset, ptr, readsize );
     AAsset_close(asset);
     return readsize;
+#endif
+    return -1;
 }
 
 
+#ifdef HSPNDK
+FILE *hgio_android_fopen( char *fname, int offset )
+{
+	AAssetManager* mgr = appengine->app->activity->assetManager;
+	if (mgr == NULL) return NULL;
+	AAsset* asset = AAssetManager_open(mgr, (const char *)fname, AASSET_MODE_UNKNOWN);
+	if (asset == NULL) return NULL;
+	if ( offset>0 ) AAsset_seek( asset, offset, SEEK_SET );
+	return (FILE *)asset;
+}
+
+void hgio_android_fclose(FILE* ptr)
+{
+	AAsset* asset = (AAsset*)ptr;
+	if (asset == NULL) return;
+    AAsset_close(asset);
+}
+
+int hgio_android_fread( FILE* ptr, void *mem, int size )
+{
+	AAsset* asset = (AAsset*)ptr;
+	if (asset == NULL) -1;
+	return AAsset_read( asset, mem, size );
+}
+
+int hgio_android_seek( FILE* ptr, int offset, int whence )
+{
+	int res;
+	AAsset* asset = (AAsset*)ptr;
+	if (asset == NULL) -1;
+	res = AAsset_seek( asset, offset, whence );
+	if ( res < 0 ) return res;
+	return 0;
+}
+
+int hgio_android_length( FILE* ptr )
+{
+	AAsset* asset = (AAsset*)ptr;
+	if (asset == NULL) -1;
+	return AAsset_getLength( asset );
+}
+
+#endif
+
+
+#ifdef HSPNDK
 void hgio_setstorage( char *path )
 {
 	int i;
@@ -1817,12 +1982,14 @@ char *hgio_getstorage( char *fname )
 	strcpy( my_storage_path, storage_path );
 	strcat( my_storage_path, fname );
 	return my_storage_path;
+	return fname;
 }
+
 #endif
 
 /*-------------------------------------------------------------------------------*/
 
-#if defined(HSPNDK)||defined(HSPIOS)
+#if defined(HSPNDK)||defined(HSPIOS)||defined(HSPLINUX)||defined(HSPEMSCRIPTEN)
 
 void hgio_touch( int xx, int yy, int button )
 {
@@ -1836,9 +2003,50 @@ void hgio_touch( int xx, int yy, int button )
         mainbm->tapstat = button;
         bm = (Bmscr *)mainbm;
         bm->UpdateAllObjects();
-        bm->setMTouchByPointId( 0, mouse_x, mouse_y, button!=0 );
+
+		HSP3MTOUCH *mt;
+		bool notice = false;
+		if (button!=0) {
+			mt = bm->getMTouchByPointId(-1);
+			if (mt==NULL) {
+				mt = bm->getMTouch(0);
+				if (mt->flag == 0) notice=true;
+			} else {
+				notice=true;
+			}
+		} else {
+			notice=true;
+		}
+		if (notice) {
+	        bm->setMTouchByPointId( -1, mouse_x, mouse_y, button!=0 );
+	    }
     }
 }
+
+void hgio_mtouchid( int pointid, int xx, int yy, int button, int opt )
+{
+    Bmscr *bm;
+    int x,y;
+
+    if ( mainbm == NULL ) return;
+    bm = (Bmscr *)mainbm;
+	x = ( xx - _originX ) * _rateX;
+	y = ( yy - _originY ) * _rateY;
+    if ( opt == 0 ) {
+        mouse_x = x;
+        mouse_y = y;
+        mouse_btn = button;
+        mainbm->savepos[BMSCR_SAVEPOS_MOSUEX] = mouse_x;
+        mainbm->savepos[BMSCR_SAVEPOS_MOSUEY] = mouse_y;
+        mainbm->tapstat = button;
+        bm->UpdateAllObjects();
+    }
+    bm->setMTouchByPointId( pointid, x, y, button!=0 );
+}
+
+#endif
+
+#if defined(HSPNDK)||defined(HSPIOS)
 
 void hgio_mtouch( int old_x, int old_y, int xx, int yy, int button, int opt )
 {
@@ -1870,27 +2078,6 @@ void hgio_mtouch( int old_x, int old_y, int xx, int yy, int button, int opt )
     bm->setMTouchByPoint( old_x2, old_y2, x, y, button!=0 );
 }
 
-void hgio_mtouchid( int pointid, int xx, int yy, int button, int opt )
-{
-    Bmscr *bm;
-    int x,y;
-
-    if ( mainbm == NULL ) return;
-    bm = (Bmscr *)mainbm;
-	x = ( xx - _originX ) * _rateX;
-	y = ( yy - _originY ) * _rateY;
-    if ( opt == 0 ) {
-        mouse_x = x;
-        mouse_y = y;
-        mouse_btn = button;
-        mainbm->savepos[BMSCR_SAVEPOS_MOSUEX] = mouse_x;
-        mainbm->savepos[BMSCR_SAVEPOS_MOSUEY] = mouse_y;
-        mainbm->tapstat = button;
-        bm->UpdateAllObjects();
-    }
-    bm->setMTouchByPointId( pointid, x, y, button!=0 );
-}
-
 int hgio_getmousex( void )
 {
 	return mouse_x;
@@ -1917,43 +2104,6 @@ int hgio_getmousebtn( void )
 char *hgio_getstorage( char *fname )
 {
 	return fname;
-}
-
-void hgio_touch( int xx, int yy, int button )
-{
-    Bmscr *bm;
-	mouse_x = ( xx - _originX ) * _rateX;
-	mouse_y = ( yy - _originY ) * _rateY;
-	mouse_btn = button;
-    if ( mainbm != NULL ) {
-        mainbm->savepos[BMSCR_SAVEPOS_MOSUEX] = mouse_x;
-        mainbm->savepos[BMSCR_SAVEPOS_MOSUEY] = mouse_y;
-        mainbm->tapstat = button;
-        bm = (Bmscr *)mainbm;
-        bm->UpdateAllObjects();
-        bm->setMTouchByPointId( 0, mouse_x, mouse_y, button!=0 );
-    }
-}
-
-void hgio_mtouchid( int pointid, int xx, int yy, int button, int opt )
-{
-    Bmscr *bm;
-    int x,y;
-
-    if ( mainbm == NULL ) return;
-    bm = (Bmscr *)mainbm;
-	x = ( xx - _originX ) * _rateX;
-	y = ( yy - _originY ) * _rateY;
-    if ( opt == 0 ) {
-        mouse_x = x;
-        mouse_y = y;
-        mouse_btn = button;
-        mainbm->savepos[BMSCR_SAVEPOS_MOSUEX] = mouse_x;
-        mainbm->savepos[BMSCR_SAVEPOS_MOSUEY] = mouse_y;
-        mainbm->tapstat = button;
-        bm->UpdateAllObjects();
-    }
-    bm->setMTouchByPointId( pointid, x, y, button!=0 );
 }
 
 void hgio_mtouchidf( int pointid, float xx, float yy, int button, int opt )
@@ -2176,23 +2326,6 @@ void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 	if (bm->vp_flag == BMSCR_VPFLAG_NOUSE) return;
 	if (bm->vp_flag == BMSCR_VPFLAG_3D) return;			// 3Dの変換には未対応
 
-#if 0
-	Vector4 v1;
-	v1.x = (float)*xaxis;
-	v1.y = (float)(nDestHeight - *yaxis);
-	v1.z = 1.0f;
-	v1.w = 0.0f;
-
-	v1.x -= _center_sx;
-	v1.y -= _center_sy;
-	v1.x *= _rate_sx;
-	v1.y *= _rate_sy;
-
-	game->convert2DRenderProjection(v1);
-	*xaxis = (int)v1.x;
-	*yaxis = (int)v1.y;
-#endif
-
 #if 1
 	VECTOR v1, v2;
 	v1.x = (float)*xaxis;
@@ -2200,10 +2333,10 @@ void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 	v1.z = 1.0f;
 	v1.w = 0.0f;
 
-	v1.x -= _center_sx;
-	v1.y -= _center_sy;
-	v1.x *= _rate_sx;
-	v1.y *= _rate_sy;
+	v1.x -= nDestWidth/2;
+	v1.y -= nDestHeight/2;
+	v1.x *= 2.0f / float(nDestWidth);
+	v1.y *= 2.0f / float(nDestHeight);
 
 	ApplyMatrix(&mat_unproj, &v2, &v1);
 	*xaxis = (int)v2.x;
@@ -2211,5 +2344,84 @@ void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 #endif
 }
 
+
+/*-------------------------------------------------------------------------------*/
+
+void hgio_scale_point( int xx, int yy, int &x, int & y )
+{
+	x = ( xx - _originX ) * _rateX;
+	y = ( yy - _originY ) * _rateY;
+}
+
+void hgio_size( int sx, int sy )
+{
+	_sizex = sx;
+	_sizey = sy;
+}
+
+
+void hgio_view( int sx, int sy )
+{
+	nDestWidth = sx;
+	nDestHeight = sy;
+    //Alertf( "Size(%d,%d)",_bgsx,_bgsy );
+}
+
+
+void hgio_scale( float xx, float yy )
+{
+	_scaleX = xx;
+	_scaleY = yy;
+	_rateX = 1.0f / _scaleX;
+	_rateY = 1.0f / _scaleY;
+    //Alertf( "Scale(%f,%f)",_scaleX,_scaleY );
+}
+
+
+void hgio_autoscale( int mode )
+{
+	int m_mode;
+	float x,y;
+	float adjx,adjy;
+	adjx = (float)_sizex/(float)nDestWidth;
+	adjy = (float)_sizey/(float)nDestHeight;
+
+	m_mode = mode;
+	if ( mode == 0 ) {
+		x = (float)nDestWidth * adjy;
+		y = (float)nDestHeight * adjx;
+		if ( adjx > adjy ) {
+			m_mode=1;
+			if ( y > (float)_sizey ) { m_mode=2; }
+		} else {
+			m_mode=2;
+			if ( x > (float)_sizex ) { m_mode=1; }
+		}
+	}
+
+	switch( m_mode ) {
+	case 1:
+		_scaleX = adjx;
+		_scaleY = adjx;
+		break;
+	case 2:
+		_scaleX = adjy;
+		_scaleY = adjy;
+		break;
+	default:
+		_scaleX = adjx;
+		_scaleY = adjy;
+		break;
+	}
+	_rateX = 1.0f / _scaleX;
+	_rateY = 1.0f / _scaleY;
+
+	x = (float)nDestWidth * _scaleX;
+	y = (float)nDestHeight * _scaleY;
+	_originX = ( _sizex - x ) / 2;
+	_originY = ( _sizey - y ) / 2;
+
+    //Alertf( "Scale(%f,%f)",_scaleX,_scaleY );
+}
 
 

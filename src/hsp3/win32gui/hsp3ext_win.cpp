@@ -794,7 +794,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 #endif	// HSP_COM_UNSUPPORTED
 
 	case 0x05:								// 	axobj
-#ifdef HSP_COM_UNSUPPORTED
+#if defined( HSP_COM_UNSUPPORTED )||defined( HSPDISH )
 		throw ( HSPERR_UNSUPPORTED_FUNCTION );
 #else
 		{

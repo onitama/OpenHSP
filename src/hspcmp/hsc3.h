@@ -13,13 +13,15 @@
 #define HSC3_OPT_MAKEPACK 4
 #define HSC3_OPT_READAHT 8
 #define HSC3_OPT_MAKEAHT 16
-#define HSC3_OPT_UTF8IN 32		// UTF8ソースを入力
-#define HSC3_OPT_UTF8OUT 64		// UTF8コードを出力
+#define HSC3_OPT_UTF8IN 32			// UTF8ソースを入力
+#define HSC3_OPT_UTF8OUT 64			// UTF8コードを出力
+#define HSC3_OPT_EMSCRIPTEN 256		// Emscriptenソースとしてコンパイル
 
 #define HSC3_MODE_DEBUG 1
 #define HSC3_MODE_DEBUGWIN 2
 #define HSC3_MODE_UTF8 4		// UTF8コードを出力
 #define HSC3_MODE_STRMAP 8		// strmapを出力
+#define HSC3_MODE_LABOUT 16		// キーワードを出力
 
 class CMemBuf;
 class CToken;
@@ -48,10 +50,12 @@ public:
 	void PreProcessEnd( void );
 	int Compile(char* fname, char* outname, int mode);
 	int CompileStrMap(char* fname, char* outname, int mode);
+	int CompileLabelOut(char* fname, int mode);
 	void SetCommonPath( char *path );
 
 	//		Service
-	int GetCmdList( int option );
+	void Print(char* mes);
+	int GetCmdList(int option, char *match=NULL);
 	int OpenPackfile( void );
 	void ClosePackfile( void );
 	void GetPackfileOption( char *out, char *keyword, char *defval );
@@ -60,13 +64,21 @@ public:
 	int SaveOutbuf( char *fname );
 	int SaveAHTOutbuf( char *fname );
 
+	//		Analyse
+	void InitAnalysisInfo(int mode, char* match, int line=0 );
+	char* GetAnalysisInfo(void);
+	int GetAnalysisInfoSize(void);
+	void DeleteAnalysisInfo(void);
+	char* GetAnalysisLineInfo(int type);
+
 	//		Data
 	//
 	CMemBuf *errbuf;
 	CMemBuf *pfbuf;
 	CMemBuf *addkw;
 	CMemBuf *outbuf;
-	CMemBuf *ahtbuf;
+	CMemBuf* ahtbuf;
+	CMemBuf* anabuf;
 
 private:
 	//		Private Data
@@ -83,6 +95,14 @@ private:
 	//		for Compile Optimize
 	int cmpopt;
 	CLabel *lb_info;
+
+	//		for Analyse
+	int analyse_mode;
+	int analyse_line;
+	char* analyse_match;
+	int analyse_caseflag;
+	char analyse_module[256];
+	char analyse_keyword[256];
 };
 
 

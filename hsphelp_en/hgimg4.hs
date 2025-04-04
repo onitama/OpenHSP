@@ -67,7 +67,7 @@ GPDRAW_OPT_DRAW2D_LATE 2D sprite drawing process (OBJ_LATE)
 If you omit the option parameter, all items are selected.
 Normally, you don't have to specify the option parameter.
 Also, if you use only 2D direct drawing instructions and do not need to draw with an object, you do not need to write a gpdraw instruction.
-Items with the OBJ_LATE mode flag value added (including those with a semi-transparent ç•™ value) are drawn after the opaque object, so the items are separated.
+Items with the OBJ_LATE mode flag value added (including those with a semi-transparent —¯ value) are drawn after the opaque object, so the items are separated.
 You can also specify multiple items separated by "|".
 ^p
 Example:
@@ -115,7 +115,7 @@ Macro name | Contents
 PRMSET_FLAG Object registration flag (*)
 PRMSET_MODE mode flag value
 PRMSET_ID Object ID (*)
-PRMSET_ALPHA Transparency (ç•™ value)
+PRMSET_ALPHA Transparency (—¯ value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
 PRMSET_COLGROUP Collision group for collision detection
@@ -155,7 +155,7 @@ Macro name | Contents
 PRMSET_FLAG Object registration flag (*)
 PRMSET_MODE mode flag value
 PRMSET_ID Object ID (*)
-PRMSET_ALPHA Transparency (Î± value)
+PRMSET_ALPHA Transparency (ƒ¿ value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
 PRMSET_COLGROUP Collision group for collision detection
@@ -295,13 +295,13 @@ Please note that all item names and settings are character strings. (Item names 
 "ONE_MINUS_SRC_COLOR" Original color (inverted value)
 "DST_COLOR" Write destination color
 "ONE_MINUS_DST_COLOR" Write destination color (inverted value)
-"SRC_ALPHA" write source Î±
-"ONE_MINUS_SRC_ALPHA" Write source Î± (inverted value)
-"DST_ALPHA" write destination Î±
-"ONE_MINUS_DST_ALPHA" Write destination Î± (inverted value)
-"CONSTANT_ALPHA" Î± fixed value
-"ONE_MINUS_CONSTANT_ALPHA" Î± fixed value (inverted value)
-"SRC_ALPHA_SATURATE" Write source Î± inversion value
+"SRC_ALPHA" write source ƒ¿
+"ONE_MINUS_SRC_ALPHA" Write source ƒ¿ (inverted value)
+"DST_ALPHA" write destination ƒ¿
+"ONE_MINUS_DST_ALPHA" Write destination ƒ¿ (inverted value)
+"CONSTANT_ALPHA" ƒ¿ fixed value
+"ONE_MINUS_CONSTANT_ALPHA" ƒ¿ fixed value (inverted value)
+"SRC_ALPHA_SATURATE" Write source ƒ¿ inversion value
 
 (*) Character string that can be set with cullFaceSide
 
@@ -1186,7 +1186,7 @@ gpmatprm16
 
 %index
 setalpha
-Object transparency (ç•™ value) setting
+Object transparency (—¯ value) setting
 %group
 Extended screen control command
 %prm
@@ -1194,11 +1194,11 @@ objid,value
 objid (0): Object ID
 value (255): Value to be set (integer value) (0 to 255)
 %inst
-Sets the transparency (ç•™ value) of the object.
+Sets the transparency (—¯ value) of the object.
 Sets the value specified by the value parameter to the object of the objid parameter.
-The value specified by the value parameter is an integer value (ç•™ value) from 0 to 255 that indicates transparency.
+The value specified by the value parameter is an integer value (—¯ value) from 0 to 255 that indicates transparency.
 0 applies to full transparency and 255 applies opacity.
-For objects whose ç•™ value is other than 255 (semi-transparent), the drawing order is changed to the front.
+For objects whose —¯ value is other than 255 (semi-transparent), the drawing order is changed to the front.
 (Same state as the mode flag value of OBJ_LATE was specified)
 %href
 gpsetprm
@@ -1525,7 +1525,7 @@ Macro name | Contents
 PRMSET_FLAG Object registration flag (*)
 PRMSET_MODE mode flag value
 PRMSET_ID Object ID (*)
-PRMSET_ALPHA Transparency (ç•™ value)
+PRMSET_ALPHA Transparency (—¯ value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
 PRMSET_COLGROUP Collision group for collision detection
@@ -1569,7 +1569,7 @@ Macro name | Contents
 PRMSET_FLAG Object registration flag (*)
 PRMSET_MODE mode flag value
 PRMSET_ID Object ID (*)
-PRMSET_ALPHA Transparency (ç•™ value)
+PRMSET_ALPHA Transparency (—¯ value)
 PRMSET_TIMER Timer value
 PRMSET_MYGROUP own collision group
 PRMSET_COLGROUP Collision group for collision detection
@@ -1851,7 +1851,7 @@ id: event ID
 fade (0): set value
 %inst
 Add an event that sets the fade value of the object.
-By specifying a negative value for the fade, the ç•™ value can be faded out toward 0, and by specifying a positive value, the ç•™ value can be faded in toward 255.
+By specifying a negative value for the fade, the —¯ value can be faded out toward 0, and by specifying a positive value, the —¯ value can be faded in toward 255.
 Equivalent to setting the PRMSET_FADE parameter with the event_prmset instruction.
 %href
 event_prmset

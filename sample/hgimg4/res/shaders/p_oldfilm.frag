@@ -8,7 +8,7 @@ precision mediump float;
 
 ///////////////////////////////////////////////////////////
 // Uniforms
-uniform sampler2D u_texture;
+uniform sampler2D u_diffuseTexture;
 uniform float u_sepiaValue;
 uniform float u_noiseValue;
 uniform float u_scratchValue;
@@ -101,7 +101,7 @@ void main()
     vec3 sepia = vec3(112.0 / 255.0, 66.0 / 255.0, 20.0 / 255.0);
 
     // Step 1: Convert to grayscale
-    vec3 colour = texture2D(u_texture, v_texCoord).xyz;
+    vec3 colour = texture2D(u_diffuseTexture, v_texCoord).xyz;
     float gray = (colour.x + colour.y + colour.z) / 3.0;
     vec3 grayscale = vec3(gray);
     

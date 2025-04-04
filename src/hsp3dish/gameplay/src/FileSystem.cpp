@@ -22,74 +22,15 @@
     #define gp_stat_struct struct stat
 #endif
 
-#ifdef __ANDROID__
-#include <android/asset_manager.h>
-extern AAssetManager* __assetManager;
-#endif
-
 #ifdef HSPDISH
-#ifdef WIN32
+//	HSP3 DPM2に対応
 #include "../../../hsp3/dpmread.h"
-#endif
+#include "../../../hsp3/filepack.h"
 #endif
 
 namespace gameplay
 {
 
-#ifdef __ANDROID__
-#include <unistd.h>
-
-static void makepath(std::string path, int mode)
-{
-    std::vector<std::string> dirs;
-    while (path.length() > 0)
-    {
-        int index = path.find('/');
-        std::string dir = (index == -1 ) ? path : path.substr(0, index);
-        if (dir.length() > 0)
-            dirs.push_back(dir);
-        
-        if (index + 1 >= path.length() || index == -1)
-            break;
-            
-        path = path.substr(index + 1);
-    }
-    
-    struct stat s;
-    std::string dirPath;
-    for (unsigned int i = 0; i < dirs.size(); i++)
-    {
-        dirPath += "/";
-        dirPath += dirs[i];
-        if (stat(dirPath.c_str(), &s) != 0)
-        {
-            // Directory does not exist.
-            if (mkdir(dirPath.c_str(), 0777) != 0)
-            {
-                GP_ERROR("Failed to create directory: '%s'", dirPath.c_str());
-                return;
-            }
-        }
-    }
-    return;
-}
-
-/**
- * Returns true if the file exists in the android read-only asset directory.
- */
-static bool androidFileExists(const char* filePath)
-{
-    AAsset* asset = AAssetManager_open(__assetManager, filePath, AASSET_MODE_RANDOM);
-    if (asset)
-    {
-        int length = AAsset_getLength(asset);
-        AAsset_close(asset);
-        return length > 0;
-    }
-    return false;
-}
-
-#endif
 
 /** @script{ignore} */
 static std::string __resourcePath("./");
@@ -106,6 +47,9 @@ static std::map<std::string, std::string> __aliases;
  */
 static void getFullPath(const char* path, std::string& fullPath)
 {
+#ifdef HSPDISH
+    fullPath.assign(path);
+#else
     if (FileSystem::isAbsolutePath(path))
     {
         fullPath.assign(path);
@@ -115,6 +59,7 @@ static void getFullPath(const char* path, std::string& fullPath)
         fullPath.assign(__resourcePath);
         fullPath += FileSystem::resolvePath(path);
     }
+#endif
 }
 
 /**
@@ -143,49 +88,13 @@ public:
     static FileStream* create(const char* filePath, const char* mode);
 
 private:
-    FileStream(FILE* file);
+    FileStream(DpmFile* dpm);
 
 private:
-    FILE* _file;
+    DpmFile* _file;
     bool _canRead;
     bool _canWrite;
 };
-
-#ifdef __ANDROID__
-
-/**
- * 
- * @script{ignore}
- */
-class FileStreamAndroid : public Stream
-{
-public:
-    friend class FileSystem;
-    
-    ~FileStreamAndroid();
-    virtual bool canRead();
-    virtual bool canWrite();
-    virtual bool canSeek();
-    virtual void close();
-    virtual size_t read(void* ptr, size_t size, size_t count);
-    virtual char* readLine(char* str, int num);
-    virtual size_t write(const void* ptr, size_t size, size_t count);
-    virtual bool eof();
-    virtual size_t length();
-    virtual long int position();
-    virtual bool seek(long int offset, int origin);
-    virtual bool rewind();
-
-    static FileStreamAndroid* create(const char* filePath, const char* mode);
-
-private:
-    FileStreamAndroid(AAsset* asset);
-
-private:
-    AAsset* _asset;
-};
-
-#endif
 
 /////////////////////////////
 
@@ -321,27 +230,6 @@ bool FileSystem::listFiles(const char* dirPath, std::vector<std::string>& files)
         result = true;
     }
 
-#ifdef __ANDROID__
-    // List the files that are in the android APK at this path
-    AAssetDir* assetDir = AAssetManager_openDir(__assetManager, dirPath);
-    if (assetDir != NULL)
-    {
-        AAssetDir_rewind(assetDir);
-        const char* file = NULL;
-        while ((file = AAssetDir_getNextFileName(assetDir)) != NULL)
-        {
-            std::string filename(file);
-            // Check if this file was already added to the list because it was copied to the SD card.
-            if (find(files.begin(), files.end(), filename) == files.end())
-            {
-                files.push_back(filename);
-            }
-        }
-        AAssetDir_close(assetDir);
-        result = true;
-    }
-#endif
-
     return result;
 #endif
 }
@@ -350,22 +238,18 @@ bool FileSystem::fileExists(const char* filePath)
 {
     GP_ASSERT(filePath);
 
-    std::string fullPath;
-
-#ifdef __ANDROID__
-    fullPath = __assetPath;
-    fullPath += resolvePath(filePath);
-
-    if (androidFileExists(fullPath.c_str()))
+#ifdef HSPDISH
     {
-        return true;
+        return (dpm_exist((char *)filePath)>=0);
     }
-#endif
+#else
+    std::string fullPath;
 
     getFullPath(filePath, fullPath);
 
     gp_stat_struct s;
     return stat(fullPath.c_str(), &s) == 0;
+#endif
 
 }
 
@@ -374,59 +258,11 @@ Stream* FileSystem::open(const char* path, size_t streamMode)
     char modeStr[] = "rb";
     if ((streamMode & WRITE) != 0)
         modeStr[0] = 'w';
-#ifdef __ANDROID__
-    std::string fullPath(__resourcePath);
-    fullPath += resolvePath(path);
 
-    if ((streamMode & WRITE) != 0)
-    {
-        // Open a file on the SD card
-        size_t index = fullPath.rfind('/');
-        if (index != std::string::npos)
-        {
-            std::string directoryPath = fullPath.substr(0, index);
-            gp_stat_struct s;
-            if (stat(directoryPath.c_str(), &s) != 0)
-                makepath(directoryPath, 0777);
-        }
-        return FileStream::create(fullPath.c_str(), modeStr);
-    }
-    else
-    {
-        // First try the SD card
-        Stream* stream = FileStream::create(fullPath.c_str(), modeStr);
-
-        if (!stream)
-        {
-            // Otherwise fall-back to assets loaded via the AssetManager
-            fullPath = __assetPath;
-            fullPath += resolvePath(path);
-
-            stream = FileStreamAndroid::create(fullPath.c_str(), modeStr);
-        }
-
-        return stream;
-    }
-#else
     std::string fullPath;
     getFullPath(path, fullPath);
     FileStream* stream = FileStream::create(fullPath.c_str(), modeStr);
     return stream;
-#endif
-}
-
-FILE* FileSystem::openFile(const char* filePath, const char* mode)
-{
-    GP_ASSERT(filePath);
-    GP_ASSERT(mode);
-
-    std::string fullPath;
-    getFullPath(filePath, fullPath);
-
-    createFileFromAsset(filePath);
-    
-    FILE* fp = fopen(fullPath.c_str(), mode);
-    return fp;
 }
 
 char* FileSystem::readAll(const char* filePath, int* fileSize)
@@ -434,7 +270,6 @@ char* FileSystem::readAll(const char* filePath, int* fileSize)
     GP_ASSERT(filePath);
 
 #ifdef HSPDISH
-#ifdef WIN32
 	{
 		size_t size = (size_t)dpm_exist((char *)filePath);
 		if (size < 0) {
@@ -451,9 +286,7 @@ char* FileSystem::readAll(const char* filePath, int* fileSize)
 		}
 		return buffer;
 	}
-#endif
-#endif
-
+#else
 	// Open file for reading.
     std::unique_ptr<Stream> stream(open(filePath));
     if (stream.get() == NULL)
@@ -481,6 +314,7 @@ char* FileSystem::readAll(const char* filePath, int* fileSize)
         *fileSize = (int)size; 
     }
     return buffer;
+#endif
 }
 
 bool FileSystem::isAbsolutePath(const char* filePath)
@@ -509,57 +343,6 @@ const char* FileSystem::getAssetPath()
     return __assetPath.c_str();
 }
 
-void FileSystem::createFileFromAsset(const char* path)
-{
-#ifdef __ANDROID__
-    static std::set<std::string> upToDateAssets;
-
-    GP_ASSERT(path);
-    std::string fullPath(__resourcePath);
-    std::string resolvedPath = FileSystem::resolvePath(path);
-    fullPath += resolvedPath;
-
-    std::string directoryPath = fullPath.substr(0, fullPath.rfind('/'));
-    struct stat s;
-    if (stat(directoryPath.c_str(), &s) != 0)
-        makepath(directoryPath, 0777);
-
-    // To ensure that the files on the file system corresponding to the assets in the APK bundle
-    // are always up to date (and in sync), we copy them from the APK to the file system once
-    // for each time the process (game) runs.
-    if (upToDateAssets.find(fullPath) == upToDateAssets.end())
-    {
-        AAsset* asset = AAssetManager_open(__assetManager, resolvedPath.c_str(), AASSET_MODE_RANDOM);
-        if (asset)
-        {
-            const void* data = AAsset_getBuffer(asset);
-            int length = AAsset_getLength(asset);
-            FILE* file = fopen(fullPath.c_str(), "wb");
-            if (file != NULL)
-            {
-                int ret = fwrite(data, sizeof(unsigned char), length, file);
-                if (fclose(file) != 0)
-                {
-                    GP_ERROR("Failed to close file on file system created from APK asset '%s'.", path);
-                    return;
-                }
-                if (ret != length)
-                {
-                    GP_ERROR("Failed to write all data from APK asset '%s' to file on file system.", path);
-                    return;
-                }
-            }
-            else
-            {
-                GP_ERROR("Failed to create file on file system from APK asset '%s'.", path);
-                return;
-            }
-
-            upToDateAssets.insert(fullPath);
-        }
-    }
-#endif
-}
 
 std::string FileSystem::getDirectoryName(const char* path)
 {
@@ -618,7 +401,7 @@ std::string FileSystem::getExtension(const char* path)
 
 //////////////////
 
-FileStream::FileStream(FILE* file)
+FileStream::FileStream(DpmFile* file)
     : _file(file), _canRead(false), _canWrite(false)
 {
     
@@ -634,7 +417,9 @@ FileStream::~FileStream()
 
 FileStream* FileStream::create(const char* filePath, const char* mode)
 {
-    FILE* file = fopen(filePath, mode);
+    DpmFile* file;
+#ifdef HSPDISH
+    file = (DpmFile*)dpm_stream((char *)filePath);
     if (file)
     {
         FileStream* stream = new FileStream(file);
@@ -650,6 +435,7 @@ FileStream* FileStream::create(const char* filePath, const char* mode)
 
         return stream;
     }
+#endif
     return NULL;
 }
 
@@ -670,41 +456,80 @@ bool FileStream::canSeek()
 
 void FileStream::close()
 {
-    if (_file)
-        fclose(_file);
+#ifdef HSPDISH
+    if (_file) {
+        _file->close();
+        delete _file;
+    }
+#endif
     _file = NULL;
 }
 
 size_t FileStream::read(void* ptr, size_t size, size_t count)
 {
+#ifdef HSPDISH
+    if (_file) {
+        return _file->read(ptr,size,count);
+    }
+#endif
+#if 0
     if (!_file)
         return 0;
     return fread(ptr, size, count, _file);
+#endif
+    return 0;
 }
 
 char* FileStream::readLine(char* str, int num)
 {
+#ifdef HSPDISH
+    if (_file) {
+        return _file->readLine(str,num);
+    }
+#endif
+#if 0
     if (!_file)
         return 0;
     return fgets(str, num, _file);
+#endif
+    return 0;
 }
 
 size_t FileStream::write(const void* ptr, size_t size, size_t count)
 {
+#ifdef HSPDISH
+    return 0;
+#endif
+#if 0
     if (!_file)
         return 0;
     return fwrite(ptr, size, count, _file);
+#endif
 }
 
 bool FileStream::eof()
 {
+#ifdef HSPDISH
+    if (_file) {
+        return _file->eof();
+    }
+#endif
+#if 0
     if (!_file || feof(_file))
         return true;
     return ((size_t)position()) >= length();
+#endif
+    return true;
 }
 
 size_t FileStream::length()
 {
+#ifdef HSPDISH
+    if (_file) {
+        return _file->length();
+    }
+#endif
+#if 0
     size_t len = 0;
     if (canSeek())
     {
@@ -716,179 +541,58 @@ size_t FileStream::length()
         seek(pos, SEEK_SET);
     }
     return len;
+#endif
+    return -1;
 }
 
 long int FileStream::position()
 {
+#ifdef HSPDISH
+    if (_file) {
+        return _file->position();
+    }
+#endif
+#if 0
     if (!_file)
         return -1;
     return ftell(_file);
+#endif
+    return -1;
 }
 
 bool FileStream::seek(long int offset, int origin)
 {
+#ifdef HSPDISH
+    if (_file) {
+        return _file->seek((int)offset,origin);
+    }
+#endif
+#if 0
     if (!_file)
         return false;
     return fseek(_file, offset, origin) == 0;
+#endif
+    return false;
 }
 
 bool FileStream::rewind()
 {
+#ifdef HSPDISH
+    if (_file) {
+        return _file->rewind();
+    }
+#endif
+#if 0
     if (canSeek())
     {
         ::rewind(_file);
         return true;
     }
+#endif
     return false;
 }
 
 ////////////////////////////////
 
-#ifdef __ANDROID__
-
-FileStreamAndroid::FileStreamAndroid(AAsset* asset)
-    : _asset(asset)
-{
-}
-
-FileStreamAndroid::~FileStreamAndroid()
-{
-    if (_asset)
-        close();
-}
-
-FileStreamAndroid* FileStreamAndroid::create(const char* filePath, const char* mode)
-{
-    AAsset* asset = AAssetManager_open(__assetManager, filePath, AASSET_MODE_RANDOM);
-    if (asset)
-    {
-        FileStreamAndroid* stream = new FileStreamAndroid(asset);
-        return stream;
-    }
-    return NULL;
-}
-
-bool FileStreamAndroid::canRead()
-{
-    return true;
-}
-
-bool FileStreamAndroid::canWrite()
-{
-    return false;
-}
-
-bool FileStreamAndroid::canSeek()
-{
-    return true;
-}
-
-void FileStreamAndroid::close()
-{
-    if (_asset)
-        AAsset_close(_asset);
-    _asset = NULL;
-}
-
-size_t FileStreamAndroid::read(void* ptr, size_t size, size_t count)
-{
-    int result = AAsset_read(_asset, ptr, size * count);
-    return result > 0 ? ((size_t)result) / size : 0;
-}
-
-char* FileStreamAndroid::readLine(char* str, int num)
-{
-    if (num <= 0)
-        return NULL;
-    char c = 0;
-    size_t maxCharsToRead = num - 1;
-    for (size_t i = 0; i < maxCharsToRead; ++i)
-    {
-        size_t result = read(&c, 1, 1);
-        if (result != 1)
-        {
-            str[i] = '\0';
-            break;
-        }
-        if (c == '\n')
-        {
-            str[i] = c;
-            str[i + 1] = '\0';
-            break;
-        }
-        else if(c == '\r')
-        {
-            str[i] = c;
-            // next may be '\n'
-            size_t pos = position();
-
-            char nextChar = 0;
-            if (read(&nextChar, 1, 1) != 1)
-            {
-                // no more characters
-                str[i + 1] = '\0';
-                break;
-            }
-            if (nextChar == '\n')
-            {
-                if (i == maxCharsToRead - 1)
-                {
-                    str[i + 1] = '\0';
-                    break;
-                }
-                else
-                {
-                    str[i + 1] = nextChar;
-                    str[i + 2] = '\0';
-                    break;
-                }
-            }
-            else
-            {
-                seek(pos, SEEK_SET);
-                str[i + 1] = '\0';
-                break;
-            }
-        }
-        str[i] = c;
-    }
-    return str; // what if first read failed?
-}
-
-size_t FileStreamAndroid::write(const void* ptr, size_t size, size_t count)
-{
-    return 0;
-}
-
-bool FileStreamAndroid::eof()
-{
-    return position() >= length();
-}
-
-size_t FileStreamAndroid::length()
-{
-    return (size_t)AAsset_getLength(_asset);
-}
-
-long int FileStreamAndroid::position()
-{
-    return AAsset_getLength(_asset) - AAsset_getRemainingLength(_asset);
-}
-
-bool FileStreamAndroid::seek(long int offset, int origin)
-{
-    return AAsset_seek(_asset, offset, origin) != -1;
-}
-
-bool FileStreamAndroid::rewind()
-{
-    if (canSeek())
-    {
-        return AAsset_seek(_asset, 0, SEEK_SET) != -1;
-    }
-    return false;
-}
-
-#endif
 
 }

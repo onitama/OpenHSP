@@ -15,6 +15,9 @@ material textured
     {
         cullFace = true
         depthTest = true
+        blend = true
+        blendSrc = SRC_ALPHA
+        blendDst = ONE_MINUS_SRC_ALPHA
     }
     
     technique
@@ -33,7 +36,7 @@ material bodyUV : textured
     
     sampler u_diffuseTexture
     {
-        path = body_SD.png
+        path = res/body_SD.png
         wrapS = REPEAT
         wrapT = REPEAT
     }
@@ -54,7 +57,7 @@ material headUV : textured
     
     sampler u_diffuseTexture
     {
-        path = head_SD.png
+        path = res/head_SD.png
         wrapS = REPEAT
         wrapT = REPEAT
     }

@@ -111,6 +111,7 @@ void main()
 
     #if defined(VERTEX_COLOR)
 	_baseColor.rgb = v_color;
+    _baseColor.a = u_diffuseColor.a;
     #else
     _baseColor = u_diffuseColor;
 	#endif
@@ -122,7 +123,7 @@ void main()
     
     #if defined(VERTEX_COLOR)
     gl_FragColor.rgb = v_color;
-    gl_FragColor.a = 1.0;
+    gl_FragColor.a = u_diffuseColor.a;
     #else
     gl_FragColor = u_diffuseColor;
     #endif

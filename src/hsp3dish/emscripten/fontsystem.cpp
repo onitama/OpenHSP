@@ -10,15 +10,10 @@
 #include <math.h>
 #include <string.h>
 
+#include "../../hsp3/hsp3config.h"
+
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 #include <unistd.h>
-#include "../../hsp3/hsp3config.h"
-#else
-#if defined(HSPNDK) || defined(HSPIOS)
-#include "../hsp3config.h"
-#else
-#include "../../hsp3/hsp3config.h"
-#endif
 #endif
 
 #ifdef HSPWIN
@@ -40,8 +35,8 @@
 #include <OpenGLES/ES1/gl.h>
 #include <OpenGLES/ES1/glext.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include "iOSgpBridge.h"
-#include "appengine.h"
+#include "Classes/iOSgpBridge.h"
+#include "hsp3dish/ios/appengine.h"
 #endif
 
 
@@ -281,6 +276,8 @@ int hgio_fontsystem_execsub(long code, unsigned char* buffer, int pitch, int off
 	// 描画位置を進める量
 	px = gm.gmCellIncX;
 	ybase = tm.tmAscent - gm.gmptGlyphOrigin.y;
+
+	if ((width<=1) && (height<=1)) return px;
 
 	LPDWORD p1 = (LPDWORD)buffer;
 	LPBYTE p2 = lpFont;
@@ -752,6 +749,7 @@ static	int fontdata_size;
 static	int fontdata_color;
 static	int fontsystem_size;
 static	int fontsystem_style;
+static	int fontsystem_texid;
 
 static int Get2N(int val)
 {
@@ -782,7 +780,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	fontsystem_style = style;
 }
 
-int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos *info)
+int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_sx, int* out_sy, texmesPos* info)
 {
 	//		msgの文字列をテクスチャバッファにレンダリングする
 	//		(bufferがNULLの場合はサイズだけを取得する)
@@ -820,7 +818,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 				document.body.appendChild(canvas);
 			}
 
-			if ($4 !== 0) {
+			if ($4 != 0) {
 				const context = canvas.getContext("2d");
 				context.font = $1 + "px 'sans-serif'";
 
@@ -835,7 +833,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 					HEAP16[($4 >> 1) + i + 1] = m.width | 0; //(m.actualBoundingBoxRight - m.actualBoundingBoxLeft) | 0;
 				}
 			}
-		}, msg, fontsystem_size, &fontsystem_sx, &fontsystem_sy, info ? info->pos : nullptr);
+			}, msg, fontsystem_size, & fontsystem_sx, & fontsystem_sy, info ? info->pos : nullptr);
 
 		//Alertf("text %s %d %d\n", msg, fontsystem_sx, fontsystem_sy);
 
@@ -862,12 +860,16 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 			canvas.height = $3;
 			document.body.appendChild(canvas);
 		}
+		if (canvas.width < $2)
+			canvas.width = $2;
+		if (canvas.height < $3)
+			canvas.height = $3;
 
 		var context = canvas.getContext("2d", { willReadFrequently: true });
 		context.font = $1 + "px 'sans-serif'";
 
 		var msg = UTF8ToString($0);
-		context.clearRect ( 0 , 0 , $2 , $3);
+		context.clearRect(0, 0, Math.min(canvas.width, $2 + 1), Math.min(canvas.height, $3 + 1));
 		context.fillStyle = 'rgba(255, 255, 255, 255)';
 		context.fillText(msg, 0, $1);
 		//console.log(msg);

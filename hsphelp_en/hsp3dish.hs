@@ -49,11 +49,11 @@ Platform running SYSREQ_PLATFORM R HSP3Dish
 
 Set whether to clear the screen when drawing by redraw 0 starts. If SYSREQ_CLSMODE is set to 1, it is cleared, and if it is 0, it is not cleared. If the screen is cleared in the script, it is better not to clear the background on the system side, which will improve the processing speed. You can set the color code for clearing with SYSREQ_CLSCOLOR. The color code is set with a single RGB 24bit ($ rrggbb).
 
-„Éª SYSREQ_TIMER
+ÅE SYSREQ_TIMER
 
 Returns a timer value in milliseconds. The value returned will vary from platform to platform, but will be incremented by 1 per millisecond.
 
-„Éª SYSREQ_PLATFORM
+ÅE SYSREQ_PLATFORM
 
 Returns the following HSP3Dish platform values.
 ^p
@@ -433,7 +433,7 @@ vptype_off 0 No coordinate transformation (default)
 vptype_translate 1 Specify movement parameters
 vptype_rotate 2 Specify rotation parameter
 vptype_scale 3 Specify scale parameter
-vptype_3dmatrix 4 Coordinate transformation by 4 √ó 4 matrix
+vptype_3dmatrix 4 Coordinate transformation by 4 Å~ 4 matrix
 vptype_2d 5 Set 2D coordinate transformation
 vptype_3d 6 Set 3D coordinate transformation
 ^p

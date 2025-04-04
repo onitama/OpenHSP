@@ -169,7 +169,7 @@ public:
 
 	void setUserPtr(void *ptr) { _userPtr = ptr; }
 	void *getUserPtr(void) { return _userPtr; }
-	
+
 	/**
      * Returns the collision shape.
      *

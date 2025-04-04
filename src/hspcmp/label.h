@@ -42,8 +42,12 @@
 #define LAB_INIT_DONE 1
 
 #define LAB_TYPEFIX_NONE 0
-#define LAB_TYPEFIX_INT 4
+#define LAB_TYPEFIX_LABEL 1
+#define LAB_TYPEFIX_STR 2
 #define LAB_TYPEFIX_DOUBLE 3
+#define LAB_TYPEFIX_INT 4
+#define LAB_TYPEFIX_STRUCT 5
+
 
 typedef std::set<std::string> FileNameSet;
 typedef std::multimap<std::string, int> LabelMap;
@@ -67,6 +71,7 @@ typedef struct LABOBJ {
 	LABREL	*rel;				// relation id
 	short	init;				// initalize flag
 	short	typefix;			// force type
+	bool	skiplablist;		// skip generate label list
 
 	char const* def_file;
 	int def_line;
@@ -100,8 +105,10 @@ public:
 	char *GetData( int id );
 	char *GetData2( int id );
 	int GetInitFlag( int id );
+	int GetForceType(int id);
 	LABOBJ *GetLabel( int id );
 	void DumpLabel( char *str );
+	int DumpHSPLabelById(int id, char* str, int option);
 	void DumpHSPLabel( char *str, int option, int maxsize );
 	int RegistList( char **list, char *modname );
 	int RegistList2( char **list, char *modname );
@@ -113,7 +120,8 @@ public:
 	void AddRelation( char *name, int rel_id );
 	int SearchRelation( int id, int rel_id );
 	void SetCaseMode( int flag );
-	void SetDefinition(int id, char const *filename, int line);
+	void SetDefinition(int id, char const* filename, int line);
+	void SetSkipLabList(int id);
 
 private:
 	int StrCase( char *str );

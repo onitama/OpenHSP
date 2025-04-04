@@ -793,7 +793,7 @@ The value specified by p2 is called the EP value and has the following meanings.
 ^p
   EP value content
 -----------------------------------------------------------
-  0 to 255 ç•™ channel value (0 = transparent, 255 = opaque)
+  0 to 255 —¯ channel value (0 = transparent, 255 = opaque)
   + $ 300 Enables alpha channel synthesis (equivalent to gmode 3)
   + $ 500 Additive synthesis is performed on the original image (equivalent to gmode 5)
   + $ 600 Subtractive synthesis on the original image (equivalent to gmode 6)
@@ -901,7 +901,7 @@ Extended screen control command
 %prm
 p1,p2
 p1 = variable name to which the result is assigned
-p2 = angle (0 to è³Š n)
+p2 = angle (0 to ‘¯ n)
 * N = es_ini Accuracy set by the 3rd parameter
 
 %inst
@@ -919,7 +919,7 @@ Extended screen control command
 %prm
 p1,p2
 p1 = variable name to which the result is assigned
-p2 = angle (0 to è³Š n)
+p2 = angle (0 to ‘¯ n)
 * N = es_ini Accuracy set by the 3rd parameter
 
 %inst

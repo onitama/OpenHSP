@@ -1,0 +1,27 @@
+#use hsp3dish
+
+	;	ラベル定義によるコンパイル時のプラットフォーム選択
+	;	(HSP3.7b10a以降で有効です)
+	;
+	s1=""
+
+#ifdef _hspwin
+	s1="Windows"
+#endif
+#ifdef _hspmac
+	s1="Mac"
+#endif
+#ifdef _hsplinux
+	s1="Linux"
+#endif
+#ifdef _hspemscripten
+	s1="Emscripten"
+#endif
+
+*main
+	redraw 0
+	pos 0,0
+	mes "Platform="+s1
+	redraw 1
+	await 1000/30
+	goto *main

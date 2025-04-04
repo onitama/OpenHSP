@@ -1,0 +1,28 @@
+#include "hsp3dish.as"
+
+*mainloop
+	ax=ginfo_accelx		; 加速度センサー値(X)
+	ay=ginfo_accely		; 加速度センサー値(Y)
+	az=ginfo_accelz		; 加速度センサー値(Z)
+	gx=ginfo_gyrox		; ジャイロセンサー値(X)
+	gy=ginfo_gyroy		; ジャイロセンサー値(Y)
+	gz=ginfo_gyroz		; ジャイロセンサー値(Z)
+
+	redraw 0
+	rgbcolor 0:boxf
+	rgbcolor -1
+	pos 0,0
+	mes "センサーの値を取得します(対応デバイスのみ)"
+
+	mes "加速度センサー値(X) = "+ax
+	mes "加速度センサー値(Y) = "+ay
+	mes "加速度センサー値(Z) = "+az
+
+	mes "ジャイロセンサー値(X) = "+gx
+	mes "ジャイロセンサー値(Y) = "+gy
+	mes "ジャイロセンサー値(Z) = "+gz
+
+	redraw 1
+	await 1000/30
+	goto *mainloop
+

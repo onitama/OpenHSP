@@ -1,5 +1,12 @@
 #include "hgimg4.as"
 
+	;
+	;	自分のモデルが物理移動した際の衝突位置を取得する(gppcontact命令テスト)
+	;	箱の衝突位置にエフェクトが出ます
+	;
+	randomize
+	title "HGIMG4 Test"
+
 	gpbox box,1,$888888					//箱を生成
 	setang box,1,1
 	setscale box,2,1,1		//箱の角度と拡大率を設定
@@ -22,7 +29,7 @@
 	event_setdir ev1, -0.2,0.2,-0.5, 0.2,0.7,0.2
 	event_adddir ev1, 0, -0.05, 0
 	event_wait ev1, 40
-	event_suicide ev1
+	event_delobj ev1
 
 	ddim respos,4
 	resid=0

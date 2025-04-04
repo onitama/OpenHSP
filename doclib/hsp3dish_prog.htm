@@ -14,7 +14,7 @@
 <body>
 	<div id="CONTAINER">
 	<!-- ヘッダー -->
-	<p id="COPY">HSP : HSP3Dish / onion software 2021(c)</p>
+	<p id="COPY">HSP : HSP3Dish / onion software 2024(c)</p>
 	<img src="hsp3dish.jpg" width="640" height="200" alt="title">
 	<h1>HSP3Dish プログラミングマニュアル</h1>
 
@@ -31,9 +31,9 @@
 		<li><a href="#GMODE">gmode命令について</a></li>
 		<li><a href="#GMULCOLOR">gmulcolor命令について</a></li>
 		<li><a href="#GFILTER">gfilter命令について</a></li>
-		<li><a href="#SYSREQ">setreq、getreq命令について</a></li>
+		<li><a href="#SYSREQ">setreq、getreq命令について<span class="new">（New!）</span></a></li>
 		<li><a href="#MTOUCH">マルチタッチ情報の取得について</a></li>
-		<li><a href="#SOUND">サウンド機能について</a></li>
+		<li><a href="#SOUND">サウンド機能について<span class="new">（New!）</span></a></li>
 		<li><a href="#HTTP">http通信機能について</a></li>
 		<li><a href="#SAMPLE">サンプルスクリプト</a></li>
 		<li><a href="#CMDLIST">HSP3Dishコマンドリスト</a></li>
@@ -41,6 +41,7 @@
 		<li><a href="#INIFILE">起動設定ファイルについて</a></li>
 		<li><a href="#OBAQ">物理エンジンOBAQのサポート</a></li>
 		<li><a href="#EXCHANGE">他プラットフォームへの変換</a><span class="new">（New!）</span></li>
+		<li><a href="#MAXTEXTURE">テクスチャ上限数について</a><span class="new">（New!）</span></li>
 		<li><a href="#PLUGIN">拡張プラグイン・外部DLLのサポート</a></li>
 		<li><a href="#INPUT">各種入出力への対応について</a></li>
 		<li><a href="#KNOWNBUG">既知の不具合について</a></li>
@@ -97,16 +98,22 @@
 	#include "hsp3dish.as"
 	</pre>
 	<p>
+	HSP3.7β7以降では、以下のような記述も可能です。
+	</p>
+	<pre>
+	#use hsp3dish
+	</pre>
+	<p>
 	以降は、通常のHSP3スクリプトと同様にソースを記述することができます。
-	ただし、マルチプラットフォームで動作させるためには、以下の機能は
-	利用できないという制約があります。
-	Windowsプラットフォームのみで使用する限りは、これらの制約はありません。
+	ただし、マルチプラットフォームで動作させるためには、以下の機能は利用できないことを留意してください。
 	</p>
 	<ul>
 	<li>拡張プラグインの命令は未サポート</li>
 	<li>COMオブジェクト操作、COM型・Variant型変数は未サポート</li>
 	<li>外部DLL呼び出し機能は未サポート</li>
 	<li>モジュール変数に関する機能は未サポート(モジュール機能そのものはサポートされます)</li>
+	<br>
+	<ul>( *Windowsプラットフォームのみで使用する限りは、これらの制約はありません。 )</ul>
 	</ul>
 	<p>
 	これらは、Windows以外のプラットフォーム上で再現できない機能を使用しています。
@@ -259,7 +266,7 @@
 		</p>
 
 
-	<h2 id="SCREEN">のスクリーンサイズ変更について</h2>
+	<h2 id="SCREEN">スクリーンサイズ変更について</h2>
 		<p>
 		HSP3Dish、HGIMG4のWindows/Linux版において、スクリーン(ウインドウ)サイズの動的な変更に対応しました。(HSP3.6β2以降)<br>
 		いままでは、hsp3dish.iniファイルに記録されたサイズに従って起動時にサイズが固定されていましたが、
@@ -283,8 +290,9 @@
 	 +16(screen_frame)     : 深い縁のあるウィンドウ
 	 +256                  : フルスクリーン
 		</pre><p>
-		p4に256を指定した場合は、指定された解像度のフルスクリーンとして初期化されます。<br>
-		また、スクリーンサイズ変更時は、通常ランタイムとは異なり、それまでに読み込んだすべての画像バッファは失われますので注意してください。
+		p4に256を指定した場合は、指定された解像度のフルスクリーンとして初期化されます。
+		(ディスプレイが対応していない解像度を指定するとエラーで終了しますのでご注意ください。)<br>
+		また、スクリーンサイズ変更時は、通常ランタイムとは異なり、<b>それまでに読み込んだすべての画像バッファは失われます</b>ので注意してください。
 		</p>
 
 
@@ -442,12 +450,64 @@
 		type : 設定タイプ(SYSREQ_???)
 	</pre>
 	<pre>
-	設定タイプ名      読み書き(*)   内容
-	-------------------------------------------
-	SYSREQ_CLSMODE        RW        背景のクリアフラグ
-	SYSREQ_CLSCOLOR       RW        背景クリア色
-	SYSREQ_TIMER          R         ミリ秒単位のタイマー値
-	SYSREQ_PLATFORM       R         HSP3Dishを実行しているプラットフォーム
+	設定タイプ名             読み書き(*)   内容
+---------------------------------------------------------------------------
+	SYSREQ_MAXMODEL          RW            HGIMG3最大モデル数
+	SYSREQ_MAXOBJ            RW            HGIMG3/4最大オブジェクト数
+	SYSREQ_MAXTEX            RW            HGIMG3/4最大テクスチャ数
+	SYSREQ_MAXMOC            RW            HGIMG3最大MOC数
+	SYSREQ_DXMODE            RW            DirectXモード(Windowsのみ)
+	SYSREQ_DXHWND            R             DirectXウインドウハンドル(Windowsのみ)
+	SYSREQ_DXWIDTH           RW            DirectXフルスクリーンXサイズ(Windowsのみ)
+	SYSREQ_DXHEIGHT          RW            DirectXフルスクリーンYサイズ(Windowsのみ)
+	SYSREQ_COLORKEY          RW            DirectXカラーキー(Windowsのみ)
+	SYSREQ_RESULT            R             DirectX初期化結果(Windowsのみ)
+	SYSREQ_RESVMODE          R             DirectXビデオ初期化結果(Windowsのみ)
+	SYSREQ_PKTSIZE           RW            パケットサイズ(未使用)
+	SYSREQ_MAXEVENT          RW            HGIMG3/4最大イベント数
+	SYSREQ_PTRD3D            R             Direct3Dクラスポインタ(Windows/HGIMG3のみ)
+	SYSREQ_PTRD3DDEV         R             Direct3DDeviceクラスポインタ(Windows/HGIMG3のみ)
+	SYSREQ_MDLANIM           RW            モデルあたりのアニメーション最大数(HGIMG3)
+	SYSREQ_CALCNORMAL        RW            Xファイルモデル法線再計算スイッチ(HGIMG3)
+	SYSREQ_2DFILTER          RW            2D描画時のテクスチャ補間モード(HGIMG3)
+	SYSREQ_3DFILTER          RW            3D描画時のテクスチャ補間モード(HGIMG3)
+	SYSREQ_OLDCAM            RW            カメラ注視モードの動作(HGIMG3)
+	SYSREQ_QUATALG           RW            Xファイルモデルアニメーション補間モード(HGIMG3)
+	SYSREQ_DXVSYNC           RW            フルスクリーンモード時のVSYNC待ちモード(HGIMG3)
+	SYSREQ_DEFTIMER          RW            hgsyncの時間待ちモード(HGIMG3)
+	SYSREQ_NOMIPMAP          RW            テクスチャのMIPMAP生成モード(HGIMG3)
+	SYSREQ_DEVLOST           RW            DirectXデバイスの存在フラグ
+	SYSREQ_MAXEMITTER        RW            HGIMG3エミッター最大数
+	SYSREQ_THROUGHFLAG       RW            X方向のボーダー処理フラグ(HGIMG3)
+	SYSREQ_OBAQMATBUF        RW            OBAQ用マテリアルバッファ数(HGIMG3)
+	SYSREQ_2DFILTER2         RW            2D直接描画時のテクスチャ補間モード(HGIMG3)
+	SYSREQ_FPUPRESERVE       RW            FPU演算精度設定オプション(HGIMG3)
+	SYSREQ_CLSMODE           RW            背景のクリアフラグ
+	SYSREQ_CLSCOLOR          RW            背景クリア色
+	SYSREQ_CLSTEX            RW            背景クリアテクスチャID(HGIMG3)
+	SYSREQ_TIMER             R             ミリ秒単位のタイマー値
+	SYSREQ_PLATFORM          R             HSP3Dishを実行しているプラットフォーム
+	SYSREQ_FPS               R             フレームレート(HGIMG4)
+	SYSREQ_VSYNC             RW            VSync待ちモード(HGIMG4)
+	SYSREQ_MAXMATERIAL       RW            HGIMG4最大マテリアル数
+	SYSREQ_PHYSICS_RATE      RW            OBAQ用物理パラメーター(OBAQ)
+	SYSREQ_MAXOBAQ           RW            OBAQ用オブジェクト最大数(OBAQ)
+	SYSREQ_MAXLOG            RW            OBAQ用コリジョンログ最大数(OBAQ)
+	SYSREQ_DEFAULT_WEIGHT    RW            OBAQ用デフォルトWeight値(OBAQ)
+	SYSREQ_DEFAULT_MOMENT    RW            OBAQ用デフォルトMoment値(OBAQ)
+	SYSREQ_DEFAULT_DAMPER    RW            OBAQ用デフォルトDamper値(OBAQ)
+	SYSREQ_DEFAULT_FRICTION  RW            OBAQ用デフォルトFriction値(OBAQ)
+	SYSREQ_MESCACHE_MAX      RW            メッセージキャッシュ最大数(HSP3Dish)
+	SYSREQ_DLIGHT_MAX        RW            ディレクショナルライト最大数(HGIMG4)
+	SYSREQ_PLIGHT_MAX        RW            ポイントライト最大数(HGIMG4)
+	SYSREQ_SLIGHT_MAX        RW            スポットライト最大数(HGIMG4)
+	SYSREQ_LOGWRITE          RW            終了時のログ出力スイッチ(HGIMG4)
+	SYSREQ_FIXEDFRAME        RW            固定フレームレートスイッチ(HGIMG4)
+	SYSREQ_DRAWNUMOBJ        R             描画されたオブジェクト数(HGIMG4)
+	SYSREQ_DRAWNUMPOLY       R             描画されたポリゴン数(HGIMG4)
+	SYSREQ_USEGPBFONT        RW            gpbフォント使用スイッチ(HGIMG4)
+	SYSREQ_FIXMESALPHA       RW            文字描画alpha値固定モード(HSP3Dish)
+	SYSREQ_OLDBOXF           RW            従来のboxf描画モード(HSP3Dish)
 
 	(*)項目ごとに、読み(R)書き(W)の可否が異なります
 	</pre>
@@ -545,6 +605,25 @@
 	長い音声の再生(.mp3形式)は、負荷軽減のため多重に再生することはできません。
 	<br>
 	それぞれの命令の詳細については、HSP Document Libraryによる命令ヘルプを参照してください。
+	</p>
+
+	<p>
+	Windowsでは、oggファイルによるサウンドの再生をサポートした<a href="hspogg.txt">hspoggプラグイン</a>を利用することが可能です。
+	hspoggプラグインは、mmplayとは別のコマンド(dmmplayなど)を使用してサウンドの再生を行います。
+	<br>
+	外部のプラグイン等を使用してサウンドを再生する場合は、HSP3Dishに内蔵されたサウンドシステムを
+	無効にしておくことをお勧めします。複数のサウンドシステムを同時に使用することで、
+	外部のプラグインに影響が出ることを抑制できます。
+	<br>
+	HSP3Dishに内蔵されたサウンドシステムの有効・無効を切り替える場合は、「devcontrol "mmsystem",値」の命令を使用してください。
+	</p>
+	<pre>
+		devcontrol "mmsystem",0		; 内蔵サウンドシステムを無効化
+		devcontrol "mmsystem",1		; 内蔵サウンドシステムを有効化
+	</pre>
+	<p>
+	命令で指定する値は0(無効)か1(有効)を指定します。screen命令を使用した場合には、内蔵サウンドシステムが再度有効化されるので注意してください。
+	この拡張コントロールは、Windowsプラットフォームでのみ有効となります。
 	</p>
 
 
@@ -675,9 +754,18 @@
 	</ul>
 
 
+	<h2 id="MAXTEXTURE">テクスチャ上限数について</h2>
+	<p>
+	HSP3Dishでは、使用する画像(テクスチャ)の数を無制限に扱うことが可能です。
+	ただし、プラットフォームやグラフィックス環境によってメモリの上限から制約が発生する場合があります。<br>
+	また、HGIMG4の場合は、マテリアル数によりテクスチャの上限数が決まります。
+	詳しくは、<a href="hgimg4.html#MEMLIMIT">HGIMG4プログラミングガイド - 登録の限界数について</a>をご覧ください。
+	</p>
+
+
 	<h2 id="PLUGIN">拡張プラグイン・外部DLLのサポート</h2>
 	<p>
-	Windows上のHSP3Dishでは、拡張プラグイン及び・外部DLL呼び出しをサポートしています。(COMオブジェクト及びActiveX関連機能はサポートしていません)
+	Windows上のHSP3Dishでは、拡張プラグイン及び・外部DLL呼び出し、COMオブジェクト関連機能をサポートしています。(ActiveX関連機能はサポートしていません)
 	ただし、HSP3Dishのシステム上、利用できないプラグインも存在するので注意してください。
 	</p>
 	<ul>
@@ -700,11 +788,14 @@
 
 	<h2 id="KNOWNBUG">既知の不具合について</h2>
 	<p>
+	以下は、iOS,androidプラットフォーム上で報告されている不具合です。<br>
+	<ul>
 	<li>#defcfuncによる複数パラメーターを持つユーザー定義関数の呼び出しで、パラメーター省略時に正しく実行が行なわれない不具合が報告されています
 	<li>#defcfuncによるユーザー定義関数の呼び出し内で、awaitやwait、stopなどタスクが停止状態になる命令を実行するとエラー(40)が発生しますので使用を避けてください
 	<li>split命令は現在正しく動作していません。getstr命令などにより代用下さい
 	<li>PNGデコーダーの違いによりWindows上で表示できる画像が、iOS,androidで表示できない場合があります
 	<li>#defcfunc、#deffunc命令によるユーザー定義呼び出し先でgosub命令を使用した際に、呼び出し先のサブルーチンで引数にアクセスできない不具合が報告されています
+	</ul>
 	</p>
 
 	<h2 id="LICENCE">著作権とライセンス</h2>

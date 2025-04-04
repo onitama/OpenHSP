@@ -1,0 +1,28 @@
+#include "hsp3dish.as"
+#pack "tamane_s1.png"
+
+	;	標準のサイズで表示
+	screen 0,640,480
+
+	; webdish素材(hsptvフォルダ)にある素材は
+	; HSP3Dishでそのまま読み込むことが可能です
+
+	tamas=ginfo_newid
+	celload "tamane_s1.png",tamas		; 素材フォルダから読み込みます
+
+	x=0:y=1024-600
+*main
+	redraw 0
+	color 0,255,255
+	boxf
+
+	gmode 2
+	pos 0,0-y
+	celput tamas
+
+	if y>0 : y=y-1
+
+	redraw 1
+	await 16
+	goto *main
+

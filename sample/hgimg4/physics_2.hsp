@@ -1,5 +1,13 @@
 #include "hgimg4.as"
 
+	;
+	;	カメラ視点の先にあるオブジェクトの衝突位置を取得する(gppraytest命令テスト)
+	;	カーソルキーかマウスで移動、衝突位置にエフェクトが出ます
+	;	スペースキーを押すと対象に衝撃を与えます
+	;
+	randomize
+	title "HGIMG4 Test"
+
 	wx=ginfo_sx:wy=ginfo_sy			; 描画エリアのサイズ
 	setpos GPOBJ_CAMERA, 0,1,10		; カメラ位置を設定
 
@@ -11,10 +19,11 @@
 	x=-8
 	repeat max
 	gpbox id_model, 1, $808080		; 箱ノードを生成する
-	setscale id_model, 1,2,0.2
+	setscale id_model, 1,2,0.5
 	z=rnd(8)-4
 	setpos id_model, x,0.5,z
-	gppbind id_model 
+	gppbind id_model
+	setcoli id_model, 1
 	x+=1
 	loop
 
@@ -30,23 +39,25 @@
 	event_wait ev1, 32
 	event_delobj ev1
 
-	ddim respos,4
-	resid=0
-
 	px=0.0:py=0.0
+
+	ddim fv,4
 
 *main
 	stick key,15+256
 	if key&128 : end
 
+	if key&1 : px-=0.1
+	if key&4 : px+=0.1
+	if key&2 : py-=0.1
+	if key&8 : py+=0.1
 	if key&256 {
 		px=double(mousex)/ginfo_sx*20-10
 		py=double(mousey)/ginfo_sy*20-10
 	}
 	gplookat GPOBJ_CAMERA, px,-py,0	; カメラから指定した座標を見る
 
-	gppraytest hitres,GPOBJ_CAMERA
-	if hitres=id_floor : hitres=0
+	gppraytest hitres, GPOBJ_CAMERA, 100, 1
 	if hitres>0 {
 		setcolor hitres, 255,0,0
 		getwork GPOBJ_CAMERA,dx,dy,dz
@@ -54,6 +65,17 @@
 		setobjmode id, OBJ_MOVE			; 自動移動を設定する
 		setpos id,dx,dy,dz
 		setevent id, ev1
+		if key&16 {
+			setwork hitres,dx,dy,dz		; WORKに座標を設定する
+			;
+			getang GPOBJ_CAMERA,dx,dy,dz
+			fvset fv,dx,dy,dz
+			fvdir fv,0,0,1.0		; カメラの角度をベクトルに変換する
+			getwork2 GPOBJ_CAMERA,dx2,dy2,dz2	; 衝突物の法線を取得する
+			fvdir fv,dx2,dy2,dz2,FVDIR_MIRROR	; 鏡面ベクトルに変換する
+			fvmul fv,-0.2,-0.2,-0.2			; ベクトルの威力を弱める
+			gppapply hitres,GPPAPPLY_IMPULSE_POS, fv(0),fv(1),fv(2)	; 対象に衝撃を与える
+		}
 	}
 	redraw 0
 	rgbcolor $eecc:boxf

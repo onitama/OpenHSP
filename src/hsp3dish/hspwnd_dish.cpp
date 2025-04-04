@@ -7,16 +7,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../hsp3/hsp3config.h"
-#include "../hsp3/hsp3debug.h"
-#include "../hsp3/dpmread.h"
-#include "../hsp3/strbuf.h"
-#include "../hsp3/strnote.h"
-
 #include "hgio.h"
 #include "supio.h"
 #include "sysreq.h"
 #include "hspwnd.h"
+
+#include "../hsp3/hsp3debug.h"
+#include "../hsp3/strbuf.h"
+#include "../hsp3/strnote.h"
 
 HspWnd *curwnd;
 
@@ -59,6 +57,7 @@ void HspWnd::Dispose( void )
 	//
 	int i;
 	Bmscr *bm;
+	if (mem_bm == NULL) return;
 	for(i=0;i<bmscr_max;i++) {
 		bm = mem_bm[i];
 		if ( bm != NULL ) {
@@ -66,6 +65,23 @@ void HspWnd::Dispose( void )
 		}
 	}
 	free( mem_bm );
+	bmscr_max = 0;
+	mem_bm = NULL;
+}
+
+
+void HspWnd::ClearAllObjects(void)
+{
+	//		破棄
+	//
+	int i;
+	Bmscr* bm;
+	for (i = 0; i < bmscr_max; i++) {
+		bm = mem_bm[i];
+		if (bm != NULL) {
+			bm->ResetHSPObject();
+		}
+	}
 }
 
 
@@ -178,7 +194,7 @@ void HspWnd::MakeBmscr( int id, int type, int x, int y, int sx, int sy, int opti
 	bm->buffer_option = option;
 
 	if (type == HSPWND_TYPE_OFFSCREEN) {
-		sprintf( bm->resname, "buffer%d", bm->wid );
+		sprintf( bm->resname, "*buffer%d", bm->wid );
 		hgio_buffer( (BMSCR *)bm );
 	}
 }
@@ -255,6 +271,33 @@ int HspWnd::GetEmptyBufferId( void )
 }
 
 
+int HspWnd::GetPreloadBufferId(char* fname)
+{
+	//		既に読み込まれているファイルのIDを取得
+	//
+	int i;
+	Bmscr* bm;
+	char basename[HSP_MAX_PATH];
+	getpath( fname, basename, 8+16 );
+
+	for (i = 1; i < bmscr_max; i++) {
+		bm = GetBmscr(i);
+		if (bm != NULL) {
+			if (bm->type == HSPWND_TYPE_BUFFER) {
+				if (bm->flag == BMSCR_FLAG_INUSE) {
+					char bname[HSP_MAX_PATH];
+					getpath(bm->resname, bname, 8 + 16);
+					if (strcmp(bname, basename) == 0) {
+						return bm->wid;
+					}
+				}
+			}
+		}
+	}
+	return -1;
+}
+
+
 void HspWnd::Resume( void )
 {
 	//		画面の再構築(フレームバッファ破棄時用)
@@ -262,13 +305,15 @@ void HspWnd::Resume( void )
 	int i;
 	Bmscr *bm;
 
+	hgio_resume();
 	bm = GetBmscr(0);
 	hgio_screen( (BMSCR *)bm );
-	hgio_resume();
 
 	bm->tapstat = 0;
 	bm->tapinvalid = 0;
 	bm->cur_obj = NULL;
+
+	bm->Select();
 
 	//		リソースを読み込み直す
 	//
@@ -277,7 +322,7 @@ void HspWnd::Resume( void )
 		if ( bm != NULL ) {
 			if ( bm->type == HSPWND_TYPE_BUFFER ) {
 				bm->flag = BMSCR_FLAG_NOUSE;
-				hgio_texload( (BMSCR *)bm, bm->resname );
+				hgio_texload((BMSCR*)bm, bm->resname);
 				bm->flag = BMSCR_FLAG_INUSE;
 			}
 			if ( bm->type == HSPWND_TYPE_OFFSCREEN ) {
@@ -285,7 +330,6 @@ void HspWnd::Resume( void )
 			}
 		}
 	}
-
 }
 
 
@@ -352,11 +396,88 @@ void Bmscr::Init( char *fname )
 	}
 	Init( sx, sy );
 
-	char _name[HSP_MAX_PATH];
-	getpath( fname, _name, 8 );
-	strncpy( resname, _name, RESNAME_MAX-1 );
+	//char _name[HSP_MAX_PATH];
+	//getpath( fname, _name, 8 );
+	strncpy( resname, fname, RESNAME_MAX-1 );
 	//Alertf( "(%d,%d)",sx,sy );
 }
+
+
+char* Bmscr::getPixelMaskBuffer(void)
+{
+#ifdef HSPWIN
+	return hgio_texmaskbuffer((BMSCR*)this, resname);
+#else
+	return NULL;
+#endif
+}
+
+
+void Bmscr::SetMousePosition(int x, int y)
+{
+	//		set master mouse position
+	//
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+	hgio_cnvview((BMSCR*)this, &x, &y);
+	this->savepos[BMSCR_SAVEPOS_MOSUEX] = x;
+	this->savepos[BMSCR_SAVEPOS_MOSUEY] = y;
+	this->UpdateAllObjects();
+#ifdef HSPERR_HANDLE
+}
+catch (HSPERROR code) {						// HSPエラー例外処理
+	code_catcherror(code);
+}
+#endif
+}
+
+
+void Bmscr::SetMouseWheel(int z, int w)
+{
+	//		set master mouse wheel info
+	//
+	this->savepos[BMSCR_SAVEPOS_MOSUEZ] = z;
+	this->savepos[BMSCR_SAVEPOS_MOSUEW] = w;
+}
+
+
+void Bmscr::SetMouseRelease(void)
+{
+	//		set master mouse release (out of window)
+	//
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+	this->tapstat = 0;
+	this->savepos[BMSCR_SAVEPOS_MOSUEX] = -1;
+	this->savepos[BMSCR_SAVEPOS_MOSUEY] = -1;
+	this->UpdateAllObjects();
+#ifdef HSPERR_HANDLE
+	}
+	catch (HSPERROR code) {						// HSPエラー例外処理
+		code_catcherror(code);
+	}
+#endif
+}
+
+void Bmscr::SetMousePress(int sw)
+{
+	//		set mouse button press
+	//
+#ifdef HSPERR_HANDLE
+	try {
+#endif
+		this->tapstat = sw;
+		this->UpdateAllObjects();
+#ifdef HSPERR_HANDLE
+	}
+	catch (HSPERROR code) {						// HSPエラー例外処理
+		code_catcherror(code);
+	}
+#endif
+}
+
 
 
 void Bmscr::Cls( int mode )
@@ -422,6 +543,20 @@ void Bmscr::Cls( int mode )
 
 	//		Multi-Touch Reset
 	resetMTouch();
+
+	//		カーソル位置を復元(win)
+#ifdef HSPWIN
+	{
+		HWND hwnd = hgio_gethwnd();
+		POINT MousePoint;
+		int x, y;
+		GetCursorPos(&MousePoint);
+		ScreenToClient(hwnd, &MousePoint);
+		x = (int)MousePoint.x;
+		y = (int)MousePoint.y;
+		this->SetMousePosition( x, y );
+	}
+#endif
 }
 
 
@@ -433,6 +568,15 @@ void Bmscr::Title( char *str )
 
 void Bmscr::Width( int x, int y, int wposx, int wposy, int mode )
 {
+}
+
+
+void Bmscr::Select(int mode)
+{
+	//		Activate current window
+	//
+	hgio_gsel((BMSCR*)this);
+	hgio_font(font_curname, font_cursize, font_curstyle);
 }
 
 
@@ -625,7 +769,7 @@ int Bmscr::PrintSub( char *mes )
 			*p = bak_a1;
 			p++; st = p; spcur = 0;		// 終端を戻す
 			a1 = *p;
-			if (a1 == 10) p++;
+			if (a1 == 10) { p++; st = p; }
 			continue;
 		}
 		if (a1 == 10) {
@@ -649,11 +793,8 @@ int Bmscr::PrintSub( char *mes )
 			} else if ((a1 >= 0xfc) && (a1 <= 0xfd)) {
 				utf8bytes = 6;
 			}
-			while (utf8bytes > 0) {
-				p++;
-				spcur++;
-				utf8bytes--;
-			}
+			p += utf8bytes;
+			spcur += utf8bytes;
 		}
 		else {
 			p++; spcur++;
@@ -663,9 +804,9 @@ int Bmscr::PrintSub( char *mes )
 #endif
 	}
 
-	if (spcur > 0) {
+//	if (spcur > 0) {
 		hgio_mes((BMSCR *)this, (char*)st);
-	}
+//	}
 
 	return printsizex;
 }
@@ -674,7 +815,12 @@ int Bmscr::PrintSub( char *mes )
 void Bmscr::Boxfill( int x1,int y1,int x2,int y2, int mode )
 {
 	//		boxf
-	hgio_boxfAlpha( (BMSCR *)this, (float)x1, (float)y1, (float)x2, (float)y2, mode );
+	if (GetSysReq(SYSREQ_OLDBOXF)) {
+		hgio_boxfAlpha((BMSCR*)this, (float)x1, (float)y1, (float)x2, (float)y2, mode);
+	}
+	else {
+		hgio_boxfAlpha((BMSCR*)this, (float)(x1), (float)(y1), (float)(x2+1), (float)(y2+1), mode);
+	}
 }
 
 
@@ -947,6 +1093,7 @@ int Bmscr::CelPut( Bmscr *src, int id )
 	yy = ( id / src->divx ) * psy;
 	texpx = xx + psx;
 	texpy = yy + psy;
+
 	if ( texpx < 0 ) return -1;
 	if ( texpx >= src->sx ) {
 		if ( xx >= src->sx ) return -1;
@@ -957,7 +1104,6 @@ int Bmscr::CelPut( Bmscr *src, int id )
 		if ( yy >= src->sy ) return -1;
 		psy = src->sy - yy;
 	}
-
 	bak_cx = cx + psx;
 	bak_cy = cy;
 	cx -= src->celofsx;
@@ -1128,13 +1274,19 @@ int Bmscr::listMTouch( int *outbuf )
 	int i;
 	int *buf;
 	HSP3MTOUCH *mt;
+	bool hasMouseIdJustBefore = false;
 	buf = outbuf;
 	mt = mtouch;
 	mtouch_num = 0;
 	for(i=0;i<BMSCR_MAX_MTOUCH;i++) {
 		if ( mt->flag ) {
+			if ( hasMouseIdJustBefore ) {
+				buf--;
+				mtouch_num--;
+			}
 			*buf++ = i;
 			mtouch_num++;
+			hasMouseIdJustBefore = (mt->pointid == -1);
 		}
 		mt++;
 	}

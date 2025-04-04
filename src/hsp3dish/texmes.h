@@ -20,6 +20,8 @@ using namespace gameplay;
 #define TEXMES_NAME_BUFFER 64		// テキストハッシュネーム用バッファサイズ
 #define TEXMES_BUFFER_MAX 0x40000	// 初期テクスチャバッファバッファサイズ
 
+class texmesPos;
+
 // テクスチャキャッシュ情報
 class texmes {
 public:
@@ -45,6 +47,7 @@ public:
 	int textsize;		// Long Text Message size
 	int font_size;		// Text font size
 	int font_style;		// Text font style
+	texmesPos* texmespos;	// texmesPos ptr (for cache)
 	char buf[TEXMES_NAME_BUFFER];		// Text Data Buffer
 
 #ifdef HSPDISHGP
@@ -53,8 +56,6 @@ public:
 	int _texture;
 #endif
 };
-
-class texmesPos;
 
 // メッセージマネージャー
 class texmesManager {
@@ -79,7 +80,7 @@ protected:
 	int Get2N(int val);
 	texmes* addTexmes(void);
 	int str2hash(char* msg, int* out_len);
-	int texmesGetCache(char* msg, short mycache);
+	int texmesGetCache(char* msg, short mycache, texmesPos* info = NULL);
 	unsigned char* texmesGetFont(char* msg, int* out_sx, int *out_sy, int* out_tsx, int* out_tsy, texmesPos *info);
 	unsigned char *texmesBuffer(int size);
 

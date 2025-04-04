@@ -1,0 +1,31 @@
+#runtime "hsp3cl"
+
+	;	コマンドラインに指定されたファイル名を取り出す
+	;
+	a="Console HSP Test"
+	mes "["+a+"]"
+
+	a = dir_cmdline
+	if a="" : mes "コマンドライン文字列がありません。" : end
+
+	b = getpath(a,0)
+	mes "すべて取り出す。"
+	mes b
+	b = getpath(a,1)
+	mes "拡張子を除いた部分を取り出す。"
+	mes b
+	b = getpath(a,2)
+	mes "拡張子を取り出す。"
+	mes b
+	b = getpath(a,8)
+	mes "ファイル名のみ取り出す。"
+	mes b
+	b = getpath(a,16)
+	mes "文字列の小文字変換を有効にする。"
+	mes b
+	b = getpath(a,32)
+	mes "ディレクトリ名を取り出す。"
+	mes b
+
+	end
+

@@ -34,6 +34,9 @@ If you have an archive, extract the contents to any directory and compile the so
 OpenGL ES2.0 or later / EGL
 	SDL2 / SDL2-mixer
 	gtk+-2
+	libcurl4
+	libgpiod2
+	libffi
 
 For Debian (Ubuntu), you can install the library from the package manager as follows.
 
@@ -44,6 +47,7 @@ For Debian (Ubuntu), you can install the library from the package manager as fol
 	sudo apt install -y libgles2-mesa-dev libegl1-mesa-dev
 	sudo apt install -y libcurl4-openssl-dev
 	sudo apt install -y libgpiod2 libgpiod-dev
+	sudo apt install -y libffi-dev
 
 The repository contains only the source, so you need to compile it with make. (If it doesn't compile correctly depending on your Linux version or distribution, you'll need to fix it.)
 

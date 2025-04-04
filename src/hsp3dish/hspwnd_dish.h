@@ -6,6 +6,7 @@
 #define __hspwnd_dish_h
 
 #include <string>
+#include <vector>
 #include "../hsp3/hsp3config.h"
 #include "../hsp3/hsp3code.h"
 
@@ -52,6 +53,7 @@
 #define HSPOBJ_LAYER_CMD_DRAW (6)
 #define HSPOBJ_LAYER_CMD_TIME (7)
 
+#define HSPOBJ_NOTICE_KEY_EXTKEY (0x1000000)
 #define HSPOBJ_NOTICE_KEY_CTRLADD (0x2000)
 #define HSPOBJ_NOTICE_KEY_SHIFTADD (0x1000)
 
@@ -61,16 +63,16 @@
 #define HSPOBJ_NOTICE_CLICK_END 0x10001
 #define HSPOBJ_NOTICE_CLICK_MOVE 0x10002
 #define HSPOBJ_NOTICE_KEY_BS (8)
-#define HSPOBJ_NOTICE_KEY_DEL (46)
-#define HSPOBJ_NOTICE_KEY_LEFT (37)
-#define HSPOBJ_NOTICE_KEY_UP (38)
-#define HSPOBJ_NOTICE_KEY_RIGHT (39)
-#define HSPOBJ_NOTICE_KEY_DOWN (40)
-#define HSPOBJ_NOTICE_KEY_HOME (36)
-#define HSPOBJ_NOTICE_KEY_END (35)
-#define HSPOBJ_NOTICE_KEY_INS (45)
-#define HSPOBJ_NOTICE_KEY_SCROLL_UP (33)
-#define HSPOBJ_NOTICE_KEY_SCROLL_DOWN (34)
+#define HSPOBJ_NOTICE_KEY_DEL (46)				// 拡張キー
+#define HSPOBJ_NOTICE_KEY_LEFT (37)				// 拡張キー
+#define HSPOBJ_NOTICE_KEY_UP (38)				// 拡張キー
+#define HSPOBJ_NOTICE_KEY_RIGHT (39)			// 拡張キー
+#define HSPOBJ_NOTICE_KEY_DOWN (40)				// 拡張キー
+#define HSPOBJ_NOTICE_KEY_HOME (36)				// 拡張キー
+#define HSPOBJ_NOTICE_KEY_END (35)				// 拡張キー
+#define HSPOBJ_NOTICE_KEY_INS (45)				// 拡張キー
+#define HSPOBJ_NOTICE_KEY_SCROLL_UP (33)		// 拡張キー
+#define HSPOBJ_NOTICE_KEY_SCROLL_DOWN (34)		// 拡張キー
 #define HSPOBJ_NOTICE_KEY_TAB (9)
 #define HSPOBJ_NOTICE_KEY_CR (13)
 
@@ -234,6 +236,26 @@ typedef struct HSPOBJINFO
 	int		owid;		// objectのValue(汎用)
 	int		owsize;		// objectの使用サイズ(汎用)
 
+	HSP3VARSET varset;	// objectから設定される情報
+
+	//		callback function
+	void	(*func_notice)( struct HSPOBJINFO *, int );
+	void	(*func_objprm)( struct HSPOBJINFO *, int, void * );
+	void	(*func_delete)( struct HSPOBJINFO * );
+
+	//		Extra Object Info (3.6)
+	//
+	Hsp3ObjBase *btnset;	// objectから設定される情報
+	int backcolor;		// 背景色
+	int fontcolor;		// テキスト色
+	int exinfo1, exinfo2;	// extra info
+	HSPCTX *hspctx;
+
+	//		callback function (HSP3Dish)
+	void	(*func_draw)( struct HSPOBJINFO * );
+
+	//		Extra Object Info (HSP3Dish)
+	//
 	short x,y;			// 左上座標
 	short sx,sy;		// サイズ
 	short tapflag;		// タップフラグ
@@ -243,20 +265,7 @@ typedef struct HSPOBJINFO
 	short fontedit;		// フォントエディット(0=none/1=edit/2=multiline)
 	short fontsize;		// フォントサイズ
 	short fontstyle;	// フォントスタイル
-	int fontcolor;		// テキスト色
-	int backcolor;		// 背景色
 	std::string *fontname;	// font name
-	int exinfo1, exinfo2;	// extra info
-
-	Hsp3ObjBase *btnset;	// objectから設定される情報
-	HSP3VARSET *varset;	// objectから設定される情報
-	HSPCTX *hspctx;
-
-	//		callback function
-	void	(*func_draw)( struct HSPOBJINFO * );
-	void	(*func_notice)( struct HSPOBJINFO *, int );
-	void	(*func_objprm)( struct HSPOBJINFO *, int, void * );
-	void	(*func_delete)( struct HSPOBJINFO * );
 
 } HSPOBJINFO;
 
@@ -340,6 +349,11 @@ public:
 	void Init( int p_sx, int p_sy );
 	void Init( char *fname );
 	void Cls( int mode );
+	void Select(int mode=0);
+	void SetMousePosition(int x, int y);
+	void SetMouseWheel(int z, int w);
+	void SetMouseRelease(void);
+	void SetMousePress(int sw);
 
 	void Posinc( int pp );
 	void Width( int x, int y, int wposx, int wposy, int mode );
@@ -421,6 +435,7 @@ public:
 
 	void Viewcalc_reset(void);
 	int Viewcalc_set(int type, HSPREAL x, HSPREAL y, HSPREAL p_sx, HSPREAL p_sy );
+	char* getPixelMaskBuffer(void);
 
 	//
 	//		Window data structure
@@ -557,6 +572,8 @@ public:
 	//
 	HspWnd( void );
 	~HspWnd( void );
+	void Dispose(void);
+	void ClearAllObjects(void);
 	void Resume( void );
 	void resetBuffers( void );
 	void SetHSPCTX(HSPCTX *ctx) { hspctx = ctx; };
@@ -573,6 +590,7 @@ public:
 	int GetActive( void );
 	int GetBmscrMax( void ) { return bmscr_max; };
 	int GetEmptyBufferId( void );
+	int GetPreloadBufferId(char* fname);
 	HSP3DEVINFO *getDevInfo( void ) { return &devinfo; }
 
 	//	Data
@@ -582,7 +600,6 @@ public:
 
 private:
 	void Reset( void );
-	void Dispose( void );
 	void ExpandScreen( int id );
 
 	//	Data

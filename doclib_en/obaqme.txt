@@ -3,7 +3,7 @@ OBAQ Model Editor ver0.1 MANUAL                     HSP : Hot Soup Processor
 HSP Support Tool Reference copyright 2014 (c) onion software
 ------------------------------------------------------------------------------
 
-郢昴し Introduction
+繝サ Introduction
 
 OBAQ Model Editor is available with HSP plugin obaq.dll
 It is a tool that can easily create a 2D shape and output it as a data file.
@@ -17,7 +17,7 @@ Since the source script is attached, anyone can reorganize and add
 You can distribute it.
 
 
-繝�繧ｭstarting method
+ツキstarting method
 
 obaqme.hsp in the sample / obaq folder with a script editor
 Please read and execute.
@@ -25,14 +25,14 @@ If necessary, press the [F9] key (automatic executable file creation) to create 
 You can create and run (obaqme.exe).
 
 
-謠イhange log
+揃Change log
 
 	2010/1/28 ver0.1
 
 First version.
 
 
-謠ッasic operation
+揃basic operation
 
 The one created on the edit screen will be loaded and saved as one model.
 On the edit screen, left-click to set the vertices and create the shape.
@@ -49,7 +49,7 @@ Complex shapes do not try to create one polygon, but multiple polygons
 Please try to combine.
 
 
-郢昴し Vertex editing
+繝サ Vertex editing
 
 Press the [ctrl] key to enter vertex edit mode.
 If you press the [ctrl] key on an existing vertex, that vertex will be edited.
@@ -64,20 +64,20 @@ can.
 However, it is safe to delete vertices, so the cursor will move to the target vertex.
 It will only be executed when it is pointing.
 
-繝�繧ｭpreview
+ツキpreview
 
 By pressing the "TEST" button, the model currently being edited can be selected.
 You can check it by displaying it in a separate window.
 
 
-繝ｻ Load and save
+・ Load and save
 
 By pressing the "SAVE" and "LOAD" buttons, the data currently being edited can be displayed.
 You can save and load to a file.
 Saved files have a ".qvd" extension.
 
 
-繝ｻ Convert
+・ Convert
 
 By pressing the "CONVERT" button, in a form available from the script
 Create a binary file.
@@ -93,7 +93,7 @@ It can be read.
 A sample (qvbtest.hsp) is also included, so please refer to it.
 
 
-繝ｻ Copyright and license
+・ Copyright and license
 
 The copyright of OBAQ Model Editor belongs to ONION software / onitama.
 OBAQ Model Editor is available under a BSD license, whether paid or free.

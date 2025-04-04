@@ -368,7 +368,7 @@ example :
 	a="c:\\disk\\test.bmp"
 	b = getpath(a,8+1)
 	mes b
-â†“ (Result)
+« (Result)
 Become "test"
 ^p
 The details of the type specification are as follows.

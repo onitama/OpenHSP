@@ -11,6 +11,7 @@
 #include <map>
 using namespace std;
 
+#include "hsp3config.h"
 #include "hspwnd.h"
 #include "supio.h"
 #include "dpmread.h"
@@ -19,8 +20,8 @@ using namespace std;
 #include "strnote.h"
 #include "hsp3code.h"
 #include "hsp3debug.h"
-#include "hsp3config.h"
 #include "hsp3int.h"
+#include "hsp3utfcnv.h"
 
 /*------------------------------------------------------------*/
 /*
@@ -54,7 +55,8 @@ PVal *mpval;									// code_getで使用されたテンポラリ変数
 static PVal *mpval_int;							// code_getで使用されたテンポラリ変数(int用)
 static PVal prmvar;								// パラメーターテンポラリ変数の実態
 
-static	unsigned char *mem_di_val;				// Debug VALS info ptr
+static	unsigned char *mem_di_val;				// Debug VARS info ptr
+static	int maxvar;								// Debug VARS id max
 static	int srcname;
 static	int funcres;							// 関数の戻り値型
 
@@ -1227,39 +1229,28 @@ STRUCTDAT *code_getcomst( void )
 }
 
 
-/*
-void code_setv( PVal *pval, PDAT *dat, int type, void *ptr )
-{
-	//		変数にパラメーターを指定する
-	//
-	PDAT *p;
-	HspVarProc *proc;
-
-	p = dat;
-	proc = HspVarCoreGetProc( type );
-	if ( pval->flag != type ) {
-		HspVarCoreReset( pval );
-		p = HspVarCorePtr( pval );					// 要素0のPDATポインタを取得
-		if ( p != dat ) throw HSPERR_INVALID_ARRAYSTORE;
-		HspVarCoreClear( pval, type );				// 最小サイズのメモリを確保
-		p = proc->GetPtr( pval );					// PDATポインタを取得
-	}
-	proc->Set( p, ptr );
-}
-*/
-
 void code_setva( PVal *pval, APTR aptr, int type, const void *ptr )
 {
 	//		変数にパラメーターを指定する
 	//
 	HspVarProc *proc;
 	pval->offset = aptr;
+#ifdef HSPDEBUG
+	if ( pval->support & HSPVAR_SUPPORT_FIXEDVALUE ) throw HSPERR_FIXED_VARVALUE;
+	int logvar = pval->support & HSPVAR_SUPPORT_ASSERTVAR;
+#endif
 	proc = HspVarCoreGetProc( type );
 	if ( pval->flag != type ) {
 		if ( aptr != 0 ) throw HSPERR_INVALID_ARRAYSTORE;
-		HspVarCoreClear( pval, type );				// 最小サイズのメモリを確保
+		HspVarCoreClearWC( pval, type );				// 最小サイズのメモリを確保
 	}
 	proc->Set( pval, proc->GetPtr( pval ), ptr );
+#ifdef HSPDEBUG
+	if (logvar) {
+		code_logmesv( pval, aptr );
+		pval->support |= logvar;
+	}
+#endif
 }
 
 
@@ -1323,6 +1314,8 @@ void cmdfunc_return( void )
 	code_next();
 
 	StackPop();
+
+	hspctx->runmode = RUNMODE_RUN;
 }
 
 #ifdef HSPEMSCRIPTEN
@@ -1426,6 +1419,9 @@ static int code_callfunc( int cmd )
 					if ((hspctx->runmode != RUNMODE_RUN) && (hspctx->runmode != RUNMODE_END) && (hspctx->runmode != RUNMODE_LOGMES)) throw HSPERR_INVALID_CALLBACK;
 				}
 				hspctx->msgfunc( hspctx );
+			}
+			if (hspctx->runmode == RUNMODE_END) {
+				throw HSPERR_NONE;
 			}
 		}
 	}
@@ -1802,6 +1798,11 @@ static int cmdfunc_var( int cmd )
 	exp = val;
 	code_next();							// 次のコードへ
 
+#ifdef HSPDEBUG
+	if (pval->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;		// 値の変更禁止
+	int logvar = pval->support & HSPVAR_SUPPORT_ASSERTVAR;
+#endif
+
 	if ( exflg ) {							// インクリメント(+)・デクリメント(-)
 		proc = HspVarCoreGetProc( pval->flag );
 		incval = 1;
@@ -1819,6 +1820,9 @@ static int cmdfunc_var( int cmd )
 		default:
 			throw HSPERR_SYNTAX;
 		}
+#ifdef HSPDEBUG
+		if (logvar) code_logmesv(pval, aptr);
+#endif
 		return RUNMODE_RUN;
 	}
 
@@ -1835,14 +1839,31 @@ static int cmdfunc_var( int cmd )
 				return RUNMODE_RUN;
 			}
 		}
-		if (( pval->flag != mpval->flag )||( pval->flag == HSPVAR_FLAG_STRUCT )) {
+		if (pval->flag == HSPVAR_FLAG_STRUCT) {
 			// HSPVAR_FLAG_STRUCTの場合は常に既存のデータをクリアする
-			if ( aptr != 0 ) throw HSPERR_INVALID_ARRAYSTORE;	// 型変更の場合は配列要素0のみ
-			HspVarCoreClear( pval, mpval->flag );		// 最小サイズのメモリを確保
-			proc = HspVarCoreGetProc( pval->flag );
-			dst = proc->GetPtr( pval );					// PDATポインタを取得
+			if (aptr != 0) {
+				if (pval->flag != mpval->flag) {
+					throw HSPERR_INVALID_ARRAYSTORE;	// 型変更の場合は配列要素0のみ
+				}
+			}
+			HspVarCoreClearWC(pval, mpval->flag);		// 最小サイズのメモリを確保
+			proc = HspVarCoreGetProc(pval->flag);
+			dst = proc->GetPtr(pval);					// PDATポインタを取得
+		}
+		else {
+			if (pval->flag != mpval->flag) {
+				if (aptr != 0) throw HSPERR_INVALID_ARRAYSTORE;	// 型変更の場合は配列要素0のみ
+				HspVarCoreClearWC(pval, mpval->flag);		// 最小サイズのメモリを確保
+				proc = HspVarCoreGetProc(pval->flag);
+				dst = proc->GetPtr(pval);					// PDATポインタを取得
+			}
 		}
 		proc->Set( pval, dst, ptr );
+
+#ifdef HSPDEBUG
+		if (logvar) code_logmesv(pval,aptr);
+#endif
+
 		if ( exflg ) return RUNMODE_RUN;
 
 		chk = pval->len[1];
@@ -1865,6 +1886,9 @@ static int cmdfunc_var( int cmd )
 
 			dst = HspVarCorePtr( pval );
 			proc->Set( pval, dst, ptr );				// 次の配列にたたき込む
+#ifdef HSPDEBUG
+			if (logvar) code_logmesv(pval, pval->offset);
+#endif
 		}
 		return RUNMODE_RUN;
 	}
@@ -1876,6 +1900,9 @@ static int cmdfunc_var( int cmd )
 		//ptr = proc->Cnv( ptr, mpval->flag );
 	}
 	calcprm( proc, dst, exp, ptr );
+#ifdef HSPDEBUG
+	if (logvar) code_logmesv(pval, aptr);
+#endif
 	if ( proc->aftertype != pval->flag ) {				// 演算後に型が変わる場合
 		throw HSPERR_TYPE_MISMATCH;
 	}
@@ -2086,11 +2113,17 @@ static int cmdfunc_prog( int cmd )
 		p4 = code_getdi( 0 );
 		if ( cmd == 0x0a ) {
 			p5 = code_getdi( 0 );
-			HspVarCoreDimFlex( pval, TYPE_STRING, p1, p2, p3, p4, p5 );
+			HspVarCoreDimFlexWC( pval, TYPE_STRING, p1, p2, p3, p4, p5 );
 			//HspVarCoreAllocBlock( pval, HspVarCorePtrAPTR( pval, 0 ), p1 );
-			break;
 		}
-		HspVarCoreDim( pval, fl, p1, p2, p3, p4 );
+		else {
+			HspVarCoreDimWC(pval, fl, p1, p2, p3, p4);
+		}
+#ifdef HSPDEBUG
+		if (pval->support & HSPVAR_SUPPORT_ASSERTVAR) {
+			code_logmesv( pval, 0 );
+		}
+#endif
 		break;
 		}
 
@@ -2141,6 +2174,7 @@ static int cmdfunc_prog( int cmd )
 		PVal *pval;
 		APTR aptr;
 		pval_m = code_getpval();
+		if (pval_m->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;
 		aptr = code_getva( &pval );
 		HspVarCoreDup( pval_m, pval, aptr );
 		break;
@@ -2154,6 +2188,7 @@ static int cmdfunc_prog( int cmd )
 		p3 = code_getdi( HSPVAR_FLAG_INT );
 		if ( p2<=0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		if ( HspVarCoreGetProc(p3)->flag == 0 ) throw HSPERR_ILLEGAL_FUNCTION;
+		if (pval_m->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;
 		HspVarCoreDupPtr( pval_m, p3, (void *)p1, p2 );
 		break;
 		}
@@ -2299,9 +2334,8 @@ static int cmdfunc_prog( int cmd )
 		break;
 		}
 	case 0x1c:								// logmes
-		code_stmpstr( code_getdsi("") );
-		hspctx->runmode = RUNMODE_LOGMES;
-		return RUNMODE_LOGMES;
+		code_logmes(code_getdsi(""));
+		break;
 
 	case 0x1d:								// newlab
 		{
@@ -2327,10 +2361,20 @@ static int cmdfunc_prog( int cmd )
 		break;
 		}
 
-	case 0x1e:								// resume
-		break;
-
-	case 0x1f:								// yield
+	case 0x1e:								// varprop
+		{
+		PVal* pval;
+		pval = code_getpval();
+		p1 = code_getdi(0);
+#ifdef HSPDEBUG
+		if (p1 == 0) {
+			pval->support &= ~HSPVAR_SUPPORT_DEBUGVAR;
+		} else {
+			p2 = (p1 & 15) * HSPVAR_SUPPORT_FIXEDTYPE;
+			pval->support |= p2;
+		}
+#endif
+		}
 		break;
 
 	case 0x20:								// strexchange
@@ -2680,6 +2724,7 @@ int code_debug_init( void )
 	mem_di_val = NULL;
 	mem_di = hspctx->mem_di;
 	if ( mem_di[0]==255) return -1;
+	maxvar = hspctx->hsphed->max_val;
 	while(1) {
 		ofs=mem_di[a++];
 		switch( ofs ) {
@@ -2706,22 +2751,38 @@ int code_debug_init( void )
 
 char *code_getdebug_varname( int val_id )
 {
+	//	変数IDから変数名文字列ポインタを得る
 	unsigned char *mm;
 	int i;
 	if ( mem_di_val == NULL ) return "";
+	if ((val_id < 0) || (val_id >= maxvar)) return "";
 	mm = mem_di_val + ( val_id * 6 );
 	i = (mm[3]<<16)+(mm[2]<<8)+mm[1];
 	return strp(i);
 }
 
 
+int code_getdebug_varid(PVal* pv)
+{
+	//	PValポインタから変数IDを得る
+	int id = -1;
+	if (mem_di_val) {
+		char *p = (char *)hspctx->mem_var;
+		id = (((char*)pv) - p ) / sizeof(PVal);
+		if ((id < 0) || (id >= maxvar)) return -1;
+	}
+	return id;
+}
+
+
 int code_getdebug_seekvar( const char *name )
 {
+	//	名前から変数IDを得る
 	unsigned char *mm;
 	int i,ofs;
 	if ( mem_di_val != NULL ) {
 		mm = mem_di_val;
-		for(i=0;i<hspctx->hsphed->max_val;i++) {
+		for(i=0;i<maxvar;i++) {
 			ofs = (mm[3]<<16)+(mm[2]<<8)+mm[1];
 			if ( strcmp( strp( ofs ), name ) == 0 ) return i;
 			mm += 6;
@@ -2759,7 +2820,8 @@ int code_exec_await( int tick )
 		if ( hspctx->lasttick == 0 ) hspctx->lasttick = tick;
 		hspctx->waittick = hspctx->lasttick + hspctx->waitcount;
 	}
-	if ( tick >= hspctx->waittick ) {
+
+	if ((tick - hspctx->waittick) >= 0) {
 		hspctx->lasttick = tick;
 		hspctx->runmode = RUNMODE_RUN;
 		return RUNMODE_RUN;
@@ -3257,7 +3319,7 @@ int code_event( int event, int prm1, int prm2, void *prm3 )
 		break;
 	case HSPEVENT_FWRITE:
 		// fwrite (fseek,size,saveptr)
-		res = mem_save( hspctx->fnbuffer, prm3, prm2, prm1 );
+		res = hsp3_binsave(hspctx->fnbuffer, prm3, prm2, prm1);
 		if ( res < 0 ) throw HSPERR_FILE_IO;
 		hspctx->strsize = res;
 		break;
@@ -3518,7 +3580,10 @@ int code_catcherror(HSPERROR code)
 	}
 	else if (code == HSPERR_EXITRUN) {
 		return hspctx->runmode;
-		hspctx->runmode = RUNMODE_EXITRUN;
+		//hspctx->runmode = RUNMODE_EXITRUN;
+	}else if (code == HSPERR_INTJUMP) {
+		return hspctx->runmode;
+		//throw HSPERR_INTJUMP;
 	}
 	else {
 		hspctx->err = code;
@@ -3536,6 +3601,87 @@ int code_catcherror(HSPERROR code)
 		Debug support
 */
 /*------------------------------------------------------------*/
+
+void code_logmes(char* msg)
+{
+#ifdef HSPDEBUG
+	code_stmpstr(msg);
+	hspctx->runmode = RUNMODE_LOGMES;
+	hspctx->msgfunc(hspctx);
+#endif
+}
+
+void code_logmesv(PVal *pval, APTR aptr)
+{
+#ifdef HSPDEBUG
+	char msg[4096];
+	char srcinfo[256];
+	char value[256];
+	char vararray[256];
+	char* varname;
+	char* p;
+	HspVarProc* proc;
+	PDAT* src;
+	int size, orgsize;
+	int srcline;
+
+	if ((pval->support & HSPVAR_SUPPORT_ARRAYNOTICE) == 0) {
+			if (aptr != 0) return;
+	}
+
+	int varid = code_getdebug_varid(pval);
+	if (varid < 0) {
+		varname = "__TempVar";
+	}
+	else {
+		if (aptr) {
+			sprintf(vararray,"%s(%d)", code_getdebug_varname(varid),aptr);
+			varname = vararray;
+		}
+		else {
+			varname = code_getdebug_varname(varid);
+		}
+	}
+
+	proc = HspVarCoreGetProc(pval->flag);
+	src = proc->GetPtr(pval);
+
+	switch (pval->flag) {
+	case HSPVAR_FLAG_DOUBLE:
+	case HSPVAR_FLAG_INT:
+		p = (char*)HspVarCoreCnv(pval->flag, HSPVAR_FLAG_STR, src);
+		break;
+	case HSPVAR_FLAG_STR:
+		p = (char*)proc->GetBlockSize(pval, src, &size);
+		orgsize = (int)strlen(p);
+		*value = 0x22;
+		if (orgsize >= 16) {
+			strsp_ini();
+			strsp_get(p, value+1, 0, 16);
+			strcat(value, "...\"");
+		}
+		else {
+			sprintf(value,"\"%s\"",p);
+		}
+		p = value;
+		break;
+	default:
+		int* data = (int*)src;
+		sprintf(value,"(%s$%x)",proc->vartype_name,*data);
+		p = value;
+		break;
+	}
+
+	*srcinfo = 0;
+	srcline = code_getdebug_line();
+	if (srcline > 0) {
+		sprintf(srcinfo,"line:%d (%s)",srcline, code_getdebug_name());
+	}
+
+	sprintf(msg, "#set[%s=%s] %s", varname,p,srcinfo);
+	code_logmes(msg);
+#endif
+}
 
 #ifdef HSPDEBUG
 
@@ -3757,7 +3903,7 @@ char *code_dbgvarinf( char *target, int option )
 	int orgsize;
 
 	code_inidbg();
-	max = hspctx->hsphed->max_val;
+	max = maxvar;
 
 	if ( target == NULL ) {
 		for(i=0;i<max;i++) {
@@ -3932,6 +4078,9 @@ void code_dbgtrace( void )
 		hspctx->msgfunc( hspctx );
 	}
 }
+
+
+
 
 #endif
 

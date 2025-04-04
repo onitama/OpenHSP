@@ -853,3 +853,49 @@ int ReplaceDone( void )
 }
 
 
+
+
+//
+//		linux debug support
+//
+void Alert( char *mes )
+{
+	printf( "%s", mes );
+	printf( "\r\n" );
+}
+
+void AlertV( char *mes, int val )
+{
+	printf( "%s%d\r\n",mes,val );
+}
+
+void Alertf( char *format, ... )
+{
+	char textbf[4096];
+	va_list args;
+	va_start(args, format);
+	vsprintf(textbf, format, args);
+	va_end(args);
+	printf( "%s", textbf );
+	printf( "\r\n" );
+}
+
+
+
+//
+//		Memory Manager
+//
+char *mem_alloc( void *base, int newsize, int oldsize )
+{
+	char *p;
+	if ( base == NULL ) {
+		p = (char *)calloc( newsize, 1 );
+		return p;
+	}
+	if ( newsize <= oldsize ) return (char *)base;
+	p = (char *)calloc( newsize, 1 );
+	memcpy( p, base, oldsize );
+	free( base );
+	return p;
+}
+

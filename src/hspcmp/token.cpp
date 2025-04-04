@@ -17,10 +17,119 @@
 #include "label.h"
 #include "tagstack.h"
 #include "membuf.h"
-#include "strnote.h"
+#include "../hsp3/strnote.h"
 #include "ahtobj.h"
 
 #define s3size 0x8000
+
+#ifdef HSPWIN
+#include <windows.h>
+#include <shlobj.h>
+#endif
+
+static inline int issjisleadbyte(unsigned char c)
+{
+	return (c >= 0x81 && c <= 0x9F) || (c >= 0xE0 && c <= 0xFC);
+}
+
+static inline int tstrcmp(const char* str1, const char* str2)
+{
+	if (strcmp(str1, str2) == 0) return -1;
+	return 0;
+}
+
+//-------------------------------------------------------------
+//		String Service
+//-------------------------------------------------------------
+
+void strcase2(char* str, char* str2)
+{
+	//	string case to lower and copy
+	//
+	unsigned char a1;
+	unsigned char* ss;
+	unsigned char* ss2;
+	ss = (unsigned char*)str;
+	ss2 = (unsigned char*)str2;
+	while (1) {
+		a1 = *ss;
+		if (a1 == 0) break;
+		if (a1 >= 0x80) {
+			*ss++;
+			*ss2++ = a1;
+			a1 = *ss++;
+			if (a1 == 0) break;
+			*ss2++ = a1;
+		}
+		else {
+			a1 = tolower(a1);
+			*ss++ = a1;
+			*ss2++ = a1;
+		}
+	}
+	*ss2 = 0;
+}
+
+void strcpy2(char* dest, const char* src, size_t size)
+{
+	if (size == 0) {
+		return;
+	}
+	char* d = dest;
+	const char* s = src;
+	size_t n = size;
+	while (--n) {
+		if ((*d++ = *s++) == '\0') {
+			return;
+		}
+	}
+	*d = '\0';
+	return;
+}
+
+
+static int findext(char const* st)
+{
+	//	拡張子をさがす。
+	//
+	int r = -1, f = 0;
+	for (int i = 0; st[i] != '\0'; ++i) {
+		if (f) {
+			f = 0;
+		}
+		else {
+			if (st[i] == '.') {
+				r = i;
+			}
+			else if (st[i] == '\\') {
+				r = -1;
+			}
+			f = issjisleadbyte(st[i]);
+		}
+	}
+	return r;
+}
+
+
+void addext(char* st, const char* exstr)
+{
+	//	add extension of filename
+	int i = findext(st);
+	if (i == -1) {
+		strcat(st, ".");
+		strcat(st, exstr);
+	}
+}
+
+
+void cutext(char* st)
+{
+	//		拡張子を取り除く
+	//
+	int i = findext(st);
+	if (i >= 0) st[i] = '\0';
+}
+
 
 //-------------------------------------------------------------
 //		Routines
@@ -102,24 +211,121 @@ int CToken::AddPackfile( char *name, int mode )
 	//
 	CStrNote note;
 	int i,max;
+	char fname[HSP_MAX_PATH];
+	char p_fdir[HSP_MAX_PATH];
+	char p_fname[HSP_MAX_PATH];
 	char packadd[1024];
 	char tmp[1024];
 	char *s;
+	char* findptr;
+	bool absolutePath = false;					// 絶対パスか?
 
-	strcpy( packadd, name );
-	strcase( packadd );
+	getpath(name, p_fdir, 32);
+	getpath(name, p_fname, 8);
+
+#ifdef HSPWIN
+	strchr3(p_fdir, ':', 0, &findptr);			// ドライブ文字があった
+	if (findptr != NULL) {
+		absolutePath = true;
+	}
+	if (*p_fdir == '\\') {
+		absolutePath = true;
+	}
+#endif
+	if (*p_fdir == '/') {
+		absolutePath = true;
+	}
+
+	if (absolutePath==false) {
+		strcpy(fname, search_path);
+		strcat(fname, p_fdir);
+		strcpy(p_fdir, fname);
+		strcat(fname, p_fname);
+	}
+	else {
+		strcat(fname, name);
+	}
+
+	strcpy( packadd, fname);
+
 	if ( mode<2 ) {
+#ifdef HSPWIN
+		strcase(packadd);
+#endif
 		note.Select( packbuf->GetBuffer() );
 		max = note.GetMaxLine();
 		for( i=0;i<max;i++ ) {
 			note.GetLine( tmp, i );
 			s = tmp;if ( *s=='+' ) s++;
-			if ( tstrcmp( s, packadd )) return -1;
+			if ( strcmp( s, packadd ) == 0 ) return -1;
 		}
 		if ( mode==1 ) packbuf->PutStr( "+" );
+		packbuf->PutStr(">");
 	}
 	packbuf->PutStr( packadd );
 	packbuf->PutStr( "\r\n" );
+	return 0;
+}
+
+
+int CToken::AddPackfileOrig(char* name, int mode)
+{
+	//		packfile出力
+	//			0=name/1=+name/2=other
+	//
+	CStrNote note;
+	int i, max;
+	char fname[HSP_MAX_PATH];
+	char p_fdir[HSP_MAX_PATH];
+	char p_fname[HSP_MAX_PATH];
+	char packadd[1024];
+	char tmp[1024];
+	char* s;
+	char* findptr;
+	bool absolutePath = false;					// 絶対パスか?
+
+	getpath(name, p_fdir, 32);
+	getpath(name, p_fname, 8);
+
+#ifdef HSPWIN
+	strchr3(p_fdir, ':', 0, &findptr);			// ドライブ文字があった
+	if (findptr != NULL) {
+		absolutePath = true;
+	}
+	if (*p_fdir == '\\') {
+		absolutePath = true;
+	}
+#endif
+	if (*p_fdir == '/') {
+		absolutePath = true;
+	}
+
+	if (absolutePath == false) {
+		strcpy(fname, search_path);
+		strcat(fname, p_fdir);
+		strcpy(p_fdir, fname);
+		strcat(fname, p_fname);
+	}
+	else {
+		strcat(fname, name);
+	}
+
+	strcpy(packadd, fname);
+	if (mode < 2) {
+#ifdef HSPWIN
+		strcase(packadd);
+#endif
+		note.Select(packbuf->GetBuffer());
+		max = note.GetMaxLine();
+		for (i = 0; i < max; i++) {
+			note.GetLine(tmp, i);
+			s = tmp; if (*s == '+') s++;
+			if (strcmp(s, packadd) == 0) return -1;
+		}
+		if (mode == 1) packbuf->PutStr("+");
+	}
+	packbuf->PutStr(packadd);
+	packbuf->PutStr("\r\n");
 	return 0;
 }
 
@@ -140,6 +346,7 @@ CToken::CToken( void )
 	ahtmodel = NULL;
 	ahtbuf = NULL;
 	scnvbuf = NULL;
+	labbuf = NULL;
 	ResetCompiler();
 }
 
@@ -156,6 +363,7 @@ CToken::CToken( char *buf )
 	ahtmodel = NULL;
 	ahtbuf = NULL;
 	scnvbuf = NULL;
+	labbuf = NULL;
 	ResetCompiler();
 }
 
@@ -167,7 +375,19 @@ CToken::~CToken( void )
 	if ( tstack!=NULL ) { delete tstack; tstack = NULL; }
 	if ( lb!=NULL ) { delete lb; lb = NULL; }
 	if ( s3 != NULL ) { free( s3 );s3 = NULL; }
-//	buffer = NULL;
+	//	buffer = NULL;
+}
+
+
+void CToken::addCmpMode(int mode)
+{
+	hed_cmpmode |= mode;
+}
+
+
+void CToken::delCmpMode(int mode)
+{
+	hed_cmpmode &= ~mode;
 }
 
 
@@ -191,10 +411,43 @@ void CToken::SetLabelInfo( CLabel *lbinfo )
 }
 
 
+void CToken::SetLabelListBuffer(CMemBuf *buf, int mode, char* match, int line, char *filename)
+{
+	labbuf = buf;
+	cg_labout_mode = mode;
+	cg_labout_match = match;
+	cg_labout_line = line;
+	if (filename == NULL) {
+		*cg_labout_orgfile = 0;
+	}
+	else {
+		strcpy(cg_labout_orgfile, filename);
+	}
+
+	static char* p[] = {
+		"---",
+		"fnc",
+		"mac",
+		"lab",
+		"var",
+		"exv",
+		"cmd",
+		"exc",
+		NULL };
+	cg_labout_header = p;
+}
+
+
+char* CToken::GetLabelListHeader(int flag)
+{
+	int i = flag & (LABBUF_FLAG_REFER-1);
+	if ((i < 0) || (i > LABBUF_FLAG_EXCMD)) i = 0;
+	return cg_labout_header[i];
+}
+
+
 void CToken::ResetCompiler( void )
 {
-//	buffer = buf;
-//	wp = (unsigned char *)buf;
 	line = 1;
 	fpbit = 256.0;
 	incinf = 0;
@@ -203,6 +456,9 @@ void CToken::ResetCompiler( void )
 	search_path[0] = 0;
 	lb->Reset();
 	fileadd = 0;
+	pp_orgline = 0;
+	pp_orgfile[0] = 0;
+	pp_orgfilefull[0] = 0;
 
 	//		reset header info
 	hed_option = 0;
@@ -210,6 +466,13 @@ void CToken::ResetCompiler( void )
 	hed_autoopt_timer = 0;
 	hed_autoopt_strexchange = 0;
 	pp_utf8 = 0;
+
+	//		reset labout
+	cg_labout_mode = 0;
+	cg_labout_line = 0;
+	cg_labout_caseflag = 0;
+	cg_labout_match = NULL;
+	*cg_labout_modname = 0;
 }
 
 
@@ -1164,7 +1427,8 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 			if (wrtbuf!=NULL) wrtbuf->PutStr( "{\"" );
 			mulstr = LMODE_STR;
 			*type = TK_STRING;
-			return ExpandStrEx( (char *)vs+2 );
+			char *pp = ExpandStrEx( (char *)vs+2 );
+			return pp;
 		}
 	}
 
@@ -1192,13 +1456,25 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 
 #ifdef HSPWIN
 	if ( hed_cmpmode & CMPMODE_SKIPJPSPC ) {
-		if ( a1 == 0x81 && vs[1] == 0x40 ) {	// 全角スペースを半角スペースに変換する
-			*type = TK_CODE;
-			vs+=2;
-			if (wrtbuf!=NULL) {
-				wrtbuf->Put( (char)0x20 );
+		if (pp_utf8) {
+			if (a1 == 0xe3 && vs[1] == 0x80 && vs[2] == 0x80) {	// 全角スペースを半角スペースに変換する(UTF8)
+				*type = TK_CODE;
+				vs += 3;
+				if (wrtbuf != NULL) {
+					wrtbuf->Put((char)0x20);
+				}
+				return (char*)vs;
 			}
-			return (char *)vs;
+		}
+		else {
+			if (a1 == 0x81 && vs[1] == 0x40) {	// 全角スペースを半角スペースに変換する(SJIS)
+				*type = TK_CODE;
+				vs += 2;
+				if (wrtbuf != NULL) {
+					wrtbuf->Put((char)0x20);
+				}
+				return (char*)vs;
+			}
 		}
 	}
 #endif
@@ -1337,16 +1613,18 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 		case LAB_TYPE_PPVAL:
 			{
 			//		constマクロ展開
+			GenerateLabelListAndTagRefPP(fixname, LABBUF_FLAG_MACRO);
 			char *ptr_dval;
 			ptr_dval = lb->GetData2( id );
 			if ( ptr_dval == NULL ) {
-				sprintf( cnvstr, "%d", lb->GetOpt(id) );
+				sprintf(cnvstr, "%d", lb->GetOpt(id));
 			} else {
-				sprintf( cnvstr, "%f", *(CALCVAR *)ptr_dval );
+				sprintf(cnvstr, "%.16f", *(CALCVAR*)ptr_dval);
 			}
 			chk = ReplaceLineBuf( str, (char *)vs, cnvstr, 0, NULL );
 			break;
 			}
+
 		case LAB_TYPE_PPINTMAC:
 			//		内部マクロ
 			//
@@ -1376,6 +1654,9 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 			//	
 			macptr = lb->GetData(id);
 			if ( macptr == NULL ) { *cnvstr=0; macptr=cnvstr; }
+			if (ltype == LAB_TYPE_PPMAC) {
+				GenerateLabelListAndTagRefPP(fixname, LABBUF_FLAG_MACRO);
+			}
 			chk = ReplaceLineBuf( str, (char *)vs, macptr, opt, (MACDEF *)lb->GetData2(id) );
 			break;
 		case LAB_TYPE_PPDLLFUNC:
@@ -1511,9 +1792,6 @@ char *CToken::SendLineBuf( char *str )
 }
 
 
-#define IS_CHAR_HEAD(str, pos) \
-	is_sjis_char_head((unsigned char *)(str), (int)((pos) - (unsigned char *)(str)))
-
 char *CToken::SendLineBufPP( char *str, int *lines )
 {
 	//		１行分のデータをlinebufに転送
@@ -1523,6 +1801,7 @@ char *CToken::SendLineBufPP( char *str, int *lines )
 	unsigned char *w;
 	unsigned char a1,a2;
 	int ln;
+	int i,skip;
 	p = (unsigned char *)str;
 	w = (unsigned char *)linebuf;
 	a2 = 0; ln =0;
@@ -1530,13 +1809,13 @@ char *CToken::SendLineBufPP( char *str, int *lines )
 		a1 = *p;if ( a1==0 ) break;
 		p++;
 		if ( a1 == 10 ) {
-			if ( a2==0x5c && IS_CHAR_HEAD(str, p - 2) ) {
+			if ( a2==0x5c ) {
 				ln++; w--; a2=0; continue;
 			}
 			break;
 		}
 		if ( a1 == 13 ) {
-			if ( a2==0x5c && IS_CHAR_HEAD(str, p - 2) ) {
+			if ( a2==0x5c ) {
 				if ( *p==10 ) p++;
 				ln++; w--; a2=0; continue;
 			}
@@ -1544,13 +1823,21 @@ char *CToken::SendLineBufPP( char *str, int *lines )
 			break;
 		}
 		*w++=a1; a2=a1;
+		//	skip multibyte
+		skip = SkipMultiByte(a1);
+		if (skip > 0) {
+			for (i = 0; i < skip; i++) {
+				a1 = *p; if (a1 == 0) break;
+				p++;
+				*w++ = a1;
+			}
+			a2 = 0;
+		}
 	}
 	*w=0;
 	*lines = ln;
 	return (char *)p;
 }
-
-#undef IS_CHAR_HEAD
 
 
 char *CToken::ExpandStrComment2( char *str )
@@ -1876,37 +2163,109 @@ ppresult_t CToken::PP_SwitchReverse( void )
 }
 
 
-ppresult_t CToken::PP_Include( int is_addition )
+
+ppresult_t CToken::PP_IncludeSub(char* word, int is_addition)
 {
-	char *word = (char *)s3;
 	char tmp_spath[HSP_MAX_PATH];
 	int add_bak;
-	if ( GetToken() != TK_STRING ) {
-		if ( is_addition ) {
-			SetError("invalid addition suffix");
-		} else {
-			SetError("invalid include suffix");
-		}
-		return PPRESULT_ERROR;
-	}
+
 	incinf++;
-	if ( incinf > 32 ) {
+	if (incinf > 32) {
 		SetError("too many include level");
 		return PPRESULT_ERROR;
 	}
-	strcpy( tmp_spath, search_path );
-	if ( is_addition ) add_bak = SetAdditionMode( 1 );
-	int res = ExpandFile( wrtbuf, word, word );
-	if ( is_addition ) SetAdditionMode( add_bak );
-	strcpy( search_path, tmp_spath );
+	strcpy(tmp_spath, search_path);
+	if (is_addition) add_bak = SetAdditionMode(1);
+	int res = ExpandFile(wrtbuf, word, word);
+	if (is_addition) SetAdditionMode(add_bak);
+	strcpy(search_path, tmp_spath);
 	incinf--;
 	if (res) {
-		if ( is_addition && res == -1 ) return PPRESULT_SUCCESS;
+		if (is_addition && res == -1) return PPRESULT_SUCCESS;
 		return PPRESULT_ERROR;
 	}
 	return PPRESULT_INCLUDED;
 }
 
+
+ppresult_t CToken::PP_Include( int is_addition )
+{
+	char* word = (char*)s3;
+	int type = GetToken();
+	switch (type) {
+	case TK_STRING:
+		return PP_IncludeSub(word, is_addition);
+	case TK_OBJ:
+		strcat(word,".as");
+		return PP_IncludeSub(word, is_addition);
+	default:
+		break;
+	}
+
+	if (is_addition) {
+		SetError("invalid addition suffix");
+	}
+	else {
+		SetError("invalid include suffix");
+	}
+	return PPRESULT_ERROR;
+}
+
+
+ppresult_t CToken::PP_use(void)
+{
+	char strtmp[1024];
+	char* word = (char*)s3;
+	int i;
+	ppresult_t myres = PPRESULT_SUCCESS;
+	CMemBuf inclist;
+	CMemBuf *bak_wrtbuf;
+	CStrNote note;
+
+	while (1) {
+		i = GetToken();
+		switch (i) {
+		case TK_OBJ:
+			inclist.PutStr(word);
+			inclist.PutCR();
+			break;
+		default:
+			sprintf(strtmp, "invalid use suffix [%s]", word);
+			SetError(strtmp);
+			return PPRESULT_ERROR;
+		}
+		if (wp == NULL) break;
+
+		i = GetToken();
+		if (i == TK_NONE) break;
+		if (i != ',') {
+			SetError("invalid use syntax");
+			return PPRESULT_ERROR;
+		}
+	}
+	inclist.Put(0);
+
+	bak_wrtbuf = wrtbuf;
+
+	note.Select( inclist.GetBuffer() );
+	int max = note.GetMaxLine();
+	for (i = 0; i < max; i++) {
+		note.GetLine(strtmp, i);
+		strcat(strtmp, ".as");
+		ppresult_t res = PP_IncludeSub(strtmp, 1);
+		if (res == PPRESULT_SUCCESS) {
+			note.GetLine(strtmp, i);
+			strcat(strtmp, ".hsp");
+			res = PP_IncludeSub(strtmp, 1);
+		}
+		wrtbuf = bak_wrtbuf;
+		if ((res == PPRESULT_ERROR)||(res == PPRESULT_SUCCESS)) {
+			return PPRESULT_ERROR;
+		}
+		myres = PPRESULT_INCLUDED;
+	}
+	return myres;
+}
 
 ppresult_t CToken::PP_Const( void )
 {
@@ -1955,6 +2314,7 @@ ppresult_t CToken::PP_Const( void )
 		SetErrorSymbolOverdefined(keyword, res);
 		return PPRESULT_ERROR;
 	}
+	GenerateLabelListAndTagPP(keyword, LABBUF_FLAG_MACRO);
 
 	if ( Calc(cres) ) return PPRESULT_ERROR;
 
@@ -2029,6 +2389,7 @@ ppresult_t CToken::PP_Enum( void )
 		SetErrorSymbolOverdefined(keyword, res);
 		return PPRESULT_ERROR;
 	}
+	GenerateLabelListAndTagPP(keyword, LABBUF_FLAG_MACRO);
 
 	if ( GetToken() == '=' ) {
 		if ( Calc( cres ) ) return PPRESULT_ERROR;
@@ -2039,6 +2400,53 @@ ppresult_t CToken::PP_Enum( void )
 	if ( glmode ) lb->SetEternal( id );
 	return PPRESULT_SUCCESS;
 }
+
+
+ppresult_t CToken::PP_VarFix(char* rootword)
+{
+	//		#var解析
+	//
+	int i,prm;
+	int glmode;
+	char* word;
+	word = (char*)s3;
+
+	wrtbuf->PutStrf("#%s ", rootword);
+	prm = 0;
+	glmode = 0;
+
+	while (1) {
+		i = GetToken();
+		if (i != TK_OBJ) { SetError("invalid variable name"); return PPRESULT_ERROR; }
+		strcase(word);
+		if (prm == 0) {
+			if (tstrcmp(word, "global")) {		// global macro
+				glmode = 1;
+				i = GetToken();
+				if (wp == NULL) break;
+				if (i != TK_OBJ) { SetError("invalid variable name"); return PPRESULT_ERROR; }
+				strcase(word);
+			}
+		}
+		if (glmode) FixModuleName(word); else AddModuleName(word);
+		if (prm>0) wrtbuf->PutStrf(",");
+		wrtbuf->PutStrf(word);
+
+		if (wp == NULL) break;
+
+		i = GetToken();
+		if (i == TK_NONE) break;
+		if (i != ',') {
+			SetError("invalid variable syntax");
+			return PPRESULT_ERROR;
+		}
+		prm++;
+	}
+
+	wrtbuf->PutCR();
+	return PPRESULT_WROTE_LINE;
+}
+
 
 
 /*
@@ -2152,7 +2560,8 @@ ppresult_t CToken::PP_Define( void )
 		SetErrorSymbolOverdefined(keyword, res);
 		return PPRESULT_ERROR;
 	}
-	
+	GenerateLabelListAndTagPP(keyword, LABBUF_FLAG_MACRO);
+
 	//		skip space,tab code
 	if ( wp==NULL ) a1=0;
 	else {
@@ -2346,7 +2755,7 @@ ppresult_t CToken::PP_Defcfunc( int mode )
 	}
 
 	if ( id == -1 ) {
-		id = lb->Regist( fixname, premode, 0 );
+		id = lb->Regist( fixname, premode, 0, pp_orgfilefull, pp_orgline);
 		if ( glmode == 0 ) lb->SetEternal( id );
 		if ( *mod != 0 ) { lb->AddRelation( mod, id ); }		// モジュールラベルに依存を追加
 	} else {
@@ -2455,7 +2864,7 @@ ppresult_t CToken::PP_Deffunc( int mode )
 		}
 
 		if ( id == -1 ) {
-			id = lb->Regist( fixname, premode, 0 );
+			id = lb->Regist( fixname, premode, 0, pp_orgfilefull, pp_orgline);
 			if ( glmode == 0 ) lb->SetEternal( id );
 			if ( *mod != 0 ) { lb->AddRelation( mod, id ); }		// モジュールラベルに依存を追加
 		} else {
@@ -2844,7 +3253,12 @@ ppresult_t CToken::PP_Pack( int mode )
 		if ( i != TK_STRING ) {
 			SetError("invalid pack name"); return PPRESULT_ERROR;
 		}
-		AddPackfile( (char *)s3, mode );
+		if (mode & 2) {
+			AddPackfile((char*)s3, mode&1);
+		}
+		else {
+			AddPackfileOrig((char*)s3, mode);
+		}
 	}
 	return PPRESULT_SUCCESS;
 }
@@ -3198,13 +3612,10 @@ ppresult_t CToken::Preprocess( char *str )
 			res = PP_Enum();
 			return res;
 		}
-		/*
-			if (tstrcmp(word,"define")) {		// keyword define
-				res = PP_Define();
-				if ( res==6 ) SetError("bad macro parameter expression");
-				return res;
-			}
-		*/
+		if (tstrcmp(word, "use")) {			// multiple include
+			res = PP_use();
+			return res;
+		}
 		if (tstrcmp(word, "module")) {		// module define
 			res = PP_Module();
 			return res;
@@ -3253,12 +3664,6 @@ ppresult_t CToken::Preprocess( char *str )
 			res = PP_Cmd("cmd");
 			return res;
 		}
-		/*
-			if (tstrcmp(word,"func2")) {		// DLL function (2)
-				res = PP_Func( "func2" );
-				return res;
-			}
-		*/
 		if (tstrcmp(word, "comfunc")) {		// COM Object function
 			res = PP_Func("comfunc");
 			return res;
@@ -3279,8 +3684,16 @@ ppresult_t CToken::Preprocess( char *str )
 			res = PP_Pack(0);
 			return res;
 		}
-		if (tstrcmp(word, "epack")) {		// packfile process
+		if (tstrcmp(word, "epack")) {			// packfile process
 			res = PP_Pack(1);
+			return res;
+		}
+		if (tstrcmp(word, "packdir")) {			// packfile process
+			res = PP_Pack(2);
+			return res;
+		}
+		if (tstrcmp(word, "epackdir")) {		// packfile process
+			res = PP_Pack(3);
 			return res;
 		}
 		if (tstrcmp(word, "packopt")) {		// packfile process
@@ -3301,6 +3714,30 @@ ppresult_t CToken::Preprocess( char *str )
 		}
 		if (tstrcmp(word, "usecom")) {		// COM definition
 			res = PP_Usecom();
+			return res;
+		}
+		if (tstrcmp(word, "var")) {			// VAR definition
+			res = PP_VarFix(word);
+			return res;
+		}
+		if (tstrcmp(word, "varint")) {		// VAR definition
+			res = PP_VarFix(word);
+			return res;
+		}
+		if (tstrcmp(word, "varlabel")) {	// VAR definition
+			res = PP_VarFix(word);
+			return res;
+		}
+		if (tstrcmp(word, "varstr")) {		// VAR definition
+			res = PP_VarFix(word);
+			return res;
+		}
+		if (tstrcmp(word, "vardouble")) {	// VAR definition
+			res = PP_VarFix(word);
+			return res;
+		}
+		if (tstrcmp(word, "varmod")) {		// VAR definition
+			res = PP_VarFix(word);
 			return res;
 		}
 	}
@@ -3375,8 +3812,38 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 	*errtmp = 0;
 	unsigned char a1;
 
+	a1 = *(unsigned char*)p;
+	if (a1 == 0xef) {		// BOMをチェック
+		a1 = (unsigned char)p[1];
+		if (a1 == 0xbb) {
+			a1 = (unsigned char)p[2];
+			if (a1 == 0xbf) {
+				if (pp_utf8 == 0) {
+#ifdef JPNMSG
+					Mesf("#ファイルに予期しない BOM があります [%s]", refname);
+#else
+					Mesf("#Unexpected BOM in file.[%s]", refname);
+#endif
+				}
+				p += 3;
+			}
+		}
+	}
+
 	while(1) {
 		RegistExtMacro( "__line__", pline );			// 行番号マクロを更新
+		pp_orgline = pline;
+
+		if (cg_labout_line == pline) {					// 解析用のラインか?
+			if (strcmp(cg_labout_orgfile, refname) == 0) {
+				//	解析ラインの状態を保存する
+				//Alertf( "#Module %s in file[%s] line %d.", modname, refname, pline );
+				strcpy(cg_labout_modname, modname);
+				if (hed_cmpmode & CMPMODE_CASE) {			// 将来のため
+					cg_labout_caseflag = 1;
+				}
+			}
+		}
 
 		while(1) {
 			a1 = *(unsigned char *)p;
@@ -3455,8 +3922,9 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 			if ( res == PPRESULT_INCLUDED ) {			// include後の処理
 				pline += 1+mline;
 
-				char *fname_literal = to_hsp_string_literal( refname );
+				char *fname_literal = to_hsp_string_literal( refname, true );
 				RegistExtMacro( "__file__", fname_literal );			// ファイル名マクロを更新
+				strcpy(pp_orgfile, refname);
 
 				wrtbuf = buf;
 				wrtbuf->PutStrf( "##%d %s\r\n", pline-1, fname_literal );
@@ -3501,18 +3969,33 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 	char purename[HSP_MAX_PATH];
 	char foldername[HSP_MAX_PATH];
 	char refname_copy[HSP_MAX_PATH];
+	char vaild_file[HSP_MAX_PATH];
+
+	char org_filename[HSP_MAX_PATH];
+	char org_filenamefull[HSP_MAX_PATH];
+	char org_fileline;
+
 	CMemBuf fbuf;
+
+	//	元の情報を保存する
+	strcpy(org_filename, pp_orgfile);
+	strcpy(org_filenamefull, pp_orgfilefull);
+	org_fileline = pp_orgline;
 
 	getpath( fname, purename, 8 );
 	getpath( fname, foldername, 32 );
 	if ( *foldername != 0 ) strcpy( search_path, foldername );
 
+	strcpy(vaild_file, refname);
 	if ( fbuf.PutFile( fname ) < 0 ) {
 		strcpy( cname, common_path );strcat( cname, purename );
+		strcpy(vaild_file, common_path); strcat(vaild_file, refname);
 		if ( fbuf.PutFile( cname ) < 0 ) {
 			strcpy( cname, search_path );strcat( cname, purename );
+			strcpy(vaild_file, search_path); strcat(vaild_file, refname);
 			if ( fbuf.PutFile( cname ) < 0 ) {
-				strcpy( cname, common_path );strcat( cname, search_path );strcat( cname, purename );
+				strcpy(cname, common_path); strcat(cname, search_path); strcat(cname, purename);
+				strcpy(vaild_file, common_path); strcat(vaild_file, search_path); strcat(vaild_file, refname);
 				if ( fbuf.PutFile( cname ) < 0 ) {
 					if ( fileadd == 0 ) {
 #ifdef JPNMSG
@@ -3527,19 +4010,27 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 		}
 	}
 	fbuf.Put( (char)0 );
+	strcpy(pp_orgfilefull, vaild_file);
 
 	if ( fileadd ) {
 		Mesf( "#Use file [%s]",purename );
 	}
 
-	char *fname_literal = to_hsp_string_literal( refname );
+	char *fname_literal = to_hsp_string_literal( refname, true );
 	RegistExtMacro( "__file__", fname_literal );			// ファイル名マクロを更新
+	strcpy(pp_orgfile, refname);
 
+	fname_literal = to_hsp_string_literal( pp_orgfilefull, true );
 	buf->PutStrf( "##0 %s\r\n", fname_literal );
 	free( fname_literal );
 
 	strcpy2( refname_copy, refname, sizeof refname_copy );
 	res = ExpandLine( buf, &fbuf, refname_copy );
+
+	//	元の情報に復帰させる
+	strcpy(pp_orgfile, org_filename );
+	strcpy(pp_orgfilefull, org_filenamefull );
+	pp_orgline = org_fileline;
 
 	if ( res == 0 ) {
 		//		プリプロセス後チェック
@@ -3725,12 +4216,20 @@ int CToken::RegistExtMacro( char *keyword, int val )
 }
 
 
-int CToken::LabelDump( CMemBuf *out, int option )
+int CToken::LabelDump(CMemBuf* out, int option, char *match)
 {
 	//		登録されているラベル情報をerrbufに展開
 	//
-	lb->DumpHSPLabel( linebuf, option, LINEBUF_MAX - 256 );
-	out->PutStr( linebuf );
+	int a,max;
+	max = lb->GetCount();
+	for (a = 0; a < max; a++) {
+		lb->DumpHSPLabelById(a, linebuf, option);
+		if (match) {
+			//	matchが含まれていない場合は無視する
+			if (strstr2(linebuf, match) == NULL) *linebuf = 0;
+		}
+		if (*linebuf!=0) out->PutStr(linebuf);
+	}
 	return 0;
 }
 
@@ -3858,6 +4357,13 @@ char *CToken::ExecSCNV( char *srcbuf, int opt )
 		strcpy( scnvbuf, srcbuf );
 #endif
 		break;
+	case SCNV_OPT_UTF8SJIS:
+#ifdef HSPWIN
+		ConvUtf82SJis(srcbuf, scnvbuf, scnvsize);
+#else
+		strcpy(scnvbuf, srcbuf);
+#endif
+		break;
 	default:
 		*scnvbuf = 0;
 		break;
@@ -3915,5 +4421,200 @@ int CToken::SkipMultiByte( unsigned char byte )
 		return CheckByteUTF8( byte );
 	}
 	return CheckByteSJIS( byte );
+}
+
+
+int CToken::ConvSJis2Utf8(char* pSource, char* pDist, int buffersize)
+{
+	int size = 0;
+	if (pDist == NULL) return -1;
+
+#ifdef HSPWIN
+	//ShiftJISからUTF-16へ変換
+	const int nSize = ::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, NULL, 0);
+
+	BYTE* buffUtf16 = new BYTE[nSize * 2 + 2];
+	::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, (LPWSTR)buffUtf16, nSize);
+
+	//UTF-16からUTF-8へ変換
+	size = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16, -1, NULL, 0, NULL, NULL);
+	size *= 2;
+	if (size > buffersize) size = buffersize;
+	ZeroMemory(pDist, size);
+	::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16, -1, (LPSTR)pDist, size, NULL, NULL);
+
+	size = lstrlen((char*)pDist) + 1;
+
+	delete [] buffUtf16;
+#endif
+	return size;
+}
+
+
+int CToken::ConvUtf82SJis(char* pSource, char* pDist, int buffersize)
+{
+	int size = 0;
+
+#ifdef HSPWIN
+
+	// サイズを計算する
+	int iLenUnicode = ::MultiByteToWideChar(CP_UTF8, 0, pSource, strlen(pSource) + 1, NULL, 0);
+	BYTE* buffUtf16 = new BYTE[iLenUnicode * 2 + 2];
+
+	::MultiByteToWideChar(CP_UTF8, 0, pSource, strlen(pSource) + 1, (LPWSTR)buffUtf16, iLenUnicode);
+
+	size = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)buffUtf16, iLenUnicode, NULL, 0, NULL, NULL);
+	if (size > buffersize) size = buffersize;
+	::WideCharToMultiByte(CP_ACP, 0,
+				(LPCWSTR)buffUtf16, iLenUnicode,
+				pDist, size,
+				NULL, NULL);
+
+	delete [] buffUtf16;
+	pDist[size] = 0;
+#endif
+	return size;
+}
+
+
+char* CToken::to_hsp_string_literal(const char* src, bool filename) {
+	//		文字列をHSPの文字列リテラル形式に
+	//		戻り値のメモリは呼び出し側がfreeする必要がある。
+	//		HSPの文字列リテラルで表せない文字は
+	//		そのまま出力されるので注意。（'\n'など）
+	//		ファイル名の場合はSJISと仮定して処理する(Winのみ)
+	//
+	int skip;
+	char* utftmp;
+	size_t length = 2;
+
+	utftmp = (char *)src;
+#ifdef HSPWIN
+	if (filename) {
+		if (pp_utf8) {			// 入力がUTF8でファイル名の場合は変換する
+			int len = strlen(src) * 4 + 1;
+			utftmp = (char*)malloc(len);
+			ConvSJis2Utf8((char*)src, utftmp, len);
+		}
+	}
+#endif
+	const unsigned char* s = (unsigned char*)utftmp;
+	while (1) {
+		unsigned char c = *s;
+		if (c == '\0') break;
+		switch (c) {
+		case '\r':
+			if (*(s + 1) == '\n') {
+				s++;
+			}
+			// FALL THROUGH
+		case '\t':
+		case '"':
+		case '\\':
+			length += 2;
+			break;
+		default:
+			length++;
+			skip = SkipMultiByte(c);
+			s += skip;
+			length+=skip;
+			break;
+		}
+		s++;
+	}
+	char* dest = (char*)malloc(length + 1);
+	if (dest == NULL) return dest;
+
+	s = (unsigned char*)utftmp;
+	unsigned char* d = (unsigned char*)dest;
+	*d++ = '"';
+	while (1) {
+		unsigned char c = *s;
+		if (c == '\0') break;
+		switch (c) {
+		case '\t':
+			*d++ = '\\';
+			*d++ = 't';
+			break;
+		case '\r':
+			*d++ = '\\';
+			if (*(s + 1) == '\n') {
+				*d++ = 'n';
+				s++;
+			}
+			else {
+				*d++ = 'r';
+			}
+			break;
+		case '"':
+			*d++ = '\\';
+			*d++ = '"';
+			break;
+		case '\\':
+			*d++ = '\\';
+			*d++ = '\\';
+			break;
+		default:
+			skip = SkipMultiByte(c);
+			*d++ = c;
+			while (skip>0) {
+				s++;
+				*d++ = *s;
+				skip--;
+			}
+		}
+		s++;
+	}
+	*d++ = '"';
+	*d = '\0';
+#ifdef HSPWIN
+	if (filename) {
+		if (pp_utf8) {
+			free(utftmp);
+		}
+	}
+#endif
+	return dest;
+}
+
+int CToken::atoi_allow_overflow(const char* s)
+{
+	//		オーバーフローチェックをしないatoi
+	//
+	int result = 0;
+	while (isdigit(*s)) {
+		result = result * 10 + (*s - '0');
+		s++;
+	}
+	return result;
+}
+
+
+void CToken::GenerateLabelListAndTagPP(char *name, int flag)
+{
+	if (labbuf == NULL) return;
+	GenerateLabelTag(name, flag, 0, pp_orgfilefull, pp_orgline);
+}
+
+
+void CToken::GenerateLabelListAndTagRefPP(char* name, int flag)
+{
+	if (labbuf == NULL) return;
+	if ((cg_labout_mode & LABLIST_MODE_REFERENCE) == 0) return;
+	GenerateLabelTag(name, flag| LABBUF_FLAG_REFER, 0, pp_orgfilefull, pp_orgline);
+}
+
+
+char* CToken::GetLabelListLineModule(void)
+{
+	if (labbuf == NULL) return "";
+	return cg_labout_modname;
+}
+
+
+int CToken::GetLabelListLineCaseFlag(void)
+{
+	if (labbuf == NULL) return 0;
+	return cg_labout_caseflag;
 }
 

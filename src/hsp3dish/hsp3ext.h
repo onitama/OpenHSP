@@ -10,11 +10,11 @@
 #endif
 
 #ifdef HSPIOS
-#include "ios/hsp3ext_ios.h"
+#include "../hsp3/ios/hsp3ext_ios.h"
 #endif
 
 #ifdef HSPNDK
-#include "ndk/hsp3ext_ndk.h"
+#include "../hsp3/ndk/hsp3ext_ndk.h"
 #endif
 
 #ifdef HSPLINUX

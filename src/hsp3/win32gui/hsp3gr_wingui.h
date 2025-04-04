@@ -13,5 +13,6 @@ void hsp3gui_mref( PVal *pval, int prm );
 void hsp3gr_nextobj( void );
 
 void hsp3gr_dbg_gui( void );
+void hsp3gr_cleanup( void );
 
 #endif

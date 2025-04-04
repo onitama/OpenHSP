@@ -1,9 +1,259 @@
 ------------------------------------------------------------------------------
-Hot Soup Processor ver3.6                           HSP : Hot Soup Processor  
-更新履歴                              copyright 1997-2021 (c) onion software  
+Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor  
+更新履歴                              copyright 1997-2025 (c) onion software  
 ------------------------------------------------------------------------------
 
 ・hsp3関連 更新履歴
+
+	2025/03/13 3.7 beta10a
+
+	コンパイル時にプラットフォームマクロ(_hspwin、_hsplinux)が定義されるように修正
+	[hspinet] jsonオブジェクトで実数を扱うためのjsonsetprmd,jsongetd,jsonputd命令を追加
+	[hspinet] jsonオブジェクトで配列を扱うためのjsongetarrayobj,jsongetarrayobjbyname命令を追加
+	[HSP3Dish] linux,iOS,android,js(WebGL)でviewcalc命令のvptype_translateが正しく設定されない不具合を修正
+	[HSP3Dish] httploadでエラーが発生した際に以降のリクエストができなくなる不具合を修正
+	[HSP3Dish][hsp3js] 大きいフォントが描画されない不具合に対応(zakki)
+	[HSP3Dish][android] β10版のhsp3dhでSDKダウンロードが正しくできなかった不具合を修正
+
+	2025/02/14 3.7 beta10
+
+	Windows上での終了時、WM_DESTROYメッセージを処理できるように修正
+	exist命令で253文字以上のファイル名を指定した場合にアプリが落ちることがある不具合を修正
+	OBAQなどの外部拡張命令実行時にエラー10(サブルーチン外のreturn)が出ることがある不具合を修正
+	スクリプトエディタの予約キーワードに#aht, #ahtmes, #epackdir, #packdirを追加
+	スクリプトエディタの「定義へ移動」などのソース解析が新規ファイルでエラーになる不具合を修正
+	「定義へ移動」「すべての定義を参照」機能でモジュール内の命令や関数が検索できない不具合を修正
+	最適化により削除されるモジュール内でソース解析が正しく動作しない不具合を修正
+	スクリプトエディタのソース解析中にエラーが発生した際にダイアログを出すように修正
+	mod_tamakeisdモジュールのsdchr_puticonのX,Y調整位置が反映されない不具合を修正
+	hspoggプラグインのoggファイル再生時の末端にノイズが発生する不具合を修正
+	[HGIMG4] 最初にタッチした際のマルチタッチ情報が-1になっていなかった不具合を修正
+	[HGIMG4] gpclone命令でモデル形状の物理設定されたオブジェクト座標がリセットされない不具合を修正
+	[hspinet] SetNkfOption、NkfConvert等のNKF内蔵APIが使用できなかった不具合を修正
+	[HSP3Dish] スプライトのライフ値とパワー値を管理するes_setlife命令を追加
+	[HSP3Dish] es_check命令の検索オプションを追加
+	[HSP3Dish] objinfo関数で取得できる項目が標準HSP3と異なっていたものを修正
+	[HSP3Dish] linux,iOS,android,js(WebGL)でgettime(7)の値が1/10になっていた不具合を修正
+	[HSP3Dish][hsp3js] 加速度(ginfo_accel*)、ジャイロセンサー値(ginfo_gyro*)の取得に対応
+	[HSP3Dish][hsp3js] HGIMG4の表示解像度(ENV.HSP_SX,SY)変更に仮対応
+	[HSP3Dish][hsp3js] HGIMG4のオフスクリーンバッファへの描画に対応(zakki)
+	[HSP3Dish][hsp3js] フォント描画の高速化に対応(zakki)
+	[HSP3Dish][hsp3js] wpoke,wpeek,lpoke,lpeekの処理がインデックス値によりWindowsと異なる不具合を修正
+	[HSP3Dish][android] APIレベル35、Gradleバージョン8.6、NDKバージョン26にアップデート
+	[HSP3Dish][android] HGIMG4でAssetフォルダ内のgpbファイルが正しく読み込まれない不具合を修正
+	[HSP3Dish][dotfw] df_updateでUPDATE_PAUSEオプションが正しく動作しない不具合を修正
+	[HSP3Dish][dotfw] 敵の動作設定を行うdf_enemyconf命令を追加
+	[HSP3Dish][dotfw] df_getbgpointで得られる座標値が大きくなっている不具合を修正
+	[HSP3Dish][Windows] ginfo関数で割り込みIDを取得するginfo_intidの値が正しくない不具合を修正
+	[HSP3Dish] 標準スプライトで近くにあるオブジェクトを検索するes_nearobj命令を追加
+
+	2024/07/18 3.7 beta9
+
+	起動から596時間経過したPC上のawait命令で停止を続けることがある不具合を修正
+	全角のファイル名を持つUTF8のスクリプトで__FILE__マクロが文字化けする不具合を修正
+	UTF8ランタイムのデバッグウインドウで全角の変数名が文字化けする不具合を修正
+	「定義へ移動」「すべての定義を参照」機能で大文字を含むキーワードが検索できない不具合を修正
+	「定義へ移動」「すべての定義を参照」機能でモジュール内のキーワードが検索できない不具合を修正
+	ファイルパックされているファイルが異なるフォルダを指定してもexist命令で参照されてしまう不具合を修正
+	[HGIMG3][HGIMG4] getcoli命令で検出するオブジェクトIDの範囲を設定するためのパラメーターを追加
+	[HGIMG3][HGIMG4] fvdir命令で取得されるベクトルの計算タイプを指定するオプションを追加
+	[HGIMG4] gppraytest命令に対象となるコリジョングループを指定するオプションを追加
+	[HGIMG4] 物理設定されたオブジェクト移動後の衝突テストを行うgppsweeptest命令を追加
+	[HGIMG4] 最も近くにあるオブジェクトを検索するgetnearobj命令を追加
+	[HGIMG4] gppapply命令に対象となる座標を指定するオプションを追加
+	[HSP3Dish] es_ini命令にマップ最大数の初期化オプションを追加
+	[HSP3Dish] 標準スプライトの描画とクリッピングに関するオプションを設定するes_spropt命令を追加
+	[HSP3Dish] 標準スプライトによる疑似3D表示サンプルを追加
+	[HSP3Dish][dotfw] df_bgscroll命令で背景を斜めにスクロールした際に一部表示されなくなる不具合を修正
+	[HSP3Dish][hsp3js] hsp3js変換時にdataフォルダ内のファイルを正しく認識しない不具合を修正
+	[HSP3Dish][android] hsp3dhでandroid新規プロジェクト作成にフルスクリーン設定を追加
+	[HSP3Dish][android] β8版でhsp3dhビルド後の自動起動が正しく行われなかった不具合を修正
+	[HSP3Dish][Windows] qmat3命令で指定される半透明レートが256以上の際に不透明にならない不具合を修正
+	[HSP3Dish][Windows] gsel命令によるウインドウの非表示/アクティブ化に対応
+	HSP3 MakeUpdateツールのType選択値を最新のアップデーターと同期
+	button gosub命令のコールバック実行時にend命令をすり抜けることがある不具合を修正
+	サンプルスクリプトのフォルダを整理、sample/analyzeフォルダを追加
+	Dish P HelperツールをVer3.1に更新(しまくろねこ)
+
+	2024/02/21 3.7 beta8
+
+	HSP3機能の更新をサポートするHSP3Update(hsp3upd.exe)を同梱
+	#var,#varint,#vardouble,#varstr等で指定される変数がモジュール名に対応していなかった不具合を修正
+	スクリプトエディタの検索置換で終了ダイアログが複数表示される不具合を修正(inovia)
+	スクリプトエディタのファイル選択ダイアログでファイル作成の確認が出ないように修正(inovia)
+	β7版でスクリプトエディタから実行ファイルのアイコン書き換えが無効だった不具合を修正
+	oncmd命令による割り込みのON/OFFをメッセージIDごとに指定できるように修正
+	珠音ちゃん・プロ生ちゃん SD 上半身コラボ素材を更新
+	ZLibWrap.dllプラグインに格納ファイル一覧を取得するzipextractlist命令を追加
+	[hspcmp] #useプリプロセッサ命令で検索されるスクリプトファイルの拡張子を、.as、.hspの2種類に修正
+	[HGIMG4] gpnodeinfo命令で複数のマテリアル情報取得ができない不具合を修正
+	[HGIMG4] gpmatprmf命令のfilter設定でエラーダイアログが表示されることがある不具合を修正
+	[HGIMG4] 頂点カラー(VERTEX_COLOR)テクスチャなしのモデルが光源計算時消えることがある不具合を修正
+	[HGIMG4] getobjcoli命令に3Dモデルの外周を囲むバウンディングスフィアのサイズを取得するオプションを追加
+	[HSP3Dish][android] ターゲットAPIを34に変更、AGPバージョンを8.2に更新
+	[HSP3Dish][android] AdMobのインタースティシャル広告の再表示に対応
+	[HSP3Dish][android] hsp3dhでManifest、HSPActivityフォルダを開くボタンを追加
+	[HSP3Dish][android] hsp3dhでリリース時のキーファイル(keystore)生成時にpemファイルも出力するように修正
+	[HSP3Dish][android] サウンドデータのロードが終わるまで待つ処理を追加(inovia)
+	[HSP3Dish][android] mmload でロードしたファイルが適切に解放されない不具合を修正(inovia)
+	[HSP3Dish][Windows] sysinfoで取得されるバージョンを標準ランタイムと合わせるためマニフェストファイルを更新
+	[HSP3Dish] es_fade命令のESSPF_EFADE,ESSPF_EFADE2で完全な透明にならない不具合を修正
+	[HSP3Dish] 無効なスプライトに対してes_fade,es_apos,es_adir命令が実行できてしまう不具合を修正
+
+	2023/10/25 3.7 beta7
+
+	VOICEVOX COREによる音声合成をサポートするhspvoicevoxプラグインを追加
+	#packopt nameで指定されたファイル名に大文字を含めることができるように修正
+	スクリプトエディタのコンテキストメニューに「定義へ移動」「すべての参照を検索」を追加
+	スクリプトエディタのラベル一覧表示をアウトライン解析を使用する形に修正
+	hsp3utf,hsp3_64ランタイム起動時にマルチバイト文字のパスが正しく認識されない不具合を修正
+	変数の代入時にデバッグログを出力するためのlogmesv,logmesva命令を追加
+	追加のスクリプトファイルを簡易指定するためのプリプロセッサ命令、#useを追加
+	変数の宣言を行うためのプリプロセッサ命令、#varを追加
+	変数の型固定・値固定を設定するためのvarprop命令を追加
+	変数型の変更を禁止する#varint,#vardouble,#varstr等のプリプロセッサ命令を追加
+	変数の宣言と初期化の機能を更新、strict.asモジュールを追加
+	mouse命令の設定オプション2を追加
+	width命令にウインドウ座標設定オプションを追加
+	Windowsのボリューム設定、音量レベルメーター取得のためのmod_mmaudio.asモジュールを追加
+	mod_vpad,mod_hsptvresモジュールを更新
+	珠音ドットフレームワークを更新、ジャンプアクション、バーチャルパッドに対応
+	珠音ちゃん・プロ生ちゃん SD 上半身コラボ素材を追加
+	マップエディタ(Tamamap)の更新
+	SQLeleプラグインに付属するsqlite3.dll をver3.43に更新(sprocket)
+	UTF8ソース変換時のメモリリークを修正
+	[hspcmp] UTF8で記述されたソースから出力文字コードを判別して出力する-jオプションを追加
+	[hspcmp] HSP3ソースの解析を行うオプションを追加、dllにも命令を追加
+	[hspcmp] UTF8で記述されたソースの全角スペースが正しくスキップされない不具合を修正
+	[hspcmp] UTF8で記述されたソースのBOMを認識できるように修正
+	[hspinet] ファイルやデータのSHA256ハッシュ値を取得するfilesha256、varsha256命令を追加
+	[HSP3Dish][Windows] ActiveXを除くCOMオブジェクトの動作をサポート
+	[HSP3Dish][Windows] devcontrol命令によるサウンドシステムのON/OFF制御を追加
+	[HSP3Dish][Windows] #packopt hideによる初期ウインドウの非表示に対応
+	[HGIMG4][Windows] Angle最新版の初期化時背景色が黒になるように修正
+
+	2023/07/26 3.7 beta6
+
+	hspoggプラグインのoggファイル再生時のメモリ使用量を抑制するように修正
+	packdir_make_listツールでdpmファイルが作成できなかった不具合を修正(しまくろねこ)
+	dish P Helperツールにテクスチャ補正のオプションを追加(しまくろねこ)
+	hsp3js変換時にresフォルダが空の場合でもres/shadersをパックするように修正
+	[HGIMG4] マテリアルのテクスチャ詳細設定を行うためのgpmatprmf命令を追加
+	[HSP3Dish] 標準スプライトのes_effect命令で指定する乗算色が有効になるように修正
+	[HSP3Dish] 標準スプライトの表示倍率を指定した時に表示が消えることがある不具合を修正
+	[HSP3Dish][Windows] マウスホイール値(mousew)が正しく取得されない不具合を修正
+	[HSP3Dish][Windows] デバイスロスト時の復帰処理中にシステムエラーが発生することがある不具合を修正
+	[HSP3Dish][Windows] circle命令で線による円が正しく描画されなかった不具合を修正
+	[HGIMG4] gpnodeinfo命令のGPNODEINFO_NODEオプションで得たIDでgetwork命令を使用することで親階層からのローカル座標を取得するように修正
+
+	2023/04/14 3.7 beta5
+
+	hspoggプラグインのメモリリークを修正
+	バーチャルパッドをサポートするmod_vpadモジュールを追加
+	DPM2ファイルパックのファイル形式を修正、β4までのdpmファイルとは互換性がありません
+	オブジェクトが配置されている画面を閉じる時に不正終了することがある不具合を修正
+	β4までの#pack/#epack命令の仕様をHSP3.6互換に戻し新規に#packdir/#epackdir命令を追加
+	β5の仕様に合わせてpack_make_listツールをpackdir_make_listツールに変更
+	シンプルなzipファイルの圧縮解凍をサポートするzipfile.asを追加
+	[HSP3Dish] input命令で複数の入力を配置した際にカーソル位置がずれることがある不具合を修正
+	[HSP3Dish] picload/celload命令実行後に画像サイズが正しく反映されないことがある不具合を修正
+	[HSP3Dish] 標準スプライトのBGマップ描画と当たり判定の機能を拡張、対応する命令を追加
+	[HSP3Dish][dotfw] 背景としてBGマップを設定できるように修正
+	[HSP3Dish][dotfw] 背景のスクロールが正しく動作しない不具合を修正
+	[HSP3Dish][dotfw] マップアクションサポートの命令セットを追加
+	[HSP3Dish][android] β4版でストレージ保存されたファイルがexist命令で認識されない不具合を修正
+	[HSP3Dish][Windows] プラグイン互換性を向上、hspoggプラグインの動作サポート
+	[HSP3Dish][Windows] スプライト描画時のUV座標計算を範囲外のドットが出ないように修正
+	[HSP3Dish][Windows] cls命令実行後にカーソル位置がリセットされる不具合を修正
+	[HSP3Dish][Windows] dialog命令によるコモンダイアログの呼び出しに対応(Windows版のみ)
+	[HSP3Dish][Windows] 解像度よりも大きなウインドウを作成した際にマウス座標が正しく反映されない不具合を修正
+	[HGIMG4] gpsetprmのPRMSET_USEGPMATでマテリアルを設定後に半透明描画されなくなる不具合を修正
+	[HGIMG4] gpnodeinfo命令でgpplateやgpfloorで作成されたオブジェクトのマテリアルが取得できない不具合を修正
+
+	2022/12/01 3.7 beta4
+
+	hspoggプラグインの.oggファイル再生をオンメモリに切り替えpackfileに対応
+	celload命令のパラメーターに既存の画像を再利用するオプションを追加
+	mmload命令でメモリストリームからの読み込みに失敗することがある不具合を修正
+	noteadd命令の引数でnotefind関数を使用した場合に書き込み内容が壊れる不具合を修正
+	mes/print命令による表示が1023文字で強制的に改行される不具合を修正
+	[HSP3Dish] mes/print命令の改行処理が標準ランタイムと異なる不具合を修正
+	[HSP3Dish] 使用するテクスチャの上限数が512までだった制限を撤廃
+	[HSP3Dish][hsp3js] 連続する空白を含む文字列表示の横幅がずれる不具合を修正(zakki)
+	[HSP3Dish][Windows] input命令で一部の記号入力が反映されなかった不具合を修正
+	[HSP3Dish][Windows] screen命令によるサイズ変更でウインドウの入力が反映されなくなる不具合を修正
+	[HSP3Dish][Windows] mes/print命令の空白に不要なピクセルが含まれる不具合を修正
+	[HGIMG4] クローンされたノードが半透明表示できなかった不具合を修正
+	[HGIMG4] ヘルプに記載されたgpsetprmon/gpsetprmoff命令が使用できなかった不具合を修正
+	[HGIMG4] event_pos命令の補間オプションでデフォルト値がHGIMG3と異なる(リニア)だった不具合を修正
+	[HGIMG4] gpdraw命令に物理オブジェクトのデバッグ表示を行うオプションを追加
+	[HGIMG4] gpnodeinfo命令にノードのマテリアル情報を取得するオプションを追加
+	[HGIMG4] resフォルダ以下のテクスチャ読み込みに失敗した場合カレントフォルダも参照するように修正
+	[HGIMG4] gpbconvツールのプレビュー機能を実装
+	[HGIMG4] gpbconvツールに別ファイルアニメーションの参照機能を追加
+	[HGIMG4] gameplay-encoderのUTF8ノード名を正しく表示するように修正
+	[HGIMG4] gameplay-encoderのマテリアル名補正オプション(-u)を追加
+	[HGIMG4] FBXから.gpbファイルの変換時に基本のブレンド設定を出力するように修正
+	[HGIMG4] FBXから.gpbファイルの変換時にマテリアルのDiffuse,Ambient色が黒の場合でも出力するように修正
+	[HGIMG4] setalpha命令の透明度が3Dモデルに正しく反映されない不具合を修正
+	[HGIMG4] gpmatprm16命令でマトリクスパラメーターが正しく設定されない不具合を修正
+	[HGIMG4] テクスチャのUVオフセット/リピート指定のためのgpmatprm2命令を追加
+	[HGIMG4] 任意のテクスチャマテリアルをシェーダーパラメーターとして設定するgpmatprmp命令を追加
+	[HGIMG4] マテリアル生成オプションにGPOBJ_MATOPT_UVOFFSET,GPOBJ_MATOPT_UVREPEATを追加
+	[HGIMG4] オフスクリーンのスプライト描画時のために解像度を再設定するes_screen命令を追加
+	[HGIMG4] setobjlight命令でライトが反映されないモデルがある不具合を修正
+	[HGIMG4] シェーダーソース(.frag/.vert)の先頭にある#versionディレクティブを維持するように修正
+	[HGIMG4][Windows] カレントフォルダ移動時にもシェーダーファイルが正しく参照されるように修正
+
+	2022/09/09 3.7 beta3
+
+	#packopt命令が編集中のソースにない時にアイコン埋め込みに失敗する不具合を修正
+	β2版で複数のdpmファイル読み込み時にファイルが正しく検索されない不具合を修正
+	[HSP3Dish][Windows] デバイスロストからの復帰時に画面クリアされない不具合を修正
+	β2版でbsave命令のオフセット指定が反映されていなかった不具合を修正
+	珠音ドットフレームワーク及び16ドットサイズ珠音素材を追加
+	[HGIMG4] 複数のオブジェクトに同一のイベントを適用した際に正しく動作しないことがある不具合を修正
+	[HGIMG4] screen命令使用時にテクスチャキャッシュがクリアされない不具合を修正
+
+	2022/06/02 3.7 beta2
+
+	HSPDAプラグインにバイナリデータ検索を行うbinmatch命令を追加
+	β1版でhsptvフォルダ参照の動作がHSP3.6と異なっていたのを修正
+	DPMファイル及びexe埋め込みファイルにフォルダ名と長いファイル名が使用できるように修正
+	#pack,#epack命令のファイル指定に'*'記号によるワイルドカードが使用できるように修正
+	button gosubによるボタン処理時にエラーが発生した際にウインドウが閉じる不具合を修正
+	コールバック先でonkey gotoの割り込みがかかった際にエラー43が出る不具合を修正
+	packoptリスト作成ツールを同梱、スクリプトエディタのメニューに追加
+	簡易的な麻雀の処理をまとめたmod_mahjongモジュールとサンプルを追加
+	[HSP3Dish] boxf命令の塗りつぶし範囲が標準ランタイムと異なる不具合を修正
+	[HSP3Dish][android] スタティックライブラリ導入によりHGIMG4のビルド時間を短縮
+	[HSP3Dish][Windows] デバイスロスト時にアプリが停止する不具合を修正
+	[HSP3Dish][Windows] celload命令により選択したフォントがリセットされる不具合を修正
+	[HSP3Dish][hsp3js] HSP3.7beta1でstick命令の入力が正しく動作しなかった不具合を修正
+	[HSP3Dish][hsp3js] ブラウザのローカルストレージに保存するIDBFSサポートを追加
+	[HSP3Dish] Dish P Helper 及び、Android/iOSアイコン作成ツールをパッケージに同梱
+	[HSP3Dish] mmload命令でwavファイルを同じIDに読み込む際にメモリリークが起こる不具合を修正
+	[HGIMG4] gpsetprm命令でマテリアルID書き換え時に反映されるように修正
+	[HGIMG4] get〜系の命令で指定された変数が配列の場合に要素が拡張されない不具合を修正
+	[HGIMG4] イベント内で複数のパラメーター変化を行った際にHGIMG3との差異が出る不具合を修正
+	[HGIMG4] OBJ_TIMERによるタイマーが正しく動作していなかった不具合を修正
+	[HGIMG4] 3Dモデルのclone時に正しくマテリアルがクローンされないことがある不具合を修正
+
+	2022/01/17 3.7 beta1
+
+	hspextプラグインのpipeexec、pipeget命令のオプションを追加
+	アルファチャンネルを含む.pngファイルの読み込み時にブレンドの誤差が起こる不具合を修正
+	hsp3cランタイムの運用を廃止、Peasエディタの同梱を廃止
+	HSPスクリプトエディタのレガシーメニューを廃止
+	hsedsdkでメモリリークとハンドルリークが起きる不具合を修正
+	UTF8ランタイム使用時のコンパイルに_hsputf8ラベルを定義するように修正
+	複数行文字列の終端がない場合に落ちることがあった不具合を修正
+	mod_joystick2モジュールでジョイスティック複数接続時のエラー処理を修正
+	モジュール型配列変数の要素1以降の書き込みでエラーになる不具合を修正
+	#constで定義されたdouble型実数値の有効桁数が少なかった不具合を修正
+	[HSP3Dish][android] HSP3Dish HelperのGradleビルドに対応
+	[HSP3Dish][android] 端末エミュレータ上で単色描画が正しく行われない不具合を修正
+	[HGIMG4] fbx->gpb変換時のマテリアル名修正オプションを追加
 
 	2021/08/10 3.6
 

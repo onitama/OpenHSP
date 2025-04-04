@@ -7,7 +7,8 @@
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
-#include <mmsystem.h>	// WIN32_LEAN_AND_MEAN
+#include <mmsystem.h>
+#include <string>
 #include "../hsp3code.h"
 
 //	Window Object Info
@@ -296,6 +297,7 @@ public:
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_matrix[16];				// Viewport matrix
 
+	std::string resname;				// Resource Name
 private:
 	void Blt( int mode, Bmscr *src, int xx, int yy, int asx, int asy );
 	void CnvRGB16( PTRIVERTEX target, DWORD src );
@@ -314,6 +316,8 @@ public:
 	HspWnd( void );
 	HspWnd( HANDLE instance, char *wndcls );
 	~HspWnd( void );
+	void Dispose(void);
+	void ClearAllObjects(void);
 	void MakeBmscr( int id, int type, int xx, int yy, int wx, int wy,
 	 int sx, int sy, int mode );
 	void MakeBmscrWnd( int id, int type, int xx, int yy, int wx, int wy,
@@ -327,7 +331,8 @@ public:
 	int GetBmscrMax( void ) { return bmscr_max; };
 	void SetEventNoticePtr( int *ptr );
 	void SetParentWindow( void *hwnd ) { wnd_parent = hwnd; };
-	int GetEmptyBufferId( void );
+	int GetEmptyBufferId(void);
+	int GetPreloadBufferId(char *fname);
 
 	//	Data
 	//
@@ -339,7 +344,6 @@ public:
 
 private:
 	void Reset( HANDLE instance, char *wndcls );
-	void Dispose( void );
 	void ExpandScreen( int idmax );
 
 	//	Data
@@ -442,6 +446,7 @@ typedef struct BMSCR
 	int		vp_flag;					// Viewport enable flag (0=none)
 	float	vp_matrix[16];				// Viewport matrix
 
+	std::string resname;				// Resource Name
 } BMSCR;
 
 void SetObjectEventNoticePtr( int *ptr );

@@ -1,0 +1,200 @@
+#use hsp3dish
+
+;
+;	疑似3D sprite sample 2
+;
+;	2Dスプライトを使った疑似3Dの表示を行うサンプルです
+;	疑似3Dの表示をモジュール化して雲を表示しています
+;	カーソルキーで上下左右、[A][D]キーでZ方向に移動します
+;	320×224画面を4倍のドットで表示しています
+;
+
+#const ZMUL 128			; 3D座標計算の基準値
+#const ZNEAR 30			; 一番手前のZ値
+#const ZFAR 320			; 一番奥のZ値
+#const ZSIZE 30			; スプライト基準サイズ
+
+#define G_SHIP (3)		; 画像を読み込むバッファID(自機)
+#define G_KUMO (4)		; 画像を読み込むバッファID(雲)
+#define CHR_SHIP (1)		; キャラクタNo.(自機)
+#define CHR_KUMO (2)		; キャラクタNo.(雲)
+
+	randomize
+	goto *start
+
+#deffunc set3dsprcam int _p1, int _p2, int _p3
+
+	;	3Dスプライトのカメラを設定
+	;	(_p1,_p2,_p3) X,Y,Z座標
+	;
+	camx=_p1:camy=_p2:camz=_p3
+	return
+
+#deffunc start3dspr
+
+	;	3Dスプライトの表示開始
+	;
+	_ent_3dspr=16
+	_totalobj=0
+	es_clear _ent_3dspr
+	return
+
+#deffunc put3dspr int _p1, int _p2, int _p3, int _p4, int _p5, int _p6
+
+	;	3Dスプライトを表示
+	;	(_p1,_p2,_p3) X,Y,Z座標
+	;	_p4 : CHR No.
+	;	_p5 : angle
+	;	_p6 : size
+	;
+	z=_p3-camz
+	if z<ZNEAR : return
+	if z>ZFAR : return
+	x=(_p1-camx)*ZMUL/z
+	px=_p6:if px<=0 : px=ZSIZE
+	px=px*ZMUL/z
+	y=(_p2-camy)*ZMUL/z
+
+	es_set _ent_3dspr, x,y, _p4,,ZFAR-z
+	es_setrot _ent_3dspr,_p5,px,px
+	es_flag _ent_3dspr,ESSPFLAG_NOWIPE,1
+
+	_ent_3dspr++
+	_totalobj++
+	return
+
+#const OBJ_MAX (256)		; ゲームオブジェクト最大数
+
+;	フラグ
+#const OBJ_FLAG_NONE (0)	; 無効
+#const OBJ_FLAG_OK (1)		; プレイヤー
+
+#deffunc obj_init
+
+	;	ゲームオブジェクト初期化
+	;
+	dim obj_flag,OBJ_MAX
+	dim obj_id,OBJ_MAX
+	dim obj_size,OBJ_MAX
+	dim obj_x,OBJ_MAX
+	dim obj_y,OBJ_MAX
+	dim obj_z,OBJ_MAX
+	dim obj_pz,OBJ_MAX
+	return
+
+#deffunc obj_reg int _p1, int _p2, int _p3, int _p4, int _p5, int _p6
+
+	;	ゲームオブジェクト登録
+	;	(_p1,_p2,_p3) X,Y,Z座標
+	;	_p4 : キャラクタNo.
+	;	_p5 : size
+	;	_p6 : flag (0=npc)
+	id=-1
+	repeat OBJ_MAX
+		if obj_flag(cnt)=0 : id =cnt : break
+	loop
+	if id<0 : return
+
+	i=_p6:if i=0 : i=OBJ_FLAG_OK
+	obj_flag(id)=i
+	obj_id(id)=_p4
+	obj_size(id)=_p5
+	obj_x(id)=_p1
+	obj_y(id)=_p2
+	obj_z(id)=_p3
+	obj_pz(id)=-1				; 少しずつZ方向に移動する
+	return
+
+#deffunc obj_exec
+
+	;	ゲームオブジェクト表示
+	;
+	totalobj=0
+	repeat OBJ_MAX
+		if obj_flag(cnt)=0 : continue
+		id=cnt
+		dup _x,obj_x(cnt)
+		dup _y,obj_y(cnt)
+		dup _z,obj_z(cnt)
+		dup _id,obj_id(cnt)
+		dup _pz,obj_pz(cnt)
+		_z+=_pz
+		if _z>ZFAR : _z=0
+		if _z<ZNEAR {			; 範囲クリップ
+			es_kill _id
+			obj_flag(cnt)=0
+			continue
+		}
+		totalobj++
+		put3dspr _x,_y,_z,_id,0,obj_size(cnt)
+	loop
+	return
+
+*start
+	sx=320:sy=224				; ゲーム全体のサイズ
+	zoom=4					; 4倍に拡大して表示する
+	wx=sx*zoom:wy=sy*zoom			; ウインドウサイズを求める
+	hsx=sx/2:hsy=sy/2			; 画面の中央座標を求める
+	screen 0,wx,wy				; ウインドウを設定する
+
+	celload "myship.png",G_SHIP		; 画像読み込み(自機)
+	celload "kumo.png",G_KUMO		; 画像読み込み(雲)
+
+	es_ini					; スプライト初期化
+	es_spropt 1,1				; スケールとクリップのオプションを設定
+	obj_init				; ゲームオブジェクト初期化
+
+	;	キャラクターの登録
+	es_sizeex 128,128,,,,,,-64,-64		; 全体サイズと中心座標を設定
+	es_pat CHR_SHIP, 0,0,0,G_SHIP		; CHR_SHIPとしてキャラクタを登録
+	es_pat CHR_KUMO, 0,0,0,G_KUMO		; CHR_KUMOとしてキャラクタを登録
+
+	;	自機の座標を初期化
+	myx=0:myy=10:myz=60:myr=0
+
+	;	カメラの初期化
+	set3dsprcam 0,0,0
+
+	;	フレームカウント
+	frame=0
+*main
+	;	キーボードで動かす
+	stick key,$1ffff
+	if key&128 : end
+	if key&1 : myx-=2
+	if key&4 : myx+=2
+	if key&2 : myy-=2
+	if key&8 : myy+=2
+	if key&$4000 : myz--
+	if key&$10000 : myz++
+
+	;	雲をランダムに登録
+	if (frame\4)=0 {
+		x=rnd(200)-100:y=rnd(100)-50:z=ZFAR
+		obj_reg x,y,z,CHR_KUMO
+	}
+
+	redraw 0		; 画面更新の開始
+	rgbcolor $00a1ff:boxf			; 背景をクリア
+
+	viewcalc vptype_2d,zoom,zoom,0		; ズームを適用する
+	viewcalc vptype_translate,hsx,hsy	; 座標(0,0)を画面中央に設定する
+	start3dspr				; ゲームオブジェクト表示開始
+
+	;	自機の表示
+	put3dspr myx,myy,myz,CHR_SHIP,myr
+
+	obj_exec				; ゲームオブジェクトの処理
+	es_draw ,,,0,ZFAR			; スプライト描画
+
+	viewcalc vptype_2d,1,1,0		; ズームを元に戻す
+	viewcalc vptype_translate,0,0		; 座標(0,0)を左上に設定する
+
+	;	X,Y,Z座標を表示する
+	rgbcolor -1
+	pos 0,0:mes "("+myx+","+myy+","+myz+")"
+
+	redraw 1		; 画面の更新
+	await 1000/60
+	frame++
+	goto *main

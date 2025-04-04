@@ -10,15 +10,10 @@
 #include <math.h>
 #include <string.h>
 
+#include "../../hsp3/hsp3config.h"
+
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 #include <unistd.h>
-#include "../../hsp3/hsp3config.h"
-#else
-#if defined(HSPNDK) || defined(HSPIOS)
-#include "../hsp3config.h"
-#else
-#include "../../hsp3/hsp3config.h"
-#endif
 #endif
 
 #ifdef HSPWIN
@@ -41,7 +36,7 @@
 #include <OpenGLES/ES1/glext.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include "iOSBridge.h"
-#include "appengine.h"
+#include "hsp3dish/ios/appengine.h"
 #endif
 
 
@@ -2376,6 +2371,41 @@ int hgio_file_read( char *fname, void *ptr, int size, int offset )
 }
 
 
+#ifdef HSPNDK
+FILE *hgio_android_fopen( char *fname, int offset )
+{
+	AAssetManager* mgr = appengine->app->activity->assetManager;
+	if (mgr == NULL) return NULL;
+	AAsset* asset = AAssetManager_open(mgr, (const char *)fname, AASSET_MODE_UNKNOWN);
+	if (asset == NULL) return NULL;
+	if ( offset>0 ) AAsset_seek( asset, offset, SEEK_SET );
+	return (FILE *)asset;
+}
+
+void hgio_android_fclose(FILE* ptr)
+{
+	AAsset* asset = (AAsset*)ptr;
+	if (asset == NULL) return;
+    AAsset_close(asset);
+}
+
+int hgio_android_fread( FILE* ptr, void *mem, int size )
+{
+	AAsset* asset = (AAsset*)ptr;
+	if (asset == NULL) -1;
+	return AAsset_read( asset, mem, size );
+}
+
+int hgio_android_seek( FILE* ptr, int offset, int whence )
+{
+	AAsset* asset = (AAsset*)ptr;
+	if (asset == NULL) -1;
+	return AAsset_seek( asset, offset, whence );
+}
+
+#endif
+
+
 void hgio_setstorage( char *path )
 {
 	int i;
@@ -2422,7 +2452,7 @@ void hgio_setview(BMSCR* bm)
 		UnitMatrix();
 		RotZ(bm->vp_viewrotate[2]);
 		GetCurrentMatrix(&tmpmat);
-		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)_bgsx / bm->vp_viewscale[0], (float)-_bgsy / bm->vp_viewscale[1], 0.0f, 1.0f);
+		OrthoMatrix(-bm->vp_viewtrans[0], bm->vp_viewtrans[1], (float)_bgsx / bm->vp_viewscale[0], (float)-_bgsy / bm->vp_viewscale[1], 0.0f, 1.0f);
 		MulMatrix(&tmpmat);
 		break;
 	case BMSCR_VPFLAG_3D:

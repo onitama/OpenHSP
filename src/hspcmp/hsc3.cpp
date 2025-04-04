@@ -10,12 +10,12 @@
 #include "../hsp3/hsp3config.h"
 #include "../hsp3/hsp3debug.h"
 #include "../hsp3/hsp3struct.h"
+#include "../hsp3/strnote.h"
 
 #include "supio.h"
 #include "hsc3.h"
 
 #include "membuf.h"
-#include "strnote.h"
 #include "label.h"
 #include "token.h"
 #include "localinfo.h"
@@ -41,6 +41,66 @@ int CHsc3::GetErrorSize( void )
 }
 
 
+char* CHsc3::GetAnalysisInfo(void)
+{
+	if (anabuf == NULL) return NULL;
+	return anabuf->GetBuffer();
+}
+
+
+int CHsc3::GetAnalysisInfoSize(void)
+{
+	if (anabuf == NULL) return 0;
+	return anabuf->GetSize() + 1;
+}
+
+
+char* CHsc3::GetAnalysisLineInfo(int type)
+{
+	char* p="";
+	if (anabuf == NULL) return p;
+	switch (type) {
+	case 0:
+		p = analyse_module;
+		break;
+	case 1:
+		if (analyse_caseflag) p = "*";
+		break;
+	default:
+		break;
+	}
+	return p;
+}
+
+
+void CHsc3::InitAnalysisInfo(int mode, char *match, int line)
+{
+	DeleteAnalysisInfo();
+	anabuf = new CMemBuf;
+	analyse_mode = mode;
+	analyse_line = line;
+	*analyse_keyword = 0;
+	*analyse_module = 0;
+	analyse_match = NULL;
+	if (match) {
+		if (*match != 0) {
+			strncpy(analyse_keyword, match, 255);
+			analyse_match = analyse_keyword;
+			strcase(analyse_match);
+		}
+	}
+}
+
+
+void CHsc3::DeleteAnalysisInfo(void)
+{
+	if (anabuf != NULL) {
+		delete anabuf;
+		anabuf = NULL;
+	}
+}
+
+
 void CHsc3::ResetError( void )
 {
 	//		エラーメッセージ消去
@@ -59,16 +119,23 @@ void CHsc3::ResetError( void )
 CHsc3::CHsc3( void )
 {
 	errbuf = new CMemBuf( ERRBUF_SIZE );
+	ahtbuf = NULL;
+	anabuf = NULL;
 	lb_info = NULL;
 	addkw = NULL;
 	common_path[0] = 0;
+	analyse_mode = 0;
+	analyse_line = 0;
+	analyse_caseflag = 0;
+	analyse_match = NULL;
 }
 
 
 CHsc3::~CHsc3( void )
 {
-	if ( addkw != NULL ) { delete addkw; addkw=NULL; }
-	if ( errbuf != NULL ) { delete errbuf; errbuf=NULL; }
+	DeleteAnalysisInfo();
+	if (addkw != NULL) { delete addkw; addkw = NULL; }
+	if (errbuf != NULL) { delete errbuf; errbuf = NULL; }
 }
 
 
@@ -85,7 +152,29 @@ void CHsc3::AddSystemMacros( CToken *tk, int option )
 	    tk->RegistExtMacro( "__line__", 0 );
 		tk->RegistExtMacro( "__file__", "" );
 		tk->RegistExtMacro( "__runtime__", "\"hsp3\"" );
+		if ( option & HSC3_OPT_UTF8IN ) tk->RegistExtMacro("_hsputf8", "");
 		if ( option & HSC3_OPT_DEBUGMODE ) tk->RegistExtMacro( "_debug", "" );
+
+#ifdef HSPWIN		// Windows(WIN32) version flag
+		tk->RegistExtMacro("_hspwin", "");
+#endif
+#ifdef HSPMAC		// Macintosh version flag
+		tk->RegistExtMacro("_hspmac", "");
+#endif
+#ifdef HSPLINUX		// Linux(CLI) version flag
+		tk->RegistExtMacro("_hsplinux", "");
+#endif
+#ifdef HSPIOS		// iOS version flag
+		tk->RegistExtMacro("_hspios", "");
+#endif
+#ifdef HSPNDK		// android NDK version flag
+		tk->RegistExtMacro("_hspndk", "");
+#endif
+#ifdef HSPEMSCRIPTEN	// EMSCRIPTEN version flag
+		tk->RegistExtMacro("_hspemscripten", "");
+#else
+		if (option & HSC3_OPT_EMSCRIPTEN) tk->RegistExtMacro("_hspemscripten", "");
+#endif
 	}
 }
 
@@ -111,7 +200,7 @@ int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 		tk.SetAHTBuffer( ahtbuf );
 	}
 
-	sprintf( mm,"#AHT processor ver%s / onion software 1997-2021(c)", hspver );
+	sprintf( mm,"#AHT processor ver%s / onion software 1997-2025(c)", hspver );
 	tk.Mes( mm );
 	res = tk.ExpandFile( outbuf, fname, fname );
 	if ( res < 0 ) return -1;
@@ -135,6 +224,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 	//					 bit3=read AHT file(on)
 	//					 bit4=write AHT file(on)
 	//					 bit5=UTF8(input)(入力ソースがUTF8であることを示す)
+	//					 bit8=Emscripten mode(ON)(Emscripten向けであることを示す)
 	//
 	int res;
 	char mm[512];
@@ -162,10 +252,13 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2021(c)", HSC3TITLE, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2025(c)", HSC3TITLE, hspver );
 	tk.Mes( mm );
-	tk.SetAdditionMode( 1 );
 
+	if (anabuf) {
+		tk.SetLabelListBuffer(anabuf, analyse_mode, analyse_match, analyse_line, rname);
+	}
+	tk.SetAdditionMode( 1 );
 	res = tk.ExpandFile( outbuf, "hspdef.as", "hspdef.as" );
 	tk.SetAdditionMode( 0 );
 	if ( res<-1 ) return -1;
@@ -187,6 +280,10 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 	}
 	outbuf->Put( (int)0 );
 
+	if (anabuf) {
+		strcpy( analyse_module, tk.GetLabelListLineModule() );
+		analyse_caseflag = tk.GetLabelListLineCaseFlag();
+	}
 #if 0
 	//		ソースのラベルを追加(停止中)
 	if ( addkw != NULL ) { delete addkw; addkw=NULL; }
@@ -232,7 +329,7 @@ void CHsc3::PreProcessEnd( void )
 		delete outbuf;
 		outbuf = NULL;
 	}
-	if ( ahtbuf != NULL ) {
+	if (ahtbuf != NULL) {
 		delete ahtbuf;
 		ahtbuf = NULL;
 	}
@@ -264,19 +361,20 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2021(c)", HSC3TITLE2, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2025(c)", HSC3TITLE2, hspver );
 	tk.Mes( mm );
-	if (genmode & HSC3_MODE_UTF8) {
-		tk.Mes("#use UTF-8 strings.");
-	}
-	if (genmode & HSC3_MODE_STRMAP) {
-		tk.Mes("#output string map.");
+
+	if (genmode & HSC3_MODE_LABOUT) {
+		tk.delCmpMode(CMPMODE_OPTCODE);
+		tk.SetLabelListBuffer( anabuf, analyse_mode, analyse_match );
+		res = tk.GenerateCode(outbuf, outname, genmode| COMP_MODE_SKIPERROR);
+		return res;
 	}
 
 	if ( outbuf != NULL ) {
 		res = tk.GenerateCode( outbuf, outname, genmode );
 	} else {
-		res = tk.GenerateCode( fname, outname, genmode| HSC3_MODE_STRMAP);
+		res = tk.GenerateCode( fname, outname, genmode| COMP_MODE_STRMAP);
 	}
 
 	return res;
@@ -285,7 +383,13 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 
 int CHsc3::CompileStrMap(char* fname, char* outname, int mode)
 {
-	return Compile(fname, outname, mode| HSC3_MODE_STRMAP);
+	return Compile(fname, outname, mode | HSC3_MODE_STRMAP);
+}
+
+
+int CHsc3::CompileLabelOut(char* fname, int mode)
+{
+	return Compile(fname, "", mode | HSC3_MODE_LABOUT);
 }
 
 
@@ -296,27 +400,24 @@ void CHsc3::SetCommonPath( char *path )
 }
 
 
-int CHsc3::GetCmdList( int option )
+int CHsc3::GetCmdList( int option, char* match )
 {
 	int res;
 	CToken tk;
 	CMemBuf outbuf;
 
-	tk.SetErrorBuf( errbuf );
-	tk.SetCommonPath( common_path );
-	tk.LabelRegist3( hsp_prestr );			// 標準キーワード
-	tk.LabelRegist3( hsp_prepp );			// プリプロセッサキーワード
-	AddSystemMacros( &tk, option );
+	tk.SetErrorBuf(errbuf);
+	tk.SetCommonPath(common_path);
+	tk.LabelRegist3(hsp_prestr);			// 標準キーワード
+	tk.LabelRegist3(hsp_prepp);			// プリプロセッサキーワード
+	AddSystemMacros(&tk, option);
 
-	res = tk.ExpandFile( &outbuf, "hspdef.as", "hspdef.as" );
-//	if ( res<-1 ) return -1;
-	tk.LabelDump( errbuf, DUMPMODE_ALL );
-
-	//errbuf->PutStr("-----\r\n");
-	//if ( addkw != NULL ) errbuf->PutStr( addkw->GetBuffer() );
+	res = tk.ExpandFile(&outbuf, "hspdef.as", "hspdef.as");
+	tk.LabelDump(errbuf, DUMPMODE_ALL, match);
 
 	return 0;
 }
+
 
 
 int CHsc3::OpenPackfile( void )
@@ -346,7 +447,7 @@ void CHsc3::GetPackfileOption( char *out, char *keyword, char *defval )
 			}
 			if ( a1 != 0 ) {
 				s[0]=0;
-				if ( tstrcmp( tmp+2, keyword )) { strcpy( out, s+1 ); }
+				if ( strcmp( tmp+2, keyword )==0 ) { strcpy( out, s+1 ); }
 			}
 		}
 	}
@@ -426,6 +527,13 @@ int CHsc3::SaveAHTOutbuf( char *fname )
 		return -1;
 	}
 	return 0;
+}
+
+
+void CHsc3::Print(char* mes)
+{
+	errbuf->PutStr(mes);
+	errbuf->PutStr("\r\n");
 }
 
 

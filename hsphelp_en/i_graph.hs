@@ -545,46 +545,46 @@ p4 = 0 to 256 (0): Blend rate during translucent composition
 Set the mode used by gcopy, size, blend ratio, etc.
 The operation of each copy mode is as follows.
 ^
-ÊèÉ Mode 0 = normal copy
+ëµ Mode 0 = normal copy
 ^p
 Copy the image using the Windows system API (BitBlt function).
 This is the most standard mode.
 It is often faster than other modes.
 ^p
-ÊèÉ Mode 1 = memory-to-memory copy
+ëµ Mode 1 = memory-to-memory copy
 ^p
 Makes a memory copy between image buffers.
 The copy source and copy destination must be in the same image mode (palette mode / full color mode).
 The operation is the same as mode 0, but it may be slightly faster than mode 0 when copying a very small size (16 * 16 dots or less, etc.).
 ^p
-ÊèÉ Mode 2 = transparent colored copy
+ëµ Mode 2 = transparent colored copy
 ^p
 Copying is done in the same way as in mode 1, but dots with all 0 RGB (complete black) are considered transparent and are not copied.
 ^p
-„Éª Mode 3 = Semi-transparent composite copy
+ÅE Mode 3 = Semi-transparent composite copy
 ^p
 It can be used only in full color mode.
 Performs a semi-transparent composite copy with the blend ratio specified by the 4th parameter of gmode. The blend ratio can range from 0 to 256, with 256 being a perfect copy.
 If the blend ratio is 0, no copy will be executed.
 Also, if the blend ratio is 256 or more, memory-to-memory copy is executed.
 ^p
-„Éª Mode 4 = Translucent composite copy with transparent color
+ÅE Mode 4 = Translucent composite copy with transparent color
 ^p
 Copying is done in the same way as in mode 3, but dots with RGB values that are the same as the color set by the color command are considered transparent and are not copied.
 If the blend ratio is 0, no copy will be executed.
 ^p
-„Éª Mode 5 = Color Additive Synthesis Copy
+ÅE Mode 5 = Color Additive Synthesis Copy
 ^p
 It can be used only in full color mode.
 Performs color additive synthesis copying with the blend ratio specified by the 4th parameter of gmode. In color addition, the RGB value of the copy source is added to the RGB value of the copy destination.
 If the brightness exceeds 255 at the time of addition, it will be clamped to 255.
 ^p
-„Éª Mode 6 = Color subtractive composite copy
+ÅE Mode 6 = Color subtractive composite copy
 ^p
 It can be used only in full color mode.
 Performs color subtractive composite copy with the blend ratio specified by the 4th parameter of gmode. In color subtraction, the RGB value of the copy source is subtracted from the RGB value of the copy destination. If the brightness is less than 0 when subtracting, it will be clamped to 0.
 ^p
-ÊèÉ Mode 7 = Pixel Alpha Blend Copy
+ëµ Mode 7 = Pixel Alpha Blend Copy
 ^p
 It can be used only in full color mode.
 Prepare an image of the size specified by gmode on the right side of the original image, and make a background composite copy using the image on the right side as an alpha blend component.
@@ -1363,7 +1363,7 @@ p5 = 0 ~ (?): Y size
 %inst
 Draws a rectangle (rectangle) of the size specified in (p4, p5) with the currently set color centered on the coordinates specified in (p1, p2).
 You can specify the rotation angle as a real number with p3.
-The unit of angle is radians (starting from 0 and going around at 2œÄ).
+The unit of angle is radians (starting from 0 and going around at 2ÉŒ).
 The grect instruction reflects the copy mode specification set in gmode.
 ^
 If gmode is 0,1, normal fill.
@@ -1402,7 +1402,7 @@ p6 = 0 ~ (?): Y size
 The grotate instruction performs processing including rotation in the gcopy instruction.
 Specify the window ID of the copy source with p1, and specify the coordinates corresponding to the original image to be copied with (p2, p3). (Similar to the gcopy instruction)
 The copy destination is the window ID specified as the current drawing destination, and the copy is performed to the coordinates centered on the location set by the pos command. At that time, you can specify the rotation angle with a real number with p4.
-The unit of angle is radians (starting from 0 and going around at 2œÄ).
+The unit of angle is radians (starting from 0 and going around at 2ÉŒ).
 In (p5, p6), specify the X and Y sizes after copying.
 Also, the default copy size set by the gmode instruction is used for the X and Y sizes of the copy source.
 In other words, if you specify a size larger than the size specified by the gmode instruction with (p5, p6), it will be expanded.
@@ -1800,7 +1800,7 @@ It is a number that identifies the divided image.
 With zoomx and zoomy, you can specify the horizontal (X) and vertical (Y) direction magnifications of the drawn image.
 You can specify zoomx and zoomy with real numbers.
 It is also possible to specify the rotation angle of the image by angle.
-The value specified for angle is a real number and the unit is radians (starting from 0 and going around in 2œÄ). (It will be the same value as the grottate and grect instructions)
+The value specified for angle is a real number and the unit is radians (starting from 0 and going around in 2ÉŒ). (It will be the same value as the grottate and grect instructions)
 ^
 The celput command copies and draws the image with the specified window ID in the same way as the gcopy command.
 As with the gcopy instruction, the copy mode and blend ratio specified by the gmode instruction are reflected.

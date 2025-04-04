@@ -18,8 +18,18 @@
 #include "../token.h"
 #include "../ahtobj.h"
 
-#define DPM_SUPPORT		// DPMファイルマネージャをサポート
+//#define DPM_SUPPORT		// DPMファイルマネージャをサポート
+#define DPM2_SUPPORT		// DPM2ファイルマネージャをサポート
+
+#ifdef DPM_SUPPORT
 #include "../win32dll/dpm.h"
+#endif
+
+#define DPM2_SUPPORT		// DPM2ファイルマネージャをサポート
+#include "../../hsp3/filepack.h"
+#define PACKFILE "packfile"
+#define DPMFILE "data"
+
 
 #define EXPORT extern "C" EMSCRIPTEN_KEEPALIVE
 #define BOOL int
@@ -36,6 +46,10 @@ static char compath[HSP_MAX_PATH];
 static CHsc3 *hsc3=NULL;
 
 extern char *hsp_prestr[];
+
+#ifdef DPM2_SUPPORT
+static FilePack filepack;		// File Pack Manager
+#endif
 
 int main()
 {
@@ -155,13 +169,22 @@ EXPORT BOOL hsc_comp ( int p1, int p2, int p3, int p4 )
 	//		hsc_comp mode,ppopt,dbgopt  (type0)
 	//			( mode: 1=debug/0=no debug )
 	//			(       2=preprocessor only )
+	//			(       4=UTF8 output mode )
+	//			(       8=strmap output mode )
+	//			(      16=keyword list mode )
 	//			( ppopt = preprocessor option )
 	//			(       0=default/1=ver2.6 mode )
+	//			(       32=UTF8 input mode )
 	//			( dbgopt = debug window option )
 	//			(       0=default/1=debug mode )
 /*
-	int st;
-	st=tcomp_main( rname, fname, oname, mesbuf, p1, compath );
+
+p1が1(bit0)の場合は、デバッグ情報が付加されます。
+p1が2(bit1)の場合はプリプロセス処理のみ行います。
+p1が4(bit2)の場合は文字列データをUTF-8コードに変換して出力します。
+p1が8(bit3)の場合は使用している文字列データファイル(strmap)を出力します
+p1が16(bit4)の場合はキーワード解析リストを出力します
+
 */
 	int st;
 	int ppopt;
@@ -212,14 +235,19 @@ EXPORT BOOL pack_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 	//
 	//		pack_ini "src-file"  (type6)
 	//
-#ifdef DPM_SUPPORT
-	strcpy(fname,p1);
+	strcpy(fname, p1);
 	cutext(fname);
-	if ( hsc3==NULL ) Alert( "#No way." );
+	if (hsc3 == NULL) Alert("#No way.");
 	hsc3->ResetError();
+	opt1 = 640; opt2 = 480; opt3 = 0;
+	strcpy(hspexe, "hsprt");
+
+#ifdef DPM_SUPPORT
 	dpmc_ini( hsc3->errbuf, fname );
-	opt1=640;opt2=480;opt3=0;
-	strcpy(hspexe,"hsprt");
+#endif
+#ifdef DPM2_SUPPORT
+	filepack.Reset();
+	filepack.SetErrorBuffer(hsc3->errbuf);
 #endif
 	return 0;
 }
@@ -231,10 +259,28 @@ EXPORT BOOL pack_view ( int p1, int p2, int p3, int p4 )
 	//		pack_view (type0)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	st = dpmc_view();
-#else
-	st = 0;
+#endif
+#ifdef DPM2_SUPPORT
+	char dpmname[HSP_MAX_PATH];
+	strcpy(dpmname,fname);
+	strcat(dpmname, ".dpm");
+	char tmp[1024];
+
+	if (p1 == 0) p1 = -1;
+	int res = filepack.LoadPackFile(dpmname, p1);
+	if (res<0) {
+		sprintf(tmp,"#Error %d in loading [%s].",res, dpmname);
+		filepack.Print(tmp);
+		st = 1;
+	}
+	else {
+		sprintf(tmp, "#[%s] Loaded.", dpmname);
+		filepack.Print(tmp);
+		filepack.PrintFiles();
+	}
 #endif
 	return -st;
 }
@@ -248,11 +294,22 @@ EXPORT BOOL pack_make ( int p1, int p2, int p3, int p4 )
 	//		     key  : (0=Default/other=New Seed)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	if ( p2 != 0 ) dpmc_dpmkey( p2 );
 	st=dpmc_pack(p1);
+#endif
+
+#ifdef DPM2_SUPPORT
+	if (p2 == 0) p2 = -1;
+#ifdef HSPWIN
+	p1 = (int)GetTickCount();	// Windowsの場合はtickをシード値とする
 #else
-	st = 0;
+	p1 = (int)time(0);			// Windows以外のランダムシード値
+#endif
+	if (filepack.SavePackFile(fname, PACKFILE, p1, p2) < 0) {
+		st = 1;
+	}
 #endif
 	return -st;
 }
@@ -286,10 +343,9 @@ EXPORT BOOL pack_exe ( int p1, int p2, int p3, int p4 )
 	//		pack_exe mode (type0)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	st=dpmc_mkexe(p1,hspexe,opt1,opt2,opt3);
-#else
-	st = 0;
 #endif
 	return -st;
 }
@@ -301,10 +357,14 @@ EXPORT BOOL pack_get ( BMSCR *bm, char *p1, int p2, int p3 )
 	//		pack_get "get-file"  (type6)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	st=dpmc_get(p1);
-#else
-	st = 0;
+#endif
+#ifdef DPM2_SUPPORT
+	if (filepack.ExtractFile(p1,NULL,p2) < 0) {
+		st = 1;
+	}
 #endif
 	return -st;
 }
@@ -374,6 +434,7 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	hsc3->ClosePackfile();
 
 	//		exeを作成
+	st = 0;
 #ifdef DPM_SUPPORT
 	dpmc_ini( hsc3->errbuf, fname );
 	st=dpmc_pack( 0 );
@@ -381,8 +442,25 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	st=dpmc_mkexe( type, hspexe, opt1, opt2, opt3 );
 	strcat( fname, ".dpm" );
 	delfile( fname );
+#endif
+#ifdef DPM2_SUPPORT
+	int myseed1,myseed2;
+#ifdef HSPWIN
+	myseed1 = (int)GetTickCount();	// Windowsの場合はtickをシード値とする
 #else
-	st = 0;
+	myseed1 = (int)time(0);			// Windows以外のランダムシード値
+#endif
+	myseed2 = hsp3_flength(PACKFILE);
+
+	filepack.Reset();
+	filepack.SetErrorBuffer(hsc3->errbuf);
+	st = filepack.SavePackFile(fname, (char *)PACKFILE, myseed1, myseed2);
+	if (st < 0) {
+		return -1;
+	}
+	st = filepack.MakeEXEFile(type, hspexe, fname, myseed2, opt1, opt2, opt3);
+	strcat(fname, ".dpm");
+	delfile( fname );
 #endif
 	return -st;
 }

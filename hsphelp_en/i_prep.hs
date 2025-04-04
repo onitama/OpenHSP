@@ -35,7 +35,7 @@ The #define macro basically registers a replacement string.
 example :
 	#define hyouji mes
 	hyouji "AAAAA..."
-‚Üì (after deployment)
+Å´ (after deployment)
 	mes "AAAAA..."
 ^p
 By inserting "global" immediately after the #define instruction, you can create a macro that can be used permanently in all modules.
@@ -57,7 +57,7 @@ The argument must be specified as "% numerical value", and the numerical value s
 example :
 	#define hyouji(%1) mes "prm="+%1
 	hyouji "AAAAA..."
-‚Üì (after deployment)
+Å´ (after deployment)
 	mes "prm="+"AAAAA..."
 ^p
 You can also set the initial (default) value for the argument.
@@ -67,7 +67,7 @@ example :
 	hyouji "AAA",a
 	hyouji "BBB"
 	hyouji ,b
-‚Üì (after deployment)
+Å´ (after deployment)
 	mes "AAA"+a
 	mes "BBB"+123
 	mes "PRM="+b
@@ -167,7 +167,7 @@ External DLL call instruction registration
 %group
 Preprocessor instructions
 %prm
-New name "function name" type name 1,‚Ä¶
+New name "function name" type name 1,Åc
 
 %inst
 Register a new instruction to call the external DLL.
@@ -242,7 +242,7 @@ External DLL call function registration
 %group
 Preprocessor instructions
 %prm
-New name "function name" type name 1,‚Ä¶
+New name "function name" type name 1,Åc
 
 %inst
 Register a new function to call the external DLL.
@@ -377,7 +377,7 @@ Module start
 %group
 Preprocessor instructions
 %prm
-Module name Variable name 1,‚Ä¶
+Module name Variable name 1,Åc
 Module name: New module name
 Variable name: Module variable name to be registered
 
@@ -418,7 +418,7 @@ Register a new instruction
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: Name of the assigned instruction
 p2 p3 ~: Parameter type name / alias name
 
@@ -493,7 +493,7 @@ Register a new function
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: The name of the function to register
 p2 p3 ~: Parameter type name / alias name
 
@@ -677,7 +677,7 @@ Similar to #define, but #const replaces the result of pre-calculation when repla
 example :
 	#const KAZU 100+50
 	a=KAZU
-‚Üì (after deployment)
+Å´ (after deployment)
 	a=150
 ^p
 If the value to be used in the source is decided in advance, it is effective for speeding up the source. It is also possible to include macros that have already been defined, so
@@ -686,7 +686,7 @@ example :
 	#const ALL 50
 	#const KAZU 100*ALL
 	a=KAZU
-‚Üì (after deployment)
+Å´ (after deployment)
 	a=5000
 ^p
 Can be used like.
@@ -866,7 +866,7 @@ Assign new instruction
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: Name of the assigned instruction
 p2 p3 ~: Parameter type name / alias name
 
@@ -894,7 +894,7 @@ Assign a new function
 %group
 Preprocessor instructions
 %prm
-p1 p2 p3,‚Ä¶
+p1 p2 p3,Åc
 p1: Name of the assigned instruction
 p2 p3 ~: Parameter type name / alias name
 
@@ -922,7 +922,7 @@ Registration of module initialization process
 %group
 Preprocessor instructions
 %prm
-p1 p2,‚Ä¶
+p1 p2,Åc
 p1 p2 ~: Parameter type name / alias name
 
 %inst
@@ -1064,7 +1064,7 @@ External COM call instruction registration
 %group
 Preprocessor instructions
 %prm
-New name Index type name 1,‚Ä¶
+New name Index type name 1,Åc
 New name: Keyword name recognized as an instruction
 Index: method index value
 Type name: Specify the argument types separated by,
@@ -1139,7 +1139,7 @@ example :
 #enum KAZU_B; KAZU_B becomes 1
 #enum KAZU_C; KAZU_C becomes 2
 	a=KAZU_B
-‚Üì (after deployment)
+Å´ (after deployment)
 	a=1
 ^p
 The constant is initialized by writing "= (equal)" and a numerical value (or expression) after the macro name. After that, the number will increase by 1 each time it is defined with the #enum instruction.

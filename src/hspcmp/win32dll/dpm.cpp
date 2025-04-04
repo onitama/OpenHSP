@@ -25,6 +25,7 @@
 #else
 #include <windows.h>
 #endif
+#include "../../hsp3/hsp3config.h"
 #include "../membuf.h"
 #include "../supio.h"
 
@@ -39,6 +40,47 @@ static void prtini( CMemBuf *msg )
 static void prt( char *msg )
 {
 	if ( errbuf!=NULL ) errbuf->PutStr( msg );
+}
+
+/*----------------------------------------------------------*/
+
+void cutlast(char* st)
+{
+	//	cut last characters
+
+	int a1;
+	unsigned char c1;
+	a1 = 0; while (1) {
+		c1 = st[a1]; if (c1 < 33) break;
+		st[a1] = tolower(c1);
+		a1++;
+	}
+	st[a1] = 0;
+}
+
+void cutlast2(char* st)
+{
+	//	cut last characters
+
+	int a1;
+	char c1;
+	char ts[256];
+
+	strcpy(ts, st);
+	a1 = 0;
+	while (1) {
+		c1 = ts[a1]; if (c1 < 33) break;
+		ts[a1] = tolower(c1);
+		a1++;
+	}
+	ts[a1] = 0;
+
+	while (1) {
+		a1--; c1 = ts[a1];
+		if (c1 == 0x5c) { a1++; break; }
+		if (a1 == 0) break;
+	}
+	strcpy(st, ts + a1);
 }
 
 /*----------------------------------------------------------*/

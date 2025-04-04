@@ -3,7 +3,7 @@ HSP3CNV: HSP3 Source Converter HSP: Hot Soup Processor
 Hot soup processor copyright 2017 (c) onion software
 ------------------------------------------------------------------------------
 
-Áπù„Çµ Introduction
+„ÉÉT Introduction
 
 HSP3 Source Converter is a tool for converting HSP3 code to other sources,
 And the library.
@@ -12,7 +12,7 @@ It is a conversion for operation, and all HSP source scripts are converted.
 There is no guarantee.
 
 
-„ÉÑ„Ç≠how to use
+ÉcÉLhow to use
 
 The HSP3 source converter uses the HSP3 Dish helper (hsp3dh) or
 You can use it by calling hsp3cnv.exe directly from the command line (prompt).
@@ -26,7 +26,7 @@ This is required when transferring sources to platforms other than Windows.
 If you compile it on Windows, you don't need to convert it to UTF-8.
 
 
-„Éª About hsp3cnv.exe
+ÅE About hsp3cnv.exe
 
 A command line application that converts HSP3 object files (ax) to C source.
 
@@ -52,7 +52,7 @@ HSP3Dish source conversion mode is for checking instructions of external plug-in
 Check for compatibility with other platforms.
 
 
-„Éª About the test project
+ÅE About the test project
 
 A library is provided for linking with the source output by hsp3cnv.
 
@@ -67,7 +67,7 @@ If you want to use the user-generated cpp source, rename it to test.cpp or
 You need to re-register the file in the project.
 
 
-„Éª About performance
+ÅE About performance
 
 Currently, it is about 2 to 5 times faster than the interpreter (normal) version of HSP3.
 (Please note that if you keep the Debug build, it will be significantly slower)
@@ -82,7 +82,7 @@ It runs at the same speed.
 	http://peppermint.jp/
 
 
-ÊèÉ Supported features
+ëµ Supported features
 
 This version is a preview version, and its operation is limited to the following contents.
 
@@ -101,10 +101,10 @@ The following features are not yet supported.
 
 The following features are not planned to be supported on this system.
 
-Áπù„Çµ Run command
+„ÉÉT Run command
 
 
-Áπù„Çµ Future plans
+„ÉÉT Future plans
 
 HSP3 Source Converter converts HSP3 source code to other platforms and
 It is a system for converting to other language sources.
@@ -112,7 +112,7 @@ First of all, I am aiming to convert to C source code, but other things such as 
 We have prepared a library that can be used for general purposes with the environment in mind.
 
 
-„ÉÑ„Ç≠license
+ÉcÉLlicense
 
 The license for the HSP3 source converter is treated as a derivative of OpenHSP and is treated as a derivative of OpenHSP.
 The license is also OpenHSP compliant.
@@ -129,9 +129,9 @@ Neither the name of the Onion Software nor the names of its contributors may be 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-„ÉÑ„Ç≠Change log
+ÉcÉLChange log
 
-	2012/06/25 3.31Œ≤2
+	2012/06/25 3.31É¿2
 
 Integrate version with HSP3.31
 Supports conversion of button instructions
@@ -182,7 +182,7 @@ First version.
 A preview version that supports basic functions such as parameters and variables.
 
 
-ÊèÉcontact information
+ëµcontact information
 
 If you have any problems, opinions, or suggestions, please email or ML.
 Please note that it may take some time to reply to the email.

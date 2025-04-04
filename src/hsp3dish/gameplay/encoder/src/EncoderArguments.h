@@ -162,6 +162,9 @@ public:
      */
     bool fileExists() const;
 
+    bool originalMaterialName() const;
+
+
     /**
      * Prints the usage information.
      */
@@ -236,6 +239,8 @@ private:
 
     bool _mergeAnimation;
     std::string _mergeAnimationFBXName;
+
+    bool _originalMaterialName;
 
     std::vector<std::string> _groupAnimationNodeId;
     std::vector<std::string> _groupAnimationAnimationId;

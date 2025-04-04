@@ -14,7 +14,7 @@
 <body>
 	<div id="CONTAINER">
 		<!-- ヘッダー -->
-		<p id="COPY">HSP : Hot Soup Processor ver3.6 / onion software 1997-2021(c)</p>
+		<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2025(c)</p>
 		<h1>HSP3 for Linux/Raspberry Pi</h1>
 		
 		<!-- 本文 -->
@@ -57,16 +57,26 @@
 コンパイルの際には、以下のライブラリが必要になりますので、あらかじめ確認を行なって下さい。
 		</p><pre>
 	OpenGLES2.0以降 / EGL
-	SDL1.2
+	SDL2 / SDL2-mixer
 	gtk+-2
+	libcurl4
+	libgpiod2
+	libffi
 		</pre><p>
-Debian(Ubuntu)の場合は、パッケージマネージャから以下のようにライブラリをインストールできます。
+Debian(Ubuntu)の場合は、以下のスクリプトを実行してコンパイルすることができます。
 		</p><pre>
-	sudo apt-get update
-	sudo apt-get install libgtk2.0-dev
-	sudo apt-get install libglew-dev
-	sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev
-	sudo apt-get install libgles2-mesa-dev libegl1-mesa-dev
+	./setup.sh
+		</pre><p>
+手動でmakeを行う場合は、以下のようにパッケージマネージャから以下のようにライブラリをインストールしてください。(Debian(Ubuntu)の場合)
+		</p><pre>
+	sudo apt update
+	sudo apt install libgtk2.0-dev
+	sudo apt install libglew-dev
+	sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+	sudo apt install libgles2-mesa-dev libegl1-mesa-dev
+	sudo apt install libcurl4-openssl-dev
+	sudo apt install libgpiod2 libgpiod-dev
+	sudo apt install -y libffi-dev
 		</pre><p>
 リポジトリにはソースのみが含まれていますので、makeによってコンパイルする必要があります。
 (Linuxのバージョンやディストリビューションによって正しくコンパイルされない場合は、修正が必要になります。)
@@ -81,9 +91,10 @@ Debian(Ubuntu)の場合は、パッケージマネージャから以下のよう
 		<h2 id="DATA">Raspberry Piインストール</h2>
 		<p>
 		<img src="image/hsp_pi2.jpg" align="right">
-		Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi4, Raspberry Pi zeo上で動作します。<br>
-		Raspbian OS上で動作します。(推奨バージョンは、September 2017 Kernel version4.9以降です)<br>
-		あらかじめ、Raspbianが動作してキーボード、マウスが接続されている状態でご使用ください。
+		Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi400, Raspberry Pi4, Raspberry Pi5, Raspberry Pi zeo上で動作します。<br>
+		Raspberry Pi OS, Raspbian OS上で動作します。あらかじめ、Raspbianが動作してキーボード、マウスが接続されている状態でご使用ください。
+		<br>
+		
 		<br>
 		hsp3dish及びhsp3gp(HGIMG4)、hsed(スクリプトエディタ)は、GUI環境でのみ動作します。<br>		
 		githubから最新版を任意のディレクトリに展開して、ソースをコンパイルしてください。コンパイルには、gcc及びmakeを実行できる環境が必要になります。
@@ -91,7 +102,13 @@ Debian(Ubuntu)の場合は、パッケージマネージャから以下のよう
 	git clone http://github.com/onitama/OpenHSP
 	cd OpenHSP
 		</pre><p>
-コンパイルの際には、追加のライブラリが必要になります。ネットワークに接続されている状態で以下のコマンドを実行することでセットアップが実行されます。
+コンパイルの際には、追加のライブラリが必要になります。ネットワークに接続されている状態でライブラリをダウンロードする必要があります。
+	Raspberry Pi OSの場合は、以下のコマンドを実行することでセットアップが実行されます。
+
+		</p><pre>
+	./setup.sh
+		</pre><p>
+	Raspberry Pi3以下の環境で、Raspbian OSの場合は、以下のコマンドを実行することでセットアップが実行されます。
 		</p><pre>
 	./pisetup.sh
 		</pre><p>
@@ -103,8 +120,8 @@ Debian(Ubuntu)の場合は、パッケージマネージャから以下のよう
 アーカイブの内容が展開されたディレクトリでmakeコマンドを実行してください。
 必要なツールのコンパイルが行なわれ、HSP3が使用できる状態になります。<br>
 		</p><pre>
-※ Raspberry Pi4の場合は、Linuxと同様の方法でmakeによるインストールを行ってください
-※ Raspberry Pi4ではフルスクリーンによる実行はサポートされません
+※ Raspberry Pi4以降の場合は、Linuxと同様の方法でインストールを行ってください
+※ Raspberry Pi4以降ではフルスクリーンによる実行はサポートされません
 		</pre>
 
 		<h2 id="DATA">使用方法</h2>
@@ -135,9 +152,9 @@ HSP3Dishに対応するサンプルコードがsampleフォルダに含まれて
 上の例では、「test.hsp」ファイルからオブジェクトファイル「test.ax」を生成します。
 生成されたオブジェクトファイルを、ランタイムに渡して実行を行ないます。
 		</p><pre>
-	./hsp3cl test.ax
+	./hspcmp -e test.ax
 		</pre><p>
-上の例では、「test.ax」をHSP3コマンドラインランタイムで実行します。
+上の例では、「test.ax」をHSP3コマンドラインランタイム「hsp3cl」で実行します。
 同様に、「hsp3dish」「hsp3gp」などのランタイムに合わせたスクリプトを実行させることができます。
 (「hsp3dish」「hsp3gp」の実行は、GUI環境が必要になります。)
 		<br><br>
@@ -166,9 +183,9 @@ Raspberry Pi版では、フルスクリーンで実行を行ないます。 実�
 		</p>
 
 
-		<h2 id="DATA">Raspberry PiのGPIO入出力</h2>
+		<h2 id="DATA">GPIO入出力</h2>
 		<p>
-		Raspberry Pi版では、devcontrol(gpio)命令によりGPIO入出力を行なう拡張が行われています。<br>
+		devcontrol(gpio)命令によりGPIO入出力を行なう拡張が行われています。<br>
 		GPIO出力を制御する場合は、以下のように記述します。
 		</p><pre>
 	devcontrol "gpio", ポート番号, 出力値
@@ -187,10 +204,11 @@ Raspberry Pi版では、フルスクリーンで実行を行ないます。 実�
 		</p>
 
 
-		<h2 id="DATA">Raspberry PiのI2C入出力</h2>
+		<h2 id="DATA">I2C入出力</h2>
 		<p>
-		Raspberry Pi版では、devcontrol(i2c～)命令によりI2Cデバイスとの入出力を行なう拡張が行われています。<br>
-		I2C制御を行う場合は、RaspberryPiのオプション設定でI2CをEnableにする必要があります。(I2C制御を行なわない場合は、設定の必要ありません) I2C制御を行う場合は、以下のように記述します。
+		devcontrol(i2c～)命令によりI2Cデバイスとの入出力を行なう拡張が行われています。<br>
+		(RaspberryPiでは、オプション設定でI2CをEnableにする必要があります。I2C制御を行なわない場合は、設定の必要ありません。)<br>
+		I2C制御を行う場合は、以下のように記述します。
 		</p><pre>
 	devcontrol "i2copen", スレーブアドレス, チャンネル
 	( 「i2copen スレーブアドレス, チャンネル」と記述することも可能 )
@@ -221,30 +239,87 @@ Raspberry Pi版では、フルスクリーンで実行を行ないます。 実�
 		</p>
 
 
-		<h2 id="DATA">Raspberry PiのSPI入出力</h2>
+		<h2 id="DATA">GPIO入出力</h2>
 		<p>
-		Raspberry Pi版では、devcontrol(spi～)命令によりI2Cデバイスとの入出力を行なう拡張が行われています。<br>
-		SPI制御を行う場合は、RaspberryPiのオプション設定でSPIをEnableにする必要があります。(SPI制御を行なわない場合は、設定の必要ありません) SPI制御を行う場合は、以下のように記述します。
+		devcontrol(gpio)命令によりGPIO入出力を行なう拡張が行われています。<br>
+		GPIO出力を制御する場合は、以下のように記述します。
 		</p><pre>
-	devcontrol "spiopen", バス番号, チップセレクト, チャンネル
-		「チャンネル」は複数のデバイスを同時に指定する場合に識別を行う番号です。(0～31の整数値)
+	devcontrol "gpio", ポート番号, 出力値
+	( 「gpio ポート番号, 出力値」と記述することも可能 )
+		</pre><p>
+		ポート番号は、GPIOのポートを数値で指定します。
+		出力値は、1(ON)か0(OFF)を数値で指定することで、デジタルポートの出力を制御します。
+		入力を行う場合は、以下のように記述します。
+		</p><pre>
+	devcontrol "gpioin", ポート番号
+	( 関数として「gpioin(ポート番号)」と記述することも可能 )
+		</pre><p>
+		命令の実行後にシステム変数statに0か1が代入されます。
+		(エラーが発生した場合は、マイナス値が代入されます)<br>
+		GPIO入出力は、hsp3dishだけでなくhsp3clからも使用することが可能です。
+		</p>
+
+
+		<h2 id="DATA">SPI入出力</h2>
+		<p>
+		devcontrol(spi)命令によりSPIの全二重通信を行なう拡張が行われています。<br>
+		HSP3.6までのSPIサポートは、read/write システムコールによるものに限られており、
+		したがって半二重通信のみがサポートされていました(read/write では全二重通信はできない)。
+		しかし SPI はデータ線が 2 本あり、いくつかの SPI デバイスは全二重通信による通信を要求します。
+		完全なデータのやり取りをするには IOCTL による全二重通信が必要になります。<br>
+		HSP3.7では、HSPスクリプトからアクセスできる汎用的で全二重通信 (IOCTL 経由) 可能な
+		SPIインターフェースを追加します。また IOCTL で全二重通信 (`SPI_IOC_MESSAGE(N)`)
+		をリクエストするときに必要なパラメータ`struct spi_ioc_transfer` を設定する関数も追加しました。<br>
+		SPI制御は、hsp3dishだけでなくhsp3clからも使用することが可能です。
+		(RaspberryPiでSPI制御を行う場合は、オプション設定でSPIをEnableにする必要があります。SPI制御を行なわない場合は、設定の必要ありません)<br>
+		基本的な命令は、以下の通りです。
+		</p><pre>
+	devcontrol "spiopen", バス番号, チップセレクト, ch番号
+	( open ch )
+		</pre><p>
+		「ch番号」は複数のデバイスを同時に指定する場合に識別を行う番号です。(0～31の整数値)
 		単一のデバイスを制御する場合は省略(0)して構いません。
 		バス番号セレクトとチップセレクトはデバイスファイルへのパス<code>/dev/spidev&lt;バス番号&gt;.&lt;チップセレクト&gt;</code>に対応し、
 		指定したデバイスファイルに対応するデバイスを制御できるようになります。
 		結果がシステム変数statに返ります。0の場合は成功、それ以外はエラーになります。
-		</pre><p>
-		データを送受信する場合は、以下のように記述します。
 		</p><pre>
-	devcontrol "spitransceive", データ値, データサイズ, チャンネル
+	devcontrol "spiclose", ch番号
+	( open ch )
+		</pre><p>
+		指定したチャンネルの通信を終了します。
+		</p><pre>
+	devcontrol "spiread", ch番号
+	( byte read )
+	devcontrol "spiread", ch番号
+	( word read )
+		</pre><p>
+		命令の実行後にシステム変数statに入力値が代入されます。
+		(エラーが発生した場合は、マイナス値が代入されます)
+		</p><pre>
+	devcontrol "spiwrite", 出力値, ch番号
+	( byte write )
+	devcontrol "spiwritew", 出力値, ch番号
+	( word write )
+		</pre><p>
+		出力値がSPIに出力されます。
+		(エラーが発生した場合は、マイナス値が代入されます)
+		</p>
+		<p>
+		全二重通信の命令は、以下の通りです。
+		</p><pre>
+	devcontrol "spitransceive", データ値, データサイズ, ch番号
 		データ値は、HSPが扱う32bitの整数値になります。
 		データサイズが0または省略した場合は、8bit(1byte)のみ出力されます。
 		データサイズは、1,2,3が指定できます。それぞれ、1～3byteのサイズが送信・受信されます。
 		送受信は同時に行われます。
-		命令の実行後に指定したサイズの受信データがシステム変数statに結果が代入されます。（エラーが発生した場合は、マイナス値が代入されます）。
+		命令の実行後に指定したサイズの受信データがシステム変数statに結果が代入されます。
+		（エラーが発生した場合は、マイナス値が代入されます）。
 		ビッグエンディアン環境で使用する場合は上位3 byteがデータを、下位1 byteがエラーを表します。
-		SPI制御は、hsp3dishだけでなくhsp3clからも使用することが可能です。
 		</pre><p>
-		SPI デバイスドライバに対して設定が必要な場合は、<code>spiconfigureh</code>、<code>spiconfighrem</code>、<code>spiconfigurel</code>、加えて<code>spisetmode</code>、<code>spisetmode32</code>、<code>spisetlsbfirst</code>、<code>spisetbitsperword</code>、<code>spisetmaxspeedhz</code>を使用します。それぞれ以下のように記述します。
+		SPI デバイスドライバに対して設定が必要な場合は、<code>spiconfigureh</code>、<code>spiconfighrem</code>、<code>spiconfigurel</code>、
+		加えて<code>spisetmode</code>、<code>spisetmode32</code>、<code>spisetlsbfirst</code>、
+		<code>spisetbitsperword</code>、<code>spisetmaxspeedhz</code>を使用します。
+		それぞれ以下のように記述します。
 		</p><pre>
 	devcontrol "spiconfigureh", SPEED_HZ, DELAY_USECS, BITS_PER_WORD
 	devcontrol "spiconfighrem", CS_CHANGE, TX_NBITS, RX_NBITS
@@ -258,17 +333,51 @@ Raspberry Pi版では、フルスクリーンで実行を行ないます。 実�
 		<code>DELAT_USECS</code> に非ゼロを設定すると最終ビット送信と次のバイト送信の間にマイクロ秒単位の遅延を挿入します。
 		<code>BITS_PER_WORD</code> でデバイスのワードサイズを設定します。
 		<code>CS_CHANGE</code> に非ゼロを設定すると通信の後にチップセレクトを非アクティブ化しません。
-		<code>TX_NBITS</code> で書き込みのデータ線本数を指定します。0 でシングルモードになります。デュアル、クアッドモードに設定する場合ホストのヘッダーから <code>SPI_TX_DUAL</code>、<code>SPI_TX_QUAD</code> が参照する値を設定してください。
-		<code>RX_NBITS</code> で読み込み時のデータ線本数を指定します。0 でシングルモードになります。デュアル、クアッドモードに設定する場合ホストのヘッダーから <code>SPI_RX_DUAL</code>、<code>SPI_RX_QUAD</code> が参照する値を設定してください。
+		<code>TX_NBITS</code> で書き込みのデータ線本数を指定します。0 でシングルモードになります。
+		デュアル、クアッドモードに設定する場合ホストのヘッダーから <code>SPI_TX_DUAL</code>、
+		<code>SPI_TX_QUAD</code> が参照する値を設定してください。
+		<code>RX_NBITS</code> で読み込み時のデータ線本数を指定します。0 でシングルモードになります。
+		デュアル、クアッドモードに設定する場合ホストのヘッダーから <code>SPI_RX_DUAL</code>、
+		<code>SPI_RX_QUAD</code> が参照する値を設定してください。
 		<code>WORD_DELAY_USECS</code> でワード間の遅延をマイクロ秒単位で設定します。
 		<code>MODE</code> に0&mdash;3を設定するとSPIの動作モードがそれぞれモード0、...、モード3 に設定されます。
 		<code>LSB_FIRST</code>にゼロを設定するとMSB先行モードに、非ゼロを設定するとLSB先行モードになります。
 		</pre>
-
+		<p>
+		SPI通信と初期化の例:
+		</p>
+		<pre>
+	; Configure spidev options
+	devcontrol "spisetmaxspeedhz", 10000, ch
+	devcontrol "spisetmode", 0, ch
+	devcontrol "spisetlsbfirst", 0, ch
+	devcontrol "spisetbitsperword", 8, ch
+	devcontrol "spiconfigureh", 10000, 0, 8
+	devcontrol "spiconfigurem", 1, 0, 0	; Keep selecting the device for the 3-bytes command
+	devcontrol "spiconfigurel", 0
+	
+	; Start communication
+	;; Prepare a buffer as {dont care, upper 2 bits of data, lower 8 bits of data}
+	dim recv, 3
+	;; Send start byte
+	devcontrol "spitransceive", 1, 1, ch
+	byte(0) = stat
+	;; Send control byte: SINGLE_ENDED (0x80) | adc_pin.
+	;; In bit-wire sepresentation, {single/diff, adc_pin[2], adc_pin[1], adc_pin[0], x, x, x}
+	SIGNLE_ENDED = 0x80
+	devcontrol "spitransceive", SINGLE_ENDED | (adc_pin &lt;&lt; 4), 1, ch
+	byte(1) = stat
+	;; Send an empty byte (avoiding start byte 0x01) and receive rest data.
+	devcontrol "spiconfigurem", 0, 0, 0	; Deselect the device
+	devcontrol "spitransceive", 0x00, 1, ch
+	byte(2) = stat
+	res = ((0x03 & byte(1)) &lt;&lt; 8) | byte(2)
+	mes res
+		</pre>
 
 		<h2 id="COPYRIGHT">著作権とライセンス</h2>
 		<p>
-		HSP3 for Linux/Raspberry Piは、OpenHSPの派生物として取り扱い、ライセンスもOpenHSP/HSP3に準拠した修正BSDライセンスとなります。
+		Linux/Raspberry Pi版は、OpenHSPの派生物として取り扱い、ライセンスもOpenHSP/HSP3に準拠した修正BSDライセンスとなります。
 		</p>
 		<pre>
 -------------------------------------------------------------------------------
@@ -277,12 +386,22 @@ Copyright (C) 1997-2021, Onion Software/onitama, all rights reserved.
 Made with base technology of OpenHSP.
 
 OpenHSP
-Copyright (C) 1997-2021, Onion Software/onitama, all rights reserved.
+Copyright (C) 1997-2025, Onion Software/onitama, all rights reserved.
 
 These softwares are provided by the copyright holders and contributors "as is" and
 any express or implied warranties, including, but not limited to, the implied
 warranties of merchantability and fitness for a particular purpose are disclaimed.
 		</pre>
+		<p>
+		Linux/Raspberry Pi版は、<a href="https://github.com/zakki" target="_blank">zakkiさん</a>、<a href="https://github.com/RollMan" target="_blank">yshimmyoさん</a>に多大なご協力を頂きました。
+	開発を支援し、ご意見をお寄せいただいた多くの方々に感謝致します。
+	<br>
+	ソースコードは、OpenHSPリポジトリから取得することができます。
+	</p>
+	<ul><pre>
+		Github OpenHSP Development
+		<a href="http://github.com/onitama/OpenHSP" target="_blank">http://github.com/onitama/OpenHSP</a>
+	</pre></ul>
 
 
 		<!-- フッター -->

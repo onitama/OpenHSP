@@ -1,0 +1,20 @@
+#include "dotfw.as"
+
+	;	横スクロール背景テスト
+	;	(背景画像をスクロールさせます)
+	;
+	df_config "md Z300"
+	df_reset
+	df_celload id_bgpic,"yamabg16.png"
+	df_setbgpic 0,id_bgpic
+	df_bgscroll 0, DIR_LEFT, 50
+
+	df_addmes "TAMANE DOT FRAMEWORK",1,1, 0,8
+	df_addplayer					; プレイヤーの設定
+
+	df_emode EMODE_YAIM, CHR_MONSTER3, 5, 4, 200	; 敵の設定
+*main
+	if key&PLAYER_KEY_ESC : end
+	df_enemygen DIR_LEFT,20				; 敵を生成
+	df_update
+	goto *main

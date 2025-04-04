@@ -1,0 +1,360 @@
+
+	;	珠音のジャンプアップ♪
+	;	HSP tamane dot sample game
+	;	このスクリプト及び素材データは自由に使用することができます。
+	;	自作のプログラムに入れて発表することができます。
+	;
+	;	カーソルキーで左右に移動、スペースキーでジャンプ
+	;	コインをすべて取ったらクリアです
+	;	トゲにあたるとアウトです
+	;
+	;	マップデータを書き換えることで
+	;	面の形を自由に作り変えることができます。
+	;
+	;
+#include "hsp3dish.as"
+#pack	"yama2.jpg"
+#pack	"parts.png"
+#pack	"tamadot.png"
+#pack	"se_block2.wav"
+#pack	"se_break3.wav"
+#pack	"se_foot.wav"
+#pack	"se_jump2.wav"
+#pack	"se_puyo.wav"
+#packopt name "tamane_jump"
+
+	sx=40:sy=40	; セルの大きさ
+	mx=16:my=12	; マップを並べる大きさ
+	wx=640:wy=480	; 画面のサイズ
+	screen 0,wx,wy
+
+	hitparts=3
+	mysizex=64:mysizey=64
+	myspd=4
+	grav=14
+
+	celload "yama2.jpg",1
+	gsel 1
+	bgmaxx=ginfo_sx:bgmaxy=ginfo_sy
+	gsel 0
+
+	title "珠音のジャンプアップ♪"
+
+	;	素材の読み込み
+	celload "parts.png",2
+	celdiv 2,sx,sy
+	celload "tamadot.png",3
+	celdiv 3,mysizex,mysizey
+
+	;	音のデータを登録
+	mmload "se_block2.wav",0
+	mmload "se_break3.wav",1
+	mmload "se_foot.wav",2
+	mmload "se_jump2.wav",3
+	mmload "se_puyo.wav",4
+	;mmload "bgm12.mid",5,1
+	;mmload "bgm19.mid",6,1
+
+*gtitle
+	;	タイトル画面
+	;mmplay 5
+
+*gtmain
+	;	タイトル画面のループ
+	redraw 0
+	pos 0,0:gmode 0,wx,wy:gcopy 1,0,400
+	color 255,255,255
+	font msgothic,40,1
+	pos 100,100
+	mes "珠音のジャンプアップ♪"
+	font msgothic,26,1
+	pos 148,260
+	mes "Enterキーを押してスタート"
+	redraw 1
+	await 1000/30
+	stick key
+	if key&32 : goto *ginit		; [Enter]が押されたか?
+	goto *gtmain
+
+*ginit
+	;	ゲームスタート時の初期化
+	stage=1
+*start
+	;	マップデータの読み込み
+	sdim mapd,$10000
+	notesel mapd
+	cr="\n"
+	;
+	;	マップデータ(ここを書き換えてください)
+	;	空白(スペース)は何もない部分、「0」はカベです
+	;	「*」 ← コイン / 「+」 ← トゲになります
+	;	マップの行数は増やすことができます。
+	;	横方向にマップを増やすことができます。
+	;	(横方向のサイズは最初の行が基準になります)
+	;
+	mapd+="                        "+cr
+	mapd+="                        "+cr
+	mapd+="                        "+cr
+	mapd+="                  *     "+cr
+	mapd+="          *      00     "+cr
+	mapd+="         000            "+cr
+	mapd+="                        "+cr
+	mapd+="      00**    00     00 "+cr
+	mapd+="        00              "+cr
+	mapd+="  0++++   00    =       "+cr
+	mapd+="   0000         00      "+cr
+	mapd+="         0000           "+cr
+	mapd+="     ***0               "+cr
+	mapd+="++  00000     00   00   "+cr
+	mapd+="00          00          "+cr
+	mapd+="          00           *"+cr
+	mapd+="                      00"+cr
+	mapd+="        0000            "+cr
+	mapd+="   ***                  "+cr
+	mapd+="  00000            000  "+cr
+	mapd+="             000        "+cr
+	mapd+="        00            00"+cr
+	mapd+="000000000000000000000000"+cr
+	;
+	noteget s1,0
+	;
+	mapsizex=strlen(s1):if mapsizex<mx : mapsizex=mx
+	mapsizey=notemax
+	vmaxx=mapsizex*sx
+	vmaxy=mapsizey*sy
+	viewx=0:viewy=vmaxy-wy
+	vbasey=viewy
+	vbasex=vmaxx-wx
+
+	;	マップの初期化
+	coinmax=0
+	dim map,mapsizex,mapsizey
+	y=0
+	repeat mapsizey
+		noteget s1,cnt
+		repeat mapsizex
+			s2=strmid(s1,cnt,1)	; 1文字だけを取り出す
+			a=0
+			if s2!=" " : a=6
+			if s2="=" : a=5
+			if s2="+" : a=4
+			if s2="*" : coinmax=coinmax+1 : a=3
+			map(cnt,y)=a		; マップデータを代入する
+		loop
+		y=y+1
+	loop
+
+	;	プレイヤーの初期化
+	coin=0		; コインの数
+
+	myflag=0
+	myani=0:mydir=0
+	myjmp=0:mygrv=0
+	px=0:py=vmaxy-sy-mysizey
+	font msgothic,16
+
+	mmstop
+	;mmplay 6
+*main
+	;	メインループ
+	redraw 0
+	gosub *drawbg		; 奥の背景を描画
+	gosub *drawmap		; マップを描画
+	gosub *mymove		; プレイヤーの移動
+	color 255,255,255:pos 0,0
+	mes "COIN:"+coin+"/"+coinmax
+	redraw 1
+
+	if myflag>0 : goto *main2
+	if coin>=coinmax : goto *main3
+
+	await 1000/60
+	goto *main
+
+
+*main2
+	;	プレイヤーやられ
+	mmstop
+	mmplay 1
+	repeat 300
+	redraw 0
+	gosub *drawbg
+	gosub *drawmap
+	gosub *mymove
+
+	font msgothic,40,1
+	pos 150,200
+	color 255,255,255
+	mes "ジャンプしっぱい"
+
+	redraw 1
+	await 1000/60
+	stick key
+	if key&32 : break		; [Enter]が押されたか?
+	loop
+	goto *gtitle			; タイトルに戻る
+
+
+*main3
+	;	クリア
+	repeat 300
+	redraw 0
+	gosub *drawbg
+	gosub *drawmap
+	gosub *mymove
+
+	font msgothic,40,1
+	pos 150,200
+	color 255,255,255
+	mes "ジャンプせいこう"
+
+	redraw 1
+	if cnt=16 : mmstop : mmplay 0
+	await 1000/60
+	stick key
+	if key&32 : break		; [Enter]が押されたか?
+	loop
+	goto *gtitle	; クリアしたらタイトルに戻る
+
+
+*mymove
+	;	プレイヤー操作
+	stick key,15
+	x=px:y=py
+	myrun=0
+
+	if myflag!=0 {
+		mydir=32
+		myflag=myflag+1
+		key=0
+	}
+
+	if key&1 : mydir=12 : myrun=1 : x=x-myspd
+	if key&4 : mydir=28 : myrun=1 : x=x+myspd
+	if x<0 : x=0
+	if x>=(vmaxx-mysizex) : x=px
+
+	if myrun>0 {
+		i=mysizey-1 : gosub *myarea
+		if a>0 {
+			gosub *chkitem
+			x=px
+		}
+	}
+
+	if myjmp>0 : goto *mymove3
+
+	;	通常時
+	if key&16 : myjmp=1 : mygrv=-grav : mmplay 3 : goto *mymove3
+
+	i=mysizey : gosub *myarea
+	if a<4 : myjmp=1 : mygrv=8 : goto *mymove3
+
+	goto *mymove2
+
+*mymove3
+	;	ジャンプ中
+	y=y+mygrv
+	mygrv=mygrv+1
+
+	if mygrv<0 : goto *mymove2
+	if mygrv>16 : mygrv=16
+
+	i=mysizey : gosub *myarea
+	if a>0 {
+		if myflag=0 : mmplay 2
+		if a>0 : gosub *chkitem
+		y=(mapy*sy)-mysizey : myjmp=0
+		mydir=0
+	}
+	if y>=vmaxy : gosub *mydead
+
+*mymove2
+	;	プレイヤー描画
+	px=x:py=y
+
+	a=mydir
+	if myrun>0 {
+		myani=myani+1
+		a+=(myani/4)\4
+	}
+
+	gmode 2,mysizex,mysizey
+	x=px-viewx:y=py-viewy
+	pos x,y:celput 3,a
+
+	i=0
+	if x<240 : i=(x-240)/40
+	if x>(wx-320) : i=(x-(wx-320))/40
+	viewx=limit( viewx+i, 0, vbasex )
+
+	i=0
+	if y<160 : i=(y-160)/40
+	if y>(wy-240) : i=(y-(wy-240))/40
+	viewy=limit( viewy+i, 0, vbasey )
+
+	return
+
+*myarea
+	;	自分の足元マップを調べる
+	mapx=(x+10)/sx
+	mapy=(y+i)/sy
+	if mapy>=mapsizey : a=0 : return
+	if mapy<0 : a=0 : return
+	a=map(mapx,mapy)
+	if a>=hitparts : return		; 接触のあるパーツID
+	mapx=(x+53)/sx
+	a=map(mapx,mapy)
+	if a>=hitparts : return		; 接触のあるパーツID
+	a=0
+	return
+
+*chkitem
+	;	障害物・アイテムのチェック
+	if a=3 {
+		coin=coin+1
+		map(mapx,mapy)=0
+		mmplay 4
+		return
+	}
+	if a=4||a=5 {
+		gosub *mydead
+		return
+	}
+	return
+
+*mydead
+	;	やられフラグを立てる
+	myflag=1
+	return
+
+*drawbg
+	;	背景描画
+	startx=-viewx\sx	; マップの表示開始X座標
+	starty=-viewy\sy	; マップの表示開始Y座標
+	ofsx=viewx/sx		; マップデータの参照開始X座標
+	ofsy=viewy/sy		; マップデータの参照開始Y座標
+
+	;	奥の背景も少しスクロールさせる
+	gmode 0,wx,wy
+	x=0:y=viewy*(bgmaxy-wy)/vbasey
+	pos 0,0:gcopy 1,x,y
+	return
+
+*drawmap
+	;	マップ描画
+	y=0
+	drawx=mx:if startx!=0 : drawx=drawx+1
+	drawy=my:if starty!=0 : drawy=drawy+1
+
+	gmode 2,sx,sy
+	repeat drawy
+		x=0
+		repeat drawx
+			a=map(ofsx+x,ofsy+y)
+			if a>0 : pos x*sx+startx,y*sy+starty:celput 2,a
+			x=x+1
+		loop
+		y=y+1
+	loop
+	return

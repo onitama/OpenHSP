@@ -137,10 +137,10 @@ dos_setup:
 	@type builds$(SEP)newline
 	@echo The following settings are used:
 	@type builds$(SEP)newline
-	@echo   platformï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³$(PLATFORM)
-	@echo   compilerï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³$(CC)
-	@echo   configuration directoryï£³ï£³ï£³ï£³ï£³ï£³$(subst /,$(SEP),$(BUILD_DIR))
-	@echo   configuration rulesï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³ï£³$(subst /,$(SEP),$(CONFIG_RULES))
+	@echo   platformÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ$(PLATFORM)
+	@echo   compilerÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ$(CC)
+	@echo   configuration directoryÿÿÿÿÿÿ$(subst /,$(SEP),$(BUILD_DIR))
+	@echo   configuration rulesÿÿÿÿÿÿÿÿÿÿ$(subst /,$(SEP),$(CONFIG_RULES))
 	@type builds$(SEP)newline
 	@echo If this does not correspond to your system or settings please remove the file
 	@echo '$(CONFIG_MK)' from this directory then read the INSTALL file for help.

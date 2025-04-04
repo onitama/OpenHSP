@@ -15,6 +15,18 @@ using std::ostringstream;
 // Fix bad material names
 static void fixMaterialName(string& name);
 
+static std::string UTF8toSJIS(const char *basestr)
+{
+    // UTF8 to cp932
+    char* path_utf8;
+    FbxUTF8ToAnsi(basestr, path_utf8);
+
+    std::string coverted_path(path_utf8);
+    FbxFree(path_utf8);
+
+    return coverted_path;
+}
+
 FBXSceneEncoder::FBXSceneEncoder()
     : _groupAnimation(NULL), _autoGroupAnimations(false)
 {
@@ -94,7 +106,7 @@ void FBXSceneEncoder::write(const string& filepath, const EncoderArguments& argu
 	_fbxScene = fbxScene;
     loadScene(fbxScene);
     print("Load materials");
-    loadMaterials(fbxScene);
+    loadMaterials(fbxScene, arguments.originalMaterialName());
     print("Loading animations.");
 	if (arguments.mergeAnimationEnabled()) {
 		loadAnimations(fbxScene2, arguments);
@@ -214,7 +226,8 @@ void FBXSceneEncoder::loadScene(FbxScene* fbxScene)
 			printf("Load nodes.(%d)\n",childCount);
 			for (int i = 0; i < childCount; ++i)
 			{
-				printf("Node:%s\n",rootNode->GetChild(i)->GetName());
+                std::string nodename = UTF8toSJIS(rootNode->GetChild(i)->GetName());
+				printf("Node:%s\n", nodename.c_str());
 				Node* node = loadNode(rootNode->GetChild(i));
 				if (node)
 				{
@@ -413,7 +426,9 @@ void FBXSceneEncoder::loadAnimationChannels(FbxAnimLayer* animLayer, FbxNode* fb
         channel->setInterpolation(AnimationChannel::LINEAR);
         channel->setTargetAttribute(channelAttribs[i]);
         animation->add(channel);
-		printf( "Anim #%d [%s]\r\n",i,name );
+
+        std::string nodename = UTF8toSJIS(name);
+        printf( "Anim #%d [%s]\r\n",i, nodename.c_str());
 
     }
 
@@ -760,6 +775,10 @@ Material* FBXSceneEncoder::createBaseMaterial(const string& baseMaterialName, Ma
     baseMaterial->setRenderState("cullFace", "true");
     baseMaterial->setRenderState("depthTest", "true");
 
+    baseMaterial->setRenderState("blend", "true");
+    baseMaterial->setRenderState("blendSrc", "SRC_ALPHA");
+    baseMaterial->setRenderState("blendDst", "ONE_MINUS_SRC_ALPHA");
+
     if (childMaterial->isTextured())
     {
 		baseMaterial->setVertexShader("res/shaders/textured.vert");
@@ -974,7 +993,7 @@ void FBXSceneEncoder::loadModel(FbxNode* fbxNode, Node* node)
     }
 }
 
-void FBXSceneEncoder::loadMaterials(FbxScene* fbxScene)
+void FBXSceneEncoder::loadMaterials(FbxScene* fbxScene, bool orgName )
 {
     FbxNode* rootNode = getRootNode(fbxScene);
     if (rootNode)
@@ -982,21 +1001,21 @@ void FBXSceneEncoder::loadMaterials(FbxScene* fbxScene)
         // Don't include the FBX root node
         const int childCount = rootNode->GetChildCount();
 		if (childCount == 0) {
-				loadMaterial(rootNode);
+				loadMaterial( rootNode, orgName );
 		} else {
 			for (int i = 0; i < childCount; ++i)
 			{
 				FbxNode* fbxNode = rootNode->GetChild(i);
 				if (fbxNode)
 				{
-					loadMaterial(fbxNode);
+					loadMaterial( fbxNode, orgName );
 				}
 			}
 		}
     }
 }
 
-void FBXSceneEncoder::loadMaterial(FbxNode* fbxNode)
+void FBXSceneEncoder::loadMaterial(FbxNode* fbxNode, bool orgName)
 {
     Node* node = findNode(fbxNode);
     Model* model = (node) ? node->getModel() : NULL;
@@ -1011,7 +1030,7 @@ void FBXSceneEncoder::loadMaterial(FbxNode* fbxNode)
     for (int index = 0; index < materialCount; ++index)
     {
         FbxSurfaceMaterial* fbxMaterial = fbxNode->GetMaterial(index);
-        string materialName(fbxMaterial->GetName());
+        std::string materialName = UTF8toSJIS(fbxMaterial->GetName());
 
 		unsigned int jointcount = 0;
 		if (model) {
@@ -1021,7 +1040,7 @@ void FBXSceneEncoder::loadMaterial(FbxNode* fbxNode)
 			}
 		}
 
-        fixMaterialName(materialName);
+        if ( orgName == false ) fixMaterialName(materialName);
 		if (jointcount>0) {                    // FIX : aboid same material name of different joint count (onitama)
 			materialName+="_";
 			materialName+=std::to_string(jointcount);
@@ -1066,7 +1085,7 @@ void FBXSceneEncoder::loadMaterial(FbxNode* fbxNode)
         FbxNode* childNode = fbxNode->GetChild(i);
         if (childNode)
         {
-            loadMaterial(childNode);
+            loadMaterial( childNode, orgName );
         }
     }
 }
@@ -1147,8 +1166,13 @@ void FBXSceneEncoder::loadMaterialFileTexture(FbxFileTexture* fileTexture, Mater
     }
     if (sampler)
     {
-		string fname = _OptionFilePath + GetFileNameFromPath(fileTexture->GetRelativeFileName());
-        sampler->set("absolutePath", fileTexture->GetFileName());
+        char* ansiname;
+        char* ansiname2;
+        FbxUTF8ToAnsi(fileTexture->GetRelativeFileName(), ansiname);
+        FbxUTF8ToAnsi(fileTexture->GetFileName(), ansiname2);
+
+        string fname = _OptionFilePath + GetFileNameFromPath(ansiname);
+        sampler->set("absolutePath", ansiname2);
         sampler->set("relativePath", fname );
         sampler->set("wrapS", fileTexture->GetWrapModeU() == FbxTexture::eClamp ? CLAMP : REPEAT);
         sampler->set("wrapT", fileTexture->GetWrapModeV() == FbxTexture::eClamp ? CLAMP : REPEAT);
@@ -1175,6 +1199,8 @@ void FBXSceneEncoder::loadMaterialFileTexture(FbxFileTexture* fileTexture, Mater
                 material->addDefine(TEXTURE_OFFSET);
             }
         }
+        FbxFree(ansiname);
+        FbxFree(ansiname2);
     }
 }
 
@@ -1188,20 +1214,20 @@ void FBXSceneEncoder::loadMaterialUniforms(FbxSurfaceMaterial* fbxMaterial, Mate
         if (material->isLit())
         {
             FbxDouble3 ambient = lambert->Ambient.Get();
-            if (!isBlack(ambient))
-            {
+            //if (!isBlack(ambient))
+            //{
                 material->setUniform("u_ambientColor", toString(ambient));
-            }
+            //}
         }
         if (!material->isTextured())
         {
             if (!material->isDefined(VERTEX_COLOR))
             {
                 FbxDouble3 diffuse = lambert->Diffuse.Get();
-                if (!isBlack(diffuse))
-                {
+                //if (!isBlack(diffuse))
+                //{
                     material->setUniform("u_diffuseColor", toString(diffuse, 1.0));
-                }
+                //}
             }
         }
     }
@@ -1335,9 +1361,9 @@ Mesh* FBXSceneEncoder::loadMesh(FbxMesh* fbxMesh)
     vector<vector<Vector2> > weights;
     bool hasSkin = loadBlendWeights(fbxMesh, weights);
 
-	printf( "#Load Mesh [%s] skin:%d\n",name,hasSkin );
+    std::string nodename = UTF8toSJIS(name);
+    printf( "#Load Mesh [%s] skin:%d\n", nodename.c_str(),hasSkin );
 
-    
     // Get list of uv sets for mesh
     FbxStringList uvSetNameList;
     fbxMesh->GetUVSetNames(uvSetNameList);
@@ -1488,6 +1514,7 @@ void fixMaterialName(string& name)
 {
     static int unnamedCount = 0;
 
+#if 0
     for (string::size_type i = 0, len = name.length(); i < len; ++i)
     {
         if (!isalnum(name[i]))
@@ -1500,4 +1527,8 @@ void fixMaterialName(string& name)
         stream << "unnamed_" << (++unnamedCount);
         name = stream.str();
     }
+#endif
+    ostringstream stream;
+    stream << "material_" << (++unnamedCount);
+    name = stream.str();
 }

@@ -25,14 +25,18 @@ public:
 	gpmat();
 	~gpmat();
 	void reset(gamehsp *owner, int id);
+	void revoke(void);
 	int setParameter( char *name, float value );
-	int setParameter( char *name, Vector3 *value );
+	int setParameter(char* name, float value, float value2);
+	int setParameter(char* name, Vector3* value);
 	int setParameter( char *name, Vector4 *value );
-	int setParameter(char *name, const Matrix *value, int count);
-	int setParameter(char *name, char *fname, int matopt);
+	int setParameter(char *name, double* value, int count);
+	int setParameter(char* name, char* fname, int matopt);
+	int setParameter(char* name, Texture::Sampler* samp);
 	int setState(char *name, char *value);
 	int updateTex32(char* ptr, int mode);
 	void applyFilterMode(int mode);
+	Texture::Sampler* getSampler(char *name="");
 
 	short _flag;						// 存在フラグ
 	short _mark;						// マーク処理用
@@ -48,6 +52,7 @@ public:
 	int _matopt;						// マテリアルオプション保存用
 	int _matcolor;						// マテリアルカラー保存用
 	int _filtermode;					// フィルターモード
+	gameplay::Matrix* _matbuffer;		// マトリクス保持用バッファ
 
 protected:
 	/**

@@ -230,6 +230,77 @@ void HspVarCoreDimFlex( PVal *pval, int flag, int len0, int len1, int len2, int 
 }
 
 
+void HspVarCoreDimWC(PVal* pval, int flag, int len1, int len2, int len3, int len4)
+{
+	//		配列を確保する
+	//		(len1～len4は、4byte単位なので注意)
+	//
+#ifdef HSPDEBUG
+	if (pval->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;
+	if (pval->flag != flag) {
+		if (pval->support & HSPVAR_SUPPORT_FIXEDTYPE) {
+			throw HSPERR_FIXED_VARTYPE;
+		}
+	}
+	int logvar = pval->support & HSPVAR_SUPPORT_DEBUGVAR;
+#endif
+	HspVarProc* p;
+	p = &hspvarproc[flag];
+	if ((len1 < 0) || (len2 < 0) || (len3 < 0) || (len4 < 0)) throw HSPVAR_ERROR_ILLEGALPRM;
+
+	HspVarCoreDispose(pval);
+
+	pval->flag = flag;
+	pval->len[0] = 1;
+	pval->offset = 0;
+	pval->arraycnt = 0;
+	pval->support = p->support;
+#ifdef HSPDEBUG
+	pval->support |= logvar;
+#endif
+	pval->len[1] = len1;
+	pval->len[2] = len2;
+	pval->len[3] = len3;
+	pval->len[4] = len4;
+	p->Alloc(pval, NULL);
+}
+
+
+void HspVarCoreDimFlexWC(PVal* pval, int flag, int len0, int len1, int len2, int len3, int len4)
+{
+	//		配列を確保する(可変長配列用)
+	//		(len1～len4は、4byte単位なので注意)
+	//
+#ifdef HSPDEBUG
+	if (pval->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;
+	if (pval->flag != flag) {
+		if (pval->support & HSPVAR_SUPPORT_FIXEDTYPE) {
+			throw HSPERR_FIXED_VARTYPE;
+		}
+	}
+	int logvar = pval->support & HSPVAR_SUPPORT_DEBUGVAR;
+#endif
+	HspVarProc* p;
+	p = &hspvarproc[flag];
+	if ((len1 < 0) || (len2 < 0) || (len3 < 0) || (len4 < 0)) throw HSPVAR_ERROR_ILLEGALPRM;
+	HspVarCoreDispose(pval);
+	pval->flag = flag;
+	pval->len[0] = len0;
+	pval->offset = 0;
+	pval->arraycnt = 0;
+	pval->support = p->support;
+#ifdef HSPDEBUG
+	pval->support |= logvar;
+#endif
+	pval->len[1] = len1;
+	pval->len[2] = len2;
+	pval->len[3] = len3;
+	pval->len[4] = len4;
+	p->Alloc(pval, NULL);
+	pval->len[0] = 1;
+}
+
+
 void HspVarCoreReDim( PVal *pval, int lenid, int len )
 {
 	//		配列を拡張する
@@ -246,6 +317,21 @@ void HspVarCoreClear( PVal *pval, int flag )
 	//		指定タイプの変数を最小メモリで初期化する
 	//
 	HspVarCoreDim( pval, flag, 1, 0, 0, 0 );	// 最小サイズのメモリを確保
+}
+
+
+void HspVarCoreClearWC(PVal* pval, int flag)
+{
+	//		指定タイプの変数を最小メモリで初期化する(型固定チェック付き)
+	//
+#ifdef HSPDEBUG
+	if (pval->flag != flag) {
+		if (pval->support & HSPVAR_SUPPORT_FIXEDTYPE) {
+			throw HSPERR_FIXED_VARTYPE;
+		}
+	}
+#endif
+	HspVarCoreDim(pval, flag, 1, 0, 0, 0);	// 最小サイズのメモリを確保
 }
 
 

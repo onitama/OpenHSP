@@ -25,8 +25,15 @@
 static HspHelpManager hsman;
 #endif
 
-#define DPM_SUPPORT		// DPMファイルマネージャをサポート
+//#define DPM_SUPPORT		// DPMファイルマネージャをサポート
+#ifdef DPM_SUPPORT
 #include "dpm.h"
+#endif
+
+#define DPM2_SUPPORT		// DPM2ファイルマネージャをサポート
+#include "../../hsp3/filepack.h"
+#define PACKFILE "packfile"
+#define DPMFILE "data"
 
 #define ICONINS_SUPPORT	// ICONINSツールをサポート
 
@@ -50,13 +57,16 @@ static CHsc3 *hsc3=NULL;
 static CAht *aht=NULL;
 static int homeid;				// Home object
 static int ahtbuild_error;		// Error code
+static char analysis_keyword[_MAX_PATH];
+static char* analysis_name;
+static int analysis_mode;
 
 extern char *hsp_prestr[];
 
-/*
-	rev 54
-	gcc でビルドしたときに DllMain が呼ばれるように修正。
-*/
+#ifdef DPM2_SUPPORT
+static FilePack filepack;		// File Pack Manager
+#endif
+
 
 #if defined( __GNUC__ ) && defined( __cplusplus )
 extern "C"
@@ -160,6 +170,8 @@ EXPORT BOOL WINAPI hsc_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 	strcpy(oname,p1);
 	cutext(oname);
 	strcat(oname,".ax");
+	analysis_name = NULL;
+	analysis_mode = 0;
 	return 0;
 }
 
@@ -174,12 +186,40 @@ EXPORT BOOL WINAPI hsc_refname ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI hsc_objname ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI hsc_objname(BMSCR* bm, char* p1, int p2, int p3)
 {
 	//
 	//		hsc_objname "obj-file"  (type6)
 	//
-	strcpy(oname,p1);
+	strcpy(oname, p1);
+	return 0;
+}
+
+
+EXPORT BOOL WINAPI hsc3_analysis(BMSCR* bm, char* p1, int p2, int p3)
+{
+	//
+	//		hsc3_analysisname "name", mode, line  (type6)
+	//
+	if (*p1 == 0) {
+		analysis_name = NULL;
+	}
+	else {
+		strncpy(analysis_keyword, p1, _MAX_PATH - 1);
+		analysis_name = analysis_keyword;
+	}
+	analysis_mode = p2;
+	hsc3->InitAnalysisInfo(analysis_mode, analysis_name, p3);
+	return 0;
+}
+
+
+EXPORT BOOL WINAPI hsc3_kwlineinfo(char* p1, int p2, int p3, int p4)
+{
+	//
+	//		hsc3_kwlineinfo val, opt (type1)
+	//
+	strcpy(p1, hsc3->GetAnalysisLineInfo(p2));
 	return 0;
 }
 
@@ -234,6 +274,12 @@ EXPORT BOOL WINAPI hsc_compath ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
+static int hsc_comp_sub(int p1, int p2, int p3, int p4)
+{
+
+}
+
+
 EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 {
 	//
@@ -242,14 +288,21 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	//			(       2=preprocessor only )
 	//			(       4=UTF8 output mode )
 	//			(       8=strmap output mode )
+	//			(      16=keyword list mode )
+	//			(     256=emscripten mode )
 	//			( ppopt = preprocessor option )
 	//			(       0=default/1=ver2.6 mode )
 	//			(       32=UTF8 input mode )
 	//			( dbgopt = debug window option )
 	//			(       0=default/1=debug mode )
 /*
-	int st;
-	st=tcomp_main( rname, fname, oname, mesbuf, p1, compath );
+
+p1が1(bit0)の場合は、デバッグ情報が付加されます。
+p1が2(bit1)の場合はプリプロセス処理のみ行います。
+p1が4(bit2)の場合は文字列データをUTF-8コードに変換して出力します。
+p1が8(bit3)の場合は使用している文字列データファイル(strmap)を出力します
+p1が16(bit4)の場合はキーワード解析リストを出力します
+
 */
 	int st;
 	int ppopt;
@@ -257,6 +310,7 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	char fname2[_MAX_PATH];
 
 	hsc3->ResetError();
+
 	if (orgcompath==0) {
 		GetModuleFileName( NULL,compath,_MAX_PATH );
 		GetFilePath( compath );
@@ -266,14 +320,15 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	strcat( fname2, ".i" );
 	hsc3->SetCommonPath( compath );
 	ppopt = 0;
-	if ( p1&1 ) ppopt|=HSC3_OPT_DEBUGMODE;
+	if (p1 & 1) ppopt |= HSC3_OPT_DEBUGMODE;
+	if (p1 & 4) ppopt |= HSC3_OPT_UTF8OUT;
+	if (p1 & 256) ppopt |= HSC3_OPT_EMSCRIPTEN;
+
 	if ( p2&1 ) ppopt|=HSC3_OPT_NOHSPDEF;
 	if ( p2&4 ) ppopt|=HSC3_OPT_MAKEPACK;
 	if ( p2&8 ) ppopt|=HSC3_OPT_READAHT;
 	if ( p2&16 ) ppopt|=HSC3_OPT_MAKEAHT;
 	if ( p2&32 ) ppopt|=HSC3_OPT_UTF8IN;
-
-	if ( p1 & 4 ) ppopt|=HSC3_OPT_UTF8OUT;
 
 	st = hsc3->PreProcess( fname, fname2, ppopt, rname );
 	if ( st != 0 ) {
@@ -288,17 +343,22 @@ EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
 	cmpmode = p1 & HSC3_MODE_DEBUG;
 	if (p1 & 4) cmpmode |= HSC3_MODE_UTF8;
 	if (p1 & 8) cmpmode |= HSC3_MODE_STRMAP;
-	if ( p3 ) cmpmode |= HSC3_MODE_DEBUGWIN;
 
-	if (p1 & 8) {
-		st = hsc3->CompileStrMap(fname2, oname, cmpmode);
+	if (p1 & 16) {
+		st = hsc3->CompileLabelOut(fname2, cmpmode);
 	}
 	else {
-		st = hsc3->Compile(fname2, oname, cmpmode);
+		if (p3) cmpmode |= HSC3_MODE_DEBUGWIN;
+		if (p1 & 8) {
+			st = hsc3->CompileStrMap(fname2, oname, cmpmode);
+		}
+		else {
+			st = hsc3->Compile(fname2, oname, cmpmode);
+		}
 	}
+
 	hsc3->PreProcessEnd();
-	if ( st != 0 ) return st;
-	return 0;
+	return st;
 }
 
 
@@ -309,14 +369,19 @@ EXPORT BOOL WINAPI pack_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 	//
 	//		pack_ini "src-file"  (type6)
 	//
-#ifdef DPM_SUPPORT
-	strcpy(fname,p1);
+	strcpy(fname, p1);
 	cutext(fname);
-	if ( hsc3==NULL ) Alert( "#No way." );
+	if (hsc3 == NULL) Alert("#No way.");
 	hsc3->ResetError();
+	opt1 = 640; opt2 = 480; opt3 = 0;
+	strcpy(hspexe, "hsprt");
+
+#ifdef DPM_SUPPORT
 	dpmc_ini( hsc3->errbuf, fname );
-	opt1=640;opt2=480;opt3=0;
-	strcpy(hspexe,"hsprt");
+#endif
+#ifdef DPM2_SUPPORT
+	filepack.Reset();
+	filepack.SetErrorBuffer(hsc3->errbuf);
 #endif
 	return 0;
 }
@@ -325,13 +390,31 @@ EXPORT BOOL WINAPI pack_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 EXPORT BOOL WINAPI pack_view ( int p1, int p2, int p3, int p4 )
 {
 	//
-	//		pack_view (type0)
+	//		pack_view encode  (type0)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	st = dpmc_view();
-#else
-	st = 0;
+#endif
+#ifdef DPM2_SUPPORT
+	char dpmname[_MAX_PATH];
+	strcpy(dpmname,fname);
+	strcat(dpmname, ".dpm");
+	char tmp[1024];
+
+	if (p1 == 0) p1 = -1;
+	int res = filepack.LoadPackFile(dpmname, p1);
+	if (res<0) {
+		sprintf(tmp,"#Error %d in loading [%s].",res, dpmname);
+		filepack.Print(tmp);
+		st = 1;
+	}
+	else {
+		sprintf(tmp, "#[%s] Loaded.", dpmname);
+		filepack.Print(tmp);
+		filepack.PrintFiles();
+	}
 #endif
 	return -st;
 }
@@ -345,11 +428,22 @@ EXPORT BOOL WINAPI pack_make ( int p1, int p2, int p3, int p4 )
 	//		     key  : (0=Default/other=New Seed)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	if ( p2 != 0 ) dpmc_dpmkey( p2 );
 	st=dpmc_pack(p1);
+#endif
+
+#ifdef DPM2_SUPPORT
+	if (p2 == 0) p2 = -1;
+#ifdef HSPWIN
+	p1 = (int)GetTickCount();	// Windowsの場合はtickをシード値とする
 #else
-	st = 0;
+	p1 = (int)time(0);			// Windows以外のランダムシード値
+#endif
+	if (filepack.SavePackFile(fname, PACKFILE, p1, p2) < 0) {
+		st = 1;
+	}
 #endif
 	return -st;
 }
@@ -383,10 +477,9 @@ EXPORT BOOL WINAPI pack_exe ( int p1, int p2, int p3, int p4 )
 	//		pack_exe mode (type0)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	st=dpmc_mkexe(p1,hspexe,opt1,opt2,opt3);
-#else
-	st = 0;
 #endif
 	return -st;
 }
@@ -395,13 +488,17 @@ EXPORT BOOL WINAPI pack_exe ( int p1, int p2, int p3, int p4 )
 EXPORT BOOL WINAPI pack_get ( BMSCR *bm, char *p1, int p2, int p3 )
 {
 	//
-	//		pack_get "get-file"  (type6)
+	//		pack_get "get-file", enc  (type6)
 	//
 	int st;
+	st = 0;
 #ifdef DPM_SUPPORT
 	st=dpmc_get(p1);
-#else
-	st = 0;
+#endif
+#ifdef DPM2_SUPPORT
+	if (filepack.ExtractFile(p1,NULL,p2) < 0) {
+		st = 1;
+	}
 #endif
 	return -st;
 }
@@ -411,19 +508,59 @@ EXPORT BOOL WINAPI pack_get ( BMSCR *bm, char *p1, int p2, int p3 )
 //		Additional service on 2.6
 //----------------------------------------------------------
 
-EXPORT BOOL WINAPI hsc3_getsym ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc3_getsym(int p1, int p2, int p3, int p4)
 {
 	//
 	//		hsc3_getsym val  (type1)
 	//
 	hsc3->ResetError();
-	if (orgcompath==0) {
-		GetModuleFileName( NULL,compath,_MAX_PATH );
-		GetFilePath( compath );
-		strcat( compath,"common\\" );
+	if (orgcompath == 0) {
+		GetModuleFileName(NULL, compath, _MAX_PATH);
+		GetFilePath(compath);
+		strcat(compath, "common\\");
 	}
-	hsc3->SetCommonPath( compath );
-	if ( hsc3->GetCmdList( p1|2 ) ) return -1;
+	hsc3->SetCommonPath(compath);
+	if (hsc3->GetCmdList(p1 | 2)) return -1;
+	return 0;
+}
+
+
+EXPORT BOOL WINAPI hsc3_kwlbuf(char* p1, int p2, int p3, int p4)
+{
+	//
+	//		hsc3_kwlbuf bufvar, maxsize  (type1)
+	//
+	char* p = hsc3->GetAnalysisInfo();
+	if (p == NULL) {
+		return -1;
+	}
+	if (p2) {
+		if (hsc3->GetAnalysisInfoSize() > p2) {
+			return -1;
+		}
+	}
+	strcpy(p1, p );
+	return 0;
+}
+
+
+EXPORT BOOL WINAPI hsc3_kwlsize(int* p1, int p2, int p3, int p4)
+{
+	//
+	//		hsc3_kwlsize var  (type1)
+	//
+	*p1 = hsc3->GetAnalysisInfoSize();
+	if (*p1 == 0) return -1;
+	return 0;
+}
+
+
+EXPORT BOOL WINAPI hsc3_kwlclose(int p1, int p2, int p3, int p4)
+{
+	//
+	//		hsc3_kwlclose var  (type0)
+	//
+	hsc3->DeleteAnalysisInfo();
 	return 0;
 }
 
@@ -515,6 +652,7 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	hsc3->ClosePackfile();
 
 	//		exeを作成
+	st = 0;
 #ifdef DPM_SUPPORT
 	dpmc_ini( hsc3->errbuf, fname );
 	st=dpmc_pack( 0 );
@@ -522,8 +660,25 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	st=dpmc_mkexe( type, hspexe, opt1, opt2, opt3 );
 	strcat( fname, ".dpm" );
 	DeleteFile( fname );
+#endif
+#ifdef DPM2_SUPPORT
+	int myseed1,myseed2;
+#ifdef HSPWIN
+	myseed1 = (int)GetTickCount();	// Windowsの場合はtickをシード値とする
 #else
-	st = 0;
+	myseed1 = (int)time(0);			// Windows以外のランダムシード値
+#endif
+	myseed2 = hsp3_flength(PACKFILE);
+
+	filepack.Reset();
+	filepack.SetErrorBuffer(hsc3->errbuf);
+	st = filepack.SavePackFile(fname, PACKFILE, myseed1, myseed2);
+	if (st < 0) {
+		return -1;
+	}
+	st = filepack.MakeEXEFile(type, hspexe, fname, myseed2, opt1, opt2, opt3);
+	strcat(fname, ".dpm");
+	DeleteFile(fname);
 #endif
 
 	//		iconins process
@@ -563,6 +718,15 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 			strcat( ici_opt, "\"" );
 		}
 		if ( p2 ) {
+			i = 1;
+			while (1) {
+				Sleep(100);
+				CMemBuf dummy;
+				int res = dummy.PutFile(ici_target);
+				if (res > 0) break;
+				i++;
+				if (i >= 50) break;
+			}
 			i = WinExec( ici_opt, SW_SHOW );
 			if ( i < 32 ) return -1;
 		}
@@ -695,7 +859,7 @@ EXPORT BOOL WINAPI aht_stdbuf ( char *p1, int p2, int p3, int p4 )
 EXPORT BOOL WINAPI aht_stdsize ( int *p1, int p2, int p3, int p4 )
 {
 	//
-	//		aht_stdbuf var  (type1)
+	//		aht_stdsize var  (type1)
 	//
 	if ( aht == NULL ) return -1;
 	*p1 = (int)strlen( aht->GetStdBuffer() ) + 1;
@@ -1303,7 +1467,7 @@ EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 		m = aht->GetModel( res );
 		p = m->GetClass();
 		len = (int)strlen( p ) - 5; if ( len < 0 ) len = 0;
-		if ( tstrcmp( p+len, ".home" ) ) {			// homeクラスかどうか確認する
+		if ( strcmp( p+len, ".home" )==0 ) {		// homeクラスかどうか確認する
 			if ( homeid != -1 ) ahtbuild_error = 2;
 			homeid = res;
 		}
@@ -1315,7 +1479,7 @@ EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 		m = aht->GetModel( i );
 		p = m->GetClass();
 		len = (int)strlen( p ) - 8; if ( len < 0 ) len = 0;
-		if ( tstrcmp( p+len, ".routine" ) ) {			// routineクラスかどうか確認する
+		if ( strcmp( p+len, ".routine" )==0 ) {		// routineクラスかどうか確認する
 			statval = -1;
 		}
 	}

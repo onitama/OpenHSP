@@ -5,7 +5,6 @@
 #ifndef __hspdef__
 #define __hspdef__
 #addition "userdef.as"
-#addition "dish_enhance.as"
 
 #define global and &
 #define global or |
@@ -18,6 +17,8 @@
 #define global screen_fixedsize (4)
 #define global screen_tool (8)
 #define global screen_frame (16)
+#define global celid_auto (-1)
+#define global celid_reuse (-2)
 
 #define global gmode_gdi (0)
 #define global gmode_mem (1)
@@ -31,6 +32,7 @@
 #define global mesopt_nocr (1)
 #define global mesopt_shadow (2)
 #define global mesopt_outline (4)
+#define global mesopt_light (8)
 #define global mesopt_gmode (16)
 
 #define global ginfo_mx ginfo(0)
@@ -166,6 +168,13 @@
 #define global objlayer_info_axis (5)
 #define global objlayer_info_size (6)
 
+#define global varprop_xtype (1)
+#define global varprop_xvalue (2)
+#define global varprop_log (4)
+#define global varprop_logarray (8)
+
+#define global logmesv(%1) varprop %1,4
+#define global logmesva(%1) varprop %1,12
 
 #ifndef _DEBUG
 #undef assert

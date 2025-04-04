@@ -10,7 +10,7 @@
 
 // The encoder version number should be incremented when a feature is added to the encoder.
 // The encoder version is not the same as the GPB version.
-#define ENCODER_VERSION "3.6.0 hsp3gp"
+#define ENCODER_VERSION "3.7.0 hsp3gp"
 #define HEIGHTMAP_SIZE_MAX 2049
 
 namespace gameplay
@@ -30,7 +30,9 @@ EncoderArguments::EncoderArguments(size_t argc, const char** argv) :
     _animationGrouping(ANIMATIONGROUP_PROMPT),
     _outputMaterial(false),
     _generateTextureGutter(false),
-    _mergeAnimation(false)
+    _mergeAnimation(false),
+    _originalMaterialName(false)
+
 {
     __instance = this;
 	_textureOptionPath = std::string("res/");
@@ -262,6 +264,11 @@ void splitString(const char* str, std::vector<std::string>* tokens)
     delete[] temp;
 }
 
+bool EncoderArguments::originalMaterialName() const
+{
+    return _originalMaterialName;
+}
+
 void EncoderArguments::printUsage() const
 {
     LOG(1, "Usage: gameplay-encoder [options] <input filepath> <output filepath>\n\n" \
@@ -301,7 +308,8 @@ void EncoderArguments::printUsage() const
         "\t\tFilename is the name of the image (PNG) to be saved.\n" \
         "\t\tMultiple -h arguments can be supplied to generate more than one \n" \
         "\t\theightmap. For 24-bit packed height data use -hp instead of -h.\n" \
-    "\n" \
+    "  -u Use original material name\n" \
+        "\n" \
     "TMX file options:\n" \
     "  -tg\tEnable texture gutter's around tiles. This will modify any referenced\n" \
     "  \ttile sets to add a 1px border around it to prevent seams.\n"
@@ -725,6 +733,9 @@ void EncoderArguments::readOption(const std::vector<std::string>& options, size_
 		_mergeAnimationFBXName = options[*index];
 		_mergeAnimation = true;
 		break;
+    case 'u':
+        _originalMaterialName = true;
+        break;
     case 'v':
         (*index)++;
         if (*index < options.size())

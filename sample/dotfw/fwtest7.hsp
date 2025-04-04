@@ -1,0 +1,41 @@
+#include "dotfw.as"
+
+	;
+	;	敵のシーケンス制御
+	;	(上から登場して、上に戻るシーケンスを実行します)
+	;
+	df_config "arcade Z300 star"
+	df_reset
+
+	score=0						; スコア
+	df_addplayer 120,210,CHR_SHIP1			; プレイヤーの設定
+
+	df_emodesub *modesub_1:emode_1=stat		; 新しいモードを追加
+
+	seq1=1
+	df_addseq seq1,  EMODE_XAIM, 12, 0		; 最初のシーケンス=EMODE_XAIMのモードで12ターン
+	df_addseq seq1+1,  emode_1, 0, 0		; 次のシーケンス=emode_1のモードで無限
+
+	df_eaction *eact_destroy,EACTION_DESTROY	; アクションを設定
+	df_emode EMODE_SEQ+seq1, CHR_MONSTER2, 5, 4, 200	; 敵の設定
+*main
+	df_mes "SCORE "+score,1,1
+
+	if key&PLAYER_KEY_ESC : end
+	df_enemygen DIR_DOWN,40				; 敵を生成
+	df_update
+	goto *main
+
+*eact_destroy
+	;	敵が破壊された時のサブルーチン(スコア加算用)
+	score+=10
+	return
+
+*modesub_1
+	;	ユーザー定義のモード処理サブルーチン
+	;	(Yの移動量を上方向に加算する)
+	df_getaxis
+	_dotfw_movey -= $4000
+	df_putaxis
+	return
+

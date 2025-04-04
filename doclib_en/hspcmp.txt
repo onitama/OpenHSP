@@ -3,7 +3,7 @@ HSPCMP ver3.6                                       HSP : Hot Soup Processor
 HSP Extension DLL Reference copyright 1999-2020 (c) onion software
 ------------------------------------------------------------------------------
 
-„Éª Introduction
+ÅE Introduction
 
 This tool is used in HSP script editor etc. of Hot Soup Processor ver3 or later
 A possible HSP code compiler.
@@ -65,7 +65,7 @@ please do it.
 After that, instructions will be added to use the features of the HSP code compiler.
 
 
-„Éª Instruction details
+ÅE Instruction details
 
 	hsc_ini "filename"
 
@@ -121,11 +121,11 @@ If necessary, execute the hsc_refname instruction in advance.
 Please. As a compilation procedure,
 
 1. "hsc_ini"
-‚Üì
+Å´
 2. "hsc_refname" (optional)
-‚Üì
+Å´
 3. "hsc_objname" (optional)
-‚Üì
+Å´
 4. "hsc_comp"
 
 It looks like.
@@ -254,7 +254,7 @@ Specify each "boot option" separated by a space
 is needed.
 
 
-ÊèÉimportant point
+ëµimportant point
 
 HSPCMP.DLL is a plug-in file that is used at the same time as HSP3.2 and above.
 Even if you create an EXE file, put HSPCMP.DLL in the same directory as the EXE file.
@@ -264,7 +264,7 @@ If you have any notices or comments about this version,
 Please send it to the mail or the bulletin board of HSP.
 
 
-„Éª Copyright and license
+ÅE Copyright and license
 
 HSPCMP.DLL is copyrighted by onion software.
 onion software is responsible for any damage caused by this program.
@@ -330,7 +330,7 @@ Other extension plugins can be accessed in basically the same way.
 The example list is used in Visual C ++.
 
 
-„Éª Caller
+ÅE Caller
 
 The list below is where HSPCMP.DLL is linked to define the function.
 I define and use a function of type DLLFUNC.

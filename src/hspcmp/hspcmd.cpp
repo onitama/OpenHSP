@@ -40,9 +40,9 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$010 15 end",
 	"$011 15 stop",
 	"$012 15 newmod",				// (ver3.0)
-//	"$013 15 setmod",				// (ver3.0)
+//	"$013 15 setmod",				// (ver3.0)(cancelled)
 	"$014 15 delmod",				// (ver3.0)
-//	"$015 15 alloc",				// (changed 3.0)
+//	"$015 15 alloc",				// (changed 3.0)(cancelled)
 	"$016 15 mref",					// (ver2.5)
 	"$017 15 run",
 	"$018 15 exgoto",				// ver2.6
@@ -51,8 +51,9 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$01b 15 assert",				// (ver3.0)
 	"$01c 15 logmes",				// (ver3.0)
 	"$01d 15 newlab",				// (ver3.2)
-	"$01e 15 resume",				// (ver3.2)
-	"$01f 15 yield",				// (ver3.2)
+	"$01e 15 varprop",				// (ver3.7)
+//	"$01e 15 resume",				// (ver3.2)(cancelled)
+//	"$01f 15 yield",				// (ver3.2)(cancelled)
 	"$020 15 strexchange",			// (ver3.6)
 
 //	"$015 15 logmode",				// (ver2.55)
@@ -352,10 +353,18 @@ char 	*hsp_prepp[] =
 	"$000 0 #usecom",
 	"$000 0 #uselib",
 	"$000 0 #cmpopt",
-	"$000 0 #defint",					// (3.3)
-	"$000 0 #defdouble",
-	"$000 0 #defnone",
 	"$000 0 #bootopt",					// (3.5)
+	"$000 0 #use",						// (3.7)
+	"$000 0 #var",
+	"$000 0 #varint",
+	"$000 0 #vardouble",
+	"$000 0 #varstr",
+	"$000 0 #varlabel",
+	"$000 0 #varmod",
+	"$000 0 #aht",
+	"$000 0 #ahtmes",
+	"$000 0 #packdir",
+	"$000 0 #epackdir",
 
 	"*"
 };

@@ -40,6 +40,9 @@ LINK_FLAGS_GP = $(LINK_FLAGS_CORE) \
 
 OBJS = \
 	src/hsp3/dpmread.js.o \
+	src/hsp3/filepack.js.o \
+	src/hsp3/hsp3crypt.js.o \
+	src/hsp3/hsp3utfcnv.js.o \
 	src/hsp3dish/geometry.js.o \
 	src/hsp3/hsp3.js.o \
 	src/hsp3/hsp3code.js.o \
@@ -76,10 +79,13 @@ OBJS = \
 	src/hsp3dish/emscripten/mmman.js.o \
 	src/hsp3dish/emscripten/webtask_emscripten.js.o \
 	src/hsp3dish/emscripten/stb_image.js.o \
-	src/hsp3dish/emscripten/supio_emscripten.js.o
+	src/hsp3/emscripten/supio_emscripten.js.o
 
 OBJS_GP = \
 	src/hsp3/dpmread.gpjs.o \
+	src/hsp3/filepack.gpjs.o \
+	src/hsp3/hsp3crypt.gpjs.o \
+	src/hsp3/hsp3utfcnv.gpjs.o \
 	src/hsp3dish/geometry.gpjs.o \
 	src/hsp3/hsp3.gpjs.o \
 	src/hsp3/hsp3code.gpjs.o \
@@ -117,7 +123,7 @@ OBJS_GP = \
 	src/hsp3dish/emscripten/mmman.gpjs.o \
 	src/hsp3dish/emscripten/webtask_emscripten.gpjs.o \
 	src/hsp3dish/emscripten/stb_image.gpjs.o \
-	src/hsp3dish/emscripten/supio_emscripten.gpjs.o
+	src/hsp3/emscripten/supio_emscripten.gpjs.o
 
 OBJS_GAMEPLAY = \
 	src/hsp3dish/gameplay/src/AbsoluteLayout.gpjs.o \

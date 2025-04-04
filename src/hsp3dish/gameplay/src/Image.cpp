@@ -30,9 +30,9 @@ Image* Image::create(const char* path)
 	char *p;
 	p = FileSystem::readAll(path, &size);
 	if ( p == NULL ) {
-		GP_ERROR("Failed to open image file '%s'.", path);
-		return NULL;
-	}
+        GP_ERROR("Failed to open image file '%s'.", path);
+        return NULL;
+    }
 
 	int tsx, tsy, comp;
 	unsigned char *pImg;

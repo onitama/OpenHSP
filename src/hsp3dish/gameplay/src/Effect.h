@@ -49,6 +49,9 @@ public:
      */
     static Effect* createFromSource(const char* vshSource, const char* fshSource, const char* defines = NULL);
 
+    static void resetCache();
+    static void SetDefaultFolder( const char *path );
+
     /**
      * Returns the unique string identifier for the effect, which is a concatenation of
      * the shader paths it was loaded from.

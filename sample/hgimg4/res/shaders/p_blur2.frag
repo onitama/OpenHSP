@@ -8,7 +8,7 @@ precision mediump float;
 
 ///////////////////////////////////////////////////////////
 // Uniforms
-uniform sampler2D u_texture;
+uniform sampler2D u_diffuseTexture;
 uniform float u_length;
 uniform float u_length2;
 
@@ -21,11 +21,11 @@ varying vec2 v_blurCoord[5];
 void main()
 {
     vec4 sum = vec4(0.0);
-    sum += texture2D(u_texture, v_blurCoord[0]) * 0.204164;
-    sum += texture2D(u_texture, v_blurCoord[1]) * 0.304005;
-    sum += texture2D(u_texture, v_blurCoord[2]) * 0.304005;
-    sum += texture2D(u_texture, v_blurCoord[3]) * 0.093913;
-    sum += texture2D(u_texture, v_blurCoord[4]) * 0.093913;
+    sum += texture2D(u_diffuseTexture, v_blurCoord[0]) * 0.204164;
+    sum += texture2D(u_diffuseTexture, v_blurCoord[1]) * 0.304005;
+    sum += texture2D(u_diffuseTexture, v_blurCoord[2]) * 0.304005;
+    sum += texture2D(u_diffuseTexture, v_blurCoord[3]) * 0.093913;
+    sum += texture2D(u_diffuseTexture, v_blurCoord[4]) * 0.093913;
     gl_FragColor = sum;
 }
 

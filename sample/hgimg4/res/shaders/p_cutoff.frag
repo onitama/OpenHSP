@@ -8,7 +8,7 @@ precision mediump float;
 
 ///////////////////////////////////////////////////////////
 // Uniforms
-uniform sampler2D u_texture;
+uniform sampler2D u_diffuseTexture;
 
 ///////////////////////////////////////////////////////////
 // Varyings
@@ -18,7 +18,7 @@ uniform float u_ratio;
 
 void main()
 {
-	vec4 color = texture2D(u_texture, v_texCoord);
+	vec4 color = texture2D(u_diffuseTexture, v_texCoord);
 
 	// check whether fragment output is higher than threshold, if so output as brightness color
 	float brightness = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));

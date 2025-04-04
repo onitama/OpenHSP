@@ -15,6 +15,7 @@
 #include "../sysreq.h"
 
 #include "hgtex.h"
+#include "filedlg.h"
 
 #include "../texmes.h"
 #include "../emscripten/fontsystem.h"
@@ -110,12 +111,12 @@ static		HCURSOR cursor_ibeam;	// テキストエリア用カーソル
 //		DirectX objects
 //
 static		D3DDISPLAYMODE target_disp;
-static		LPDIRECT3D8 d3d;
-static		LPDIRECT3DDEVICE8 d3ddev;
+static		LPDIRECT3D8 d3d = NULL;
+static		LPDIRECT3DDEVICE8 d3ddev = NULL;
 static		D3DDEVTYPE	d3ddevtype;
 static		D3DPRESENT_PARAMETERS d3dapp;
 
-#define CIRCLE_DIV 16
+#define CIRCLE_DIV 32
 #define DEFAULT_FONT_NAME ""
 #define DEFAULT_FONT_SIZE 18
 #define DEFAULT_FONT_STYLE 0
@@ -585,7 +586,6 @@ static void InitTexture(void)
 {
 	//		テクスチャ情報初期化
 	//
-	SetSysReq(SYSREQ_CLSMODE, CLSMODE_NONE);
 	TexSetD3DParam(d3d, d3ddev, target_disp);
 	TexInit();
 
@@ -662,6 +662,46 @@ void hgio_clsmode( int mode, int color, int tex )
 }
 
 
+void hgio_resize_window(int x, int y)
+{
+	if (d3ddev == NULL) return;
+
+	HRESULT hr;
+	IDirect3DSurface8* pBackBuffer;
+	D3DSURFACE_DESC pDesc;
+
+	//バックバッファを得る
+
+	hr = d3ddev->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+	if (FAILED(hr)) return;
+
+	hr = pBackBuffer->GetDesc(&pDesc);
+	if (FAILED(hr)) return;
+
+	pBackBuffer->Release();
+
+	nDestWidth = pDesc.Width;
+	nDestHeight = pDesc.Height;
+	//d3dapp.BackBufferWidth = pDesc.Width;
+	//d3dapp.BackBufferHeight = pDesc.Height;
+	//d3ddev->Reset(&d3dapp);
+}
+
+
+int hgio_device_ready(void)
+{
+	HRESULT hr;
+	if (FAILED(hr = d3ddev->TestCooperativeLevel())) {
+
+		if (D3DERR_DEVICELOST == hr) return -1;
+		if (D3DERR_DEVICENOTRESET == hr) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+
 int hgio_device_restore( void )
 {
 	//	デバイスの修復
@@ -682,11 +722,16 @@ int hgio_device_restore( void )
 			}
 			Init3DDevicesW( master_wnd );
 			InitVertexTemp();
-//			VertexShaderInit();
+			InitTexture();
+			//			VertexShaderInit();
 			TexSetD3DParam( d3d, d3ddev, target_disp );
+
+			SetSysReq(SYSREQ_DEVLOST, 0);			// デバイス戻った
+			drawflag = 0;
+			return 0;
 		}
 	}
-	return 0;
+	return -2;
 }
 
 
@@ -710,12 +755,15 @@ int hgio_render_end( void )
 	//シーンレンダー終了
 	d3ddev->EndScene();
 	hr =  d3ddev->Present(NULL,NULL,NULL,NULL);
-	if( FAILED(hr) ) res = -1;
+	if (FAILED(hr)) {
+		res = -1;
+	}
 	SetSysReq( SYSREQ_DEVLOST, res );
 	drawflag = 0;
 
-	tmes.texmesProc();
-
+	if (res == 0) {
+		tmes.texmesProc();
+	}
 	return res;
 }
 
@@ -749,16 +797,6 @@ int hgio_render_start( void )
 	//static D3DXMATRIX InvViewport;
 	if ( drawflag ) {
 		hgio_render_end();
-	}
-
-	//	デバイスロスト時の対応
-	//
-	if ( GetSysReq( SYSREQ_DEVLOST ) ) {
-		if ( hgio_device_restore() == 0 ) {
-			SetSysReq( SYSREQ_DEVLOST, 0 );			// デバイス戻った
-		} else {
-			return -1;
-		}
 	}
 
 	//	マトリクスを設定
@@ -945,6 +983,35 @@ int hgio_redraw( BMSCR *bm, int flag )
 	return 0;
 }
 
+int hgio_dialog_ex(HSPCTX* ctx, Bmscr* bmscr, int mode, char* str1, char* str2)
+{
+	HWND hwnd;
+	int i, res;
+	i = 0;
+
+	hwnd = master_wnd;
+
+	if (mode >= 64) {
+		return 0;
+	}
+	if (mode & 16) {
+		res = fd_dialog(hwnd, mode & 3, str1, str2);
+		if (res == 0) {
+			ctx->refstr[0] = 0;
+		}
+		else {
+			strncpy(ctx->refstr, fd_getfname(), HSPCTX_REFSTR_MAX - 1);
+		}
+		return res;
+	}
+	if (mode & 32) {
+		i = (int)fd_selcolor(hwnd, mode & 1);
+		if (i == -1) return 0;
+		bmscr->Setcolor2( i );
+		return 1;
+	}
+	return hgio_dialog(mode,str1,str2);
+}
 
 int hgio_dialog( int mode, char *str1, char *str2 )
 {
@@ -952,6 +1019,7 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	//
 	int i,res;
 	i = 0;
+
 	if (mode&1) i|=MB_ICONEXCLAMATION; else i|=MB_ICONINFORMATION;
 	if (mode&2) i|=MB_YESNO; else i|=MB_OK;
 	res = MessageBox( master_wnd, str1, str2, i );
@@ -986,6 +1054,25 @@ int hgio_texload( BMSCR *bm, char *fname )
 	bm->texid = i;
 
 	return 0;
+}
+
+
+char* hgio_texmaskbuffer(BMSCR* bm, char* resname)
+{
+	//		マスクバッファ作成
+	//
+	char* p;
+	int fsize, xsize, ysize;
+	fsize = OpenMemFilePtr(resname);				// HSPリソースを含めて検索する
+	p = GetPixelMaskBuffer(GetMemFilePtr(), fsize, &xsize, &ysize);
+	CloseMemFilePtr();
+	if (p) {
+		if ((xsize == bm->sx) || (ysize == bm->sy)) {
+			return p;
+		}
+		free(p);
+	}
+	return NULL;
 }
 
 
@@ -1078,13 +1165,16 @@ static int GetCopyTexAlpha(BMSCR *bm)
 {
 	//		ブレント設定
 	int alpha;
+	int rate;
 
 	SetAlphaMode(bm->gmode);
 	if (bm->gmode < 3) {
 		alpha = 0xff000000;
 	}
 	else {
-		alpha = (bm->gfrate & 0xff) << 24;
+		rate = bm->gfrate;
+		if (rate > 255) rate = 255;
+		alpha = rate << 24;
 	}
 	return alpha;
 }
@@ -1272,6 +1362,22 @@ void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
 	x = x1 + rx;
 	y = y1 + ry;
 
+	if (mode == 0) {
+		float xx, yy;
+		for (int i = 0; i <= CIRCLE_DIV; i++) {
+			xx = x + cos((float)i * rate) * rx;
+			yy = y + sin((float)i * rate) * ry;
+			if (i == 0) {
+				hgio_line(bm, xx, yy);
+			}
+			else {
+				hgio_line2(xx, yy);
+			}
+		}
+		hgio_line(NULL, 0.0f, 0.0f);
+		return;
+	}
+
 	ChangeTex( -1 );
 	SetAlphaMode( 0 );
 	col = bm->color;
@@ -1387,8 +1493,8 @@ void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *
 		ty1 = ((float)(yy + srcsy));
 	}
 
-	x1 = ((float)bm->cx) - 0.5f;
-	y1 = ((float)bm->cy) - 0.5f;
+	x1 = ((float)bm->cx);// -0.5f;
+	y1 = ((float)bm->cy);// -0.5f;
 	x2 = x1 + psx;
 	y2 = y1 + psy;
 
@@ -1402,6 +1508,8 @@ void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *
 	tx1 *= sx;
 	ty0 *= sy;
 	ty1 *= sy;
+	tx0 += tex->ratehx;
+	ty0 += tex->ratehy;
 
 	v = vertex2DEX;
 	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) | ( bm->mulcolor );
@@ -1467,6 +1575,8 @@ void hgio_fontcopy(BMSCR *bm, int x, int y, int psx, int psy, int texid, int bas
 	tx1 *= sx;
 	ty0 *= sy;
 	ty1 *= sy;
+	tx0 += tex->ratehx;
+	ty0 += tex->ratehy;
 
 	int col;
 	if (GetSysReq(SYSREQ_FIXMESALPHA)) {
@@ -1560,6 +1670,8 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	ty0 = ((float)yy) * sy;
 	tx1 = ((float)(texpx)) * sx;
 	ty1 = ((float)(texpy)) * sy;
+	tx0 += tex->ratehx;
+	ty0 += tex->ratehy;
 
 	v = vertex2DEX;
 	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) |  ( bm->mulcolor );

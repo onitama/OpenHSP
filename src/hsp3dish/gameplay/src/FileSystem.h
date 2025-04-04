@@ -176,7 +176,7 @@ public:
      * @see setResourcePath(const char*)
      * @script{ignore}
      */
-    static FILE* openFile(const char* filePath, const char* mode);
+    //static FILE* openFile(const char* filePath, const char* mode);
 
     /**
      * Reads the entire contents of the specified file and returns its contents.
@@ -223,7 +223,7 @@ public:
      * 
      * @param path The path to the file.
      */
-    static void createFileFromAsset(const char* path);
+    //static void createFileFromAsset(const char* path);
 
     /**
      * Returns the directory name up to and including the trailing '/'.

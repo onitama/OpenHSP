@@ -61,6 +61,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -75,6 +76,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -85,6 +87,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\hsp3\filepack.cpp" />
+    <ClCompile Include="..\..\hsp3\filepack_write.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3crypt.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp" />
+    <ClCompile Include="..\..\hsp3\strbuf.cpp" />
+    <ClCompile Include="..\..\hsp3\strnote.cpp" />
+    <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp" />
     <ClCompile Include="..\ahtmodel.cpp" />
     <ClCompile Include="..\ahtobj.cpp" />
     <ClCompile Include="..\codegen.cpp" />
@@ -96,14 +105,17 @@
     <ClCompile Include="..\label.cpp" />
     <ClCompile Include="..\localinfo.cpp" />
     <ClCompile Include="..\membuf.cpp" />
-    <ClCompile Include="..\strnote.cpp" />
     <ClCompile Include="..\tagstack.cpp" />
     <ClCompile Include="..\token.cpp" />
-    <ClCompile Include="..\win32\supio_win.cpp" />
-    <ClCompile Include="dpm.cpp" />
     <ClCompile Include="Hspcmp3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\hsp3\filepack.h" />
+    <ClInclude Include="..\..\hsp3\hsp3crypt.h" />
+    <ClInclude Include="..\..\hsp3\hsp3utfcnv.h" />
+    <ClInclude Include="..\..\hsp3\strbuf.h" />
+    <ClInclude Include="..\..\hsp3\strnote.h" />
+    <ClInclude Include="..\..\hsp3\win32gui\supio_win.h" />
     <ClInclude Include="..\ahtmodel.h" />
     <ClInclude Include="..\ahtobj.h" />
     <ClInclude Include="..\comutil.h" />
@@ -114,12 +126,9 @@
     <ClInclude Include="..\label.h" />
     <ClInclude Include="..\localinfo.h" />
     <ClInclude Include="..\membuf.h" />
-    <ClInclude Include="..\strnote.h" />
     <ClInclude Include="..\supio.h" />
     <ClInclude Include="..\tagstack.h" />
     <ClInclude Include="..\token.h" />
-    <ClInclude Include="..\win32\supio_win.h" />
-    <ClInclude Include="dpm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

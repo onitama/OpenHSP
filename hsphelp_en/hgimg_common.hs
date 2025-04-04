@@ -298,7 +298,7 @@ fval = variable name to which a real value is assigned
 frot = rotation angle (radians)
 %inst
 Assigns the sine value of the angle specified by frot to the variable specified by fval.
-The unit of angle is radians (2Ï€ = 360 degrees).
+The unit of angle is radians (2ƒÎ = 360 degrees).
 %href
 fcos
 fsqr
@@ -317,7 +317,7 @@ fval = variable name to which a real value is assigned
 frot = rotation angle (radians)
 %inst
 Assigns the cosine value of the angle specified by frot to the variable specified by fval.
-The unit of angle is radians (2Ï€ = 360 degrees).
+The unit of angle is radians (2ƒÎ = 360 degrees).
 %href
 fsin
 fsqr

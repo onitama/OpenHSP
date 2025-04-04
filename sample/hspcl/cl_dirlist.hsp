@@ -1,0 +1,18 @@
+#runtime "hsp3cl"
+
+	a="Console HSP Test"
+	mes "["+a+"]"
+
+	dirlist buf,"*.*",1
+	notesel buf
+
+	mes "カレントディレクトリの内容("+notemax+"ファイル):"
+
+	repeat notemax
+	noteget fname,cnt
+	mes ""+cnt+":"+fname
+	loop
+
+	;notesave "dir.txt"
+
+	stop

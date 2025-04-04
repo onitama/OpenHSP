@@ -6,8 +6,8 @@
 #define __hsmanager_h
 
 #include <string>
+#include "../hsp3/strnote.h"
 #include "membuf.h"
-#include "strnote.h"
 
 #define INDEX_FILE "hsphelp.idx"
 #define SPLTMP_MAX 255

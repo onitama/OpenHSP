@@ -289,7 +289,7 @@ Specify the coordinates of the placement with (x, y). (Set the internal coordina
 Specify the placement angle (+ direction is clockwise) with r. The unit is radians.
 Use (sx, sy) to specify the size at the time of placement. By default, the size (10,10) is used.
 mygroup, exgroup, loggroup are the group values set for collision detection.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768‚Ä¶).
+The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
 You can select the mode of placement check with colsw.
 ^p
 Mode value Contents
@@ -348,7 +348,7 @@ Specify the coordinates of the placement with (x, y). (Set the internal coordina
 Specify the placement angle (+ direction is clockwise) with r. The unit is radians.
 Use (sx, sy) to specify the size at the time of placement. By default, the size (10,10) is used.
 mygroup, exgroup, loggroup are the group values set for collision detection.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768‚Ä¶).
+The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
 You can select the mode of placement check with colsw.
 ^p
 Mode value Contents
@@ -575,7 +575,7 @@ loggroup (0): Group value that creates the collision log
 %inst
 Sets the group parameters for the specified object.
 Group parameters are used to identify conflicting objects, such as when identifying them.
-The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768‚Ä¶).
+The group value is indicated by a value in which one of the 32 bits is 1 (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768Åc).
 ^
 If execution fails, a non-zero value is assigned to the system variable stat.
 

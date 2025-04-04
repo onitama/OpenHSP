@@ -8,7 +8,7 @@ precision mediump float;
 
 ///////////////////////////////////////////////////////////
 // Uniforms
-uniform sampler2D u_texture;
+uniform sampler2D u_diffuseTexture;
 
 ///////////////////////////////////////////////////////////
 // Varyings
@@ -29,6 +29,6 @@ vec2 discretize(vec2 v, float d)
 void main()
 {
     vec2 texCoord = discretize(v_texCoord, 128.0);
-    gl_FragColor = texture2D(u_texture, texCoord);
+    gl_FragColor = texture2D(u_diffuseTexture, texCoord);
 }
 

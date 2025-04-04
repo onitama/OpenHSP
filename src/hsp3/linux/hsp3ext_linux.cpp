@@ -17,9 +17,10 @@
 #include "../strbuf.h"
 
 #include "hsp3ext_linux.h"
+#include "hsp3extlib_ffi.h"
 
-static HSPCTX *hspctx;		// Current Context
-static HSPEXINFO *exinfo;	// Info for Plugins
+static HSPCTX *hspctx = NULL;		// Current Context
+static HSPEXINFO *exinfo = NULL;	// Info for Plugins
 static int *type;
 static int *val;
 static int *exflg;
@@ -77,24 +78,6 @@ static void InitSystemInformation(void)
 */
 /*------------------------------------------------------------*/
 
-static int cmdfunc_dllcmd( int cmd )
-{
-	//		cmdfunc : TYPE_DLLCTRL
-	//		(拡張DLLコントロールコマンド)
-	//
-	code_next();							// 次のコードを取得(最初に必ず必要です)
-
-	switch( cmd ) {							// サブコマンドごとの分岐
-	case 0x00:								// newcom
-		throw (HSPERR_UNSUPPORTED_FUNCTION);
-
-	default:
-		throw ( HSPERR_SYNTAX );
-	}
-
-	return RUNMODE_RUN;
-}
-
 
 static void *reffunc_dllcmd( int *type_res, int arg )
 {
@@ -108,7 +91,7 @@ static void *reffunc_dllcmd( int *type_res, int arg )
 	if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
 
 	*type_res = HSPVAR_FLAG_INT;
-	//exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
+	exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
 	reffunc_intfunc_ivalue = hspctx->stat;
 
 	//			')'で終わるかを調べる
@@ -141,6 +124,7 @@ void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 	info->termfunc = termfunc_dllcmd;
 
 	InitSystemInformation();
+	Hsp3ExtLibInit( info );
 }
 
 void hsp3typeinit_dllctrl( HSP3TYPEINFO *info )
@@ -188,6 +172,7 @@ char* hsp3ext_getdir(int id)
 {
 	//		dirinfo命令の内容を設定する
 	//
+	if ( hspctx==NULL ) return "";
 	char *p = hspctx->stmp;
 	*p = 0;
 	int cutlast = 0;
@@ -210,7 +195,11 @@ char* hsp3ext_getdir(int id)
 		p = hspctx->cmdline;
 		break;
 	case 5:				//    HSPTV素材があるディレクトリ
+#if defined(HSPDEBUG)||defined(HSP3IMP)
 		p = hspctx->tvfoldername;
+#else
+		p = "";
+#endif
 		break;
 	case 6:				//    ランゲージコード
 		p = hspctx->langcode;

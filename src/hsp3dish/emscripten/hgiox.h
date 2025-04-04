@@ -60,6 +60,11 @@ void hgio_test(void);
 int hgio_file_exist( char *fname );
 int hgio_file_read( char *fname, void *ptr, int size, int offset );
 
+FILE *hgio_android_fopen( char *fname, int offset );
+int hgio_android_fread( FILE* ptr, void *mem, int size );
+void hgio_android_fclose(FILE* ptr);
+int hgio_android_seek( FILE* ptr, int offset, int whence );
+
 int hgio_getDesktopWidth( void );
 int hgio_getDesktopHeight( void );
 

@@ -1,0 +1,70 @@
+#include "hsp3dish.as"
+#include "mod_tamakeisd.as"
+
+	;	アニメーション表示
+
+	;	珠音ちゃん・プロ生ちゃん SD 上半身コラボ素材（イラスト: らぐほのえりか）
+	;	HSP3用スクリプトサンプル( https://hsp.tv/ )
+	;	(実際の画像データはpngフォルダに入っています)
+	;
+	;	暮井 慧（プロ生ちゃん）(C) Pronama LLC
+	;	珠音ちゃん (C) オガワコウサク(チームグリグリ)/HSPTV!/onion software
+	;	※このスクリプト及びサンプルデータは、ガイドラインのもと自由にお使い頂けます
+	;	https://github.com/onitama/tamakei_ragho
+	;
+	;	(画像素材はhsptvフォルダから読み込みます)
+	;
+	screen 0,640,480
+
+	chr=1			; キャラID
+
+*start
+	;	SDキャラの準備
+	;	sdchr_load p1, p2, p3
+	;
+	;	p1(0) : キャラID(0=慧/1=珠音/2=フィネス/3=千由莉)
+	;	p2(0) : 向き(0=右/1=左)
+	;	p3(0) : サイズ%(0=100%)
+	;
+	cls
+	sdchr_load 0,0,50	; 素材の指定
+	sdchr_load chr,1,50	; 素材の指定
+
+	;button "キャラ変更",*chrchange
+
+	mepati=0		; 目のアニメーション
+	kutipaku=0		; 口のアニメーション
+	kutiwait=0
+*main
+	stick key
+	if key&16 : kutiwait=4	; スペースキーで口を動かします
+
+	redraw 0
+
+	pos 320,0
+
+	mepati++:i=mepati\60
+	if i>2 : i=0
+	j=0
+	if kutiwait>0 {
+		kutiwait--
+		j=1
+	}
+	sdchr_put chr,0,i,j		; 素材の表示
+	sdchr_putsanta
+
+	pos 0,0
+	sdchr_put 0,0,i,j		; 素材の表示
+	sdchr_putsanta
+
+	redraw 1
+	await 1000/30
+	goto *main
+
+*chrchange
+	;	キャラ変更
+	chr++
+	if chr>3 : chr=0
+	goto *start
+
+

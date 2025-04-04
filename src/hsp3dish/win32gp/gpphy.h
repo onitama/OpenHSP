@@ -12,7 +12,10 @@ using namespace gameplay;
 #define GPPAPPLY_IMPULSE (1)
 #define GPPAPPLY_TORQUE (2)
 #define GPPAPPLY_TORQUE_IMPULSE (3)
+#define GPPAPPLY_FORCE_POS (4)
+#define GPPAPPLY_IMPULSE_POS (5)
 
+#define BIND_PHYSICS_NONE (-1)
 #define BIND_PHYSICS_NOSCALE (1)
 #define BIND_PHYSICS_MESH (2)
 
@@ -48,7 +51,7 @@ public:
 	PhysicsRigidBody *_colObj;			// コリジョンオブジェクト
 	gpobj *_parent;						// 親のgpobj
 	std::vector<gppinfo> _ainfo;		// gppinfo配列
-
+	Game* _master;						// 親のgameplay
 };
 
 

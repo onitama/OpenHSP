@@ -1,0 +1,83 @@
+#include "hgimg4.as"
+
+	;	珠音（たまね）3D model sample
+	;	モデリング&アニメーション製作 : オガワコウサク(チームグリグリ)
+	;	HGIM43対応 HSP3用スクリプトサンプル
+	;	※このスクリプト及びサンプルデータは、自作ソフトで自由にお使い頂けます
+	;	※詳しくは、 http://hsp.tv/make/tamane3d.html
+	;
+
+	title "HGIMG4 Test"
+
+	gpreset
+
+	setcls CLSMODE_SOLID, $404040
+
+	setcolor GPOBJ_LIGHT, 1,1,1		; ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.5,0.5,0.5		; アンビエントカラーを設定
+
+	gpload id_model,"res/tamane2"		; モデル読み込み
+	setang id_mode, 0, 3.141592		; モデルの回転を設定
+	setscale id_model, 0.1,0.1,0.1
+
+	setpos GPOBJ_CAMERA, 0,20,30		; カメラ位置を設定
+
+	gpact id_model
+
+	nodename = "atama"			; テクスチャを入れ替えるノード名
+
+	;	特定のノードに割り当てられたマテリアルを取り出す
+	gpnodeinfo id_proxymat,id_model, GPNODEINFO_MATERIAL, nodename
+
+	;	ボタンを設置
+	objsize 200,60
+	button gosub "FACE1",*face1
+	button gosub "FACE2",*face2
+	button gosub "FACE3",*face3
+
+repeat
+	stick key,15
+	if key&128 : end
+
+	redraw 0			; 描画開始
+
+	;	タッチでカメラ位置を動かす
+	if dragmd {	; ドラッグ中
+		getkey a,1
+		if a=1 {
+			dx=0.05*(mousex-dragx)+cx
+			dy=0.05*(mousey-dragy)+cy
+			setpos GPOBJ_CAMERA, dx,dy,cz
+		} else {
+			dragmd=0
+		}
+	} else {	; ドラッグなし
+		getkey a,1
+		if a {
+			dragx=mousex:dragy=mousey
+			getpos GPOBJ_CAMERA, cx,cy,cz
+			dragmd=1
+		}
+	}
+	gplookat GPOBJ_CAMERA, 0,14,0		; カメラから指定した座標を見る
+
+	gpdraw				; シーンの描画
+
+	redraw 1			; 描画終了
+	await 1000/60			; 待ち時間
+
+loop
+
+
+*face1
+	gpmatprmt id_proxymat, , "res/head_SD.png"
+	return
+*face2
+	gpmatprmt id_proxymat, , "res/head_SD1.png"
+	return
+*face3
+	gpmatprmt id_proxymat, , "res/head_SD2.png"
+	return
+
+
+

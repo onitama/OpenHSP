@@ -3,7 +3,7 @@ HSPSOCK ver3.4   REFERENCE MANUAL                   HSP : Hot Soup Processor
 HSP Extension DLL Reference copyright 1999-2014 (c) onion software
 ------------------------------------------------------------------------------
 
-„Éª Introduction
+ÅE Introduction
 
 This DLL can be used in various ways by using it with Hot Soup Processor ver3 or later.
 It is a plug-in module that can be expanded.
@@ -13,7 +13,7 @@ These instructions are for tools and utilities that cannot be realized by HSP al
 There are many things that are useful for creating, and it enables more advanced application development.
 
 
-„Éª Installation
+ÅE Installation
 
 The extension plug-in file, HSPSOCK.DLL, has HSED3.EXE and HSP3.EXE.
 Place it in the same location as the directory.
@@ -27,14 +27,14 @@ First of all, try running the included sample script.
 You should be able to see a simple usage example of the enhanced functionality.
 
 
-„ÉÑ„Ç≠important point
+ÉcÉLimportant point
 
 HSPSOCK.DLL is a plug-in file that is used at the same time as HSP3.EXE.
 Even if you create an EXE file, put HSPSOCK.DLL in the same directory as the EXE file.
 It will not work unless it is placed in. Also, you cannot add DLLs to the packfile.
 
 
-Áπù„Çµ Copyright and contact information
+„ÉÉT Copyright and contact information
 
 Of the original software (executable file) created by the user using HSP
 The right belongs to the user who created it.
@@ -49,7 +49,7 @@ We do not guarantee. Use at your own risk.
 HSPDB.DLL is compiled with Microsoft Visual C ++ 7.1.
 
 
-„Éª Instruction list
+ÅE Instruction list
 
 sockopen p1, "url", p2 Initialize socket and connect
 sockclose p1 Disconnect socket
@@ -90,7 +90,7 @@ p1 = 0 to 31 (0): Socket ID number
 "url": URL specification string
 p2 = 0 to (0): Port number
 
-ÊèÉDescription
+ëµDescription
 
 Initializes the socket so that it can be used.
 When performing TCP / IP communication, be sure to initialize it first and the other server
@@ -119,7 +119,7 @@ sockclose p1 Disconnect socket
 
 p1 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 Disconnect the connected socket.
 Be sure to disconnect the initialized socket with the sockclose instruction.
@@ -130,7 +130,7 @@ sockput "message", send p1 data
 "message": Message to send
 p1 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 Sends data to the socket. The character string specified by "message" or
 Or send the contents of the string type variable as it is.
@@ -142,7 +142,7 @@ sockputc p1, p2 1 byte data transmission
 p1 = 0 to 255 (0): Message to be sent (1 byte)
 p2 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 Sends data to the socket. Send 1 byte of the numerical value specified by p1
 To do. If an error occurs during transmission, the system variable stat
@@ -155,7 +155,7 @@ p2 = 0 to (0): Buffer offset (in bytes)
 p3 = 0 to (64): Transmission size (byte unit)
 p4 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 The contents of the variable buffer specified by p1 are stored in the socket as binary data.
 I will send.
@@ -181,7 +181,7 @@ p1 = variable: variable name where the received contents are stored
 p2 = 0 to (64): Receive size (byte unit)
 p3 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 Receives data from the socket and puts it in a string type variable specified by p1
 Substitute the content. Specify the maximum reception size with p2.
@@ -193,7 +193,7 @@ sockgetc p1, p2 Receive 1 byte of data
 p1 = variable: variable name where the received contents are stored
 p3 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 Receives 1 byte of data from the socket and converts it to a numeric variable specified by p1.
 Substitute the content.
@@ -207,7 +207,7 @@ p2 = 0 to (0): Buffer offset (in bytes)
 p3 = 0 to (64): Receive size (byte unit)
 p4 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 Receives data from the socket and puts it in the variable buffer specified by p1
 Stores the contents as binary data.
@@ -233,7 +233,7 @@ sockmake p1, p2 Initialize socket as server
 p1 = 0 to 31 (0): Socket ID number
 p2 = 0 to (0): Port number
 
-ÊèÉDescription
+ëµDescription
 
 Initializes the socket so that it can be used as a server.
 Specify the socket ID number with p1.
@@ -260,7 +260,7 @@ sockwait p1, p2 Wait for incoming client
 p1 = 0 to 31 (0): Socket ID number
 p2 = 0 to 31 (0): Alternate socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 A socket prepared as a server with the sockmake instruction, a client
 Wait for an incoming call. The sockwait instruction always completes the sockmake instruction normally.
@@ -303,7 +303,7 @@ stat error details
 
 ipget Get the IP address of the host
 
-ÊèÉDescription
+ëµDescription
 
 Get the IP address of the host and assign it to the system variable refstr.
 If an error occurs when getting the IP address, the system variable stat
@@ -315,7 +315,7 @@ sockcheck p1 Check the arrival of data
 
 p1 = 0 to 31 (0): Socket ID number
 
-ÊèÉDescription
+ëµDescription
 
 Data that can be acquired by sockget type instructions arrives at the specified socket
 Find out if you are.

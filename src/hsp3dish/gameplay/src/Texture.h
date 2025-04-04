@@ -17,6 +17,8 @@ class Texture : public Ref
     friend class Sampler;
 
 public:
+    static void resetCache(void);
+
 
     /**
      * Defines the set of supported texture formats.

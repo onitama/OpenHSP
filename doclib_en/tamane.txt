@@ -3,7 +3,7 @@ HSP3 official 2D / 3D material "Tamane"
 copyright 2014 (c) Ogawa Kosaku (Team GrisGris) / HSPTV!
 ------------------------------------------------------------------------------
 
-笆 HSP3 official 3D material "Tamane"
+■ HSP3 official 3D material "Tamane"
 
 HSP3 Official 3D Material "Tamane" is an official material that can be used with Hot Soup Processor (HSP).
 Contains all the data and scripts that can be displayed by HSP3, as well as the original data.
@@ -15,18 +15,18 @@ Check out the latest information on "Tamane" on the official page!
 http://hsp.tv/make/tamane3d.html
 
 
-笆 HSP3 official 2D material "Tamane"
+■ HSP3 official 2D material "Tamane"
 
 2D material that can be displayed by HSP3 is recorded as standard.
 "Tamaface.bmp" and "tamaface.png" for cards of Tamane,
 Pixel art animation patterns ("tamadot.bmp" and "tamadot.png"), etc.
 Materials that can be widely used are provided.
-In addition, sample games such as "Jump Up of Tamane 笙ｪ", "Drop Puzzle", and "Card Battle" are also included.
+In addition, sample games such as "Jump Up of Tamane ♪", "Drop Puzzle", and "Card Battle" are also included.
 Check out the latest information on 2D materials on the official page!
 http://hsp.tv/make/tamane2d.html
 
 
-笆 About sample execution
+■ About sample execution
 
 When running the sample from HSP3, be sure to use the latest version (HSP3.4 or later).
 
@@ -43,7 +43,7 @@ The folder structure is as follows.
               + --- fbx 3D data (FBX format)
 
 
-笆 Copyright and license
+■ Copyright and license
 
 The 3D material "Tamane" is made by Mr. Kosaku Ogawa (Team GrisGris).
 It is published by onion software.
@@ -66,16 +66,16 @@ http://www.gris2.com/
 ------------------------------------------------------------------------------
 
 
-笆 fbx folder
+■ fbx folder
 
 The original 3D data is recorded in FBX format.
 This data cannot be read directly from HSP3.
 
-high_school_girl 繝ｻ 繝ｻ 繝ｻ Normal body model
-high_school_girlSD 繝ｻ 繝ｻ Deformed model
+high_school_girl ・ ・ ・ Normal body model
+high_school_girlSD ・ ・ Deformed model
 
 
-笆 hgimg3 folder
+■ hgimg3 folder
 
 Contains data and scripts that run on the hgimg3 runtime.
 samples 1 to 4 are sample scripts.
@@ -91,7 +91,7 @@ tamane2_w.x Deformed version "Tamane" walking pose
 tamane2_r.x Deformed version "Tamane" running pose
 
 
-笆 hgimg4 folder
+■ hgimg4 folder
 
 Contains data and scripts that run on the hgimg4 runtime.
 (Even if you create an executable file, the data contained under the res folder is always required.)
@@ -104,7 +104,7 @@ tamane.gpb "Tamane" Standby pose
 tamane2.gpb Deformed version "Tamane" Standby pose
 
 
-笆 Acknowledgments
+■ Acknowledgments
 
 We would like to thank Mr. Kosaku Ogawa (Team GrisGris) for creating a wonderful model.
 The site of Team GrisGris, represented by Mr. Kosaku Ogawa, is here.

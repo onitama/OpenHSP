@@ -1,0 +1,35 @@
+#include "hsp3dish.as"
+
+	;
+	; viewcalc命令サンプル
+	;
+	sx=ginfo_sx: sy=ginfo_sy
+	celload "ball64.png",3
+	celdiv 3,64,64
+
+	frame = 0
+	pos 0,80
+	button gosub "NORMAL",*to_1x1
+	button gosub "2X",*to_2x2
+*main
+	frame++
+	redraw 0
+	rgbcolor 0:boxf
+	rgbcolor $ffffff
+	pos 0,0
+	mes "Frame:"+frame
+
+	pos 128,80
+	celput 3,(frame/60)&63,,,deg2rad(frame)
+
+	redraw 1
+	await 1000/60
+	goto *main
+
+*to_2x2
+	viewcalc vptype_2d,2,2
+	return
+*to_1x1
+	viewcalc vptype_off
+	return
+

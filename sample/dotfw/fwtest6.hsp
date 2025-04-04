@@ -1,0 +1,43 @@
+#include "dotfw.as"
+
+	;
+	;	ユーザー定義のモード処理
+	;	(EMODE_XAIMと同様の処理をユーザー定義します)
+	;
+	df_config "arcade Z300 star"
+	df_reset
+
+	score=0						; スコア
+	df_addplayer 120,210,CHR_SHIP1			; プレイヤーの設定
+
+	df_eaction *eact_destroy,EACTION_DESTROY	; アクションを設定
+	df_eaction *eact_shot,EACTION_SHOT		; アクションを設定
+	df_emodesub *modesub_1:emode_1=stat		; 新しいモードを追加
+	df_emode emode_1, CHR_MONSTER2, 5, 4, 200	; 敵の設定
+*main
+	df_mes "SCORE "+score,1,1
+
+	if key&PLAYER_KEY_ESC : end
+	df_enemygen DIR_DOWN,20				; 敵を生成
+	df_update
+	goto *main
+
+*eact_destroy
+	;	敵が破壊された時のサブルーチン(スコア加算用)
+	score+=10
+	return
+
+*eact_shot
+	;	敵のショット時
+	df_getaxis
+	df_addemis _dotfw_cx,_dotfw_cy, DIR_AIM, 200, CHR_DOT1
+	return
+
+*modesub_1
+	;	ユーザー定義のモード処理サブルーチン
+	df_getaxis
+	if _dotfw_cx<_dotfw_myx : _dotfw_movex += $2000
+	if _dotfw_cx>_dotfw_myx : _dotfw_movex -= $2000
+	df_putaxis
+	return
+

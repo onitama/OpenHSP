@@ -1,0 +1,303 @@
+#include "hgimg4.as"
+#include "mod_posteffect.as"
+#include "mod_vpad.as"
+#define USE_EFFECT
+
+title "HGIMG4 Sample"
+
+	;	立方体を使った簡単なスネークゲーム
+	;	赤いブロックを取っていってください
+	;
+	randomize
+	goto *restart
+
+*restart
+
+	score=0
+	level=1
+*gstart
+	gpreset
+	hspvpad_init 2,1+4			; バーチャルパッドの初期化
+
+	post_reset
+	post_select POSTID_NONE
+#ifdef USE_EFFECT
+	post_select POSTID_GLOW2		; ポストエフェクト設定
+	post_setprm 80,0.7,10			; ポストエフェクトのパラメーター
+#endif
+	gpresetlight 1,2			; ポイントライトを2個追加する
+
+	setcolor GPOBJ_LIGHT, 0.8,0.8,0.8	; 標準ライトカラーを設定
+	setdir GPOBJ_LIGHT, 0.2,0.2,0.2		; 標準アンビエントカラーを設定
+
+	;	nullライトとして設定します
+	gpnull id_model
+	gplight id_model, GPOBJ_LGTOPT_POINT,16,0.8,0.5	; ポイントライトとして設定する
+	setcolor id_model, 1,1,1			; ライトカラーを設定
+	gpuselight id_model				; ポイントライトを使用する
+
+	;	nullライトとして設定します
+	gpnull id_target
+	gplight id_target, GPOBJ_LGTOPT_POINT,16,1,0.5	; ポイントライトとして設定する
+	setcolor id_target, 1,0,0			; ライトカラーを設定
+	gpuselight id_target, 1				; ポイントライトを使用する
+
+	wx=30:wz=30				; フィールドのサイズ
+	basex=0.5-(wx/2):basez=0.5-(wz/2)	; ベース座標
+	basey=0.5				; Y座標のベース
+	dim map,wx,wz				; 仮想マップ
+	dim boxcolor,8				; 色リスト	
+
+	;	色リストを設定
+	boxcolor(1) = $c0c0c0
+	boxcolor(2) = $a00000
+	boxcolor(3) = $a060
+
+	;	方向リストを作成
+	dim dirpx,4:dim dirpz,4:sdim dirstr,64,4
+	dirpz(0)=-1:dirpz(2)=1
+	dirpx(1)=1:dirpx(3)=-1
+	dirstr(0)="↑"
+	dirstr(1)="→"
+	dirstr(2)="↓"
+	dirstr(3)="←"
+
+	;	壁を作成
+	col_wall = $808080
+	gpbox i, 1, col_wall	; 箱ノードを生成する
+	setscale i, wx, 1, 1 : setpos i, 0 , basey , basez
+	gpbox i, 1, col_wall	; 箱ノードを生成する
+	setscale i, wx, 1, 1 : setpos i, 0 , basey , basez+wz-1
+	gpbox i, 1, col_wall	; 箱ノードを生成する
+	setscale i, 1, 1, wz : setpos i, basex , basey , 0
+	gpbox i, 1, col_wall	; 箱ノードを生成する
+	setscale i, 1, 1, wz : setpos i, basex+wx-1 , basey , 0
+	repeat wx : map(cnt,0)=1 : map(cnt,wz-1)=1 : loop
+	repeat wz : map(0,cnt)=1 : map(wx-1,cnt)=1 : loop
+
+	histmax=64:curhist=8+level
+	dim myid, histmax
+	dim myposx, histmax
+	dim myposz, histmax
+	myx=wx/2:myz=wz/2
+	myflag=0
+	mykey=2
+	mydir=0
+	mydist=10.0
+	myspeed=15
+	left=4+level
+	gosub *move_player
+
+	max=level*10+10
+	repeat max
+		gosub *rndaxis
+		a=1:gosub *putbox
+	loop
+	gosub *add_target
+
+	gpfloor id_floor, wx,wz, $606060	; 床ノードを追加
+
+	gosub *camera_init
+	frame=1
+	hval=0
+	msg="Level..."+level
+	repeat 120
+		gosub *key_input
+		gosub *camera_update
+		gosub *screen_update
+	loop
+	msg=""
+*main
+	;	キー入力
+	gosub *key_input
+	if (frame\myspeed)=0 {
+		; プレイヤーを更新
+		gosub *move_player
+	}
+	if (frame\240)=0 {
+		gosub *speedup
+	}
+	gosub *camera_update
+	gosub *screen_update
+	if myflag : goto *main_ov
+	if left=0 : goto *main_clr
+	goto *main
+
+*main_ov
+	;	ゲームオーバー
+	msg="Crash...!"
+	stick key
+	if key&128 : goto *byebye
+	if key&$130 : goto *restart
+	gosub *camera_update2
+	gosub *screen_update
+	goto *main_ov
+
+*main_clr
+	;	クリア
+	msg="Clear...!"
+	repeat 120
+	stick key
+	if key&128 : goto *byebye
+	gosub *camera_update2
+	gosub *screen_update
+	loop
+	level++
+	goto *gstart
+
+*byebye
+	end
+
+*screen_update
+	;	描画処理
+	post_drawstart			; 描画開始
+
+	;	ライトの色を変化させる
+	;	hsvcolorの値をRGB値に変換する
+	hsvcolor hval,255,255
+	hval+:if hval>192 : hval=0
+	rval=double(ginfo_r)/255.0
+	gval=double(ginfo_g)/255.0
+	bval=double(ginfo_b)/255.0
+	setcolor id_model, rval,gval,bval	; ライトカラーを設定
+
+	rgbcolor $305070:boxf		; 背景クリア
+	gpdraw				; シーンの描画
+	gmode 0
+	font "",20
+	color 255,255,255
+	pos 8,8:mes "SCORE:"+score
+	;mes dirstr(mydir)
+	if msg!="" {
+		font "",120,,4
+		pos 210,240:mes msg,mesopt_outline
+	}
+
+	hspvpad_put mykey
+
+	post_drawend			; 描画終了
+	await 1000/60			; 待ち時間
+	frame++
+	return
+
+*rndaxis
+	;	ランダムな位置を取得->(x,y)
+	x=rnd(wx-2)+1:z=rnd(wz-2)+1
+	if map(x,z) : goto *rndaxis
+	if abs(myx-x)+abs(myz-z)<4 : goto *rndaxis
+	return
+*putbox
+	;	箱を設置
+	;	(x,z)の位置にboxを設置、aの値が色リストのコード
+	map(x,z)=a
+	gpbox i, 1, boxcolor(a)	; 箱ノードを生成する
+	setpos i, basex+x, basey, basez+z
+	return
+
+*add_target
+	;	ターゲットを設置
+	gosub *rndaxis
+	a=map(x+1,z)+map(x-1,z)+map(x,z+1)+map(x,z-1)
+	if a>=2 : goto *add_target
+
+	a=2:gosub *putbox:redid=i
+	tarx=basex+x:tarz=basez+z
+	setpos id_target,tarx,1,tarz
+	return
+
+*key_input
+	;	キー入力処理
+	stick key,$100
+	hspvpad_key key
+
+	if key&128 : goto *byebye
+	if key&2 : mydir=0 : mykey=2
+	if key&8 : mydir=2 : mykey=8
+	if key&1 : mydir=3 : mykey=1
+	if key&4 : mydir=1 : mykey=4
+	return
+
+*move_player
+	;	プレイヤーを進める
+	if myflag : return
+	if curhist>0 {
+		i=curhist
+		if myid(i)>0 {
+			map(myposx(i),myposz(i))=0
+			delobj myid(i)
+		}
+		repeat
+			if i=0 : break
+			myid(i)=myid(i-1)
+			myposx(i)=myposx(i-1)
+			myposz(i)=myposz(i-1)
+			i--
+		loop
+	}
+	myx+=dirpx(mydir)
+	myz+=dirpz(mydir)
+	a=map(myx,myz)
+	if a=1|a=3 {				; やられた?
+		myflag=1
+		return
+	}
+	if a=2 {				; ターゲット
+		gosub *add_player
+		delobj redid
+		score+=level*10
+		left--
+		if left>0 : gosub *add_target
+	}
+	x=myx:z=myz:a=3:gosub *putbox
+	newid=i
+	realx=basex+x:realz=basez+z		; 先頭のプレイヤー座標
+	setpos id_model,realx,1,realz
+
+	myid(0)=newid
+	myposx(0)=x
+	myposz(0)=z
+
+	return
+*add_player
+	;	プレイヤーを伸ばす
+	curhist++
+	if curhist>=histmax : curhist=histmax-1
+	return
+*speedup
+	;	プレイヤーのスピードアップ
+	if myspeed>4 : myspeed--
+	return
+
+*camera_init
+	;	カメラ初期化
+	camx=0.0:camy=15.0:camz=0.0
+	camadjz=13.0:camyfix=0
+	mydist=camadjz
+	camang = 0.0
+	return
+
+*camera_update
+	;	カメラ設定サブルーチン
+	dx = realx-tarx
+	dz = realz-tarz
+	todist = sqrt(dx*dx+dz*dz)*0.5+5
+	mydist+=(todist-mydist)*0.01
+
+	dx=(realx-camx)*0.02
+	dz=(realz-camz)*0.02
+	camx+=dx:camz+=dz
+	camadjz = 5 + mydist
+	setpos GPOBJ_CAMERA, camx,camy,camz+mydist		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, camx,camyfix,camz		; カメラから指定した座標を見る
+	return
+
+*camera_update2
+	;	カメラ設定サブルーチン(周回)
+	dx=sin(camang)*mydist
+	dz=cos(camang)*mydist
+	if camy>3 : camy-=0.05
+	setpos GPOBJ_CAMERA, camx+dx,camy,camz+dz		; カメラ位置を設定
+	gplookat GPOBJ_CAMERA, camx,camyfix,camz		; カメラから指定した座標を見る
+	camang+=0.01
+	return
+

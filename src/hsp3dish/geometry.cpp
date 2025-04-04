@@ -690,7 +690,7 @@ void  PerspectiveFOV(float fov, float Zn, float Zf, float left, float top, float
 {
 	float f_n = 1.0f / (Zf - Zn);
 	float theta = DEG2RAD(fov) * 0.5f;
-	float divisor = tan(theta);
+	float divisor = (float)tan(theta);
 	float factor = 1.0f / divisor;
 	MATRIX* mat = currentMatrix;
 
@@ -1493,3 +1493,55 @@ void GetTargetAngle( VECTOR *ang, VECTOR *src, VECTOR *target )
 	ang->w = 0.0f;
 }
 	
+
+int GetTargetVector(VECTOR* result, VECTOR* target, int type )
+{
+	//	ベクトルの計算
+	//
+	switch (type) {
+	case GEOMETRY_VECTYPE_ROTORDER_ZYX:
+		InitMatrix();
+		RotZ(result->z);
+		RotY(result->y);
+		RotX(result->x);
+		ApplyMatrix(result, target);
+		break;
+	case GEOMETRY_VECTYPE_ROTORDER_XYZ:
+		InitMatrix();
+		RotX(result->x);
+		RotY(result->y);
+		RotZ(result->z);
+		ApplyMatrix(result, target);
+		break;
+	case GEOMETRY_VECTYPE_ROTORDER_YXZ:
+		InitMatrix();
+		RotY(result->y);
+		RotX(result->x);
+		RotZ(result->z);
+		ApplyMatrix(result, target);
+		break;
+	case GEOMETRY_VECTYPE_HALFVECTOR:
+		AddVector(result,result,target);
+		UnitVector(result);
+		break;
+	case GEOMETRY_VECTYPE_REFRECTION:
+	case GEOMETRY_VECTYPE_MIRROR:
+	{
+		float dot = InnerProduct(result,target);
+		if (type == GEOMETRY_VECTYPE_REFRECTION) {
+			dot *= -2.0f;
+		}
+		else {
+			dot *= 2.0f;
+		}
+		result->x = dot * target->x;
+		result->y = dot * target->y;
+		result->z = dot * target->z;
+		break;
+	}
+	default:
+		return -1;
+	}
+	return 0;
+}
+

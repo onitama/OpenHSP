@@ -5,21 +5,7 @@
 //	onion software/onitama 2011/3
 //
 #ifdef HSPDISHGP
-#ifdef HSPWIN
 #include "win32gp/gamehsp.h"
-#endif
-#ifdef HSPNDK
-#include "ndkgp/gamehsp.h"
-#endif
-#ifdef HSPIOS
-#include "iosgp/gamehsp.h"
-#endif
-#ifdef HSPLINUX
-#include "win32gp/gamehsp.h"
-#endif
-#ifdef HSPEMSCRIPTEN
-#include "win32gp/gamehsp.h"
-#endif
 char *hsp3dish_getlog(void);		// for gameplay3d log
 #endif
 
@@ -48,7 +34,7 @@ char *hsp3dish_getlog(void);		// for gameplay3d log
 #include "hsp3ext.h"
 
 #ifdef HSPWIN
-#include "win32/dxsnd.h"
+#include "win32/bmscr_exc.h"
 #endif
 
 #define USE_WEBTASK
@@ -63,7 +49,6 @@ char *hsp3dish_getlog(void);		// for gameplay3d log
 
 static HspWnd *wnd;
 static Bmscr *bmscr;
-static Bmscr *master_bmscr;
 static HSPCTX *ctx;
 static int *type;
 static int *val;
@@ -77,6 +62,7 @@ extern int resY0, resY1;
 
 #ifdef USE_MMAN
 #ifdef HSPWIN
+#include "win32/dxsnd.h"
 #include "win32/mmman.h"
 #endif
 #ifdef HSPIOS
@@ -92,7 +78,7 @@ extern int resY0, resY1;
 #include "emscripten/mmman.h"
 #endif
 
-static MMMan *mmman;
+static MMMan *mmman = NULL;
 #endif
 
 static int dxsnd_flag;
@@ -104,6 +90,7 @@ static WebTask *webtask;
 #ifdef USE_ESSPRITE
 #include "essprite.h"
 static essprite* sprite;
+static int sprite_target_window;
 #endif
 
 
@@ -161,7 +148,7 @@ static int sysinfo( int p2 )
 void *ex_getbmscr( int wid )
 {
 	Bmscr *bm;
-	bm = wnd->GetBmscr( wid );
+	bm = wnd->GetBmscr(wid);
 	return bm;
 }
 
@@ -235,27 +222,47 @@ static void code_setivec( int *ptr, VECTOR *vec )
 	ptr[3] = (int)vec->w;
 }
 
-static HSPREAL *code_getvvec( void )
+static HSPREAL* code_getvmat(void)
 {
-	PVal *pval;
-	int size,inisize;
+	PVal* pval;
+	int size, inisize;
 	HSPREAL dummy;
-	HSPREAL *v;
+	HSPREAL* v;
 
-	v = (HSPREAL *)code_getvptr( &pval, &size );
+	v = (HSPREAL*)code_getvptr(&pval, &size);
 	dummy = (HSPREAL)0.0;
-	if ( pval->flag != HSPVAR_FLAG_DOUBLE ) {
-		code_setva( pval, 0, HSPVAR_FLAG_DOUBLE, &dummy );
+	if (pval->flag != HSPVAR_FLAG_DOUBLE) {
+		code_puterror(HSPERR_TYPE_MISMATCH);
 	}
 	inisize = pval->len[1];
-	if ( inisize < 4 ) {
-			pval->len[1] = 4;						// ちょっと強引に配列を拡張
-			pval->size = 4 * sizeof(HSPREAL);
-			code_setva( pval, 3, HSPVAR_FLAG_DOUBLE, &dummy );
-			if ( inisize < 3 ) code_setva( pval, 2, HSPVAR_FLAG_DOUBLE, &dummy );
-			if ( inisize < 2 ) code_setva( pval, 1, HSPVAR_FLAG_DOUBLE, &dummy );
+	if (inisize < 16) {
+		code_puterror(HSPERR_TYPE_MISMATCH);
 	}
-	v = (HSPREAL *)HspVarCorePtrAPTR( pval, 0 );
+	v = (HSPREAL*)HspVarCorePtrAPTR(pval, 0);
+	return v;
+}
+
+static HSPREAL* code_getvvec(void)
+{
+	PVal* pval;
+	int size, inisize;
+	HSPREAL dummy;
+	HSPREAL* v;
+
+	v = (HSPREAL*)code_getvptr(&pval, &size);
+	dummy = (HSPREAL)0.0;
+	if (pval->flag != HSPVAR_FLAG_DOUBLE) {
+		code_setva(pval, 0, HSPVAR_FLAG_DOUBLE, &dummy);
+	}
+	inisize = pval->len[1];
+	if (inisize < 4) {
+		pval->len[1] = 4;						// ちょっと強引に配列を拡張
+		pval->size = 4 * sizeof(HSPREAL);
+		code_setva(pval, 3, HSPVAR_FLAG_DOUBLE, &dummy);
+		if (inisize < 3) code_setva(pval, 2, HSPVAR_FLAG_DOUBLE, &dummy);
+		if (inisize < 2) code_setva(pval, 1, HSPVAR_FLAG_DOUBLE, &dummy);
+	}
+	v = (HSPREAL*)HspVarCorePtrAPTR(pval, 0);
 
 	return v;
 }
@@ -328,15 +335,41 @@ static int *code_getiv2( PVal **out_pval )
 	return v;
 }
 
-static void code_setivlen( PVal *pval, int len )
+static void code_setivlen(PVal* pval, int len)
 {
 	//		配列変数を拡張(intのみ)
 	//
 	int ilen;
 	ilen = len;
-	if ( ilen < 1 ) ilen = 1;
+	if (ilen < 1) ilen = 1;
 	pval->len[1] = ilen;						// ちょっと強引に配列を拡張
 	pval->size = ilen * sizeof(int);
+}
+
+
+static void code_setva_double(PVal* pval, APTR aptr, double *ptr)
+{
+	//		code_setvaでdouble値を書き込むためのサービス
+	//		(配列チェック、型チェックを行う)
+	//
+	int size, inisize;
+	HSPREAL dummy;
+
+	if (pval->flag != HSPVAR_FLAG_DOUBLE) {
+		if (aptr > 0) code_puterror(HSPERR_ARRAY_OVERFLOW);
+		dummy = (HSPREAL)0.0;
+		code_setva(pval, 0, HSPVAR_FLAG_DOUBLE, &dummy);
+	}
+
+	inisize = pval->len[1];
+	if (aptr > 0) {
+		size = (aptr + 1);
+		if (inisize < size) {
+			pval->len[1] = size;						// ちょっと強引に配列を拡張
+			pval->size = size * sizeof(HSPREAL);
+		}
+	}
+	code_setva(pval, aptr, HSPVAR_FLAG_DOUBLE, ptr);
 }
 
 
@@ -358,7 +391,12 @@ static void cmdfunc_dialog( void )
 	strncpy( stmp, ptr, 0x4000-1 );
 	p1 = code_getdi( 0 );
 	ps = code_getds("");
+
+#ifdef HSPWIN
+	ctx->stat = hgio_dialog_ex(ctx, bmscr, p1, stmp, ps);
+#else
 	ctx->stat = hgio_dialog( p1, stmp, ps );
+#endif
 }
 
 
@@ -427,18 +465,22 @@ static int cmdfunc_extcmd( int cmd )
 
 #ifdef USE_MMAN
 	case 0x08:								// mmload
-		{
-		int i;
+	{
+		int i = 0;
 		char fname[HSP_MAX_PATH];
-		strncpy( fname, code_gets(), HSP_MAX_PATH-1 );
-		p1 = code_getdi( 0 );
-		p2 = code_getdi( 0 );
+		strncpy(fname, code_gets(), HSP_MAX_PATH - 1);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
 #if defined(HSPEMSCRIPTEN)
-		p3 = code_getdi( 0 );
-		p4 = code_getdi( 3600*10*1000 );
-		i = mmman->Load( fname, p1, p2, p3, p4 );
+		p3 = code_getdi(0);
+		p4 = code_getdi(3600 * 10 * 1000);
+		if (mmman) {
+			i = mmman->Load(fname, p1, p2, p3, p4);
+		}
 #else
-		i = mmman->Load( fname, p1, p2 );
+		if (mmman) {
+			i = mmman->Load(fname, p1, p2);
+		}
 #endif
 		if (i) throw HSPERR_FILE_IO;
 		break;
@@ -448,21 +490,36 @@ static int cmdfunc_extcmd( int cmd )
 		//mmman->SetWindow( bmscr->hwnd, bmscr->cx, bmscr->cy, bmscr->sx, bmscr->sy );
 #if defined(HSPEMSCRIPTEN)
 		p2 = code_getdi( -1 );
-		mmman->Play( p1, p2 );
+		if (mmman) {
+			mmman->Play(p1, p2);
+		}
 #else
-		mmman->Play( p1 );
+		if (mmman) {
+			mmman->Play(p1);
+		}
 #endif
 		break;
 
 	case 0x0a:								// mmstop
 		p1 = code_getdi( -1 );
-		mmman->StopBank( p1 );
+		if (mmman) {
+			mmman->StopBank(p1);
+		}
 		break;
 #endif
 	case 0x0b:								// mci
 #ifdef HSPWIN
-		ctx->stat = mmman->SendMCI(code_gets());
-		strncpy(ctx->refstr, mmman->GetMCIResult(), HSPCTX_REFSTR_MAX - 1);
+#ifdef USE_MMAN
+		if (mmman) {
+			ctx->stat = mmman->SendMCI(code_gets());
+			strncpy(ctx->refstr, mmman->GetMCIResult(), HSPCTX_REFSTR_MAX - 1);
+		}
+		else {
+			code_gets();
+			ctx->stat = 0;
+			*(ctx->refstr) = 0;
+		}
+#endif
 #else
 		code_gets();
 #endif
@@ -546,10 +603,10 @@ static int cmdfunc_extcmd( int cmd )
 		strncpy( fname, code_gets(), 63 );
 		p1 = code_getdi( 0 );
 		wid = bmscr->wid;
-		wnd->Picload( wid, fname, p1 );
-		//if ( i ) throw HSPERR_PICTURE_MISSING;
-		//bmscr = wnd->GetBmscr( wid );
-		//cur_window = wid;
+		int i = wnd->Picload( wid, fname, p1 );
+		if ( i ) throw HSPERR_PICTURE_MISSING;
+		bmscr = wnd->GetBmscr( wid );
+		cur_window = wid;
 		break;
 		}
 	case 0x18:								// color
@@ -621,7 +678,8 @@ static int cmdfunc_extcmd( int cmd )
 		p2 = code_getdi( -1 );
 		p3 = code_getdi( -1 );
 		p4 = code_getdi( -1 );
-		bmscr->Width( p1, p2, p3, p4, 1 );
+		p5 = code_getdi( 0 );
+		bmscr->Width( p1, p2, p3, p4, p5 );
 		break;
 
 	case 0x1d:								// gsel
@@ -630,7 +688,21 @@ static int cmdfunc_extcmd( int cmd )
 
 		bmscr = wnd->GetBmscrSafe( p1 );
 		cur_window = p1;
-		hgio_gsel((BMSCR *)bmscr);
+		bmscr->Select( p2 );
+#ifdef HSPWIN
+		if (p1 == 0) {
+			if (p2 < 0) {
+				ShowWindow((HWND)sys_hwnd, SW_HIDE);
+			}
+			else if (p2 > 0) {
+				HWND i;
+				if (p2 == 1) i = HWND_NOTOPMOST; else i = HWND_TOPMOST;
+				ShowWindow((HWND)sys_hwnd, SW_SHOW);
+				SetActiveWindow((HWND)sys_hwnd);
+				SetWindowPos((HWND)sys_hwnd, i, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+			}
+		}
+#endif
 		break;
 
 	case 0x1e:								// gcopy
@@ -889,7 +961,7 @@ static int cmdfunc_extcmd( int cmd )
 			}
 		}
 		SetCursorPos(p1, p2);
-		if (p3 > 0) break;
+		if (p3 == 1) break;
 		if (p3 < 0) {
 			if (msact >= 0) {
 				msact = ShowCursor(0);
@@ -1077,18 +1149,24 @@ static int cmdfunc_extcmd( int cmd )
 
 	case 0x3c:								// celload
 		{
-		//int i;
 		char fname[HSP_MAX_PATH];
 		strncpy( fname, code_gets(), HSP_MAX_PATH-1);
-		p1 = code_getdi( -1 );
+		p1 = code_getdi( -2 );
 		p2 = code_getdi( 0 );
-		if ( p1 < 0 ) p1 = wnd->GetEmptyBufferId();
-		//Alertf( "celload[%s],%d,%d\n", fname, p1, p2 );
-
+		if ( p1 == -2 ) {
+			p1 = wnd->GetPreloadBufferId(fname);
+			if (p1 >= 0) {
+				bmscr->Select(cur_window);
+				ctx->stat = p1;
+				break;
+			}
+		}
+		if (p1 < 0) {
+			p1 = wnd->GetEmptyBufferId();
+		}
 		wnd->MakeBmscrFromResource( p1, fname );
-		//i = wnd->Picload( p1, fname, 0 );
-		//if ( i ) throw HSPERR_PICTURE_MISSING;
-
+		bmscr = wnd->GetBmscr(cur_window);
+		bmscr->Select(cur_window);
 		ctx->stat = p1;
 		break;
 		}
@@ -1163,12 +1241,20 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x42:								// mmvol
 		p1 = code_getdi( 0 );
 		p2 = code_getdi( 0 );
-		mmman->SetVol( p1, p2 );
+#ifdef USE_MMAN
+		if (mmman) {
+			mmman->SetVol(p1, p2);
+		}
+#endif
 		break;
 	case 0x43:								// mmpan
 		p1 = code_getdi( 0 );
 		p2 = code_getdi( 0 );
-		mmman->SetPan( p1, p2 );
+#ifdef USE_MMAN
+		if (mmman) {
+			mmman->SetPan(p1, p2);
+		}
+#endif
 		break;
 	case 0x44:								// mmstat
 		{
@@ -1177,7 +1263,16 @@ static int cmdfunc_extcmd( int cmd )
 		p_aptr = code_getva( &p_pval );
 		p1 = code_getdi( 0 );
 		p2 = code_getdi( 0 );
-		p3 = mmman->GetStatus( p1, p2 );
+#ifdef USE_MMAN
+		if (mmman) {
+			p3 = mmman->GetStatus(p1, p2);
+		}
+		else {
+			p3 = 0;
+		}
+#else
+		p3 = 0;
+#endif
 		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p3 );
 		break;
 		}
@@ -1415,10 +1510,12 @@ static int cmdfunc_extcmd( int cmd )
 		game->resetScreen( p1 );
 		break;
 	case 0x61:								// gpdraw
-		p1 = code_getdi( -1 );
+		p1 = code_getdi(-1);
+		p2 = code_getdi(0);
 		if ( p1 & GPDRAW_OPT_OBJUPDATE ) {
 			game->updateAll();
 		}
+		p1 = (p1 & 0xffff) | ( p2 & 0xff0000 );
 		hgio_draw_all(bmscr, p1);
 
 		if ( p1 & GPDRAW_OPT_DRAW2D ) {
@@ -1436,7 +1533,7 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi( 0 );
 		p2 = code_getdi( 0 );
 		p3 = code_getdi( 0 );
-		p4 = game->setObjectPrm( p1, p2, p3 );
+		p4 = game->setObjectPrm( p1, p2, p3, GPOBJ_PRMMETHOD_SET);
 		if ( p4 < 0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		break;
 	case 0x64:								// gpgetprm
@@ -1509,7 +1606,12 @@ static int cmdfunc_extcmd( int cmd )
 		p2 = code_getdi( 0 );
 		p3 = code_getdi( bmscr->sx );
 		p4 = code_getdi( bmscr->sy );
-		game->updateViewport( p1, p2, p3, p4 );
+		if (cur_window == 0) {
+			game->updateScaledViewport(p1, p2, p3, p4);
+		}
+		else {
+			game->updateViewport(p1, p2, p3, p4);
+		}
 		break;
 	case 0x6b:								// setobjname
 		{
@@ -1819,9 +1921,9 @@ static int cmdfunc_extcmd( int cmd )
 		dp1 = (HSPREAL)v.x;
 		dp2 = (HSPREAL)v.y;
 		dp3 = (HSPREAL)v.z;
-		code_setva( pv1, aptr1, HSPVAR_FLAG_DOUBLE, &dp1 );
-		code_setva( pv2, aptr2, HSPVAR_FLAG_DOUBLE, &dp2 );
-		code_setva( pv3, aptr3, HSPVAR_FLAG_DOUBLE, &dp3 );
+		code_setva_double( pv1, aptr1, &dp1 );
+		code_setva_double( pv2, aptr2, &dp2 );
+		code_setva_double( pv3, aptr3, &dp3 );
 		break;
 		}
 	case 0x81:								// getquat
@@ -1847,10 +1949,10 @@ static int cmdfunc_extcmd( int cmd )
 		dp2 = (HSPREAL)v.y;
 		dp3 = (HSPREAL)v.z;
 		dp4 = (HSPREAL)v.w;
-		code_setva(pv1, aptr1, HSPVAR_FLAG_DOUBLE, &dp1);
-		code_setva(pv2, aptr2, HSPVAR_FLAG_DOUBLE, &dp2);
-		code_setva(pv3, aptr3, HSPVAR_FLAG_DOUBLE, &dp3);
-		code_setva(pv4, aptr4, HSPVAR_FLAG_DOUBLE, &dp4);
+		code_setva_double(pv1, aptr1, &dp1);
+		code_setva_double(pv2, aptr2, &dp2);
+		code_setva_double(pv3, aptr3, &dp3);
+		code_setva_double(pv4, aptr4, &dp4);
 		break;
 	}
 
@@ -2024,9 +2126,9 @@ static int cmdfunc_extcmd( int cmd )
 		dp1 = (HSPREAL)v2.x;
 		dp2 = (HSPREAL)v2.y;
 		dp3 = (HSPREAL)v2.z;
-		code_setva(pv1, aptr1, HSPVAR_FLAG_DOUBLE, &dp1);
-		code_setva(pv2, aptr2, HSPVAR_FLAG_DOUBLE, &dp2);
-		code_setva(pv3, aptr3, HSPVAR_FLAG_DOUBLE, &dp3);
+		code_setva_double(pv1, aptr1, &dp1);
+		code_setva_double(pv2, aptr2, &dp2);
+		code_setva_double(pv3, aptr3, &dp3);
 		break;
 		}
 	case 0xd9:								// getcoli
@@ -2036,8 +2138,9 @@ static int cmdfunc_extcmd( int cmd )
 		p_aptr = code_getva( &p_pval );
 		p1 = code_getdi( 0 );
 		fp1 = (float)code_getdd( 1.0 );
-		p2 = code_getdi( 0 );
-		p6 = game->updateObjColi( p1, fp1, p2 );
+		p2 = code_getdi(0);
+		p3 = code_getdi(-1);
+		p6 = game->updateObjColi( p1, fp1, 0, p2, p3 );
 		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p6 );
 		break;
 		}
@@ -2061,6 +2164,7 @@ static int cmdfunc_extcmd( int cmd )
 		p_aptr = code_getva( &p_pval );
 		p1 = code_getdi( 0 );
 		p2 = code_getdi(0);
+		p3 = 0;
 		obj = game->getSceneObj( p1 );
 		if ( obj == NULL ) code_puterror( HSPERR_ILLEGAL_FUNCTION );
 		switch (p2) {
@@ -2076,11 +2180,25 @@ static int cmdfunc_extcmd( int cmd )
 		case 3:
 			p1 = obj->_lightgroup;
 			break;
+		case 4:
+			{
+			Node* node = obj->_node;
+			if (node == NULL) code_puterror(HSPERR_ILLEGAL_FUNCTION);
+			BoundingSphere bound = node->getBoundingSphere();
+			dp1 = (double)bound.radius;
+			p3 = 1;
+			break;
+			}
 		default:
 			code_puterror(HSPERR_ILLEGAL_FUNCTION);
 			break;
 		}
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_INT, &p1 );
+		if (p3) {
+			code_setva(p_pval, p_aptr, HSPVAR_FLAG_DOUBLE, &dp1);
+		}
+		else {
+			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p1);
+		}
 		break;
 		}
 	case 0xdc:								// objexist
@@ -2093,7 +2211,18 @@ static int cmdfunc_extcmd( int cmd )
 		ctx->stat = p2;
 		break;
 		}
-
+	case 0xde:								// getnearobj
+		{
+		PVal* p_pval;
+		APTR p_aptr;
+		p_aptr = code_getva(&p_pval);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		dp1 = code_getdd(10.0);
+		p3 = game->getNearestObj(p1, (float)dp1, p2);
+		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p3);
+		break;
+		}
 
 	case 0xe0:								// fvset
 		p_vec = code_getvvec();
@@ -2128,33 +2257,14 @@ static int cmdfunc_extcmd( int cmd )
 		break;
 	case 0xe5:								// fvdir
 		{
-		VECTOR *v;
-		VECTOR ang;
+		VECTOR v;
+		gameplay::Vector4 v2;
 		p_vec = code_getvvec();
-		code_getvec( &p_vec1);
-		v = (VECTOR *)&p_vec1;
+		SetVector(&v, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f);
+		code_getvec(&v2);
 		p1 = code_getdi( 0 );
-		SetVector( &ang, (float)p_vec[0], (float)p_vec[1], (float)p_vec[2], 1.0f );
-		InitMatrix();
-		switch( p1 ) {
-		case 0:
-			RotZ( ang.z );
-			RotY( ang.y );
-			RotX( ang.x );
-			break;
-		case 1:
-			RotX( ang.x );
-			RotY( ang.y );
-			RotZ( ang.z );
-			break;
-		case 2:
-			RotY( ang.y );
-			RotX( ang.x );
-			RotZ( ang.z );
-			break;
-		}
-		ApplyMatrix( &ang, v );
-		code_setvec( p_vec, &ang );
+		ctx->stat = GetTargetVector(&v,(VECTOR *)&v2,p1);
+		code_setvec( p_vec, &v );
 		break;
 		}
 	case 0xe6:								// fvmin
@@ -2254,7 +2364,7 @@ static int cmdfunc_extcmd( int cmd )
 		ps = code_gets();
 		sscanf( ps, "%f", &fp );
 		dp1 = (double)fp;
-		code_setva( p_pval, p_aptr, HSPVAR_FLAG_DOUBLE, &dp1 );
+		HSPVAR_FLAG_DOUBLE, ( p_pval, p_aptr, &dp1 );
 		break;
 		}
 
@@ -2419,19 +2529,22 @@ static int cmdfunc_extcmd( int cmd )
 		char fname[256];
 		char *ps;
 		gpmat *mat;
+		HSPREAL* p_mat;
 		p1 = code_getdi(0);
 		ps = code_gets();
 		strncpy(fname, ps, 256);
-		code_getvec(&p_vec1);
+		p_mat = code_getvmat();
 		p2 = code_getdi(1);
+
 		mat = game->getMat(p1);
 		if (mat == NULL) {
 			gpobj *obj = game->getObj(p1);
 			if (obj == NULL) throw HSPERR_ILLEGAL_FUNCTION;
-			ctx->stat = obj->setParameter(fname, (gameplay::Matrix *)&p_vec1, p2, -1);
+			if ( p2 != 1 ) throw HSPERR_ILLEGAL_FUNCTION;
+			ctx->stat = obj->setParameter(fname, p_mat, p2, -1);
 		}
 		else {
-			ctx->stat = mat->setParameter(fname, (gameplay::Matrix *)&p_vec1, p2);
+			ctx->stat = mat->setParameter(fname, p_mat, p2);
 		}
 		break;
 	}
@@ -2443,12 +2556,16 @@ static int cmdfunc_extcmd( int cmd )
 		char *ps;
 		gpmat *mat;
 		p1 = code_getdi(0);
-		ps = code_gets();
+		ps = code_getds("");
 		strncpy(fname, ps, 256);
 		ps = code_gets();
 		strncpy(texname, ps, 256);
 		p2 = code_getdi(0);
 		mat = game->getMat(p1);
+
+		if (*fname == 0) {
+			strcpy(fname, "u_diffuseTexture");
+		}
 		if (mat == NULL) {
 			gpobj *obj = game->getObj(p1);
 			if (obj == NULL) throw HSPERR_ILLEGAL_FUNCTION;
@@ -2500,15 +2617,6 @@ static int cmdfunc_extcmd( int cmd )
 			bm2 = wnd->GetBmscrSafe(p1);	// 転送元のBMSCRを取得
 			if (bm2) {
 				res = bm2->texid;
-			}
-			break;
-		}
-		case 2:
-		{
-			gpobj *obj;
-			obj = game->getObj(p1);
-			if (obj) {
-				res = obj->_usegpmat;
 			}
 			break;
 		}
@@ -2675,7 +2783,13 @@ static int cmdfunc_extcmd( int cmd )
 			dp3 = CnvIntRot((int)dp3);
 			p6 = MOC_ANGX;
 		}
-		p3 = code_getdi(MOVEMODE_LINEAR);
+		if (cmd == 0x110) {
+			p3 = code_getdi(MOVEMODE_SPLINE);
+		}
+		else {
+			p3 = code_getdi(MOVEMODE_LINEAR);
+		}
+		if (p3 & 16) p6 |= GPEVENT_MOCOPT_SRCWORK;
 		switch( p3 & 15 ) {
 		case MOVEMODE_LINEAR:
 			ctx->stat = game->AddMoveEvent( p1, p6, (float)dp1, (float)dp2, (float)dp3, p2, 0 );
@@ -2852,6 +2966,7 @@ static int cmdfunc_extcmd( int cmd )
 		aptr1 = code_getva(&pv1);
 		p1 = code_getdi(0);
 		dist = code_getdd(100.0);
+		p2 = code_getdi(0);
 
 		Vector4 pos;
 		Vector4 ang;
@@ -2860,7 +2975,7 @@ static int cmdfunc_extcmd( int cmd )
 		p6 = game->getObjectVector(p1, MOC_FORWARD, &ang);
 		if (p6 < 0) code_puterror(HSPERR_ILLEGAL_FUNCTION);
 
-		res = game->execPhysicsRayTest((Vector3 *)&pos, (Vector3 *)&ang, dist);
+		res = game->execPhysicsRayTest((Vector3 *)&pos, (Vector3 *)&ang, dist, p2);
 		code_setva(pv1, aptr1, HSPVAR_FLAG_INT, &res);
 		if (res > 0) {
 			game->setObjectVector(p1, MOC_WORK, &pos);
@@ -2892,6 +3007,132 @@ static int cmdfunc_extcmd( int cmd )
 		ctx->stat = res;
 		break;
 	}
+	case 0x15a:								// gpmatprm2
+	{
+		char fname[256];
+		char* ps;
+		gpmat* mat;
+		p1 = code_getdi(0);
+		ps = code_gets();
+		strncpy(fname, ps, 256);
+		dp1 = code_getdd(0.0);
+		dp2 = code_getdd(0.0);
+		mat = game->getMat(p1);
+		if (mat == NULL) {
+			gpobj* obj = game->getObj(p1);
+			if (obj == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+			ctx->stat = obj->setParameter(fname, (float)dp1, (float)dp2, -1);
+		}
+		else {
+			ctx->stat = mat->setParameter(fname, (float)dp1, (float)dp2);
+		}
+		break;
+	}
+	case 0x15b:								// gpmatprmp
+	{
+		char fname[256];
+		char* ps;
+		gpmat* mat;
+		gpmat* mat2;
+		p1 = code_getdi(0);
+		ps = code_getds("");
+		strncpy(fname, ps, 256);
+		p2 = code_getdi(0);
+		if (*fname == 0) {
+			strcpy(fname, "u_diffuseTexture");
+		}
+
+		Texture::Sampler* samp = NULL;
+
+		if (p2 & GPOBJ_ID_SRCFLAG) {
+			Bmscr* bm2;
+			bm2 = wnd->GetBmscrSafe(p2 & GPOBJ_ID_FLAGMASK);	// 転送元のBMSCRを取得
+			if (bm2 == NULL)  throw HSPERR_ILLEGAL_FUNCTION;
+			p2 = bm2->texid;
+		}
+		mat2 = game->getMat(p2);
+		if (mat2 == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+		samp = mat2->getSampler();
+		if (samp == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+
+		mat = game->getMat(p1);
+		if (mat == NULL) {
+			gpobj* obj = game->getObj(p1);
+			if (obj == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+			ctx->stat = obj->setParameter(fname, samp, -1);
+		}
+		else {
+			ctx->stat = mat->setParameter(fname, samp);
+		}
+		break;
+	}
+	case 0x15c:								// gpsetprmon
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+		p4 = game->setObjectPrm(p1, p2, p3, GPOBJ_PRMMETHOD_ON);
+		if (p4 < 0) throw HSPERR_ILLEGAL_FUNCTION;
+		break;
+	case 0x15d:								// gpsetprmoff
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+		p4 = game->setObjectPrm(p1, p2, p3, GPOBJ_PRMMETHOD_OFF);
+		if (p4 < 0) throw HSPERR_ILLEGAL_FUNCTION;
+		break;
+	case 0x15e:								// gpmatprmf
+	{
+		char fname[256];
+		char prmname[256];
+		char valname[256];
+		char* ps;
+		gpmat* mat;
+		Texture::Sampler* samp = NULL;
+		p1 = code_getdi(0);
+		ps = code_getds("");
+		strncpy(prmname, ps, 256);
+		ps = code_getds("");
+		strncpy(valname, ps, 256);
+		ps = code_getds("");
+		strncpy(fname, ps, 256);
+
+		mat = game->getMat(p1);
+		if (mat == NULL) {
+			gpobj* obj = game->getObj(p1);
+			if (obj == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+			samp = obj->getSamplerByName(fname, -1);
+			if (samp == NULL) throw HSPERR_ILLEGAL_FUNCTION;
+			ctx->stat = game->applySamplerModeByString(samp, prmname, valname);
+		}
+		else {
+			samp = mat->getSampler(fname);
+			ctx->stat = game->applySamplerModeByString(samp, prmname, valname);
+		}
+		break;
+	}
+	case 0x15f:								// gppsweeptest
+	{
+		PVal* pv1;
+		APTR aptr1;
+		int res;
+		aptr1 = code_getva(&pv1);
+		p1 = code_getdi(0);
+		dp1 = code_getdd(0.0);
+		dp2 = code_getdd(0.0);
+		dp3 = code_getdd(0.0);
+		p2 = code_getdi(1);
+
+		Vector4 pos;
+		Vector4 ang;
+		pos.set(dp1, dp2, dp3, 0.0f);
+		res = game->execPhysicsSweepTest(p1, (Vector3*)&pos, p2, (Vector3*)&ang );
+		code_setva(pv1, aptr1, HSPVAR_FLAG_INT, &res);
+		if (res > 0) {
+			game->setObjectVector(p1, MOC_WORK, &pos);
+			game->setObjectVector(p1, MOC_WORK2, &ang);
+		}
+		break;
+	}
 
 
 #endif
@@ -2904,19 +3145,23 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = code_getdi(512);
 		p2 = code_getdi(1024);
 		p3 = code_getdi(64);
-		sprite->init(p1,p2,p3);
+		p4 = code_getdi(16);
+		sprite->init(p1,p2,p3,p4);
 		break;
 	}
-	case 0x201:								// es_window
+	case 0x201:								// es_screen
 	{
 		//		set window area (type0)
-		//		es_window tx,ty,sx,sy
+		//		es_screen width,height
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
-		p3 = code_getdi(0);
-		p4 = code_getdi(0);
-		p5 = code_getdi(0);
-		//sprite->setWindow(p1,p2,p3,p4,p5);
+		if (sprite_target_window != cur_window) {
+			sprite_target_window = cur_window;
+#ifndef HSPDISHGP
+			code_puterror(HSPERR_ILLEGAL_FUNCTION);
+#endif
+		}
+		sprite->setResolution(wnd, p1, p2, sprite_target_window);
 		break;
 	}
 	case 0x202:								// es_area
@@ -2934,11 +3179,14 @@ static int cmdfunc_extcmd( int cmd )
 	{
 		//		define character size (type0)
 		//		es_size x,y,collision_rate,tpflag
-		p1 = code_geti();
-		p2 = code_geti();
+		p1 = code_getdi(16);
+		p2 = code_getdi(16);
 		p3 = code_getdi(100);
 		p4 = code_getdi(0x3ff);
-		sprite->setSize(p1, p2, p3, p4);
+		if (sprite->sprite_enable) {
+			sprite->setSize(p1, p2, p3, p4);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
 	case 0x204:								// es_pat
@@ -3020,7 +3268,7 @@ static int cmdfunc_extcmd( int cmd )
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
 		if (sprite->sprite_enable) {
-			p1 = sprite->getParameter(p2, p3);
+			ctx->stat = sprite->getParameter(p2, p3, &p1);
 			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p1);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
@@ -3029,12 +3277,13 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x209:								// es_setp
 	{
 		//		set sprite parameters (type0)
-		//		es_get spno, prm_code, new_prm
+		//		es_get spno, prm_code, new_prm, opt
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
+		p4 = code_getdi(0);
 		if (sprite->sprite_enable) {
-			sprite->setParameter(p1, p2, p3);
+			ctx->stat = sprite->setParameter(p1, p2, p3, p4);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
@@ -3060,14 +3309,17 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x20b:								// es_check
 	{
 		//		check sprite collision (type1)
-		//		es_check var, spno, type
+		//		es_check var, spno, type, rotflag, start, end
 		PVal* p_pval;
 		APTR p_aptr;
 		p_aptr = code_getva(&p_pval);
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
+		p4 = code_getdi(0);
+		p5 = code_getdi(0);
+		p6 = code_getdi(-1);
 		if (sprite->sprite_enable) {
-			p1 = sprite->checkCollision(p2, p3);
+			p1 = sprite->checkCollision(p2, p3,p4,p5,p6);
 			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p1);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
@@ -3101,11 +3353,12 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x20e:								// es_flag
 	{
 		//		set sprite flag data (type0)
-		//		es_flag spno, flag
+		//		es_flag spno, flag, op
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
+		p3 = code_getdi(0);
 		if (sprite->sprite_enable) {
-			ctx->stat = sprite->setSpriteFlag(p1, p2);
+			ctx->stat = sprite->setSpriteFlag(p1, p2, p3);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
@@ -3229,7 +3482,7 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x218:								// es_draw
 	{
 		//		execute drawing ESCD system (type0)
-		//		es_draw start,kazz,start_pri,end_pri
+		//		es_draw start,kazz,flag,start_pri,end_pri
 		p1 = code_getdi(0);
 		p2 = code_getdi(-1);
 		p3 = code_getdi(0);
@@ -3255,8 +3508,8 @@ static int cmdfunc_extcmd( int cmd )
 	case 0x21a:								// es_bound
 	{
 		p1 = code_getdi(0);
-		p2 = code_getdi(0);
-		p3 = code_getdi(0);
+		p2 = code_getdi(128);
+		p3 = code_getdi(3);
 		if (sprite->sprite_enable) {
 			ctx->stat = sprite->setBound(p1, p2, p3);
 		}
@@ -3287,7 +3540,20 @@ static int cmdfunc_extcmd( int cmd )
 	}
 	case 0x21d:								// es_move
 	{
-		throw HSPERR_UNSUPPORTED_FUNCTION;
+		//		execute drawing ESCD system (type0)
+		//		es_move frame, start,kazz,animflag
+		p1 = code_getdi(1);
+		p2 = code_getdi(0);
+		p3 = code_getdi(-1);
+		p4 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			int mode = ESDRAW_NODISP;
+			if (p4) mode |= ESDRAW_NOANIM;
+			for (int i = 0; i < p1; i++) {
+				ctx->stat = sprite->draw(p2, p3, mode, -1, -1);
+			}
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
 	case 0x21e:								// es_setpri
@@ -3313,7 +3579,12 @@ static int cmdfunc_extcmd( int cmd )
 		p6 = code_getdi(0x10000);
 		p7 = code_getdi(0);
 		if (sprite->sprite_enable) {
-			sprite->put(p1, p2, p3, p4, p5, p6, p7);
+			if (sprite->sprite_newfunc) {
+				sprite->put2(p1, p2, p3, p4, p5, p6, p7, bmscr->mulcolor);
+			}
+			else {
+				sprite->put(p1, p2, p3, p4, p5, p6, p7, bmscr->mulcolor);
+			}
 		} else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
@@ -3455,7 +3726,7 @@ static int cmdfunc_extcmd( int cmd )
 		p_aptr = code_getva(&p_pval);
 		p_aptr2 = code_getva(&p_pval2);
 		p2 = code_getdi(0);
-		res = 0;
+		res = -1;
 		if (sprite->sprite_enable) {
 			res = sprite->getSpritePos( &xx,&yy,p1,p2 );
 			if (res == 0) {
@@ -3580,6 +3851,252 @@ static int cmdfunc_extcmd( int cmd )
 		else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
 	}
+	case 0x22e:								// es_bgparam
+	{
+		//		set BGMAP parameter
+		//		es_bgparam bgno, gmode, prmtype
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setMapParam(p1, p2, p3);
+		}
+		break;
+	}
+	case 0x22f:								// es_bgattr
+	{
+		//		set BGMAP cel attribute
+		//		es_bgparam bgno, start, end, attribute
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0xffff);
+		p4 = code_getdi(0);
+
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setMapAttribute(p1, p2, p3, p4);
+		}
+		break;
+	}
+	case 0x230:								// es_bghitpos
+	{
+		//		make BGMAP hit info
+		//		es_bghitpos bgno, x, y, sx, sy, px, py, sw
+		int p7,p8;
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+		p4 = code_getdi(16);
+		p5 = code_getdi(16);
+		p6 = code_getdi(0);
+		p7 = code_getdi(0);
+		p8 = code_getdi(0);
+		ctx->stat = -1;
+		if (sprite->sprite_enable) {
+			if (p8) {
+				ctx->stat = sprite->getMapMaskHit32(p1, p2, p3, p4, p5, p6, p7);
+			}
+			else {
+				ctx->stat = sprite->getMapMaskHit(p1, p2, p3, p4, p5, p6, p7);
+			}
+		}
+		break;
+	}
+	case 0x231:								// es_getbghit
+	{
+		//		get BGMAP hit info
+		//		es_getbghit var, bgno, index
+		PVal* p_pval;
+		APTR p_aptr;
+		p_aptr = code_getva(&p_pval);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		ctx->stat = -1;
+		if (sprite->sprite_enable) {
+			if (p2 < 0) {
+				BGMAP* map = sprite->getMap(p1);
+				if (map == NULL) break;
+				int res = map->maphit_cnt;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
+				ctx->stat = 0;
+				break;
+			}
+			BGHITINFO* info = sprite->getMapHitInfo(p1,p2);
+			if (info) {
+				p_aptr = 0;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &info->result);
+				p_aptr = 1;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &info->celid);
+				p_aptr = 2;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &info->attr);
+				p_aptr = 3;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &info->myx);
+				p_aptr = 4;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &info->myy);
+				p_aptr = 5;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &info->x);
+				p_aptr = 6;
+				code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &info->y);
+				ctx->stat = 0;
+			}
+		}
+		break;
+	}
+	case 0x232:								// es_getbgattr
+	{
+		//		get BGMAP cel attribute
+		//		es_getbgattr var, bgno, celno
+		PVal* p_pval;
+		APTR p_aptr;
+		p_aptr = code_getva(&p_pval);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->getMapAttribute(p1, p2);
+			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &ctx->stat);
+		}
+		break;
+	}
+	case 0x233:								// es_bglink
+	{
+		//		Sprite BG link set (type0)
+		//		es_bglink bgno, maphitoption
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setSpriteMapLink(p1, p2);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x234:								// es_stick
+	{
+		//		sprite stick
+		//		es_stick spno, targetsp
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setSpriteStick(p1, p2);
+		}
+		break;
+	}
+	case 0x235:								// es_bghit
+	{
+		//		make BGMAP hit info
+		//		es_bghit spno
+		p1 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->execSingle(p1);
+		}
+		break;
+	}
+	case 0x236:								// es_regdeco
+	{
+		//		register decoration sprite data (type0)
+		//		es_regdeco chr, opt, direction, speed, life, entry
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(-1);
+		p4 = code_getdi(-1);
+		p5 = code_getdi(30);
+		p6 = code_getdi(-1);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->registSpriteDecoration(p1, p2, p3, p4, p5, p6);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x237:								// es_setdeco
+	{
+		//		set decoration sprite data (type0)
+		//		es_setdeco x, y, decoid
+		p1 = code_getdi(bmscr->cx);
+		p2 = code_getdi(bmscr->cy);
+		p3 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setSpriteDecoration(p1, p2, p3);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x238:								// es_bgfetch
+	{
+		//		set decoration sprite data (type0)
+		//		es_bgfetch bgno, dir, size, evtype
+		p1 = code_getdi(0);
+		p2 = code_getdi(1);
+		p3 = code_getdi(1);
+		p4 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->fetchMap(p1, p2, p3, p4);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x239:								// es_sizeex
+	{
+		//		define character size (type0)
+		//		es_sizeex x,y,tpflag, colsx, colsy, colx, coly, putx, puty
+		int p7, p8, p9;
+		p1 = code_getdi(16);
+		p2 = code_getdi(16);
+		p3 = code_getdi(0x3ff);
+		p4 = code_getdi(0);
+		p5 = code_getdi(0);
+		p6 = code_getdi(0);
+		p7 = code_getdi(0);
+		p8 = code_getdi(0);
+		p9 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			sprite->setSizeEx(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x23a:								// es_spropt
+	{
+		//		set sprite option (type0)
+		//		es_scaleopt scaleopt, clipopt
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			sprite->setSpriteScaleOption(p1,p2);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x23b:								// es_nearobj
+	{
+		//		set sprite option (type0)
+		//		es_nearobj var, id, group, range
+		PVal* p_pval;
+		APTR p_aptr;
+		int res;
+		p_aptr = code_getva(&p_pval);
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			res = sprite->getNear(p1, p2, p3);
+			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
+	case 0x23c:								// es_sprlife
+	{
+		//		process sprite Life (type0)
+		//		es_sprlife id, life, option
+		p1 = code_getdi(0);
+		p2 = code_getdi(0);
+		p3 = code_getdi(0);
+		if (sprite->sprite_enable) {
+			ctx->stat = sprite->setSpriteLife( p1, p2, p3 );
+		}
+		else throw HSPERR_UNSUPPORTED_FUNCTION;
+		break;
+	}
 
 
 #endif
@@ -3651,23 +4168,11 @@ static int get_ginfo( int arg )
 #endif
 
 	case 12:
-		//if ( bmscr->type != HSPWND_TYPE_BUFFER ) {
-		//	bmscr->GetClientSize( &i, &j );
-		//	return i;
-		//}
 	case 26:
 		return bmscr->sx;
-		//return hgio_getWidth();
-		//return bmscr->sx;
 	case 13:
-		//if ( bmscr->type != HSPWND_TYPE_BUFFER ) {
-		//	bmscr->GetClientSize( &i, &j );
-		//	return j;
-		//}
 	case 27:
 		return bmscr->sy;
-		//return hgio_getHeight();
-		//return bmscr->sy;
 	case 14:
 		return bmscr->printsizex;
 	case 15:
@@ -3704,8 +4209,11 @@ static int get_ginfo( int arg )
 	case 23:
 		return bmscr->cy;
 	case 24:
-		//return ctx->intwnd_id;
+#ifdef HSPWIN
+		return ctx->intwnd_id;
+#else
 		return 0;
+#endif
 	case 25:
 		return wnd->GetEmptyBufferId();
 	case 28:
@@ -3849,7 +4357,7 @@ static int termfunc_extcmd( int option )
 	delete sprite;
 #endif
 #ifdef USE_MMAN
-	delete mmman;
+	hsp3excmd_init_mmsystem(0);
 #endif
 #ifdef USE_WEBTASK
 	delete webtask;
@@ -3875,16 +4383,17 @@ void hsp3typeinit_extcmd( HSP3TYPEINFO *info )
 	sys_hwnd = 0;
 	sys_hdc = 0;
 	msact = 0;
+	cur_window = 0;
 
 #ifdef USE_MMAN
-	mmman = new MMMan;
-	mmman->Reset( ctx->wnd_parent );
+	hsp3excmd_init_mmsystem(1);
 #endif
 #ifdef USE_WEBTASK
 	webtask = new WebTask;
 #endif
 #ifdef USE_ESSPRITE
 	sprite = new essprite;
+	sprite_target_window = 0;
 	sprite->setResolution( wnd, bmscr->sx, bmscr->sy);
 #endif
 
@@ -3917,7 +4426,9 @@ HSP3DEVINFO *hsp3extcmd_getdevinfo( void )
 void hsp3notify_extcmd( void )
 {
 #ifdef USE_MMAN
-	mmman->Notify();
+	if (mmman) {
+		mmman->Notify();
+	}
 #endif
 }
 
@@ -3932,22 +4443,24 @@ void hsp3excmd_rebuild_window(void)
 #ifdef USE_ESSPRITE
 	if (sprite) delete sprite;
 	sprite = new essprite;
+	sprite_target_window = 0;
 	sprite->setResolution( wnd, bmscr->sx, bmscr->sy);
 #endif
 
 #ifdef USE_MMAN
-	delete mmman;
-	mmman = new MMMan;
-	mmman->Reset(ctx->wnd_parent);
+	hsp3excmd_init_mmsystem(0);
+	hsp3excmd_init_mmsystem(1);
 #endif
 }
 
 
-void hsp3extcmd_pause( void )
+void hsp3extcmd_pause(void)
 {
 #if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 #ifdef USE_MMAN
-	mmman->Pause();
+	if (mmman) {
+		mmman->Pause();
+	}
 #endif
 #endif
 }
@@ -3957,10 +4470,18 @@ void hsp3extcmd_resume( void )
 {
 #if defined(HSPNDK) || defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 #ifdef USE_MMAN
-	mmman->Resume();
+	if (mmman) {
+		mmman->Resume();
+	}
 	wnd->Resume();
 	bmscr = wnd->GetBmscr( 0 );
+	bmscr->Select(0);
 #endif
+#endif
+#ifdef HSPWIN
+	wnd->Resume();
+	bmscr = wnd->GetBmscr(0);
+	bmscr->Select(0);
 #endif
 }
 
@@ -3971,6 +4492,41 @@ void hsp3extcmd_sysvars(int inst, int hwnd, int hdc)
 	sys_hwnd = hwnd;
 	sys_hdc = hdc;
 	bmscr = wnd->GetBmscr(0);
+	sprite_target_window = 0;
 	sprite->setResolution(wnd, bmscr->sx, bmscr->sy);
+#ifdef HSPWIN
+	init_bmscr3(bmscr, inst, hwnd, hdc);
+#endif
+}
+
+
+void hsp3gr_cleanup(void)
+{
+	//		全オブジェクトを破棄(クリーンアップ)
+	//
+	if (wnd) {
+		wnd->ClearAllObjects();
+		wnd->Dispose();
+	}
+}
+
+
+void hsp3excmd_init_mmsystem(int flag)
+{
+	//		mmsystemの有効・無効切り替え
+	//		flag=0:OFF/1:ON
+	//
+	if (flag) {
+		if (mmman == NULL) {
+			mmman = new MMMan;
+			mmman->Reset(ctx->wnd_parent);
+		}
+	}
+	else {
+		if (mmman) {
+			delete mmman;
+			mmman = NULL;
+		}
+	}
 }
 

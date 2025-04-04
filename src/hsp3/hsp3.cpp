@@ -166,7 +166,9 @@ int Hsp3::Reset( int mode )
 		*p = 0;
 		if ( sum != 0x6cced385 ) return -1;
 		if ( mode ) {
-			if (dpm_filebase(fname) != 1) return -1;	// DPM,packfileからのみstart.axを読み込む
+			if (dpm_filebase(fname) != 1) {
+				return -1;	// DPM,packfileからのみstart.axを読み込む
+			}
 		}
 	}
 	else {
@@ -198,31 +200,6 @@ int Hsp3::Reset( int mode )
 	hspctx.mem_linfo = (LIBDAT *)copy_LIBDAT(hsphed, ptr + hsphed->pt_linfo, hsphed->max_linfo);
 	hspctx.mem_minfo = (STRUCTPRM *)copy_DAT(ptr + hsphed->pt_minfo, hsphed->max_minfo);
 	hspctx.mem_finfo = (STRUCTDAT *)copy_STRUCTDAT(hsphed, ptr + hsphed->pt_finfo, hsphed->max_finfo);
-
-	//		init strmap
-	int *exopt_pt = (int *)(ptr + hsphed->pt_exopt);
-	int* dsindex = NULL;
-	int dsindex_size = 0;
-	if (hsphed->max_exopt) {
-		while (1) {
-			int tag,bodysize;
-			tag = *exopt_pt++;
-			bodysize = tag >> 16;
-			tag = tag & 0xffff;
-			if (tag == HSPHED_EXOPTION_TAG_NONE) {
-				break;
-			}
-			if (tag == HSPHED_EXOPTION_TAG_DSINDEX) {
-				dsindex = exopt_pt;
-				exopt_pt+= bodysize;
-				dsindex_size = bodysize;
-				continue;
-			}
-			break;
-		}
-	}
-	hspctx.dsindex = dsindex;
-	hspctx.dsindex_size = dsindex_size;
 
 	HspVarCoreResetVartype( hsphed->max_varhpi );		// 型の初期化
 
@@ -275,6 +252,44 @@ int Hsp3::Reset( int mode )
 			HspVarCoreClear( pval, HSPVAR_FLAG_INT );	// グローバル変数を0にリセット
 		}
 	}
+
+	//		init strmap
+	int* exopt_pt = (int*)(ptr + hsphed->pt_exopt);
+	int* dsindex = NULL;
+	int dsindex_size = 0;
+	if (hsphed->max_exopt) {
+		while (1) {
+			int tag, bodysize;
+			tag = *exopt_pt++;
+			bodysize = tag >> 16;
+			tag = tag & 0xffff;
+			if (tag == HSPHED_EXOPTION_TAG_NONE) {
+				break;
+		}
+			switch (tag) {
+			case HSPHED_EXOPTION_TAG_DSINDEX:
+				dsindex = exopt_pt;
+				dsindex_size = bodysize;
+				break;
+			case HSPHED_EXOPTION_TAG_VARFIX:
+			{
+				int varindex = exopt_pt[0];
+				int varfixvalue = exopt_pt[1];
+				PVal* pval = &hspctx.mem_var[varindex];
+				HspVarCoreClear(pval, varfixvalue);
+				pval->support |= HSPVAR_SUPPORT_FIXEDTYPE;
+				break;
+			}
+			default:
+				break;
+			}
+			exopt_pt += bodysize / sizeof(int);
+			continue;
+	}
+	}
+	hspctx.dsindex = dsindex;
+	hspctx.dsindex_size = dsindex_size;
+
 
 	//		debug
 	//Alertf( "#HSP objcode initalized.(CS=%d/DS=%d/OT=%d/VAR=%d)\n",hsphed->max_cs, hsphed->max_ds, hsphed->max_ot, hsphed->max_val );

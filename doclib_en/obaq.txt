@@ -3,7 +3,7 @@ OBAQ for HSP ver3.4 REFERENCE MANUAL                HSP : Hot Soup Processor
 HSP Extension Extension DLL Reference Copyright 2014 (c) Zener Works / kuni / onitama
 ------------------------------------------------------------------------------
 
-繝ｻ Introduction
+・ Introduction
 
 This DLL can be used with Hot Soup Processor ver3.2 or later.
 It is a plug-in that allows you to easily use the functions of the physics engine (OBAQ).
@@ -11,7 +11,7 @@ OBAQ contains all the functions in the DLL, as long as it is an environment wher
 No additional modules or DLLs need to be installed.
 
 
-繝ｻ Overview of OBAQ functions
+・ Overview of OBAQ functions
 
 By using OBAQ, collision of rigid bodies by 2D base, gravity simulation
 Can be handled.
@@ -25,7 +25,7 @@ You can easily draw sprites. In addition, the user can set the display coordinat
 By managing it, it is possible to support display systems using DirectX, etc.
 
 
-繝ｻ Preparation for use
+・ Preparation for use
 
 OBAQ.DLL is included in the latest HSP3 full set.
 If the DLL does not work, in the same directory as the HSP3.EXE used for execution,
@@ -38,7 +38,7 @@ please try.
 You should be able to see a simple usage example of the enhanced functionality.
 
 
-繝ｻ Overview of how to use
+・ Overview of how to use
 
 OBAQ has a built-in simple display management and drawing function.
 The smallest unit managed is called an object.
@@ -272,7 +272,7 @@ quser2 Set user-defined data 2
 The above is the basic usage.
 
 
-繝ｻ Limitations of the current version
+・ Limitations of the current version
 
 The current version has the following restrictions on its use.
 Please note that the operation is not guaranteed when these values are exceeded.
@@ -282,7 +282,7 @@ Total number of vertices of shape data held by all objects: up to 16384
 Number of custom shapes that can be contained in one object: up to 8
 
 
-繝ｻ Notes on display
+・ Notes on display
 
 The accuracy of rotating / enlarging / reducing the image by sprite display is low due to the speedup.
 It has become a thing. Sometimes the exact match with the wireframe contour does not occur
@@ -295,7 +295,7 @@ If you are concerned about these parts, absorb the blur on the display side if n
 Please take measures such as.
 
 
-繝ｻ About OBAQ Model Editor
+・ About OBAQ Model Editor
 
 OBAQ Model Editor is for editing free shapes that can be used with the qaddmodel instruction.
 It's a simple tool.
@@ -304,7 +304,7 @@ It can be read and executed.
 Please refer to the manual (obaqme.txt) for detailed usage.
 
 
-繝ｻ Support with HGIM G3
+・ Support with HGIM G3
 
 From ver3.21 of HGIMG3, to display OBAQ object by DirectX
 The function is installed. User writes for OBAQ plugin
@@ -313,7 +313,7 @@ This makes it possible to display a large number of objects, reduce the rotation
 In addition, the drawing speed can be improved.
 
 
-繝ｻ Instruction list
+・ Instruction list
 
 OBAQ.DLL adds the following instructions to HSP to make it available.
 For the usage of each instruction, refer to the help (instruction reference by F1 key).
@@ -371,7 +371,7 @@ qblast Gives radial force from anywhere
 qgetversion Get version information
 
 
-謠ナmportant point
+揃important point
 
 OBAQ.DLL is a plug-in file that is used at the same time as HSP3.EXE.
 Please use ver3.3 or above as the HSP to use. For HSP ver2.61 and earlier
@@ -380,9 +380,9 @@ Even if you create an EXE file, put OBAQ.DLL in the same directory as the EXE fi
 It will not work unless it is placed in. Also, you cannot add DLLs to the packfile.
 
 
-謠イhange log
+揃Change log
 
-	2014/04/24 ver3.4ﾎｲ4
+	2014/04/24 ver3.4β4
 
 Added 2 to the option parameter value of the qspeed instruction.
 Until now, when 1 was specified for the option parameter,
@@ -417,7 +417,7 @@ Added new sample game, tof2.hsp.
 First version.
 
 
-謠ツredit
+揃credit
 
 OBAQ is a physics engine jointly developed by Zener Works, Inc./kuni/onitama.
 If you can help play games that use the laws of physics and give a sense of reality to small movements
@@ -434,19 +434,19 @@ By all means, please surprise us by creating something new with OBAQ.
 	http://www.onionsoft.net/
 
 
-繝ｻ Copyright and license
+・ Copyright and license
 
 OBAQ.DLL is copyrighted by Zener Works, Inc / kuni / onitama.
 In the original software (executable file) created by the user
 When distributing OBAQ.DLL as an attachment, please follow the conditions below.
 
-繝ｻ When distributing as free software
+・ When distributing as free software
 
 You can freely attach OBAQ.DLL and use it.
 It is licensed without the need for reporting or inquiry when using it.
 The copyright notice of the DLL and the OBAQ logo may or may not be displayed.
 
-繝ｻ When distributing as a fee (commercially available, shareware)
+・ When distributing as a fee (commercially available, shareware)
 
 If the software that uses OBAQ.DLL generates profits that require tax filing,
 You need to obtain a paid license.
@@ -456,7 +456,7 @@ Obtaining a paid license does not always cost money.
 We will individually conclude the specified license agreement according to the number of sales.
 For more information, please email info@hsp.tv.
 
-繝ｻ Free / paid common items
+・ Free / paid common items
 
 We do not guarantee any damage caused by this program.
 Use at your own risk.

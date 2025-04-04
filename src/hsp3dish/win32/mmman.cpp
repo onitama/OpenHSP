@@ -101,6 +101,11 @@ void MMMan::DeleteBank( int bank )
 		free( lpSnd );
 	}
 	mem_snd[bank].mempt=NULL;
+	if (mem_snd[bank].flag == MMDATA_INTWAVE) {
+		SndDelete( (int)mem_snd[bank].track );
+		mem_snd[bank].flag = MMDATA_NONE;
+	}
+
 	if ( mem_snd[bank].fname != NULL ) {
 		free( mem_snd[bank].fname );
 		mem_snd[bank].fname = NULL;

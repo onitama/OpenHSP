@@ -36,8 +36,9 @@ namespace gameplay
 static std::vector<Bundle*> __bundleCache;
 
 Bundle::Bundle(const char* path) :
-    _path(path), _referenceCount(0), _references(NULL), _stream(NULL), _trackedNodes(NULL),	_callback(NULL)
+    _path(path), _referenceCount(0), _references(NULL), _stream(NULL), _trackedNodes(NULL), _callback(NULL)
 {
+    _meshSkins.clear();
 }
 
 Bundle::~Bundle()
@@ -273,7 +274,8 @@ Bundle::Reference* Bundle::find(const char* id) const
 
 void Bundle::clearLoadSession()
 {
-    for (size_t i = 0, count = _meshSkins.size(); i < count; ++i)
+    size_t count = _meshSkins.size();
+    for (size_t i = 0; i < count; ++i)
     {
         SAFE_DELETE(_meshSkins[i]);
     }

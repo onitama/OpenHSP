@@ -212,7 +212,6 @@ void hsp3win_msgfunc( HSPCTX *hspctx )
 				hsp3win_dispatch( &msg );
 				if ( hspctx->runmode != RUNMODE_STOP ) break;
 			}
-
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 1000, QS_ALLINPUT );
 			break;
 		case RUNMODE_WAIT:
@@ -240,14 +239,14 @@ void hsp3win_msgfunc( HSPCTX *hspctx )
 				}
 			} else {
 				//	高精度タイマー
-				tick = timeGetTime()+5;				// すこし早めに抜けるようにする
+				tick = timeGetTime() + 5;				// すこし早めに抜けるようにする
 				if ( code_exec_await( tick ) != RUNMODE_RUN ) {
 					MsgWaitForMultipleObjects(0, NULL, FALSE, hspctx->waittick - tick, QS_ALLINPUT );
 				} else {
-					tick = timeGetTime();
-					while( tick < hspctx->waittick ) {	// 細かいwaitを取る
-						Sleep(1);
+					while (1) {						// 細かいwaitを取る
 						tick = timeGetTime();
+						if (code_exec_await(tick) == RUNMODE_RUN) break;
+						Sleep(1);
 					}
 					hspctx->lasttick = tick;
 					hspctx->runmode = RUNMODE_RUN;
@@ -472,6 +471,7 @@ void hsp3win_bye( void )
 #ifdef HSPERR_HANDLE
 	try {
 #endif
+		hsp3gr_cleanup();
 		hsp->Dispose();
 #ifdef HSPERR_HANDLE
 	}

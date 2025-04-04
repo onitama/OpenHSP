@@ -467,7 +467,7 @@ p1: Angle value (radian)
 
 %inst
 Returns the arc sine (inverse sine) value of p1.
-Results are given in real and radians, in the range -M_PI / 2 to M_PI / 2 (-90 å±ž to 90 å±ž in frequency).
+Results are given in real and radians, in the range -M_PI / 2 to M_PI / 2 (-90 ‘® to 90 ‘® in frequency).
 
 %href
 acos
@@ -485,7 +485,7 @@ p1: Angle value (radian)
 
 %inst
 Returns the arc cosine (reverse cosine) value of p1.
-Results are given in real and radians, ranging from 0 to M_PI (0 å±ž to 180 å±ž in frequency).
+Results are given in real and radians, ranging from 0 to M_PI (0 ‘® to 180 ‘® in frequency).
 
 %href
 asin
