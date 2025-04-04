@@ -1,6 +1,6 @@
 ;
-;	HSP help manager—p HELPƒ\[ƒXƒtƒ@ƒCƒ‹
-;	(æ“ª‚ªu;v‚Ìs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·)
+;	HSP help managerç”¨ HELPã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+;	(å…ˆé ­ãŒã€Œ;ã€ã®è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™)
 ;
 
 %type
@@ -86,7 +86,7 @@ File Operation Commands
 p1,"filemask",p2
 p1=Variable : String variable to store the directory list
 "filemask" : File mask for the list
-p2=0`(0)   : Directory acquisition mode
+p2=0ã€œ(0)   : Directory acquisition mode
 
 %inst
 Creates a list of files in the current directory and assigns it to a variable.
@@ -169,8 +169,8 @@ File Operation Commands
 "filename",p1,p2,p3
 "filename" : File Name to Load
 p1=Variable : Variable Name
-p2=64`(-1): Size to Load (in Bytes)
-p3=0`(-1) : File Offset
+p2=64ã€œ(-1): Size to Load (in Bytes)
+p3=0ã€œ(-1) : File Offset
 
 %inst
 Loads the contents of a file into a memory buffer.
@@ -206,8 +206,8 @@ File Operation Commands
 "filename",p1,p2,p3
 "filename" : File Name to Save
 p1=Variable : Variable Name
-p2=0`(-1) : Size to Save (in Bytes)
-p3=0`(-1) : File Offset
+p2=0ã€œ(-1) : Size to Save (in Bytes)
+p3=0ã€œ(-1) : File Offset
 %inst
 Writes the contents of a memory buffer to a file.
 Normally used with memory buffers secured with the sdim command, but can also be used with variables of other types or array variables.
@@ -236,8 +236,8 @@ File Operation Commands
 %prm
 p1,p2,p3
 p1=Variable : Variable Name to be Streamed
-p2=0`(0)   : Buffer Offset
-p3=0`(MAX) : Buffer Size
+p2=0ã€œ(0)   : Buffer Offset
+p3=0ã€œ(MAX) : Buffer Size
 %inst
 Sets a variable that has a memory space to be treated as a substitute for a file (memory stream function).
 The variable specified by p1 will be the read source of the file specified by "MEM:filename" thereafter.
@@ -267,7 +267,7 @@ File Operation Commands
 "dpmname",p1,p2
 "dpmname" : DPM File Name
 p1(-1)    : Encryption Key Specification
-p2(-1)    : Slot Number (0`15)
+p2(-1)    : Slot Number (0ã€œ15)
 
 %inst
 Sets the .dpm file (data file packed with multiple files) to be read.

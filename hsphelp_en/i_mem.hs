@@ -55,21 +55,21 @@ dllproc
 Let
 p1,p2
 p1=Variable name : Variable name to be assigned
-p2=0Å`(0) : Resource ID (Memory content to be assigned)
+p2=0„Äú(0) : Resource ID (Memory content to be assigned)
 
 %inst
 Assigns the memory content specified by p2 to the variable specified by p1.
 ^p
      Value  : Corresponding resource
  --------------------------------------------------
-   0Å` 7 : Local parameter #1Å`8(Numeric)
+   0„Äú 7 : Local parameter #1„Äú8(Numeric)
     64   : System variable stat
     65   : System variable refstr
     66   : In-window image data (VRAM)
     67   : Current window information (BMSCR structure)
     68   : HSP system information (HSPCTX structure)
     69   : Palette information
-    96Å` : Window ID 0Å` information (BMSCR structure)
+    96„Äú : Window ID 0„Äú information (BMSCR structure)
 ^p
 The system variables with resource IDs 64 and 65, for example, "mref a,64", will make the variable a equivalent to the system variable stat, allowing you to assign values to it. This allows you to reflect the calculation results within a user-defined command to the system variable and return it to the caller.
 ^
@@ -171,7 +171,7 @@ Memory management commands
 %prm
 p1,p2
 p1 = Variable    : Target variable
-p2 = 0Å`(64) : Reallocation size (in 1-byte units)
+p2 = 0„Äú(64) : Reallocation size (in 1-byte units)
 
 %inst
 Reallocates the memory area that the variable specified by p1 has.
@@ -194,7 +194,7 @@ Memory management commands
 %prm
 p1,p2...
 p1=Variable : Variable name to assign the array to
-p2=0Å`  : Maximum number of elements
+p2=0„Äú  : Maximum number of elements
 
 %inst
 Creates a label-type array variable.
@@ -208,7 +208,7 @@ Multi-dimensional arrays can be secured up to 4 dimensions.
 The ldim command can be defined/redefined anywhere in the script.
 Also, when an array variable is created, all contents are cleared to an "undefined" state.
 ^
-Å¶This command is defined as a macro in hspdef.as.
+‚ÄªThis command is defined as a macro in hspdef.as.
 
 %href
 dim

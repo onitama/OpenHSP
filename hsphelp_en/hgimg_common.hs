@@ -311,7 +311,7 @@ fval    = Variable name to which the real number is assigned
 frot    = Rotation angle (radians)
 %inst
 Assigns the sine value of the angle specified by frot to the variable specified by fval.
-The unit of angle is radians (2ƒÎ=360 degrees).
+The unit of angle is radians (2Ï€=360 degrees).
 %href
 fcos
 fsqr
@@ -330,7 +330,7 @@ fval    = Variable name to which the real number is assigned
 frot    = Rotation angle (radians)
 %inst
 Assigns the cosine value of the angle specified by frot to the variable specified by fval.
-The unit of angle is radians (2ƒÎ=360 degrees).
+The unit of angle is radians (2Ï€=360 degrees).
 %href
 fsin
 fsqr
@@ -366,7 +366,7 @@ fval,prm
 fval    = Variable name to which the real number is assigned
 prm(0)  = Angle value of 0-1023 (integer)
 %inst
-Converts the integer value (0 to 1023) specified by prm as a value indicating an angle, converts it to a radian angle value of -ƒÎ to +ƒÎ, and assigns it to fval.
+Converts the integer value (0 to 1023) specified by prm as a value indicating an angle, converts it to a radian angle value of -Ï€ to +Ï€, and assigns it to fval.
 %href
 fsin
 fcos
@@ -1588,7 +1588,7 @@ Parameter ID   Content
 		PRMSET_FLAG            Object registration flag(*)
 		PRMSET_MODE            Mode flag value
 		PRMSET_ID              Object ID(*)(HGIMG4 only)
-		PRMSET_ALPHA           Transparency (—¯ value) (HGIMG4 only)
+		PRMSET_ALPHA           Transparency (ç•™ value) (HGIMG4 only)
 		PRMSET_SHADE           Shading mode (HGIMG3 only)
 		PRMSET_TIMER           Timer value
 		PRMSET_MYGROUP         Own collision group

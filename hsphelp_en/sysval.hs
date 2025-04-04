@@ -66,7 +66,7 @@ Loop Counter
 System Variables
 
 %inst
-The counter for the repeatÅ`loop loop is assigned as an integer value.
+The counter for the repeat„Äúloop loop is assigned as an integer value.
 
 %href
 repeat
@@ -211,7 +211,7 @@ Repeat Nesting Level
 System Variables
 
 %inst
-The nesting level of repeatÅ`loop is assigned.
+The nesting level of repeat„Äúloop is assigned.
 
 %href
 repeat
@@ -974,9 +974,9 @@ Acquires the value from the acceleration sensor in an environment where it is av
 This is the acceleration with respect to the X axis, obtained as a real number (m/s^2). (The value includes the gravitational acceleration of 9.8 m/s^2.)
 In environments where the acceleration sensor is not available, 0.0 is obtained.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
-Å¶It may not be obtainable depending on the device in HSP3Dish.
-Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
+‚ÄªIt may not be obtainable depending on the device in HSP3Dish.
+‚ÄªFor HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
@@ -996,9 +996,9 @@ Acquires the accelerometer value in environments where the accelerometer is avai
 This is the acceleration with respect to the Y-axis, obtained as a real number (m/s^2). (The value includes the gravitational acceleration of 9.8 m/s^2.)
 If the accelerometer is not available, 0.0 is returned.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
-Å¶It may not be obtainable depending on the device.
-Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
+‚ÄªIt may not be obtainable depending on the device.
+‚ÄªFor HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
@@ -1018,9 +1018,9 @@ Acquires the accelerometer value in environments where the accelerometer is avai
 This is the acceleration with respect to the Z-axis, obtained as a real number (m/s^2). (The value includes the gravitational acceleration of 9.8 m/s^2.)
 If the accelerometer is not available, 0.0 is returned.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
-Å¶It may not be obtainable depending on the device.
-Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
+‚ÄªIt may not be obtainable depending on the device.
+‚ÄªFor HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
@@ -1040,9 +1040,9 @@ Acquires the tilt sensor value in environments where the tilt sensor is availabl
 This is the tilt angle with respect to the X-axis, obtained in degrees.
 If the tilt sensor is not available, 0.0 is returned.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
-Å¶It may not be obtainable depending on the device.
-Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
+‚ÄªIt may not be obtainable depending on the device.
+‚ÄªFor HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
@@ -1062,9 +1062,9 @@ Acquires the tilt sensor value in environments where the tilt sensor is availabl
 This is the tilt angle with respect to the Y-axis, obtained in degrees.
 If the tilt sensor is not available, 0.0 is returned.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
-Å¶It may not be obtainable depending on the device.
-Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
+‚ÄªIt may not be obtainable depending on the device.
+‚ÄªFor HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
@@ -1084,9 +1084,9 @@ Acquires the tilt sensor value in environments where the tilt sensor is availabl
 This is the tilt angle with respect to the Z-axis, obtained in degrees.
 If the tilt sensor is not available, 0.0 is returned.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
-Å¶It may not be obtainable depending on the device.
-Å¶For HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
+‚ÄªIt may not be obtainable depending on the device.
+‚ÄªFor HTML5, an HTTPS connection is required. Please note that some browsers may not support this.
 
 %href
 ginfo
@@ -1104,7 +1104,7 @@ System Variables
 %inst
 The path of the current directory (folder) is assigned as a string.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1120,7 +1120,7 @@ System Variables
 %inst
 The path of the directory (folder) where the runtime executable file is located is assigned as a string.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1136,7 +1136,7 @@ System Variables
 %inst
 The path of the directory (folder) where Windows is installed is assigned as a string.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1152,7 +1152,7 @@ System Variables
 %inst
 The path of the Windows system directory (folder) is assigned as a string.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1168,7 +1168,7 @@ System Variables
 %inst
 The command line string passed at execution time is assigned.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1184,7 +1184,7 @@ System Variables
 %inst
 The path of the desktop directory (folder) is assigned as a string.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1200,7 +1200,7 @@ System Variables
 %inst
 The path of the My Documents directory (folder) is assigned as a string.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo
@@ -1218,7 +1218,7 @@ The path of the HSPTV directory (folder) is assigned as a string.
 It can be used to refer to resources that are standardly prepared in the HSPTV directory.
 dir_tv is only acquired during debug execution, and returns an empty string ("") when running as an executable (.exe) file. When creating an executable file for software that uses files in the HSPTV directory, be careful to specify the necessary files using the #pack command.
 ^
-Å¶This system variable is defined as a macro within hspdef.as.
+‚ÄªThis system variable is defined as a macro within hspdef.as.
 
 %href
 dirinfo

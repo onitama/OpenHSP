@@ -1,5 +1,5 @@
 ;
-; HSP help manageróp HELPÉ\Å[ÉXÉtÉ@ÉCÉã
+; HSP help managerÁî® HELP„ÇΩ„Éº„Çπ„Éï„Ç°„Ç§„É´
 ; (Lines starting with ";" are treated as comments)
 ;
 
@@ -32,7 +32,7 @@ Extended Screen Control Commands
 p1,p2
 p1(512)=Maximum number of sprites
 p2(1024)=Maximum number of character definitions
-p3(64)=Circumference precision (64Å`4096)
+p3(64)=Circumference precision (64„Äú4096)
 p4(16)=Maximum number of map definitions
 %inst
 Initializes the standard sprite system.
@@ -512,7 +512,7 @@ The values indicated by the flag value are as follows. [ ] indicates the defined
 ^p
 flag value=
   0    :  Sprite unregistered
-  bit 0-7 : 1Å`127 Count down timer (HSPDX compatible)
+  bit 0-7 : 1„Äú127 Count down timer (HSPDX compatible)
   bit 8 :  $100 Sprite display ON [ESSPFLAG_STATIC]
   bit 9 :  $200 Sprite movement ON [ESSPFLAG_MOVE]
   bit10 :  $400 Free fall movement ON [ESSPFLAG_GRAVITY] (For HSPDX compatibility)
@@ -754,7 +754,7 @@ You can hold internal processing using the p3 parameter.
 | 8 | ESDRAW_NODISP | Hold display |
 | 16 | ESDRAW_NOSORT | Hold sorting |
 
-Normally, when a command is executed, sprite movement Å® animation processing Å® display processing Å® callback processing are executed, but each process can be held.
+Normally, when a command is executed, sprite movement ‚Üí animation processing ‚Üí display processing ‚Üí callback processing are executed, but each process can be held.
 ESDRAW_NO* macros can be added to specify them at the same time.
 This allows you to temporarily stop movement and animation. Normally, there is no problem omitting the p3 parameter.
 
@@ -973,7 +973,7 @@ Trigonometric Function
 Extended Screen Control Commands
 %prm
 p1
-p1(0)=Angle (0~ëØn) *n=accuracy set in es_ini 3rd parameter
+p1(0)=Angle (0~Ë≥än) *n=accuracy set in es_ini 3rd parameter
 %inst
 Assigns the cosine of angle p1 to the system variable `stat`.
 The range of p1 is up to the value set in es_ini.
@@ -991,7 +991,7 @@ Trigonometric Function
 Extended Screen Control Commands
 %prm
 p1
-p1(0)=Angle (0~ëØn) *n=accuracy set in es_ini 3rd parameter
+p1(0)=Angle (0~Ë≥än) *n=accuracy set in es_ini 3rd parameter
 %inst
 Assigns the sine of angle p1 to the system variable `stat`.
 The range of p1 is up to the value set in es_ini.
@@ -1442,7 +1442,7 @@ After execution, the results are assigned to the array elements 0 to 6 of the va
 Variable(0) contains the judgment result. This value is defined by the ESMAPHIT_* macro.
 The following values are assigned based on the attribute value.
 ^p
-      ValueÅ@Macro Name        Content
+      Value„ÄÄMacro Name        Content
 --------------------------------------------------
        0  ESMAPHIT_NONE   No contact (movable)
        1  ESMAPHIT_HITX   Contact during X-axis movement
@@ -1470,10 +1470,10 @@ Sprite drawing
 Extended screen control commands
 %prm
 p1,p2,p3,p4
-p1(1)=Number of frames to move (1Å`)
+p1(1)=Number of frames to move (1„Äú)
 p2(0)=Starting sprite No.
 p3(-1)=Number of sprites to move
-p4(0)=Animation control flag (0Å`1)
+p4(0)=Animation control flag (0„Äú1)
 %inst
 Performs sprite movement processing. This is the same as the es_draw instruction, but without the sprite drawing, and is mainly used for frame skipping when the processing load is too high.
 The movement process is executed for the number of frames specified by the p1 parameter.
@@ -1500,7 +1500,7 @@ New sprite map reference settings
 Extended screen control commands
 %prm
 p1,p2
-p1(0)=BGNo.(0Å`15)
+p1(0)=BGNo.(0„Äú15)
 p2(0)=MAPHIT setting option (ESSPMAPHIT_*)
 %inst
 Sets the BG map reference setting for sprites newly set with the es_set command.
@@ -1508,7 +1508,7 @@ This command makes it easy to register sprites that synchronize their coordinate
 (This is the same as being linked to the BG map by the es_setparent command.)
 The MAPHIT setting option is also added in the same way. The following values can be specified for the MAPHIT setting option.
 ^p
-      ValueÅ@Macro Name             Content
+      Value„ÄÄMacro Name             Content
 ------------------------------------------------------------------
    0x100  ESSPMAPHIT_BGHIT     Performs contact determination based on the attribute value of the map
    0x400  ESSPMAPHIT_BLOCKBIT  Determines attributes that match the block bit setting value as walls
@@ -1567,7 +1567,7 @@ Once registered, the same pattern can be displayed at any time with the es_regde
 Specify the character No. to display with the p1 parameter.
 Specify the setting option for the p2 parameter. The following values can be specified (can be set simultaneously by adding them):
 ^p
-      ValueÅ@Macro Name             Content
+      Value„ÄÄMacro Name             Content
 ------------------------------------------------------------------
        1  ESDECO_FRONT         Display on the frontmost layer
        2  ESDECO_MAPHIT        Enable map collision detection
@@ -1661,7 +1661,7 @@ Get attribute values within the BG map area
 Extended Screen Control Commands
 %prm
 p1,p2,p3,p4
-p1(0)=BGNo.(0Å`15)
+p1(0)=BGNo.(0„Äú15)
 p2(1)=Search Target Position(0=Down, 1=Right, 2=Up, 3=Left, 4=All)
 p3(1)=Search Cell Size
 p4(0)=Event Type Specification(Not Implemented)

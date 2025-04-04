@@ -1,6 +1,6 @@
 ;
-;	HSP help manager—p HELPƒ\[ƒXƒtƒ@ƒCƒ‹
-;	(æ“ª‚ª;‚Ìs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·)
+;	HSP help managerç”¨ HELPã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+;	(å…ˆé ­ãŒ;ã®è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™)
 ;
 
 %type
@@ -27,7 +27,7 @@ Clear screen
 Screen control commands
 %prm
 p1
-p1=0`4(0) : Color to clear with
+p1=0ã€œ4(0) : Color to clear with
 
 %inst
 Clears all information in the window.
@@ -184,7 +184,7 @@ Open dialog
 Screen control commands
 %prm
 "message",p1,"option"
-p1=0`(0) : Dialog type setting
+p1=0ã€œ(0) : Dialog type setting
 
 %inst
 Displays various standard Windows dialog boxes on the screen.
@@ -204,7 +204,7 @@ The type of dialog changes depending on the setting of p1.
     17    : File SAVE dialog
     32    : Color selection dialog (fixed colors)
     33    : Color selection dialog (RGB can be freely selected)
-    64`  : Extended dialog
+    64ã€œ  : Extended dialog
 ^p
 For types 0 to 3, a message box displaying the contents specified by "message" will appear. Also, you can specify the title bar string of the message box in "option". (If omitted, nothing will be displayed in the title.)
 When the message box is closed, the information of the button pressed is assigned to the system variable stat. At this time, the content of the variable stat is,
@@ -253,14 +253,14 @@ Initialize borderless window
 Screen control commands
 %prm
 p1,p2,p3,p4,p5,p6,p7,p8
-p1=0`(0)  : Window ID
-p2=1`(640): Initial screen size X (in pixels)
-p3=1`(480): Initial screen size Y (in pixels)
-p4=0`(0) : Initial screen mode
-p5=0`(-1) : Window placement X (in pixels)
-p6=0`(-1) : Window placement Y (in pixels)
-p7=0`     : Window size X (in pixels)
-p8=0`     : Window size Y (in pixels)
+p1=0ã€œ(0)  : Window ID
+p2=1ã€œ(640): Initial screen size X (in pixels)
+p3=1ã€œ(480): Initial screen size Y (in pixels)
+p4=0ã€œ(0) : Initial screen mode
+p5=0ã€œ(-1) : Window placement X (in pixels)
+p6=0ã€œ(-1) : Window placement Y (in pixels)
+p7=0ã€œ     : Window size X (in pixels)
+p8=0ã€œ     : Window size Y (in pixels)
 
 %inst
 Initializes the window ID and creates a borderless window.
@@ -325,10 +325,10 @@ Fill rectangle
 Screen control command
 %prm
 p1,p2,p3,p4
-p1=0`(0)  : X coordinate of the top-left corner of the rectangle
-p2=0`(0)  : Y coordinate of the top-left corner of the rectangle
-p3=0`     : X coordinate of the bottom-right corner of the rectangle
-p4=0`     : Y coordinate of the bottom-right corner of the rectangle
+p1=0ã€œ(0)  : X coordinate of the top-left corner of the rectangle
+p2=0ã€œ(0)  : Y coordinate of the top-left corner of the rectangle
+p3=0ã€œ     : X coordinate of the bottom-right corner of the rectangle
+p4=0ã€œ     : Y coordinate of the bottom-right corner of the rectangle
 
 %inst
 Fills a rectangle (quadrilateral) on the screen with the current drawing color, using (p1,p2) and (p3,p4) as the top-left and bottom-right points.
@@ -359,10 +359,10 @@ Initialize virtual screen
 Screen control command
 %prm
 p1,p2,p3,p4
-p1=0` (0) : Window ID
-p2=1`(640): Screen size X to initialize (in pixels)
-p3=1`(480): Screen size Y to initialize (in pixels)
-p4=0`(0) : Screen mode to initialize
+p1=0ã€œ (0) : Window ID
+p2=1ã€œ(640): Screen size X to initialize (in pixels)
+p3=1ã€œ(480): Screen size Y to initialize (in pixels)
+p4=0ã€œ(0) : Screen mode to initialize
 
 %inst
 Similar to the screen command, initializes the specified window ID for use. Similar to the screen command, specifies the screen size to initialize, but the buffer command only creates a virtual screen in memory and does not display it on the actual screen.
@@ -407,9 +407,9 @@ Change image resolution
 Screen control command
 %prm
 p1,p2,p3
-p1=0`2(0)  : Mode setting
-p2=0`(640) : X-direction image resolution setting
-p3=0`(480) : Y-direction image resolution setting
+p1=0ã€œ2(0)  : Mode setting
+p2=0ã€œ(640) : X-direction image resolution setting
+p3=0ã€œ(480) : Y-direction image resolution setting
 
 %inst
 Forces a change to the current display resolution.
@@ -437,7 +437,7 @@ Color settings
 Screen control command
 %prm
 p1,p2,p3
-p1,p2,p3=0`255(0) : Color code (R, G, B brightness)
+p1,p2,p3=0ã€œ255(0) : Color code (R, G, B brightness)
 
 %inst
 Sets the color for message display, drawing, etc., to the specified value.
@@ -462,9 +462,9 @@ Screen control command
 %prm
 "fontname",p1,p2,p3
 "fontname"   : Font name
-p1=1`(12)   : Font size
-p2=0`(0)    : Font style
-p3=1`(1)    : Font modification width
+p1=1ã€œ(12)   : Font size
+p2=0ã€œ(0)    : Font style
+p3=1ã€œ(1)    : Font modification width
 
 %inst
 Sets the font style for text displayed by the mes and print commands.
@@ -510,11 +510,11 @@ Screen copy
 Screen control command
 %prm
 p1,p2,p3,p4,p5
-p1=0`(0) : Window ID
-p2=0`(0) : X coordinate of the top-left corner of the copy source
-p3=0`(0) : Y coordinate of the top-left corner of the copy source
-p4=0`    : X size to copy (in pixels)
-p5=0`    : Y size to copy (in pixels)
+p1=0ã€œ(0) : Window ID
+p2=0ã€œ(0) : X coordinate of the top-left corner of the copy source
+p3=0ã€œ(0) : Y coordinate of the top-left corner of the copy source
+p4=0ã€œ    : X size to copy (in pixels)
+p5=0ã€œ    : Y size to copy (in pixels)
 
 %inst
 The gcopy command copies a part of the screen of the specified window ID to the current drawing destination and current position.
@@ -539,10 +539,10 @@ Screen copy mode setting
 Screen control command
 %prm
 p1,p2,p3,p4
-p1=0`6(0)   : Screen copy mode
-p2=0`(32)   : X size to copy (in pixels)
-p3=0`(32)   : Y size to copy (in pixels)
-p4=0`256(0) : Blend rate for semi-transparent composition
+p1=0ã€œ6(0)   : Screen copy mode
+p2=0ã€œ(32)   : X size to copy (in pixels)
+p3=0ã€œ(32)   : Y size to copy (in pixels)
+p4=0ã€œ256(0) : Blend rate for semi-transparent composition
 
 gcopy Modes and Settings (Size, Blend Rate, etc.)
 
@@ -642,8 +642,8 @@ Specify Drawing Destination, Window to Front, Hide Settings
 Screen Control Commands
 %prm
 p1,p2
-p1=0`(0)  : Window ID
-p2=0`2(0) : Window Active Switch
+p1=0ã€œ(0)  : Window ID
+p2=0ã€œ2(0) : Window Active Switch
 
 %inst
 Changes the screen for screen control commands to the specified window ID.
@@ -672,14 +672,14 @@ Scale and Copy Screen
 Screen Control Commands
 %prm
 p1,p2,p3,p4,p5,p6,p7,p8
-p1=0`     : Size to copy to the screen X (in dots)
-p2=0`     : Size to copy to the screen Y (in dots)
-p3=0`(0)  : Window ID
-p4=0`(0)  : X coordinate of the upper left of the copy source
-p5=0`(0)  : Y coordinate of the upper left of the copy source
-p6=0`     : Size to copy X (in dots)
-p7=0`     : Size to copy Y (in dots)
-p8=0`1(0) : Zoom mode
+p1=0ã€œ     : Size to copy to the screen X (in dots)
+p2=0ã€œ     : Size to copy to the screen Y (in dots)
+p3=0ã€œ(0)  : Window ID
+p4=0ã€œ(0)  : X coordinate of the upper left of the copy source
+p5=0ã€œ(0)  : Y coordinate of the upper left of the copy source
+p6=0ã€œ     : Size to copy X (in dots)
+p7=0ã€œ     : Size to copy Y (in dots)
+p8=0ã€œ1(0) : Zoom mode
 
 %inst
 The `gzoom` command copies a portion of the screen of the specified window ID to the current drawing destination current position by scaling it to an arbitrary size.
@@ -702,7 +702,7 @@ Drawing Palette Setting
 Screen Control Commands
 %prm
 p1
-p1=0`255(0) : Palette Code
+p1=0ã€œ255(0) : Palette Code
 
 %inst
 Sets the color for message display, drawing, etc. to the specified value.
@@ -722,9 +722,9 @@ Palette Setting
 Screen Control Commands
 %prm
 p1,p2,p3,p4,p5
-p1=0`255(0)       : Palette Code
-p2,p3,p4=0`255(0) : Color Code (R, G, B luminance)
-p5=0`1(0)         : Update Switch
+p1=0ã€œ255(0)       : Palette Code
+p2,p3,p4=0ã€œ255(0) : Color Code (R, G, B luminance)
+p5=0ã€œ1(0)         : Update Switch
 
 %inst
 Changes the color data of the palette set on the current screen.
@@ -745,8 +745,8 @@ Get 1 dot point
 Screen Control Commands
 %prm
 p1,p2
-p1=0` : X coordinate on the screen
-p2=0` : Y coordinate on the screen
+p1=0ã€œ : X coordinate on the screen
+p2=0ã€œ : Y coordinate on the screen
 
 %inst
 Reads the color data of 1 dot on the screen.
@@ -771,7 +771,7 @@ Screen Control Commands
 %prm
 "filename",p1
 "filename" : File name to load
-p1=0`1(0) : Image Load Mode
+p1=0ã€œ1(0) : Image Load Mode
 
 %inst
 Loads an image file. Normally,
@@ -824,8 +824,8 @@ Current Position Setting
 Screen Control Commands
 %prm
 p1,p2
-p1=0`     : X coordinate of the current position
-p2=0`     : Y coordinate of the current position
+p1=0ã€œ     : X coordinate of the current position
+p2=0ã€œ     : Y coordinate of the current position
 %inst
 Specifies the coordinates of the current position, which serves as the basic coordinates for displaying messages, objects, etc.
 ^
@@ -848,8 +848,8 @@ Displays a 1-dot point
 Screen control commands
 %prm
 p1,p2
-p1=0` : X coordinate on the screen
-p2=0` : Y coordinate on the screen
+p1=0ã€œ : X coordinate on the screen
+p2=0ã€œ : Y coordinate on the screen
 
 %inst
 Draws a 1-dot point on the screen with the currently set drawing color.
@@ -874,11 +874,11 @@ Redraw settings
 Screen control commands
 %prm
 p1,p2,p3,p4,p5
-p1=0`3(1) : Drawing mode setting
-p2=0`(0)  : X coordinate of the upper left corner to redraw
-p3=0`(0)  : Y coordinate of the upper left corner to redraw
-p4=0`(0)  : Width X to redraw (in dots)
-p5=0`(0)  : Width Y to redraw (in dots)
+p1=0ã€œ3(1) : Drawing mode setting
+p2=0ã€œ(0)  : X coordinate of the upper left corner to redraw
+p3=0ã€œ(0)  : Y coordinate of the upper left corner to redraw
+p4=0ã€œ(0)  : Width X to redraw (in dots)
+p5=0ã€œ(0)  : Width Y to redraw (in dots)
 
 %inst
 Specifies the drawing mode of the screen.  The drawing mode is:
@@ -928,14 +928,14 @@ Initializes the window
 Screen control commands
 %prm
 p1,p2,p3,p4,p5,p6,p7,p8
-p1=0`(0)  : Window ID
-p2=1`(640): Initial screen size X (in dots)
-p3=1`(480): Initial screen size Y (in dots)
-p4=0`(0)  : Initial screen mode
-p5=0`(-1) : Window position X (in dots)
-p6=0`(-1) : Window position Y (in dots)
-p7=0`     : Window size X (in dots)
-p8=0`     : Window size Y (in dots)
+p1=0ã€œ(0)  : Window ID
+p2=1ã€œ(640): Initial screen size X (in dots)
+p3=1ã€œ(480): Initial screen size Y (in dots)
+p4=0ã€œ(0)  : Initial screen mode
+p5=0ã€œ(-1) : Window position X (in dots)
+p6=0ã€œ(-1) : Window position Y (in dots)
+p7=0ã€œ     : Window size X (in dots)
+p8=0ã€œ     : Window size Y (in dots)
 %inst
 Initializes the specified window ID so that it can be used.
 In the initial state of HSP, only the screen with window ID 0 is used, but by specifying window ID 1 or higher, you can create a new window.
@@ -1010,11 +1010,11 @@ Window size setting
 Screen control commands
 %prm
 p1,p2,p3,p4,p5
-p1=0`(-1) : Client area size X (in dots)
-p2=0`(-1) : Client area size Y (in dots)
-p3=0`(-1) : Window X coordinate on the display (in dots)
-p4=0`(-1) : Window Y coordinate on the display (in dots)
-p5=0`1(0) : Window coordinate setting option
+p1=0ã€œ(-1) : Client area size X (in dots)
+p2=0ã€œ(-1) : Client area size Y (in dots)
+p3=0ã€œ(-1) : Window X coordinate on the display (in dots)
+p4=0ã€œ(-1) : Window Y coordinate on the display (in dots)
+p5=0ã€œ1(0) : Window coordinate setting option
 %inst
 Changes the client size of the window (the actual size displayed) and the window display position.
 The client size cannot be larger than the screen size initialized by the screen command or the buffer/bgscr commands.
@@ -1039,7 +1039,7 @@ Select system font
 Screen control commands
 %prm
 p1
-p1=0` : Font type specification
+p1=0ã€œ : Font type specification
 
 %inst
 Selects a system standard font.
@@ -1074,10 +1074,10 @@ Draws a straight line
 Screen control commands
 %prm
 p1,p2,p3,p4
-p1=0`(0)  : X coordinate of the end point of the line
-p2=0`(0)  : Y coordinate of the end point of the line
-p3=0`     : X coordinate of the starting point of the line
-p4=0`     : Y coordinate of the starting point of the line
+p1=0ã€œ(0)  : X coordinate of the end point of the line
+p2=0ã€œ(0)  : Y coordinate of the end point of the line
+p3=0ã€œ     : X coordinate of the starting point of the line
+p4=0ã€œ     : Y coordinate of the starting point of the line
 
 %inst
 Draws a straight line connecting (p1, p2) and (p3, p4) on the screen.
@@ -1104,11 +1104,11 @@ Draw a circle
 Screen control commands
 %prm
 p1,p2,p3,p4,p5
-p1=0`(0)  : X coordinate of the upper left corner of the rectangle
-p2=0`(0)  : Y coordinate of the upper left corner of the rectangle
-p3=0`     : X coordinate of the lower right corner of the rectangle
-p4=0`     : Y coordinate of the lower right corner of the rectangle
-p5=0`1(1) : Drawing mode (0=line, 1=fill)
+p1=0ã€œ(0)  : X coordinate of the upper left corner of the rectangle
+p2=0ã€œ(0)  : Y coordinate of the upper left corner of the rectangle
+p3=0ã€œ     : X coordinate of the lower right corner of the rectangle
+p4=0ã€œ     : Y coordinate of the lower right corner of the rectangle
+p5=0ã€œ1(1) : Drawing mode (0=line, 1=fill)
 
 %inst
 Draws a circle on the screen with a size that fits within a rectangle with (p1, p2) as the upper left point and (p3, p4) as the lower right point.
@@ -1369,7 +1369,7 @@ p5=0-(?)   : Y size
 %inst
 Draws a rectangle (rectangle) with the size specified by (p4, p5) in the currently set color with the coordinates specified by (p1, p2) as the center.
 The rotation angle can be specified by a real number in p3.
-The unit of angle is radian (starting from 0, one round at 2ƒÎ).
+The unit of angle is radian (starting from 0, one round at 2Ï€).
 The grect command reflects the copy mode specified by gmode.
 ^
 If gmode is 0 or 1, normal filling.
@@ -1408,7 +1408,7 @@ p6=0-(?)   : Y size
 The grotate command performs processing including rotation on the gcopy command.
 Specify the window ID of the copy source in p1, and specify the coordinates corresponding to the original image to be copied in (p2, p3). (Same as the gcopy command)
 The copy destination is the window ID specified as the current drawing destination, and the copy is performed to the coordinates centered on the location set by the pos command. At that time, the rotation angle can be specified by a real number in p4.
-The unit of angle is radian (starting from 0, one round at 2ƒÎ).
+The unit of angle is radian (starting from 0, one round at 2Ï€).
 Specify the X, Y sizes after the copy in (p5, p6).
 Also, the X, Y sizes of the copy source use the default copy size set by the gmode command.
 In other words, if you specify a size larger than the size specified by the gmode command in (p5, p6), it will be enlarged.
@@ -1454,12 +1454,12 @@ Transparent color settings and semi-transparent settings all function in the sam
 ^
 Semi-transparent processing is not executed in palette mode.
 Also, copying between different screen modes (palette mode and full color mode) will result in an error.
-p1‚É-1‚È‚Ç‚Ìƒ}ƒCƒiƒX’l‚ğw’è‚µ‚½ê‡‚ÍA‰æ‘œƒRƒs[‚Å‚Í‚È‚­“h‚è‚Â‚Ô‚µ‚ªs‚í‚ê‚Ü‚·B
-“h‚è‚Â‚Ô‚µ‚ÍA’PF‚É‚æ‚é“h‚è‚Â‚Ô‚µ‚ÆAƒOƒ‰ƒf[ƒVƒ‡ƒ“‚É‚æ‚é“h‚è‚Â‚Ô‚µ‚ğ‘I‘ğ‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
-p1‚ÉA-1‚©‚ç-256‚Ì’l‚ğw’è‚µ‚½ê‡‚ÍA’PF‚É‚æ‚é“h‚è‚Â‚Ô‚µ‚Æ‚È‚è‚Ü‚·B
-’PF“h‚è‚Â‚Ô‚µ‚ğs‚È‚¤ê‡‚É‚ÍAp4,p5ƒpƒ‰ƒ[ƒ^[‚ğw’è‚·‚é•K—v‚Í‚ ‚è‚Ü‚¹‚ñB
-‚»‚ÌÛAƒtƒ‹ƒJƒ‰[ƒ‚[ƒh‚É‚Í•`‰æF‚É‚æ‚é“h‚è‚Â‚Ô‚µ‚Æ‚È‚è‚Ü‚·B
-ƒpƒŒƒbƒgƒ‚[ƒh‚ÍAp1‚Åw’è‚µ‚½’l-1‚ğƒpƒŒƒbƒgƒR[ƒh‚Æ‚µ‚Ä“h‚è‚Â‚Ô‚µ‚ğs‚È‚¢‚Ü‚·B(-1`-256‚ªƒpƒŒƒbƒgƒR[ƒh0`255‚É‘Î‰‚µ‚Ü‚·)
+p1ã«-1ãªã©ã®ãƒã‚¤ãƒŠã‚¹å€¤ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ã€ç”»åƒã‚³ãƒ”ãƒ¼ã§ã¯ãªãå¡—ã‚Šã¤ã¶ã—ãŒè¡Œã‚ã‚Œã¾ã™ã€‚
+å¡—ã‚Šã¤ã¶ã—ã¯ã€å˜è‰²ã«ã‚ˆã‚‹å¡—ã‚Šã¤ã¶ã—ã¨ã€ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³ã«ã‚ˆã‚‹å¡—ã‚Šã¤ã¶ã—ã‚’é¸æŠã™ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚
+p1ã«ã€-1ã‹ã‚‰-256ã®å€¤ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ã€å˜è‰²ã«ã‚ˆã‚‹å¡—ã‚Šã¤ã¶ã—ã¨ãªã‚Šã¾ã™ã€‚
+å˜è‰²å¡—ã‚Šã¤ã¶ã—ã‚’è¡Œãªã†å ´åˆã«ã¯ã€p4,p5ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’æŒ‡å®šã™ã‚‹å¿…è¦ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚
+ãã®éš›ã€ãƒ•ãƒ«ã‚«ãƒ©ãƒ¼ãƒ¢ãƒ¼ãƒ‰æ™‚ã«ã¯æç”»è‰²ã«ã‚ˆã‚‹å¡—ã‚Šã¤ã¶ã—ã¨ãªã‚Šã¾ã™ã€‚
+ãƒ‘ãƒ¬ãƒƒãƒˆãƒ¢ãƒ¼ãƒ‰æ™‚ã¯ã€p1ã§æŒ‡å®šã—ãŸå€¤-1ã‚’ãƒ‘ãƒ¬ãƒƒãƒˆã‚³ãƒ¼ãƒ‰ã¨ã—ã¦å¡—ã‚Šã¤ã¶ã—ã‚’è¡Œãªã„ã¾ã™ã€‚(-1ã€œ-256ãŒãƒ‘ãƒ¬ãƒƒãƒˆã‚³ãƒ¼ãƒ‰0ã€œ255ã«å¯¾å¿œã—ã¾ã™)
 
 If a negative value such as -1 is specified for p1, filling will be performed instead of image copying.
 You can choose between solid color filling and gradient filling.
@@ -1468,10 +1468,10 @@ When performing solid color filling, it is not necessary to specify the p4 and p
 At that time, in full-color mode, filling will be done with the drawing color.
 In palette mode, the value specified by p1 minus 1 will be used as the palette code for filling. (Values from -1 to -256 correspond to palette codes 0 to 255.)
 
-p1‚ÉA-257‚Ü‚½‚Ígsquare_grad(-257‚Ìƒ}ƒNƒ’è‹`)‚ğw’è‚µ‚½ê‡‚ÍAƒOƒ‰ƒf[ƒVƒ‡ƒ“‚É‚æ‚é“h‚è‚Â‚Ô‚µ‚ªÀs‚³‚ê‚Ü‚·B
-ƒOƒ‰ƒf[ƒVƒ‡ƒ““h‚è‚Â‚Ô‚µ‚ğs‚È‚¤ê‡‚É‚ÍAp4ƒpƒ‰ƒ[ƒ^[‚É’¸“_‚ÌF‚ğ¦‚·RGBƒR[ƒh‚ğŠi”[‚µ‚½”z—ñ•Ï”‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B
-(RGBƒR[ƒh‚ÍAgradf–½—ß‚Åw’è‚³‚ê‚éFƒR[ƒh‚Æ“¯ˆê‚Ì‚à‚Ì‚É‚È‚è‚Ü‚·B)
-ƒOƒ‰ƒf[ƒVƒ‡ƒ““h‚è‚Â‚Ô‚µ‚Å‚ÍAgmode‚Åİ’è‚³‚ê‚½ƒRƒs[ƒ‚[ƒh‚Ìw’è‚Í”½‰f‚³‚ê‚¸Aí‚É•s“§–¾‚Ì•`‰æ‚É‚È‚é‚Ì‚Å’ˆÓ‚µ‚Ä‚­‚¾‚³‚¢B
+p1ã«ã€-257ã¾ãŸã¯gsquare_grad(-257ã®ãƒã‚¯ãƒ­å®šç¾©)ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ã€ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³ã«ã‚ˆã‚‹å¡—ã‚Šã¤ã¶ã—ãŒå®Ÿè¡Œã•ã‚Œã¾ã™ã€‚
+ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³å¡—ã‚Šã¤ã¶ã—ã‚’è¡Œãªã†å ´åˆã«ã¯ã€p4ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã«é ‚ç‚¹ã®è‰²ã‚’ç¤ºã™RGBã‚³ãƒ¼ãƒ‰ã‚’æ ¼ç´ã—ãŸé…åˆ—å¤‰æ•°ã‚’æŒ‡å®šã—ã¦ãã ã•ã„ã€‚
+(RGBã‚³ãƒ¼ãƒ‰ã¯ã€gradfå‘½ä»¤ã§æŒ‡å®šã•ã‚Œã‚‹è‰²ã‚³ãƒ¼ãƒ‰ã¨åŒä¸€ã®ã‚‚ã®ã«ãªã‚Šã¾ã™ã€‚)
+ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³å¡—ã‚Šã¤ã¶ã—ã§ã¯ã€gmodeã§è¨­å®šã•ã‚ŒãŸã‚³ãƒ”ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã®æŒ‡å®šã¯åæ˜ ã•ã‚Œãšã€å¸¸ã«ä¸é€æ˜ã®æç”»ã«ãªã‚‹ã®ã§æ³¨æ„ã—ã¦ãã ã•ã„ã€‚
 
 If -257 or gsquare_grad (macro definition of -257) is specified for p1, gradient filling will be executed.
 When performing gradient filling, specify an array variable containing the RGB codes indicating the vertex colors in the p4 parameter.
@@ -1499,8 +1499,8 @@ Getting window object information
 Basic input/output functions
 %prm
 (p1,p2)
-p1=0` : Window object ID
-p2=0` : Type to get
+p1=0ã€œ : Window object ID
+p2=0ã€œ : Type to get
 
 %inst
 Returns the information value related to a specific window object placed in the currently active window.
@@ -1512,12 +1512,12 @@ The following types can be obtained:
      2  : Window object handle (HWND)
      3  : owid (internal general-purpose data)
      4  : owsize (internal general-purpose data)
-  5`8  : Information of assigned variables
- 9`11  : Information of window object callback
+  5ã€œ8  : Information of assigned variables
+ 9ã€œ11  : Information of window object callback
     12  : Background brush handle (HBRUSH)
     13  : Background color information (RGB)
     14  : Text color information (RGB)
-15`16  : Additional information specific to the object (exinfo1, exinfo2)
+15ã€œ16  : Additional information specific to the object (exinfo1, exinfo2)
 ^p
 Window object information is usually not necessary for normal use.
 It can be used for special purposes, such as passing the window object handle (HWND) to an external API (DLL).
@@ -1542,8 +1542,8 @@ Screen control commands
 p1,"IID",p2,p3
 p1    : Variable name to which the COM object is assigned
 "IID" : Class ID or Program ID of the COM object
-p2=0`: X size of the object
-p3=0`: Y size of the object
+p2=0ã€œ: X size of the object
+p3=0ã€œ: Y size of the object
 
 
 %inst
@@ -1657,8 +1657,8 @@ Set the drawing origin and scale of the window
 Screen control commands
 %prm
 p1,p2,p3,p4
-p1=0`(0)  : X coordinate that becomes the origin of drawing to the window
-p2=0`(0)  : Y coordinate that becomes the origin of drawing to the window
+p1=0ã€œ(0)  : X coordinate that becomes the origin of drawing to the window
+p2=0ã€œ(0)  : Y coordinate that becomes the origin of drawing to the window
 
 %inst
 Sets the origin coordinate for drawing the graphic surface to the window.
@@ -1680,13 +1680,13 @@ Fills a rectangle with a gradient
 Screen control commands
 %prm
 p1,p2,p3,p4,p5,p6,p7
-p1=0`(0)  : X coordinate of the upper left of the rectangle
-p2=0`(0)  : Y coordinate of the upper left of the rectangle
-p3=0`     : X size of the rectangle
-p4=0`     : Y size of the rectangle
-p5=0`(0)  : Gradient mode
-p6=0`     : Fill color 1 (RGB color code)
-p7=0`     : Fill color 2 (RGB color code)
+p1=0ã€œ(0)  : X coordinate of the upper left of the rectangle
+p2=0ã€œ(0)  : Y coordinate of the upper left of the rectangle
+p3=0ã€œ     : X size of the rectangle
+p4=0ã€œ     : Y size of the rectangle
+p5=0ã€œ(0)  : Gradient mode
+p6=0ã€œ     : Fill color 1 (RGB color code)
+p7=0ã€œ     : Fill color 2 (RGB color code)
 
 %inst
 Fills a rectangle (quadrilateral) with a gradient, using (p1, p2) as the upper left point and (p3, p4) as the size.
@@ -1727,8 +1727,8 @@ Screen control commands
 %prm
 "filename",p1,p2
 "filename" : Filename to load
-p1=1`(-2) : Window ID to load to
-p2=0`1(0) : Screen mode to initialize
+p1=1ã€œ(-2) : Window ID to load to
+p2=0ã€œ1(0) : Screen mode to initialize
 
 %inst
 Loads an image file into the specified virtual screen.
@@ -1774,11 +1774,11 @@ Sets the division size of the image material
 Screen Control Commands
 %prm
 p1,p2,p3,p4,p5
-p1=0`(1) : Window ID
-p2=1`(0) : Horizontal division size
-p3=1`(0) : Vertical division size
-p4=0`(0) : Horizontal center coordinate
-p5=0`(0) : Vertical center coordinate
+p1=0ã€œ(1) : Window ID
+p2=1ã€œ(0) : Horizontal division size
+p3=1ã€œ(0) : Vertical division size
+p4=0ã€œ(0) : Horizontal center coordinate
+p5=0ã€œ(0) : Vertical center coordinate
 
 %inst
 Sets the division size of the image material held by the specified window ID.
@@ -1813,11 +1813,11 @@ Draw image material
 Screen Control Commands
 %prm
 id,no,zoomx,zoomy,angle
-id=0`(1) : Window ID with the image material
-no=0`(0) : Divided image No.
-zoomx=0.0`(1.0) : Horizontal display magnification (real number)
-zoomy=0.0`(1.0) : Vertical display magnification (real number)
-angle=0.0`(0.0) : Rotation angle (unit is radians)
+id=0ã€œ(1) : Window ID with the image material
+no=0ã€œ(0) : Divided image No.
+zoomx=0.0ã€œ(1.0) : Horizontal display magnification (real number)
+zoomy=0.0ã€œ(1.0) : Vertical display magnification (real number)
+angle=0.0ã€œ(0.0) : Rotation angle (unit is radians)
 
 %inst
 Draws the image material loaded into the virtual screen on the current operation destination window.
@@ -1826,7 +1826,7 @@ Specify the divided image No. in no. The divided image No. is a number that iden
 You can specify the horizontal (X) and vertical (Y) magnification of the image to be drawn by zoomx, zoomy.
 The zoomx and zoomy specifications can be specified as real numbers.
 You can also specify the rotation angle of the image by angle.
-The value specified in angle is a real number, and the unit is radians (starting from 0, 2ƒÎ for one rotation). (Same values as the grote, grect commands)
+The value specified in angle is a real number, and the unit is radians (starting from 0, 2Ï€ for one rotation). (Same values as the grote, grect commands)
 ^
 The celput command copies and draws the image of the specified window ID in the same way as the gcopy command.
 Similarly to the gcopy command, the copy mode and blend ratio specified by the gmode command are reflected.

@@ -1,6 +1,6 @@
 ;
-;	HSP help manager—p HELPƒ\[ƒXƒtƒ@ƒCƒ‹
-;	(æ“ª‚ªu;v‚Ìs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·)
+;	HSP help managerç”¨ HELPã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+;	(å…ˆé ­ãŒã€Œ;ã€ã®è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™)
 ;
 
 %type
@@ -86,8 +86,8 @@ Clear object
 Object Control Commands
 %prm
 p1,p2
-p1=0`(0)   : Object ID to delete (start)
-p2=-1`(-1) : Object ID to delete (end) (If -1, the final ID is specified)
+p1=0ã€œ(0)   : Object ID to delete (start)
+p2=-1ã€œ(-1) : Object ID to delete (end) (If -1, the final ID is specified)
 
 %inst
 Deletes objects displayed by button, mesbox, etc.
@@ -106,7 +106,7 @@ Object Control Commands
 %prm
 p1,p2,p3
 p1=variable      : Numeric variable holding the state of the combo box
-p2=0`(100)  : Extended Y size
+p2=0ã€œ(100)  : Extended Y size
 p3="strings" : String indicating the content of the combo box
 
 %inst
@@ -143,7 +143,7 @@ Object Control Commands
 p1,p2,p3,p4
 p1=variable : Variable for input
 p2,p3   : Message box size (in dots)
-p4=0`  : Maximum number of characters that can be entered
+p4=0ã€œ  : Maximum number of characters that can be entered
 
 %inst
 Places an input box as an object in the current position. Specify the size with p2, p3, and the location is from the current position. If p2 and p3 are omitted, the size specified by objsize is used.
@@ -173,7 +173,7 @@ Object Control Commands
 %prm
 p1,p2,p3
 p1=variable      : Numeric variable holding the state of the list box
-p2=0`(100)  : Extended Y size
+p2=0ã€œ(100)  : Extended Y size
 p3="strings" : String indicating the content of the list box
 
 %inst
@@ -210,8 +210,8 @@ Object Control Commands
 p1,p2,p3,p4,p5
 p1=variable    : String variable with the display message assigned
 p2,p3      : Message box size (in dots)
-p4=0`(1)  : Message box style
-p5=0`(-1) : Maximum number of characters that can be entered
+p4=0ã€œ(1)  : Message box style
+p5=0ã€œ(-1) : Maximum number of characters that can be entered
 
 %inst
 Places a message box (window for displaying messages) as an object on the window. Specify the size with p2, p3, and the location is from the current position.
@@ -243,7 +243,7 @@ Change object content
 Object Control Commands
 %prm
 p1,p2
-p1=0`(0) : Object ID specification
+p1=0ã€œ(0) : Object ID specification
 p2        : Contents of the parameter to be changed
 
 %inst
@@ -285,9 +285,9 @@ Set object size
 Object Control Commands
 %prm
 p1,p2,p3
-p1=0`(64)  : Object width (in dots)
-p2=0`(24)  : Object height (in dots)
-p3=0`(0)   : Minimum number of lines to secure in the Y direction (in dots)
+p1=0ã€œ(64)  : Object width (in dots)
+p2=0ã€œ(24)  : Object height (in dots)
+p3=0ã€œ(0)   : Minimum number of lines to secure in the Y direction (in dots)
 
 %inst
 Sets the size of the object when placing buttons and input boxes.
@@ -313,7 +313,7 @@ Set input focus to object
 Object Control Commands
 %prm
 p1
-p1=0`(0) : Object ID specification
+p1=0ã€œ(0) : Object ID specification
 
 %inst
 Sets the input focus to the object ID specified by p1.
@@ -330,8 +330,8 @@ Set object mode
 Object Control Commands
 %prm
 p1,p2
-p1=0`(0) : Object font setting mode specification
-p2=0`1   : Focus movement key specification (0=OFF/1=ON)
+p1=0ã€œ(0) : Object font setting mode specification
+p2=0ã€œ1   : Focus movement key specification (0=OFF/1=ON)
 %inst
 This command is used to set the styles, etc. used by object control commands such as button, input, and mesbox.
 You can specify the font settings and style-related modes with p1.
@@ -379,7 +379,7 @@ Set object color
 Object Control Commands
 %prm
 p1,p2,p3
-p1,p2,p3=0`255(0) : Color code (R,G,B brightness)
+p1,p2,p3=0ã€œ255(0) : Color code (R,G,B brightness)
 
 %inst
 Sets the color used by the object.
@@ -403,8 +403,8 @@ Set object enabled/disabled
 Object Control Commands
 %prm
 p1,p2
-p1=0`(0) : Object ID specification
-p2=0`(1) : 0 if disabled, other than 0 is enabled
+p1=0ã€œ(0) : Object ID specification
+p2=0ã€œ(1) : 0 if disabled, other than 0 is enabled
 
 %inst
 Changes the state of the object ID specified by p1.
@@ -426,8 +426,8 @@ Set object focus movement mode
 Object Control Commands
 %prm
 p1,p2
-p1=0`(0) : Object ID specification
-p2=1`(2) : Focus movement mode
+p1=0ã€œ(0) : Object ID specification
+p2=1ã€œ(2) : Focus movement mode
 
 %inst
 Sets the focus movement mode of the object ID specified by p1.
@@ -499,7 +499,7 @@ p1,p2,p3,*label,p4
 p1,p2     ; Layer object XY size (in dots)
 p3(0)     : Layer ID
 *label    : Layer object processing subroutine
-p4=0`(0) : Option value
+p4=0ã€œ(0) : Option value
 
 %inst
 Place a layer object at the current position.

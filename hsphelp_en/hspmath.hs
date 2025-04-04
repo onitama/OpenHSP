@@ -465,7 +465,7 @@ p1 : Angle value (radians)
 
 %inst
 Returns the arcsine (inverse sine) value of p1.
-The result is a real number in radians, in the range -M_PI/2 to M_PI/2 (from -90‘® to 90‘® in degrees).
+The result is a real number in radians, in the range -M_PI/2 to M_PI/2 (from -90å±ž to 90å±ž in degrees).
 
 %href
 acos
@@ -483,7 +483,7 @@ p1 : Angle value (radians)
 
 %inst
 Returns the arccosine (inverse cosine) value of p1.
-The result is a real number in radians, in the range 0 to M_PI (from 0‘® to 180‘® in degrees).
+The result is a real number in radians, in the range 0 to M_PI (from 0å±ž to 180å±ž in degrees).
 
 %href
 asin

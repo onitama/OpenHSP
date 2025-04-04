@@ -28,9 +28,9 @@ Initializes a socket and connects to it
 Communication control command
 %prm
 p1,"url",p2
-p1=0Å`31(0) : Socket ID number
+p1=0„Äú31(0) : Socket ID number
 "url"       : URL specification string
-p2=0Å`(0)   : Port number
+p2=0„Äú(0)   : Port number
 %inst
 Initializes a socket to make it usable.
 When performing TCP/IP communication, it must always be initialized first and connected to the other server.
@@ -67,7 +67,7 @@ Disconnects the socket
 Communication control command
 %prm
 p1
-p1=0Å`31(0) : Socket ID number
+p1=0„Äú31(0) : Socket ID number
 %inst
 Disconnects the connected socket.
 Be sure to disconnect the initialized socket with the sockclose command.
@@ -86,7 +86,7 @@ Communication control command
 %prm
 "message",p1
 "message"   : Message to send
-p1=0Å`31(0) : Socket ID number
+p1=0„Äú31(0) : Socket ID number
 %inst
 Sends data to the socket. The string specified by "message" or the contents of the string type variable is sent as is.
 ^
@@ -105,8 +105,8 @@ Sends data 1 byte at a time
 Communication control command
 %prm
 p1,p2
-p1=0Å`255(0) : Message to send (1 byte)
-p2=0Å`31(0)  : Socket ID number
+p1=0„Äú255(0) : Message to send (1 byte)
+p2=0„Äú31(0)  : Socket ID number
 %inst
 Sends data to the socket. Sends the number specified by p1 as 1 byte.
 ^
@@ -126,9 +126,9 @@ Communication control command
 %prm
 p1,p2,p3,p4
 p1=Variable     : Variable name containing the transmission contents
-p2=0Å`(0)   : Buffer offset (in bytes)
-p3=0Å`(64)  : Transmission size (in bytes)
-p4=0Å`31(0) : Socket ID number
+p2=0„Äú(0)   : Buffer offset (in bytes)
+p3=0„Äú(64)  : Transmission size (in bytes)
+p4=0„Äú31(0) : Socket ID number
 %inst
 Sends the contents of the variable buffer specified by p1 as binary data to the socket.
 The variable specified by p1 can be either a string type or a numeric type. The contents of the memory secured by the variable are sent directly.
@@ -152,7 +152,7 @@ Checks for data arrival
 Communication control command
 %prm
 p1
-p1=0Å`31(0) : Socket ID number
+p1=0„Äú31(0) : Socket ID number
 %inst
 Checks whether data that can be acquired with the sockget series command has arrived at the specified socket.
 If there is receivable data, 0 is assigned to the system variable stat. If data has not arrived, the system variable stat becomes 1.
@@ -183,8 +183,8 @@ Communication control command
 %prm
 p1,p2,p3
 p1=Variable     : Variable name where the received content is stored
-p2=0Å`(64)  : Reception size (in bytes)
-p3=0Å`31(0) : Socket ID number
+p2=0„Äú(64)  : Reception size (in bytes)
+p3=0„Äú31(0) : Socket ID number
 %inst
 Receives data from the socket and assigns the contents to the string type variable specified by p1. Specify the maximum reception size with p2.
 ^
@@ -204,7 +204,7 @@ Communication control command
 %prm
 p1,p2
 p1=Variable     : Variable name where the received content is stored
-p2=0Å`31(0) : Socket ID number
+p2=0„Äú31(0) : Socket ID number
 %inst
 Receives data 1 byte from the socket and assigns the contents to the numeric type variable specified by p1.
 ^
@@ -224,9 +224,9 @@ Communication control command
 %prm
 p1,p2,p3,p4
 p1=Variable : Variable name where the received content is stored
-p2=0Å`(0)   : Buffer offset (in bytes)
-p3=0Å`(64)  : Reception size (in bytes)
-p4=0Å`31(0) : Socket ID number
+p2=0„Äú(0)   : Buffer offset (in bytes)
+p3=0„Äú(64)  : Reception size (in bytes)
+p4=0„Äú31(0) : Socket ID number
 %inst
 Receives data from the socket and stores the contents as binary data in the variable buffer specified by p1.
 The variable specified by p1 can be either a string type or a numeric type. The received content is read directly into the memory secured by the variable.
@@ -254,8 +254,8 @@ Initializes the socket as a server
 Communication control command
 %prm
 p1,p2
-p1=0Å`31(0) : Socket ID number
-p2=0Å`(0)   : Port number
+p1=0„Äú31(0) : Socket ID number
+p2=0„Äú(0)   : Port number
 %inst
 Initializes the socket to make it usable as a server.
 Specify the socket ID number with p1.
@@ -289,8 +289,8 @@ Waits for client connection
 Communication control command
 %prm
 p1,p2
-p1=0Å`31(0) : Socket ID number
-p2=0Å`31(0) : Alternate socket ID number
+p1=0„Äú31(0) : Socket ID number
+p2=0„Äú31(0) : Alternate socket ID number
 %inst
 Waits for client connection on the socket prepared as a server by the sockmake command.
 The sockwait command must always be executed after the sockmake command has completed normally.

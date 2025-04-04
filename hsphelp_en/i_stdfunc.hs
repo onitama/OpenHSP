@@ -1,6 +1,6 @@
 ;
-;	HSP help manager—p HELPƒ\[ƒXƒtƒ@ƒCƒ‹
-;	(æ“ª‚ª;‚Ìs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·)
+;	HSP help managerç”¨ HELPã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+;	(å…ˆé ­ãŒ;ã®è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™)
 ;
 
 %type
@@ -50,7 +50,7 @@ Generate a random number
 Basic input/output functions
 %prm
 (p1)
-p1=1`32768 : Range of random numbers
+p1=1ã€œ32768 : Range of random numbers
 
 %inst
 Generates an integer random number in the range of 0 to (p1-1).
@@ -258,7 +258,7 @@ Get the time and date
 Basic input/output functions
 %prm
 (p1)
-p1=0`7(0) : Type to get
+p1=0ã€œ7(0) : Type to get
 
 %inst
 Returns the date and time information of the type specified by p1.
@@ -312,7 +312,7 @@ Get directory information
 Basic input/output functions
 %prm
 (p1)
-p1=0`5 : Type to get
+p1=0ã€œ5 : Type to get
 
 %inst
 Returns the directory name of the type specified by p1.
@@ -370,7 +370,7 @@ p1=(0.0) : Angle value (radians)
 
 %inst
 Returns the sine value of p1 as a real number.
-The unit specified by p1 is radians (2ƒÎ is 360 degrees).
+The unit specified by p1 is radians (2Ï€ is 360 degrees).
 %href
 cos
 tan
@@ -388,7 +388,7 @@ p1=(0.0) : Angle value (radians)
 
 %inst
 Returns the cosine value of p1 as a real number.
-The unit specified by p1 is radians (2ƒÎ is 360 degrees).
+The unit specified by p1 is radians (2Ï€ is 360 degrees).
 %href
 sin
 tan
@@ -406,7 +406,7 @@ p1=(0.0) : Angle value (radians)
 
 %inst
 Returns the tangent value of p1 as a real number.
-The unit specified by p1 is radians (2ƒÎ is 360 degrees).
+The unit specified by p1 is radians (2Ï€ is 360 degrees).
 %href
 sin
 cos
@@ -424,7 +424,7 @@ p1      : Y value
 p2(1.0) : X value
 
 %inst
-Using p1 as the Y value and p2 as the X value, the angle of Y/X (arctangent value) is returned in real radian units (2ƒÎ is 360 degrees).
+Using p1 as the Y value and p2 as the X value, the angle of Y/X (arctangent value) is returned in real radian units (2Ï€ is 360 degrees).
 If p2 is omitted, 1.0 is used.
 
 %href
@@ -440,7 +440,7 @@ Returns the root value
 Basic input/output functions
 %prm
 (p1)
-p1=0.0`(0.0) : Value to find the root
+p1=0.0ã€œ(0.0) : Value to find the root
 
 %inst
 Returns the root (square root) value of p1 as a real number.
@@ -456,7 +456,7 @@ Get system information
 Basic input/output functions
 %prm
 (p1)
-p1=0` : Type to get
+p1=0ã€œ : Type to get
 
 %inst
 Returns the system information value of the type specified by p1.
@@ -489,7 +489,7 @@ Memory management functions
 %prm
 (p1,p2)
 p1=Variable : Variable name from which to read the contents
-p2=0`  : Buffer index (in bytes)
+p2=0ã€œ  : Buffer index (in bytes)
 
 %inst
 Returns the contents of 1 byte (8 bits) at an arbitrary location on the data memory stored in the variable as a numerical value.
@@ -509,7 +509,7 @@ Memory management functions
 %prm
 (p1,p2)
 p1=Variable : Variable name from which to read the contents
-p2=0`  : Buffer index (in bytes)
+p2=0ã€œ  : Buffer index (in bytes)
 
 %inst
 Returns the contents of 2 bytes (16 bits) at an arbitrary location on the data memory stored in the variable as a numerical value.
@@ -529,7 +529,7 @@ Memory management functions
 %prm
 (p1,p2)
 p1=Variable : Variable name from which to read the contents
-p2=0`  : Buffer index (in bytes)
+p2=0ã€œ  : Buffer index (in bytes)
 
 %inst
 Returns the contents of 4 bytes (32 bits) at an arbitrary location on the data memory stored in the variable as a numerical value.
@@ -609,7 +609,7 @@ Returns the logarithm
 Basic Input/Output Functions
 %prm
 (p1)
-p1=0.0`(0.0) : Value to calculate the logarithm of
+p1=0.0ã€œ(0.0) : Value to calculate the logarithm of
 
 %inst
 Returns the logarithm (log) value of p1 as a real number.
@@ -624,7 +624,7 @@ Returns the exponential value
 Basic Input/Output Functions
 %prm
 (p1)
-p1=0.0`(0.0) : Value to calculate the exponential of
+p1=0.0ã€œ(0.0) : Value to calculate the exponential of
 
 %inst
 Returns the exponential (exp) value of p1 as a real number.

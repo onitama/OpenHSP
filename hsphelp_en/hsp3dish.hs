@@ -1,5 +1,5 @@
 ;
-;	HSP help manageróp HELPÉ\Å[ÉXÉtÉ@ÉCÉã
+;	HSP help managerÁî® HELP„ÇΩ„Éº„Çπ„Éï„Ç°„Ç§„É´
 ;	(Lines starting with ";" are treated as comments)
 ;
 
@@ -97,15 +97,15 @@ The following symbols can be specified for the setting type name.
 	(*) The availability of read(R) and write(W) differs for each item.
 ^p
 
-ÅESYSREQ_CLSMODE, SYSREQ_CLSCOLOR
+„ÉªSYSREQ_CLSMODE, SYSREQ_CLSCOLOR
 
 Sets whether to clear the screen when drawing starts with redraw 0. If SYSREQ_CLSMODE is set to 1, it will be cleared; if it is set to 0, it will not be cleared. If the screen is being cleared in the script, the processing speed will be improved if the system does not clear the background. The color code for clearing can be set with SYSREQ_CLSCOLOR. The color code should be set as a single numerical value combining RGB 24bit ($rrggbb).
 
-ÅESYSREQ_TIMER
+„ÉªSYSREQ_TIMER
 
 Returns the timer value in milliseconds. The value returned differs for each platform, but the value is incremented by 1 per millisecond.
 
-ÅESYSREQ_PLATFORM
+„ÉªSYSREQ_PLATFORM
 
 Returns the following HSP3Dish platform values.
 ^p
@@ -435,7 +435,7 @@ gmulcolor
 Set texture multiplication value
 %prm
 p1,p2,p3
-p1,p2,p3=0Å`255(255) : Color code (R, G, B brightness)
+p1,p2,p3=0„Äú255(255) : Color code (R, G, B brightness)
 %inst
 Specifies the color multiplication value when copying an image (texture).
 p1, p2, and p3 are the brightness of R, G, and B, respectively.
@@ -526,7 +526,7 @@ You must initialize an off-screen buffer created with the buffer command and a v
 	buffer 2,256,256,screen_offscreen
 ^p
 
-Next, create a variable buffer to replace the buffer. Initialize and create a one-dimensional array using the `dim` command. The size to create should be the X size Å~ Y size of the off-screen buffer.
+Next, create a variable buffer to replace the buffer. Initialize and create a one-dimensional array using the `dim` command. The size to create should be the X size √ó Y size of the off-screen buffer.
 
 ^p
 	dim bitmap, 256*256

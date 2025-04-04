@@ -35,7 +35,7 @@ The #define macro basically registers a replacement string.
 Example:
 	#define hyouji mes
 	hyouji "AAAAA..."
-		Å´(After expansion)
+		‚Üì(After expansion)
 	mes "AAAAA..."
 ^p
 By placing "global" immediately after the #define command, you can create a macro that can be used permanently in all modules.
@@ -56,7 +56,7 @@ Arguments must be specified as "%number," and the numbers must be written in ord
 Example:
 	#define hyouji(%1) mes "prm="+%1
 	hyouji "AAAAA..."
-		Å´(After expansion)
+		‚Üì(After expansion)
 	mes "prm="+"AAAAA..."
 ^p
 In addition, you can set an initial (default) value for arguments.
@@ -66,7 +66,7 @@ Example:
 	hyouji "AAA",a
 	hyouji "BBB"
 	hyouji ,b
-		Å´(After expansion)
+		‚Üì(After expansion)
 	mes "AAA"+a
 	mes "BBB"+123
 	mes "PRM="+b
@@ -95,8 +95,8 @@ This special keyword is mainly for sharing parameters between different macros a
 The special expansion macros specified here are "%s1" and "%o".
 A sample using this is expanded as follows.
 ^p
-	start "OK" Å® mes "START"
-	owari Å® mes "OK"
+	start "OK" ‚Üí mes "START"
+	owari ‚Üí mes "OK"
 ^p
 In this way, it is possible to share data between different macros.
 The following are the types and functions of special expansion macros.
@@ -130,8 +130,8 @@ The following shows an example of label generation.
 ^p
 A sample using this is expanded as follows.
 ^p
-	start Å® *_start_0000
-	owari Å® await 20:stick a:if a=0 : goto *_start_0000
+	start ‚Üí *_start_0000
+	owari ‚Üí await 20:stick a:if a=0 : goto *_start_0000
 ^p
 "%i" generates a unique label name that does not overlap with others and pushes it onto the stack. If "%i0" is specified, the label name is pushed onto the stack, but it is not expanded.
 Also, "%n" generates and expands a unique label name, but does not push it onto the stack.
@@ -166,7 +166,7 @@ External DLL call command registration
 %group
 Preprocessor command
 %prm
-New name "Function name" Type name 1,Åc
+New name "Function name" Type name 1,‚Ä¶
 
 %inst
 Registers a new command for calling an external DLL.
@@ -211,10 +211,10 @@ If you specify a number for the type, an argument compatible with the DLL type s
 ^
 The following points require attention in terms of compatibility with ver2.5.
 ^p
-ÅEThe BMSCR structure can only refer to the fields from flag to color.
-ÅEThe PVal structure is compatible with the PVAL2 structure of ver2.5.
-ÅEThe DLL cannot rewrite the flag field (type type value) or the len field (array information) of the PVal structure.
-ÅEYou cannot access a string type array variable from the PVal structure.
+„ÉªThe BMSCR structure can only refer to the fields from flag to color.
+„ÉªThe PVal structure is compatible with the PVAL2 structure of ver2.5.
+„ÉªThe DLL cannot rewrite the flag field (type type value) or the len field (array information) of the PVal structure.
+„ÉªYou cannot access a string type array variable from the PVal structure.
 ^p
 In other respects, the same information as HSP ver2.5 is passed.
 ^
@@ -565,7 +565,7 @@ This is similar to #define, but #const replaces the result of pre-calculation wh
 Example:
 	#const KAZU 100+50
 	a=KAZU
-		Å´(after expansion)
+		‚Üì(after expansion)
 	a=150
 ^p
 It is effective for speeding up the source code if the values used in the source code are determined in advance. Since it is also possible to include already defined macros,
@@ -574,7 +574,7 @@ Example:
 	#const ALL 50
 	#const KAZU 100*ALL
 	a=KAZU
-		Å´(after expansion)
+		‚Üì(after expansion)
 	a=5000
 ^p
 It can be used as.
@@ -656,7 +656,7 @@ Example :
 	#endif
 ^p
 It can also be used like this. Notes on writing and operators in calculations are the same as for the #const directive.
-Also, it is possible to nest #ifÅ`#endif blocks.
+Also, it is possible to nest #if„Äú#endif blocks.
 ^p
 Example :
 	#ifdef SW
@@ -755,9 +755,9 @@ Assign a New Command
 %group
 Preprocessor Directive
 %prm
-p1 p2 p3,Åc
+p1 p2 p3,‚Ä¶
 p1      : Name of the command to be assigned
-p2 p3Å` : Parameter type name/alias name
+p2 p3„Äú : Parameter type name/alias name
 
 %inst
 Registers a new command for processing module variables.
@@ -781,9 +781,9 @@ Assign a New Function
 %group
 Preprocessor Directive
 %prm
-p1 p2 p3,Åc
+p1 p2 p3,‚Ä¶
 p1      : Name of the command to be assigned
-p2 p3Å` : Parameter type name/alias name
+p2 p3„Äú : Parameter type name/alias name
 
 %inst
 Registers a new function for processing module variables.
@@ -807,8 +807,8 @@ Register Module Initialization Processing
 %group
 Preprocessor Directive
 %prm
-p1 p2,Åc
-p1 p2Å` : Parameter type name/alias name
+p1 p2,‚Ä¶
+p1 p2„Äú : Parameter type name/alias name
 
 %inst
 Registers processing (constructor) to initialize module variables.
@@ -915,7 +915,7 @@ Interface Name    : Keyword to identify the interface
 %inst
 Defines an external component (COM).
 Assigns the class IID and interface IID to the specified interface name to make it usable.
-The IID can be specified as a string ({Å`}) similar to the registry.
+The IID can be specified as a string ({„Äú}) similar to the registry.
 Also, "Class IID" can be omitted.
 ^p
 Example :
@@ -937,7 +937,7 @@ Register External COM Call Command
 %group
 Preprocessor Directive
 %prm
-New Name Index Type Name1,Åc
+New Name Index Type Name1,‚Ä¶
 New Name     : Keyword recognized as a command
 Index : Method index value
 Type Name     : Specifies the argument type separated by commas
@@ -1009,7 +1009,7 @@ Example:
 	#enum KAZU_B		; KAZU_B becomes 1
 	#enum KAZU_C		; KAZU_C becomes 2
 	a=KAZU_B
-		Å´(After expansion)
+		‚Üì(After expansion)
 	a=1
 ^p
 By writing "=(equals)" and a numerical value (or expression) after the macro name, the constant is initialized. After that, the numerical value increases by 1 each time it is defined with the #enum instruction.

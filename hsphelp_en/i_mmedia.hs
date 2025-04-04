@@ -1,6 +1,6 @@
 ;
-;	HSP help manager—p HELPƒ\[ƒXƒtƒ@ƒCƒ‹
-;	(æ“ª‚ªu;v‚Ìs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·)
+;	HSP help managerç”¨ HELPã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+;	(å…ˆé ­ãŒã€Œ;ã€ã®è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™)
 ;
 
 %type
@@ -71,7 +71,7 @@ Media playback
 Multimedia control commands
 %prm
 p1
-p1=0`(0) : Media buffer ID to play
+p1=0ã€œ(0) : Media buffer ID to play
 
 %inst
 Plays the media loaded by the mmload command.
@@ -101,8 +101,8 @@ Media file loading
 Multimedia control commands
 %prm
 "filename",p1,p2
-p1=0`(0)  : Media buffer ID to allocate
-p2=0`2(0) : Allocation mode
+p1=0ã€œ(0)  : Media buffer ID to allocate
+p2=0ã€œ2(0) : Allocation mode
 
 %inst
 Registers media data files.
@@ -161,7 +161,7 @@ Stop media playback
 Multimedia control commands
 %prm
 p1
-p1=0`(-1) : Media buffer ID
+p1=0ã€œ(-1) : Media buffer ID
 %inst
 Stops media playback by the mmplay command.
 By specifying the media buffer ID in p1, you can stop the playback of the specified media.
@@ -180,8 +180,8 @@ Volume settings
 Extended multimedia control commands
 %prm
 p1,p2
-p1=0`(0) : Media buffer ID
-p2(0)     : Volume value (-1000`0)
+p1=0ã€œ(0) : Media buffer ID
+p2(0)     : Volume value (-1000ã€œ0)
 %inst
 Sets the volume of media played by the mmplay command.
 The volume value is 0 for maximum volume and -1000 for silent.
@@ -203,8 +203,8 @@ Panning settings
 Extended multimedia control commands
 %prm
 p1,p2
-p1=0`(0) : Media buffer ID
-p2(0)     : Panning value (-1000`1000)
+p1=0ã€œ(0) : Media buffer ID
+p2(0)     : Panning value (-1000ã€œ1000)
 %inst
 Sets the panning (stereo left/right balance) of media played by the mmplay command.
 -1000 is the leftmost localization, 1000 is the rightmost localization. (0 is the center localization)

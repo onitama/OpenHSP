@@ -1,6 +1,6 @@
 ;
-;	HSP help manager�p HELP�\�[�X�t�@�C��
-;	(�擪���u;�v�̍s�̓R�����g�Ƃ��ď�������܂�)
+;	HSP help manager用 HELPソースファイル
+;	(先頭が「;」の行はコメントとして処理されます)
 ;
 %ver
 3.7

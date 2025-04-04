@@ -1,6 +1,6 @@
 ;
-; HSP help manager—p HELPƒ\[ƒXƒtƒ@ƒCƒ‹
-; (æ“ª‚ªu;v‚Ìs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·)
+; HSP help managerç”¨ HELPã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+; (å…ˆé ­ãŒã€Œ;ã€ã®è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™)
 ;
 
 %type
@@ -27,7 +27,7 @@ Wait for a specified time
 Program control commands
 %prm
 p1
-p1=0`(0) : Wait time (in milliseconds)
+p1=0ã€œ(0) : Wait time (in milliseconds)
 
 %inst
 Pauses the execution of the program for a specified time.
@@ -57,7 +57,7 @@ Program control commands
 %prm
 "filename",p1,"command"
 "filename" : Target filename
-p1=0`(0)  : File execution mode
+p1=0ã€œ(0)  : File execution mode
 "command"  : Context menu operation name
 
 %inst
@@ -161,7 +161,7 @@ Program control commands
 Makes a subroutine jump.
 The gosub command jumps to the location specified by *label.
 After that, if there is a return command, it will return to the next line of the gosub command and continue execution.
-gosub`return can be nested.
+gosubã€œreturn can be nested.
 (The maximum number of nesting depends on the amount of stack memory that HSP has)
 
 %href
@@ -442,11 +442,11 @@ Indicates the beginning of a loop
 Program control commands
 %prm
 p1,p2
-p1=1`(-1) : Number of loops
-p2=0`(0)  : Start value of system variable cnt
+p1=1ã€œ(-1) : Number of loops
+p2=0ã€œ(0)  : Start value of system variable cnt
 
 %inst
-Repeatedly executes the section between the repeat`loop commands.
+Repeatedly executes the section between the repeatã€œloop commands.
 The repeat command indicates the starting point of the repetition.
 The loop command returns to the repeat command that was last passed. In other words,
 ^p
@@ -458,7 +458,7 @@ A program like this will display "Yahoo!" 5 times.
 The parameter p1 of the repeat command can be used to specify the number of repetitions. If the number of times is omitted, or if a negative value is specified, it becomes an infinite loop.
 If the number of repetitions is 0, the repeat portion is not executed and jumps to the corresponding loop command.
 ^
-A nested structure in which the part including repeat`loop is further looped can also be described. However, if you exit the loop without passing through the loop command normally, the nested structure will be messed up, so avoid structures that force you to exit the loop.
+A nested structure in which the part including repeatã€œloop is further looped can also be described. However, if you exit the loop without passing through the loop command normally, the nested structure will be messed up, so avoid structures that force you to exit the loop.
 ^
 The system variable cnt can be referenced to check the number of loops or to use a counter. cnt normally starts from 0 and increases by 1 each time it loops with the loop command.
 However, it is also possible to change the number from which the counter starts with p2 of the repeat command. For example, if you specify repeat 3,1, the value of the variable cnt will change in the order of 1, 2, 3.
@@ -477,7 +477,7 @@ Exit the loop
 %group
 Program control commands
 %inst
-Forcibly exits from the loop between the repeat`loop commands.
+Forcibly exits from the loop between the repeatã€œloop commands.
 ^p
 	repeat 5
 		if cnt=2 : break
@@ -511,10 +511,10 @@ Redo the loop
 Program control commands
 %prm
 p1
-p1 = 0` : Repetition counter change value
+p1 = 0ã€œ : Repetition counter change value
 
 %inst
-Redoes the loop between repeat`loop commands.
+Redoes the loop between repeatã€œloop commands.
 When the continue command is executed, it returns to the repeat command and executes the next repetition.
 ^p
 	repeat 5
@@ -533,7 +533,7 @@ When the above script is executed,
 The display will be like this, and you can see that the mes command is not executed only when the system variable cnt is 2.
 It may be difficult to understand at first, but the continue command can also be said to work the same as the loop command, but not in the same location as the loop command.
 The repetition counter increases by 1 in the same way as the loop command even when the continue command is executed.
-If the continue command is executed in the last repetition, the repeat`loop ends, that is, execution continues from the command after the loop command.
+If the continue command is executed in the last repetition, the repeatã€œloop ends, that is, execution continues from the command after the loop command.
 
 %href
 repeat
@@ -692,9 +692,9 @@ Branching by number
 %group
 Program control command
 %prm
-p1 goto/gosub Label0,Label1c
-p1=0`(0) : Value for branching
-Label0` : Branch destination label name
+p1 goto/gosub Label0,Label1â€¦
+p1=0ã€œ(0) : Value for branching
+Label0ã€œ : Branch destination label name
 %inst
 The `on` command selects a branch destination according to the value specified by `p1` (0, 1, 2...).
 In the format "on number goto" or "on number gosub", you can then write one or more branch destination labels separated by ",".

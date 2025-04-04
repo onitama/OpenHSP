@@ -244,7 +244,7 @@ Get mode and option data
 
 %prm
 (p1)
-p1=0Å` : Window object ID
+p1=0„Äú : Window object ID
 
 %inst
 Returns the mode and option data of the specified window object.
@@ -268,7 +268,7 @@ Get the pointer to the BMSCR structure where the object is placed
 
 %prm
 (p1)
-p1=0Å` : Window object ID
+p1=0„Äú : Window object ID
 
 %inst
 Returns the pointer to the BMSCR structure where the specified window object is placed.
@@ -293,7 +293,7 @@ Get the handle of the window object
 
 %prm
 (p1)
-p1=0Å` : Window object ID
+p1=0„Äú : Window object ID
 
 %inst
 Returns the handle of the specified window object.
@@ -799,7 +799,7 @@ Converts the unit of angle from radians to degrees. It can also be said that it 
 
 %sample
 	tmp = M_PI
-	mes str(tmp) + " radians is " + rad2deg(tmp) + "ëÆ."
+	mes str(tmp) + " radians is " + rad2deg(tmp) + "Â±û."
 	stop
 
 %href
@@ -821,7 +821,7 @@ Converts the unit of angle from degrees to radians. It can also be said that it 
 
 %sample
 	tmp = 90
-	mes str(tmp) + "ëÆ is " + deg2rad(tmp) + " radians."
+	mes str(tmp) + "Â±û is " + deg2rad(tmp) + " radians."
 	stop
 
 %href

@@ -1,6 +1,6 @@
 ;
-;	HSP help manager—p HELPƒ\[ƒXƒtƒ@ƒCƒ‹
-;	(æ“ª‚ªu;v‚Ìs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·)
+;	HSP help managerç”¨ HELPã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+;	(å…ˆé ­ãŒã€Œ;ã€ã®è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™)
 ;
 
 %type
@@ -31,9 +31,9 @@ String manipulation commands
 p1,p2,p3,p4,p5
 p1=Variable : Variable name to read the content into
 p2=Variable : Variable name to which the buffer is assigned
-p3=0` : Buffer index (in bytes)
-p4=0`255 : ASCII code of the delimiter character
-p5=0`(1024) : Maximum number of characters to read
+p3=0ã€œ : Buffer index (in bytes)
+p4=0ã€œ255 : ASCII code of the delimiter character
+p5=0ã€œ(1024) : Maximum number of characters to read
 
 %inst
 Reads the content from an arbitrary location in the memory buffer as a string into a variable.
@@ -70,8 +70,8 @@ String manipulation commands
 %prm
 p1,p2,p3
 p1=String : String or variable name to add or change
-p2=0`(-1) : Index to add to
-p3=0`1(0) : Overwrite mode specification (0=add, 1=overwrite)
+p2=0ã€œ(-1) : Index to add to
+p3=0ã€œ1(0) : Overwrite mode specification (0=add, 1=overwrite)
 
 %inst
 Adds or changes the contents of the memory notepad.
@@ -108,7 +108,7 @@ Delete line
 String manipulation commands
 %prm
 p1
-p1=0` : Index to delete
+p1=0ã€œ : Index to delete
 
 %inst
 Deletes the specified index of the memory notepad.
@@ -130,7 +130,7 @@ String manipulation commands
 %prm
 p1,p2
 p1=Variable : Variable name to read to
-p2=0`(0) : Index to read
+p2=0ã€œ(0) : Index to read
 
 %inst
 Assigns the contents of the index specified in p2 in the memory notepad to the variable specified in p1. You can read the contents of any line in the memory notepad.
@@ -258,8 +258,8 @@ String manipulation functions
 %prm
 (p1,p2,p3)
 p1=Variable name : Variable name storing the original string to extract from
-p2=-1` : Index to start extracting from
-p3=0` : Number of characters to extract
+p2=-1ã€œ : Index to start extracting from
+p3=0ã€œ : Number of characters to extract
 %inst
 Returns the characters extracted from the string variable specified in p1 according to the conditions specified in p2 and p3.
 p2 specifies the index to start extracting from. This is the index where the first character of the string is 0, and it increases sequentially as 1, 2, 3... Note that it does not start from 1.
@@ -281,7 +281,7 @@ String manipulation functions
 %prm
 (p1,p2,"string")
 p1=Variable name : String variable name storing the string to be searched
-p2=0`(0) : Index to start searching from
+p2=0ã€œ(0) : Index to start searching from
 "string"  : String to search for
 %inst
 Checks whether the string specified by "string" exists in the string variable specified by p1 and returns the index.
@@ -368,7 +368,7 @@ Example:
 	a="c:\\disk\\test.bmp"
 	b = getpath(a,8+1)
 	mes b
-	«(Result)
+	â†“(Result)
 	"test"
 ^p
 Details of type specification are as follows:
@@ -537,8 +537,8 @@ Details of the values indicating the removal position specified by p2 are as fol
 For the character code specified by p3, you can specify a 2-byte code indicating a full-width character.
 ^p
 Example:
-	s="@Hello@This is a full-width character@"
-	zenspace="@"				; Full-width space
+	s="ã€€Helloã€€This is a full-width characterã€€"
+	zenspace="ã€€"				; Full-width space
 	code = wpeek(zenspace,0)		; Get the code for the full-width space
 	mes strtrim(s,3,code)
 ^p

@@ -67,7 +67,7 @@ By specifying the option parameter, you can draw only limited items.
 If the option parameter is omitted, all items are selected.
 Normally, there is no problem even if you do not specify the option parameter.
 Also, if you only use 2D direct drawing commands and do not need drawing by objects, you do not need to write the gpdraw command.
-Items with the mode flag value of OBJ_LATE added (including those with a translucent óØ value set) are drawn after opaque objects, so the items are divided.
+Items with the mode flag value of OBJ_LATE added (including those with a translucent Áïô value set) are drawn after opaque objects, so the items are divided.
 Multiple items can be specified by separating them with "|".
 ^p
 	Example:
@@ -122,7 +122,7 @@ The following items can be specified as core parameter IDs.
 	PRMSET_FLAG            Object registration flag (*)
 	PRMSET_MODE            Mode flag value
 	PRMSET_ID              Object ID (*)
-	PRMSET_ALPHA           Transparency (óØ value)
+	PRMSET_ALPHA           Transparency (Áïô value)
 	PRMSET_TIMER           Timer value
 	PRMSET_MYGROUP         Own collision group
 	PRMSET_COLGROUP        Collision detection collision group
@@ -172,7 +172,7 @@ The following items can be specified as core parameter IDs.
 	PRMSET_FLAG            Object registration flag (*)
 	PRMSET_MODE            Mode flag value
 	PRMSET_ID              Object ID (*)
-	PRMSET_ALPHA           Transparency (óØ value)
+	PRMSET_ALPHA           Transparency (Áïô value)
 	PRMSET_TIMER           Timer value
 	PRMSET_MYGROUP         Own collision group
 	PRMSET_COLGROUP        Collision detection collision group
@@ -212,7 +212,7 @@ Extended Screen Control Commands
 %prm
 id,index
 id(0) : ID of the light object to register
-index=0Å`9(0) : Index of the light object to register
+index=0„Äú9(0) : Index of the light object to register
 %inst
 Registers the specified light object to the current light.
 Be sure to specify a light object that has been initialized as a light.
@@ -477,7 +477,7 @@ These settings can also be set separately with the gpmatstate command.
 	GPOBJ_MATOPT_SPECULAR   Apply specular (u_specularExponent) during lighting calculation
 	GPOBJ_MATOPT_MIRROR     Display as an inverted image
 	GPOBJ_MATOPT_CUBEMAP    Set as a cube map
-	GPOBJ_MATOPT_NODISCARD  Disable pixel discarding by óØ channel
+	GPOBJ_MATOPT_NODISCARD  Disable pixel discarding by Áïô channel
 	GPOBJ_MATOPT_UVOFFSET	Allow to specify UV offset value (u_textureOffset)
 	GPOBJ_MATOPT_UVREPEAT	Allow to specify UV repeat value (u_textureRepeat)
 ^p
@@ -523,7 +523,7 @@ These settings can also be set separately with the gpmatstate command.
 	GPOBJ_MATOPT_BLENDADD   Set the blend mode to addition
 	GPOBJ_MATOPT_SPECULAR   Apply specular (u_specularExponent) during lighting calculation
 	GPOBJ_MATOPT_MIRROR     Display as an inverted image
-	GPOBJ_MATOPT_NODISCARD  Disable pixel discarding by óØ channel
+	GPOBJ_MATOPT_NODISCARD  Disable pixel discarding by Áïô channel
 ^p
 If the material cannot be generated normally, error 3 (parameter value is abnormal) occurs.
 If generated correctly, the material ID (integer value) is assigned to the variable specified by var.
@@ -567,7 +567,7 @@ These settings can also be set separately with the gpmatstate command.
 	GPOBJ_MATOPT_SPECULAR   Apply specular (u_specularExponent) during lighting calculation
 	GPOBJ_MATOPT_MIRROR     Display as an inverted image
 	GPOBJ_MATOPT_CUBEMAP    Set as a cube map
-	GPOBJ_MATOPT_NODISCARD  Disable pixel discarding by óØ channel
+	GPOBJ_MATOPT_NODISCARD  Disable pixel discarding by Áïô channel
 ^p
 
 If the material cannot be generated successfully, error 3 (parameter value is abnormal) will occur.
@@ -1183,7 +1183,7 @@ gpmatprm16
 
 %index
 setalpha
-Object transparency (óØ value) setting
+Object transparency (Áïô value) setting
 %group
 Extended Screen Control Commands
 %prm
@@ -1191,11 +1191,11 @@ objid,value
 objid(0)   : Object ID
 value(255) : Value to set (integer value) (0-255)
 %inst
-Sets the transparency (óØ value) of an object.
+Sets the transparency (Áïô value) of an object.
 Sets the value specified by the value parameter to the object of the objid parameter.
-The value specified by the value parameter is an integer value (óØ value) from 0 to 255 indicating transparency.
+The value specified by the value parameter is an integer value (Áïô value) from 0 to 255 indicating transparency.
 0 is completely transparent, and 255 is opaque.
-For objects with an óØ value other than 255 (semi-transparent), the drawing order is changed to the front.
+For objects with an Áïô value other than 255 (semi-transparent), the drawing order is changed to the front.
 (Same state as when the OBJ_LATE mode flag value is specified)
 %href
 gpsetprm
@@ -1783,9 +1783,9 @@ Initialize current light
 Extended screen control commands
 %prm
 p1,p2,p3
-p1=1Å`9(1) : Number of directional lights
-p2=0Å`9(0) : Number of point lights
-p3=0Å`9(0) : Number of spotlights
+p1=1„Äú9(1) : Number of directional lights
+p2=0„Äú9(0) : Number of point lights
+p3=0„Äú9(0) : Number of spotlights
 %inst
 Initializes the current light along with the type of light to use.
 By setting the current light, you can determine the details of the light received by models and materials generated thereafter.
@@ -2143,7 +2143,7 @@ Parameter ID   Content
 		PRMSET_FLAG            Object registration flag (*)
 		PRMSET_MODE            Mode flag value
 		PRMSET_ID              Object ID (*) (HGIMG4 only)
-		PRMSET_ALPHA           Transparency (óØ value) (HGIMG4 only)
+		PRMSET_ALPHA           Transparency (Áïô value) (HGIMG4 only)
 		PRMSET_SHADE           Shading mode (HGIMG3 only)
 		PRMSET_TIMER           Timer value
 		PRMSET_MYGROUP         Own collision group
