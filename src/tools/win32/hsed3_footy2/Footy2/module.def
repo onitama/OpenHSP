@@ -1,0 +1,108 @@
+;module.def
+;このファイルは、Footy2.dllのモジュール定義ファイルです
+;(C)2002-2009 ShinjiWatanabe
+
+LIBRARY	Footy2
+
+EXPORTS      ;エクスポート関数の記述
+
+;システム
+	GetFooty2Ver					@001
+	GetFooty2BetaVer				@002
+
+;ウィンドウ
+	Footy2Create					@100
+	Footy2ChangeParent				@101
+	Footy2Delete					@102
+	Footy2Move						@103
+	Footy2ChangeView				@104
+	Footy2SetFocus					@105
+	Footy2GetWnd					@106
+	Footy2GetWndVSplit				@107
+	Footy2GetWndHSplit				@108
+	Footy2GetActiveView				@109
+	Footy2Refresh					@110
+
+;編集系
+	Footy2Copy						@200
+	Footy2Cut						@201
+	Footy2Paste						@202
+	Footy2Undo						@203
+	Footy2Redo						@204
+	Footy2IsEdited					@205
+	Footy2SelectAll					@206
+	Footy2ShiftLock					@207
+	Footy2IsShiftLocked				@208
+	Footy2SetReadOnly				@209
+	Footy2IsReadOnly				@210
+	
+;文字列処理
+	Footy2SetSelTextA				@300
+	Footy2SetSelTextW				@301
+	Footy2SetTextA					@302
+	Footy2SetTextW					@303
+	Footy2GetTextLengthA			@304
+	Footy2GetTextLengthW			@305
+	Footy2GetTextA					@306
+	Footy2GetTextW					@307
+	Footy2GetLineA					@308
+	Footy2GetLineW					@309
+	Footy2GetLineLengthA			@400
+	Footy2GetLineLengthW			@401
+	Footy2GetLines					@402
+	Footy2SetLineW					@403
+	Footy2SetLineA					@404
+	Footy2GetSelLengthA				@405
+	Footy2GetSelLengthW				@406
+	Footy2GetSelTextA				@407
+	Footy2GetSelTextW				@408
+
+;ファイル関係
+	Footy2TextFromFileA				@500
+	Footy2TextFromFileW				@501
+	Footy2SaveToFileA				@502
+	Footy2SaveToFileW				@503
+	Footy2CreateNew					@504
+	Footy2GetCharSet				@505
+	Footy2GetLineCode				@506
+
+;キャレット関連
+	Footy2GetCaretPosition			@600
+	Footy2SetCaretPosition			@601
+	Footy2GetSel					@602
+	Footy2SetSel					@603
+
+;表示
+	Footy2AddEmphasisA				@700
+	Footy2AddEmphasisW				@701
+	Footy2FlushEmphasis				@702
+	Footy2ClearEmphasis				@703
+	Footy2SetFontSize				@704
+	Footy2SetFontFaceA				@705
+	Footy2SetFontFaceW				@706
+	Footy2SetLineIcon				@707
+	Footy2GetLineIcon				@708
+
+;設定系
+	Footy2SetMetrics				@900
+	Footy2GetMetrics				@901
+	Footy2SetLapel					@902
+	Footy2SetColor					@903
+	Footy2GetVisibleColumns			@904
+	Footy2GetVisibleLines			@905
+	Footy2SetBackgroundImageA		@906
+	Footy2SetBackgroundImageW		@907
+	Footy2ClearBackgroundImage		@908
+	Footy2SetBackgroundImageColor	@909
+
+;検索系
+	Footy2SearchA					@1000
+	Footy2SearchW					@1001
+
+;イベント関係
+	Footy2SetFuncFocus				@1100
+	Footy2SetFuncMoveCaret			@1101
+	Footy2SetFuncTextModified		@1102
+	Footy2SetFuncInsertModeChanged	@1103
+
+;[EOF]

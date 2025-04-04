@@ -1,0 +1,570 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#include "poppad.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "XPStyle.xml"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+ONIPAD                  ICON                    "onipad.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+ONIPAD MENU 
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "新規作成(&N)\tctrl+N",            IDM_NEW
+        MENUITEM "開く(&O)...\tctrl+O",           IDM_OPEN
+        MENUITEM "上書き保存(&S)\tctrl+S",           IDM_SAVE
+        MENUITEM "名前を付けて保存(&A)...",             IDM_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "印刷(&P)...\tctrl+P",           IDM_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&Q)\tctrl+Q",              IDM_EXIT
+    END
+    POPUP "編集(&E)"
+    BEGIN
+        MENUITEM "やり直し(&U)\tctrl+Z",            IDM_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "切り取り(&T)\tctrl+X",            IDM_CUT
+        MENUITEM "コピー(&C)\tctrl+C",             IDM_COPY
+        MENUITEM "貼り付け(&P)\tctrl+V",            IDM_PASTE
+        MENUITEM "削除(&D)\tDelete",              IDM_CLEAR
+        MENUITEM SEPARATOR
+        MENUITEM "すべてを選択(&A)\tctrl+A",          IDM_SELALL
+    END
+    POPUP "カーソル(&L)"
+    BEGIN
+        MENUITEM "先頭行に移動(&T)\tctrl+T",          IDM_LTOP
+        MENUITEM "最終行に移動(&B)\tctrl+B",          IDM_LBTM
+        MENUITEM "指定行に移動(&J)...\tctrl+J",       IDM_JUMP
+        MENUITEM "ラベル一覧...(&L)\tF11",           IDM_LABEL
+    END
+    POPUP "検索(&S)"
+    BEGIN
+        MENUITEM "文字列の検索(&F)...\tF4",           IDM_FIND
+        MENUITEM "次を検索(&N)\tF3",                IDM_NEXT
+        MENUITEM "文字列の置換(&R)...",               IDM_REPLACE
+    END
+    POPUP "オプション(&O)"
+    BEGIN
+        MENUITEM "フォント(&F)...",                 IDM_FONT
+        MENUITEM "背景カラー(&B)",                   IDM_BGCOLOR
+        MENUITEM "ツールバー(&T)",                   IDM_VIEW_TOOLBAR
+        MENUITEM "ステータスバー(&S)",                 IDM_VIEW_STATUS
+        MENUITEM "スクロールバー(&H)",                 IDM_HSCROLL
+        MENUITEM "起動時ディレクトリ(&D)...",            IDM_STARTDIR
+    END
+    POPUP "ＨＳＰ(&P)"
+    BEGIN
+        MENUITEM "コンパイル+実行(&C)\tF5",            IDM_COMP
+        MENUITEM "実行(&R)\tF6",                  IDM_RUN
+        MENUITEM "コンパイルのみ(&P)\tF7",             IDM_COMP2
+        MENUITEM "エラー表示(&E)...\tF8",            IDM_HSPERR
+        MENUITEM "オブジェクトファイル作成(&B)\tF9",        IDM_MKOBJ
+        MENUITEM "START.AXファイル作成(&S)",          IDM_MKOBJ2
+        MENUITEM "実行ファイル自動作成(&A)\tctrl+F9",     IDM_AUTOMAKE
+        MENUITEM "外部ファイル実行(&F)...\tF10",        IDM_COMP3
+        MENUITEM "予約キーワード一覧(&K)...",            IDM_HSPSYM
+        MENUITEM SEPARATOR
+        MENUITEM "起動オプション(&O)...",              IDM_CMDOPT
+        MENUITEM "Debugウインドゥ表示(&D)",            IDM_DEBUG
+    END
+    POPUP "ツール(&T)"
+    BEGIN
+        MENUITEM "PACKFILE編集(&E)...",           IDM_PACKED
+        MENUITEM "DPMファイル作成(&P)",               IDM_PACKGO
+        MENUITEM "EXEファイル作成(&M)",               IDM_MKEXE1
+        MENUITEM "スクリーンセーバー作成(&S)",             IDM_MKEXE2
+        MENUITEM "ソースフォルダを開く(&O)...",           IDM_OPEN_SRCFOLDER
+        MENUITEM "HSPアシスタント起動(&F)...",          IDM_START_RUNTIMEMAN
+    END
+    POPUP "ヘルプ(&H)"
+    BEGIN
+        MENUITEM "HSPキーワード検索(&K)...\tF1",       IDM_KWHELP
+        MENUITEM "HSPヘルプ設定...(&D)",             IDM_HELPDIR
+        MENUITEM "HSPプログラムガイドを開く(&P)...",       IDM_HSPMAN1
+        MENUITEM "HSP命令リファレンスを開く(&R)...",       IDM_HSPMAN2
+        MENUITEM "HSPマニュアル目次(&I)...",           IDM_HSPMAN3
+        MENUITEM "バージョン情報(&A)...",              IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+ONIPAD ACCELERATORS 
+BEGIN
+    VK_F9,          IDM_AUTOMAKE,           VIRTKEY, CONTROL, NOINVERT
+    VK_F12,         IDM_COMP,               VIRTKEY, NOINVERT
+    VK_F5,          IDM_COMP,               VIRTKEY, NOINVERT
+    VK_F7,          IDM_COMP2,              VIRTKEY, NOINVERT
+    VK_F10,         IDM_COMP3,              VIRTKEY, NOINVERT
+    "^C",           IDM_COPY,               ASCII,  NOINVERT
+    "^X",           IDM_CUT,                ASCII,  NOINVERT
+    VK_DELETE,      IDM_CUT,                VIRTKEY, SHIFT, NOINVERT
+    "^Q",           IDM_EXIT,               ASCII,  NOINVERT
+    "^F",           IDM_FIND,               ASCII,  NOINVERT
+    VK_F4,          IDM_FIND,               VIRTKEY, NOINVERT
+    VK_F8,          IDM_HSPERR,             VIRTKEY, NOINVERT
+    "^G",           IDM_JUMP,               ASCII,  NOINVERT
+    "^J",           IDM_JUMP,               ASCII,  NOINVERT
+    VK_F1,          IDM_KWHELP,             VIRTKEY, NOINVERT
+    VK_F11,         IDM_LABEL,              VIRTKEY, NOINVERT
+    "^B",           IDM_LBTM,               ASCII,  NOINVERT
+    "^L",           IDM_LOGCOMP,            ASCII,  NOINVERT
+    "^T",           IDM_LTOP,               ASCII,  NOINVERT
+    VK_F9,          IDM_MKOBJ,              VIRTKEY, NOINVERT
+    "^N",           IDM_NEW,                ASCII,  NOINVERT
+    VK_F3,          IDM_NEXT,               VIRTKEY, NOINVERT
+    "^O",           IDM_OPEN,               ASCII,  NOINVERT
+    VK_F2,          IDM_OPEN,               VIRTKEY, SHIFT, NOINVERT
+    "^V",           IDM_PASTE,              ASCII,  NOINVERT
+    "^P",           IDM_PRINT,              ASCII,  NOINVERT
+    VK_F6,          IDM_RUN,                VIRTKEY, NOINVERT
+    "^S",           IDM_SAVE,               ASCII,  NOINVERT
+    VK_F2,          IDM_SAVE,               VIRTKEY, NOINVERT
+    "^A",           IDM_SELALL,             ASCII,  NOINVERT
+    "^Z",           IDM_UNDO,               ASCII,  NOINVERT
+    VK_BACK,        IDM_UNDO,               VIRTKEY, ALT, NOINVERT
+    VK_INSERT,      IDM_PASTE,              VIRTKEY, SHIFT, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+ABOUTBOX DIALOGEX 20, 20, 159, 97
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "About application"
+FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x0
+BEGIN
+    CTEXT           "HSP script editor",IDC_STATIC,41,12,67,8
+    ICON            "OniPad",IDC_STATIC,8,8,20,20
+    CTEXT           "For Windows version 3.5",IDC_STATIC,0,29,159,8
+    CTEXT           "Copyright 1997-2017 onion software",IDC_STATIC,0,37,159,8
+    DEFPUSHBUTTON   "OK",IDOK,64,75,32,14,WS_GROUP
+    CTEXT           "http://hsp.tv/",IDC_STATIC,0,59,159,8
+    LTEXT           "Information available at:",IDC_STATIC,46,51,71,8
+END
+
+PRINTDLGBOX DIALOG  20, 20, 100, 76
+STYLE WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "PopPad"
+BEGIN
+    CTEXT           "Sending",-1,0,10,100,8
+    CTEXT           "",IDD_FNAME,0,20,100,8
+    CTEXT           "to print spooler.",-1,0,30,100,8
+    DEFPUSHBUTTON   "Cancel",IDCANCEL,34,50,32,14,WS_GROUP
+END
+
+JUMPBOX DIALOG  0, 0, 130, 38
+STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "カーソル移動"
+FONT 10, "system"
+BEGIN
+    PUSHBUTTON      "OK",IDOK,73,4,46,11,NOT WS_TABSTOP
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,73,20,46,11,NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT1,6,5,61,12,ES_AUTOHSCROLL
+    CTEXT           "移動先の行番号",-1,6,20,66,13
+END
+
+CMDBOX DIALOG  0, 0, 185, 77
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "HSP起動オプション指定"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    PUSHBUTTON      "OK",IDOK,73,56,50,14,NOT WS_TABSTOP
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,128,56,50,14,NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT1,7,19,171,13,ES_AUTOHSCROLL
+    LTEXT           "コマンドラインに追加される文字列を入力してください",IDC_STATIC,7,39,171,8
+END
+
+MKEXE DIALOGEX 0, 0, 187, 150
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "実行可能ファイル作成"
+FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "OK",IDOK,72,129,50,14,NOT WS_TABSTOP
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,130,129,50,14,NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT1,7,7,164,14,ES_AUTOHSCROLL
+    LTEXT           "作成するファイル名を入力してください ( 拡張子なし )",IDC_STATIC,7,27,173,12
+    EDITTEXT        IDC_EDIT2,33,55,41,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT3,98,55,41,12,ES_AUTOHSCROLL
+    LTEXT           "X",IDC_STATIC,22,57,8,12
+    LTEXT           "Y",IDC_STATIC,86,57,8,12
+    GROUPBOX        "ウインドゥ初期サイズ",IDC_STATIC,7,43,165,31
+    CONTROL         "起動時にメインウインドゥを非表示にする",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,91,145,11
+    CONTROL         "起動時のディレクトリ移動を無効にする",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,105,145,11
+    GROUPBOX        "特殊な設定(通常は必要ありません)",IDC_STATIC,7,81,165,41
+END
+
+EXTCOMP DIALOG  0, 0, 187, 79
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "外部ファイル実行"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    PUSHBUTTON      "OK",IDOK,73,58,50,14,NOT WS_TABSTOP
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,130,58,50,14,NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT1,7,7,145,14,ES_AUTOHSCROLL
+    LTEXT           "コンパイル+実行するファイル名を入力してください。",IDC_STATIC,7,25,173,12
+    CONTROL         "オブジェクトファイルのみ作成",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,37,123,10
+END
+
+ERRBOX DIALOG  0, 0, 259, 207
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "結果レポート"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "閉じる",IDOK,194,186,50,14
+    EDITTEXT        IDC_EDIT1,7,7,245,172,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+END
+
+FILEBOX DIALOG  0, 0, 322, 225
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "PACKFILE一覧"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "閉じる",IDOK,259,204,50,14
+    PUSHBUTTON      "追加 >>",IDCM_ADD,138,50,50,14
+    LISTBOX         IDC_LIST1,7,22,123,136,LBS_SORT | LBS_NOINTEGRALHEIGHT | LBS_EXTENDEDSEL | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST2,7,169,123,49,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST3,195,7,120,188,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "削除 ->",IDCM_DEL,138,71,50,14
+    PUSHBUTTON      "全追加 >>",IDCM_ALLSEL,137,123,50,14
+    PUSHBUTTON      "全削除 ->",IDCM_CLR,137,143,50,14
+    LTEXT           "ｶﾚﾝﾄﾃﾞｨﾚｸﾄﾘ",IDC_CDIR,7,7,173,8
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCM_BYE,202,204,50,14
+    EDITTEXT        IDC_EDIT1,138,21,49,13,ES_AUTOHSCROLL
+    CONTROL         "暗号化",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,93,49,13
+END
+
+HELPDIR DIALOG  0, 0, 203, 175
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "HSPヘルプ設定"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,89,154,50,14
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,146,154,50,14
+    EDITTEXT        IDC_EDIT1,7,116,189,14,ES_AUTOHSCROLL
+    LTEXT           "hsphelpの場所を指定してください。\n空欄の場合は、エディタのあるディレクトリになります。",IDC_STATIC,7,92,171,20
+    CONTROL         "HTML形式ヘルプ",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,23,171,13
+    CONTROL         "WinHelp形式ヘルプ(オプション)",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,38,171,13
+    CONTROL         "HSPヘルプマネージャ(オプション)",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,53,171,13
+    GROUPBOX        "表示されるヘルプの形式",IDC_STATIC,7,7,189,80
+    PUSHBUTTON      "参照...",IDC_BUTTON1,146,135,50,14
+    CONTROL         "HTML HELP形式(オプション)",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,18,68,171,12
+END
+
+LABELBOX DIALOG  0, 0, 233, 235
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ラベル一覧"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LISTBOX         IDC_LIST2,7,7,163,215,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "移動",IDOK,176,7,50,14
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,176,24,50,14,NOT WS_TABSTOP
+END
+
+LOGCOMP DIALOG  0, 0, 187, 93
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "履歴付き実行"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "実行開始",IDOK,130,7,50,14
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,130,24,50,14
+    CONTROL         "行番号",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,37,45,11
+    CONTROL         "時刻",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,37,51,11
+    CONTROL         "日付",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,52,46,11
+    CONTROL         "ファイル名",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,52,49,11
+    CONTROL         "前回の履歴をクリアしない(追記)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,106,11
+    PUSHBUTTON      "ログの編集",IDC_BUTTON1,130,72,50,14
+    LTEXT           "実行ログファイル""hsplog.txt""を\n生成しながら実行します。\n以下の項目をログに付加できます。",IDC_STATIC,7,7,113,24
+END
+
+STARTDIR DIALOGEX 0, 0, 203, 147
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "起動ディレクトリ設定"
+FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,89,123,50,14
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,146,123,50,14
+    EDITTEXT        IDC_EDIT1,7,85,189,14,ES_AUTOHSCROLL
+    LTEXT           "ユーザー指定ディレクトリ",IDC_STATIC,7,74,171,10
+    CONTROL         "マイドキュメント",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,23,171,13
+    CONTROL         "ユーザーが指定したディレクトリ",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,38,171,13
+    CONTROL         "指定なし",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,53,171,13
+    GROUPBOX        "起動時のカレントディレクトリ",IDC_STATIC,7,7,189,64
+    PUSHBUTTON      "参照...",IDC_BUTTON1,146,105,50,14
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""poppad.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP1             BITMAP                  "bitmap1.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    "CMDBOX", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 178
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 70
+    END
+
+    "MKEXE", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+
+    "EXTCOMP", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 72
+    END
+
+    "ERRBOX", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 252
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 200
+    END
+
+    "HELPDIR", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 196
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+
+    "LABELBOX", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 226
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 228
+    END
+
+    "LOGCOMP", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 86
+    END
+
+    "STARTDIR", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 196
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 140
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDM_NEW                 "スクリプトの新規作成"
+    IDM_OPEN                "スクリプトをファイルから読み込み"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_SAVE                "スクリプトをファイルに保存"
+    IDM_SAVEAS              "スクリプトを別名でファイルに保存"
+    IDM_PRINT               "スクリプトをプリンタに印刷"
+    IDM_EXIT                "スクリプトエディタを終了"
+    IDM_UNDO                "１つ前の状態に戻る"
+    IDM_CUT                 "選択範囲を切り取る"
+    IDM_COPY                "選択範囲をクリップボードにコピー"
+    IDM_PASTE               "クリップボードから貼り付け"
+    IDM_CLEAR               "選択範囲を削除"
+    IDM_SELALL              "すべてのテキストを選択範囲に指定"
+    IDM_DEL                 "選択範囲を削除"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FIND                "指定した文字列を検索"
+    IDM_NEXT                "次の検索結果へカーソルを移動"
+    IDM_REPLACE             "指定した文字列を別の文字列に置換"
+    IDM_FONT                "フォントの指定"
+    IDM_HSCROLL             "横スクロールバーの表示ON/OFF"
+    IDM_BGCOLOR             "背景色の設定"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_ABOUT               "スクリプトエディタのバージョン情報を表示"
+    IDM_KWHELP              "カーソル位置のキーワードのヘルプを表示"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_LTOP                "先頭行にカーソルを移動"
+    IDM_LBTM                "最終行にカーソルを移動"
+    IDM_JUMP                "指定した番号の行にカーソルを移動"
+    IDM_COMP                "スクリプトをコンパイルして実行"
+    IDM_RUN                 "コンパイル済みのオブジェクトを実行"
+    IDM_COMP2               "スクリプトのコンパイルのみを行なう"
+    IDM_HSPERR              "コンパイル時のエラーメッセージを表示"
+    IDM_MKOBJ               "現スクリプトのオブジェクトファイル作成"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MAIN_MENU           "ファイル管理・印刷メニュー"
+    IDS_MAIN_MENU1          "編集メニュー"
+    IDS_MAIN_MENU2          "カーソル移動メニュー"
+    IDS_MAIN_MENU3          "文字列検索・置換メニュー"
+    IDS_MAIN_MENU4          "オプション設定メニュー"
+    IDS_MAIN_MENU5          "ＨＳＰ実行・コンパイルメニュー"
+    IDS_MAIN_MENU6          "HSP関連ツールメニュー"
+    IDS_MAIN_MENU7          "ヘルプメニュー"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_VIEW_TOOLBAR        "ツールバーの表示ON./OFF"
+    IDM_VIEW_STATUS         "ステータスバーの表示ON/OFF"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FULLSCR             "HSP実行時のフルスクリーンモードをON/OFF"
+    IDM_CMDOPT              "HSP実行時の起動オプションを指定"
+    IDM_PACKED              "PACKFILEをテキスト編集する"
+    IDM_PACKGO              "複数ファイルを結合しDATA.DPMを作成します"
+    IDM_MKEXE1              "実行可能なEXEファイルを作成"
+    IDM_MKEXE2              "スクリーンセーバーモジュールを作成"
+    IDM_HSPMAN1             "HSPプログラムガイドをブラウザで開く"
+    IDM_HSPMAN2             "HSP命令リファレンスをブラウザで開く"
+    IDM_COMP3               "指定した外部ファイルをコンパイルして実行"
+    IDM_HSPMAN3             "HSPマニュアル目次をブラウザで開く"
+    IDM_HELPDIR             "HSPヘルプ表示の設定"
+    IDM_MKOBJ2              "現スクリプトのオブジェクトファイルをstart.axという名前で作成"
+    IDM_DEBUG               "デバッグウインドゥ表示ON/OFF"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_LABEL               "HSPラベル定義行を選択してカーソルを移動"
+    IDM_LOGCOMP             "履歴ログを作成しながら実行"
+    IDM_HSPEXTMACRO         "HSP拡張マクロの使用をON/OFF"
+    IDM_HSPSYM              "予約済みキーワード一覧を表示"
+    IDM_AUTOMAKE            "現在のソースから実行ファイル作成"
+    IDM_HSPCLMODE           "コンソールアプリケーション作成モードON/OFF"
+    IDM_START_RUNTIMEMAN    "HSPアシスタントを起動"
+    IDM_OPEN_SRCFOLDER      "スクリプトのあるフォルダを開く"
+    IDM_STARTDIR            "起動時のディレクトリを設定する"
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

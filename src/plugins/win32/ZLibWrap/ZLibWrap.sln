@@ -1,0 +1,31 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibWrapLib", "ZLibWrapLib\ZLibWrapLib.vcxproj", "{5165F5BD-8224-4145-8D45-324968D4F2B0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibWrap", "ZLibWrap\ZLibWrap.vcxproj", "{E496B08E-BC62-461F-A503-0E1BBF8B1992}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xlZip", "xlZip\xlZip.vcxproj", "{1CD9278F-C327-4C23-A4DB-B277C0F0FAFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5165F5BD-8224-4145-8D45-324968D4F2B0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5165F5BD-8224-4145-8D45-324968D4F2B0}.Debug|Win32.Build.0 = Debug|Win32
+		{5165F5BD-8224-4145-8D45-324968D4F2B0}.Release|Win32.ActiveCfg = Release|Win32
+		{5165F5BD-8224-4145-8D45-324968D4F2B0}.Release|Win32.Build.0 = Release|Win32
+		{E496B08E-BC62-461F-A503-0E1BBF8B1992}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E496B08E-BC62-461F-A503-0E1BBF8B1992}.Debug|Win32.Build.0 = Debug|Win32
+		{E496B08E-BC62-461F-A503-0E1BBF8B1992}.Release|Win32.ActiveCfg = Release|Win32
+		{E496B08E-BC62-461F-A503-0E1BBF8B1992}.Release|Win32.Build.0 = Release|Win32
+		{1CD9278F-C327-4C23-A4DB-B277C0F0FAFE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1CD9278F-C327-4C23-A4DB-B277C0F0FAFE}.Debug|Win32.Build.0 = Debug|Win32
+		{1CD9278F-C327-4C23-A4DB-B277C0F0FAFE}.Release|Win32.ActiveCfg = Release|Win32
+		{1CD9278F-C327-4C23-A4DB-B277C0F0FAFE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

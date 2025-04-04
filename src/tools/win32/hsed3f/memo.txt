@@ -1,0 +1,23 @@
+====================================================================================================
+	Memo
+====================================================================================================
+----- From LonelyWolf ------------------------------------------------------------------------------
+[classify.cppのInitClassify関数内のqsortについて]
+Footyが登録された順に色分けキーワードの認識を行うため、キーワードの先頭に
+別の先に登録されていたキーワードを含む場合は、正しく認識されません。
+そのため、字数で降順ソートを行うことで、別のキーワードを包むキーワードが
+先に登録されるようにしています。
+
+[About memos written in English]
+I translated my Japanese memos into English.
+But my English isn't so good :-(
+So these sentence may be incoherent.
+Please interpret as you think fit.
+
+[About qsort in InitClassify in classify.cpp]
+Footy analyzes the emphasis keywords in order of the time they have been registered,
+so if the keyword registered includes the keyword have registered earlier,
+Footy can't analyze the keyword exactly.
+That's why I made the keyword which includes other keyword be registered earlier
+by sorting them in the descending order.
+----------------------------------------------------------------------------------------------------

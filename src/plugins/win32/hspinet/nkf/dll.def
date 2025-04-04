@@ -1,0 +1,24 @@
+LIBRARY hspinet.dll
+
+EXPORTS
+	GetNkfVersion
+	SetNkfOption
+	NkfConvert
+	ToHankaku
+	ToZenkakuKana
+	EncodeSubject
+	ToMime
+	NkfGetKanjiCode
+	NkfFileConvert1
+	NkfConvertSafe
+	ToHankakuSafe
+	ToZenkakuKanaSafe
+	EncodeSubjectSafe
+	GetNkfVersionSafeA
+	NkfFileConvert1SafeA
+	GetNkfGuessA
+	GetNkfVersionSafeW
+	NkfFileConvert1SafeW
+	GetNkfGuessW
+	GetNkfSupportFunctions
+	NkfUsage

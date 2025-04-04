@@ -1,0 +1,44 @@
+
+・RATE_PHYSICS(gamePhysics.h)の数値
+
+　物理部分を何倍の速度で動かしているかを示す値。流体部分で表示に繋がらない回の処理を省くのに使われているだけなので、剛体のみなら数値は任意。
+
+
+・ログ保存域のサイズ変更
+
+	ROCKBASE::init(int _maxCollisionLog = 0) {
+
+このメソッド内にしか用意していないため、初期化を含まないサイズ変更は現時点では出来ない。
+
+
+・重力
+
+　剛体と流体で独立した値が使われるため、
+
+pVessel->setGravity(x, y);				// 流体, デフォルトは(0.0f, 0.0125f)
+pVessel->spu.rockbase.setGravity(x, y);	// 剛体, デフォルトは(0.0f, 0.0025f)
+
+　上記のように、個別に設定する必要がある。
+
+　また、剛体のデフォルト値はLITRON互換性のためかなり小さい。0.01f程度が適当。
+
+
+・可動する岩に設定すべき値
+
+		float			weight;
+		float			moment;
+		float			inertia;			// 惰性(0.0f <= inertia <= 1.0f, default 0.999f), 0.0fに近づくほど謎抵抗でねっとりした動きになる
+		float			friction;			// 摩擦(0.0f <= friction <= 1.0f, default - 0.7f), 接触する物体のfrictionと乗算した数値が参照される
+		float			damper;				// 吸振(0.0f <= damper <= 1.0f, default - 0.7f), 接触する物体のdamperと乗算した数値が参照される
+
+inertia, friction, damperはデフォルト値で意外と大丈夫。
+
+weightは、半径rの円に標準的な比重（litron等のゲームで使用している値）の場合、(r ^ 2) / 32.0fくらいが適当。
+
+momentは以下のあたりを参考に、手探りで決めるが妥当かも。
+
+半径rの円盤： weight * (r ^ 2) / 2.0f
+辺の長さがa, bの長方形 : weight * ((a ^ 2) + (b ^ 2)) / 12.0f
+
+※ http://www12.plala.or.jp/ksp/mechanics/inertiaTable1/
+※ 平面図形に対してはz軸の慣性モーメントを見れば、2D物理に適用できる。

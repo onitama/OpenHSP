@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug(Static)|Win32">
+      <Configuration>Debug(Static)</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release(Static)|Win32">
+      <Configuration>Release(Static)</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_en|Win32">
+      <Configuration>release_en</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Footy2</ProjectName>
+    <ProjectGuid>{1302D61E-A353-476F-877E-EF22741ABA68}</ProjectGuid>
+    <RootNamespace>Footy2</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(Static)|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_en|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug(Static)|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release(Static)|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_en|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug(Static)|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.27428.2015</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug(Static)|Win32'">
+    <OutDir>$(SolutionDir)Debug\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(Static)|Win32'">
+    <OutDir>$(SolutionDir)Release\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_en|Win32'">
+    <OutDir>$(SolutionDir)Release\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;FOOTY2_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ForcedIncludeFiles>Global.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>module.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;FOOTY2_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ForcedIncludeFiles>Global.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>module.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug(Static)|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;FOOTY2_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ForcedIncludeFiles>Global.h;zmouse.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release(Static)|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;FOOTY2_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ForcedIncludeFiles>Global.h;zmouse.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_en|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;FOOTY2_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ForcedIncludeFiles>Global.h;zmouse.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Caret.cpp" />
+    <ClCompile Include="CharsetDetective.cpp" />
+    <ClCompile Include="CharsetDetective_EUC.cpp" />
+    <ClCompile Include="CharsetDetective_MultiBytes.cpp" />
+    <ClCompile Include="CharsetDetective_Unicode.cpp" />
+    <ClCompile Include="CharsetDetector.cpp" />
+    <ClCompile Include="ConvFactory.cpp" />
+    <ClCompile Include="Cursor.cpp" />
+    <ClCompile Include="DllCaretFunc.cpp" />
+    <ClCompile Include="DllEditFunc.cpp" />
+    <ClCompile Include="DllFileFunc.cpp" />
+    <ClCompile Include="DllMain.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug(Static)|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release(Static)|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_en|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="DllMetricsFunc.cpp" />
+    <ClCompile Include="DllSetFunc.cpp" />
+    <ClCompile Include="DllTextFunc.cpp" />
+    <ClCompile Include="DllViewFunc.cpp" />
+    <ClCompile Include="DoubleBuffering.cpp" />
+    <ClCompile Include="EditPosition.cpp" />
+    <ClCompile Include="EmphasisWord.cpp" />
+    <ClCompile Include="EthicLine.cpp" />
+    <ClCompile Include="FontObjects.cpp" />
+    <ClCompile Include="Footy.cpp" />
+    <ClCompile Include="FootyDoc.cpp" />
+    <ClCompile Include="FootyDocClip.cpp" />
+    <ClCompile Include="FootyDocIndent.cpp" />
+    <ClCompile Include="FootyDocSearch.cpp" />
+    <ClCompile Include="FootyDocSelect.cpp" />
+    <ClCompile Include="FootyDocUndo.cpp" />
+    <ClCompile Include="FootyLine.cpp" />
+    <ClCompile Include="FootyLineClick.cpp" />
+    <ClCompile Include="FootyLineEmpSearch.cpp" />
+    <ClCompile Include="FootyLineWord.cpp" />
+    <ClCompile Include="FootyStatus.cpp" />
+    <ClCompile Include="FootyView.cpp" />
+    <ClCompile Include="FootyViewGUI.cpp" />
+    <ClCompile Include="FootyViewKey.cpp" />
+    <ClCompile Include="FootyViewMouse.cpp" />
+    <ClCompile Include="FootyViewMsg.cpp" />
+    <ClCompile Include="FootyViewScroll.cpp" />
+    <ClCompile Include="HSplitter.cpp" />
+    <ClCompile Include="ImageController.cpp" />
+    <ClCompile Include="PositionBase.cpp" />
+    <ClCompile Include="RegExpContainer.cpp" />
+    <ClCompile Include="RegExpElement.cpp" />
+    <ClCompile Include="RegExpLetters.cpp" />
+    <ClCompile Include="SplitBase.cpp" />
+    <ClCompile Include="TextConverter.cpp" />
+    <ClCompile Include="TextConverter_Ansi.cpp" />
+    <ClCompile Include="TextConverter_EucJis2004.cpp" />
+    <ClCompile Include="TextConverter_ShiftJIS2004.cpp" />
+    <ClCompile Include="TextConverter_UTF16.cpp" />
+    <ClCompile Include="TextConverter_UTF32.cpp" />
+    <ClCompile Include="TextConverter_UTF8.cpp" />
+    <ClCompile Include="UndoBuffer.cpp" />
+    <ClCompile Include="UnicodeTable_ISO8859.cpp" />
+    <ClCompile Include="UnicodeTable_JISX0213_P1.cpp" />
+    <ClCompile Include="UnicodeTable_JISX0213_P2.cpp" />
+    <ClCompile Include="VSplitter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="module.def" />
+    <None Include="Resource\ln.cur" />
+    <None Include="Resource\url.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\attach.bmp" />
+    <Image Include="Resource\back.bmp" />
+    <Image Include="Resource\box_checked.bmp" />
+    <Image Include="Resource\box_unchecked.bmp" />
+    <Image Include="Resource\cancel.bmp" />
+    <Image Include="Resource\clock-2.bmp" />
+    <Image Include="Resource\contents.bmp" />
+    <Image Include="Resource\db cancel.bmp" />
+    <Image Include="Resource\db delete.bmp" />
+    <Image Include="Resource\db edit.bmp" />
+    <Image Include="Resource\db first.bmp" />
+    <Image Include="Resource\db insert.bmp" />
+    <Image Include="Resource\db last.bmp" />
+    <Image Include="Resource\db next.bmp" />
+    <Image Include="Resource\db post.bmp" />
+    <Image Include="Resource\db previous.bmp" />
+    <Image Include="Resource\db refresh.bmp" />
+    <Image Include="Resource\delete.bmp" />
+    <Image Include="Resource\execute.bmp" />
+    <Image Include="Resource\favs.bmp" />
+    <Image Include="Resource\flag blue.bmp" />
+    <Image Include="Resource\flag green.bmp" />
+    <Image Include="Resource\flag red.bmp" />
+    <Image Include="Resource\forward.bmp" />
+    <Image Include="Resource\help-2.bmp" />
+    <Image Include="Resource\information-2.bmp" />
+    <Image Include="Resource\key.bmp" />
+    <Image Include="Resource\lock on.bmp" />
+    <Image Include="Resource\record.bmp" />
+    <Image Include="Resource\tick.bmp" />
+    <Image Include="Resource\tips.bmp" />
+    <Image Include="Resource\warning.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rc.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Caret.h" />
+    <ClInclude Include="CharsetDetective.h" />
+    <ClInclude Include="CharsetDetective_MultiBytes.h" />
+    <ClInclude Include="CharsetDetector.h" />
+    <ClInclude Include="ConvFactory.h" />
+    <ClInclude Include="Cursor.h" />
+    <ClInclude Include="DoubleBuffering.h" />
+    <ClInclude Include="EditPosition.h" />
+    <ClInclude Include="EmphasisWord.h" />
+    <ClInclude Include="EthicLine.h" />
+    <ClInclude Include="FontObjects.h" />
+    <ClInclude Include="Footy.h" />
+    <ClInclude Include="Footy2.h" />
+    <ClInclude Include="FootyDoc.h" />
+    <ClInclude Include="FootyLine.h" />
+    <ClInclude Include="FootyStatus.h" />
+    <ClInclude Include="FootyView.h" />
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="HSplitter.h" />
+    <ClInclude Include="ImageController.h" />
+    <ClInclude Include="KeyBoardState.h" />
+    <ClInclude Include="PositionBase.h" />
+    <ClInclude Include="RegExpContainer.h" />
+    <ClInclude Include="RegExpElement.h" />
+    <ClInclude Include="RegExpLetters.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SplitBase.h" />
+    <ClInclude Include="StaticStack.h" />
+    <ClInclude Include="StaticVector.h" />
+    <ClInclude Include="TextConverter.h" />
+    <ClInclude Include="TextConverter_Ansi.h" />
+    <ClInclude Include="TextConverter_ISO8859.h" />
+    <ClInclude Include="TextConverter_Japanese.h" />
+    <ClInclude Include="TextConverter_Unicode.h" />
+    <ClInclude Include="UndoBuffer.h" />
+    <ClInclude Include="UnicodeTable.h" />
+    <ClInclude Include="VSplitter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReleaseNote_Footy.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

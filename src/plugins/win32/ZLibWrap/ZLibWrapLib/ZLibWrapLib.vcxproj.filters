@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ZLib">
+      <UniqueIdentifier>{8c1c4566-03f7-4186-ae11-326f9efb8c40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ZLib\Core">
+      <UniqueIdentifier>{a99258ce-2efe-4a50-9c7c-51ff3c7d72b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ZLib\MiniZip">
+      <UniqueIdentifier>{277c8302-3198-4b09-bdef-a2e974b89ee3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\crc32.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\deflate.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\gzguts.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\inffast.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\inffixed.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\inflate.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\inftrees.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\trees.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\zconf.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\zlib.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\zutil.h">
+      <Filter>ZLib\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\contrib\minizip\crypt.h">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\contrib\minizip\ioapi.h">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\contrib\minizip\iowin32.h">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\contrib\minizip\mztools.h">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\contrib\minizip\unzip.h">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\zlib\contrib\minizip\zip.h">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClInclude>
+    <ClInclude Include="ZLibWrapLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\adler32.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\compress.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\crc32.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\deflate.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\gzclose.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\gzlib.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\gzread.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\gzwrite.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\infback.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\inffast.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\inflate.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\inftrees.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\trees.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\uncompr.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\zutil.c">
+      <Filter>ZLib\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\contrib\minizip\ioapi.c">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\contrib\minizip\iowin32.c">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\contrib\minizip\mztools.c">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\contrib\minizip\unzip.c">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\zlib\contrib\minizip\zip.c">
+      <Filter>ZLib\MiniZip</Filter>
+    </ClCompile>
+    <ClCompile Include="Encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLibWrapLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

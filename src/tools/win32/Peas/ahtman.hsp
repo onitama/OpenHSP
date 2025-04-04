@@ -1,0 +1,326 @@
+
+;
+;	AHT Manager (HSP3.1以降専用)
+;
+#packopt name "ahtman"
+#packopt hide 1
+#pack "ahtman_wnd.bmp"
+#pack "ahticon.bmp"
+#pack "ahtman640.bmp"
+
+;#define global EXEC_DEBUG
+;#define global EZINPUT_DEBUG
+;#define EZINPUT_DEBUG_NOTE
+
+#include "hsedsdk.as"
+#include "mod_aht.as"
+
+	;gsel 0,-1
+	tminit
+
+#ifdef EZINPUT_DEBUG
+	;ahtfile = "test.aht"
+	;ahtfile = "ezinput\\test.aht"
+	ahtfile = "ezinput\\オブジェクト\\チェックボックスを配置.aht"
+	goto *goaht
+#endif
+	sdim fext,64
+	ahtfile = dir_cmdline
+	if peek(ahtfile,0)=0x22 {
+		ahtfile=strmid( ahtfile,1,strlen(ahtfile)-2 )
+	}
+	peasopen = 0
+	if ahtfile!="" {
+		fext=getpath(ahtfile,2)
+		if fext=".aht" : goto *goaht
+		if fext=".peas" : peasopen = 1
+	}
+
+	scrinit
+
+	chdir dir_mydoc
+
+	;tmload m,"test.aht"
+	;tmload m,"フォントを指定.aht"
+
+*main1
+	;	メイン画面
+	;
+	onexit *owari
+	scrmain
+
+	if peasopen {			; 起動時にロード
+		prjload ahtfile
+		peasopen = 0
+	}
+*main2
+	selflag 1
+	dlgmode=0
+*main2x
+	scr_update
+	await 15
+	if clcmd@ahtmod = 0 : goto *main2x
+	;
+	if dlgmode : goto *main2x
+	;
+	if clcmd@ahtmod = 1 : goto *main_load
+	if clcmd@ahtmod = 2 : goto *main_save
+	if clcmd@ahtmod = 3 : goto *main_save2
+	if clcmd@ahtmod = 4 : goto *execaht
+
+	if clcmd@ahtmod = 5 : goto *partssel
+	if clcmd@ahtmod = 6 : goto *partsedit
+	if clcmd@ahtmod = 7 : goto *linkparts
+	if clcmd@ahtmod = 8 : goto *unlinkparts
+	if clcmd@ahtmod = 9 : goto *delparts
+
+	if clcmd@ahtmod = 11 : goto *gopage
+	if clcmd@ahtmod = 12 : goto *decpage
+	if clcmd@ahtmod = 13 : goto *incpage
+
+	if clcmd@ahtmod = 14 : goto *gohome
+	if clcmd@ahtmod = 15 : goto *aboutscr
+
+	goto *main2x
+
+*partssel
+	;	パーツ選択
+	;
+	dlgmode=1
+	i_list=0
+	i_listbak=0
+	scrparts
+	objsize 146,22
+	pos 478,20
+	listbox i_list,240,ahtdirs@ahtmod
+	;
+	objsize 73,22
+	pos 478,304
+	button "<-",*parts_dec
+	pos 478+73,304
+	button "->",*parts_inc
+	objsize 146,22
+	pos 478,330
+	button "キャンセル",*nosel
+
+*parts_loop
+	stick key
+	scrp_update
+	await 15
+
+	;	リストボックス選択
+	if i_listbak!=i_list {
+		i_listbak=i_list
+		scrparts_dir i_list
+		goto *parts_loop
+	}
+
+	;	マウスクリック
+	if (key&$100)=0 : goto *parts_loop
+	if cldrag@ahtmod<0 : goto *parts_loop
+
+	;	パーツ決定
+	;
+	gsel 6,-1
+	scrparts_sel cldrag@ahtmod
+	if tmload_res = 0 {
+		selinfo clsel@ahtmod
+		;goto *main2
+		goto *partsedit
+	}
+	;	エラー発生
+	gsel 0
+	objprm 0,stdbuf@ahtmod
+	goto *main2
+*parts_dec
+	parts_page@ahtmod-=20
+	if parts_page@ahtmod<0 : parts_page@ahtmod=0
+	goto *parts_loop
+*parts_inc
+	parts_page@ahtmod+=20
+	i=parts_max-20:if i<0 : i=0
+	if parts_page@ahtmod>i : parts_page@ahtmod=i
+	goto *parts_loop
+
+*nosel
+	;	パーツキャンセル
+	;
+	gsel 6,-1
+	gsel 0
+	goto *main2
+
+
+*partsedit
+	;	パーツ編集
+	;
+	dlgmode=1
+	editm = clsel@ahtmod
+	if editm<0 : goto *main2
+	tmprops editm
+	button "Ok",*editdone
+	;
+	gsel 0
+	selflag 0
+	goto *main2x
+*editdone
+	gsel 1,-1
+	tmsetprop editm
+	gsel 0
+	goto *main2
+*srcedit
+	;	ソース編集
+	;
+	m = clsel@ahtmod
+	if m<0 : goto *main2
+	edit_src clsel@ahtmod
+	goto *main2
+
+*linkparts
+	;	パーツ接続
+	m_link = clsel@ahtmod
+	if m_link<0 : goto *main2
+	;
+	dlgmode=1
+	dlg_notice "選択されたパーツを接続します。\nよろしいですか。"
+	button "Ok",*linkparts_exec
+	button "キャンセル",*dlg_close
+	;
+	gsel 0
+	goto *main2x
+
+*linkparts_exec
+	m = clsel@ahtmod
+	if m<0 : goto *main2
+	if m != m_link {
+		tmlink m_link, m
+	}
+	dlg_done
+	goto *main2
+
+
+*unlinkparts
+	;	パーツ切断
+	dlgmode=1
+	dlg_notice "選択されたパーツの接続を切ります。\nよろしいですか。"
+	button "Ok",*unlinkparts_exec
+	button "キャンセル",*dlg_close
+	;
+	gsel 0
+	goto *main2x
+
+*unlinkparts_exec
+	m = clsel@ahtmod
+	if m<0 : goto *main2
+	tmunlink m
+	dlg_done
+	goto *main2
+
+
+*delparts
+	;	パーツ削除
+	dlgmode=1
+	dlg_notice "選択されたパーツを削除します。\nよろしいですか。"
+	button "Ok",*delparts_exec
+	button "キャンセル",*dlg_close
+	;
+	gsel 0
+	goto *main2x
+
+*delparts_exec
+	m = clsel@ahtmod
+	if m<0 : goto *main2
+	tmdelete m
+	dlg_done
+	goto *main2
+
+*dlg_close
+	dlg_done
+	goto *main2
+
+
+*incpage
+	chg_page 1
+	goto *main2
+*decpage
+	chg_page -1
+	goto *main2
+
+*gohome
+	num_page@ahtmod =0
+*gopage
+	chg_page 0
+	goto *main2
+
+
+*execaht
+	;	実行
+	;
+	screxec 0
+	goto *main2
+
+	;ahtfile = "test.aht"
+
+*aboutscr
+	;	about画面
+	;
+	dialog APPNAME@ahtmod+"\nMade with base technology of OpenHSP.\nCopyright (C) 1997-2007, Onion Software/onitama\nAll rights reserved."
+	goto *main2
+
+*goaht
+	;	AHTかんたん入力時
+	;
+	tmload m,ahtfile,"",-1
+	if m<0 : dialog "読み込み中にエラーが発生しました。["+ahtfile+"]" : end
+
+	tmprops m
+	button "Ok",*update
+	stop
+
+*update
+	;	ahtoutをエディタに送信
+	;
+	tmsetprop m
+	tmmake m, 2
+	if stat {
+		dialog stdbuf@ahtmod,0,"AHTファイルの変換中にエラーが発生しました。"
+	}
+
+#ifdef EZINPUT_DEBUG_NOTE
+	exec "notepad ahtout"
+	end
+#endif
+
+	notesel buf
+	noteload "ahtout"
+	hsed_sendstr buf
+
+	end
+
+*main_load
+	;	読み込み
+	prjload ""
+	goto *main2
+
+*main_save
+	;	保存
+	prjsave 0
+	goto *main2
+
+*main_save2
+	;	名前を付けて保存
+	prjsave 1
+	goto *main2
+
+*owari
+	;	終了ボタンの処理
+	;
+	if iparam!=0 : end			; Windowsによる強制終了
+	if ginfo_act != 0 {			; サブウィンドウの場合
+		gsel ginfo_act, -1
+		goto *main2
+	}
+#ifndef _DEBUG
+	dialog "アプリケーションを終了してよろしいですか？",3
+	if stat != 6 : goto *main2
+#endif
+	end

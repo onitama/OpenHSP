@@ -1,0 +1,148 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// “ú–{Œê resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,0,1,7
+ PRODUCTVERSION 2,0,1,7
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "Comments", "High-performance text editor control"
+            VALUE "FileDescription", "Footy2 Dynamic Link Library"
+            VALUE "FileVersion", "2, 0, 1, 7"
+            VALUE "InternalName", "Footy2"
+            VALUE "LegalCopyright", "Copyright (C) 2002 - 2009 Shinji Watanabe"
+            VALUE "OriginalFilename", "Footy2.dll"
+            VALUE "ProductName", "Footy2 Dynamic Link Library"
+            VALUE "ProductVersion", "2, 0, 1, 7"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_LINE                CURSOR                  "Resource\\ln.cur"
+IDC_URL                 CURSOR                  "Resource\\url.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_LI_ATTACH           BITMAP                  "Resource\\attach.bmp"
+IDB_LI_BACK             BITMAP                  "Resource\\back.bmp"
+IDB_LI_CHECKED          BITMAP                  "Resource\\box_checked.bmp"
+IDB_LI_UNCHECKED        BITMAP                  "Resource\\box_unchecked.bmp"
+IDB_LI_CANCEL           BITMAP                  "Resource\\cancel.bmp"
+IDB_LI_CLOCK            BITMAP                  "Resource\\clock-2.bmp"
+IDB_LI_CONTENTS         BITMAP                  "Resource\\contents.bmp"
+IDB_LI_DB_CANCEL        BITMAP                  "Resource\\db cancel.bmp"
+IDB_LI_DB_DELETE        BITMAP                  "Resource\\db delete.bmp"
+IDB_LI_DB_EDIT          BITMAP                  "Resource\\db edit.bmp"
+IDB_LI_DB_FIRST         BITMAP                  "Resource\\db first.bmp"
+IDB_LI_DB_INSERT        BITMAP                  "Resource\\db insert.bmp"
+IDB_LI_DB_LAST          BITMAP                  "Resource\\db last.bmp"
+IDB_LI_DB_NEXT          BITMAP                  "Resource\\db next.bmp"
+IDB_LI_DB_POST          BITMAP                  "Resource\\db post.bmp"
+IDB_LI_DB_PREVIOUS      BITMAP                  "Resource\\db previous.bmp"
+IDB_LI_DB_REFRESH       BITMAP                  "Resource\\db refresh.bmp"
+IDB_LI_DELETE           BITMAP                  "Resource\\delete.bmp"
+IDB_LI_EXECUTE          BITMAP                  "Resource\\execute.bmp"
+IDB_LI_FAVORITE         BITMAP                  "Resource\\favs.bmp"
+IDB_LI_BLUE             BITMAP                  "Resource\\flag blue.bmp"
+IDB_LI_GREEN            BITMAP                  "Resource\\flag green.bmp"
+IDB_LI_RED              BITMAP                  "Resource\\flag red.bmp"
+IDB_LI_FORWARD          BITMAP                  "Resource\\forward.bmp"
+IDB_LI_HELP             BITMAP                  "Resource\\help-2.bmp"
+IDB_LI_INFORMATION      BITMAP                  "Resource\\information-2.bmp"
+IDB_LI_KEY              BITMAP                  "Resource\\key.bmp"
+IDB_LI_LOCK             BITMAP                  "Resource\\lock on.bmp"
+IDB_LI_RECORD           BITMAP                  "Resource\\record.bmp"
+IDB_LI_TICK             BITMAP                  "Resource\\tick.bmp"
+IDB_LI_TIPS             BITMAP                  "Resource\\tips.bmp"
+IDB_LI_WARNING          BITMAP                  "Resource\\warning.bmp"
+#endif    // “ú–{Œê resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

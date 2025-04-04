@@ -1,0 +1,83 @@
+
+LICENSE INFO
+
+Name        : OBAQ
+Copyright   : Zener Works, Inc/kuni/onitama
+License     : CC BY-NC-ND 4.0
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from 
+the use of this software.
+
+Attribution-NonCommercial-NoDerivatives 4.0 International.
+http://creativecommons.org/licenses/by-nc-nd/4.0/
+
+1. Share:
+    copy and redistribute the material in any medium or format
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+2. NonCommercial:
+   You must give appropriate credit, provide a link to the license, and indicate if
+   changes were made. You may do so in any reasonable manner, but not in any way that
+   suggests the licensor endorses you or your use. 
+
+3. NoDerivatives - If you remix, transform, or build upon the material,
+    you may not distribute the modified material. 
+
+
+・ファイル種別
+
+	OBAQライブラリはC/C++ソースコードの形で提供されています。
+	以下のファイルは、OBAQライブラリのソースコードとして
+	OBAQlicenseが適用されます。
+
+		gamePhysics.h
+		ptttypes.h
+		rock.cpp
+		rock.h
+		vessel.cpp
+		vessel.h
+
+
+・著作権とライセンス
+
+	OBAQライブラリの著作権はZener Works, Inc/kuni/onitamaにあります。
+	ユーザーが作成したオリジナルのソフトウェア(実行ファイル)に
+	OBAQ.DLLを添付して配布する場合は、以下の条件に従ってください。
+
+	・無償(フリーソフト)として配布する場合
+
+	OBAQライブラリソフトウェアを、静的・動的な形で自由に組み込んで
+	お使い頂けます。
+	使用する際の報告や問い合わせの必要なく、ライセンスされます。
+	ソフトウェアの著作権表示として、「LICENSE INFO」で示された
+	「Name」「Copyright」「License」をドキュメントまたは、
+	ソフトウェア内で提示してください。
+	OBAQlicense.txtの同梱とOBAQロゴの明示は、してもしなくても構いません。
+
+	・有償(市販、シェアウエア)として配布する場合
+
+	OBAQ.DLLを使用したソフトにより、税務申告が必要な利益が発生する場合には、
+	有償ライセンスの取得が必要です。
+	ただし、少数の配布、最低限の必要経費(メディア代金等)のみで配布する
+	場合は無償と考えますので、有償ライセンスの取得は必要ありません。
+	有償ライセンスの取得には、必ず費用がかかるわけではありません。
+	販売数に応じて、定められたライセンス契約を個別に締結させて頂きます。
+	詳しくは、info@hsp.tvまでメールにてお問い合わせください。
+
+
+・無償/有償の共通事項
+
+	本プログラムによって生じた、いかなる損害についても保証いたしません。
+	自己の責任の範囲で使用してください。
+	また、付属のサンプルスクリプトは自由に改変、公開していただいて構いません。
+	Zener Works, Inc.
+	http://www.zener.co.jp/
+
+	kuni
+	http://susami.co.jp/
+
+	ONION software
+	http://www.onionsoft.net/
+
+

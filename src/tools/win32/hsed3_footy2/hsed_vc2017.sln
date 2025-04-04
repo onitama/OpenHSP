@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsed", "hsed_vc2017.vcxproj", "{A599DDBE-AF26-446B-A144-17BF357A4E60}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Footy2", "Footy2\Footy2_vc2017.vcxproj", "{1302D61E-A353-476F-877E-EF22741ABA68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		release_en|Win32 = release_en|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A599DDBE-AF26-446B-A144-17BF357A4E60}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A599DDBE-AF26-446B-A144-17BF357A4E60}.Debug|Win32.Build.0 = Debug|Win32
+		{A599DDBE-AF26-446B-A144-17BF357A4E60}.release_en|Win32.ActiveCfg = release_en|Win32
+		{A599DDBE-AF26-446B-A144-17BF357A4E60}.release_en|Win32.Build.0 = release_en|Win32
+		{A599DDBE-AF26-446B-A144-17BF357A4E60}.Release|Win32.ActiveCfg = Release|Win32
+		{A599DDBE-AF26-446B-A144-17BF357A4E60}.Release|Win32.Build.0 = Release|Win32
+		{1302D61E-A353-476F-877E-EF22741ABA68}.Debug|Win32.ActiveCfg = Debug(Static)|Win32
+		{1302D61E-A353-476F-877E-EF22741ABA68}.Debug|Win32.Build.0 = Debug(Static)|Win32
+		{1302D61E-A353-476F-877E-EF22741ABA68}.release_en|Win32.ActiveCfg = release_en|Win32
+		{1302D61E-A353-476F-877E-EF22741ABA68}.release_en|Win32.Build.0 = release_en|Win32
+		{1302D61E-A353-476F-877E-EF22741ABA68}.Release|Win32.ActiveCfg = Release(Static)|Win32
+		{1302D61E-A353-476F-877E-EF22741ABA68}.Release|Win32.Build.0 = Release(Static)|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A86D63E-4FEF-46E6-A705-93765D32B0AE}
+	EndGlobalSection
+EndGlobal
