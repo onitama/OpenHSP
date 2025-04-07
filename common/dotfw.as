@@ -3,7 +3,7 @@
 
 #include "hsp3dish.as"
 #include "layer_fade.as"
-#include "mod_joystick2.as"
+#addition "mod_joystick2.as"
 #include "mod_vpad.as"
 
 ;
@@ -1341,11 +1341,15 @@
 	if player_button_int>0 : i|=PLAYER_KEY_BUTTON1
 	i|=256
 
+#ifdef _hspwin
 	if _dotfw_joystick@ {
 		jstick key@,i
 	} else {
 		stick key@,i
 	}
+#else
+	stick key@,i
+#endif
 	if _dotfw_vpad@ : hspvpad_key key@
 
 	redraw 0
