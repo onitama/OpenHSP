@@ -1,6 +1,6 @@
 ;
-;	HSP help manager用 HELPソースファイル
-;	(先頭が;の行はコメントとして処理されます)
+; HSP help manager HELP source file
+; (Lines starting with ; are treated as comments)
 ;
 
 %type
@@ -25,7 +25,7 @@ Let
 
 %index
 int
-Convert to integer value
+Convert to integer
 %group
 Basic input/output functions
 %prm
@@ -35,7 +35,7 @@ p1 : Value or variable to convert
 %inst
 Returns the integer value of p1.
 If the value is a real number, the decimal part is truncated.
-If the value is a string, it will be converted to the number if it is a numeric string, otherwise it will be 0.
+If the value is a string, it becomes the number if it's a numeric string; otherwise, it becomes 0.
 
 %href
 str
@@ -45,7 +45,7 @@ double
 
 %index
 rnd
-Generate a random number
+Generate random number
 %group
 Basic input/output functions
 %prm
@@ -53,13 +53,13 @@ Basic input/output functions
 p1=1〜32768 : Range of random numbers
 
 %inst
-Generates an integer random number in the range of 0 to (p1-1).
+Generates an integer random number in the range from 0 to (p1-1).
 The value of p1 is not included in the range. For example,
 ^p
-Example :
+Example:
     a=rnd(10)
 ^p
-assigns a random number from 0 to 9 to the variable a.
+This assigns a random number from 0 to 9 to variable a.
 The rnd function generates random numbers in a fixed pattern after the program starts.
 If you want to make the random number pattern non-constant, use the randomize command.
 
@@ -70,17 +70,17 @@ randomize
 
 %index
 strlen
-Get the length of a string
+Get string length
 %group
 Basic input/output functions
 %prm
 (p1)
-p1 : String or string variable name to get the length of
+p1 : String or string-type variable name whose length you want to check
 
 %inst
-Returns the length (memory size) of the string specified by p1 or the string held by the string variable.
-If the string contains double-byte characters (Japanese), each character is calculated as two characters.
-(However, the length of the character may be different in HSP64 and UTF-8 runtime)
+Returns the length (memory size) of the string specified by p1 or the string held by the string-type variable.
+If the string contains double-byte characters (Japanese), even one character is calculated as two characters.
+(However, in the case of HSP64, UTF-8 runtime, the length of the characters may be different)
 %href
 
 
@@ -96,8 +96,8 @@ Basic input/output functions
 p1 : Variable to check the array
 
 %inst
-Returns the number of array elements (1-dimensional) that the variable specified by p1 has.
-If the number of array elements is 5, p1(0) to p1(4) will exist.
+Returns the number of array elements (1-dimensional) possessed by the variable specified by p1.
+If the number of array elements is 5, then p1(0) to p1(4) exist.
 
 %href
 length2
@@ -116,8 +116,8 @@ Basic input/output functions
 p1 : Variable to check the array
 
 %inst
-Returns the number of array elements (2-dimensional) that the variable specified by p1 has.
-If the number of array elements is 5, p1(0,0) to p1(?,4) will exist.
+Returns the number of array elements (2-dimensional) possessed by the variable specified by p1.
+If the number of array elements is 5, then p1(0,0) to p1(?,4) exist.
 If the dimension of the array does not exist, 0 is returned.
 
 %href
@@ -137,8 +137,8 @@ Basic input/output functions
 p1 : Variable to check the array
 
 %inst
-Returns the number of array elements (3-dimensional) that the variable specified by p1 has.
-If the number of array elements is 5, p1(0,0,0) to p1(?,?,4) will exist. If the dimension of the array does not exist, 0 is returned.
+Returns the number of array elements (3-dimensional) possessed by the variable specified by p1.
+If the number of array elements is 5, then p1(0,0,0) to p1(?,?,4) exist. If the dimension of the array does not exist, 0 is returned.
 
 %href
 length
@@ -157,8 +157,8 @@ Basic input/output functions
 p1 : Variable to check the array
 
 %inst
-Returns the number of array elements (4-dimensional) that the variable specified by p1 has.
-If the number of array elements is 5, p1(0,0,0,0) to p1(?,?,?,4) will exist. If the dimension of the array does not exist, 0 is returned.
+Returns the number of array elements (4-dimensional) possessed by the variable specified by p1.
+If the number of array elements is 5, then p1(0,0,0,0) to p1(?,?,?,4) exist. If the dimension of the array does not exist, 0 is returned.
 
 %href
 length
@@ -174,11 +174,11 @@ Returns the type of variable
 Basic input/output functions
 %prm
 (p1)
-p1 : Variable or string to check the type
+p1 : Variable to check the type, or string
 
 %inst
 Checks and returns the type of value stored in the variable specified by p1.
-The value returned is an integer value that indicates the type. The type values are as follows:
+The value returned is an integer value indicating the type. The values of the types are as follows.
 ^p
  1 : Label type
  2 : String type
@@ -187,7 +187,7 @@ The value returned is an integer value that indicates the type. The type values 
  5 : Module type
  6 : COM object type
 ^p
-If the type is extended by a plugin, etc., a value other than these will be returned.
+If the type is extended by a plugin, etc., values other than these will be returned.
 Also, if a string is specified for p1, it is treated as a type name indicating the type.
 The type name must exactly match the registered one, including case.
 ^p
@@ -196,7 +196,7 @@ The type name must exactly match the registered one, including case.
 "double" : Real number type
 "struct" : Module type
 ^p
-The strings that can be used as standard type names are as above. However, if the type is extended by a plugin, etc., the type names that can be specified will also be added.
+The strings that can be used as standard type names are as above. However, if the type is extended by plugins, etc., the type names that can be specified are also added.
 
 
 %href
@@ -212,13 +212,13 @@ Returns the pointer of variable data
 Basic input/output functions
 %prm
 (p1)
-p1 : Variable or command to check the pointer
+p1 : Variable to check the pointer, or command
 
 %inst
 Returns the memory address where the data stored in the variable specified by p1 is located.
-If an external extension command (command for calling DLL defined by #func) is specified for p1, the address of the external function that is actually executed is returned.
-This function is used in special cases such as when you want to pass a pointer to an external DLL, and you usually don't need to remember it.
-The pointer obtained by varptr may change due to array expansion or content updates, so use it just before referencing the value.
+If you specify an external extended command (an instruction for calling a DLL defined with #func) in p1, it returns the address of the external function that is actually executed.
+This function is used in special cases, such as when you want to pass a pointer to an external DLL, and is not normally something you need to remember.
+The pointer obtained by varptr may change due to array expansion or content updates, so use it immediately before referring to the value.
 
 %href
 varsize
@@ -238,8 +238,8 @@ Basic input/output functions
 p1 : Variable to check the buffer size
 
 %inst
-Returns the buffer size (memory size allocated) of the data stored in the variable specified by p1.
-The size obtained by varsize may change due to content updates, so use it just before referencing the value.
+Returns the buffer size (memory size secured) of the data stored in the variable specified by p1.
+The size obtained by varsize may change due to content updates, so use it immediately before referring to the value.
 
 %href
 varptr
@@ -253,21 +253,21 @@ Let
 
 %index
 gettime
-Get the time and date
+Get time/date
 %group
 Basic input/output functions
 %prm
 (p1)
-p1=0〜7(0) : Type to get
+p1=0〜7(0) : Type to acquire
 
 %inst
-Returns the date and time information of the type specified by p1.
+Returns date/time information of the type specified by p1.
 The types to get are as follows:
 
 ^p
     0 : Year
     1 : Month
-    2 : DayOfWeek
+    2 : Day of week (DayOfWeek)
     3 : Day
     4 : Hour
     5 : Minute
@@ -277,10 +277,10 @@ The types to get are as follows:
 For example,
 
 ^p
-Example :
+Example:
     a=gettime(4)   ; What time is it?
 ^p
-assigns the current hour to the variable a.
+assigns the current hour to variable a.
 
 %href
 
@@ -297,7 +297,7 @@ Basic input/output functions
 p1 : Value or variable to convert
 
 %inst
-Returns the string value of p1.
+Returns the value specified by p1 as a string.
 
 %href
 int
@@ -312,22 +312,22 @@ Get directory information
 Basic input/output functions
 %prm
 (p1)
-p1=0〜5 : Type to get
+p1=0〜5 : Type to acquire
 
 %inst
 Returns the directory name of the type specified by p1.
 The types to get are as follows:
 ^p
     0 : Current directory (dir_cur)
-    1 : Directory where the HSP executable file is located (dir_exe)
+    1 : Directory where HSP executable file is located (dir_exe)
     2 : Windows directory (dir_win)
     3 : Windows system directory (dir_sys)
     4 : Command line string (dir_cmdline)
     5 : HSPTV directory (dir_tv)
 ^p
 p1 cannot be omitted.
-Also, if a value of 0x10000 or more is specified for p1, the special folder is acquired by using bits 0 to 15 as the CSIDL value.
-This allows you to acquire most folders managed by the system, such as Desktop (0x10000) and My Documents (0x10005).
+Also, if a value of 0x10000 or higher is specified for p1, the special folder is acquired by treating bits 0 to 15 as CSIDL values.
+This allows you to acquire most of the folders managed by the system, such as Desktop (0x10000) and My Documents (0x10005).
 Normally, please use it through the "dir_*" macro defined in hspdef.as.
 
 %href
@@ -342,7 +342,7 @@ dir_tv
 
 %index
 double
-Convert to real value
+Convert to real number
 %group
 Basic input/output functions
 %prm
@@ -350,8 +350,8 @@ Basic input/output functions
 p1 : Value or variable to convert
 
 %inst
-Returns the real value of p1.
-If the value is a string, it will be converted to the number if it is a numeric string, otherwise it will be 0.
+Returns the value specified by p1 as a real number.
+If the value is a string, it becomes the number if it's a numeric string; otherwise, it becomes 0.
 
 %href
 int
@@ -361,7 +361,7 @@ str
 
 %index
 sin
-Returns the sine value
+Returns sine value
 %group
 Basic input/output functions
 %prm
@@ -379,7 +379,7 @@ atan
 
 %index
 cos
-Returns the cosine value
+Returns cosine value
 %group
 Basic input/output functions
 %prm
@@ -397,7 +397,7 @@ atan
 
 %index
 tan
-Returns the tangent value
+Returns tangent value
 %group
 Basic input/output functions
 %prm
@@ -415,7 +415,7 @@ atan
 
 %index
 atan
-Returns the arctangent value
+Returns arctangent value
 %group
 Basic input/output functions
 %prm
@@ -424,7 +424,7 @@ p1      : Y value
 p2(1.0) : X value
 
 %inst
-Using p1 as the Y value and p2 as the X value, the angle of Y/X (arctangent value) is returned in real radian units (2π is 360 degrees).
+Using p1 as Y and p2 as the X value, the angle of Y/X (arctangent value) is returned in real radians (2π is 360 degrees).
 If p2 is omitted, 1.0 is used.
 
 %href
@@ -435,7 +435,7 @@ tan
 
 %index
 sqrt
-Returns the root value
+Returns root value
 %group
 Basic input/output functions
 %prm
@@ -456,19 +456,19 @@ Get system information
 Basic input/output functions
 %prm
 (p1)
-p1=0〜 : Type to get
+p1=0〜 : Type to acquire
 
 %inst
 Returns the system information value of the type specified by p1.
-The types that can be obtained are as follows:
+The types that can be acquired are as follows:
 ^p
   0 : String OS name and version number
-  1 : String Logged in user name
+  1 : String Logged-in user name
   2 : String Computer name on the network
   3 : Numeric Language used by HSP (0=English/1=Japanese)
- 16 : Numeric Type of CPU being used (code)
- 17 : Numeric Number of CPUs being used
- 33 : Numeric Usage of physical memory size (in %)
+ 16 : Numeric Type of CPU used (code)
+ 17 : Numeric Number of CPUs used
+ 33 : Numeric Amount of physical memory usage (unit %)
  34 : Numeric Total physical memory size
  35 : Numeric Free physical memory size
  36 : Numeric Total size of swap file
@@ -488,11 +488,11 @@ Read 1 byte from buffer
 Memory management functions
 %prm
 (p1,p2)
-p1=Variable : Variable name from which to read the contents
-p2=0〜  : Buffer index (in bytes)
+p1=Variable : Variable name of the source to read content from
+p2=0〜  : Index of buffer (in bytes)
 
 %inst
-Returns the contents of 1 byte (8 bits) at an arbitrary location on the data memory stored in the variable as a numerical value.
+Returns the content of 1 byte (8 bits) at an arbitrary location on the data memory saved in the variable as a numerical value.
 The return value of the function is an integer value from 0 to 255.
 
 %href
@@ -508,11 +508,11 @@ Read 2 bytes from buffer
 Memory management functions
 %prm
 (p1,p2)
-p1=Variable : Variable name from which to read the contents
-p2=0〜  : Buffer index (in bytes)
+p1=Variable : Variable name of the source to read content from
+p2=0〜  : Index of buffer (in bytes)
 
 %inst
-Returns the contents of 2 bytes (16 bits) at an arbitrary location on the data memory stored in the variable as a numerical value.
+Returns the content of 2 bytes (16 bits) at an arbitrary location on the data memory saved in the variable as a numerical value.
 The return value of the function is an integer value from 0 to 65535.
 
 %href
@@ -528,11 +528,11 @@ Read 4 bytes from buffer
 Memory management functions
 %prm
 (p1,p2)
-p1=Variable : Variable name from which to read the contents
-p2=0〜  : Buffer index (in bytes)
+p1=Variable : Variable name of the source to read content from
+p2=0〜  : Index of buffer (in bytes)
 
 %inst
-Returns the contents of 4 bytes (32 bits) at an arbitrary location on the data memory stored in the variable as a numerical value.
+Returns the content of 4 bytes (32 bits) at an arbitrary location on the data memory saved in the variable as a numerical value.
 The return value of the function is an integer value from 0 to $ffffffff.
 
 %href
@@ -542,35 +542,39 @@ wpeek
 peek
 wpeek
 
+
+
 %index
 callfunc
-Calling External Functions
+Calling external functions
 %group
 Basic Input/Output Functions
 %prm
 (p1,p2,p3)
-p1 : Array variable containing parameters
+p1 : Array variable storing parameters
 p2 : Function address
 p3 : Number of parameters
 
 %inst
 Calls the address specified by p2 as a native function.
-Uses the values stored in the numerical array variable specified by p1 as arguments for the call. You can specify the number of parameters with p3.
+Uses the values stored in the numeric array variable specified by p1 as arguments for the call. You can specify the number of parameters with p3.
 ^p
-Example:
+Example :
 	a.0=1
 	a.1=2
 	a.2=3
 	res = callfunc( a, proc, 3 )
 ^p
-In the example above, the function at the address indicated by proc is called with the arguments (1,2,3).
-The return value of the called function becomes the return value of callfunc.
-This function is used in special situations where you prepare a function address yourself and call it.
-Normally, it is not necessary to use this. Also, be very careful when using this function, as failure to call an external function may result in freezing or unexpected results.
+In the above example, the function at the address indicated by proc is called with the arguments (1,2,3).
+The return value of the called function becomes the return value of callfunc as is.
+This function is used in special situations where you prepare and call a function address yourself.
+Normally, you do not need to use this. Also, if the external function call fails, freezing or unexpected results may occur, so use it with sufficient caution.
 
 %href
 #uselib
 #func
+
+
 
 %index
 absf
@@ -579,7 +583,7 @@ Returns the absolute value of a real number
 Basic Input/Output Functions
 %prm
 (p1)
-p1 : Real number to convert to absolute value
+p1 : Real value to convert to absolute value
 
 %inst
 Returns the absolute value of p1 as a real number.
@@ -594,13 +598,14 @@ Returns the absolute value of an integer
 Basic Input/Output Functions
 %prm
 (p1)
-p1 : Integer to convert to absolute value
+p1 : Integer value to convert to absolute value
 
 %inst
 Returns the absolute value of p1 as an integer.
 If you need the absolute value of a real number, use the absf function.
 %href
 absf
+
 
 %index
 logf
@@ -609,13 +614,15 @@ Returns the logarithm
 Basic Input/Output Functions
 %prm
 (p1)
-p1=0.0〜(0.0) : Value to calculate the logarithm of
+p1=0.0〜(0.0) : Value to find the logarithm of
 
 %inst
 Returns the logarithm (log) value of p1 as a real number.
-If you specify 0 for p1, it returns infinity (INF).
+If 0 is specified for p1, infinity (INF) is returned.
 %href
 expf
+
+
 
 %index
 expf
@@ -624,13 +631,15 @@ Returns the exponential value
 Basic Input/Output Functions
 %prm
 (p1)
-p1=0.0〜(0.0) : Value to calculate the exponential of
+p1=0.0〜(0.0) : Value to find the exponential value of
 
 %inst
 Returns the exponential (exp) value of p1 as a real number.
-If it overflows, it returns infinity (INF), and if it underflows, it returns 0.
+If it overflows, infinity (INF) is returned, and if it underflows, 0 is returned.
 %href
 logf
+
+
 
 %index
 limit
@@ -644,15 +653,17 @@ p2 : Minimum value
 p3 : Maximum value
 
 %inst
-Returns the value specified in p1 converted to an integer within the range of p2 to p3.
+Returns the value specified in p1 converted to an integer that falls within the range of p2 to p3.
 If the value of p1 is less than p2, the value of p2 is returned, and if the value of p1 is greater than p3, the value of p3 is returned.
-As a result, the value returned by the limit function is always within the range of p2 to p3.
-If the p2 parameter is omitted, the minimum value is not restricted.
-If the p3 parameter is omitted, the maximum value is not restricted.
-To find the range of real numbers, use the limitf function.
+Therefore, the value returned by the limit function is always within the range of p2 to p3.
+If the p2 parameter is omitted, the minimum value is not limited.
+If the p3 parameter is omitted, the maximum value is not limited.
+If you want to find the range of real numbers, use the limitf function.
 
 %href
 limitf
+
+
 
 %index
 limitf
@@ -666,15 +677,17 @@ p2 : Minimum value
 p3 : Maximum value
 
 %inst
-Returns the value specified in p1 converted to a real number within the range of p2 to p3.
+Returns the value specified in p1 converted to a real number that falls within the range of p2 to p3.
 If the value of p1 is less than p2, the value of p2 is returned, and if the value of p1 is greater than p3, the value of p3 is returned.
-As a result, the value returned by the limitf function is always within the range of p2 to p3.
-If the p2 parameter is omitted, the minimum value is not restricted.
-If the p3 parameter is omitted, the maximum value is not restricted.
-To find the range of integers, use the limit function.
+Therefore, the value returned by the limitf function is always within the range of p2 to p3.
+If the p2 parameter is omitted, the minimum value is not limited.
+If the p3 parameter is omitted, the maximum value is not limited.
+If you want to find the range of integers, use the limit function.
 
 %href
 limit
+
+
 
 %index
 varuse
@@ -687,7 +700,7 @@ p1 : Variable to check usage status
 
 %inst
 Returns the usage status of the variable specified in p1.
-varuse is only effective in situations where an entity does not exist, such as module-type or COM object-type variables.
+varuse is only valid when there are situations where there is no actual entity, such as module type or COM object type variables.
 Returns 1 if the specified variable is valid, and 0 otherwise.
 For module-type variables, you can check whether it is unused (0), initialized (1), or a clone of another variable (2).
 For COM object types, you can check whether it holds a valid COM object.
@@ -698,9 +711,12 @@ delmod
 %port-
 Let
 
+
+
+
 %index
 libptr
-Gets the information address of an external call command
+Get the information address of an external call command
 %group
 Basic Input/Output Functions
 %prm
@@ -708,9 +724,9 @@ Basic Input/Output Functions
 p1 : Command to check the address
 
 %inst
-Acquires the information address of the command specified in p1 and returns it as an integer value.
+Obtains the information address of the command specified in p1 and returns it as an integer value.
 By specifying an external DLL call command or function as a parameter, you can obtain the address of the STRUCTDAT structure where information about the command is stored.
-The STRUCTDAT structure is defined in HSPSDK as follows:
+The STRUCTDAT structure is defined as follows in HSPSDK.
 ^p
 	typedef struct STRUCTDAT {
 	short	index;           // base LIBDAT index
@@ -726,9 +742,9 @@ The STRUCTDAT structure is defined in HSPSDK as follows:
 	};
 	} STRUCTDAT;
 ^p
-Similarly, when a COM call command, a user-defined instruction, or a user-defined function is specified in p1, the address of the STRUCTDAT structure is obtained.
-The libptr function assists in accessing the internal data used by HSP, and you should use it with sufficient knowledge of the contents of the information handled here.
-Normally, it is not necessary to use or remember this function in the normal usage range.
+The address of the STRUCTDAT structure is also obtained when a COM call command, user-defined command, or user-defined function is specified in p1.
+The libptr function assists in accessing internal data used by HSP, and should be used with sufficient knowledge of the contents of the information handled here.
+Normally, it is not necessary to use or remember this function in the normal range of use.
 ^
 By referring to the STRUCTDAT structure, it is possible to obtain information such as the address of the external call DLL and the DLL handle.
 
@@ -739,12 +755,12 @@ varptr
 	#func MessageBoxA "MessageBoxA" int,sptr,sptr,int
 
 	ladr=libptr( MessageBoxA )
-	dupptr lptr,ladr,28	; Get STRUCTDAT structure
+	dupptr lptr,ladr,28	; Get the STRUCTDAT structure
 	lib_id=wpeek(lptr,0)
 	mes "LIB#"+lib_id
 	mref hspctx,68
 	linf_adr=lpeek( hspctx, 832 )
-	dupptr linf,linf_adr + lib_id*16,16	; Get LIBDAT structure
+	dupptr linf,linf_adr + lib_id*16,16	; Get the LIBDAT structure
 	dll_flag = linf(0)
 	dll_name = linf(1)
 	dll_handle = linf(2)
@@ -754,9 +770,11 @@ varptr
 %port-
 Let
 
+
+
 %index
 comevdisp
-Check COM event contents
+Check COM event content
 %group
 COM Object Manipulation Functions
 %prm
@@ -764,9 +782,9 @@ COM Object Manipulation Functions
 p1      : Variable name
 
 %inst
-Within the event subroutine of the variable (COM object type) specified by p1, obtains the event dispatch ID (DISPID).
+Retrieves the event's dispatch ID (DISPID) within the event subroutine of the variable (COM object type) specified by p1.
 The variable specified by p1 must be initialized by the comevent command.
-Also, acquisition must always be done within the event subroutine.
+Also, the acquisition must be done within the event subroutine.
 
 %href
 comevent
@@ -774,9 +792,10 @@ comevarg
 %port-
 Let
 
+
 %index
 powf
-Calculates powers (exponentiation)
+Calculate exponentiation (power)
 %group
 Basic Input/Output Functions
 %prm
@@ -786,8 +805,8 @@ p2 : Exponent
 
 %inst
 Calculates the value of p1 raised to the power of p2. The result is given as a real number.
-p1 must always be positive. If it is negative, it will not result in an error, but a non-number (-1.#IND00) will be returned.
-p2 can be either positive or negative. It is also possible to specify a real number.
+p1 must be positive. If it is negative, it will not be an error, but a non-number (-1.#IND00) will be returned.
+p2 can be positive or negative. It is also possible to specify a real number.
 
 %sample
 	repeat 5, -2
@@ -797,22 +816,24 @@ p2 can be either positive or negative. It is also possible to specify a real num
 %port-
 Let
 
+
+
 %index
 getease
-Gets the easing value as an integer
+Get the easing value as an integer
 %group
 Basic Input/Output Functions
 %prm
 (p1,p2)
-p1(0) : Time elapsed value (integer value)
-p2(4096) : Maximum of time elapsed value (integer value)
+p1(0) : Elapsed time value (integer value)
+p2(4096) : Maximum elapsed time value (integer value)
 %inst
-Obtains the calculation result value of the easing function, which interpolates numerical values within a determined range using an arbitrary calculation formula, as an integer.
-When using an easing function, it is necessary to first set the minimum value, maximum value, and calculation formula to be output by the setease command.
-The time elapsed value specified by p1 is an integer value starting from 0, and by specifying up to the maximum of the time elapsed value (p2 parameter), the calculation result of the easing function is returned.
+Acquires the calculation result value of the easing function, which interpolates numerical values in a determined range using arbitrary calculation formulas, as an integer.
+When using the easing function, it is necessary to first set the minimum value, maximum value, and calculation formula to be output by the setease command.
+The elapsed time value specified by p1 is an integer value starting from 0. By specifying up to the maximum elapsed time value (p2 parameter), the calculation result of the easing function is returned.
 If the maximum value (p2 parameter) is omitted, 4096 is used.
-Normally, if the time elapsed value is a negative value, it is regarded as 0. Also, if the time elapsed value exceeds the maximum value (p2 parameter), it is treated as the maximum value.
-(However, if ease_loop (interpolation loop) is added to the calculation formula type setting by the setease command, interpolation is performed including values outside the range (repeatedly).)
+Normally, if the elapsed time value is a negative value, it is regarded as 0. Also, even if the elapsed time value exceeds the maximum value (p2 parameter), it is treated as the maximum value.
+(However, if ease_loop (interpolation loop) is added to the calculation formula type setting by the setease command, the interpolation is looped (repeated) even including values outside the range.)
 
 %href
 setease
@@ -820,23 +841,25 @@ geteasef
 %port-
 Let
 
+
+
 %index
 geteasef
-Gets the easing value as a real number
+Get the easing value as a real number
 %group
 Basic Input/Output Functions
 %prm
 (p1,p2)
-p1(0) : Time elapsed value (real number value)
-p2(1.0) : Maximum of time elapsed value (real number value)
+p1(0) : Elapsed time value (real value)
+p2(1.0) : Maximum elapsed time value (real value)
 %inst
-Obtains the calculation result value of the easing function, which interpolates numerical values within a determined range using an arbitrary calculation formula, as a real number.
-When using an easing function, it is necessary to first set the minimum value, maximum value, and calculation formula to be output by the setease command.
-The time elapsed value specified by p1 is a real number value starting from 0, and by specifying up to the maximum of the time elapsed value (p2 parameter), the calculation result of the easing function is returned.
+Acquires the calculation result value of the easing function, which interpolates numerical values in a determined range using arbitrary calculation formulas, as a real number.
+When using the easing function, it is necessary to first set the minimum value, maximum value, and calculation formula to be output by the setease command.
+The elapsed time value specified by p1 is a real number starting from 0. By specifying up to the maximum elapsed time value (p2 parameter), the calculation result of the easing function is returned.
 If the maximum value (p2 parameter) is omitted, 1.0 is used.
-Normally, if the time elapsed value is a negative value, it is regarded as 0. Also, if the time elapsed value exceeds the maximum value (p2 parameter), it is treated as the maximum value.
-(However, if ease_loop (interpolation loop) is added to the calculation formula type setting by the setease command, interpolation is performed including values outside the range (repeatedly).)
-The geteasef command obtains more detailed easing function calculation results. If you want to get values that are passed as integers, such as normal coordinate values, it is faster to use the getease function.
+Normally, if the elapsed time value is a negative value, it is regarded as 0. Also, even if the elapsed time value exceeds the maximum value (p2 parameter), it is treated as the maximum value.
+(However, if ease_loop (interpolation loop) is added to the calculation formula type setting by the setease command, the interpolation is looped (repeated) even including values outside the range.)
+The geteasef command obtains more detailed easing function calculation results. When acquiring values passed as integers such as normal coordinate values, it is faster to use the getease function.
 
 %href
 setease

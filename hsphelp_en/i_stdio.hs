@@ -1,5 +1,5 @@
 ;
-;	HELP source file for HSP help manager
+;	HSP help manager HELP source file
 ;	(Lines starting with ; are treated as comments)
 ;
 
@@ -20,9 +20,6 @@ Win
 Cli
 Let
 
-
-
-
 %index
 getkey
 Check key input
@@ -30,32 +27,32 @@ Check key input
 Basic input/output control commands
 %prm
 p1,p2
-p1=Variable   : Variable to read into
+p1=variable : Variable to read into
 p2=1〜(1) : Key code
 
 %inst
-Checks the state of the keyboard and mouse buttons and assigns it to a variable. If the specified button is pressed, 1 is assigned; otherwise, 0 is assigned.
-Details of the values specified by key code are as follows.
+Checks the status of the keyboard and mouse buttons and assigns it to a variable.  If the specified button is pressed, 1 is assigned; otherwise, 0 is assigned.
+The details of the values specified by the key code are as follows:
 ^p
-  Key Code : Actual Key
+  Key code : Actual key
  ------------------------------------------
         1    : Mouse left button
         2    : Mouse right button
         3    : Cancel ([CTRL]+[BREAK])
-        4    : Middle button of 3-button mouse
-        8    : [BACKSPACE] ([BS] on PC98)
+        4    : Middle button of a 3-button mouse
+        8    : [BACKSPACE] (PC98's [BS])
         9    : [TAB]
        13    : [ENTER]
        16    : [SHIFT]
        17    : [CTRL]
-       18    : [ALT] ([GRPH] on PC98)
+       18    : [ALT] (PC98's [GRPH])
        20    : [CAPSLOCK]
        27    : [ESC]
        32    : Space key
-       33    : [PAGEUP] ([ROLLDOWN] on PC98)
-       34    : [PAGEDOWN] ([ROLLUP] on PC98)
-       35    : [END] ([HELP] on PC98)
-       36    : [HOME] ([HOMECLR] on PC98)
+       33    : [PAGEUP] (PC98's [ROLLDOWN])
+       34    : [PAGEDOWN] (PC98's [ROLLUP])
+       35    : [END] (PC98's [HELP])
+       36    : [HOME] (PC98's [HOMECLR])
        37    : Cursor key [←]
        38    : Cursor key [↑]
        39    : Cursor key [→]
@@ -65,8 +62,7 @@ Details of the values specified by key code are as follows.
   96〜105    : [0]〜[9] (Numeric keypad)
  112〜121    : Function keys [F1]〜[F10]
 ^p
-Even if the key is not listed in this table, it may be acquired. (You can check the key code by executing the sample.)
-
+Even keys that are not listed in this table may be obtainable. (You can check the key codes by running the sample.)
 
 %sample
 title "Please input a key (^^)v"
@@ -78,12 +74,8 @@ if lparam>>30:stop
 mes wparam
 stop
 
-
 %href
 stick
-
-
-
 
 %index
 mouse
@@ -95,28 +87,25 @@ p1,p2,p3
 p1,p2 : X,Y coordinates to set
 p3(0) : Setting mode value
 %inst
-Changes the mouse cursor to the coordinates specified by p1, p2.
-The specified coordinates are not window-relative, but display-relative coordinates (usually X=0〜ginfo_dispx/Y=0〜ginfo_dispy).
-If p1 and p2 are omitted, the current coordinates are applied as is.
-The setting mode for mouse cursor display/hide is determined by the value of p3. The value of p3 operates as follows.
+Changes the mouse cursor to the coordinates specified by p1 and p2.
+The coordinates specified are not coordinates within the window, but coordinates on the display (usually X=0 to ginfo_dispx/Y=0 to ginfo_dispy).
+If the specifications of p1 and p2 are omitted, the current coordinates are applied as they are.
+The setting mode regarding the display/non-display of the mouse cursor is determined by the value of p3. The value of p3 operates as follows.
 ^p
-Mode Value  Content
+Mode value  Content
 -------------------------------------------------------------------------
-    0     Hides the mouse cursor when the value of p1 or p2 is negative.
-          Otherwise, moves the mouse cursor to the (p1, p2) coordinates and displays it.
-   -1     Moves the mouse cursor to the (p1, p2) coordinates and sets it to hidden.
-    1     Moves the mouse cursor to the (p1, p2) coordinates and maintains the display/hide setting.
-    2     Moves the mouse cursor to the (p1, p2) coordinates and displays it if it is set to hidden.
+    0     Sets the mouse cursor to be hidden when the value of p1 or p2 is negative.
+          Otherwise, moves the mouse cursor to the coordinates of (p1, p2) and displays it.
+   -1     Moves the mouse cursor to the coordinates of (p1, p2) and sets it to be hidden.
+    1     Moves the mouse cursor to the coordinates of (p1, p2) and maintains the display/non-display setting.
+    2     Moves the mouse cursor to the coordinates of (p1, p2) and displays it if it is set to non-display.
 ^p
 If the value of p3 is 0 (default value), the mouse cursor display is set to OFF (hidden) on the HSP window when p1 or p2 is a negative value.
-After the mouse cursor display is turned OFF, it will be displayed again by setting valid coordinates.
-If the value of p3 is other than 0, the coordinates can be specified regardless of the values of (p1, p2) and the ON/OFF state of the mouse cursor. This is used when it is necessary to handle negative coordinate values in a multi-monitor environment, etc.
+After turning OFF the mouse cursor display, it will be displayed again by setting valid coordinates.
+If the value of p3 is other than 0, coordinates can be specified regardless of the values of (p1, p2) and the ON/OFF of the mouse cursor. This is used when you need to handle negative coordinates in a multi-monitor environment, etc.
 
 %port-
 Let
-
-
-
 
 %index
 randomize
@@ -125,42 +114,39 @@ Initialize random number generation
 Basic input/output control commands
 %prm
 p1
-p1=0〜(Indefinite) : Random number initialization parameter
+p1=0〜(undefined) : Random number initialization parameter
 
 %inst
 Initializes the pattern of random numbers generated by the rnd function.
 ^
-Random numbers initialized with the same value for p1 can always be generated in the same pattern.
-If p1 is omitted, initialization is performed using an indefinite value obtained from the Windows timer. This allows completely different random numbers to be generated each time.
+Random numbers initialized by specifying the same value for p1 can always be generated in the same pattern.
+If p1 is omitted, it is initialized using an indefinite value obtained from the Windows timer. This allows you to generate completely different random numbers each time.
 
 %href
 rnd
 
-
-
-
 %index
 stick
-Acquire key input information
+Get key input information
 %group
 Basic input/output control commands
 %prm
 p1,p2,p3
-p1=Variable    : Variable to read into
-p2=0〜(0)  : Non-trigger type key specification
+p1=variable : Variable to read into
+p2=0〜(0) : Non-trigger type key specification
 p3=0〜1(1) : Window active check ON/OFF
 
 %inst
-Collectively checks the state of frequently used keyboard and mouse buttons and assigns them to a variable.
+Checks the status of frequently used keyboard and mouse buttons collectively and assigns it to a variable.
 ^
-When the stick command is executed, the following button information is assigned to the variable specified by p1 as a single numerical value.
+When the stick command is executed, the following button information is assigned to the variable specified by p1 as a single numeric value.
 ^p
-Value (Decimal)  Value (Hex) Key
+Value (decimal) Value (hex) Key
 -------------------------------------
-     1  : $00001 : Cursor key Left (←)
-     2  : $00002 : Cursor key Up (↑)
-     4  : $00004 : Cursor key Right (→)
-     8  : $00008 : Cursor key Down (↓)
+     1  : $00001 : Cursor key left (←)
+     2  : $00002 : Cursor key up (↑)
+     4  : $00004 : Cursor key right (→)
+     8  : $00008 : Cursor key down (↓)
     16  : $00010 : Space key
     32  : $00020 : Enter key
     64  : $00040 : Ctrl key
@@ -176,39 +162,36 @@ Value (Decimal)  Value (Hex) Key
  65536  : $10000 : [D] key
 131072  : $20000 : [S] key
 ^p
-0 is assigned if no button is pressed.
+0 is assigned if no buttons are pressed.
 ^
-If multiple buttons are pressed simultaneously, all of their values are added together.
+If multiple buttons are pressed simultaneously, all of those numeric values are added together.
 For example, if the cursor key right and the space key are pressed simultaneously, 4+16=20 is read into the variable.
-When checking this number with an if command or similar, the operator "&" is useful.
+When checking this numeric value with an if command, the operator "&" is useful.
 ^p
-Example :
+Example:
 	stick a,0            ; Read the key state into variable a
 	if a&16 : goto *spc  ; Was the space key pressed?
 	if a&32 : goto *ent  ; Was the Enter key pressed?
 ^p
-In this way, "variable & key information" can be used to extract only one key information from a number containing multiple button information.
+In this way, "variable&key information" can be used to extract only one key information from the numeric value containing multiple button information.
 ^
-The stick command is very similar to the getkey command, but the biggest difference is that it detects only the moment a button is pressed. In other words, it returns information that a button is pressed only once when the button is pressed, and after that, it does not consider the button to be pressed until the pressed button is released.
+The stick command is very similar to the getkey command, but the biggest difference is that it detects only the moment a button is pressed. In other words, it returns the pressed information only once when the button is pressed, and after that, it will not be considered pressed until the pressed button is released.
 ^
-However, by specifying a non-trigger type key for p2, it becomes possible to detect information even when it is held down.
+However, by specifying the non-trigger type key of p2, information can be detected even if the key is held down.
 ^
-If you specify the code of a key that will be detected even when held down in p2 (the code is in the table above. If there are multiple, add the respective values), that key will be detected continuously while the button is pressed.
+If you specify the code of a key that can be detected even when it is held down in p2 (the codes in the table above. If there are multiple keys, add the respective numeric values), then only that key will continue to be detected while the button is pressed.
 ^
-This command may seem very complex, but it will be a very useful function when creating scripts that use keys.
-For example, imagine a shooting game. Your aircraft must move continuously in the up, down, left, and right directions while the button is pressed. However, the missile launch button will not fire the next bullet until it is pressed once and released.
-In such a case, you can specify only the up, down, left, and right keys as non-trigger type keys, and make the other keys return information that has been pressed only once.
+This command seems very complicated, but it will be a very useful feature when creating scripts that use keys.
+For example, think of a shooting game. Your aircraft must move continuously in the up, down, left, and right directions while the buttons are pressed. However, the missile launch button will not launch the next missile until it is pressed once and released.
+In such a case, only the up, down, left, and right keys should be specified as non-trigger type keys, and all other keys should return information that is pressed only once.
 ^
-Also, with p3, you can turn ON/OFF the function to disable input when the window is not active.
-If p3 is 1 or omitted, key input is disabled if the HSP window is not active.
+Also, you can turn ON/OFF the function to disable input when the window is not active with p3.
+If p3 is 1 or omitted, key input is disabled when the HSP window is not active.
 If p3 is 0, key input is performed in all situations.
-
 
 %href
 getkey
 jstick
-
-
 
 %index
 logmes
@@ -221,9 +204,9 @@ HSP system control commands
 
 %inst
 Records the contents of "message" in the debug log when the debug window is displayed.
-It can be used to check the contents of variables at a certain point, or to check passage.
-It is necessary to set the display mode of the debug window from the script editor, or to display the debug window with the assert command.
-When recording a log when assigning a variable, you can use the logmesv and logmesva commands.
+It can be used to check the contents of variables at a certain point in time, or for pass checks, etc.
+You need to set the display mode of the debug window from the script editor, or display the debug window with the assert command.
+If you want to record a log when assigning a variable, you can use the logmesv and logmesva commands.
 This command is disabled when creating an executable file.
 
 %href
@@ -232,28 +215,26 @@ logmesva
 assert
 varprop
 
-
-
 %index
 logmesv
-Variable debug message display setting
+Variable debug message display settings
 %group
 HSP system control commands
 %prm
 var
-var   : Variable name to set the debug message
+var : Variable name to set debug message for
 %inst
 Sets the display of variable debug messages.
 This allows you to record debug messages for the specified variable when the debug window is displayed.
-By specifying a variable in the var parameter, the display of debug messages is enabled. In this case, elements 1 and later of the array variable will not be displayed. To enable the display of debug messages for all elements of an array variable, use the logmesva command.
+Debug message display is enabled by specifying a variable in the var parameter. In this case, array variable elements 1 and later are not displayed. To enable debug message display for all elements of an array variable, use the logmesva command.
 ^
-In the following example, debug message display is set for variable a.
+The following example sets debug message display for variable a.
 ^p
-Example :
+Example:
 	logmesv a		; A debug message is displayed when variable a is assigned
 ^p
-Debug messages are recorded for variables for which debug message display is set when the content is changed by assignment or the like.
-Variable debug messages are displayed as follows.
+Variables for which debug message display is set will have a debug message recorded when their contents are changed, such as by assignment.
+Variable debug messages are displayed as follows:
 ^p
 #set[a=0] line:17 (test_logmes.hsp)
 #set[b=456] line:22 (test_logmes.hsp)
@@ -261,48 +242,59 @@ Variable debug messages are displayed as follows.
 #set[b(2)=789] line:22 (test_logmes.hsp)
 #set[c="abcdefgh..."] line:23 (test_logmes.hsp)
 ^p
-"#set" is followed by "variable name=content". The content display is only a simplified one. Only the first 16 characters of a string are displayed.
-Array variables are displayed as "variable name(element)", but note that array elements of 2 or more dimensions are treated as 1 dimension.
-At the end, information is recorded in the form "line:line number (script file)" about which line and script file the value was set in.
-Variable debug messages allow you to check for mistakes such as unintentionally changing the contents of a script or not assigning correctly.
+The "variable name=content" set after #set is displayed. Content display is only intended to be simple. Only the first 16 characters of a string are displayed.
+Array variables are displayed as "variable name(element)", but note that array elements with two or more dimensions are treated as one dimension.
+At the end, information about which line and script file the value was set in is recorded in the form "line:line number (script file)".
+Variable debug messages can be used to check for mistakes such as the contents being unintentionally changed within the script, or not being assigned correctly.
 ^
-To disable the display of debug messages set for a variable, use the varprop command. The varprop command allows you to change the debug message settings.
+To disable the display of debug messages set for a variable, use the varprop command. The varprop command can be used to change the settings of debug messages.
 ^
 To display the debug window, you need to set the display mode of the debug window from the script editor, or display the debug window with the assert command.
-Please note that this command is disabled in scripts converted to executable files or in platform-converted environments (iOS, android).
+Please note that this command is disabled in executable scripts and platform-converted environments (iOS, android).
 %href
+Please translate this text into English. This is an article about the programming language HSP3. Do not change lines starting with '%' or '^' absolutely. Do not delete parts of the text. Be sure to translate Japanese. Make sure no Japanese remains.
+logmes
 logmesva
 assert
 varprop
+
+
+%index
+logmesva
+Array variable debug message display settings
+%group
+HSP System Control Commands
+%prm
 var
-var   : Name of the variable to set debug messages for
+var   : The name of the variable for which to set the debug message
 %inst
 Sets the display settings for variable debug messages.
 This allows you to record debug messages for the specified variable when the debug window is displayed.
 Specifying a variable in the var parameter enables the display of debug messages.
-This command operates similarly to the logmesv command. The difference from the logmesv command is that debug message display is enabled for all elements of an array variable.
+This command operates similarly to the logmesv command. The difference between the logmesv command and this command is that debug message display is enabled for all elements of an array variable.
 To record debug messages for variables that do not use arrays, use the logmesv command.
-To display the debug window, you need to set the debug window display mode from the script editor or display the debug window using the assert command.
-Please note that this command is disabled in scripts converted to executable files or in platform-converted environments (iOS, Android).
+To display the debug window, you need to set the debug window display mode from the script editor, or display the debug window using the assert command.
+Please note that this command is disabled in scripts that have been converted into executable files or in platform-converted environments (iOS, Android).
 %href
 logmes
 logmesva
 assert
 varprop
 
+
 %index
 assert
 Display debug window
 %group
-HSP system control command
+HSP System Control Commands
 %prm
 p1
 p1(0) : Conditional expression for debugging
 
 %inst
 Temporarily interrupts the program and displays the debug window.
-If a conditional expression is specified in p1, the debug window is displayed only if the condition in p1 is not met.
-(Note that p1 should contain the condition that must be met for the program to proceed).
+If a conditional expression is specified in p1, the debug window is displayed only when the condition in p1 is not true.
+(Note that p1 should contain the conditional expression for when to pass through without debugging.)
 ^p
 	assert a>5  ; Debug when a is 5 or less
 ^p
@@ -314,11 +306,13 @@ logmesv
 %port-
 Let
 
+
+
 %index
 mcall
-Call method
+Method call
 %group
-Basic input/output control command
+Basic Input/Output Control Commands
 %prm
 p1,p2,p3…
 p1 : Variable name
@@ -326,14 +320,14 @@ p2 : Method name
 p3 : Parameter
 
 %inst
-Calls a method according to the type of variable specified by p1.
-By specifying a COM object type for the variable p1, it is possible to call COM automation methods.
-Specify the method name (string) or dispatch ID (DISPID) in p2, and specify the arguments in p3 and later.
-The number and type of parameters from p3 onwards are appropriately converted and passed to the method.
+Calls a method according to the type of variable specified in p1.
+By specifying a COM object type for the variable in p1, it is possible to call COM automation methods.
+Specify the method name (string) or dispatch ID (DISPID) in p2, and specify the arguments after p3.
+The number of parameters and the type of parameters from p3 onward are converted appropriately and passed to the method.
 The return value of the method execution is assigned to the variable set by the comres command.
 Also, if the method execution is successful, the system variable stat becomes 0, and if an execution error occurs, the result code (HRESULT) is assigned to the system variable stat.
 
-The mcall command can provide new functions by preparing extended variable types. It supports only COM object types by default.
+The mcall command can provide new functionality by providing extended variable types. Standard support is only available for COM object types.
 
 %href
 #usecom
@@ -344,22 +338,24 @@ comres
 %port-
 Let
 
+
+
 %index
 setease
-Set the easing function calculation formula
+Set easing function calculation formula
 %group
-Basic input/output control command
+Basic Input/Output Control Commands
 %prm
 p1,p2,p3
 p1 : Minimum output value (real number)
 p2 : Maximum output value (real number)
 p3 : Calculation formula type value
 %inst
-Sets the easing function to interpolate a number within a defined range using an arbitrary calculation formula.
-The settings specified here are reflected when obtaining values with the easing functions (getease, geteasef).
-The following can be specified for the calculation formula type value:
+Sets the easing function for interpolating numbers within a specified range using an arbitrary calculation formula.
+The settings specified here are reflected when obtaining values using the easing functions (getease, geteasef).
+The following can be specified as the calculation formula type value:
 ^p
-	Macro Name                Interpolation Content
+	Macro name                Interpolation content
 	------------------------------------------------------------
 	ease_linear		Linear (linear interpolation)
 	ease_quad_in		Acceleration (Quadratic)
@@ -377,26 +373,26 @@ The following can be specified for the calculation formula type value:
 	ease_shake_in		Shake effect (in)
 	ease_shake_out		Shake effect (out)
 	ease_shake_inout	Shake effect (in/out)
-	ease_loop		Loop of interpolation (*)
+	ease_loop		Interpolation loop (*)
 
-The types indicated by (*) can be added to other types.
+The type indicated by (*) can be added to other types.
 ^p
 If the calculation formula type value is omitted, the previously set value is used as is.
 
-Easing functions support basic calculations for achieving natural motion animations.
-For example, suppose you want to move an object with an X coordinate of 100 to an X coordinate of 200 in a 50-frame animation.
-Normally, the animation would be created by adding 2 to the X coordinate in each frame, such as 100, 102, 104, 106, and so on, to obtain the new coordinate.
-However, this only results in linear motion. Easing functions allow you to obtain the coordinate for each frame from a specific calculation formula.
-Depending on the setting of the calculation formula, you can achieve organic animations such as starting to move slowly, accelerating while moving, and decelerating again in front of the target, as well as various other uses such as movements that draw parabolas and bounce, or movements that shake.
+Easing functions support basic calculations for obtaining natural motion animations.
+For example, suppose an object with an X coordinate of 100 is moved to an X coordinate of 200 in an animation of 50 frames.
+Normally, the animation would be created by adding 2 to the X coordinate for each frame, such as 100, 102, 104, 106, ... to obtain the new coordinate.
+However, this only results in linear movement. Easing functions allow you to obtain the coordinates for each frame from a specific calculation formula.
+Depending on the calculation formula settings, it is possible to achieve organic animations such as starting the movement slowly, accelerating during the movement, and decelerating again before the target, as well as various applications such as movements that draw parabolas and bounce, and movements that shake around.
 To use easing functions, first specify the range in which the value changes and the calculation formula with the setease command.
 ^p
 	;	Easing function settings
 	setease 100,200,ease_cubic_inout
 ^p
-In the above example, an easing function for obtaining values from 100 to 200 is set using the ease_cubic_inout calculation formula.
+In the above example, an easing function is set with the ease_cubic_inout calculation formula to obtain values from 100 to 200.
 Next, obtain the actual value using the getease or geteasef function.
-getease and geteasef are basically the same, but the difference is whether the obtained value is an integer value or a real number value.
-When handling normal coordinates, there is no problem even if you obtain them as integer values. (Both use real number calculations internally in the easing function.)
+getease and geteasef are basically the same, but differ in whether the value obtained is an integer value or a real number value.
+When handling normal coordinates, it is usually not a problem to obtain them as integer values. (Both internally use real number calculations in the easing function)
 ^p
 	;	Easing function settings
 	setease 100,200,ease_cubic_inout
@@ -404,7 +400,7 @@ When handling normal coordinates, there is no problem even if you obtain them as
 	repeat
 		redraw 0
 		color 0,0,0:boxf	; Clear the screen
-		x = getease(i,50)	; Get the easing value (integer)
+		x = getease(i,50)	; Get easing value (integer)
 		color 255,255,255
 		pos x,100 : mes "●"
 		redraw 1
@@ -412,22 +408,22 @@ When handling normal coordinates, there is no problem even if you obtain them as
 		i=i+1
 	loop
 ^p
-The argument of the getease function is getease(elapsed time value, maximum value).
-The elapsed time value is an integer value starting from 0, and specifies a value up to the value specified by the maximum value.
-In other words, in the above example, getease(0,50) returns the start value in the range from 100 to 200 set by the setease command, that is, 100.
-As the elapsed time value increases, the value returned from 100 to 200 also increases. And when it becomes getease(50,50), it is a calculation formula that returns 200.
+The argument of the getease function is getease(time elapsed value, maximum value).
+The time elapsed value is an integer value starting from 0 and specifying up to the value specified by the maximum value.
+In other words, in the above example, getease(0,50) returns the start value in the range of 100 to 200 set by the setease command, that is, 100.
+As the time elapsed value increases, the value returned from 100 to 200 also increases. And, getease(50,50) becomes a calculation formula that returns 200.
 ^p
-	When the elapsed time value is 0 = the minimum output value specified by the setease command is returned
-	When the elapsed time value is the maximum value = the maximum output value specified by the setease command is returned
+	When the time elapsed value is 0 = the minimum output value specified by the setease command is returned
+	When the time elapsed value is the maximum value = the maximum output value specified by the setease command is returned
 ^p
 If the maximum value parameter is omitted, 4096 is used.
-In the case of the geteasef function, the argument is the same as geteasef(elapsed time value, maximum value).
-However, real numbers can be used for both the elapsed time value and the maximum value, and the easing function can be used with finer accuracy. Also, if the maximum value parameter is omitted with the geteasef function, 1.0 is used.
+In the case of the geteasef function as well, the argument is the same as geteasef(time elapsed value, maximum value).
+However, both the time elapsed value and the maximum value can use real numbers, and the easing function can be used with finer precision. Also, if the maximum value parameter is omitted in the geteasef function, 1.0 is used.
 
-Normally, if the elapsed time value is a negative value, it is regarded as 0. Also, if the elapsed time value exceeds the maximum value, it is treated as the maximum value.
-However, if ease_loop (interpolation loop) is added to the calculation formula type setting by the setease command, the interpolation loop (repetition) is performed including values outside the range. In the interpolation loop, the minimum output value and the maximum output value move back and forth according to the elapsed time value.
+Normally, if the time elapsed value is a negative value, it is regarded as 0. Also, if the time elapsed value exceeds the maximum value, it is also treated as the maximum value.
+However, if ease_loop (interpolation loop) is added in the calculation formula type setting by the setease command, the interpolation loop (repetition) is performed including values outside the range. In the interpolation loop, the output minimum value and the output maximum value reciprocate according to the time elapsed value.
 
-Easing functions may be difficult to imagine the result at first, but they are a convenient feature that allows you to easily use advanced animations by mastering them.
+Easing functions may be difficult to imagine the results at first, but they are a convenient function that allows you to easily use advanced animation by mastering them.
 Also, because it is a command built into the standard, it can be called in the same way in all runtimes such as HSP3Dish and HGIMG4.
 
 %href
@@ -436,80 +432,87 @@ geteasef
 %port-
 Let
 
+
+
 %index
 sortval
 Sort array variables numerically
 %group
-Basic input/output control command
+Basic Input/Output Control Commands
 %prm
 p1,p2
-p1 : Name of the numeric array variable
+p1 : Numeric array variable name
 p2 : Sort order (0=ascending/1=descending)
 %inst
 Sorts (rearranges) an array variable containing numbers in the specified sort order.
-The array variable specified by p1 is directly rearranged.
+The array variable specified in p1 is directly rearranged.
 
-Information about the sort can be obtained with the sortget command.
+Information about sorting can be obtained using the sortget command.
 %href
 sortget
 %port-
 Let
+
 
 %index
 sortstr
-Sort array variables by string
+Sort array variables alphabetically
 %group
-Basic input/output control command
+Basic Input/Output Control Commands
 %prm
 p1,p2
-p1 : Name of the string array variable
+p1 : String array variable name
 p2 : Sort order (0=ascending/1=descending)
 %inst
 Sorts (rearranges) an array variable containing strings in the specified sort order.
-The array variable specified by p1 is directly rearranged.
-The sort order is compared based on the larger and smaller ASCII codes, so it is sorted in ABC order or in alphabetical order.
+The array variable specified in p1 is directly rearranged.
+The sort order is compared by the size of the ASCII code, so it is sorted in ABC order or あいうえお order.
 
-Information about the sort can be obtained with the sortget command.
+Information about sorting can be obtained using the sortget command.
 %href
 sortget
 %port-
 Let
 
+
+
 %index
 sortnote
-Sorts the memory notepad string
+Sort memory note strings
 %group
-Basic input/output control command
+Basic Input/Output Control Commands
 %prm
 p1,p2
-p1 : Variable name of the string type in memory notepad format
+p1 : Variable name of string type in memory note format
 p2 : Sort order (0=ascending/1=descending)
 %inst
 Sorts (rearranges) a variable containing a string in memory notepad format in the specified sort order.
-The variable specified by p1 is directly rearranged.
-The sort order is compared based on the larger and smaller ASCII codes, so it is sorted in ABC order or in alphabetical order.
+The variable specified in p1 is directly rearranged.
+The sort order is compared by the size of the ASCII code, so it is sorted in ABC order or あいうえお order.
 
-Information about the sort can be obtained with the sortget command.
-Memory notepad format is a sequence of data separated by "\n" (line feed code) that can be used with the notesel, noteget commands, etc.
+Information about sorting can be obtained using the sortget command.
+The memory notepad format is a string of data separated by "\n" (line feed code), which can be used with the notesel, noteget commands, etc.
 %href
 notesel
 sortget
 %port-
 Let
 
+
+
 %index
 sortget
 Get the index of the sort source
 %group
-Basic input/output control command
+Basic Input/Output Control Commands
 %prm
 p1,p2
 p1 : Variable name where the result is assigned
 p2 : Index No.
 %inst
-After executing the sortstr, sortval, or sortnote command, this command examines which index the stored data was located in before sorting in the array, and returns the result.
-For example, if the value 1 is returned by the command sortget n,4 after sorting the array variable a, it indicates that the value currently in the array variable a(4) was in a(1) before sorting.
-This command is effective when sorting only a part of the data and using that information to rearrange other data.
+After executing the sortstr, sortval, or sortnote command, this command checks which index the stored data was placed in before sorting in the array and returns the result.
+For example, if the array variable a is sorted and the command sortget n,4 returns a value of 1, it indicates that the value currently in the array variable a(4) was in a(1) before sorting.
+This command is effective when sorting only a part of the data and rearranging other data based on that information.
 %href
 sortstr
 sortval
@@ -517,46 +520,39 @@ sortnote
 %port-
 Let
 
+
+
 %index
 varprop
-Performs variable debug settings
+Set debug settings for variables
 %group
-HSP System Control Command
+HSP System Control Commands
 %prm
 var,p1
-var   : Variable name to set debug settings
+var   : Variable name to configure debugging settings
 p1(0) : Debug setting value (varprop_*)
 %inst
-Sets debug settings for a variable.
-
-This supports safer variable operation and bug detection by individually specifying type fixing, value fixing, and debug log recording for the specified variable.
-
-Specify the variable name in the var parameter, and specify the debug setting value in the p1 parameter. (Already set debug setting values will be maintained.)
-
-The following macros can be used for debug setting values.
+Configures debugging settings for variables.
+This supports safer variable operation and bug detection by individually specifying type locking, value locking, and debugging log recording for the specified variable.
+Specify the variable name in the var parameter, and the debug setting value in the p1 parameter. (Already set debug setting values will be maintained.)
+You can use the following macros for debug setting values.
 ^p
-	Macro Name         Value     Setting Content
+	Macro Name        Value    Description
 	------------------------------------------------------------
-	varprop_xtype     1     Fixes the variable type
-	varprop_xvalue    2     Fixes the variable value
-	varprop_log       4     Enables variable debug logging
-	varprop_logarray  8     Enables array variable debug logging
+	varprop_xtype     1     Lock variable type
+	varprop_xvalue    2     Lock variable value
+	varprop_log       4     Enable variable debug logging
+	varprop_logarray  8     Enable array variable debug logging
 ^p
-Each value can be added together to specify multiple settings simultaneously.
-
-If "varprop_xtype" is set, the variable type will be fixed. After this, the variable type will be prohibited from changing, and an error will occur if the variable type is changed during execution.
-
-This works the same way as fixing a variable type with the preprocessor directive "#varint".
-
-If "varprop_xvalue" is set, the variable value will be fixed to the value assigned at that point. After this, an error will occur if the variable value is changed during execution.
-
-This allows you to fix variable values and types, and discover unintended variable initialization or value overwrites.
-
-If "varprop_log" or "varprop_logarray" is set, variable debug messages will be displayed in the debug window's log when the variable is assigned a value. This is the same as the "logmesv" and "logmesva" commands. See the help for the logmesv command for details on variable debug messages.
-
-If the p1 parameter is omitted or set to 0, all variable debug settings will be cleared.
+Each value can be added together to specify multiple settings at the same time.
+If "varprop_xtype" is set, the variable type will be locked. From this point on, the variable type will be prohibited from changing, and an error will occur if the variable type is changed during execution.
+This is the same behavior as when the variable type is locked with the preprocessor instruction "#varint".
+If "varprop_xvalue" is set, the variable value will be locked to the value that was assigned at that point. From this point on, an error will occur if the variable value is changed during execution.
+This allows you to lock variable values and types, and detect unintended variable initialization or value overwrites.
+If "varprop_log" or "varprop_logarray" is set, a variable debug message will be displayed in the debug window's log when a variable is assigned. This is the same function as the "logmesv" and "logmesva" commands. See the help for the logmesv command for details on variable debug messages.
+If the p1 parameter is omitted or 0 is specified, all variable debug settings will be cleared.
 ^
-The varprop command, like the assert command, provides assistance during debug execution. Please note that this command is disabled in scripts that have been converted to executable files or in platform-converted environments (iOS, Android).
+The varprop command, like the assert command, provides support for debugging execution. Please note that this command is disabled in scripts that have been converted to executable files or in platform-converted environments (iOS, Android).
 %href
 logmesv
 logmesva

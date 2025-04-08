@@ -15,7 +15,7 @@
 	chdir helpdir
 	;
 	s1=dir_cmdline
-	;s1="stop"
+	;s1="use"
 
 	if s1="" {
 		mes "Usage : helpmes [keyword]"
@@ -25,7 +25,7 @@
 	res=0
 *main
 	if res>1 {
-		mes "[ERROR] No answer."
+		mes "[ERROR] No answer ["+s1+"]."
 		end
 	}
 	ihelp_init msg, res			;index build
@@ -33,18 +33,29 @@
 		mes "[ERROR] Index build failed."
 		end
 	}
-	res++
 
 	ihelp_find s1
-	if stat=0 {
-		goto *main
+	if stat>0 {
+		ihelp_open 0
+		if stat=0 {
+			goto *goanswer
+		}
 	}
 
-	ihelp_open 0
-	if stat {
-		goto *main
+	ihelp_init msg, res			;index build
+	s2="#"+s1
+	ihelp_find s2
+	if stat>0 {
+		ihelp_open 0
+		if stat=0 {
+			goto *goanswer
+		}
 	}
 
+res++
+	goto *main
+
+*goanswer
 	mes ih_ans_key+" "+ih_fncprm+"     ["+ih_ans_title+"]"
 	mes ih_prminf
 	mes ih_info
