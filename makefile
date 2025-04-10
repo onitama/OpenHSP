@@ -293,7 +293,6 @@ OBJS_BULLET_COLLISION = \
 	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btDbvt.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btDbvtBroadphase.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btDispatcher.gpo \
-	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btQuantizedBvh.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/BroadphaseCollision/btSimpleBroadphase.gpo \
@@ -302,8 +301,10 @@ OBJS_BULLET_COLLISION = \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btBoxBoxDetector.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionDispatcher.gpo \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionDispatcherMt.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionObject.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionWorld.gpo \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCollisionWorldImporter.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.gpo \
@@ -340,12 +341,14 @@ OBJS_BULLET_COLLISION = \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btCylinderShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btEmptyShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.gpo \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btMiniSDF.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btMinkowskiSumShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btMultiSphereShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btOptimizedBvh.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.gpo \
+	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btSdfCollisionShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btShapeHull.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btSphereShape.gpo \
 	src/hsp3dish/extlib/src/BulletCollision/CollisionShapes/btStaticPlaneShape.gpo \
@@ -384,32 +387,44 @@ OBJS_BULLET_COLLISION = \
 
 OBJS_BULLET_DYNAMICS = \
 	src/hsp3dish/extlib/src/BulletDynamics/Character/btKinematicCharacterController.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btBatchedConstraints.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btContactConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btFixedConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btGearConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btHinge2Constraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btHingeConstraint.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btNNCGConstraintSolver.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btSliderConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btTypedConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/ConstraintSolver/btUniversalConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btRigidBody.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btSimpleDynamicsWorld.gpo \
-	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/Bullet-C-API.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Dynamics/btSimulationIslandManagerMt.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBody.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyDynamicsWorld.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyFixedConstraint.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyGearConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyJointLimitConstraint.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyJointMotor.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyMLCPConstraintSolver.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodyPoint2Point.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodySliderConstraint.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodySphericalJointLimit.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/Featherstone/btMultiBodySphericalJointMotor.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/MLCPSolvers/btDantzigLCP.gpo \
+	src/hsp3dish/extlib/src/BulletDynamics/MLCPSolvers/btLemkeAlgorithm.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/MLCPSolvers/btMLCPSolver.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Vehicle/btRaycastVehicle.gpo \
 	src/hsp3dish/extlib/src/BulletDynamics/Vehicle/btWheelInfo.gpo
@@ -421,7 +436,10 @@ OBJS_LINEAR_MATH = \
 	src/hsp3dish/extlib/src/LinearMath/btGeometryUtil.gpo \
 	src/hsp3dish/extlib/src/LinearMath/btPolarDecomposition.gpo \
 	src/hsp3dish/extlib/src/LinearMath/btQuickprof.gpo \
+	src/hsp3dish/extlib/src/LinearMath/btReducedVector.gpo \
 	src/hsp3dish/extlib/src/LinearMath/btSerializer.gpo \
+	src/hsp3dish/extlib/src/LinearMath/btSerializer64.gpo \
+	src/hsp3dish/extlib/src/LinearMath/btThreads.gpo \
 	src/hsp3dish/extlib/src/LinearMath/btVector3.gpo
 
 TARGETS = hsp3dish hsp3gp hsp3cl hspcmp hsed
