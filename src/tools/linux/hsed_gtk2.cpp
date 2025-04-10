@@ -988,9 +988,9 @@ int getUTF8Offset( char *target, int offset )
 	if (( a1>='0' )&&( a1<='9' )) {
 		return (int)a1;
 	}
-	//if ( a1=='#' ) {
-	//	return (int)a1;
-	//}
+	if ( a1=='#' ) {
+		return (int)a1;
+	}
 	if (( a1<'@' )||( a1>'z' )) {
 		return 0;
 	}

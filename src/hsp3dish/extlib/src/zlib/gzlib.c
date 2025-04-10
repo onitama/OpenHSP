@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-#if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+#if defined(HSPLINUX) || defined(HSPEMSCRIPTEN) || defined(HSPNDK) || defined(HSPIOS)
 #include <unistd.h>
 #endif
 #include "gzguts.h"

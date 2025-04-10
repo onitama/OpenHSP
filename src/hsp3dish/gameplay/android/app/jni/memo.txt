@@ -1,0 +1,16 @@
+プリビルドライブラリ準備
+
+D:\and_project\setenv.bat
+を実行
+
+D:\and_project\mkLib\app\jni
+に
+hsp3
+hsp3dish
+をコピーする
+(hsp3crypt.cppに注意)
+
+D:\and_project\mkLib\app\jni\go.bat
+を実行
+
+
