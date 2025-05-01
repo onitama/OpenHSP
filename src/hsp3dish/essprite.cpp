@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 #include <algorithm>
 
 #include "essprite.h"
@@ -116,8 +117,8 @@ ESVec2 ESRectAxis::getAxis(int index)
 
 // Checks if projections of two rectangles onto an axis overlap
 bool ESRectAxis::checkAxisOverlap( ESRectAxis *rect1, ESRectAxis *rect2,  ESVec2 *axis) {
-	double min1 = FLT_MAX, max1 = -FLT_MAX;
-	double min2 = FLT_MAX, max2 = -FLT_MAX;
+	double min1 = DBL_MAX, max1 = -DBL_MAX;
+	double min2 = DBL_MAX, max2 = -DBL_MAX;
 
 	// Project rect1 onto axis
 	for (int i = 0; i < 4; i++) {
