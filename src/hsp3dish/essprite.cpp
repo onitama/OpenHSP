@@ -31,6 +31,15 @@
 */
 /*------------------------------------------------------------*/
 
+ESVec2 ESVec2::normalize() const {
+	double len = sqrt(x * x + y * y);
+	if (len > 0) {
+		return ESVec2(x / len, y / len);
+	}
+	return ESVec2(0, 0);
+}
+
+
 ESRectAxis::ESRectAxis(void)
 {
 	_rect = NULL;

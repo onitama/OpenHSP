@@ -145,13 +145,7 @@ public:
 		return x * other.x + y * other.y;
 	}
 
-	ESVec2 normalize() const {
-		double len = sqrt(x * x + y * y);
-		if (len > 0) {
-			return ESVec2(x / len, y / len);
-		}
-		return ESVec2(0, 0);
-	}
+	ESVec2 normalize() const;
 };
 
 typedef struct ESHitRect
