@@ -32,6 +32,14 @@
 */
 /*------------------------------------------------------------*/
 
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
+
 ESVec2 ESVec2::normalize() const {
 	double len = sqrt(x * x + y * y);
 	if (len > 0) {
