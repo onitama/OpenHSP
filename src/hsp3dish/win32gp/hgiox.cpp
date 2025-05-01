@@ -919,7 +919,7 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	j_dispDialog( str1, str2, mode );
 #endif
 #ifdef HSPIOS
-    gpb_dialog( mode, str1, str2 );
+    gb_dialog( mode, str1, str2 );
     //Alertf( str1 );
 #endif
 #ifdef HSPLINUX

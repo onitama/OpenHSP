@@ -3319,7 +3319,12 @@ static int cmdfunc_extcmd( int cmd )
 		p5 = code_getdi(0);
 		p6 = code_getdi(-1);
 		if (sprite->sprite_enable) {
-			p1 = sprite->checkCollision(p2, p3,p4,p5,p6);
+			if (p4 & 1) {
+				p1 = sprite->checkCollisionRotate(p2, p3, p4, p5, p6);
+			}
+			else {
+				p1 = sprite->checkCollision(p2, p3, p4, p5, p6);
+			}
 			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &p1);
 		}
 		else throw HSPERR_UNSUPPORTED_FUNCTION;

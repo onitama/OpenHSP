@@ -20,6 +20,7 @@ char *hsp3eb_stmp( char *str );
 void hsp3eb_pause( void );
 void hsp3eb_resume( void );
 int hsp3eb_gettask( void );
+void hsp3eb_execstart( void );
 
 
 #ifdef __cplusplus

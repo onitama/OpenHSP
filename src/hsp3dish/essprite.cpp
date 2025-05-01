@@ -24,6 +24,136 @@
 */
 /*------------------------------------------------------------*/
 
+
+/*------------------------------------------------------------*/
+/*
+		ESHitRect interface
+*/
+/*------------------------------------------------------------*/
+
+ESRectAxis::ESRectAxis(void)
+{
+	_rect = NULL;
+}
+
+
+void ESRectAxis::setRect(ESHitRect* rect)
+{
+	_rect = rect;
+}
+
+
+void ESRectAxis::setRect( int x, int y, int sx, int sy, int ofsx, int ofsy )
+{
+	_master.center = ESVec2((double)x, (double)y);
+	_master.halfSize = ESVec2(((double)sx)*0.5, ((double)sy)*0.5 );
+	_master.offset = ESVec2((double)ofsx, (double)ofsy);
+	setRect(&_master);
+}
+
+
+void ESRectAxis::setRotation(double rotation)
+{
+	//	回転角度に応じた頂点を生成する
+	//
+	_rotation = rotation;
+	double s = sin(_rotation);
+	double c = cos(_rotation);
+
+	double cx = _rect->center.x;
+	double cy = _rect->center.y;
+	double halfx = _rect->halfSize.x;
+	double halfy = _rect->halfSize.y;
+	double halfnx = -halfx;
+	double halfny = -halfy;
+	double centerx = _rect->center.x;
+	double centery = _rect->center.y;
+	double offsetx = _rect->offset.x;
+	double offsety = _rect->offset.y;
+
+	if ((offsetx != 0.0) || (offsety != 0.0)) {
+		halfx += offsetx; halfy += offsety;
+		halfnx += offsetx; halfny += offsety;
+	}
+
+	_corner[0].x = cx + halfnx * c - halfny * s;
+	_corner[0].y = cy + halfnx * s + halfny * c;
+
+	_corner[1].x = cx + halfx * c - halfny * s;
+	_corner[1].y = cy + halfx * s + halfny * c;
+
+	_corner[2].x = cx + halfnx * c - halfy * s;
+	_corner[2].y = cy + halfnx * s + halfy * c;
+
+	_corner[3].x = cx + halfx * c - halfy * s;
+	_corner[3].y = cy + halfx * s + halfy * c;
+}
+
+
+ESVec2 *ESRectAxis::getCorner(int index)
+{
+	return &_corner[index];
+}
+
+
+ESVec2 ESRectAxis::getAxis(int index)
+{
+	double s = sin(_rotation);
+	double c = cos(_rotation);
+	if (index == 0) return ESVec2(c, s).normalize(); // X axis
+	return ESVec2(-s, c).normalize(); // Y axis
+}
+
+
+// Checks if projections of two rectangles onto an axis overlap
+bool ESRectAxis::checkAxisOverlap( ESRectAxis *rect1, ESRectAxis *rect2,  ESVec2 *axis) {
+	double min1 = FLT_MAX, max1 = -FLT_MAX;
+	double min2 = FLT_MAX, max2 = -FLT_MAX;
+
+	// Project rect1 onto axis
+	for (int i = 0; i < 4; i++) {
+		ESVec2 *corner = rect1->getCorner(i);
+		double proj = axis->dot(ESVec2(corner->x, corner->y));
+		min1 = min(min1, proj);
+		max1 = max(max1, proj);
+	}
+
+	// Project rect2 onto axis
+	for (int i = 0; i < 4; i++) {
+		ESVec2 *corner = rect2->getCorner(i);
+		double proj = axis->dot(ESVec2(corner->x, corner->y));
+		min2 = min(min2, proj);
+		max2 = max(max2, proj);
+	}
+
+	// Check if projections overlap
+	return !(max1 < min2 || max2 < min1);
+}
+
+
+// Main collision check function using SAT
+bool ESRectAxis::checkRotatedCollision( ESRectAxis *rect1, ESRectAxis *rect2) {
+	// Check rect1's axes
+	for (int i = 0; i < 2; i++) {
+		ESVec2 axis = rect1->getAxis(i);
+		if (!checkAxisOverlap(rect1, rect2, &axis)) {
+			return false; // Separation found
+		}
+	}
+
+	// Check rect2's axes
+	for (int i = 0; i < 2; i++) {
+		ESVec2 axis = rect2->getAxis(i);
+		if (!checkAxisOverlap(rect1, rect2, &axis)) {
+			return false; // Separation found
+		}
+	}
+
+	// No separation found on any axis, must be colliding
+	return true;
+}
+
+
 /*------------------------------------------------------------*/
 /*
 		hgemitter interface
@@ -147,6 +277,11 @@ int essprite::init(int maxsprite, int maxchr, int rotrate, int maxmap)
 
 	mem_deco.clear();
 	setSpriteScaleOption(0, 0);
+
+	setDebugColor(0, 0xffffff);
+	setDebugColor(1, 0x00ff00);
+	setDebugColor(2, 0xff0000);
+	setDebugColor(3, 0x0000ff);
 	return 0;
 }
 
@@ -418,7 +553,7 @@ void essprite::setTransparentMode(int tp)
 }
 
 
-int essprite::put(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, int rotz, int mulcolor)
+int essprite::put(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, int rotz, int mulcolor, int mode)
 {
 	//		sprite put
 	//
@@ -444,7 +579,6 @@ int essprite::put(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, i
 		vx = (nx * zoomx) >> dotshift;
 		vy = (ny * zoomy) >> dotshift;
 		rot = pans * -rotz;
-
 		
 		if (ofsx != 0) ofsx = (ofsx * zoomx) >> dotshift;
 		if (ofsy != 0) ofsy = (ofsy * zoomy) >> dotshift;
@@ -485,16 +619,88 @@ int essprite::put(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, i
 	if (tp < 0) tp = chr->tpflag;
 	setTransparentMode(tp);
 
-	if (deform) {
-		bmscr->FillRotTex(vx, vy, (float)rot, src, ix, iy, nx, ny);
+	if (mode & ESDRAW_DEBUG) {
+		// normal draw
+		if (deform) {
+			bmscr->FillRotTex(vx, vy, (float)rot, src, ix, iy, nx, ny);
+			return 0;
+		}
+		bmscr->Copy(src, ix, iy, nx, ny);
 		return 0;
 	}
-	bmscr->Copy(src, ix, iy, nx, ny);
+
+	//	DEBUG draw
+	int colsx = chr->colsx;
+	int colsy = chr->colsy;
+	int colx = xx + chr->colx;
+	int coly = yy + chr->coly;
+
+	if (deform) {
+		//bmscr->FillRotTex(vx, vy, (float)rot, src, ix, iy, nx, ny);
+
+		ESVec2* corner;
+		ESVec2* corner_start;
+
+		int colvx = ((chr->colx) * zoomx) >> dotshift;
+		int colvy = ((chr->coly) * zoomy) >> dotshift;
+		colsx = (chr->colsx * zoomx) >> dotshift;
+		colsy = (chr->colsy * zoomy) >> dotshift;
+
+		int basex = ((colsx - vx)>>1) + colvx;
+		int basey = ((colsy - vy)>>1) + colvy;
+		rectaxis.setRect(x, y, colsx, colsy, basex-ofsx, basey-ofsy);
+		rectaxis.setRotation(rot);
+		bmscr->Setcolor(debugcolor_line[1]);
+
+		corner_start = rectaxis.getCorner(0);
+		bmscr->cx = (int)corner_start->x; bmscr->cy = (int)corner_start->y;
+		corner = rectaxis.getCorner(1);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(3);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(2);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		bmscr->Line((int)corner_start->x, (int)corner_start->y);
+
+		rectaxis.setRect(x, y, vx, vy);
+		rectaxis.setRotation(rot);
+		bmscr->Setcolor(debugcolor_line[0]);
+
+		corner_start = rectaxis.getCorner(0);
+		bmscr->cx = (int)corner_start->x; bmscr->cy = (int)corner_start->y;
+		corner = rectaxis.getCorner(1);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(3);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(2);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		bmscr->Line((int)corner_start->x, (int)corner_start->y);
+
+		return 0;
+	}
+	//bmscr->Copy(src, ix, iy, nx, ny);
+
+	bmscr->Setcolor(debugcolor_line[1]);
+	bmscr->cx = colx;
+	bmscr->cy = coly;
+	bmscr->Line(colx + colsx, coly);
+	bmscr->Line(colx + colsx, coly + colsy);
+	bmscr->Line(colx, coly + colsy);
+	bmscr->Line(colx, coly);
+
+	bmscr->Setcolor(debugcolor_line[0]);
+	bmscr->cx = x;
+	bmscr->cy = y;
+	bmscr->Line(x + nx, y);
+	bmscr->Line(x + nx, y + ny);
+	bmscr->Line(x, y + ny);
+	bmscr->Line(x, y);
+
 	return 0;
 }
 
 
-int essprite::put2(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, int rotz, int mulcolor)
+int essprite::put2(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, int rotz, int mulcolor, int mode)
 {
 	//		sprite put
 	//
@@ -557,11 +763,84 @@ int essprite::put2(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, 
 	if (tp < 0) tp = chr->tpflag;
 	setTransparentMode(tp);
 
-	if (deform) {
-		bmscr->FillRotTex(vx, vy, (float)rot, src, ix, iy, nx, ny);
+	if (mode & ESDRAW_DEBUG) {
+		// normal draw
+		if (deform) {
+			bmscr->FillRotTex(vx, vy, (float)rot, src, ix, iy, nx, ny);
+			return 0;
+		}
+		bmscr->Copy(src, ix, iy, nx, ny);
 		return 0;
 	}
-	bmscr->Copy(src, ix, iy, nx, ny);
+
+	//	DEBUG draw
+	int colsx = chr->colsx;
+	int colsy = chr->colsy;
+	int colx = xx + chr->colx;
+	int coly = yy + chr->coly;
+
+	if (deform) {
+		//bmscr->FillRotTex(vx, vy, (float)rot, src, ix, iy, nx, ny);
+
+		ESVec2* corner;
+		ESVec2* corner_start;
+
+		int colvx = ((chr->colx) * zoomx) >> dotshift;
+		int colvy = ((chr->coly) * zoomy) >> dotshift;
+		colsx = (chr->colsx * zoomx) >> dotshift;
+		colsy = (chr->colsy * zoomy) >> dotshift;
+
+		int basex = ((colsx - vx) >> 1) + colvx;
+		int basey = ((colsy - vy) >> 1) + colvy;
+		rectaxis.setRect(x, y, colsx, colsy, basex - ((ofsx * zoomx) >> dotshift), basey - ((ofsy * zoomy) >> dotshift));
+
+		rectaxis.setRotation(rot);
+		bmscr->Setcolor(debugcolor_line[1]);
+
+		corner_start = rectaxis.getCorner(0);
+		bmscr->cx = (int)corner_start->x; bmscr->cy = (int)corner_start->y;
+		corner = rectaxis.getCorner(1);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(3);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(2);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		bmscr->Line((int)corner_start->x, (int)corner_start->y);
+
+		rectaxis.setRect(x, y, vx, vy);
+		rectaxis.setRotation(rot);
+		bmscr->Setcolor(debugcolor_line[0]);
+
+		corner_start = rectaxis.getCorner(0);
+		bmscr->cx = (int)corner_start->x; bmscr->cy = (int)corner_start->y;
+		corner = rectaxis.getCorner(1);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(3);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		corner = rectaxis.getCorner(2);
+		bmscr->Line((int)corner->x, (int)corner->y);
+		bmscr->Line((int)corner_start->x, (int)corner_start->y);
+
+		return 0;
+	}
+	//bmscr->Copy(src, ix, iy, nx, ny);
+
+	bmscr->Setcolor(debugcolor_line[1]);
+	bmscr->cx = colx;
+	bmscr->cy = coly;
+	bmscr->Line(colx + colsx, coly);
+	bmscr->Line(colx + colsx, coly + colsy);
+	bmscr->Line(colx, coly + colsy);
+	bmscr->Line(colx, coly);
+
+	bmscr->Setcolor(debugcolor_line[0]);
+	bmscr->cx = x;
+	bmscr->cy = y;
+	bmscr->Line(x + nx, y);
+	bmscr->Line(x + nx, y + ny);
+	bmscr->Line(x, y + ny);
+	bmscr->Line(x, y);
+
 	return 0;
 }
 
@@ -635,6 +914,42 @@ int essprite::checkCollisionSub(SPOBJ* sp)
 }
 
 
+int essprite::checkCollisionSub2(SPOBJ* sp)
+{
+	int xx, yy, x1, y1;
+	int chrcolx, chrcoly, chrcolsx, chrcolsy;
+
+	chr = &mem_chr[sp->chr];
+
+	int zoomx = sp->zoomx;
+	int zoomy = sp->zoomy;
+
+	chrcolx = chr->colx * zoomx;
+	chrcoly = chr->coly * zoomy;
+	chrcolsx = chr->colsx * zoomx;
+	chrcolsy = chr->colsy * zoomy;
+
+	getSpriteParentAxis(sp, xx, yy, 0);
+	x1 = (xx)+chrcolx;
+	y1 = (yy)+chrcoly;
+
+	if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
+		x1 -= zoomx >> 1;
+		y1 -= zoomy >> 1;
+	}
+
+	if (colex <= x1) return 0;
+	if (coley <= y1) return 0;
+
+	if ((x1 + chrcolsx) > colx) {
+		if ((y1 + chrcolsy) > coly) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
 int essprite::checkCollision(int spno, int chktype, int rotflag, int startno, int endno)
 {
 	//		sprite collision check
@@ -660,14 +975,23 @@ int essprite::checkCollision(int spno, int chktype, int rotflag, int startno, in
 	chrcolsy = chr->colsy * zoomy;
 
 	getSpriteParentAxis(ssp, x, y, 0);
-	colx = (x) + chrcolx;
-	coly = (y) + chrcoly;
-
-	if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
-		int px = (chr->bsx << dotshift) - (chr->bsx * zoomx);
-		int py = (chr->bsy << dotshift) - (chr->bsy * zoomy);
-		colx += px / 2;
-		coly += py / 2;
+	if (sprite_newfunc) {
+		colx = (x)+chrcolx;
+		coly = (y)+chrcoly;
+		if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
+			colx -= zoomx>>1;
+			coly -= zoomy>>1;
+		}
+	}
+	else {
+		colx = (x)+chrcolx;
+		coly = (y)+chrcoly;
+		if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
+			int px = (chr->bsx << dotshift) - (chr->bsx * zoomx);
+			int py = (chr->bsy << dotshift) - (chr->bsy * zoomy);
+			colx += px>>1;
+			coly += py>>1;
+		}
 	}
 
 	colex = colx + chrcolsx;
@@ -683,12 +1007,155 @@ int essprite::checkCollision(int spno, int chktype, int rotflag, int startno, in
 	SPOBJ* sp = getObj(a);
 	if (sp == NULL) return -1;
 
+	if (sprite_newfunc) {
+		while (1) {
+			if (a > n_end) break;
+			if (sp->fl) {
+				if (sp->type & cc) {
+					if (spno != a) {
+						if (checkCollisionSub2(sp)) return a;
+					}
+				}
+			}
+			sp++;
+			a++;
+		}
+	}
+	else {
+		while (1) {
+			if (a > n_end) break;
+			if (sp->fl) {
+				if (sp->type & cc) {
+					if (spno != a) {
+						if (checkCollisionSub(sp)) return a;
+					}
+				}
+			}
+			sp++;
+			a++;
+		}
+	}
+	return -1;
+}
+
+
+int essprite::checkCollisionRotateSub(SPOBJ* sp, ESRectAxis* rect, ESRectAxis* rect2)
+{
+	//		check 4-corner collision (rotate)
+	//
+	int xx, yy, x1, y1, vx, vy;
+	int chrcolx, chrcoly, chrcolsx, chrcolsy;
+
+	chr = &mem_chr[sp->chr];
+
+	int zoomx = sp->zoomx;
+	int zoomy = sp->zoomy;
+
+	chrcolx = chr->colx * zoomx;
+	chrcoly = chr->coly * zoomy;
+	chrcolsx = chr->colsx * zoomx;
+	chrcolsy = chr->colsy * zoomy;
+	vx = chr->bsx * zoomx;
+	vy = chr->bsy * zoomy;
+
+	getSpriteParentAxis(sp, xx, yy, 0);
+	x1 = (xx)+(vx>>1);
+	y1 = (yy)+(vy>>1);
+	if (sprite_newfunc) {
+		if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
+			x1 -= zoomx >> 1;
+			y1 -= zoomy >> 1;
+		}
+	}
+	else {
+		if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
+			int px = (chr->bsx << dotshift) - (chr->bsx * zoomx);
+			int py = (chr->bsy << dotshift) - (chr->bsy * zoomy);
+			x1 += px >> 1;
+			y1 += py >> 1;
+		}
+	}
+
+	int basex = ((chrcolsx - vx) >> 1) + chrcolx;
+	int basey = ((chrcolsy - vy) >> 1) + chrcoly;
+
+	rect2->setRect(x1, y1, chrcolsx, chrcolsy, basex, basey);
+	rect2->setRotation(pans * -sp->rotz);
+
+	if (rect->checkRotatedCollision(rect, rect2)) return 1;
+
+	return 0;
+}
+
+
+int essprite::checkCollisionRotate(int spno, int chktype, int rotflag, int startno, int endno)
+{
+	//		sprite collision check (rotate)
+	//
+	int a, cc;
+	int x, y, x1, y1, vx, vy;
+	int n_start, n_end;
+	ESRectAxis rect;
+	ESRectAxis rect2;
+
+	cc = chktype;
+	if (cc == 0) cc = -1;
+	SPOBJ* ssp = getObj(spno);
+	if (ssp == NULL) return -1;
+	chr = getChr(ssp->chr);
+	if (chr == NULL) return -1;
+
+	int zoomx = ssp->zoomx;
+	int zoomy = ssp->zoomy;
+	int chrcolx, chrcoly, chrcolsx, chrcolsy;
+
+	chrcolx = chr->colx * zoomx;
+	chrcoly = chr->coly * zoomy;
+	chrcolsx = chr->colsx * zoomx;
+	chrcolsy = chr->colsy * zoomy;
+	vx = chr->bsx * zoomx;
+	vy = chr->bsy * zoomy;
+
+	getSpriteParentAxis(ssp, x, y, 0);
+	x1 = x+(vx >> 1);
+	y1 = y+(vy >> 1);
+	if (sprite_newfunc) {
+		if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
+			x1 -= zoomx >> 1;
+			y1 -= zoomy >> 1;
+		}
+	}
+	else {
+		if ((zoomx != dotshift_base) || (zoomy != dotshift_base)) {
+			int px = (chr->bsx << dotshift) - (chr->bsx * zoomx);
+			int py = (chr->bsy << dotshift) - (chr->bsy * zoomy);
+			x1 += px >> 1;
+			y1 += py >> 1;
+		}
+	}
+
+	int basex = ((chrcolsx - vx) >> 1) + chrcolx;
+	int basey = ((chrcolsy - vy) >> 1) + chrcoly;
+
+	rect.setRect( x1, y1, chrcolsx, chrcolsy, basex, basey );
+	rect.setRotation( pans * -ssp->rotz );
+
+	n_start = startno;
+	n_end = endno;
+	if ((n_end < 0) || (n_end >= spkaz)) {
+		n_end = spkaz - 1;
+	}
+
+	a = n_start;
+	SPOBJ* sp = getObj(a);
+	if (sp == NULL) return -1;
+
 	while (1) {
 		if (a > n_end) break;
 		if (sp->fl) {
 			if (sp->type & cc) {
 				if (spno != a) {
-					if (checkCollisionSub(sp)) return a;
+					if (checkCollisionRotateSub(sp,&rect,&rect2)) return a;
 				}
 			}
 		}
@@ -1353,10 +1820,10 @@ int essprite::drawSubPut(SPOBJ *sp, int mode)
 			}
 		}
 		if (sprite_newfunc) {
-			put2(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor);
+			put2(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor, mode);
 		}
 		else {
-			put(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor);
+			put(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor, mode);
 		}
 		res++;
 	}
@@ -1473,6 +1940,7 @@ int essprite::draw(int start, int num, int mode, int start_pri, int end_pri)
 		std::sort(selspr, selspr + maxspr, less_int_1);
 	}
 
+	// for normal draw
 	spr = selspr;
 	for (i = 0; i < maxspr; i++) {
 		sp = getObj(spr->info);

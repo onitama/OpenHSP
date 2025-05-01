@@ -64,6 +64,7 @@ extern "C" {
 #define ESDRAW_NOCALLBACK (4)
 #define ESDRAW_NODISP (8)
 #define ESDRAW_NOSORT (16)
+#define ESDRAW_DEBUG (32)
 
 #define ESSPLINK_BGMAP (0x10000)
 
@@ -130,6 +131,52 @@ extern "C" {
 #define ESDECO_EPADD (0x4000)
 #define ESDECO_FADEOUT (0x8000)
 
+//
+//	for rotate expression
+//
+class ESVec2 {
+public:
+	double x, y;
+
+	ESVec2() { x = 0.0; y = 0.0; }
+	ESVec2(double _x, double _y) : x(_x), y(_y) {}
+
+	double dot(const ESVec2 &other) const {
+		return x * other.x + y * other.y;
+	}
+
+	ESVec2 normalize() const {
+		double len = sqrt(x * x + y * y);
+		if (len > 0) {
+			return ESVec2(x / len, y / len);
+		}
+		return ESVec2(0, 0);
+	}
+};
+
+typedef struct ESHitRect
+{
+	ESVec2 center;
+	ESVec2 halfSize;
+	ESVec2 offset;
+} ESHitRect;
+
+class ESRectAxis {
+public:
+	ESRectAxis();
+	void setRect( ESHitRect *rect );
+	void setRect(  int x, int y, int sx, int sy, int ofsx=0, int ofsy=0 );
+	void setRotation(double rotation);
+	ESVec2* getCorner(int index);
+	ESVec2 getAxis(int index);
+	bool checkAxisOverlap(ESRectAxis* rect1, ESRectAxis* rect2, ESVec2* axis);
+	bool checkRotatedCollision(ESRectAxis* rect1, ESRectAxis* rect2);
+
+	ESHitRect _master;
+	ESHitRect *_rect;
+	ESVec2 _corner[4];
+	double _rotation;
+};
 
 //
 //	sprite move flag (fl) condition :
@@ -279,13 +326,16 @@ public:
 	void clear(int p1, int p2);
 	void setTransparentMode(int tp);
 	SPOBJ* resetSprite(int spno);
-	int put(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1);
-	int put2(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1);
+	int put(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1, int mode = 0);
+	int put2(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1, int mode = 0);
 	int draw(int start, int num, int mode, int start_pri, int end_pri);
 	int execSingle(int id);
 	int find(int chktype, int spno, int endspno = -1, int step = 0);
-	int checkCollisionSub(SPOBJ *sp);
+	int checkCollisionSub(SPOBJ* sp);
+	int checkCollisionSub2(SPOBJ* sp);
 	int checkCollision(int spno, int chktype, int rotflag = 0, int startno = 0, int endno = -1);
+	int checkCollisionRotateSub(SPOBJ* sp, ESRectAxis* rect, ESRectAxis* rect2);
+	int checkCollisionRotate(int spno, int chktype, int rotflag = 0, int startno = 0, int endno = -1);
 	int getNear(int spno, int chktype, int range );
 
 	void initMap(void);
@@ -378,6 +428,7 @@ protected:
 	int drawSubPut(SPOBJ* sp, int mode);
 	int drawSubMoveGravity(SPOBJ* sp);
 	int drawSubMoveVector(SPOBJ* sp);
+	void setDebugColor(int num, int color) { debugcolor_line[num] = color; };
 
 private:
 	//	Parameters
@@ -393,6 +444,7 @@ private:
 	int		mapkaz;	// Max map object
 	BGMAP* mem_map;
 	std::vector<SPDECOINFO> mem_deco;
+	ESRectAxis rectaxis;
 
 	int		main_sx, main_sy;	// default window size
 	int		ofsx, ofsy;			// for sprite offset
@@ -428,6 +480,7 @@ private:
 	int		bak_hitmapx;		// Map hit axis backup (previous)
 	int		bak_hitmapy;		// Map hit axis backup (previous)
 
+	int		debugcolor_line[4];
 };
 
 //	sprite pack info ( for sort )
