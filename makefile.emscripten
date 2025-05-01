@@ -400,6 +400,10 @@ OBJS_BULLET_DYNAMICS = \
 	src/hsp3dish/extlib/src/BulletDynamics/Vehicle/btRaycastVehicle.gpjs.o \
 	src/hsp3dish/extlib/src/BulletDynamics/Vehicle/btWheelInfo.gpjs.o
 
+JS_LILBS = \
+	src/hsp3/emscripten/utils.js \
+	src/hsp3dish/emscripten/license.js \
+
 LIBS =
 LIBS_GP = \
 	libgameplay.js.a \
@@ -413,12 +417,14 @@ all: $(TARGETS)
 
 .SUFFIXES: .cpp
 
-hsp3dish.js: $(OBJS) src/hsp3dish/emscripten/license.js
+hsp3dish.js: $(OBJS) $(JS_LILBS)
 	$(CXX) $(CFLAGS) $(LINK_FLAGS) $(OBJS) -o $@ $(LIBS) \
+	--post-js src/hsp3/emscripten/utils.js \
 	--extern-pre-js src/hsp3dish/emscripten/license.js
 
-hsp3dish-gp.js: $(OBJS_GP) $(LIBS_GP) src/hsp3dish/emscripten/license.js
+hsp3dish-gp.js: $(OBJS_GP) $(LIBS_GP) $(JS_LILBS)
 	$(CXX) $(CFLAGS_GP) $(LINK_FLAGS_GP) $(OBJS_GP) $(LIBS_GP) -o hsp3dish-gp.js \
+	--post-js src/hsp3/emscripten/utils.js \
 	--extern-pre-js src/hsp3dish/emscripten/license.js
 
 libgameplay.js.a: $(OBJS_GAMEPLAY)
