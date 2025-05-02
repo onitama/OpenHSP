@@ -269,11 +269,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3dish\win32\filedlg.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3\filepack.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3\hsp3crypt.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3\hsp3utfcnv.cpp" />
+    <ClCompile Include="..\win32\bmscr_exc.cpp" />
+    <ClCompile Include="..\win32\filedlg.cpp" />
+    <ClCompile Include="..\..\hsp3\filepack.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3crypt.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp" />
     <ClCompile Include="..\..\hsp3\dpmread.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3code.cpp" />
@@ -315,11 +315,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3dish\win32\filedlg.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3\filepack.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3\hsp3crypt.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3\hsp3utfcnv.h" />
+    <ClInclude Include="..\win32\bmscr_exc.h" />
+    <ClInclude Include="..\win32\filedlg.h" />
+    <ClInclude Include="..\..\hsp3\filepack.h" />
+    <ClInclude Include="..\..\hsp3\hsp3crypt.h" />
+    <ClInclude Include="..\..\hsp3\hsp3utfcnv.h" />
     <ClInclude Include="..\..\hsp3\dpmread.h" />
     <ClInclude Include="..\..\hsp3\hsp3.h" />
     <ClInclude Include="..\..\hsp3\hsp3code.h" />

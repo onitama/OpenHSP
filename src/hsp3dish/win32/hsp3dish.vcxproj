@@ -153,11 +153,11 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3\filepack.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3\hsp3crypt.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3\hsp3utfcnv.cpp" />
-    <ClCompile Include="..\..\..\..\..\hsp3\win32gui\filedlg.cpp" />
+    <ClCompile Include="..\..\hsp3dish\win32\bmscr_exc.cpp" />
+    <ClCompile Include="..\..\hsp3\filepack.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3crypt.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp" />
+    <ClCompile Include="..\..\hsp3\win32gui\filedlg.cpp" />
     <ClCompile Include="..\..\hsp3\dpmread.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3code.cpp" />
@@ -199,11 +199,11 @@
     <ClCompile Include="webtask_win.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3\filepack.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3\hsp3crypt.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3\hsp3utfcnv.h" />
-    <ClInclude Include="..\..\..\..\..\hsp3\win32gui\filedlg.h" />
+    <ClInclude Include="..\..\hsp3dish\win32\bmscr_exc.h" />
+    <ClInclude Include="..\..\hsp3\filepack.h" />
+    <ClInclude Include="..\..\hsp3\hsp3crypt.h" />
+    <ClInclude Include="..\..\hsp3\hsp3utfcnv.h" />
+    <ClInclude Include="..\..\hsp3\win32gui\filedlg.h" />
     <ClInclude Include="..\..\hsp3\dpmread.h" />
     <ClInclude Include="..\..\hsp3\hsp3.h" />
     <ClInclude Include="..\..\hsp3\hsp3code.h" />
