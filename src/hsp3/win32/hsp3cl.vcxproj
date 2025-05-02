@@ -23,19 +23,19 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='hsp3cl_hrt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -79,6 +79,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -93,7 +94,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -110,7 +111,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(ProjectName).hrt</OutputFile>
@@ -122,14 +123,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\hsp3\filepack.cpp" />
+    <ClCompile Include="..\..\..\..\..\hsp3\hsp3crypt.cpp" />
+    <ClCompile Include="..\..\..\..\..\hsp3\hsp3utfcnv.cpp" />
     <ClCompile Include="..\Dpmread.cpp" />
-    <ClCompile Include="..\filepack.cpp" />
     <ClCompile Include="..\hsp3.cpp" />
     <ClCompile Include="..\hsp3code.cpp" />
-    <ClCompile Include="..\hsp3crypt.cpp" />
     <ClCompile Include="..\hsp3debug.cpp" />
     <ClCompile Include="..\hsp3int.cpp" />
-    <ClCompile Include="..\hsp3utfcnv.cpp" />
     <ClCompile Include="..\hspvar_core.cpp" />
     <ClCompile Include="..\hspvar_double.cpp" />
     <ClCompile Include="..\hspvar_int.cpp" />
@@ -152,18 +153,18 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\hsp3\filepack.h" />
+    <ClInclude Include="..\..\..\..\..\hsp3\hsp3crypt.h" />
+    <ClInclude Include="..\..\..\..\..\hsp3\hsp3utfcnv.h" />
     <ClInclude Include="..\Dpmread.h" />
-    <ClInclude Include="..\filepack.h" />
     <ClInclude Include="..\hsp3.h" />
     <ClInclude Include="..\hsp3code.h" />
     <ClInclude Include="..\hsp3config.h" />
-    <ClInclude Include="..\hsp3crypt.h" />
     <ClInclude Include="..\hsp3debug.h" />
     <ClInclude Include="..\hsp3ext.h" />
     <ClInclude Include="..\hsp3gr.h" />
     <ClInclude Include="..\hsp3int.h" />
     <ClInclude Include="..\hsp3struct.h" />
-    <ClInclude Include="..\hsp3utfcnv.h" />
     <ClInclude Include="..\hspvar_core.h" />
     <ClInclude Include="..\hspvar_label.h" />
     <ClInclude Include="..\stack.h" />

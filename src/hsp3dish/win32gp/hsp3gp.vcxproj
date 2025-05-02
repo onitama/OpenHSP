@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="angle_hsprt|Win32">
@@ -21,10 +21,6 @@
       <Configuration>ReleaseDll</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="ReleaseUTF|Win32">
-      <Configuration>ReleaseUTF</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -34,54 +30,47 @@
     <ProjectGuid>{70071784-3472-4FDA-8F73-8163A29F9D3F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>hsp3gp</RootNamespace>
-    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='angle_Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='angle_hsprt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='hsprt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -92,9 +81,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'" Label="PropertySheets">
@@ -116,11 +102,6 @@
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSdk_71A_IncludePath);</IncludePath>
-    <GenerateManifest>false</GenerateManifest>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(VC_IncludePath);$(WindowsSdk_71A_IncludePath);</IncludePath>
     <GenerateManifest>false</GenerateManifest>
@@ -151,13 +132,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISH;HSPDISHGP;HSPDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISH;HSPDISHGP;HSPDEBUG;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/glew/;../gameplay/src/</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -180,34 +161,11 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISH;HSPDISHGP;HSPDEBUG;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISH;HSPDISHGP;HSPDEBUG;NDEBUG;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/glew/;../gameplay/src/</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>lib/lib/;windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISH;HSPDISHGP;HSPDEBUG;HSPUTF8;NDEBUG;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/glew/;../gameplay/src/</AdditionalIncludeDirectories>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -230,7 +188,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/glew/;../gameplay/src/</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -249,10 +207,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;HSPDISH;HSPDEBUG;NDEBUG;GP_USE_ANGLE;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;HSPDISH;HSPDEBUG;NDEBUG;GP_USE_ANGLE;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/angle/;../gameplay/src/</AdditionalIncludeDirectories>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -272,10 +230,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;HSPDISH;NDEBUG;GP_USE_ANGLE;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;HSPDISH;NDEBUG;GP_USE_ANGLE;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/angle/;../gameplay/src/</AdditionalIncludeDirectories>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -295,10 +253,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;HSPDISH;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HSPWIN;HSPDISHGP;HSPDISH;NDEBUG;HSP_COM_UNSUPPORTED;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>lib/include/;../extlib/src/;../extlib/src/glew/;../gameplay/src/</AdditionalIncludeDirectories>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -311,14 +269,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.cpp" />
+    <ClCompile Include="..\..\..\..\..\hsp3dish\win32\filedlg.cpp" />
+    <ClCompile Include="..\..\..\..\..\hsp3\filepack.cpp" />
+    <ClCompile Include="..\..\..\..\..\hsp3\hsp3crypt.cpp" />
+    <ClCompile Include="..\..\..\..\..\hsp3\hsp3utfcnv.cpp" />
     <ClCompile Include="..\..\hsp3\dpmread.cpp" />
-    <ClCompile Include="..\..\hsp3\filepack.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3code.cpp" />
-    <ClCompile Include="..\..\hsp3\hsp3crypt.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3debug.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3int.cpp" />
-    <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp" />
     <ClCompile Include="..\..\hsp3\hspvar_core.cpp" />
     <ClCompile Include="..\..\hsp3\hspvar_double.cpp" />
     <ClCompile Include="..\..\hsp3\hspvar_int.cpp" />
@@ -328,24 +288,9 @@
     <ClCompile Include="..\..\hsp3\stack.cpp" />
     <ClCompile Include="..\..\hsp3\strbuf.cpp" />
     <ClCompile Include="..\..\hsp3\strnote.cpp" />
-    <ClCompile Include="..\..\hsp3\win32gui\comobj.cpp" />
-    <ClCompile Include="..\..\hsp3\win32gui\comobj_event.cpp" />
     <ClCompile Include="..\..\hsp3\win32gui\hsp3extlib.cpp" />
     <ClCompile Include="..\..\hsp3\win32gui\hsp3ext_win.cpp" />
-    <ClCompile Include="..\..\hsp3\win32gui\hspvar_comobj.cpp" />
-    <ClCompile Include="..\..\hsp3\win32gui\hspvar_variant.cpp" />
-    <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\hsp3\win32gui\supio_win_unicode.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='angle_hsprt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='hsprt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='angle_Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp" />
     <ClCompile Include="..\emscripten\fontsystem.cpp" />
     <ClCompile Include="..\essprite.cpp" />
     <ClCompile Include="..\geometry.cpp" />
@@ -356,9 +301,7 @@
     <ClCompile Include="..\random.cpp" />
     <ClCompile Include="..\sysreq.cpp" />
     <ClCompile Include="..\texmes.cpp" />
-    <ClCompile Include="..\win32\bmscr_exc.cpp" />
     <ClCompile Include="..\win32\dxsnd.cpp" />
-    <ClCompile Include="..\win32\filedlg.cpp" />
     <ClCompile Include="..\win32\mmman.cpp" />
     <ClCompile Include="..\win32\webtask_win.cpp" />
     <ClCompile Include="gamehsp.cpp" />
@@ -372,18 +315,20 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.h" />
+    <ClInclude Include="..\..\..\..\..\hsp3dish\win32\filedlg.h" />
+    <ClInclude Include="..\..\..\..\..\hsp3\filepack.h" />
+    <ClInclude Include="..\..\..\..\..\hsp3\hsp3crypt.h" />
+    <ClInclude Include="..\..\..\..\..\hsp3\hsp3utfcnv.h" />
     <ClInclude Include="..\..\hsp3\dpmread.h" />
-    <ClInclude Include="..\..\hsp3\filepack.h" />
     <ClInclude Include="..\..\hsp3\hsp3.h" />
     <ClInclude Include="..\..\hsp3\hsp3code.h" />
     <ClInclude Include="..\..\hsp3\hsp3config.h" />
-    <ClInclude Include="..\..\hsp3\hsp3crypt.h" />
     <ClInclude Include="..\..\hsp3\hsp3debug.h" />
     <ClInclude Include="..\..\hsp3\hsp3ext.h" />
     <ClInclude Include="..\..\hsp3\hsp3gr.h" />
     <ClInclude Include="..\..\hsp3\hsp3int.h" />
     <ClInclude Include="..\..\hsp3\hsp3struct.h" />
-    <ClInclude Include="..\..\hsp3\hsp3utfcnv.h" />
     <ClInclude Include="..\..\hsp3\hspvar_core.h" />
     <ClInclude Include="..\..\hsp3\hspvar_label.h" />
     <ClInclude Include="..\..\hsp3\hspwnd.h" />
@@ -391,19 +336,8 @@
     <ClInclude Include="..\..\hsp3\strbuf.h" />
     <ClInclude Include="..\..\hsp3\strnote.h" />
     <ClInclude Include="..\..\hsp3\supio.h" />
-    <ClInclude Include="..\..\hsp3\win32gui\comobj.h" />
-    <ClInclude Include="..\..\hsp3\win32gui\comobj_event.h" />
     <ClInclude Include="..\..\hsp3\win32gui\hspvar_comobj.h" />
     <ClInclude Include="..\..\hsp3\win32gui\hspvar_variant.h" />
-    <ClInclude Include="..\..\hsp3\win32gui\supio_win_unicode.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='angle_hsprt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='hsprt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='angle_Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\emscripten\fontsystem.h" />
     <ClInclude Include="..\essprite.h" />
     <ClInclude Include="..\geometry.h" />
@@ -417,8 +351,6 @@
     <ClInclude Include="..\sysreq.h" />
     <ClInclude Include="..\texmes.h" />
     <ClInclude Include="..\webtask.h" />
-    <ClInclude Include="..\win32\bmscr_exc.h" />
-    <ClInclude Include="..\win32\filedlg.h" />
     <ClInclude Include="dxsnd.h" />
     <ClInclude Include="gamehsp.h" />
     <ClInclude Include="gpcam.h" />
@@ -432,9 +364,7 @@
     <ClInclude Include="hsp3ext_win.h" />
     <ClInclude Include="mmman.h" />
     <ClInclude Include="shader_sprite.h" />
-    <ClInclude Include="supio_win.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseUTF|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="supio_win.h" />
     <ClInclude Include="webtask_win.h" />
   </ItemGroup>
   <ItemGroup>
