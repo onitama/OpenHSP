@@ -589,6 +589,10 @@ struct HSPCTX
 	char *tvfoldername;					// HSPTV Folder Name Parameters (HSPAPI)
 	char *homefoldername;				// System Folder Name Parameters (HSPAPI)
 	char langcode[4];					// Language country code (2byte ansi)
+
+	char* estmp;						// Extra string buffer
+	int estmp_ptr;						// Extra string buffer pointer
+	int estmp_max;						// Extra string buffer size
 };
 
 #define HSPCTX_REFSTR_MAX 4096

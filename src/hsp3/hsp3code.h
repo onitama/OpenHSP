@@ -69,6 +69,8 @@ void code_setvs( PVal *pval, APTR aptr, int type, void *ptr, int size, int subid
 char *code_stmpstr( char *src );
 char *code_stmp( int size );
 char *code_getsptr( int *type );
+char* code_estmppush( char* ptr );
+char* code_estmppop( void );
 
 int code_debug_init( void );
 int code_getdebug_line( void );

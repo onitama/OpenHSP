@@ -2198,13 +2198,17 @@ int gamehsp::makeModelNode(char *fname, char *idname, char *defs)
 	model_defines_shade += light_defines;
 
 	Material* boxMaterial = Material::create(fn2,gamehsp::passCallback,NULL);
-	if (boxMaterial == NULL) return -1;
+	if (boxMaterial == NULL) {
+		deleteObj(obj->_id);
+		return -1;
+	}
 
 	animation = NULL;
 	if (idname) {
 		rootNode = bundle->loadNode(idname);
 		if (rootNode == NULL) {
 			Alertf("Node not found.(%s#%s)", fname, idname);
+			deleteObj(obj->_id);
 			return -1;
 		}
 	}
@@ -2216,6 +2220,7 @@ int gamehsp::makeModelNode(char *fname, char *idname, char *defs)
 		scene = bundle->loadScene(NULL, gamehsp::passCallback);
 		if (scene == NULL) {
 			Alertf("Scene not found.(%s)", fname);
+			deleteObj(obj->_id);
 			return -1;
 		}
 
@@ -3748,9 +3753,6 @@ int gamehsp::addFreeVertexPolygon(int id1, int id2, int id3, int id4)
 
 int gamehsp::makeFreeVertexNode(int color, int matid)
 {
-	gpobj *obj = addObj();
-	if (obj == NULL) return -1;
-
 	float *vertices = (float *)_freevertex.data();
 	short *indices = (short *)_freeindex.data();
 
@@ -3758,6 +3760,9 @@ int gamehsp::makeFreeVertexNode(int color, int matid)
 	unsigned int indexCount = _freeindex.size();
 
 	if ((vertexCount==0) || (indexCount==0)) return -1;
+
+	gpobj* obj = addObj();
+	if (obj == NULL) return -1;
 
 	VertexFormat::Element elements[] =
 	{
@@ -3769,6 +3774,7 @@ int gamehsp::makeFreeVertexNode(int color, int matid)
 	if (mesh == NULL)
 	{
 		GP_ERROR("Failed to create user mesh.");
+		deleteObj(obj->_id);
 		return -1;
 	}
 	mesh->setVertexData(vertices, 0, vertexCount);
