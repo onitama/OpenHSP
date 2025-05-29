@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 
 #include <algorithm>
 #include <dlfcn.h>
@@ -424,10 +425,10 @@ int cnvwstr( void *out, char *in, int bufsize )
 {
 	//	hspchar->unicode に変換
 	//
-#ifndef HSPUTF8 
+#ifndef HSPUTF8
 	return MultiByteToWideChar( CP_ACP, 0, in, -1, (LPWSTR)out, bufsize );
 #else
-	return MultiByteToWideChar(CP_UTF8, 0, in, -1, (LPWSTR)out, bufsize); 
+	return MultiByteToWideChar(CP_UTF8, 0, in, -1, (LPWSTR)out, bufsize);
 #endif
 }
 
@@ -705,6 +706,54 @@ static int code_expand_next( ffi_type **prm_args, void **prm_values, const STRUC
 #ifndef HSP_COM_UNSUPPORTED
 	if ( punklocal ) punklocal->Release();
 #endif
+	return result;
+}
+
+int64_t call_extfunc( void *proc, int **prm, int prms, int rettype )
+{
+	ffi_cif cif;
+
+	std::vector<ffi_type *> args(prms);
+	std::vector<void *> values(prms);
+
+	int64_t result = 0;
+	ffi_type *result_type;
+
+	switch (rettype) {
+	case HSPVAR_FLAG_NONE:
+		result_type = &ffi_type_void;
+		break;
+	case HSPVAR_FLAG_STR:
+		result_type = &ffi_type_pointer;
+		break;
+	case HSPVAR_FLAG_DOUBLE:
+		result_type = &ffi_type_double;
+		break;
+	case HSPVAR_FLAG_INT:
+		result_type = &ffi_type_sint;
+		break;
+	case HSPVAR_FLAG_INT64:
+		result_type = &ffi_type_sint64;
+		break;
+	// case HSPVAR_FLAG_FLOAT: // TODO
+	//	result_type = &ffi_type_float;
+	//	break;
+	case HSPVAR_FLAG_LABEL:
+	case HSPVAR_FLAG_STRUCT:
+	case HSPVAR_FLAG_COMSTRUCT:
+	case 7: // VARIANT
+	case HSPVAR_FLAG_USERDEF:
+	default:
+		throw ( HSPERR_TYPE_MISMATCH );
+	}
+
+	for (int i = 0; i < prms; i++) {
+		args[i] = &ffi_type_pointer;
+		values[i] = prm[i];
+	}
+	ffi_prep_cif(&cif, FFI_DEFAULT_ABI, prms, result_type, args.data());
+	ffi_call(&cif, FFI_FN(proc), &result, values.data());
+
 	return result;
 }
 
