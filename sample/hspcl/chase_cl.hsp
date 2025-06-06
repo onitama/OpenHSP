@@ -65,7 +65,7 @@
 	gosub *putmap
 	if cmdval=10 : goto *main2
 
-	mes "? ",1
+	mes "? "
 	input cmdstr,,1
 	cmdval=0+cmdstr
 
@@ -141,7 +141,7 @@
 	mes "*** YOU HAVE BEEN DESTROYED BY A LUCKY COMPUTER ***"
 	goto *another
 *another
-	mes "ANOTHER GAME (Y/N) ? ",1
+	mes "ANOTHER GAME (Y/N) ? "
 	input cmdstr,,1
 	if cmdstr="n"|cmdstr="N" : goto *byebye
 	goto *start
