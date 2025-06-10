@@ -153,6 +153,7 @@
 #define global ESDRAW_NOCALLBACK (4)
 #define global ESDRAW_NODISP (8)
 #define global ESDRAW_NOSORT (16)
+#define global ESDRAW_DEBUG (32)
 
 #define global ESSPF_TIMEWIPE (1)
 #define global ESSPF_BLINK (2)
