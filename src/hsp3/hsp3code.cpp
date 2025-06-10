@@ -2189,7 +2189,7 @@ static int cmdfunc_prog( int cmd )
 		if ( p2<=0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		if ( HspVarCoreGetProc(p3)->flag == 0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		if (pval_m->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;
-		HspVarCoreDupPtr( pval_m, p3, (void *)p1, p2 );
+		HspVarCoreDupPtr( pval_m, p3, (void *)((intptr_t)p1), p2 );
 		break;
 		}
 
