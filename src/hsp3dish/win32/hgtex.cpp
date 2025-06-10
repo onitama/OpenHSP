@@ -716,7 +716,7 @@ void ChangeTex( int id )
 
 TEXINF *GetTex( int id )
 {
-	if (id >= (int)texinf.size()) return NULL;
+	if ((id<0)||(id >= (int)texinf.size())) return NULL;
 	return &texinf[id];
 }
 

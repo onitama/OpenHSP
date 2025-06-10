@@ -888,15 +888,18 @@ int Bmscr::Copy( Bmscr *src, int xx, int yy, int s_psx, int s_psy )
 	psy = s_psy;
 	texpx = xx + s_psx;
 	texpy = yy + s_psy;
-	if ( texpx < 0 ) return -1;
-	if ( texpx >= src->sx ) {
-		if ( xx >= src->sx ) return -1;
-		psx = src->sx - xx;
-	}
-	if ( texpy < 0 ) return -1;
-	if ( texpy >= src->sy ) {
-		if ( yy >= src->sy ) return -1;
-		psy = src->sy - yy;
+
+	if (vp_flag == BMSCR_VPFLAG_NOUSE) {
+		if (texpx < 0) return -1;
+		if (texpx >= src->sx) {
+			if (xx >= src->sx) return -1;
+			psx = src->sx - xx;
+		}
+		if (texpy < 0) return -1;
+		if (texpy >= src->sy) {
+			if (yy >= src->sy) return -1;
+			psy = src->sy - yy;
+		}
 	}
 	hgio_copy( (BMSCR *)this, xx, yy, psx, psy, (BMSCR *)src, (float)psx, (float)psy );
 	return 0;
@@ -913,15 +916,17 @@ int Bmscr::Zoom( int dx, int dy, Bmscr *src, int xx, int yy, int s_psx, int s_ps
 	psy = s_psy;
 	texpx = xx + s_psx;
 	texpy = yy + s_psy;
-	if ( texpx < 0 ) return -1;
-	if ( texpx >= src->sx ) {
-		if ( xx >= src->sx ) return -1;
-		psx = src->sx - xx;
-	}
-	if ( texpy < 0 ) return -1;
-	if ( texpy >= src->sy ) {
-		if ( yy >= src->sy ) return -1;
-		psy = src->sy - yy;
+	if (vp_flag == BMSCR_VPFLAG_NOUSE) {
+		if (texpx < 0) return -1;
+		if (texpx >= src->sx) {
+			if (xx >= src->sx) return -1;
+			psx = src->sx - xx;
+		}
+		if (texpy < 0) return -1;
+		if (texpy >= src->sy) {
+			if (yy >= src->sy) return -1;
+			psy = src->sy - yy;
+		}
 	}
 	hgio_copy( (BMSCR *)this, xx, yy, psx, psy, (BMSCR *)src, (float)dx, (float)dy );
 	return 0;
@@ -1057,15 +1062,17 @@ int Bmscr::CelPut( Bmscr *src, int id, float destx, float desty, float ang )
 	yy = ( id / src->divx ) * psy;
 	texpx = xx + psx;
 	texpy = yy + psy;
-	if ( texpx < 0 ) return -1;
-	if ( texpx >= src->sx ) {
-		if ( xx >= src->sx ) return -1;
-		psx = src->sx - xx;
-	}
-	if ( texpy < 0 ) return -1;
-	if ( texpy >= src->sy ) {
-		if ( yy >= src->sy ) return -1;
-		psy = src->sy - yy;
+	if (vp_flag == BMSCR_VPFLAG_NOUSE) {
+		if (texpx < 0) return -1;
+		if (texpx >= src->sx) {
+			if (xx >= src->sx) return -1;
+			psx = src->sx - xx;
+		}
+		if (texpy < 0) return -1;
+		if (texpy >= src->sy) {
+			if (yy >= src->sy) return -1;
+			psy = src->sy - yy;
+		}
 	}
 
 	dsx = (float)psx * destx;
@@ -1094,15 +1101,17 @@ int Bmscr::CelPut( Bmscr *src, int id )
 	texpx = xx + psx;
 	texpy = yy + psy;
 
-	if ( texpx < 0 ) return -1;
-	if ( texpx >= src->sx ) {
-		if ( xx >= src->sx ) return -1;
-		psx = src->sx - xx;
-	}
-	if ( texpy < 0 ) return -1;
-	if ( texpy >= src->sy ) {
-		if ( yy >= src->sy ) return -1;
-		psy = src->sy - yy;
+	if (vp_flag == BMSCR_VPFLAG_NOUSE) {
+		if (texpx < 0) return -1;
+		if (texpx >= src->sx) {
+			if (xx >= src->sx) return -1;
+			psx = src->sx - xx;
+		}
+		if (texpy < 0) return -1;
+		if (texpy >= src->sy) {
+			if (yy >= src->sy) return -1;
+			psy = src->sy - yy;
+		}
 	}
 	bak_cx = cx + psx;
 	bak_cy = cy;

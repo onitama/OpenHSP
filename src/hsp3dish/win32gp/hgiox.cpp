@@ -1117,7 +1117,9 @@ int hgio_mes(BMSCR* bm, char* msg)
 	texmesManager *tmes = game->getTexmesManager();
 
 	// print per line
-	if (bm->cy >= bm->sy) return -1;
+	if (bm->vp_flag == BMSCR_VPFLAG_NOUSE) {
+		if (bm->cy >= bm->sy) return -1;
+	}
 
 	if (*msg == 0) {
 		ysize = tmes->_fontsize;
