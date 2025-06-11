@@ -59,7 +59,7 @@ Use “setup.sh” for install the library and build or or try make from command
 The necessary tools have been compiled and HSP3 is ready for use.
 
 
-# Regacy Raspberry Pi installation
+# Legacy Raspberry Pi installation
 
 It runs on RaspberryPi OS.
 Please use it with Raspbian running and a keyboard and mouse connected in advance.

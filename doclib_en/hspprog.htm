@@ -1251,14 +1251,16 @@ p2=0〜65535(0)</pre>
 			<code>"VALUE="+val</code> is <code>"VALUE=5"</code> (if the variable val is 5).
 		</p>
 		<p>
-			"\" is interpreted as a character with a special meaning.
+			As with many other programming languages, the backslash (<tt>\</tt>) is a 
+			metacharacter in HSP strings and is used to start an escape sequence which is 
+			interpreted as below:
 		</p>
 		<ul>
-			<li>"\n" means to start a new line.</li>
-			<li>"\t" represents the TAB code.</li>
-			<li>"\r" represents the return code (0x0d).</li>
-			<li>"\"" represents a double quote (").</li>
-			<li>"\\" is just a "\".</li>
+			<li><tt>"\n"</tt> produces a string containing a new line character (i.e. ASCII 0x0A)</li>
+			<li><tt>"\t"</tt> produces a string containing a horizontal tab character (i.e. ASCII 0x09)</li>
+			<li><tt>"\r"</tt> produces a string containing the carriage return character (i.e. ASCII 0x0d)</li>
+			<li><tt>"\""</tt> produces a string containing double quotes (i.e. ASCII 0x22)</li>
+			<li><tt>"\\"</tt> produces a string containing a single backslash (i.e. ASCII 0x5C)</li>
 		</ul>
 		<p>
 			Therefore, a string to indicate a directory, such as <code>"C:\WINDOWS\SYSTEM"</code>,
@@ -1267,10 +1269,10 @@ p2=0〜65535(0)</pre>
 		<p>
 			It is also possible to write long strings that do not fit on one line collectively.
 		</p>
-			<pre>    mes {"
+			<code>    mes {"
     Here, you can write a message directly
     on the entire line.
-"}</pre>
+"}</code>
 		<p>
 			In this way, everything between "{" and "}" is interpreted as a string.
 			When spanning multiple lines, a line feed code is inserted at the end of each line.
@@ -1301,7 +1303,7 @@ p2=0〜65535(0)</pre>
 			<tr><td>noteload</td><td>Load target buffer</td></tr>
 		</table>
 		<p>
-			In addition, many support is provided by extension plugins and modules.
+			Additionally, there are many more commands and functions provided by extension plugins and modules.
 		</p>
 
 
@@ -3040,17 +3042,43 @@ owari         → mes "OK"</pre>
         mes "a="+a
     wend        ; Repeats while and below only while a is 5 or less</pre>
 		<h4>for〜next macro</h4>
-			<pre>for variable name, initial value(0), final value(0), increment(1)</pre>
+			<code>for <em>variable</em>, <em>initial</em>, <em>final</em>, <em>increment</em></code>
 			<p>
-				By specifying as a parameter, the for〜next section is repeated the specified number of times.
-				Values in parentheses are values when omitted. The variable name cannot be omitted.
-				The specified variable is used as a counter, starting from the initial value,
-				and the increment is added each time it is repeated. When the final value is reached,
-				it exits the loop (the final value is not included in the loop).
+				The for〜next macro allows repeating execution of a sequence of statements.
 			</p>
 			<p>
-				If the final value condition is met from the beginning, the repetition will not be executed.
-				You can also restart from the beginning of the loop with _continue, and escape the loop with _break.
+				The variable name is mandatory and may not be omitted.  Other parameters to the for〜next 
+				macro may be omitted, but only if the parameters preceding it have already been specified (e.g. 
+				not omitted).
+			
+				The specified <em>variable</em> is used as a counter, starting with the <em>initial</em> value 
+				and ending with the <em>final</em> value; after each iteraction, the value of <em>increment</em> 
+				will be added to the counter <em>variable</em>, and the value of <em>variable</em> will be 
+				compared against <em>final</em>.  Upon <em>variable</em> reaching the <em>final</em>
+				value, the loop will be terminated (e.g. the loop will not execute with <em>variable</em> set to the
+				<em>final</em> value), and program execution continues after the loop.
+
+				<ul>
+				<li>If omitted, the initial value defaults to 0.</li>
+				<li>If omitted, the final value defaults to 0.</li>
+				<li>If omitted, the increment value defaults to 1.</li>
+				</ul>
+			</p>
+			<p>
+				The <em>initial</em>, <em>final</em>, and <em>increment</em> values must all evaluate to integer 
+				expressions.
+			</p>
+			<p>
+				If the <em>initial</em> value is the same as the <em>final</em> value, the entire body of the 
+				for〜next macro will not be executed.
+
+				The <code>_continue</code> macro skips execution of the remainder of the current iteration of this loop;
+				however, <em>increment</em> is still added to <em>variable</em>, and <em>variable</em> is still compared 
+				to <em>final</em> to determine if the next iteration of the loop should run.
+
+				The <code>_break</code> macro terminates any remaining iterations of the loop, as if <em>variable</em>
+				were equal to <em>final</em>; however, <em>variable</em> retains the value it had before 
+				the <code>_break</code> macro.
 			</p>
 			<pre>; Example
     for a,0,5,1
