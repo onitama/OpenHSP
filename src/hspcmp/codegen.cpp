@@ -2868,7 +2868,7 @@ int CToken::PutLIB( int flag, char *name )
 	lib.hlib = NULL;
 #endif
 	lib.clsid = -1;
-	li_buf->PutData( &lib, sizeof(LIBDAT) );
+	li_buf->PutData( &lib, sizeof(HED_LIBDAT) );
 	//Mesf( "LIB#%d:%s",flag,name );
 
 	return p;
@@ -2877,8 +2877,8 @@ int CToken::PutLIB( int flag, char *name )
 
 void CToken::SetLIBIID( int id, char *clsid )
 {
-	LIBDAT *l;
-	l = (LIBDAT *)li_buf->GetBuffer();
+	HED_LIBDAT *l;
+	l = (HED_LIBDAT *)li_buf->GetBuffer();
 	l += id;
 	if ( *clsid == 0 ) {
 		l->clsid = -1;

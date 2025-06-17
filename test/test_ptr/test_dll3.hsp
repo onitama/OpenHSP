@@ -1,0 +1,16 @@
+; test_dll3.hsp - call two shared libraries with int-returning functions
+#runtime "hsp3cl"
+
+; use libc to call strlen and getpid
+#uselib "libc.so.6"
+#cfunc c_strlen "strlen" sptr
+#cfunc c_getpid "getpid"
+
+; use libm to call ilogb (returns int)
+#uselib "libm.so.6"
+#cfunc c_ilogb "ilogb" double
+
+; display results
+mes "c_strlen(\"Hello\") = " + c_strlen("Hello")
+mes "c_getpid() = " + c_getpid()
+mes "ilogb(3.14) = " + c_ilogb(3.14)
