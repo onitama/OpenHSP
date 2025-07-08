@@ -5,7 +5,16 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 
 ・hsp3関連 更新履歴
 
-	2025/03/13 3.7 beta10a
+	2025/06/09 3.7 RC1
+
+	mes命令の第2パラメーターで文字列の変換を行った際に表示が変わってしまう不具合を修正
+	[HGIMG4] gpload命令でエラーが発生した場合でもオブジェクトが生成される不具合を修正
+	[HGIMG4] gpmesh命令で空のメッシュを作成した場合でもオブジェクトが生成される不具合を修正
+	[HSP3Dish] viewcalc命令による座標変換時は、mes,celput等の表示座標チェックを除外するように修正
+	[HSP3Dish] es_draw命令にスプライトのデバッグ表示オプションを追加
+	[HSP3Dish] es_check命令の衝突判定取得に回転を考慮した判定オプションを追加
+
+	2025/04/07 3.7 beta10a
 
 	コンパイル時にプラットフォームマクロ(_hspwin、_hsplinux)が定義されるように修正
 	[hspinet] jsonオブジェクトで実数を扱うためのjsonsetprmd,jsongetd,jsonputd命令を追加
@@ -14,6 +23,7 @@ Hot Soup Processor ver3.7beta                       HSP : Hot Soup Processor
 	[HSP3Dish] httploadでエラーが発生した際に以降のリクエストができなくなる不具合を修正
 	[HSP3Dish][hsp3js] 大きいフォントが描画されない不具合に対応(zakki)
 	[HSP3Dish][android] β10版のhsp3dhでSDKダウンロードが正しくできなかった不具合を修正
+	[HSP3Dish][dotfw] 外部ジョイスティックの使用をWindows版のみ行われるように修正
 
 	2025/02/14 3.7 beta10
 

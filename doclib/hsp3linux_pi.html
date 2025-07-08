@@ -51,7 +51,7 @@
 		LinuxのGUI環境(X Window System)で動作します。一部の機能は、OpenGL及びSDLライブラリを使用して動作します。
 		ネットワークに接続できる場合は、gitコマンドで直接リポジトリを取得してください。
 		</p><pre>
-	git clone http://github.com/onitama/OpenHSP
+	git clone https://github.com/onitama/OpenHSP
 		</pre><p>
 		アーカイブがある場合は、内容を任意のディレクトリに展開して、ソースをコンパイルしてください。コンパイルには、gcc及びmakeを実行できる環境が必要になります。
 コンパイルの際には、以下のライブラリが必要になりますので、あらかじめ確認を行なって下さい。
@@ -90,25 +90,10 @@ Debian(Ubuntu)の場合は、以下のスクリプトを実行してコンパイ
 
 		<h2 id="DATA">Raspberry Piインストール</h2>
 		<p>
-		<img src="image/hsp_pi2.jpg" align="right">
-		Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi400, Raspberry Pi4, Raspberry Pi5, Raspberry Pi zeo上で動作します。<br>
-		Raspberry Pi OS, Raspbian OS上で動作します。あらかじめ、Raspbianが動作してキーボード、マウスが接続されている状態でご使用ください。
-		<br>
-		
-		<br>
-		hsp3dish及びhsp3gp(HGIMG4)、hsed(スクリプトエディタ)は、GUI環境でのみ動作します。<br>		
-		githubから最新版を任意のディレクトリに展開して、ソースをコンパイルしてください。コンパイルには、gcc及びmakeを実行できる環境が必要になります。
-		</p><pre>
-	git clone http://github.com/onitama/OpenHSP
-	cd OpenHSP
-		</pre><p>
-コンパイルの際には、追加のライブラリが必要になります。ネットワークに接続されている状態でライブラリをダウンロードする必要があります。
-	Raspberry Pi OSの場合は、以下のコマンドを実行することでセットアップが実行されます。
-
-		</p><pre>
-	./setup.sh
-		</pre><p>
-	Raspberry Pi3以下の環境で、Raspbian OSの場合は、以下のコマンドを実行することでセットアップが実行されます。
+		Raspberry Piを使用している場合も、最新のRaspberry Pi OSをご使用の際はLinuxインストールと
+		同様の手順でインストールすることが可能です。
+		現在は、Raspberry Pi, Raspberry Pi2, Raspberry Pi3, Raspberry Pi400, Raspberry Pi4, Raspberry Pi5, Raspberry Pi zeo上で動作します。(Picoは動作対象外です)<br>
+		古いRaspbian OS上で動作させる場合は、以下のコマンドを実行することでセットアップが実行されます。
 		</p><pre>
 	./pisetup.sh
 		</pre><p>
@@ -120,8 +105,8 @@ Debian(Ubuntu)の場合は、以下のスクリプトを実行してコンパイ
 アーカイブの内容が展開されたディレクトリでmakeコマンドを実行してください。
 必要なツールのコンパイルが行なわれ、HSP3が使用できる状態になります。<br>
 		</p><pre>
-※ Raspberry Pi4以降の場合は、Linuxと同様の方法でインストールを行ってください
-※ Raspberry Pi4以降ではフルスクリーンによる実行はサポートされません
+※ Raspbian OS以外の環境では、Linuxと同様の方法でインストールを行ってください
+※ Raspbian OS以外の環境では、フルスクリーンによる実行はサポートされません
 		</pre>
 
 		<h2 id="DATA">使用方法</h2>
@@ -158,7 +143,7 @@ HSP3Dishに対応するサンプルコードがsampleフォルダに含まれて
 同様に、「hsp3dish」「hsp3gp」などのランタイムに合わせたスクリプトを実行させることができます。
 (「hsp3dish」「hsp3gp」の実行は、GUI環境が必要になります。)
 		<br><br>
-Raspberry Pi版では、フルスクリーンで実行を行ないます。 実行の中断は、[ctrl]+[C]か[esc]キーを押してください。 キーボードだ正しく認識されていない場合など、中断ができなくなることがありますので注意してください。 GUIエディタだけでなく、コマンドラインから「./hsp3dish ****.ax」の形で実行を行なうことも可能です。
+※古いRaspberry Piでは、フルスクリーンで実行を行ないます。 実行の中断は、[ctrl]+[C]か[esc]キーを押してください。 キーボードだ正しく認識されていない場合など、中断ができなくなることがありますので注意してください。 GUIエディタだけでなく、コマンドラインから「./hsp3dish ****.ax」の形で実行を行なうことも可能です。
 		</p>
 		<table>
 				<tr>
@@ -400,7 +385,7 @@ warranties of merchantability and fitness for a particular purpose are disclaime
 	</p>
 	<ul><pre>
 		Github OpenHSP Development
-		<a href="http://github.com/onitama/OpenHSP" target="_blank">http://github.com/onitama/OpenHSP</a>
+		<a href="https://github.com/onitama/OpenHSP" target="_blank">https://github.com/onitama/OpenHSP</a>
 	</pre></ul>
 
 

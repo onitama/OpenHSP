@@ -23,10 +23,6 @@
 #include "../dpmread.h"
 #include "../strbuf.h"
 
-#ifdef HSPUTF8
-#pragma execution_character_set("utf-8")
-#endif
-
 //
 //		basic C I/O support
 //

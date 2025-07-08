@@ -919,7 +919,7 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	j_dispDialog( str1, str2, mode );
 #endif
 #ifdef HSPIOS
-    gpb_dialog( mode, str1, str2 );
+    gb_dialog( mode, str1, str2 );
     //Alertf( str1 );
 #endif
 #ifdef HSPLINUX
@@ -1117,7 +1117,9 @@ int hgio_mes(BMSCR* bm, char* msg)
 	texmesManager *tmes = game->getTexmesManager();
 
 	// print per line
-	if (bm->cy >= bm->sy) return -1;
+	if (bm->vp_flag == BMSCR_VPFLAG_NOUSE) {
+		if (bm->cy >= bm->sy) return -1;
+	}
 
 	if (*msg == 0) {
 		ysize = tmes->_fontsize;

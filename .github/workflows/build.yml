@@ -31,7 +31,7 @@ jobs:
   build-js:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4    
+    - uses: actions/checkout@v4
     - name: Setup cache
       id: cache-system-libraries
       uses: actions/cache@v4
@@ -58,3 +58,34 @@ jobs:
           *.wasm
           src/hspcmp/*.js
           src/hspcmp/*.wasm
+
+  build-win32:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build hsp3
+      working-directory: src/hsp3
+      run: |
+        cmd /c vsbuild.bat
+
+    - name: Build hsp3dish
+      working-directory: src/hsp3dish
+      run: |
+        cmd /c vsbuild.bat
+
+    - name: Build hspcmp
+      working-directory: src/hspcmp
+      run: |
+        cmd /c vsbuild.bat
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: openhsp-win32
+        path: |
+          src/hsp3/Release/**/*

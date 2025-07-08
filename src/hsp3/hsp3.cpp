@@ -51,6 +51,11 @@ Hsp3::Hsp3()
 	hspctx.tvfoldername = sbAlloc(HSPCTX_PATH_MAX);
 	hspctx.homefoldername = sbAlloc(HSPCTX_PATH_MAX);
 
+	//		拡張文字列バッファ
+	hspctx.estmp = sbAlloc(HSPCTX_REFSTR_MAX);
+	hspctx.estmp_ptr = 0;
+	hspctx.estmp_max = HSPCTX_REFSTR_MAX;
+
 	//		language setup
 	hspctx.language = HSPCTX_LANGUAGE_EN;				// Default Language
 

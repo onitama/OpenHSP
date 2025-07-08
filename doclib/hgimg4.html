@@ -14,7 +14,7 @@
 <body>
 	<div id="CONTAINER">
 	<!-- ヘッダー -->
-	<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2024(c)</p>
+	<p id="COPY">HSP : Hot Soup Processor ver3.7 / onion software 1997-2025(c)</p>
 	<img src="image/hgimg4ttl.jpg" width="640" height="200" alt="title">
 	<h1>HGIMG4プログラミングガイド</h1>
 
@@ -253,7 +253,7 @@
 	gplight id,opt,range,inner,outer		ライトノードを設定
 	gpcamera id,fov,aspect,near,far			カメラノードを設定
 
-	gpclone var,objid				ノードを複製
+	gpclone var,objid,mode,eventid			ノードを複製
 	setobjmode objid,value,mode			オブジェクトのモード設定
 	setalpha objid,value				オブジェクトの透明度(α値)設定
 	gplookat objid,x,y,z				指定座標に向けてノードを回転
@@ -1943,14 +1943,27 @@ groupパラメーターで、衝突の対象となるコリジョングループ
 	クローン機能は、既に存在するオブジェクトと同じ設定で、新しいオブジェクトを
 	生成するものです。同一の形状、パラメーター設定(物理設定を除く)を持ちますが座標や角度
 	などを新しく設定することができます。
-	同一の物体を複数生成する場合に、設定や読み込みを何度も行なう手間を軽減し高速化にも
-	つながります。
+	同一の物体を複数生成する場合に、設定や読み込みを何度も行なう手間を軽減し高速化にもつながります。
 	</p>
 	<pre>
 		例:
 		gpload id_model,"res/duck"	; モデル読み込み
 		gpclone i, id_model		; 同じものをクローン
 	</pre>
+	<p>
+	gpclone命令は、オブジェクトのクローンを行った後、モード値の追加やイベントの設定などを行うことが可能です。
+	</p>
+	<pre>
+		gpclone var,objid,mode,eventid
+
+		var         : 複製されたオブジェクトのIDが代入される変数名
+		objid(0)    : 複製元のオブジェクトID
+		mode(0)     : 追加モード値
+		eventid(-1) : イベントID
+	</pre>
+	<p>
+	特に必要ない場合は、モード値やイベントIDの指定は省略することができます。
+	</p>
 
 
 	<h2 id="VECTOR">実数ベクトルサポート命令</h2>

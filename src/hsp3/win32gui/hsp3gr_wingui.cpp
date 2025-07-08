@@ -27,10 +27,6 @@
 #include "../hsp3code.h"
 #include "../hsp3debug.h"
 
-#ifdef HSPUTF8
-#pragma execution_character_set("utf-8")
-#endif
-
 /*------------------------------------------------------------*/
 /*
 		system data
@@ -569,7 +565,9 @@ static int cmdfunc_extcmd( int cmd )
 		int sw;
 		char *ptr;
 		ptr = code_getdsi( "" );
+		code_estmppush(ptr);
 		sw = code_getdi(0);
+		ptr = code_estmppop();
 		bmscr->Print(ptr, sw );
 		break;
 	}

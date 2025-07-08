@@ -35,11 +35,6 @@
 #pragma comment(lib,"winmm.lib")
 #endif
 
-#ifdef HSPUTF8
-#pragma execution_character_set("utf-8")
-#endif
-
-
 #define sndbank(a) (char *)(mem_snd[a].mempt)
 
 void MMMan::SendMCIT(TCHAR *ss)

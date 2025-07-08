@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ソース ファイル">
@@ -144,34 +144,19 @@
     <ClCompile Include="..\hspwnd_edit.cpp">
       <Filter>ソース ファイル\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\hsp3\filepack.cpp">
+    <ClCompile Include="..\..\..\..\..\hsp3\filepack.cpp">
       <Filter>ソース ファイル\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\hsp3\hsp3crypt.cpp">
+    <ClCompile Include="..\..\..\..\..\hsp3\hsp3crypt.cpp">
       <Filter>ソース ファイル\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp">
+    <ClCompile Include="..\..\..\..\..\hsp3\hsp3utfcnv.cpp">
       <Filter>ソース ファイル\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\win32\filedlg.cpp">
+    <ClCompile Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.cpp">
       <Filter>ソース ファイル\win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\hsp3\win32gui\supio_win_unicode.cpp">
-      <Filter>ソース ファイル\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\win32\bmscr_exc.cpp">
-      <Filter>ソース ファイル\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\hsp3\win32gui\comobj.cpp">
-      <Filter>ソース ファイル\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\hsp3\win32gui\comobj_event.cpp">
-      <Filter>ソース ファイル\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\hsp3\win32gui\hspvar_comobj.cpp">
-      <Filter>ソース ファイル\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\hsp3\win32gui\hspvar_variant.cpp">
+    <ClCompile Include="..\..\..\..\..\hsp3dish\win32\filedlg.cpp">
       <Filter>ソース ファイル\win</Filter>
     </ClCompile>
   </ItemGroup>
@@ -314,28 +299,19 @@
     <ClInclude Include="..\emscripten\fontsystem.h">
       <Filter>ヘッダー ファイル\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\hsp3\filepack.h">
+    <ClInclude Include="..\..\..\..\..\hsp3\filepack.h">
       <Filter>ヘッダー ファイル\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\hsp3\hsp3crypt.h">
+    <ClInclude Include="..\..\..\..\..\hsp3\hsp3crypt.h">
       <Filter>ヘッダー ファイル\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\hsp3\hsp3utfcnv.h">
+    <ClInclude Include="..\..\..\..\..\hsp3\hsp3utfcnv.h">
       <Filter>ヘッダー ファイル\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\win32\filedlg.h">
+    <ClInclude Include="..\..\..\..\..\hsp3dish\win32\bmscr_exc.h">
       <Filter>ヘッダー ファイル\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\hsp3\win32gui\supio_win_unicode.h">
-      <Filter>ヘッダー ファイル\win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\win32\bmscr_exc.h">
-      <Filter>ヘッダー ファイル\win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\hsp3\win32gui\comobj.h">
-      <Filter>ヘッダー ファイル\win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\hsp3\win32gui\comobj_event.h">
+    <ClInclude Include="..\..\..\..\..\hsp3dish\win32\filedlg.h">
       <Filter>ヘッダー ファイル\win</Filter>
     </ClInclude>
   </ItemGroup>

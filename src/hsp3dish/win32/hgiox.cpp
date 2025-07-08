@@ -1753,6 +1753,7 @@ void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, i
 	texid = bmsrc->texid;
 	ChangeTex( texid );
 	tex = GetTex( texid );
+	if (tex==NULL) throw HSPERR_ILLEGAL_FUNCTION;
 	sx = tex->ratex;
 	sy = tex->ratey;
 
@@ -2146,7 +2147,9 @@ int hgio_mes(BMSCR* bm, char* msg)
 	if (drawflag == 0) hgio_render_start();
 
 	// print per line
-	if (bm->cy >= bm->sy) return -1;
+	if (bm->vp_flag == BMSCR_VPFLAG_NOUSE) {
+		if (bm->cy >= bm->sy) return -1;
+	}
 
 	if (*msg == 0) {
 		ysize = tmes._fontsize;

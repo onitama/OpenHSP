@@ -19,13 +19,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -61,7 +61,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -76,7 +76,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -91,8 +91,8 @@
     <ClCompile Include="..\..\hsp3\filepack_write.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3crypt.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp" />
-    <ClCompile Include="..\..\hsp3\strbuf.cpp" />
     <ClCompile Include="..\..\hsp3\strnote.cpp" />
+    <ClCompile Include="..\..\hsp3\strbuf.cpp" />
     <ClCompile Include="..\..\hsp3\win32gui\supio_win.cpp" />
     <ClCompile Include="..\ahtmodel.cpp" />
     <ClCompile Include="..\ahtobj.cpp" />
@@ -113,8 +113,8 @@
     <ClInclude Include="..\..\hsp3\filepack.h" />
     <ClInclude Include="..\..\hsp3\hsp3crypt.h" />
     <ClInclude Include="..\..\hsp3\hsp3utfcnv.h" />
-    <ClInclude Include="..\..\hsp3\strbuf.h" />
     <ClInclude Include="..\..\hsp3\strnote.h" />
+    <ClInclude Include="..\..\hsp3\strbuf.h" />
     <ClInclude Include="..\..\hsp3\win32gui\supio_win.h" />
     <ClInclude Include="..\ahtmodel.h" />
     <ClInclude Include="..\ahtobj.h" />

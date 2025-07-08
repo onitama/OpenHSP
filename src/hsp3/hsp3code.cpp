@@ -1656,6 +1656,60 @@ char *code_stmpstr( char *src )
 }
 
 
+char* code_estmppush(char* ptr)
+{
+	//		estmp(拡張文字列バッファ)に文字列をpushする
+	//		( 拡張文字列バッファ = 先頭4byteに前回のptr、その後に実際の文字列データが続く )
+	//
+	char* p;
+	char* pstr;
+	char* mystr = ptr;
+	if (mystr == NULL) mystr = "";
+
+	int size = strlen(mystr);
+	int mysize = (size + 3) & 0xfffffffc;
+	int prevptr = hspctx->estmp_ptr;
+
+	int newptr = prevptr + sizeof(int) + mysize;
+	int newbufsize = newptr + sizeof(int);
+
+	if (hspctx->estmp_max <= newbufsize) {
+		hspctx->estmp = sbExpand(hspctx->estmp, newbufsize);
+		hspctx->estmp_max = newbufsize;
+	}
+
+	p = hspctx->estmp + prevptr;
+	pstr = p + sizeof(int);
+	strcpy( pstr, mystr );	// 実際のデータをコピーする
+
+	p = hspctx->estmp + newptr;
+	*(int*)p = prevptr;		// 以前のポインタを保存する
+	hspctx->estmp_ptr = newptr;
+
+	return pstr;
+}
+
+
+char* code_estmppop(void)
+{
+	//		estmp(拡張文字列バッファ)から文字列をpopする
+	//
+	char* p = hspctx->estmp + hspctx->estmp_ptr;
+	if (hspctx->estmp_ptr <= 0) {
+		hspctx->estmp_ptr = 0;
+		return "";			// もうpopできない
+	}
+	int prevptr = *(int*)p;
+	if (prevptr >= hspctx->estmp_max) {
+		hspctx->estmp_ptr = 0;
+		return "";			// ポインタがおかしい
+	}
+	hspctx->estmp_ptr = prevptr;
+	p = hspctx->estmp + prevptr + sizeof(int);
+	return p;
+}
+
+
 char *code_getsptr( int *type )
 {
 	int fl;

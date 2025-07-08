@@ -33,9 +33,6 @@ char* hsp3ext_getdir(int id);
 #include "hsp3config.h"
 #include "supio.h"
 #include "hsp3ext.h"
-#ifdef HSPUTF8
-#pragma execution_character_set("utf-8")
-#endif
 
 //
 //		変換用のテンポラリ
