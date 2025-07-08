@@ -381,8 +381,10 @@ public:
 	int setObjLight( int objid );
 
 	char *getAnimId(int objid, int index, int option);
-	int getAnimPrm(int objid, int index, int option, int *res);
+	int getAnimPrm(int objid, int index, int option, int* res);
+	int getAnimPrmFloat(int objid, int index, int option, float* res);
 	int setAnimPrm(int objid, int index, int option, int value);
+	int setAnimPrmFloat(int objid, int index, int option, float value);
 	int addAnimId(int objid, char *name, int start, int end, int option);
 	int playAnimId(int objid, char *name, int option);
 

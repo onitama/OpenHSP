@@ -1797,6 +1797,36 @@ int gamehsp::getAnimPrm(int objid, int index, int option, int *res)
 	return 0;
 }
 
+int gamehsp::getAnimPrmFloat(int objid, int index, int option, float* res)
+{
+	gpobj* obj;
+	Animation* anim;
+	AnimationClip* clip;
+	float p_res = 0;
+	obj = getObj(objid);
+	if (obj == NULL) return -1;
+	anim = obj->_animation;
+	if (anim == NULL) return -1;
+	int max = anim->getClipCount();
+	if ((index < 0) || (index >= max)) return -1;
+	clip = anim->getClip(index);
+	switch (option) {
+	case GPANIM_OPT_ELAPSED:
+		p_res = clip->getElapsedTime();
+		break;
+	case GPANIM_OPT_BLEND:
+		p_res = clip->getBlendWeight();
+		break;
+	case GPANIM_OPT_SPEED:
+		p_res = clip->getSpeed();
+		break;
+	default:
+		return -1;
+	}
+	*res = p_res;
+	return 0;
+}
+
 int gamehsp::setAnimPrm(int objid, int index, int option, int value)
 {
 	gpobj *obj;
@@ -1830,6 +1860,35 @@ int gamehsp::setAnimPrm(int objid, int index, int option, int value)
 		float weight = (float)value;
 		weight = weight * 0.01f;
 		clip->setSpeed(weight);
+		break;
+	}
+	default:
+		return -1;
+	}
+	return 0;
+}
+
+int gamehsp::setAnimPrmFloat(int objid, int index, int option, float value)
+{
+	gpobj* obj;
+	Animation* anim;
+	AnimationClip* clip;
+	obj = getObj(objid);
+	if (obj == NULL) return -1;
+	anim = obj->_animation;
+	if (anim == NULL) return -1;
+	int max = anim->getClipCount();
+	if ((index < 0) || (index >= max)) return -1;
+	clip = anim->getClip(index);
+	switch (option) {
+	case GPANIM_OPT_BLEND:
+	{
+		clip->setBlendWeight(value);
+		break;
+	}
+	case GPANIM_OPT_SPEED:
+	{
+		clip->setSpeed(value);
 		break;
 	}
 	default:

@@ -365,8 +365,10 @@ static void code_setva_double(PVal* pval, APTR aptr, double *ptr)
 	if (aptr > 0) {
 		size = (aptr + 1);
 		if (inisize < size) {
-			pval->len[1] = size;						// ちょっと強引に配列を拡張
-			pval->size = size * sizeof(HSPREAL);
+			if (pval->len[2] == 0) {
+				pval->len[1] = size;						// ちょっと強引に配列を拡張
+				pval->size = size * sizeof(HSPREAL);
+			}
 		}
 	}
 	code_setva(pval, aptr, HSPVAR_FLAG_DOUBLE, ptr);
@@ -2492,23 +2494,37 @@ static int cmdfunc_extcmd( int cmd )
 			else {
 				ctx->stat = 0;
 				code_setva(p_pval, p_aptr, HSPVAR_FLAG_STR, ps);
+				break;
 			}
 		}
-		else {
-			int res = 0;
-			ctx->stat = game->getAnimPrm(p1, p2, p3, &res);
-			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
+		if (p3 & 32) {
+			double dp;
+			float value;
+			ctx->stat = game->getAnimPrmFloat(p1, p2, p3&31, &value);
+			dp = (double)value;
+			code_setva(p_pval, p_aptr, HSPVAR_FLAG_DOUBLE, &dp);
+			break;
 		}
+		int res = 0;
+		ctx->stat = game->getAnimPrm(p1, p2, p3, &res);
+		code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &res);
 		break;
 	}
 
 	case 0xf9:								// gpsetanim
 	{
+		double dp;
 		p1 = code_getdi(0);
 		p2 = code_getdi(0);
 		p3 = code_getdi(0);
-		p4 = code_getdi(0);
-		ctx->stat = game->setAnimPrm(p1, p2, p3, p4);
+		if (p3 & 32) {
+			dp = code_getdd(0.0);
+			ctx->stat = game->setAnimPrmFloat(p1, p2, p3&31, (float)dp);
+		}
+		else {
+			p4 = code_getdi(0);
+			ctx->stat = game->setAnimPrm(p1, p2, p3, p4);
+		}
 		break;
 	}
 
