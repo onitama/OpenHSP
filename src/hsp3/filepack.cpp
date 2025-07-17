@@ -443,7 +443,10 @@ int FilePack::LoadPackFile( char *fname, int encode, int dpmoffset, int slot)
 
 	p = (HFPHED *)_MALLOC( hedsize );
 	ff=hsp3_fopen(dpmname, dpmoffset);
-	if (ff == NULL) return -2;
+	if (ff == NULL) {
+		_FREE(p);
+		return -2;
+	}
 	hsp3_fread( ff, p, hedsize );
 	hsp3_fclose(ff);
 

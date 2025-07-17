@@ -243,7 +243,7 @@ int CToken::AddPackfile( char *name, int mode )
 		strcat(fname, p_fname);
 	}
 	else {
-		strcat(fname, name);
+		strcpy(fname, name);
 	}
 
 	strcpy( packadd, fname);
@@ -307,7 +307,7 @@ int CToken::AddPackfileOrig(char* name, int mode)
 		strcat(fname, p_fname);
 	}
 	else {
-		strcat(fname, name);
+		strcpy(fname, name);
 	}
 
 	strcpy(packadd, fname);

@@ -1895,7 +1895,10 @@ int essprite::draw(int start, int num, int mode, int start_pri, int end_pri)
 	a1 = start; a2 = num;
 	if (a1 < 0) a1 = 0;
 	if (a2 < 0) a2 = spkaz;
-	if (a1 >= spkaz) return -1;
+	if (a1 >= spkaz) {
+		delete [] selspr;
+		return -1;
+	}
 	if ((a1 + a2) >= spkaz) a2 = spkaz-a1;
 
 	if ((start_pri >= 0) && (end_pri >= 0)) {
