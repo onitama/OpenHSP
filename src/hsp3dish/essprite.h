@@ -320,8 +320,8 @@ public:
 	void clear(int p1, int p2);
 	void setTransparentMode(int tp);
 	SPOBJ* resetSprite(int spno);
-	int put(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1, int mode = 0);
-	int put2(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1, int mode = 0);
+	int put(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1, int mode = ESDRAW_DEBUG);
+	int put2(int x, int y, int chr, int tpflag = -1, int zoomx = 0x10000, int zoomy = 0x10000, int rotz = 0, int mulcolor = -1, int mode = ESDRAW_DEBUG);
 	int draw(int start, int num, int mode, int start_pri, int end_pri);
 	int execSingle(int id);
 	int find(int chktype, int spno, int endspno = -1, int step = 0);
