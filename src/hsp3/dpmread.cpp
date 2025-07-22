@@ -165,17 +165,20 @@ int dpm_filecopy( char *fname, char *sname )
 	fp2=fopen(sname,"wb");if (fp2==NULL) return 1;
 #endif
 	fp1 = filepack.pack_fopen(fname);
-	if (fp1 == NULL) return -1;
+	if (fp1 == NULL) {
+		fclose(fp2);
+		return -1;
+	}
 
-		mem=(char *)mem_ini(max);
-		while(1) {
-			if (flen==0) break;
-			if (flen<max) xlen=flen; else xlen=max;
-			filepack.pack_fread(fp1, mem, xlen);
-			fres = (int)fwrite( mem, 1, xlen, fp2 );
-			if (fres<xlen) break;
-			flen-=xlen;
-		}
+	mem=(char *)mem_ini(max);
+	while(1) {
+		if (flen==0) break;
+		if (flen<max) xlen=flen; else xlen=max;
+		filepack.pack_fread(fp1, mem, xlen);
+		fres = (int)fwrite( mem, 1, xlen, fp2 );
+		if (fres<xlen) break;
+		flen-=xlen;
+	}
 
 	filepack.pack_fclose(fp1);
 	fclose(fp2);
