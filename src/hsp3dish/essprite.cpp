@@ -585,6 +585,8 @@ int essprite::put(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, i
 	x = xx; y = yy;
 	if ((chrno < 0) || (chrno >= chrkaz)) return -1;
 	chr = &mem_chr[chrno];
+	if (chr == NULL) return -2;
+	if (chr->wid <= 0) return -2;
 	nx = chr->bsx; ny = chr->bsy;
 	ix = chr->bx; iy = chr->by;
 	ofsx = chr->putofsx;
@@ -603,20 +605,20 @@ int essprite::put(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, i
 
 		x += ofsx; y += ofsy;
 		if (sprite_clip) {
-			if ((x + vx) <= 0) return -1;
-			if ((x - vx) > main_sx) return -1;
-			if ((y + vy) <= 0) return -1;
-			if ((y - vy) > main_sy) return -1;
+			if ((x + vx) <= 0) return 1;
+			if ((x - vx) > main_sx) return 1;
+			if ((y + vy) <= 0) return 1;
+			if ((y - vy) > main_sy) return 1;
 		}
 	}
 	else {
 		vx = nx; vy = ny;
 		x += ofsx; y += ofsy;
 		if (sprite_clip) {
-			if ((x + vx) <= 0) return -1;
-			if (x > main_sx) return -1;
-			if ((y + vy) <= 0) return -1;
-			if (y > main_sy) return -1;
+			if ((x + vx) <= 0) return 1;
+			if (x > main_sx) return 1;
+			if ((y + vy) <= 0) return 1;
+			if (y > main_sy) return 1;
 		}
 	}
 
@@ -732,6 +734,8 @@ int essprite::put2(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, 
 	x = xx; y = yy;
 	if ((chrno < 0) || (chrno >= chrkaz)) return -1;
 	chr = &mem_chr[chrno];
+	if (chr == NULL) return -2;
+	if (chr->wid <= 0) return -2;
 	nx = chr->bsx; ny = chr->bsy;
 	ix = chr->bx; iy = chr->by;
 	ofsx = chr->putofsx;
@@ -747,20 +751,20 @@ int essprite::put2(int xx, int yy, int chrno, int tpflag, int zoomx, int zoomy, 
 
 		x += ofsx; y += ofsy;
 		if (sprite_clip) {
-			if ((x + vx) <= 0) return -1;
-			if ((x - vx) > main_sx) return -1;
-			if ((y + vy) <= 0) return -1;
-			if ((y - vy) > main_sy) return -1;
+			if ((x + vx) <= 0) return 1;
+			if ((x - vx) > main_sx) return 1;
+			if ((y + vy) <= 0) return 1;
+			if ((y - vy) > main_sy) return 1;
 		}
 	}
 	else {
 		vx = nx; vy = ny;
 		x += ofsx; y += ofsy;
 		if (sprite_clip) {
-			if ((x + vx) <= 0) return -1;
-			if (x > main_sx) return -1;
-			if ((y + vy) <= 0) return -1;
-			if (y > main_sy) return -1;
+			if ((x + vx) <= 0) return 1;
+			if (x > main_sx) return 1;
+			if ((y + vy) <= 0) return 1;
+			if (y > main_sy) return 1;
 		}
 	}
 
@@ -1785,6 +1789,7 @@ int essprite::drawSubPut(SPOBJ *sp, int mode)
 {
 	//		1 sprite draw (on sp)
 	//
+	int st;
 	int res = 0;
 	int fl,x,y,xx,yy,blink;
 	int next;
@@ -1838,10 +1843,14 @@ int essprite::drawSubPut(SPOBJ *sp, int mode)
 			}
 		}
 		if (sprite_newfunc) {
-			put2(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor, mode);
+			st = put2(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor, mode);
 		}
 		else {
-			put(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor, mode);
+			st = put(x + ofsx, y + ofsy, chr, sp->tpflag, sp->zoomx, sp->zoomy, sp->rotz, sp->mulcolor, mode);
+		}
+		if (st < 0) {
+			Alertf("Invalid sprite CHR#%d (%d)", chr, st);
+			throw HSPERR_ILLEGAL_FUNCTION;
 		}
 		res++;
 	}

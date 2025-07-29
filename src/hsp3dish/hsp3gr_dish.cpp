@@ -3601,10 +3601,10 @@ static int cmdfunc_extcmd( int cmd )
 		p7 = code_getdi(0);
 		if (sprite->sprite_enable) {
 			if (sprite->sprite_newfunc) {
-				sprite->put2(p1, p2, p3, p4, p5, p6, p7, bmscr->mulcolor);
+				ctx->stat = sprite->put2(p1, p2, p3, p4, p5, p6, p7, bmscr->mulcolor);
 			}
 			else {
-				sprite->put(p1, p2, p3, p4, p5, p6, p7, bmscr->mulcolor);
+				ctx->stat = sprite->put(p1, p2, p3, p4, p5, p6, p7, bmscr->mulcolor);
 			}
 		} else throw HSPERR_UNSUPPORTED_FUNCTION;
 		break;
