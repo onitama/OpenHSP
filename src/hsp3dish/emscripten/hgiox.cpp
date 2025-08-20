@@ -481,6 +481,8 @@ void hgio_reset( void )
     glEnable(GL_BLEND);
 #ifdef HSPIOS
     glBlendEquationOES(GL_FUNC_ADD_OES);
+#else
+    glBlendEquation(GL_FUNC_ADD);
 #endif
     glBlendFunc(GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
 
@@ -722,6 +724,8 @@ static void setBlendMode( int mode )
             glEnable(GL_BLEND);
 #ifdef HSPIOS
             glBlendEquationOES(GL_FUNC_ADD_OES);
+#else
+            glBlendEquation(GL_FUNC_ADD);
 #endif
             glBlendFunc(GL_SRC_ALPHA,GL_ONE);
             break;
@@ -729,6 +733,8 @@ static void setBlendMode( int mode )
             glEnable(GL_BLEND);
 #ifdef HSPIOS
             glBlendEquationOES(GL_FUNC_REVERSE_SUBTRACT_OES);
+#else
+            glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
 #endif
             glBlendFunc(GL_SRC_ALPHA,GL_ONE);
             break;
