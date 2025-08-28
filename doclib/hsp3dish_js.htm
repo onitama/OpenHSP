@@ -28,6 +28,7 @@
 		<li><a href="#MEDIA">メディアファイルの再生</a></li>
 		<li><a href="#EXEC">exec,dialog命令によるブラウザ制御</a></li>
 		<li><a href="#SENSOR">センサー情報の取得<span class="new">（New!）</span></a></li>
+		<li><a href="#STORAGE">データ保存</a></li>
 		<li><a href="#NOTICE">制限事項・既知の問題点</a></li>
 		<li><a href="#FUTURE">今後の予定</a></li>
 		<li><a href="#LICENSE">ライセンス・謝辞</a></li>
@@ -184,6 +185,9 @@
 	        ENV.HSP_AUTOSCALE = "0";//スケーリングモード
 	        ENV.HSP_FPS = "0";//フレームレート
 	        ENV.HSP_LIMIT_STEP = "15000";//ブラウザに処理を返すまでの実行ステップ数
+	        ENV.HSP_FONT_LEADING = "1.1";//フォントの行間調整(1.0=余白無し,1.1=標準,1.2=少し広め)
+	        ENV.HSP_KEYBOARD_ELEMENT = null;//キーボード入力対象要素(null=ウィンドウ全体,または要素IDを"#canvas"などのように指定)
+	        ENV.HSP_SYNC_DIR = null;//IndexDBで永続化するディレクトリ
 	    });
 	</pre></ul>
 	<p>
@@ -280,6 +284,15 @@
 	ジャイロセンサーが使用可能な環境で、センサーの値を取得します。
 	それぞれの座標軸に対する傾き角度(Degree)を取得したものになります。
 	ジャイロセンサーが使用できない環境では、0.0が取得されます。
+	</p>
+
+
+	<h2 id="STORAGE">データ保存</h2>
+	<p>
+	基本的にはhsp3dish.jsでは、notesave命令やbsave命令などはメモリ上でエミュレートされ、ブラウザを閉じると消えてしまいます。<br>
+	hsp3dish.jsでの拡張としてIndexDBを使用して、データを永続化することも可能です。
+	ENV.HSP_SYNC_DIRに保存するディレクトリ名を指定し、<code>devcontrol "syncfs"</code>を呼び出すことで、指定したディレクトリ以下のデータをIndexedDBに保存することができます。
+	保存されたデータは、ブラウザを閉じても残りますので、次回起動時に復元されます。
 	</p>
 
 
