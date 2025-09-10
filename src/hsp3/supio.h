@@ -39,6 +39,10 @@
 #include "emscripten/supio_emscripten.h"
 #endif
 
+#ifdef HSPMAC
+#include "linux/supio_linux.h"
+#endif
+
 
 #endif
 

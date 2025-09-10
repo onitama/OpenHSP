@@ -1242,7 +1242,7 @@ EXPORT BOOL WINAPI jsongets( HSPEXINFO *hei, int p1, int p2, int p3 )
 		}
 		break;
 	case cJSON_True:
-		mystr = "Ture";
+		mystr = "True";
 		break;
 	case cJSON_False:
 		mystr = "False";

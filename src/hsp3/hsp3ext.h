@@ -25,5 +25,9 @@
 #include "emscripten/hsp3ext_emscripten.h"
 #endif
 
+#ifdef HSPMAC
+#include "linux/hsp3ext_linux.h"
+#endif
+
 
 #endif

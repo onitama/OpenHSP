@@ -252,7 +252,7 @@ int main( int argc, char *argv[] )
 			strcpy( oname, "hsp3.exe" );			// デフォルトランタイム
 		}
 
-#ifdef HSPLINUX
+#if defined(HSPLINUX)||defined(HSPMAC)
 		cutext( oname );
 		if ( execobj & 8 ) {
 			printf("Runtime[%s].\n",oname);

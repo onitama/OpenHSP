@@ -10,6 +10,10 @@
 #include <ctype.h>
 #include <locale.h>
 
+#ifndef HSPMAC
+#define USE_FFILIB
+#endif
+
 #include "../hsp3config.h"
 #include "../hsp3code.h"
 #include "../hsp3debug.h"
@@ -17,7 +21,9 @@
 #include "../strbuf.h"
 
 #include "hsp3ext_linux.h"
+#ifdef USE_FFILIB
 #include "hsp3extlib_ffi.h"
+#endif
 
 static HSPCTX *hspctx = NULL;		// Current Context
 static HSPEXINFO *exinfo = NULL;	// Info for Plugins
@@ -78,31 +84,31 @@ static void InitSystemInformation(void)
 */
 /*------------------------------------------------------------*/
 
-
+#ifdef USE_FFILIB
 static void *reffunc_dllcmd( int *type_res, int arg )
 {
-	//		reffunc : TYPE_DLLFUNC
-	//		(拡張DLL関数)
-	//
-
-	//			'('で始まるかを調べる
-	//
-	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
-	if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
-
-	*type_res = HSPVAR_FLAG_INT;
-	exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
-	reffunc_intfunc_ivalue = hspctx->stat;
-
-	//			')'で終わるかを調べる
-	//
-	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
-	if ( *val != ')' ) throw ( HSPERR_INVALID_FUNCPARAM );
-	code_next();
-
-	return &reffunc_intfunc_ivalue;
+    //		reffunc : TYPE_DLLFUNC
+    //		(拡張DLL関数)
+    //
+    
+    //			'('で始まるかを調べる
+    //
+    if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
+    if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
+    
+    *type_res = HSPVAR_FLAG_INT;
+    exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
+    reffunc_intfunc_ivalue = hspctx->stat;
+    
+    //			')'で終わるかを調べる
+    //
+    if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
+    if ( *val != ')' ) throw ( HSPERR_INVALID_FUNCPARAM );
+    code_next();
+    
+    return &reffunc_intfunc_ivalue;
 }
-
+#endif
 
 static int termfunc_dllcmd( int option )
 {
@@ -119,12 +125,16 @@ void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 	val = exinfo->npval;
 	exflg = exinfo->npexflg;
 
+#ifdef USE_FFILIB
 	info->cmdfunc = cmdfunc_dllcmd;
 	info->reffunc = reffunc_dllcmd;
-	info->termfunc = termfunc_dllcmd;
+#endif
+    info->termfunc = termfunc_dllcmd;
 
 	InitSystemInformation();
+#ifdef USE_FFILIB
 	Hsp3ExtLibInit( info );
+#endif
 }
 
 void hsp3typeinit_dllctrl( HSP3TYPEINFO *info )
@@ -150,7 +160,12 @@ char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
 
 	switch(p2) {
 	case 0:
-		strcpy( p1, "Linux" );
+#ifdef HSPLINUX
+        strcpy( p1, "Linux" );
+#endif
+#ifdef HSPMAC
+        strcpy( p1, "MacOS" );
+#endif
 		fl=HSPVAR_FLAG_STR;
 		break;
 	case 1:
@@ -179,7 +194,7 @@ char* hsp3ext_getdir(int id)
 
 	switch( id ) {
 	case 0:				//    カレント(現在の)ディレクトリ
-#if defined(HSPLINUX)||defined(HSPEMSCRIPTEN)
+#if defined(HSPLINUX)||defined(HSPEMSCRIPTEN)||defined(HSPMAC)
 		getcwd( p, HSP_MAX_PATH );
 		cutlast = 1;
 #endif
@@ -222,7 +237,7 @@ char* hsp3ext_getdir(int id)
 
 void hsp3ext_execfile(char* msg, char* option, int mode)
 {
-#ifdef HSPLINUX
+#if defined(HSPLINUX)||defined(HSPMAC)
 	system(msg);
 #endif
 }
