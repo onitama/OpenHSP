@@ -28,6 +28,7 @@
 		<li><a href="#MEDIA">Media File Playback</a></li>
 		<li><a href="#EXEC">Browser Control with exec, dialog Commands</a></li>
 		<li><a href="#SENSOR">Acquiring Sensor Information <span class="new">(New!)</span></a></li>
+		<li><a href="#STORAGE">Data Storage</a></li>
 		<li><a href="#NOTICE">Restrictions/Known Issues</a></li>
 		<li><a href="#FUTURE">Future Plans</a></li>
 		<li><a href="#LICENSE">License/Acknowledgements</a></li>
@@ -184,6 +185,8 @@
 	        ENV.HSP_AUTOSCALE = "0";//Scaling mode
 	        ENV.HSP_FPS = "0";//Frame rate
 	        ENV.HSP_LIMIT_STEP = "15000";//Number of execution steps before returning processing to the browser
+			ENV.HSP_FONT_LEADING = "1.1";//Font line spacing adjustment (1.0=No margin, 1.1=Standard, 1.2=A little wider)
+			ENV.HSP_KEYBOARD_ELEMENT = null;//Keyboard input target element (null=whole window, or specify an element ID like "#canvas")
 	    });
 	</pre></ul>
 	<p>
@@ -278,6 +281,15 @@
 	Acquires the sensor value in an environment where the gyro sensor is available.
 	This is the tilt angle (Degree) obtained for each coordinate axis.
 	0.0 is acquired in environments where the gyro sensor is not available.
+	</p>
+
+
+	<h2 id="STORAGE">Data Storage</h2>
+	<p>
+	Basically, in hsp3dish.js, commands such as notesave and bsave are emulated in memory and will disappear when the browser is closed.<br>
+	As an extension in hsp3dish.js, it is also possible to persist data using IndexedDB.
+	By specifying the directory name to save in ENV.HSP_SYNC_DIR and calling <code>devcontrol "syncfs"</code>, you can save data under the specified directory to IndexedDB.
+	The saved data will remain even after closing the browser, so it will be restored the next time you start up.
 	</p>
 
 

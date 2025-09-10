@@ -58,6 +58,7 @@
 #define USE_JAVA_FONT
 #define FONT_TEX_SX 512
 #define FONT_TEX_SY 128
+#define FONT_PADDING 1
 #endif
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
@@ -741,12 +742,14 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 
 #if defined(HSPEMSCRIPTEN)
 #ifndef USE_TTFFONT
+#define HSPJS_DEFAULT_FONTNAME "sans-serif"
 static	int fontsystem_flag = 0;
 static	int fontsystem_sx;		// 横のサイズ
 static	int fontsystem_sy;		// 縦のサイズ
 static	unsigned char *fontdata_pix;
 static	int fontdata_size;
 static	int fontdata_color;
+static	std::string fontsystem_fontname = HSPJS_DEFAULT_FONTNAME;
 static	int fontsystem_size;
 static	int fontsystem_style;
 static	int fontsystem_texid;
@@ -775,6 +778,9 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	//		フォントレンダリング初期化
 	//
 	hgio_fontsystem_term();
+	if (fontname != NULL && *fontname != 0) {
+		fontsystem_fontname = fontname;
+	}
 	fontsystem_flag = 1;
 	fontsystem_size = size;
 	fontsystem_style = style;
@@ -786,56 +792,50 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	//		(bufferがNULLの場合はサイズだけを取得する)
 	//
 
+	EM_ASM_({
+		let canvas = document.getElementById('hsp3dishFontCanvas');
+		if (!canvas) {
+			canvas = document.createElement("canvas");
+			canvas.id = 'hsp3dishFontCanvas';
+			canvas.style.setProperty("visibility", "hidden");
+			canvas.style.setProperty("position", "absolute");
+			canvas.style.setProperty("top", "0");
+			canvas.style.setProperty("left", "0");
+			document.body.appendChild(canvas);
+		}
+	});
+
 	if (buffer == NULL) {
 		EM_ASM_({
-			let d = document.getElementById('hsp3dishFontDiv');
-			if (!d) {
-				d = document.createElement("div");
-				d.id = 'hsp3dishFontDiv';
-				d.style.setProperty("width", "auto");
-				d.style.setProperty("height", "auto");
-				d.style.setProperty("position", "absolute");
-				d.style.setProperty("visibility", "hidden");
-				d.style.setProperty("top", "0");
-				d.style.setProperty("left", "0");
-				document.body.appendChild(d);
-			}
-			d.style.setProperty("font", $1 + "px 'sans-serif'");
+			const canvas = document.getElementById('hsp3dishFontCanvas');
+			const context = canvas.getContext("2d", { willReadFrequently: true });
+			const msg = UTF8ToString($0);
+			const fontname = UTF8ToString($1);
+			const fontsize = $2;
 
-			//const t = document.createTextNode(UTF8ToString($0));
-			//if (d.hasChildNodes())
-			//	d.removeChild(d.firstChild);
-			//d.appendChild(t);
-			d.innerText = UTF8ToString($0);
-			HEAP32[$2 >> 2] = d.clientWidth | 0;
-			HEAP32[$3 >> 2] = d.clientHeight | 0;
+			let fontStyle = "";
+			if ($3 & 1) fontStyle += "bold ";
+			if ($3 & 2) fontStyle += "italic ";
+			const leading_scale = Number(ENV.HSP_FONT_LEADING) || 1.1;
+			fontStyle += Math.round($2 / leading_scale) + "px " + fontname;
+			context.font = fontStyle;
+			// console.log("measure char", fontStyle);
 
-			let canvas = document.getElementById('hsp3dishFontCanvas');
-			if (!canvas) {
-				canvas = document.createElement("canvas");
-				canvas.id = 'hsp3dishFontCanvas';
-				canvas.style.setProperty("visibility", "hidden");
-				document.body.appendChild(canvas);
-			}
+			const metrics = context.measureText(msg);
+			HEAP32[$4 >> 2] = Math.ceil(Math.max(metrics.width, metrics.actualBoundingBoxRight) - Math.min(0, metrics.actualBoundingBoxLeft)) + 1;
+			HEAP32[$5 >> 2] = fontsize * 2;
 
-			if ($4 != 0) {
-				const context = canvas.getContext("2d");
-				context.font = $1 + "px 'sans-serif'";
-
-				const msg = UTF8ToString($0);
-				const metrics = context.measureText(msg);
+			if ($6 !== 0) {
 				//console.log({msg, metrics});
 				const arr = Array.from(msg);
 				for (let i = 0; i < msg.length; i++) {
 					const sub = arr.slice(0, i + 1).join("");
 					const m = context.measureText(sub);
 					//console.log({i, sub, m});
-					HEAP16[($4 >> 1) + i + 1] = m.width | 0; //(m.actualBoundingBoxRight - m.actualBoundingBoxLeft) | 0;
+					HEAP16[($6 >> 1) + i + 1] = m.width | 0; //(m.actualBoundingBoxRight - m.actualBoundingBoxLeft) | 0;
 				}
 			}
-			}, msg, fontsystem_size, & fontsystem_sx, & fontsystem_sy, info ? info->pos : nullptr);
-
-		//Alertf("text %s %d %d\n", msg, fontsystem_sx, fontsystem_sy);
+		}, msg, fontsystem_fontname.c_str(), fontsystem_size, fontsystem_style, &fontsystem_sx, &fontsystem_sy, info ? info->pos : nullptr);
 
 		*out_sx = fontsystem_sx;
 		*out_sy = fontsystem_sy;
@@ -847,38 +847,33 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	int sy = Get2N(fontsystem_sy);
 
 	EM_ASM_({
-		var canvas = document.getElementById('hsp3dishFontCanvas');
-		if (!canvas) {
-			//document.body.removeChild(canvas);
-			canvas = document.createElement("canvas");
-			canvas.id = 'hsp3dishFontCanvas';
-			canvas.style.setProperty("visibility", "hidden");
-			canvas.style.setProperty("position", "absolute");
-			canvas.style.setProperty("top", "0");
-			canvas.style.setProperty("left", "0");
-			canvas.width = $2;
-			canvas.height = $3;
-			document.body.appendChild(canvas);
-		}
-		if (canvas.width < $2)
-			canvas.width = $2;
-		if (canvas.height < $3)
-			canvas.height = $3;
+		const canvas = document.getElementById('hsp3dishFontCanvas');
+		if (canvas.width < $4)
+			canvas.width = $4;
+		if (canvas.height < $5)
+			canvas.height = $5;
+		const context = canvas.getContext("2d", { willReadFrequently: true });
+		const msg = UTF8ToString($0);
+		const fontname = UTF8ToString($1);
+		const fontsize = $2;
 
-		var context = canvas.getContext("2d", { willReadFrequently: true });
-		context.font = $1 + "px 'sans-serif'";
+		let fontStyle = "";
+		if ($3 & 1) fontStyle += "bold ";
+		if ($3 & 2) fontStyle += "italic ";
+		const leading_scale = Number(ENV.HSP_FONT_LEADING) || 1.1;
+		fontStyle += Math.round($2 / leading_scale) + "px " + fontname;
+		context.font = fontStyle;
 
-		var msg = UTF8ToString($0);
-		context.clearRect(0, 0, Math.min(canvas.width, $2 + 1), Math.min(canvas.height, $3 + 1));
+		context.clearRect(0, 0, Math.min(canvas.width, $4 + 1), Math.min(canvas.height, $5 + 1));
 		context.fillStyle = 'rgba(255, 255, 255, 255)';
-		context.fillText(msg, 0, $1);
+		context.fillText(msg, 0, Math.floor(fontsize * 1.5));
 		//console.log(msg);
 
 		//GLctx.texImage2D(GLctx.TEXTURE_2D, 0, GLctx.RGBA, GLctx.RGBA, GLctx.UNSIGNED_BYTE, context.getImageData(0, 0, $2, $3));
-		var imageData = context.getImageData(0, 0, $2, $3);
-		HEAPU8.set(imageData.data, $4);
+		var imageData = context.getImageData(0, 0, $4, $5);
+		HEAPU8.set(imageData.data, $6);
 
-		}, msg, fontsystem_size, sx, sy, buffer);
+	}, msg, fontsystem_fontname.c_str(), fontsystem_size, fontsystem_style, sx, sy, buffer);
 
 	//Alertf( "Init:Surface(%d,%d) %d destpitch%d",fontsystem_sx,fontsystem_sy,fontdata_color,pitch );
 	*out_sx = fontsystem_sx;

@@ -95,6 +95,7 @@ void texmes::reset(int width, int height, int p_texsx, int p_texsy, void* data)
 	life = TEXMES_CACHE_DEFAULT;
 	font_size = 0;
 	font_style = 0;
+	fontname = "";
 	if (text != NULL) text[0] = 0;
 	buf[0] = 0;
 	texmespos = NULL;
@@ -246,7 +247,7 @@ int texmesManager::texmesGetCache(char* msg, short mycache, texmesPos* info)
 	for (i = 0; i < _maxtexmes; i++) {
 		if (t->flag) {							// 使用中だった時
 			if (t->hash == mycache) {			// まずハッシュを比べる
-				if (t->font_size == _fontsize && t->font_style == _fontstyle) {	// サイズ・スタイルを比べる
+				if (t->font_size == _fontsize && t->font_style == _fontstyle && t->fontname == _fontname) {	// サイズ・スタイル・フォントを比べる
 					bool found = true;
 					if (info) {
 						if (info != t->texmespos) {	// 異なるtexmesPosはキャッシュしない
@@ -372,6 +373,7 @@ int texmesManager::texmesRegist(char* msg, texmesPos *info)
 	tex->hash = mycache;
 	tex->font_size = _fontsize;
 	tex->font_style = _fontstyle;
+	tex->fontname = _fontname;
 	tex->texmespos = info;
 
 	return tex->entry;
