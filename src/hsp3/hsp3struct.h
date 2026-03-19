@@ -594,6 +594,10 @@ struct HSPCTX
 	char* estmp;						// Extra string buffer
 	int estmp_ptr;						// Extra string buffer pointer
 	int estmp_max;						// Extra string buffer size
+
+
+	// 64bit integer value (3.7_64)
+	int64_t stat64;						// sysvar 'stat64'
 };
 
 #define HSPCTX_REFSTR_MAX 4096

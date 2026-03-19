@@ -15,23 +15,25 @@ goto *main
     return
 
 #defcfunc cf_int64 int64 v
-    return v
+    return v * 1000
 
 *main
 mes "=== deffunc int64 ==="
-df_int64 0
-df_int64 42
-df_int64 -1
-df_int64 2147483647
-df_int64 2147483648
+df_int64 int64("0")
+df_int64 int64("42")
+df_int64 int64("-1")
+df_int64 int64("2147483647")
+df_int64 int64("2147483648")
 
 mes "=== deffunc int64,int64 ==="
 df_int64_int64 100, 200
-df_int64_int64 2147483647, 2147483648
+df_int64_int64 2147483647, int64("2147483648")
+df_int64_int64 int64("9007199254740992"), int64("9007199254740993")
+df_int64_int64 int64("9223372036854775806"), int64("9223372036854775807")
 
 mes "=== deffunc int,int64 ==="
-df_int_int64 1, 2147483648
+df_int_int64 int64("1"), int64("2147483648")
 
 mes "=== defcfunc int64 ==="
 mes cf_int64(0)
-mes cf_int64(42)
+mes cf_int64(2147483647)

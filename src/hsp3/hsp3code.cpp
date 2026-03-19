@@ -4,6 +4,9 @@
 //	(中間言語展開およびパラメーター取得)
 //	onion software/onitama 2004/6
 //
+#include "hsp3struct.h"
+#include "hspvar_core.h"
+#include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1577,6 +1580,15 @@ void code_expandstruct( char *p, STRUCTDAT *st, int option )
 			memcpy(out, &d, sizeof(double));
 			break;
 			}
+		case MPTYPE_INT64:
+			*(int64_t *)out = code_getdl(0);
+			break;
+		case MPTYPE_FLOAT:
+			{
+			float d = (float)code_getd();
+			memcpy(out, &d, sizeof(float));
+			break;
+			}
 		case MPTYPE_LOCALSTRING:
 			{
 			char *str;
@@ -1846,14 +1858,17 @@ static void *reffunc_custom( int *type_res, int arg )
 
 	*type_res = funcres;					// 返値のタイプを指定する
 	switch( funcres ) {						// 返値のポインタを設定する
-	case TYPE_STRING:
+	case HSPVAR_FLAG_STR:
 		ptr = hspctx->refstr;
 		break;
-	case TYPE_DNUM:
+	case HSPVAR_FLAG_DOUBLE:
 		ptr = &hspctx->refdval;
 		break;
-	case TYPE_INUM:
+	case HSPVAR_FLAG_INT:
 		ptr = &hspctx->stat;
+		break;
+	case HSPVAR_FLAG_INT64:
+		ptr = &hspctx->stat64;
 		break;
 	default:
 		if ( hspctx->runmode == RUNMODE_END ) {
@@ -2027,6 +2042,9 @@ static void cmdfunc_return_setval( void )
 		break;
 	case HSPVAR_FLAG_DOUBLE:
 		hspctx->refdval = *(double *)mpval->pt;
+		break;
+	case HSPVAR_FLAG_INT64:
+		hspctx->stat64 = *(int64_t *)mpval->pt;
 		break;
 	default:
 		throw HSPERR_TYPE_MISMATCH;

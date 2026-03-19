@@ -1392,6 +1392,7 @@ static void *reffunc_intfunc( int *type_res, int arg )
 	//		0～255   : int
 	//		256～383 : string
 	//		384～511 : double(HSPREAL)
+	//		512～639 : int64
 	//
 	switch( arg>>7 ) {
 		case 2:										// 返値がstr
@@ -1401,6 +1402,10 @@ static void *reffunc_intfunc( int *type_res, int arg )
 		case 3:										// 返値がdouble
 			*type_res = HSPVAR_FLAG_DOUBLE;			// 返値のタイプを指定する
 			ptr = &reffunc_intfunc_value;			// 返値のポインタ
+			break;
+		case 4:										// 返値がint64
+			*type_res = HSPVAR_FLAG_INT64;			// 返値のタイプを指定する
+			ptr = &reffunc_intfunc_lvalue;			// 返値のポインタ
 			break;
 		default:									// 返値がint
 			*type_res = HSPVAR_FLAG_INT;			// 返値のタイプを指定する
@@ -1641,7 +1646,6 @@ static void *reffunc_intfunc( int *type_res, int arg )
 		break;
 		}
 
-
 	// str function
 	case 0x100:								// str
 		{
@@ -1811,6 +1815,17 @@ static void *reffunc_intfunc( int *type_res, int arg )
 			reffunc_intfunc_value = getEase( dval, dval2 );
 		}
 		break;
+
+	// int64 functions
+	case 0x200:								// int64
+		{
+		int64_t *ip;
+		chk = code_get();
+		if ( chk <= PARAM_END ) { throw HSPERR_INVALID_FUNCPARAM; }
+		ip = (int64_t *)HspVarCoreCnvPtr( mpval, HSPVAR_FLAG_INT64 );
+		reffunc_intfunc_lvalue = *ip;
+		break;
+		}
 
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
