@@ -1,0 +1,37 @@
+; Test for numeric type conversions involving int64
+#include "hsp3cl.as"
+
+mes "=== type conversion ==="
+
+dimtype i64, vartype("int64"), 1
+
+; int -> int64
+i64 = 42
+mes "int->int64: " + str(i64)
+
+; large int64 -> int (truncation to lower 32 bits)
+i64 = 4294967297
+dim i32
+i32 = i64
+mes "int64->int: " + str(i32)
+
+; double -> int64
+dimtype d, vartype("double"), 1
+d = 1.5e10
+i64 = d
+mes "double->int64: " + str(i64)
+
+; int64 -> double
+i64 = 9007199254740992
+d = i64
+mes "int64->double: " + strf("%.0f", d)
+
+; negative int64 -> int
+i64 = -1
+dim i32neg
+i32neg = i64
+mes "neg int64->int: " + str(i32neg)
+
+; int64 zero
+i64 = 0
+mes "zero: " + str(i64)

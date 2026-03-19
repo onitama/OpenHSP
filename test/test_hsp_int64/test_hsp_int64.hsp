@@ -1,0 +1,46 @@
+; Test for int64 arithmetic operations
+#include "hsp3cl.as"
+
+mes "=== int64 arithmetic ==="
+dimtype a, vartype("int64"), 1
+
+; INT32_MAX
+a = 2147483647
+mes "INT32_MAX: " + str(a)
+
+; INT32_MAX + 1 (overflows int32, but not int64)
+a += 1
+mes "INT32_MAX+1: " + str(a)
+
+; *2
+a *= 2
+mes "*2: " + str(a)
+
+; Large multiplication
+a = 1000000000
+a *= 1000000000
+mes "1e18: " + str(a)
+
+; Subtraction
+a -= 1
+mes "1e18-1: " + str(a)
+
+; Division
+a = 9000000000000000000
+a /= 3
+mes "9e18/3: " + str(a)
+
+; Negative value
+a = -1
+mes "neg: " + str(a)
+
+a = -1000000000
+a *= 1000000000
+mes "-1e18: " + str(a)
+
+; int64 array
+dimtype arr, vartype("int64"), 3
+arr(0) = 100
+arr(1) = 200
+arr(2) = 300
+mes str(arr(0)) + " " + str(arr(1)) + " " + str(arr(2))
