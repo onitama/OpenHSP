@@ -976,8 +976,11 @@ int code_getdi( const int defval )
 	chk = code_get();
 	if ( chk<=PARAM_END ) { return defval; }
 	if ( mpval->flag != HSPVAR_FLAG_INT ) {
-		if ( mpval->flag != HSPVAR_FLAG_DOUBLE ) throw HSPERR_TYPE_MISMATCH;
-		return (int)(*(double *)(mpval->pt));		// doubleの時はintに変換
+		if ( mpval->flag == HSPVAR_FLAG_DOUBLE )
+			return (int)(*(double *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_INT64 )
+			return (int)(*(int64_t *)(mpval->pt));
+		throw HSPERR_TYPE_MISMATCH;
 	}
 	return *(int *)(mpval->pt);
 }
@@ -1027,8 +1030,11 @@ double code_getd( void )
 	chk = code_get();
 	if ( chk<=PARAM_END ) { throw HSPERR_NO_DEFAULT; }
 	if ( mpval->flag != HSPVAR_FLAG_DOUBLE ) {
-		if ( mpval->flag != HSPVAR_FLAG_INT ) throw HSPERR_TYPE_MISMATCH;
-		return (double)(*(int *)(mpval->pt));		// intの時はdoubleに変換
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (double)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_INT64 )
+			return (double)(*(int64_t *)(mpval->pt));
+		throw HSPERR_TYPE_MISMATCH;
 	}
 	return *(double *)(mpval->pt);
 }
@@ -1042,8 +1048,11 @@ double code_getdd( const double defval )
 	chk = code_get();
 	if ( chk<=PARAM_END ) { return defval; }
 	if ( mpval->flag != HSPVAR_FLAG_DOUBLE ) {
-		if ( mpval->flag != HSPVAR_FLAG_INT ) throw HSPERR_TYPE_MISMATCH;
-		return (double)(*(int *)(mpval->pt));		// intの時はdoubleに変換
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (double)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_INT64 )
+			return (double)(*(int64_t *)(mpval->pt));
+		throw HSPERR_TYPE_MISMATCH;
 	}
 	return *(double *)(mpval->pt);
 }
