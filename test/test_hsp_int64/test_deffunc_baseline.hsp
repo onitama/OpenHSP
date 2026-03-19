@@ -1,0 +1,54 @@
+; Baseline: deffunc/defcfunc with int and double params
+#include "hsp3cl.as"
+
+goto *main
+#deffunc df_int int v
+    mes "int: " + v
+    return
+
+#deffunc df_double double v
+    mes "double: " + strf("%.6g", v)
+    return
+
+#deffunc df_int_int int a, int b
+    mes "int+int: " + a + " " + b
+    return
+
+#deffunc df_int_double int a, double b
+    mes "int+double: " + a + " " + strf("%.6g", b)
+    return
+
+#defcfunc cf_int int v
+    return v * 2
+
+#defcfunc cf_double double v
+    return v * 2.0
+
+*main
+mes "=== deffunc int ==="
+df_int 0
+df_int 42
+df_int -1
+df_int 2147483647
+
+mes "=== deffunc double ==="
+df_double 0.0
+df_double 3.14
+df_double -1.5
+
+mes "=== deffunc int,int ==="
+df_int_int 1, 2
+df_int_int -1, 100
+
+mes "=== deffunc int,double ==="
+df_int_double 1, 2.5
+df_int_double -1, 1.0e10
+
+mes "=== defcfunc int ==="
+mes cf_int(0)
+mes cf_int(21)
+mes cf_int(-1)
+
+mes "=== defcfunc double ==="
+mes strf("%.6g", cf_double(0.0))
+mes strf("%.6g", cf_double(1.5))

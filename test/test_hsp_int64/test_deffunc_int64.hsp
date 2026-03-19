@@ -1,0 +1,37 @@
+; deffunc/defcfunc with int64 params
+#include "hsp3cl.as"
+
+goto *main
+#deffunc df_int64 int64 v
+    mes "int64: " + str(v)
+    return
+
+#deffunc df_int64_int64 int64 a, int64 b
+    mes "int64+int64: " + str(a) + " " + str(b)
+    return
+
+#deffunc df_int_int64 int a, int64 b
+    mes "int+int64: " + a + " " + str(b)
+    return
+
+#defcfunc cf_int64 int64 v
+    return v
+
+*main
+mes "=== deffunc int64 ==="
+df_int64 0
+df_int64 42
+df_int64 -1
+df_int64 2147483647
+df_int64 2147483648
+
+mes "=== deffunc int64,int64 ==="
+df_int64_int64 100, 200
+df_int64_int64 2147483647, 2147483648
+
+mes "=== deffunc int,int64 ==="
+df_int_int64 1, 2147483648
+
+mes "=== defcfunc int64 ==="
+mes cf_int64(0)
+mes cf_int64(42)
