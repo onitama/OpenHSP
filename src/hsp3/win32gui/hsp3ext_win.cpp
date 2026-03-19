@@ -50,6 +50,7 @@ static int *type;
 static int *val;
 static int *exflg;
 static int reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_lvalue;
 //static PVal **pmpval;
 
 
@@ -494,7 +495,12 @@ int call_method( void *iptr, int index, int *prm, int count )
 	proc = (*(int **)iptr);
 	proc += index;
 	//Alertf( "%x:%x:%d",proc,*proc,index );
+#ifdef HSP64
+	// TODO
+	return -1;
+#else
 	return call_extfunc( (void*)*proc, prm, count );
+#endif
 }
 
 int call_method2( char *prmbuf, const STRUCTDAT *st )
@@ -1182,6 +1188,7 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 	//
 	void *ptr;
 	int p1,p2;
+	int64_t lp1;
 
 	//			'('で始まるかを調べる
 	//
@@ -1199,9 +1206,33 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 		PDAT *p;
 		pval = code_getpval();
 		p = HspVarCorePtrAPTR( pval, 0 );
+#ifdef HSP64
+		lp1 = code_getl();
+		p2 = code_geti();
+		int fl = code_getdi(HSPVAR_FLAG_INT);
+		switch (fl) {
+		case HSPVAR_FLAG_NONE:
+		case HSPVAR_FLAG_STR:
+		case HSPVAR_FLAG_DOUBLE:
+		case HSPVAR_FLAG_INT:
+		case HSPVAR_FLAG_INT64:
+		  break;
+		case HSPVAR_FLAG_LABEL:
+		case HSPVAR_FLAG_STRUCT:
+		case HSPVAR_FLAG_COMSTRUCT:
+		case 7: // VARIANT
+		case HSPVAR_FLAG_USERDEF:
+		default:
+		  throw (HSPERR_TYPE_MISMATCH);
+		}
+		reffunc_intfunc_lvalue = call_extfunc( (void *)lp1, (int **)p, p2, fl );
+		ptr = &reffunc_intfunc_lvalue;
+		*type_res = HSPVAR_FLAG_INT64;
+#else
 		p1 = code_geti();
 		p2 = code_geti();
 		reffunc_intfunc_ivalue = call_extfunc( (void *)p1, (int *)p, p2 );
+#endif
 		break;
 		}
 	case 0x101:								// cnvwtos
@@ -1272,7 +1303,13 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 		code_next();
 		st = GetPRM( p1 );
 		//lib = &hspctx->mem_linfo[ st->index ];
+#ifdef HSP64
+		reffunc_intfunc_lvalue = (INT_PTR)st;
+		ptr = &reffunc_intfunc_lvalue;
+		*type_res = HSPVAR_FLAG_INT64;
+#else
 		reffunc_intfunc_ivalue = (int)((INT_PTR)st);
+#endif
 		break;
 		}
 

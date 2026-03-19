@@ -5,6 +5,10 @@
 #ifndef __hsp3extlib_h
 #define __hsp3extlib_h
 
+#ifdef HSP64
+#include "../linux/hsp3extlib_ffi.h"
+#else
+
 #include "../hsp3code.h"
 
 #include <deque>
@@ -82,4 +86,6 @@ int cnvwstr( void *out, char *in, int bufsize );
 int cnvsjis( void *out, char *in, int bufsize );
 int cnvu8( void *out, wchar_t *in, int bufsize);
 
-#endif
+#endif // HSP64
+
+#endif // __hsp3extlib_h

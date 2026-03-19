@@ -15,7 +15,9 @@
 #include <vector>
 
 #include <algorithm>
+#ifndef _WIN32
 #include <dlfcn.h>
+#endif
 
 #include <ffi.h>
 
@@ -145,7 +147,11 @@ bool CDllManager::free_all_library()
 {
 	typedef holder_type::iterator Iter;
 	for ( Iter i = mModules.begin(); i != mModules.end(); ++i ) {
+#ifdef _WIN32
+		if ( FreeLibrary( *i ) ) *i = NULL;
+#else
 		if ( dlclose( *i ) == 0 ) *i = NULL;
+#endif
 	}
 	mModules.erase( std::remove( mModules.begin(), mModules.end(),
 		static_cast< HANDLE_MODULE >( NULL ) ), mModules.end() );
@@ -227,9 +233,9 @@ static int BindFUNC( STRUCTDAT *st, char *name )
 	st->proc = (void *)GetProcAddress( hd, n );
 #else
 	st->proc = (void *)dlsym( hd, n );
-#endif
 	char *err = dlerror();
 	if (err != NULL) printf("erroro: %s\n", err);
+#endif
 	if ( st->proc == NULL ) return 1;
 	st->subid--;
 	return 0;
@@ -568,7 +574,12 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 #ifndef HSP_COM_UNSUPPORTED
 		case STRUCTPRM_SUBID_COMOBJ:
 			// COM メソッドの呼び出し
+#ifdef HSP64
+			// TODO 実装
+			throw (HSPERR_UNSUPPORTED_FUNCTION);
+#else
 			result = call_method2( prmbuf, st );
+#endif
 			break;
 #endif
 		default:
