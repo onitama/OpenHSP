@@ -31,9 +31,11 @@
 //		HSPが使用する64bit整数値型
 //
 #ifdef HSP64
-#define HSPLPTR long
+#define HSPLPTR long // FIXME
+#define HSPPTRINT int64_t
 #else
 #define HSPLPTR int
+#define HSPPTRINT int
 #endif
 
 // command type
@@ -347,7 +349,7 @@ typedef struct IRQDAT {
 	int		custom2;							// custom message value2
 	int		iparam;								// iparam option
 	unsigned short *ptr;						// jump ptr
-	void	(*callback)(struct IRQDAT *,int,int);		// IRQ callback function
+	void	(*callback)(struct IRQDAT *, HSPPTRINT, HSPPTRINT);		// IRQ callback function
 } IRQDAT;
 
 typedef struct HSPCTX HSPCTX;
@@ -476,7 +478,7 @@ typedef struct HSPEXINFO
 	void (*HspFunc_free)( void *ptr );
 	char *(*HspFunc_expand)( char *ptr, int size );
 	IRQDAT *(*HspFunc_addirq)( void );
-	int (*HspFunc_hspevent)( int event, int prm1, int prm2, void *prm3 );
+	int (*HspFunc_hspevent)( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 );
 	void (*HspFunc_registvar)( int flag, HSPVAR_COREFUNC func );
 	void (*HspFunc_setpc)( const unsigned short *pc );
 	void (*HspFunc_call)( const unsigned short *pc );
@@ -540,9 +542,9 @@ struct HSPCTX
 
 	IRQDAT *mem_irq;					// IRQ data ptr
 	int irqmax;							// IRQ data count
-	int iparam;							// IRQ Info data1
-	int wparam;							// IRQ Info data2
-	int lparam;							// IRQ Info data3
+	HSPPTRINT iparam;							// IRQ Info data1
+	HSPPTRINT wparam;							// IRQ Info data2
+	HSPPTRINT lparam;							// IRQ Info data3
 
 	PVal *mem_var;						// var storage index
 	HSPEXINFO30 exinfo;					// HSP function data(3.0)
@@ -652,8 +654,8 @@ typedef struct
 typedef int (* HSP3_CMDFUNC) (int);
 typedef void *(* HSP3_REFFUNC) (int *,int);
 typedef int (* HSP3_TERMFUNC) (int);
-typedef int (* HSP3_MSGFUNC) (int,int,int);
-typedef int (* HSP3_EVENTFUNC) (int,int,int,void *);
+typedef int (* HSP3_MSGFUNC) (int,HSPPTRINT,HSPPTRINT);
+typedef int (* HSP3_EVENTFUNC) (int,HSPPTRINT,HSPPTRINT,void *);
 
 
 typedef struct {
@@ -673,8 +675,8 @@ typedef struct {
 
 	// イベントコールバックファンクション
 	//
-	int (* msgfunc) (int,int,int);				// Windowメッセージコールバック
-	int (* eventfunc) (int,int,int,void *);		// HSPイベントコールバック
+	int (* msgfunc) (int, HSPPTRINT, HSPPTRINT);				// Windowメッセージコールバック
+	int (* eventfunc) (int, HSPPTRINT, HSPPTRINT,void *);		// HSPイベントコールバック
 
 } HSP3TYPEINFO;
 

@@ -1793,6 +1793,7 @@ char *code_getsptr( int *type )
 /*------------------------------------------------------------*/
 
 static int reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_lvalue;
 
 /*
 	rev 43
@@ -2563,6 +2564,23 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		reffunc_intfunc_ivalue = hspctx->sublev;
 		break;
 
+#ifdef HSP64
+	case 0x009:								// iparam
+		reffunc_intfunc_lvalue = hspctx->iparam;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+		break;
+	case 0x00a:								// wparam
+		reffunc_intfunc_lvalue = hspctx->wparam;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+		break;
+	case 0x00b:								// lparam
+		reffunc_intfunc_lvalue = hspctx->lparam;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+		break;
+#else
 	case 0x009:								// iparam
 		reffunc_intfunc_ivalue = hspctx->iparam;
 		break;
@@ -2572,6 +2590,7 @@ static void *reffunc_sysvar( int *type_res, int arg )
 	case 0x00b:								// lparam
 		reffunc_intfunc_ivalue = hspctx->lparam;
 		break;
+#endif
 	case 0x00c:								// refstr
 		*type_res = HSPVAR_FLAG_STR;
 		ptr = (void *)hspctx->refstr;
@@ -3364,7 +3383,7 @@ int code_execcmd2( void )
 */
 /*------------------------------------------------------------*/
 
-static int call_eventfunc( int option, int event, int prm1, int prm2, void *prm3 )
+static int call_eventfunc( int option, int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 {
 	//		各タイプのイベントコールバックを呼び出す
 	//
@@ -3404,7 +3423,7 @@ HSPEVENT_ENABLE_PICLOAD,	// HSPEVENT_GETPICSIZE
 HSPEVENT_ENABLE_PICLOAD,	// HSPEVENT_PICLOAD
 };
 
-int code_event( int event, int prm1, int prm2, void *prm3 )
+int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 {
 	//		HSP内部イベント実行
 	//		(result:0=Not care/1=Done)
@@ -3569,7 +3588,7 @@ int code_isirq( int id )
 }
 
 
-int code_sendirq( int id, int iparam, int wparam, int lparam )
+int code_sendirq( int id, int iparam, HSPPTRINT wparam, HSPPTRINT lparam )
 {
 	//		指定したIRQイベントを発生
 	//
@@ -3601,7 +3620,7 @@ int code_irqresult( int *value )
 }
 
 
-int code_checkirq( int id, int message, int wparam, int lparam )
+int code_checkirq( int id, int message, HSPPTRINT wparam, HSPPTRINT lparam )
 {
 	//		指定したメッセージに対応するイベントを発生
 	//
@@ -3671,7 +3690,7 @@ IRQDAT *code_addirq( void )
 }
 
 
-void code_execirq( IRQDAT *irq, int wparam, int lparam )
+void code_execirq( IRQDAT *irq, HSPPTRINT wparam, HSPPTRINT lparam )
 {
 	//		IRQを実行する
 	//
@@ -3864,6 +3883,18 @@ void code_adddbg( char *name, int val )
 	_itoa( val, tmp, 10 );
 #else
 	sprintf( tmp, "%d", val);
+#endif
+	code_adddbg( name, tmp );
+}
+
+
+void code_adddbg( char *name, int64_t val )
+{
+	char tmp[32];
+#ifdef HSPWIN
+	_i64toa( val, tmp, 10 );
+#else
+	sprintf( tmp, "%ld", val);
 #endif
 	code_adddbg( name, tmp );
 }

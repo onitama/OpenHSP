@@ -167,7 +167,7 @@ static void hsp3win_dispatch( MSG *msg )
 #ifdef HSPERR_HANDLE
 			try {
 #endif
-				code_sendirq(HSPIRQ_ONKEY, (int)MapVirtualKey(msg->wParam, 2), (int)msg->wParam, (int)msg->lParam);
+				code_sendirq(HSPIRQ_ONKEY, (HSPPTRINT)MapVirtualKey((UINT)msg->wParam, 2), (HSPPTRINT)msg->wParam, (HSPPTRINT)msg->lParam);
 #ifdef HSPERR_HANDLE
 			}
 			catch (HSPERROR code) {						// HSPエラー例外処理

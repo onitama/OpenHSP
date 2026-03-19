@@ -126,7 +126,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 		try {
 #endif
-		if ( code_checkirq( (int)GetWindowLongPtr( hwnd, GWLP_USERDATA ), (int)uMessage, (int)wParam, (int)lParam ) ) {
+		if ( code_checkirq( (int)GetWindowLongPtr( hwnd, GWLP_USERDATA ), uMessage, (HSPPTRINT)wParam, (HSPPTRINT)lParam ) ) {
 			if ( code_irqresult( &retval ) ) return retval;
 		}
 #ifdef HSPERR_HANDLE
@@ -213,7 +213,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 			try {
 #endif
-				code_sendirq( HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam );
+				code_sendirq( HSPIRQ_ONCLICK, (HSPPTRINT)uMessage - (HSPPTRINT)WM_LBUTTONDOWN, (HSPPTRINT)wParam, (HSPPTRINT)lParam );
 #ifdef HSPERR_HANDLE
 			}
 			catch (HSPERROR code) {						// HSPエラー例外処理

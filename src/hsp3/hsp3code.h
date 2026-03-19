@@ -7,6 +7,7 @@
 
 #include "hsp3debug.h"
 #include "hsp3struct.h"
+#include <cstdint>
 
 extern PVal *mpval;
 
@@ -82,7 +83,7 @@ int code_getdebug_seekvar( const char *name );
 char* code_getdebug_varname(int val_id);
 int code_getdebug_varid(PVal *pv);
 
-int code_event( int event, int prm1, int prm2, void *prm3 );
+int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 );
 void code_bload( char *fname, int ofs, int size, void *ptr );
 void code_bsave( char *fname, int ofs, int size, void *ptr );
 
@@ -91,9 +92,9 @@ IRQDAT *code_seekirq( int actid, int custom );
 IRQDAT *code_addirq( void );
 int code_isirq( int id );
 int code_isuserirq( void );
-int code_sendirq( int id, int iparam, int wparam, int lparam );
-int code_checkirq( int id, int message, int wparam, int lparam );
-void code_execirq( IRQDAT *irq, int wparam, int lparam );
+int code_sendirq( int id, int iparam, HSPPTRINT wparam, HSPPTRINT lparam );
+int code_checkirq( int id, int message, HSPPTRINT wparam, HSPPTRINT lparam );
+void code_execirq( IRQDAT *irq, HSPPTRINT wparam, HSPPTRINT lparam );
 void code_setirq( int id, int opt, int custom, unsigned short *ptr );
 int code_irqresult( int *value );
 void code_enableirq( int id, int sw );
@@ -106,10 +107,12 @@ int code_getdbgmode( void );
 HSP3DEBUG *code_getdbg( void );
 char *code_inidbg( void );
 void code_adddbg( char *name, int val );
+void code_adddbg( char *name, int64_t val );
 void code_adddbg( char *name, char *str );
 
 void code_dbg_global( void );
 char *code_dbgvalue( int type );
+char *code_dbgvalue( int64_t type );
 char *code_dbgvarinf( char *target, int option );
 void code_dbgcurinf( void );
 void code_dbgclose( char *buf );

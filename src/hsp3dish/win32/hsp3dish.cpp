@@ -217,7 +217,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		try {
 #endif
 			int retval;
-			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (int)uMessage, (int)wParam, (int)lParam)) {
+			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (HSPPTRINT)uMessage, (HSPPTRINT)wParam, (HSPPTRINT)lParam)) {
 				if (code_irqresult(&retval)) return retval;
 			}
 #ifdef HSPERR_HANDLE
@@ -325,7 +325,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 			try {
 #endif
-				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam);
+				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (HSPPTRINT)wParam, (HSPPTRINT)lParam);
 #ifdef HSPERR_HANDLE
 			}
 			catch (HSPERROR code) {						// HSPエラー例外処理
@@ -928,7 +928,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			}
 			hsp3dish_initwindow(m_hInstance, hsp_wx, hsp_wy, hsp_wposx, hsp_wposy, hsp_wstyle, 0);
 			hsp3excmd_rebuild_window();
-			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+			hsp3extcmd_sysvars((HSPPTRINT)m_hInstance, (HSPPTRINT)m_hWnd, 0);
 			HSP3DEVINFO *devinfo = hsp3extcmd_getdevinfo();
 			hsp3dish_setdevinfo(devinfo);
 #ifdef USE_OBAQ
@@ -1151,7 +1151,7 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo(devinfo);
 
-	hsp3extcmd_sysvars((int)hInstance, (int)m_hWnd, 0);
+	hsp3extcmd_sysvars((HSPPTRINT)hInstance, (HSPPTRINT)m_hWnd, 0);
 
 #ifdef USE_OBAQ
 	hsp3typeinit_dw_extcmd( code_gettypeinfo( TYPE_USERDEF ) );
