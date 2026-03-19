@@ -1366,6 +1366,7 @@ static int cmdfunc_intcmd( int cmd )
 }
 
 static int reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_lvalue;
 static HSPREAL reffunc_intfunc_value;
 
 static void *reffunc_intfunc( int *type_res, int arg )
@@ -1513,13 +1514,25 @@ static void *reffunc_intfunc( int *type_res, int arg )
 		STRUCTDAT *st;
 		if ( *type == TYPE_DLLFUNC ) {
 			st = &(ctx->mem_finfo[ *val ]);
+#ifdef HSP64
+			reffunc_intfunc_lvalue = (int64_t)(st->proc);
+			*type_res = HSPVAR_FLAG_INT64;
+			ptr = &reffunc_intfunc_lvalue;
+#else
 			reffunc_intfunc_ivalue = (int)(size_t)(st->proc);
+#endif
 			code_next();
 			break;
 		}
 		aptr = code_getva( &pval );
 		pdat = HspVarCorePtrAPTR( pval, aptr );
+#ifdef HSP64
+		reffunc_intfunc_lvalue = (int64_t)(pdat);
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+#else
 		reffunc_intfunc_ivalue = (int)(size_t)(pdat);
+#endif
 		HspVarCoreGetBlockSize(pval, pdat, &ctx->strsize);
 		break;
 		}

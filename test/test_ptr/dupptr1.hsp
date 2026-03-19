@@ -1,0 +1,8 @@
+dim a
+dupptr b , varptr(a) , 4 , 4
+
+a=1
+mes b
+
+a=123
+mes b

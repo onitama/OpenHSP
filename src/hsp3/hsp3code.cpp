@@ -983,6 +983,42 @@ int code_getdi( const int defval )
 }
 
 
+int64_t code_getl( void )
+{
+	//		数値パラメーターを取得
+	//
+	int chk;
+	chk = code_get();
+	if ( chk<=PARAM_END ) { throw HSPERR_NO_DEFAULT; }
+	if ( mpval->flag != HSPVAR_FLAG_INT64 ) {
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (int64_t)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_DOUBLE )
+			return (int64_t)(*(double *)(mpval->pt));
+		 throw HSPERR_TYPE_MISMATCH;
+	}
+	return *(int64_t *)(mpval->pt);
+}
+
+
+int64_t code_getdl( const int64_t defval )
+{
+	//		数値パラメーターを取得(デフォルト値あり)
+	//
+	int chk;
+	chk = code_get();
+	if ( chk<=PARAM_END ) { return defval; }
+	if ( mpval->flag != HSPVAR_FLAG_INT64 ) {
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (int64_t)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_DOUBLE )
+			return (int64_t)(*(double *)(mpval->pt));
+		 throw HSPERR_TYPE_MISMATCH;
+	}
+	return *(int64_t *)(mpval->pt);
+}
+
+
 double code_getd( void )
 {
 	//		数値(double)パラメーターを取得
@@ -2036,6 +2072,7 @@ static int cmdfunc_prog( int cmd )
 	//
 
 	int p1,p2,p3,p4,p5;
+	int64_t lp1;
 
 	code_next();							// 次のコードを取得(最初に必ず必要です)
 
@@ -2237,13 +2274,21 @@ static int cmdfunc_prog( int cmd )
 		{
 		PVal *pval_m;
 		pval_m = code_getpval();
+#ifdef HSP64
+		lp1 = code_getl();
+#else
 		p1 = code_geti();
+#endif
 		p2 = code_geti();
 		p3 = code_getdi( HSPVAR_FLAG_INT );
 		if ( p2<=0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		if ( HspVarCoreGetProc(p3)->flag == 0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		if (pval_m->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;
+#ifdef HSP64
+		HspVarCoreDupPtr( pval_m, p3, (void *)lp1, p2 );
+#else
 		HspVarCoreDupPtr( pval_m, p3, (void *)p1, p2 );
+#endif
 		break;
 		}
 

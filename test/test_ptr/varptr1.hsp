@@ -1,0 +1,9 @@
+a = "foo"
+mes varptr(a)
+p = varptr(a)
+mes p
+
+b = 10
+mes varptr(b)
+p = varptr(b)
+mes p
