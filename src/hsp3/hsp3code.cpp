@@ -2599,6 +2599,11 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		*type_res = HSPVAR_FLAG_DOUBLE;
 		ptr = (void *)&hspctx->refdval;
 		break;
+	case 0x00e:								// stat64
+		reffunc_intfunc_lvalue = hspctx->stat64;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+		break;
 
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;

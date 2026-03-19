@@ -38,6 +38,10 @@
 #define HSPPTRINT int
 #endif
 
+#ifdef stat64
+#undef stat64
+#endif
+
 // command type
 #define TYPE_MARK 0
 #define TYPE_VAR 1
