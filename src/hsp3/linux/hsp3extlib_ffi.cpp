@@ -514,6 +514,43 @@ union FfiParam {
 	void *ptr;
 };
 
+#if defined(_WIN32) && !defined(HSP_COM_UNSUPPORTED)
+static HSPPTRINT call_method2_ffi(ffi_type **prm_args, void **prm_values, const STRUCTDAT *st)
+{
+	const LIBDAT *lib = &hspctx->mem_linfo[st->index];
+	const IID *piid = (IID *)strp(lib->nameidx);
+	IUnknown *punk = *(IUnknown **)prm_values[0];
+	IUnknown *punk2 = NULL;
+	HRESULT hr;
+	int result = 0;
+
+	if (st->otindex < 0 || punk == NULL) throw (HSPERR_COMDLL_ERROR);
+
+	hr = punk->QueryInterface(*piid, (void **)&punk2);
+	if (FAILED(hr) || punk2 == NULL) throw (HSPERR_COMDLL_ERROR);
+
+	try {
+		void *com_ptr = punk2;
+		HSPPTRINT *vtbl = *(HSPPTRINT **)punk2;
+		void *proc = (void *)vtbl[st->otindex];
+		ffi_cif cif;
+
+		prm_values[0] = &com_ptr;
+		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, st->prmmax, &ffi_type_sint32, prm_args) != FFI_OK) {
+			throw HSPERR_INVALID_FUNCPARAM;
+		}
+		ffi_call(&cif, FFI_FN(proc), &result, prm_values);
+	}
+	catch (...) {
+		punk2->Release();
+		throw;
+	}
+
+	punk2->Release();
+	return result;
+}
+#endif
+
 HSPPTRINT code_expand_and_call( const STRUCTDAT *st )
 {
 	//	パラメータの取得および関数呼び出し（再帰処理による）
@@ -575,8 +612,7 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 		case STRUCTPRM_SUBID_COMOBJ:
 			// COM メソッドの呼び出し
 #ifdef HSP64
-			// TODO 実装
-			throw (HSPERR_UNSUPPORTED_FUNCTION);
+			result = call_method2_ffi(prm_args, prm_values, st);
 #else
 			result = call_method2( prmbuf, st );
 #endif
@@ -839,4 +875,3 @@ int cmdfunc_dllcmd( int cmd )
 	//
 	return exec_dllcmd( cmd, STRUCTDAT_OT_STATEMENT );
 }
-

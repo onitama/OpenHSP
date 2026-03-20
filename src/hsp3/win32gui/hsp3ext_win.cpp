@@ -365,8 +365,6 @@ void *comget_variant( VARIANT *var, int *restype, BOOL fvariantret /* = FALSE*/ 
 	case VT_UI2:
 	case VT_I1:
 	case VT_UI1:
-	case VT_I8:
-	case VT_UI8:
 	case VT_BOOL:
 		VariantChangeType( &comconv_var, &comconv_var, VARIANT_NOVALUEPROP, VT_I4 );
 	case VT_I4:
@@ -376,6 +374,11 @@ void *comget_variant( VARIANT *var, int *restype, BOOL fvariantret /* = FALSE*/ 
 	case VT_UINT:
 		*restype = HSPVAR_FLAG_INT;
 		return &comconv_var.lVal;
+	case VT_UI8:
+		VariantChangeType( &comconv_var, &comconv_var, VARIANT_NOVALUEPROP, VT_I8 );
+	case VT_I8:
+		*restype = HSPVAR_FLAG_INT64;
+		return &comconv_var.llVal;
 
 	default:
 		if ( comconv_var.vt & VT_ARRAY ) {
@@ -397,6 +400,10 @@ void comset_variant( VARIANT *var, void *data, int vtype )
 	case HSPVAR_FLAG_INT:
 		var->vt = VT_I4;
 		var->lVal = *(int *)data;
+		break;
+	case HSPVAR_FLAG_INT64:
+		var->vt = VT_I8;
+		var->llVal = *(int64_t *)data;
 		break;
 	case HSPVAR_FLAG_DOUBLE:
 		var->vt = VT_R8;
@@ -1672,5 +1679,4 @@ void hsp3ext_execfile(char* stmp, char* ps, int mode)
 	}
 	if (i < 32) throw HSPERR_EXTERNAL_EXECUTE;
 }
-
 
