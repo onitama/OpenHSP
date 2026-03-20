@@ -44,7 +44,7 @@ static void *HspVarInt64_Cnv( const void *buffer, int flag )
 		return &conv;
 	case HSPVAR_FLAG_DOUBLE:
 		conv = (int64_t)( *(double *)buffer );
-		break;
+		return &conv;
 	case HSPVAR_FLAG_INT64:
 		break;
 	default:
@@ -148,6 +148,7 @@ static void HspVarInt64_ModI( PDAT *pval, const void *val )
 	int64_t p = *((int64_t *)(val));
 	if (p == 0) throw(HSPVAR_ERROR_DIVZERO);
 	*GetPtr(pval) %= p;
+	*aftertype = HSPVAR_FLAG_INT64;
 }
 
 
