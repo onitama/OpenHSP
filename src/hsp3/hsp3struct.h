@@ -38,10 +38,6 @@
 #define HSPPTRINT int
 #endif
 
-#ifdef stat64
-#undef stat64
-#endif
-
 // command type
 #define TYPE_MARK 0
 #define TYPE_VAR 1
@@ -603,7 +599,7 @@ struct HSPCTX
 
 
 	// 64bit integer value (3.7_64)
-	int64_t stat64;						// sysvar 'stat64'
+	int64_t stat_i64;						// sysvar 'stat64'
 };
 
 #define HSPCTX_REFSTR_MAX 4096

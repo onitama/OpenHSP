@@ -1869,7 +1869,7 @@ static void *reffunc_custom( int *type_res, int arg )
 		ptr = &hspctx->stat;
 		break;
 	case HSPVAR_FLAG_INT64:
-		ptr = &hspctx->stat64;
+		ptr = &hspctx->stat_i64;
 		break;
 	default:
 		if ( hspctx->runmode == RUNMODE_END ) {
@@ -2045,7 +2045,7 @@ static void cmdfunc_return_setval( void )
 		hspctx->refdval = *(double *)mpval->pt;
 		break;
 	case HSPVAR_FLAG_INT64:
-		hspctx->stat64 = *(int64_t *)mpval->pt;
+		hspctx->stat_i64 = *(int64_t *)mpval->pt;
 		break;
 	default:
 		throw HSPERR_TYPE_MISMATCH;
@@ -2600,7 +2600,7 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		ptr = (void *)&hspctx->refdval;
 		break;
 	case 0x00e:								// stat64
-		reffunc_intfunc_lvalue = hspctx->stat64;
+		reffunc_intfunc_lvalue = hspctx->stat_i64;
 		*type_res = HSPVAR_FLAG_INT64;
 		ptr = &reffunc_intfunc_lvalue;
 		break;
