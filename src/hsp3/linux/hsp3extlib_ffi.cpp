@@ -614,8 +614,7 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 	case MPTYPE_INT64:
 		p.l = (int64_t)code_getdl(0);
 		prm_values[index] = &p.l;
-		//prm_args[index] = &ffi_type_slong;
-		prm_args[index] = &ffi_type_pointer;
+		prm_args[index] = &ffi_type_slong;
 		break;
 	case MPTYPE_PVARPTR:
 		aptr = code_getva( &pval );
@@ -777,7 +776,9 @@ HSPPTRINT call_extfunc( void *proc, int **prm, int prms, int rettype )
 		args[i] = &ffi_type_pointer;
 		values[i] = prm[i];
 	}
-	ffi_prep_cif(&cif, FFI_DEFAULT_ABI, prms, result_type, args.data());
+	if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, prms, result_type, args.data()) != FFI_OK) {
+		throw ( HSPERR_DLL_ERROR );
+	}
 	ffi_call(&cif, FFI_FN(proc), &result, values.data());
 
 	return result;

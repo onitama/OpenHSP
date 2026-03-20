@@ -157,8 +157,17 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 			strcpy( sptr, (char*) reffunc_intfunc_lvalue );
 			*type_res = HSPVAR_FLAG_STR;
 			break;
-		default:
+		case HSPVAR_FLAG_INT:
+			reffunc_intfunc_ivalue = (int)reffunc_intfunc_lvalue;
+			ptr = &reffunc_intfunc_ivalue;
 			*type_res = fl;
+			break;
+		case HSPVAR_FLAG_INT64:
+			ptr = &reffunc_intfunc_lvalue;
+			*type_res = fl;
+			break;
+		default:
+			// TODO INT以外の対応
 			break;
 		}
 		break;

@@ -488,19 +488,14 @@ BSTR comget_bstr( char *ps )
 	return bstr;
 }
 
-
+#if !defined(HSP64)
 int call_method( void *iptr, int index, int *prm, int count )
 {
 	int *proc;
 	proc = (*(int **)iptr);
 	proc += index;
 	//Alertf( "%x:%x:%d",proc,*proc,index );
-#ifdef HSP64
-	// TODO
-	return -1;
-#else
 	return call_extfunc( (void*)*proc, prm, count );
-#endif
 }
 
 int call_method2( char *prmbuf, const STRUCTDAT *st )
@@ -525,6 +520,7 @@ int call_method2( char *prmbuf, const STRUCTDAT *st )
 	punk2->Release();
 	return result;
 }
+#endif
 
 static BOOL GetIIDFromString( IID *iid, char *ps, bool fClsid = false )
 {
@@ -1204,6 +1200,7 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 		{
 		PVal *pval;
 		PDAT *p;
+		char *sptr;
 		pval = code_getpval();
 		p = HspVarCorePtrAPTR( pval, 0 );
 #ifdef HSP64
@@ -1226,8 +1223,25 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 		  throw (HSPERR_TYPE_MISMATCH);
 		}
 		reffunc_intfunc_lvalue = call_extfunc( (void *)lp1, (int **)p, p2, fl );
-		ptr = &reffunc_intfunc_lvalue;
-		*type_res = HSPVAR_FLAG_INT64;
+		switch( fl ) {
+		case HSPVAR_FLAG_STR:
+			ptr = sptr = code_stmp( strlen((char*)reffunc_intfunc_lvalue) + 1 );
+			strcpy( sptr, (char*) reffunc_intfunc_lvalue );
+			*type_res = HSPVAR_FLAG_STR;
+			break;
+		case HSPVAR_FLAG_INT:
+			reffunc_intfunc_ivalue = (int)reffunc_intfunc_lvalue;
+			ptr = &reffunc_intfunc_ivalue;
+			*type_res = HSPVAR_FLAG_INT;
+			break;
+		case HSPVAR_FLAG_INT64:
+			ptr = &reffunc_intfunc_lvalue;
+			*type_res = HSPVAR_FLAG_INT64;
+			break;
+		default:
+			// TODO INT以外の対応
+			break;
+		}
 #else
 		p1 = code_geti();
 		p2 = code_geti();
