@@ -2,8 +2,8 @@
 //
 //	hsp3extlib.cpp header
 //
-#ifndef __hsp3extlib_h
-#define __hsp3extlib_h
+#ifndef __hsp3extlib_ffi_h
+#define __hsp3extlib_ffi_h
 
 #include "../hsp3code.h"
 
@@ -64,8 +64,8 @@ void Hsp3ExtLibTerm( void );
 
 int cmdfunc_dllcmd( int cmd );
 int exec_dllcmd( int cmd, int mask );
-int code_expand_and_call( const STRUCTDAT *st );
-int64_t call_extfunc( void *proc, int **prm, int prms, int rettype );
+HSPPTRINT code_expand_and_call( const STRUCTDAT *st );
+HSPPTRINT call_extfunc( void *proc, int **prm, int prms, int rettype );
 
 int cnvwstr( void *out, char *in, int bufsize );
 int cnvsjis( void *out, char *in, int bufsize );

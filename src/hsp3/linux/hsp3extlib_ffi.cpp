@@ -497,17 +497,18 @@ static char *prepare_localstr( char *src, int mode )
 	return dst;
 }
 
-static int code_expand_next( ffi_type **prm_args, void **prm_values, const STRUCTDAT *, int );
+static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const STRUCTDAT *, int );
 
 // libffi用引数をスタック上に保持する
 union FfiParam {
 	int i;
+	int64_t l;
 	double d;
 	float f;
 	void *ptr;
 };
 
-int code_expand_and_call( const STRUCTDAT *st )
+HSPPTRINT code_expand_and_call( const STRUCTDAT *st )
 {
 	//	パラメータの取得および関数呼び出し（再帰処理による）
 	//
@@ -517,7 +518,7 @@ int code_expand_and_call( const STRUCTDAT *st )
 	//	DLL 関数呼び出し時は st->proc に関数アドレスをセットして
 	//	おかなければなりません（ BindFUNC() により）。
 	//
-	int result;
+	HSPPTRINT result;
 
 	ffi_type **prm_args = (ffi_type **) sbAlloc(st->prmmax * sizeof(ffi_type *));
 	void **prm_values = (void **) sbAlloc(st->prmmax * sizeof(void *));
@@ -535,11 +536,12 @@ int code_expand_and_call( const STRUCTDAT *st )
 	return result;
 }
 
-static int code_expand_next( ffi_type **prm_args, void **prm_values, const STRUCTDAT *st, int index )
+static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const STRUCTDAT *st, int index )
 {
 	//	次のパラメータを取得（および関数呼び出し）（再帰処理）
 	//
-	int result;
+	HSPPTRINT result = 0;
+	ffi_type *rtype;
 	HSPAPICHAR *hactmp1 = 0;
 	if ( index == st->prmmax ) {
 		// 関数（またはメソッド）の呼び出し
@@ -553,7 +555,14 @@ static int code_expand_next( ffi_type **prm_args, void **prm_values, const STRUC
 			//Alertf("%s:%d call_extfun(%p, *, %d)\n", __func__, __LINE__, st->proc, st->prmmax);
 			ffi_cif cif;
 			// TODO intと互換性のない返り値の受け取り
-			ffi_prep_cif(&cif, FFI_DEFAULT_ABI, st->prmmax, &ffi_type_sint, prm_args);
+#ifdef HSP64
+			rtype = &ffi_type_slong;
+#else
+			rtype = &ffi_type_sint;
+#endif
+			if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, st->prmmax, rtype, prm_args) != FFI_OK) {
+				throw HSPERR_INVALID_FUNCPARAM;
+			}
 			ffi_call(&cif, FFI_FN(st->proc), &result, prm_values);
 			break;
 #ifndef HSP_COM_UNSUPPORTED
@@ -590,6 +599,12 @@ static int code_expand_next( ffi_type **prm_args, void **prm_values, const STRUC
 		p.i = (int)code_getdi(0);
 		prm_values[index] = &p.i;
 		prm_args[index] = &ffi_type_sint;
+		break;
+	case MPTYPE_INT64:
+		p.l = (int64_t)code_getdl(0);
+		prm_values[index] = &p.l;
+		//prm_args[index] = &ffi_type_slong;
+		prm_args[index] = &ffi_type_pointer;
 		break;
 	case MPTYPE_PVARPTR:
 		aptr = code_getva( &pval );
@@ -686,7 +701,7 @@ static int code_expand_next( ffi_type **prm_args, void **prm_values, const STRUC
 		break;
 #endif
 	default:
-		Alertf("### Unsupported %s:%d %d\n", __func__, __LINE__, prm->mptype);
+		// Alertf("### Unsupported %s:%d %d\n", __func__, __LINE__, prm->mptype);
 		throw ( HSPERR_UNSUPPORTED_FUNCTION );
 	}
 
@@ -709,14 +724,14 @@ static int code_expand_next( ffi_type **prm_args, void **prm_values, const STRUC
 	return result;
 }
 
-int64_t call_extfunc( void *proc, int **prm, int prms, int rettype )
+HSPPTRINT call_extfunc( void *proc, int **prm, int prms, int rettype )
 {
 	ffi_cif cif;
 
 	std::vector<ffi_type *> args(prms);
 	std::vector<void *> values(prms);
 
-	int64_t result = 0;
+	HSPPTRINT result = 0;
 	ffi_type *result_type;
 
 	switch (rettype) {
@@ -761,7 +776,7 @@ int exec_dllcmd( int cmd, int mask )
 {
 	STRUCTDAT *st;
 	void* pFn;
-	int result;
+	HSPPTRINT result;
 
 	code_next();							// 次のコードを取得(最初に必ず必要です)
 
@@ -797,6 +812,9 @@ int exec_dllcmd( int cmd, int mask )
 		hspctx->stat = -result;
 	} else {
 		hspctx->stat = result;
+#ifdef HSP64
+		hspctx->stat64 = result;
+#endif
 	}
 
 	return RUNMODE_RUN;
