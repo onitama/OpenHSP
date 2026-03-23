@@ -18,7 +18,7 @@ void hsp3extcmd_pause( void );
 void hsp3extcmd_resume( void );
 
 HSP3DEVINFO *hsp3extcmd_getdevinfo( void );
-void hsp3extcmd_sysvars( int inst, int hwnd, int hdc );
+void hsp3extcmd_sysvars( HSPPTRINT inst, HSPPTRINT hwnd, HSPPTRINT hdc );
 void hsp3excmd_rebuild_window(void);
 
 void hsp3excmd_init_mmsystem(int flag);

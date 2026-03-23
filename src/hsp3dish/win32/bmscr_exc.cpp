@@ -112,7 +112,7 @@ typedef struct BMSCR3
 static BMSCR3 bmscr;
 
 
-void init_bmscr3(Bmscr* bm, int _inst, int _wnd, int _hdc)
+void init_bmscr3(Bmscr* bm, HSPPTRINT _inst, HSPPTRINT _wnd, HSPPTRINT _hdc)
 {
 	//		HSP3DishのBMSCRをHSP3のBMSCR型に変換する
 	//

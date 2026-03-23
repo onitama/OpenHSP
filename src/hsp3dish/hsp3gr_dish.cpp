@@ -57,11 +57,7 @@ static int cur_window;
 static int ckey,cklast,cktrg;
 static int msact;
 static int dispflg;
-#ifdef HSP64
-static int64_t sys_inst, sys_hwnd, sys_hdc;
-#else
-static int sys_inst, sys_hwnd, sys_hdc;
-#endif
+static HSPPTRINT sys_inst, sys_hwnd, sys_hdc;
 
 extern int resY0, resY1;
 
@@ -4531,7 +4527,7 @@ void hsp3extcmd_resume( void )
 }
 
 
-void hsp3extcmd_sysvars(int inst, int hwnd, int hdc)
+void hsp3extcmd_sysvars(HSPPTRINT inst, HSPPTRINT hwnd, HSPPTRINT hdc)
 {
 	sys_inst = inst;
 	sys_hwnd = hwnd;

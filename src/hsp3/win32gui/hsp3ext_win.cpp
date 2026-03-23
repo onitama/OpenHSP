@@ -626,7 +626,11 @@ static int cmdfunc_ctrlcmd( int cmd )
 			piid2 = &IID_IUnknown;
 		}
 		inimode = code_getdi(0);				// 初期化モード
+#ifdef HSP64
+		punkDef = (IUnknown *)code_getdl(0);	// デフォルトオブジェクト
+#else
 		punkDef = (IUnknown *)code_getdi(0);	// デフォルトオブジェクト
+#endif
 
 		// 新規CLSIDからインスタンスを作成
 		hspctx->stat = 0;
@@ -900,31 +904,39 @@ static int cmdfunc_ctrlcmd( int cmd )
 		char *ps;
 		BMSCR *bm;
 		int i;
+#ifdef HSP64
+		int64_t prm[6];
+#else
 		int prm[6];
+#endif
 
 		ps = code_gets(); strncpy( clsname8, ps, 1023 );
 		ps = code_gets(); strncpy( winname8, ps, 1023 );
 
 		bm = GetBMSCR();
 		for(i=0;i<6;i++) {
+#ifdef HSP64
+			prm[i] = code_getdl(0);
+#else
 			prm[i] = code_getdi(0);
+#endif
 		}
 		if ( prm[2] <= 0 ) prm[2] = bm->ox;
 		if ( prm[3] <= 0 ) prm[3] = bm->oy;
 
 		hwnd = CreateWindowEx(
-		    (DWORD) prm[0],			// 拡張ウィンドウスタイル
-		    chartoapichar(clsname8,&clsname),	// ウィンドウクラス名
-		    chartoapichar(winname8,&winname),	// ウィンドウ名
-		    (DWORD) prm[1],			// ウィンドウスタイル
+			(DWORD) prm[0],			// 拡張ウィンドウスタイル
+			chartoapichar(clsname8,&clsname),	// ウィンドウクラス名
+			chartoapichar(winname8,&winname),	// ウィンドウ名
+			(DWORD) prm[1],			// ウィンドウスタイル
 			bm->cx, bm->cy, prm[2], prm[3],		// X,Y,SIZEX,SIZEY
 			bm->hwnd,				// 親ウィンドウのハンドル
-		    (HMENU) prm[4],			// メニューハンドルまたは子ウィンドウID
+			(HMENU) prm[4],			// メニューハンドルまたは子ウィンドウID
 			bm->hInst,				// インスタンスハンドル
-		    (PVOID) prm[5]			// ウィンドウ作成データ
-			);
-			freehac(&clsname);
-			freehac(&winname);
+			(PVOID) prm[5]			// ウィンドウ作成データ
+		);
+		freehac(&clsname);
+		freehac(&winname);
 
 		// AddHSPObject( hwnd, HSPOBJ_TAB_SKIP, prm[3], NULL, 0 );			// HSPのウインドゥオブジェクトとして登録する
 		AddHSPObject( hwnd, HSPOBJ_TAB_SKIP, prm[3] );
@@ -934,6 +946,39 @@ static int cmdfunc_ctrlcmd( int cmd )
 
 	case 0x07:								// 	sendmsg
 		{
+#ifdef HSP64
+		int p1;
+		WPARAM p2;
+		LPARAM p3;
+		HWND hw;
+		int fl;
+		char *vptr;
+		HSPAPICHAR *hactmp1 = 0;
+		HSPAPICHAR *hactmp2 = 0;
+		hw = (HWND)code_getdl(0);
+		p1 = code_getdi(0);
+
+		vptr = code_getsptr( &fl );
+		if ( fl == TYPE_STRING ) {
+			p2 = (WPARAM)chartoapichar(vptr,&hactmp1);
+		} else {
+			p2 = *(WPARAM *)vptr;
+		}
+
+		vptr = code_getsptr( &fl );
+		if ( fl == TYPE_STRING ) {
+			p3 = (LPARAM)chartoapichar(vptr,&hactmp2);
+		} else {
+			p3 = *(LPARAM *)vptr;
+		}
+
+		//Alertf( "SEND[%x][%x][%x]",p1,p2,p3 );
+		hspctx->stat_i64 = (int64_t)SendMessage( hw, p1, p2, p3 );
+		hspctx->stat = (int)hspctx->stat_i64;
+		freehac(&hactmp1);
+		freehac(&hactmp2);
+		break;
+#else
 		int p1;
 		WPARAM p2;
 		LPARAM p3;
@@ -964,6 +1009,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 		freehac(&hactmp1);
 		freehac(&hactmp2);
 		break;
+#endif
 		}
 
 	case 0x08:								// 	comevent

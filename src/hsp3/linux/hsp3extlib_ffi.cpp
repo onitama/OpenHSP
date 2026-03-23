@@ -3,6 +3,7 @@
 //	onion software/onitama 2004/6
 //	               chokuto 2005/3
 //
+#include <cstdint>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN            // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
@@ -701,9 +702,14 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 		mpval = *pmpval;
 		switch( mpval->flag ) {
 		case HSPVAR_FLAG_INT:
-			p.i = *(int *)(mpval->pt);
-			prm_values[index] = &p.i;
-			prm_args[index] = &ffi_type_sint;
+			p.ptr = (void*)(HSPPTRINT)(*(int *)(mpval->pt));
+			prm_values[index] = &p.ptr;
+			prm_args[index] = &ffi_type_pointer;
+			break;
+		case HSPVAR_FLAG_INT64:
+			p.ptr = (void*)(HSPPTRINT)(*(int64_t *)(mpval->pt));
+			prm_values[index] = &p.ptr;
+			prm_args[index] = &ffi_type_pointer;
 			break;
 		case HSPVAR_FLAG_STR:
 			p.ptr = localbuf = prepare_localstr( mpval->pt, prm->mptype == MPTYPE_FLEXWPTR );

@@ -43,7 +43,7 @@ static int val,type,exflg;
 static short csvalue, csvalue2;
 static int hspevent_opt;		// Event enable flag
 static MPModVarData modvar_init;
-static int sptr_res;
+static HSPPTRINT sptr_res;
 static int arrayobj_flag;
 
 static HSPEXINFO mem_exinfo;	// HSPEXINFO本体
@@ -1777,8 +1777,15 @@ char *code_getsptr( int *type )
 		bp = (char *)&sptr_res;
 	} else {
 		fl = mpval->flag;
-		bp = mpval->pt;
-		if (( fl != HSPVAR_FLAG_INT )&&( fl != HSPVAR_FLAG_STR )) {
+		if ( fl == HSPVAR_FLAG_INT ) {
+			sptr_res = *(int*)mpval->pt;
+			bp = (char *)&sptr_res;
+		} else if ( fl == HSPVAR_FLAG_INT64 ) {
+			sptr_res = *(int64_t*)mpval->pt;
+			bp = (char *)&sptr_res;
+		} else if ( fl == HSPVAR_FLAG_STR ) {
+			bp = mpval->pt;
+		} else {
 			throw HSPERR_TYPE_MISMATCH;
 		}
 	}

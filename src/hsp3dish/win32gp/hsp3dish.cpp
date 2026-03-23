@@ -239,7 +239,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 		try {
 #endif
 			int retval;
-			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (int)uMessage, (int)wParam, (int)lParam)) {
+			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (int)uMessage, (HSPPTRINT)wParam, (HSPPTRINT)lParam)) {
 				if (code_irqresult(&retval)) return retval;
 			}
 #ifdef HSPERR_HANDLE
@@ -349,7 +349,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 			try {
 #endif
-				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam);
+				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (HSPPTRINT)wParam, (HSPPTRINT)lParam);
 #ifdef HSPERR_HANDLE
 			}
 			catch (HSPERROR code) {						// HSPエラー例外処理
@@ -976,7 +976,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			hsp3excmd_rebuild_window();
 			HSP3DEVINFO *devinfo = hsp3extcmd_getdevinfo();
 			hsp3dish_setdevinfo(devinfo);
-			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+			hsp3extcmd_sysvars((HSPPTRINT)m_hInstance, (HSPPTRINT)m_hWnd, 0);
 			DestroyWindow(bak_hwnd);
 
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
@@ -1246,7 +1246,7 @@ int hsp3dish_reset(void)
 	HSP3DEVINFO *devinfo;
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo( devinfo );
-	hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+	hsp3extcmd_sysvars((HSPPTRINT)m_hInstance, (HSPPTRINT)m_hWnd, 0);
 
 	game->resetScreen();
 	gameplay::Logger::log(gameplay::Logger::LEVEL_INFO, "HGIMG4 %s initalized : %s\n", hspver, devinfo->devname);
