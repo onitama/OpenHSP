@@ -57,6 +57,18 @@ static int is_statement_end( int type )
 	return ( type == TK_SEPARATE )||( type == TK_EOL )||( type == TK_EOF );
 }
 
+static void put_int64_literal_as_func( CToken *self, int64_t value, int exflag )
+{
+	char literal[32];
+
+	// Keep AX compatibility by lowering int64 literals to the existing int64() builtin call.
+	snprintf( literal, sizeof(literal), "%lld", (long long)value );
+	self->PutCS( TYPE_INTFUNC, 0x200, exflag );
+	self->PutCS( TYPE_MARK, '(', 0 );
+	self->PutCS( TYPE_STRING, self->PutDS( literal ), 0 );
+	self->PutCS( TYPE_MARK, ')', 0 );
+}
+
 
 void CToken::CalcCG_regmark( int mark )
 {
@@ -137,6 +149,12 @@ void CToken::CalcCG_factor( void )
 		return;
 	case TK_DNUM:
 		PutCS( TYPE_DNUM, val_d, texflag );
+		texflag = 0;
+		CalcCG_token();
+		calccount++;
+		return;
+	case TK_INT64:
+		put_int64_literal_as_func( this, val64, texflag );
 		texflag = 0;
 		CalcCG_token();
 		calccount++;
@@ -570,6 +588,12 @@ char *CToken::GetTokenCG( char *str, int option )
 			vs++;
 		}
 		cg_str[a]=0;
+		if ( *vs=='l' ) {
+			vs++;
+			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 16 );
+			ttype = TK_INT64;
+			return (char *)vs;
+		}
 		ttype = TK_NUM;
 		return (char *)vs;
 	}
@@ -586,6 +610,12 @@ char *CToken::GetTokenCG( char *str, int option )
 			vs++;
 		}
 		cg_str[a]=0;
+		if ( *vs=='l' ) {
+			vs++;
+			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 2 );
+			ttype = TK_INT64;
+			return (char *)vs;
+		}
 		ttype = TK_NUM;
 		return (char *)vs;
 	}
@@ -640,6 +670,14 @@ char *CToken::GetTokenCG( char *str, int option )
 			s2[a++]=a1;vs++;
 		}
 		if (( a1=='f' )||( a1=='d' )) { chk = 1; vs++; }
+		if ( a1=='l' ) {			// int64 suffix
+			s2[a]=0;
+			val64 = strtoll( (char *)s2, nullptr, 10 );
+			if ( is_negative_number ) val64 = -val64;
+			ttype = TK_INT64;
+			vs++;
+			return (char *)vs;
+		}
 		if ( a1=='e' ) {						// 指数部を取り込む
 			chk = 1;
 			s2[a++] = 'e';
@@ -3463,4 +3501,3 @@ void CToken::GenerateLabelListAndTagRef(int labelid, int flag )
 
 	GenerateLabelTag(lab->name, flag| LABBUF_FLAG_REFER, lab->type, cg_orgfilefull, cg_orgline );
 }
-
