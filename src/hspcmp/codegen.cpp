@@ -588,7 +588,7 @@ char *CToken::GetTokenCG( char *str, int option )
 			vs++;
 		}
 		cg_str[a]=0;
-		if ( *vs=='l' ) {
+		if ( *vs=='l' || *vs=='L' ) {
 			vs++;
 			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 16 );
 			ttype = TK_INT64;
@@ -610,7 +610,7 @@ char *CToken::GetTokenCG( char *str, int option )
 			vs++;
 		}
 		cg_str[a]=0;
-		if ( *vs=='l' ) {
+		if ( *vs=='l' || *vs=='L' ) {
 			vs++;
 			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 2 );
 			ttype = TK_INT64;
@@ -669,8 +669,8 @@ char *CToken::GetTokenCG( char *str, int option )
 			}
 			s2[a++]=a1;vs++;
 		}
-		if (( a1=='f' )||( a1=='d' )) { chk = 1; vs++; }
-		if ( a1=='l' ) {			// int64 suffix
+		if (( a1=='f' )||( a1=='F' )||( a1=='d' )||( a1=='D' )) { chk = 1; vs++; }
+		if ( a1=='l' || a1=='L' ) {			// int64 suffix
 			s2[a]=0;
 			val64 = strtoll( (char *)s2, nullptr, 10 );
 			if ( is_negative_number ) val64 = -val64;
@@ -678,7 +678,7 @@ char *CToken::GetTokenCG( char *str, int option )
 			vs++;
 			return (char *)vs;
 		}
-		if ( a1=='e' ) {						// 指数部を取り込む
+		if ( a1=='e' || a1=='E' ) {						// 指数部を取り込む
 			chk = 1;
 			s2[a++] = 'e';
 			vs++;
