@@ -253,7 +253,6 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$00b 14 lparam",					// (ver2.55)
 	"$00c 14 refstr",
 	"$00d 14 refdval",					// (3.0)
-	"$00e 14 stat64",					// (3.7_64)
 
 	//	3.0 internal function
 	"$000 13 int",
@@ -372,4 +371,3 @@ char 	*hsp_prepp[] =
 
 	"*"
 };
-

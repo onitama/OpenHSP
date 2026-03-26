@@ -973,8 +973,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 		}
 
 		//Alertf( "SEND[%x][%x][%x]",p1,p2,p3 );
-		hspctx->stat_i64 = (int64_t)SendMessage( hw, p1, p2, p3 );
-		hspctx->stat = (int)hspctx->stat_i64;
+		hspctx->stat = (HSPPTRINT)SendMessage( hw, p1, p2, p3 );
 		freehac(&hactmp1);
 		freehac(&hactmp2);
 		break;
@@ -1725,4 +1724,3 @@ void hsp3ext_execfile(char* stmp, char* ps, int mode)
 	}
 	if (i < 32) throw HSPERR_EXTERNAL_EXECUTE;
 }
-

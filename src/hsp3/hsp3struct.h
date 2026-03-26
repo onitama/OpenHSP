@@ -33,9 +33,11 @@
 #ifdef HSP64
 #define HSPLPTR long // FIXME
 #define HSPPTRINT int64_t
+#define HSPCTX_STAT_FLAG HSPVAR_FLAG_INT64
 #else
 #define HSPLPTR int
 #define HSPPTRINT int
+#define HSPCTX_STAT_FLAG HSPVAR_FLAG_INT
 #endif
 
 // command type
@@ -542,9 +544,9 @@ struct HSPCTX
 
 	IRQDAT *mem_irq;					// IRQ data ptr
 	int irqmax;							// IRQ data count
-	HSPPTRINT iparam;							// IRQ Info data1
-	HSPPTRINT wparam;							// IRQ Info data2
-	HSPPTRINT lparam;							// IRQ Info data3
+	HSPPTRINT iparam;					// IRQ Info data1
+	HSPPTRINT wparam;					// IRQ Info data2
+	HSPPTRINT lparam;					// IRQ Info data3
 
 	PVal *mem_var;						// var storage index
 	HSPEXINFO30 exinfo;					// HSP function data(3.0)
@@ -558,7 +560,7 @@ struct HSPCTX
 	int looplev;						// repeat loop level
 	HSPERROR err;						// error code
 	int hspstat;						// HSP status
-	int stat;							// sysvar 'stat'
+	HSPPTRINT stat;						// sysvar 'stat'
 	int strsize;						// sysvar 'strsize'
 	char *refstr;						// RefStr Buffer
 	char *fnbuffer;						// buffer for FILENAME
@@ -597,9 +599,6 @@ struct HSPCTX
 	int estmp_ptr;						// Extra string buffer pointer
 	int estmp_max;						// Extra string buffer size
 
-
-	// 64bit integer value (3.7_64)
-	int64_t stat_i64;						// sysvar 'stat64'
 };
 
 #define HSPCTX_REFSTR_MAX 4096

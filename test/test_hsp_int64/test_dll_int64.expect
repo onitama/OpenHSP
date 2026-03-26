@@ -1,13 +1,13 @@
 gpiod initalize failed.
 === int64 return value ===
-atoll(12345) stat=12345 stat64=12345
-atoll(2^33) stat=0 stat64=8589934592
-atoll(INT64_MAX) stat64=9223372036854775807
-atoll(-1) stat=-1 stat64=-1
-strlen(Hello, World!) stat64=13
-llround(3.7) stat64=4
-llround(2^33) stat64=8589934592
+atoll(12345) stat=12345 stat=12345
+atoll(2^33) stat=8589934592 stat=8589934592
+atoll(INT64_MAX) stat=9223372036854775807
+atoll(-1) stat=-1 stat=-1
+strlen(Hello, World!) stat=13
+llround(3.7) stat=4
+llround(2^33) stat=8589934592
 === int64 argument ===
 tmpfile: ok
-fseeko/ftello(2^33) stat64=8589934592
-fseeko/ftello(2^40) stat64=1099511627776
+fseeko/ftello(2^33) stat=8589934592
+fseeko/ftello(2^40) stat=1099511627776

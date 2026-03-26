@@ -42,11 +42,11 @@ Hsp3ObjBase::~Hsp3ObjBase(void)
 /*------------------------------------------------------------*/
 
 static bool bmscr_obj_drawflag;
-static int *notice_ptr;
+static HSPPTRINT *notice_ptr;
 static int bmscr_obj_ival;
 static double bmscr_obj_dval;
 
-void SetObjectEventNoticePtr( int *ptr )
+void SetObjectEventNoticePtr( HSPPTRINT *ptr )
 {
 	//		イベント時の値ポインタを設定(stat値)
 	//
@@ -1365,5 +1365,4 @@ int Bmscr::UpdateAllObjects( void )
 
 	return -1;
 }
-
 

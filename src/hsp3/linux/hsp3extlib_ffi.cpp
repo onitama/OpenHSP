@@ -866,9 +866,6 @@ int exec_dllcmd( int cmd, int mask )
 		hspctx->stat = -result;
 	} else {
 		hspctx->stat = result;
-#ifdef HSP64
-		hspctx->stat_i64 = result;
-#endif
 	}
 
 	return RUNMODE_RUN;

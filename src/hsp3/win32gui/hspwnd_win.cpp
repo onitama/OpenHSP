@@ -468,7 +468,7 @@ void HspWnd::Reset( HANDLE instance, char *wndcls )
 }
 
 
-void HspWnd::SetEventNoticePtr( int *ptr )
+void HspWnd::SetEventNoticePtr( HSPPTRINT *ptr )
 {
 	resptr = ptr;
 	SetObjectEventNoticePtr( resptr );
@@ -2195,4 +2195,3 @@ void Bmscr::Viewcalc_calc(HSPREAL& axisx, HSPREAL& axisy)
 	//
 	if (vp_flag == 0) return;
 }
-

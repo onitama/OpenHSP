@@ -165,6 +165,8 @@ void ex_mref( PVal *pval, int prm )
 	} else {
 		switch( prm ) {
 		case 0x40:
+			t = HSPCTX_STAT_FLAG;
+			size = sizeof(HSPPTRINT);
 			ptr = &ctx->stat;
 			break;
 		case 0x41:
@@ -3976,7 +3978,7 @@ static int cmdfunc_extcmd( int cmd )
 
 		if (sprite->sprite_enable) {
 			ctx->stat = sprite->getMapAttribute(p1, p2);
-			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &ctx->stat);
+			code_setva(p_pval, p_aptr, HSPCTX_STAT_FLAG, &ctx->stat);
 		}
 		break;
 	}
@@ -4570,4 +4572,3 @@ void hsp3excmd_init_mmsystem(int flag)
 		}
 	}
 }
-
