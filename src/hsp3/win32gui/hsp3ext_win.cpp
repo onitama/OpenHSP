@@ -1426,9 +1426,14 @@ static void *reffunc_dllcmd( int *type_res, int arg )
 	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
 	if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
 
-	*type_res = HSPVAR_FLAG_INT;
 	exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
+#ifdef HSP64
+	*type_res = HSPVAR_FLAG_INT64;
+	reffunc_intfunc_lvalue = hspctx->stat;
+#else
+	*type_res = HSPVAR_FLAG_INT;
 	reffunc_intfunc_ivalue = hspctx->stat;
+#endif
 
 	//			')'で終わるかを調べる
 	//
@@ -1436,7 +1441,11 @@ static void *reffunc_dllcmd( int *type_res, int arg )
 	if ( *val != ')' ) throw ( HSPERR_INVALID_FUNCPARAM );
 	code_next();
 
+#ifdef HSP64
+	return &reffunc_intfunc_lvalue;
+#else
 	return &reffunc_intfunc_ivalue;
+#endif
 }
 
 

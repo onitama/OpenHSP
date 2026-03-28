@@ -21,25 +21,25 @@ dimtype offset, vartype("int64"), 1
 ; === int64 返り値テスト ===
 mes "=== int64 return value ==="
 
-; 32bitに収まる値: statとstatは一致
+; 32bitに収まる値: statは一致
 ret = c_atoll("12345")
-mes "atoll(12345) stat=" + stat + " stat=" + stat
+mes "atoll(12345) ret=" + ret + " stat=" + stat
 
-; 2^33: statは0(下位32bit)、statに正確な値
+; 2^33
 ret = c_atoll("8589934592")       ; 引数はstr(文字列)なのでリテラル変換不要
-mes "atoll(2^33) stat=" + stat + " stat=" + stat
+mes "atoll(2^33) ret=" + ret + " stat=" + stat
 
 ; INT64_MAX
 ret = c_atoll("9223372036854775807")
-mes "atoll(INT64_MAX) stat=" + stat
+mes "atoll(INT64_MAX) ret=" + ret + " stat=" + stat
 
 ; 負の値
 ret = c_atoll("-1")
-mes "atoll(-1) stat=" + stat + " stat=" + stat
+mes "atoll(-1) ret=" + ret + " stat=" + stat
 
 ; strlen: size_t (64bit) 返り値
 ret = c_strlen("Hello, World!")
-mes "strlen(Hello, World!) stat=" + stat
+mes "strlen(Hello, World!) ret=" + ret
 
 ; llround: double → long long
 ret = c_llround(3.7)
@@ -60,12 +60,12 @@ if fp != 0 : mes "tmpfile: ok" : else : mes "tmpfile: failed"
 offset = int64("8589934592")
 c_fseeko fp, offset, 0
 ret = c_ftello(fp)
-mes "fseeko/ftello(2^33) stat=" + stat
+mes "fseeko/ftello(2^33) ret=" + ret
 
 ; 2^40 = 1099511627776 オフセット (1TB, 32bitでは表現不可)
 offset = int64("1099511627776")
 c_fseeko fp, offset, 0
 ret = c_ftello(fp)
-mes "fseeko/ftello(2^40) stat=" + stat
+mes "fseeko/ftello(2^40) ret=" + ret
 
 c_fclose fp
