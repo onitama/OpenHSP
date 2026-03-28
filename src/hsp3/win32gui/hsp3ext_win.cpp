@@ -3,6 +3,7 @@
 //	HSP3 External DLL manager
 //	onion software/onitama 2004/6
 //
+#include <cstddef>
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1516,7 +1517,7 @@ char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
 	DWORD* mss;
 	SYSTEM_INFO si;
 	MEMORYSTATUS ms;
-	int plen;
+	size_t plen;
 	char *p;
 
 	fl = HSPVAR_FLAG_INT;

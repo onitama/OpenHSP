@@ -6,6 +6,7 @@
 //
 #include "hsp3struct.h"
 #include "hspvar_core.h"
+#include <cstddef>
 #include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
@@ -134,7 +135,8 @@ static int parse_strmap(char* strmap, int mode)
 	//
 	int idmax = -1;
 	int curline;
-	int maxline, header_size;
+	int maxline;
+	size_t header_size;
 	CStrNote note;
 	char* p;
 	char* pres;
@@ -909,7 +911,7 @@ char *code_getas(void)
 	chartoapichar(s, &hactmp1);
 	apichartoansichar(hactmp1, &actmp1);
 	freehac(&hactmp1);
-	sbCopy(&hspctx->stmp,actmp1,strlen(actmp1)+1);
+	sbCopy(&hspctx->stmp,actmp1,(int)strlen(actmp1)+1);
 	freeac(&actmp1);
 	return hspctx->stmp;
 #else
@@ -930,7 +932,7 @@ char *code_getads(const char *defval)
 	chartoapichar(s, &hactmp1);
 	apichartoansichar(hactmp1, &actmp1);
 	freehac(&hactmp1);
-	sbCopy(&hspctx->stmp,actmp1,strlen(actmp1)+1);
+	sbCopy(&hspctx->stmp,actmp1,(int)strlen(actmp1)+1);
 	freeac(&actmp1);
 	return hspctx->stmp;
 #else
@@ -2925,7 +2927,7 @@ int code_getdebug_varid(PVal* pv)
 	int id = -1;
 	if (mem_di_val) {
 		char *p = (char *)hspctx->mem_var;
-		id = (((char*)pv) - p ) / sizeof(PVal);
+		id = (int)(((char*)pv) - p ) / sizeof(PVal);
 		if ((id < 0) || (id >= maxvar)) return -1;
 	}
 	return id;
@@ -3509,7 +3511,7 @@ int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 		{
 		char **p;
 		dirlist_target = sbAlloc( 0x1000 );
-		hspctx->stat = dirlist( hspctx->fnbuffer, &dirlist_target, prm1 );
+		hspctx->stat = dirlist( hspctx->fnbuffer, &dirlist_target, (int)prm1 );
 		p = (char **)prm3;
 		*p = dirlist_target;
 		break;

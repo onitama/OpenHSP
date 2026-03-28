@@ -88,7 +88,7 @@ void HSP3Crypt::SetBasePath(char* path)
 	// 対象ファイルのパスを設定する
 	//
 	Reset();
-	int size = strlen(path);
+	int size = (int)strlen(path);
 	this->basepath = (char*)_MALLOC(size+1);
 	strcpy(this->basepath,path);
 }

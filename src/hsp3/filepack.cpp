@@ -199,7 +199,7 @@ FILE* FilePack::pack_fopen(char* name, int offset)
 		strcpy(pathname, GetFolderName(obj));
 		strcat(pathname, GetFileName(obj));
 
-		int enc_crypt = cm->GetCRC32(pathname, strlen(pathname));			// ファイルパスを暗号キーにする
+		int enc_crypt = cm->GetCRC32(pathname, (int)strlen(pathname));			// ファイルパスを暗号キーにする
 		enc_crypt = cm->GetSalt(enc_crypt);
 		if (enc_crypt == 0) enc_crypt = 1;
 		int size = (int)obj->size;
@@ -716,7 +716,7 @@ bool DpmFile::open(FilePack* pack, char* fname)
 		strcpy(pathname, filepack->GetFolderName(obj));
 		strcat(pathname, filepack->GetFileName(obj));
 
-		int enc_crypt = crypt->GetCRC32(pathname, strlen(pathname));			// ファイルパスを暗号キーにする
+		int enc_crypt = crypt->GetCRC32(pathname, (int)strlen(pathname));			// ファイルパスを暗号キーにする
 		enc_crypt = crypt->GetSalt(enc_crypt);
 		if (enc_crypt == 0) enc_crypt = 1;
 		if (enc_crypt != obj->crypt) {
