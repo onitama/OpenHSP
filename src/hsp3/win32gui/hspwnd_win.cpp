@@ -119,7 +119,7 @@ void WM_Paint( HWND hwnd, Bmscr *bm )
 LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam )
 {
 	int id;
-	int retval;
+	HSPPTRINT retval;
 	Bmscr *bm;
 
 	if ( code_isuserirq() ) {

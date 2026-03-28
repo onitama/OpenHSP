@@ -3623,7 +3623,7 @@ int code_isuserirq( void )
 }
 
 
-int code_irqresult( int *value )
+int code_irqresult( HSPPTRINT *value )
 {
 	//		IRQイベントの戻り値を取得する
 	//

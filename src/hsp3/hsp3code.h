@@ -96,7 +96,7 @@ int code_sendirq( int id, int iparam, HSPPTRINT wparam, HSPPTRINT lparam );
 int code_checkirq( int id, int message, HSPPTRINT wparam, HSPPTRINT lparam );
 void code_execirq( IRQDAT *irq, HSPPTRINT wparam, HSPPTRINT lparam );
 void code_setirq( int id, int opt, int custom, unsigned short *ptr );
-int code_irqresult( int *value );
+int code_irqresult( HSPPTRINT *value );
 void code_enableirq( int id, int sw );
 int code_catcherror(HSPERROR code);
 
