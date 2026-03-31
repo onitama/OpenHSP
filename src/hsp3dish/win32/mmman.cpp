@@ -17,8 +17,9 @@
 #include <windowsx.h>
 #include <direct.h>
 #include <shlobj.h>
+#include <tchar.h>
 
-#pragma comment(lib, "d3d8.lib")
+//#pragma comment(lib, "d3d8.lib")
 #pragma comment(lib, "dxguid.lib")
 #endif
 
@@ -34,6 +35,7 @@
 #include "../supio.h"
 #include "../../hsp3/dpmread.h"
 #include "../../hsp3/strbuf.h"
+#include "../../hsp3/hsp3utfcnv.h"
 #include "mmman.h"
 
 #ifdef MMMAN_USE_DXSND
@@ -186,9 +188,21 @@ void MMMan::ClearAllBank( void )
 int MMMan::SendMCI( char *mci_commands )
 {
 	int a;
+	HspToApiStr command { mci_commands };
+	TCHAR res[256];
+	a=mciSendString( command,res,256,(HWND)hwm );
+	if (a) return -1;
+	return _ttoi(res);
+}
+
+
+int MMMan::SendMCIT( TCHAR *mci_commands )
+{
+	int a;
+	TCHAR res[256];
 	a=mciSendString( mci_commands,res,256,(HWND)hwm );
 	if (a) return -1;
-	return atoi(res);
+	return _ttoi(res);
 }
 
 
@@ -308,8 +322,8 @@ int MMMan::Play( int num )
 	//
 	int a,flg;
 	int bank;
-	char ss[1024];
-	char fpath[MAX_PATH];
+	TCHAR ss[1024];
+	TCHAR fpath[MAX_PATH];
 	MMM *mmm;
 
 	bank = SearchBank( num );
@@ -342,16 +356,17 @@ int MMMan::Play( int num )
 		case MMDATA_MCIVOICE:							// when "MID" file
 		case MMDATA_MCIVIDEO:							// when "AVI" file
 		case MMDATA_MPEGVIDEO:							// when "MPG" file
-
-			if ( GetShortPathName( mmm->fname, fpath, MAX_PATH ) == 0 ) {
+		{
+			HspToApiStr fname{ mmm->fname };
+			if ( GetShortPathName( fname, fpath, MAX_PATH ) == 0 ) {
 				return 1;
 			}
 			if ( flg!=MMDATA_MPEGVIDEO ) {
-				sprintf( ss,"open %s alias myid",fpath );
+				_stprintf( ss,_T("open %s alias myid"),fpath );
 			} else {
-				sprintf( ss,"open %s type MPEGVIDEO alias myid",fpath );
+				_stprintf( ss,_T("open %s type MPEGVIDEO alias myid"),fpath );
 			}
-			SendMCI( ss );
+			SendMCIT( ss );
 /*
 			if (flg!=MMDATA_MCIVOICE) {
 				if ( SendMCI( "where myid source" )==0 ) strcpy( avi_wh,res+4 );
@@ -365,8 +380,9 @@ int MMMan::Play( int num )
 				SendMCI( ss );
 			}
 */
-			strcpy( ss,"play myid from 0" );
+			_tcscpy( ss,_T("play myid from 0") );
 			break;
+		}
 
 /*
 		case MMDATA_CDAUDIO:							// when "CD audio"
@@ -387,9 +403,9 @@ int MMMan::Play( int num )
 	}
 
 	a&=15;
-	if (a==1) strcat( ss," notify" );
-	if (a==2) strcat( ss," wait" );
-	SendMCI( ss );
+	if (a==1) _tcscat( ss,_T(" notify") );
+	if (a==2) _tcscat( ss,_T(" wait") );
+	SendMCIT( ss );
 	curmus = num;
 
 	if ( mmm->vol != 0 ) { SetVol( num, mmm->vol ); }

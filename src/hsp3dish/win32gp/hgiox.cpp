@@ -864,7 +864,7 @@ int hgio_redraw( BMSCR *bm, int flag )
 		}
 	}
 	SetCursor(hc);
-	SetClassLong(hwnd, -12, (LONG)hc);
+	SetClassLongPtr(hwnd, -12, (LONG_PTR)hc);
 #endif
 
 	return 0;
@@ -912,7 +912,9 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 	i = 0;
 	if (mode&1) i|=MB_ICONEXCLAMATION; else i|=MB_ICONINFORMATION;
 	if (mode&2) i|=MB_YESNO; else i|=MB_OK;
-	res = MessageBox( master_wnd, str1, str2, i );
+	HspToApiStr str1w{ str1 };
+	HspToApiStr str2w{ str2 };
+	res = MessageBox( master_wnd, str1w, str2w, i);
 	return res;
 #endif
 #ifdef HSPNDK
@@ -944,7 +946,8 @@ int hgio_title( char *str1 )
 	//		title変更
 	//
 #ifdef HSPWIN
-	SetWindowText( master_wnd, str1 );
+    HspToApiStr str1w{ str1 };
+	SetWindowText(master_wnd, str1w);
 #endif
 
 #if defined(HSPEMSCRIPTEN)

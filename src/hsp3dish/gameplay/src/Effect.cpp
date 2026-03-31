@@ -75,7 +75,7 @@ Effect* Effect::createFromFile(const char* vshPath, const char* fshPath, const c
     const char* basedir = __default_folder.c_str();
     if (*basedir != 0) {
         _tgetcwd(pw, 1024);
-        _tchdir(basedir);
+        chdir(basedir);
     }
 #endif
 	// Read source from file.

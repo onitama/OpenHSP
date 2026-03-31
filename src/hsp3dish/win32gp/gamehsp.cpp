@@ -509,8 +509,9 @@ void gamehsp::resetScreen( int opt )
 #ifdef WIN32
 	TCHAR pw[1024];
 	_tgetcwd(pw, 1024);
-	shader_folder = pw;
-	Effect::SetDefaultFolder(pw);
+	ApiToAnsiStr pw8{ pw };
+	shader_folder = pw8;
+	Effect::SetDefaultFolder(shader_folder.c_str());
 #endif
 
 	// シーン作成

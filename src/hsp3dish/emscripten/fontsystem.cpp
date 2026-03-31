@@ -182,6 +182,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 		if (style & 1) {
 			fw = FW_BOLD;
 		}
+		HspToApiStr fontnamew{ fontname };
 		htexfont = CreateFont(
 			size,						// フォント高さ
 			0,							// 文字幅
@@ -196,7 +197,7 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 			CLIP_DEFAULT_PRECIS,		// クリッピング精度
 			PROOF_QUALITY,				// 出力品質
 			DEFAULT_PITCH | FF_MODERN,	// ピッチとファミリー
-			fontname					// 書体名
+			fontnamew					// 書体名
 		);
 		fontsystem_size = size;
 		fontsystem_style = style;

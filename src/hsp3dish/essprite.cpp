@@ -8,6 +8,7 @@
 
 #ifdef HSPWIN
 #include <windows.h>
+#include <tchar.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>

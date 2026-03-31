@@ -1,5 +1,9 @@
 #ifndef GP_NO_PLATFORM
 #ifdef WIN32
+#define HSPWIN
+#ifdef _UNICODE
+#define HSPUTF8
+#endif
 
 #include "Base.h"
 #include "Platform.h"
@@ -17,9 +21,11 @@
 #include <windowsx.h>
 #include <Commdlg.h>
 #include <shellapi.h>
+#include <tchar.h>
 #ifdef GP_USE_GAMEPAD
 #include <XInput.h>
 #endif
+#include "../../../hsp3/hsp3utfcnv.h"
 
 using gameplay::print;
 
@@ -586,7 +592,7 @@ Platform::Platform(Game* game)
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = NULL;  // No brush - we are going to paint our own background
     wc.lpszMenuName = NULL;  // No default menu
-    wc.lpszClassName = "gameplay";
+    wc.lpszClassName = _T("gameplay");
 
     ::RegisterClassEx(&wc);
 }
@@ -643,10 +649,11 @@ bool createWindow(WindowCreationParams* params, HWND* hwnd, HDC* hdc)
     AdjustWindowRectEx(&rect, style, FALSE, styleEx);
 
     // Create the native Windows window.
-    char* wclass = "HSP3DishWindow";
-    if (__tempWindowMode) wclass = "gameplay";
+    TCHAR* wclass = _T("HSP3DishWindow");
+    if (__tempWindowMode) wclass = _T("gameplay");
 
-    *hwnd = CreateWindowEx(styleEx, wclass, windowName.c_str(), style, 0, 0, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, __hinstance, NULL);
+    HspToApiStr wname{ windowName.c_str() };
+    *hwnd = CreateWindowEx(styleEx, wclass, wname, style, 0, 0, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, __hinstance, NULL);
     if (*hwnd == NULL)
     {
         GP_ERROR("Failed to create window.");
@@ -1690,7 +1697,7 @@ bool Platform::launchURL(const char* url)
     //int len = MultiByteToWideChar(CP_ACP, 0, url, -1, NULL, 0);
     //wchar_t* wurl = new wchar_t[len];
     //MultiByteToWideChar(CP_ACP, 0, url, -1, wurl, len);
-    int r = (int)ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
+    int r = (int)ShellExecuteA(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
     //SAFE_DELETE_ARRAY(wurl);
     return (r > 32);
 }
