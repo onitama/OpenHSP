@@ -55,6 +55,50 @@ char *apichartoansichar(const HSPAPICHAR *, char **);
 void freeac(char **);
 
 #endif
+
+//
+//	RAII wrappers for character conversion
+//
+class HspToApiStr {
+	HSPAPICHAR* hac = nullptr;
+public:
+	explicit HspToApiStr(const char* s) { chartoapichar(s, &hac); }
+	~HspToApiStr() { freehac(&hac); }
+	operator HSPAPICHAR*() const { return hac; }
+	HspToApiStr(const HspToApiStr&) = delete;
+	HspToApiStr& operator=(const HspToApiStr&) = delete;
+};
+
+class ApiToHspStr {
+	HSPCHAR* hc = nullptr;
+public:
+	explicit ApiToHspStr(const HSPAPICHAR* s) { apichartohspchar(s, &hc); }
+	~ApiToHspStr() { freehc(&hc); }
+	operator HSPCHAR*() const { return hc; }
+	ApiToHspStr(const ApiToHspStr&) = delete;
+	ApiToHspStr& operator=(const ApiToHspStr&) = delete;
+};
+
+class ApiToAnsiStr {
+	char* ac = nullptr;
+public:
+	explicit ApiToAnsiStr(const HSPAPICHAR* s) { apichartoansichar(s, &ac); }
+	~ApiToAnsiStr() { freeac(&ac); }
+	operator char*() const { return ac; }
+	ApiToAnsiStr(const ApiToAnsiStr&) = delete;
+	ApiToAnsiStr& operator=(const ApiToAnsiStr&) = delete;
+};
+
+class AnsiToApiStr {
+	HSPAPICHAR* hac = nullptr;
+public:
+	explicit AnsiToApiStr(const char* s) { ansichartoapichar(s, &hac); }
+	~AnsiToApiStr() { freehac(&hac); }
+	operator HSPAPICHAR*() const { return hac; }
+	AnsiToApiStr(const AnsiToApiStr&) = delete;
+	AnsiToApiStr& operator=(const AnsiToApiStr&) = delete;
+};
+
 #endif
 
 //		String Service
