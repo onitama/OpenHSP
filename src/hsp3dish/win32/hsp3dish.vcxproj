@@ -157,6 +157,7 @@
     <ClCompile Include="..\..\hsp3\filepack.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3crypt.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp" />
+    <ClCompile Include="..\..\hsp3\hspvar_int64.cpp" />
     <ClCompile Include="..\..\hsp3\win32gui\filedlg.cpp" />
     <ClCompile Include="..\..\hsp3\dpmread.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3.cpp" />
