@@ -141,9 +141,19 @@ void hgio_fontsystem_win32_init(HWND wnd)
 
 long hgio_fontsystem_getcode(unsigned char* pt)
 {
-	//		文字コードを返す(SJIS)
 	unsigned char a1 = *pt;
-
+#ifdef HSPUTF8
+	//		文字コードを返す(UTF-8 -> Unicode codepoint)
+	if (a1 & 0x80) {
+		if ((a1 & 0xf8) == 0xf0)
+			return ((long)(a1 & 0x07) << 18) | ((long)(pt[1] & 0x3f) << 12) | ((long)(pt[2] & 0x3f) << 6) | (pt[3] & 0x3f);
+		if ((a1 & 0xf0) == 0xe0)
+			return ((long)(a1 & 0x0f) << 12) | ((long)(pt[1] & 0x3f) << 6) | (pt[2] & 0x3f);
+		if ((a1 & 0xe0) == 0xc0)
+			return ((long)(a1 & 0x1f) << 6) | (pt[1] & 0x3f);
+	}
+#else
+	//		文字コードを返す(SJIS)
 	//		全角チェック
 	if (a1 >= 129) {					// 全角文字チェック
 		if ((a1 <= 159) || (a1 >= 224)) {
@@ -151,6 +161,7 @@ long hgio_fontsystem_getcode(unsigned char* pt)
 			return (i << 8) + (long)pt[1];
 		}
 	}
+#endif
 	return (long)a1;
 }
 
@@ -213,7 +224,11 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	long code = 0x20;
 	GetCharWidth(htexdc, code, code, &fontsystem_space);
 	code = hgio_fontsystem_getcode((unsigned char*)def_zspace);
+#ifdef HSPUTF8
+	GetCharWidthW(htexdc, (UINT)code, (UINT)code, &fontsystem_zspace);
+#else
 	GetCharWidth(htexdc, code, code, &fontsystem_zspace);
+#endif
 
 	if (tbl_init == false) {
 		for (int i = 0; i < 32; i++) {
@@ -239,7 +254,11 @@ int hgio_fontsystem_execsub(long code, unsigned char* buffer, int pitch, int off
 	//	int tmpy;
 
 	if (buffer == NULL) {
+#ifdef HSPUTF8
+		GetCharWidthW(htexdc, (UINT)code, (UINT)code, &width);
+#else
 		GetCharWidth(htexdc, code, code, &width);
+#endif
 		return width;
 	}
 	if (fontsystem_sx <= 0) return 0;
@@ -254,16 +273,30 @@ int hgio_fontsystem_execsub(long code, unsigned char* buffer, int pitch, int off
 
 
 	if (fontsystem_style & 16) {
+#ifdef HSPUTF8
+		// バッファサイズ受信
+		Size = GetGlyphOutlineW(htexdc, (UINT)code, GGO_GRAY4_BITMAP, pgm, 0, NULL, &mat);
+		// バッファ取得
+		GetGlyphOutlineW(htexdc, (UINT)code, GGO_GRAY4_BITMAP, pgm, Size, lpFont, &mat);
+#else
 		// バッファサイズ受信
 		Size = GetGlyphOutline(htexdc, code, GGO_GRAY4_BITMAP, pgm, 0, NULL, &mat);
 		// バッファ取得
 		GetGlyphOutline(htexdc, code, GGO_GRAY4_BITMAP, pgm, Size, lpFont, &mat);
+#endif
 	}
 	else {
+#ifdef HSPUTF8
+		// バッファサイズ受信
+		Size = GetGlyphOutlineW(htexdc, (UINT)code, GGO_BITMAP, pgm, 0, NULL, &mat);
+		// バッファ取得
+		GetGlyphOutlineW(htexdc, (UINT)code, GGO_BITMAP, pgm, Size, lpFont, &mat);
+#else
 		// バッファサイズ受信
 		Size = GetGlyphOutline(htexdc, code, GGO_BITMAP, pgm, 0, NULL, &mat);
 		// バッファ取得
 		GetGlyphOutline(htexdc, code, GGO_BITMAP, pgm, Size, lpFont, &mat);
+#endif
 	}
 
 	// フォントピッチ
@@ -344,6 +377,37 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 	unsigned char *p = (unsigned char*)msg;
 	unsigned char a1;
 
+#ifdef HSPUTF8
+	while (1) {
+		a1 = *p;
+		if (a1 == 0) break;
+		if (a1 < 32) { p++; continue; }
+
+		//		UTF-8バイト数を判定
+		int nbytes = 1;
+		if      ((a1 & 0xf8) == 0xf0) nbytes = 4;
+		else if ((a1 & 0xf0) == 0xe0) nbytes = 3;
+		else if ((a1 & 0xe0) == 0xc0) nbytes = 2;
+
+		//		UTF-8 -> Unicodeコードポイントに変換
+		unsigned char cb[4] = { p[0], (nbytes>1)?p[1]:(unsigned char)0, (nbytes>2)?p[2]:(unsigned char)0, (nbytes>3)?p[3]:(unsigned char)0 };
+		switch (nbytes) {
+		case 4: code = ((long)(cb[0]&0x07)<<18)|((long)(cb[1]&0x3f)<<12)|((long)(cb[2]&0x3f)<<6)|(cb[3]&0x3f); break;
+		case 3: code = ((long)(cb[0]&0x0f)<<12)|((long)(cb[1]&0x3f)<<6)|(cb[2]&0x3f); break;
+		case 2: code = ((long)(cb[0]&0x1f)<<6)|(cb[1]&0x3f); break;
+		default: code = (long)cb[0]; break;
+		}
+		p += nbytes;
+
+		if (info) {
+			if (count < info->maxlength) {
+				info->pos[count] = (short)x;
+			}
+		}
+		x += hgio_fontsystem_execsub(code, buffer, pitch, x);
+		count++;
+	}
+#else
 	while (1) {
 		a1 = *p++;
 		if (a1 == 0) break;
@@ -366,6 +430,7 @@ int hgio_fontsystem_exec(char* msg, unsigned char* buffer, int pitch, int* out_s
 		x += hgio_fontsystem_execsub(code, buffer, pitch, x);
 		count++;
 	}
+#endif
 
 	fontsystem_sx = x;
 
