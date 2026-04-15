@@ -6,9 +6,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <array>
 #include <time.h>
 #include <math.h>
 #include <string.h>
+#include <vector>
 
 #include "../../hsp3/hsp3config.h"
 
@@ -19,6 +21,7 @@
 #ifdef HSPWIN
 #define STRICT
 #include <windows.h>
+#include <usp10.h>  // Uniscribe API (サロゲートペア対応)
 #endif
 
 #ifdef HSPNDK
@@ -133,6 +136,16 @@ static		char *def_zspace = "　";
 static		int fontsystem_size;
 static		int fontsystem_style;
 
+// Uniscribe API用グローバル変数
+static		SCRIPT_CACHE g_script_cache = NULL;
+
+// フォントフォールバック用グローバル変数
+static		HFONT hFontFallback1 = NULL;  // 第1代替フォント
+static		HFONT hFontFallback2 = NULL;  // 第2代替フォント
+
+#pragma comment(lib, "usp10.lib")
+
+
 void hgio_fontsystem_win32_init(HWND wnd)
 {
 	master_wnd = wnd;
@@ -165,11 +178,58 @@ long hgio_fontsystem_getcode(unsigned char* pt)
 	return (long)a1;
 }
 
+void hgio_fontsystem_init_uniscribe(void)
+{
+	//		Uniscribe 初期化 (キャッシュ + 代替フォント作成)
+	//		htexdc は既にフォント選択済み
+	//
+	g_script_cache = NULL;
+
+	// 代替フォント作成 (フォント非対応文字用)
+	if (hFontFallback1 == NULL) {
+		hFontFallback1 = CreateFont(
+			fontsystem_size, 0, 0, 0, FW_REGULAR, 0, 0, 0,
+			DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
+			PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN,
+			L"Arial Unicode MS"
+		);
+	}
+	if (hFontFallback2 == NULL) {
+		hFontFallback2 = CreateFont(
+			fontsystem_size, 0, 0, 0, FW_REGULAR, 0, 0, 0,
+			DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
+			PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN,
+			L"Segoe UI Symbol"
+		);
+	}
+}
+
+void hgio_fontsystem_term_uniscribe(void)
+{
+	//		Uniscribe 解放 (キャッシュ + 代替フォント解放)
+	//
+	if (g_script_cache != NULL) {
+		ScriptFreeCache(&g_script_cache);
+		g_script_cache = NULL;
+	}
+	if (hFontFallback1 != NULL) {
+		DeleteObject(hFontFallback1);
+		hFontFallback1 = NULL;
+	}
+	if (hFontFallback2 != NULL) {
+		DeleteObject(hFontFallback2);
+		hFontFallback2 = NULL;
+	}
+}
+
 void hgio_fontsystem_term(void)
 {
 	//		フォントレンダリング解放
 	//
 	if (htexfont == NULL) return;
+
+	// Uniscribe 解放
+	hgio_fontsystem_term_uniscribe();
 
 	SelectObject(htexdc, htexfont_old);
 	DeleteObject(htexfont);
@@ -217,6 +277,10 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 	if (htexfont == NULL) return;
 
 	htexfont_old = (HFONT)SelectObject(htexdc, htexfont);
+
+	// Uniscribe 初期化
+	hgio_fontsystem_init_uniscribe();
+
 	GetTextMetrics(htexdc, &tm);
 	fontsystem_sx = 0;
 	fontsystem_sy = tm.tmHeight;
@@ -242,9 +306,212 @@ void hgio_fontsystem_init(char* fontname, int size, int style)
 }
 
 
+
+int hgio_fontsystem_execsub_uniscribe(long code, unsigned char* buffer, int pitch, int offsetx)
+{
+	//		Uniscribe を使用したサロゲートペア対応グリフ取得
+	//
+	std::array<WCHAR, 3> text = {};
+	int textLen = 0;
+
+	//		サロゲートペア -> UTF-16 変換
+	if (code >= 0x10000) {
+		long adjusted = code - 0x10000;
+		text[0] = (WCHAR)(0xD800 + (adjusted >> 10));      // 高サロゲート
+		text[1] = (WCHAR)(0xDC00 + (adjusted & 0x3FF));    // 低サロゲート
+		textLen = 2;
+	} else {
+		text[0] = (WCHAR)(code & 0xFFFF);
+		textLen = 1;
+	}
+
+	if (buffer == NULL) {
+		//		幅のみ取得 (複数フォント試行)
+		std::array<HFONT, 3> fonts = { htexfont, hFontFallback1, hFontFallback2 };
+		HFONT currentFont = NULL;
+
+		std::array<SCRIPT_ITEM, 2> itemList = {};
+		int itemCount = 0;
+		HRESULT hr = ScriptItemize(text.data(), textLen, (int)itemList.size(), NULL, NULL, itemList.data(), &itemCount);
+		if (FAILED(hr) || itemCount == 0) return 0;
+
+		for (HFONT tryFont : fonts) {
+			if (tryFont == NULL) continue;
+
+			SelectObject(htexdc, tryFont);
+			ScriptFreeCache(&g_script_cache);  // フォント切り替え時はキャッシュリセット
+
+			std::array<WORD, 2> glyphs = {};
+			std::array<WORD, 2> logClust = {};
+			std::array<SCRIPT_VISATTR, 2> visAttr = {};
+			int glyphCount = 0;
+
+			hr = ScriptShape(htexdc, &g_script_cache, text.data(), textLen, (int)glyphs.size(),
+							&itemList[0].a, glyphs.data(), logClust.data(), visAttr.data(), &glyphCount);
+			if (FAILED(hr) || glyphCount == 0 || glyphs[0] == 0) continue;  // グリフ ID 0 も失敗と判定
+
+			std::array<int, 2> piAdvance = {};
+			std::array<GOFFSET, 2> pGoffset = {};
+			ABC abc;
+			hr = ScriptPlace(htexdc, &g_script_cache, glyphs.data(), glyphCount,
+							visAttr.data(), &itemList[0].a, piAdvance.data(), pGoffset.data(), &abc);
+			if (FAILED(hr)) continue;
+
+			// 成功したフォント・キャッシュを保存
+			currentFont = tryFont;
+			int totalWidth = 0;
+			for (int i = 0; i < glyphCount; i++) {
+				totalWidth += piAdvance[i];
+			}
+			// 元のフォントに戻す
+			SelectObject(htexdc, htexfont);
+			return totalWidth;
+		}
+
+		// すべてのフォントで失敗
+		SelectObject(htexdc, htexfont);
+		return 0;
+	}
+
+	//		グリフ取得・レンダリング (複数フォント試行)
+	std::array<HFONT, 3> fonts = { htexfont, hFontFallback1, hFontFallback2 };
+	std::array<SCRIPT_ITEM, 2> itemList = {};
+	int itemCount = 0;
+	HRESULT hr = ScriptItemize(text.data(), textLen, (int)itemList.size(), NULL, NULL, itemList.data(), &itemCount);
+	if (FAILED(hr) || itemCount == 0) return 0;
+
+	std::array<WORD, 10> glyphs = {};
+	std::array<WORD, 2> logClust = {};
+	std::array<SCRIPT_VISATTR, 10> visAttr = {};
+	int glyphCount = 0;
+	HFONT successFont = NULL;
+
+	// 複数フォントで試行
+	for (HFONT tryFont : fonts) {
+		if (tryFont == NULL) continue;
+
+		SelectObject(htexdc, tryFont);
+		ScriptFreeCache(&g_script_cache);  // フォント切り替え時はキャッシュリセット
+
+		hr = ScriptShape(htexdc, &g_script_cache, text.data(), textLen, (int)glyphs.size(),
+						&itemList[0].a, glyphs.data(), logClust.data(), visAttr.data(), &glyphCount);
+		if (FAILED(hr) || glyphCount == 0 || glyphs[0] == 0) continue;  // グリフ ID 0 も失敗
+
+		// グリフが見つかった
+		successFont = tryFont;
+		break;
+	}
+
+	if (successFont == NULL) {
+		SelectObject(htexdc, htexfont);
+		return 0;
+	}
+
+	// メトリクス取得（見つかったフォント使用）
+	std::vector<int> piAdvance(glyphCount);
+	std::vector<GOFFSET> pGoffset(glyphCount);
+	std::vector<ABC> abcs(glyphCount);
+
+	hr = ScriptPlace(htexdc, &g_script_cache, glyphs.data(), glyphCount,
+					visAttr.data(), &itemList[0].a, piAdvance.data(), pGoffset.data(), abcs.data());
+	if (FAILED(hr)) {
+		SelectObject(htexdc, htexfont);
+		return 0;
+	}
+
+	//		グリフビットマップ取得・レンダリング
+	MAT2 mat;
+	ZeroMemory(&mat, sizeof(mat));
+	mat.eM11.value = 1; mat.eM11.fract = 0;
+	mat.eM22.value = 1; mat.eM22.fract = 0;
+
+	int totalWidth = 0;
+
+	for (int i = 0; i < glyphCount; i++) {
+		WORD glyphID = glyphs[i];
+		GLYPHMETRICS gm;
+		ZeroMemory(&gm, sizeof(gm));
+
+		UINT glyphFormat = (fontsystem_style & 16) ? GGO_GRAY4_BITMAP : GGO_BITMAP;
+		DWORD size = GetGlyphOutlineW(htexdc, glyphID,
+									  glyphFormat | GGO_GLYPH_INDEX, &gm, 0, NULL, &mat);
+
+		if (size == GDI_ERROR || size == 0) {
+			totalWidth += piAdvance[i];
+			continue;
+		}
+
+		// グリフ取得（successFont で）
+		BYTE lpFont[0x10000];
+		GetGlyphOutlineW(htexdc, glyphID,
+						glyphFormat | GGO_GLYPH_INDEX, &gm, size, lpFont, &mat);
+
+		//		レンダリング処理
+		int width = (int)gm.gmBlackBoxX;
+		int height = (int)gm.gmBlackBoxY;
+		int px = piAdvance[i];
+
+		if ((width > 1) || (height > 1)) {
+			LPDWORD p1 = (LPDWORD)buffer;
+			LPBYTE p2 = lpFont;
+			int ybase = tm.tmAscent - gm.gmptGlyphOrigin.y;
+
+			p1 += (offsetx + totalWidth + gm.gmptGlyphOrigin.x) + (ybase * pitch);
+
+			DWORD fontPitch = (size / gm.gmBlackBoxY) & ~0x03;
+
+			if (fontsystem_style & 16) {
+				//		4bit グレースケール
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						DWORD aval = p2[x];
+						if (aval > 15) aval = 15;
+						DWORD alpha = (aval << 28) + 0xffffff;
+
+						if (fontsystem_style & 2) {
+							p1[x] |= alpha;
+						} else {
+							p1[x] = alpha;
+						}
+					}
+					p1 += pitch;
+					p2 += fontPitch;
+				}
+			} else {
+				//		1bit モノクロ
+				for (int y = 0; y < height; y++) {
+					LPBYTE pp = p2;
+					int bmask = 0x80;
+					for (int x = 0; x < width; x++) {
+						if (bmask == 0) { bmask = 0x80; pp++; }
+						if (*pp & bmask) p1[x] = 0xffffffff;
+						bmask >>= 1;
+					}
+					p1 += pitch;
+					p2 += fontPitch;
+				}
+			}
+		}
+
+		totalWidth += px;
+	}
+
+	// 元のフォントに戻す
+	SelectObject(htexdc, htexfont);
+	return totalWidth;
+}
+
+
 int hgio_fontsystem_execsub(long code, unsigned char* buffer, int pitch, int offsetx)
 {
 	//		フォントバッファ取得
+	//		サロゲートペア (U+10000以上) は Uniscribe で処理
+	//
+	if (code >= 0x10000) {
+		return hgio_fontsystem_execsub_uniscribe(code, buffer, pitch, offsetx);
+	}
+
+	//		以下は BMP 文字 (U+0000-U+FFFF) の処理
 	MAT2 mat;
 	DWORD Size;
 	GLYPHMETRICS gm;
@@ -270,7 +537,6 @@ int hgio_fontsystem_execsub(long code, unsigned char* buffer, int pitch, int off
 	long m21 = (long)(0.0 * 65536.0);	long m22 = (long)(1.0 * 65536.0);
 	mat.eM11 = *((FIXED*)&m11);	mat.eM12 = *((FIXED*)&m12);
 	mat.eM21 = *((FIXED*)&m21);	mat.eM22 = *((FIXED*)&m22);
-
 
 	if (fontsystem_style & 16) {
 #ifdef HSPUTF8
