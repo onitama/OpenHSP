@@ -78,6 +78,7 @@ int ConvertIID( COM_GUID *guid, char *name )
 {
 	//		SJIS文字列 IID から IID 構造体を得る
 	//		(COMサポート場合は変換が必要)
+	memset(guid, 0, sizeof(COM_GUID));
 	return 0;
 }
 

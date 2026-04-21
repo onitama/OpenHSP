@@ -257,8 +257,11 @@ int FilePack::pack_flength(char* name)
 		if (memfile_active) {					// メモリストリーム時
 			return memfile.size;
 		}
-		pack_fclose(ff);
-	}
+        fseek(ff, 0, SEEK_END);
+        size = (int)ftell(ff);
+        pack_fclose(ff);
+        return size;
+    }
 	return -1;
 }
 

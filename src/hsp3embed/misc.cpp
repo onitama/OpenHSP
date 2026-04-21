@@ -1,8 +1,8 @@
 
-#include "../appengine.h"
-#include "misc.h"
-
 #include <stdio.h>
+
+//#include "../hsp3dish/ios/appengine.h"
+#include "misc.h"
 
 int sgn( int i )
 {
