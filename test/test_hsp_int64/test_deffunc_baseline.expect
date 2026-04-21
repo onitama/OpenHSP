@@ -1,0 +1,23 @@
+gpiod initalize failed.
+=== deffunc int ===
+int: 0
+int: 42
+int: -1
+int: 2147483647
+=== deffunc double ===
+double: 0
+double: 3.14
+double: -1.5
+=== deffunc int,int ===
+int+int: 1 2
+int+int: -1 100
+=== deffunc int,double ===
+int+double: 1 2.5
+int+double: -1 1e+10
+=== defcfunc int ===
+0
+42
+-2
+=== defcfunc double ===
+0
+3

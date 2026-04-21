@@ -16,6 +16,7 @@
 #include <string.h>
 #include <objbase.h>
 #include <commctrl.h>
+#include <tchar.h>
 
 //#define GP_USE_MEM_LEAK_DETECTION			// Memory Leak Check
 
@@ -164,7 +165,7 @@ static void	MTouchInit( HWND hwnd )
 	sysmet = GetSystemMetrics( SM_DIGITIZER );
 	if (( sysmet & NID_READY ) == 0 ) return;
 	if (( sysmet & NID_MULTI_INPUT ) == 0 ) return;
-	h_user32 = GetModuleHandle("USER32.DLL");
+	h_user32 = GetModuleHandle(_T("USER32.DLL"));
 	if ( h_user32 ) {
 		i_RegisterTouchWindow = (bool (WINAPI *)( HWND, int )) GetProcAddress(h_user32, "RegisterTouchWindow" ); 
 		i_CloseTouchInputHandle =(bool (WINAPI *)( HANDLE )) GetProcAddress(h_user32, "CloseTouchInputHandle" ); 
@@ -238,8 +239,8 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 		try {
 #endif
-			int retval;
-			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (int)uMessage, (int)wParam, (int)lParam)) {
+			HSPPTRINT retval;
+			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (int)uMessage, (HSPPTRINT)wParam, (HSPPTRINT)lParam)) {
 				if (code_irqresult(&retval)) return retval;
 			}
 #ifdef HSPERR_HANDLE
@@ -349,7 +350,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 			try {
 #endif
-				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam);
+				code_sendirq(HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (HSPPTRINT)wParam, (HSPPTRINT)lParam);
 #ifdef HSPERR_HANDLE
 			}
 			catch (HSPERROR code) {						// HSPエラー例外処理
@@ -546,9 +547,9 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int yy, int style, int hidesw)
 {
 #ifdef HSPDEBUG
-	char* windowtitle = "HSPDish ver" hspver;
+	TCHAR* windowtitle = _T("HSPDish ver" hspver);
 #else
-	char* windowtitle = NULL;
+	TCHAR* windowtitle = NULL;
 #endif
 
 #if 0
@@ -596,7 +597,7 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 
 
 	// Create the render window
-	m_hWnd = CreateWindowEx(exstyle, "HSP3DishWindow", windowtitle, m_dwWindowStyle,
+	m_hWnd = CreateWindowEx(exstyle, _T("HSP3DishWindow"), windowtitle, m_dwWindowStyle,
 
 								(xx != -1 ? xx : CW_USEDEFAULT),
 								(yy != -1 ? yy : CW_USEDEFAULT),
@@ -621,7 +622,8 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 
 void hsp3dish_dialog( char *mes )
 {
-	MessageBox( NULL, mes, "Error",MB_ICONEXCLAMATION | MB_OK );
+	HspToApiStr mesw{ mes };
+	MessageBox( NULL, mesw, _T("Error"),MB_ICONEXCLAMATION | MB_OK );
 }
 
 
@@ -681,7 +683,7 @@ int hsp3dish_debugopen( void )
 #ifdef HSPDEBUG
 	if ( h_dbgwin != NULL ) return 0;
 #ifdef HSP64
-	h_dbgwin = LoadLibrary( "hsp3debug_64.dll" );
+	h_dbgwin = LoadLibrary( L"hsp3debug_64.dll" );
 #else
 	h_dbgwin = LoadLibrary("hsp3debug.dll");
 #endif
@@ -976,7 +978,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			hsp3excmd_rebuild_window();
 			HSP3DEVINFO *devinfo = hsp3extcmd_getdevinfo();
 			hsp3dish_setdevinfo(devinfo);
-			hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+			hsp3extcmd_sysvars((HSPPTRINT)m_hInstance, (HSPPTRINT)m_hWnd, 0);
 			DestroyWindow(bak_hwnd);
 
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
@@ -997,13 +999,14 @@ static void hsp3dish_savelog( void )
 	//		ログをファイルに出力する
 	//
 	if (game != NULL) {
-		char fname[_MAX_PATH + 1];
+		HSPAPICHAR fnamew[_MAX_PATH+1];
 		const char *logs;
 #ifdef GP_USE_MEM_LEAK_DETECTION
 		printMemoryLeaks();
 #endif
 		logs = gplog.c_str();
-		GetModuleFileName(NULL, fname, _MAX_PATH);
+		GetModuleFileName(NULL, fnamew, _MAX_PATH);
+		ApiToHspStr fname{ fnamew };
 		getpath(fname, fname, 32);
 		changedir(fname);
 		hsp3_binsave("hsp3gp.log", (void *)logs, (int)strlen(logs), -1);
@@ -1043,7 +1046,7 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 	//		HSP3Dishシステム関連の初期化
 	//
 	int orgexe, mode;
-	char fname[_MAX_PATH + 1];
+	TCHAR fname[_MAX_PATH + 1];
 	char *ss;
 #ifdef HSPDEBUG
 	int i;
@@ -1077,9 +1080,10 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 		ss++; i -= 2;
 	}
 	if (i > 0) {
-		strncpy(fname, ss, i);
-		fname[i] = 0;
-		hsp->SetFileName(fname);
+		char fname2[_MAX_PATH + 1];
+		strncpy(fname2, ss, i);
+		fname2[i] = 0;
+		hsp->SetFileName(fname2);
 	}
 #else
 	if (startfile != NULL) {
@@ -1120,8 +1124,8 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 #ifndef HSPDEBUG
 	if ((hsp_wd & 2) == 0) {
 		GetModuleFileName(NULL, fname, _MAX_PATH);
-		getpath(fname, fname, 32);
-		changedir(fname);
+		getpathW(fname, fname, 32);
+		changedirW(fname);
 	}
 #endif
 
@@ -1174,7 +1178,7 @@ int hsp3dish_reset(void)
 	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);  // No brush - we are going to paint our own background
 	wndClass.lpszMenuName = NULL;  // No default menu
-	wndClass.lpszClassName = "HSP3DishWindow";
+	wndClass.lpszClassName = _T("HSP3DishWindow");
 
 	if (!::RegisterClassEx(&wndClass))
 	{
@@ -1246,7 +1250,7 @@ int hsp3dish_reset(void)
 	HSP3DEVINFO *devinfo;
 	devinfo = hsp3extcmd_getdevinfo();
 	hsp3dish_setdevinfo( devinfo );
-	hsp3extcmd_sysvars((int)m_hInstance, (int)m_hWnd, 0);
+	hsp3extcmd_sysvars((HSPPTRINT)m_hInstance, (HSPPTRINT)m_hWnd, 0);
 
 	game->resetScreen();
 	gameplay::Logger::log(gameplay::Logger::LEVEL_INFO, "HGIMG4 %s initalized : %s\n", hspver, devinfo->devname);

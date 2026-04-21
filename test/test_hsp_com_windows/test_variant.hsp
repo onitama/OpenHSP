@@ -1,0 +1,36 @@
+; test_variant.hsp
+; Windows 専用 Variant 型テスト
+#runtime "hsp3cl"
+
+dimtype v, vartype("variant"), 1
+dim a, 3
+
+a(0) = 10
+a(1) = 20
+a(2) = 30
+
+mes "=== variant int64 ==="
+v("value") = int64("8589934592")
+mes "vtmask=" + str(v("vtmask"))
+mes "value=" + str(v("value"))
+
+mes "=== variant string ==="
+v("value") = "abc"
+mes "vtmask=" + str(v("vtmask"))
+mes "bstrptr=" + str(v("bstrptr") != 0)
+mes "value=" + v("value")
+
+mes "=== variant safearray ==="
+sarrayconv v, a, 0
+mes "isarray=" + str(v("isarray"))
+mes "vtmask=" + str(v("vtmask"))
+mes "arrayptr=" + str(v("arrayptr") != 0)
+mes "count1=" + str(v("arraycount", 1))
+mes "lbound1=" + str(v("arraylbound", 1))
+mes "ubound1=" + str(v("arrayubound", 1))
+mes "elem0=" + str(v("value", 0))
+mes "elem2=" + str(v("value", 2))
+
+delcom v
+
+end

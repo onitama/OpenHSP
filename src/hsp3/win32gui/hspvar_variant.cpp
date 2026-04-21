@@ -32,6 +32,27 @@
 
 static HspVarProc *myproc;
 
+static HSPPTRINT get_hsp_ptr_value(const void *data, int vtype)
+{
+	switch (vtype) {
+	case HSPVAR_FLAG_INT:
+		return (HSPPTRINT)(*(const int *)data);
+	case HSPVAR_FLAG_INT64:
+		return (HSPPTRINT)(*(const int64_t *)data);
+	default:
+		throw HSPERR_INVALID_ARRAYSTORE;
+	}
+}
+
+static int get_hsp_ptr_type(void)
+{
+#ifdef HSP64
+	return HSPVAR_FLAG_INT64;
+#else
+	return HSPVAR_FLAG_INT;
+#endif
+}
+
 // Core
 static PDAT *HspVarVariant_GetPtr( PVal *pval )
 {
@@ -270,12 +291,14 @@ void comcheck_variant_conv( VARTYPE vt, int vtype )
 		if ( vt == VT_BSTR ) return;
 		break;
 	case HSPVAR_FLAG_DOUBLE:
-		if ( vt == VT_R4 && vt == VT_R8 ) return;
+		if ( vt == VT_R4 || vt == VT_R8 ) return;
 		break;
 	case HSPVAR_FLAG_INT:
 		switch ( vt ) {
 		case VT_I4:
 		case VT_UI4:
+		case VT_INT:
+		case VT_UINT:
 		case VT_I1:
 		case VT_UI1:
 		case VT_I2:
@@ -284,6 +307,23 @@ void comcheck_variant_conv( VARTYPE vt, int vtype )
 		case VT_ERROR:
 		case VT_I8:
 		case VT_UI8:
+			return;
+		}
+		break;
+	case HSPVAR_FLAG_INT64:
+		switch ( vt ) {
+		case VT_I8:
+		case VT_UI8:
+		case VT_I4:
+		case VT_UI4:
+		case VT_INT:
+		case VT_UINT:
+		case VT_I1:
+		case VT_UI1:
+		case VT_I2:
+		case VT_UI2:
+		case VT_BOOL:
+		case VT_ERROR:
 			return;
 		}
 		break;
@@ -296,6 +336,7 @@ void comcheck_variant_conv( VARTYPE vt, int vtype )
 	default:
 		throw HSPERR_INVALID_TYPE;
 	}
+	throw HSPERR_INVALID_TYPE;
 }
 
 static void copy_ref_data( VARIANT *var, void *data )
@@ -331,9 +372,11 @@ static void copy_ref_data( VARIANT *var, void *data )
 	case VT_R8:				// データサイズ 8 バイト
 	case VT_CY:
 	case VT_DATE:
+		*(double *)pDst = *(double *)pSrc;
+		break;
 	case VT_I8:
 	case VT_UI8:
-		*(double *)pDst = *(double *)pSrc;
+		*(int64_t *)pDst = *(int64_t *)pSrc;
 		break;
 	case VT_BSTR:
 		*(BSTR *)pDst = SysAllocString( *(BSTR *)pSrc );
@@ -465,8 +508,7 @@ static void HspVarVariant_ObjectWrite( PVal *pval, void *data, int vtype )
 
 	case HSPVAR_VARIANT_ARRAY_PTR:
 		// 渡された整数が SafeArray であるとして代入
-		if ( vtype != HSPVAR_FLAG_INT ) throw HSPERR_INVALID_ARRAYSTORE;
-		psa = (SAFEARRAY *)( *(int*)data );
+		psa = (SAFEARRAY *)get_hsp_ptr_value(data, vtype);
 		if ( psa == NULL ) throw HSPERR_ILLEGAL_FUNCTION;
 		hr = SafeArrayGetVartype( psa, &vt );
 		if ( FAILED(hr) ) throw HSPERR_INVALID_ARRAYSTORE;
@@ -477,8 +519,7 @@ static void HspVarVariant_ObjectWrite( PVal *pval, void *data, int vtype )
 
 	case HSPVAR_VARIANT_BSTR_PTR:
 		// 渡された整数がBSTRであるとして代入
-		if ( vtype != HSPVAR_FLAG_INT ) throw HSPERR_INVALID_ARRAYSTORE;
-		bstr = (BSTR)( *(int*)data );
+		bstr = (BSTR)get_hsp_ptr_value(data, vtype);
 		VariantClear( var );
 		var->vt = VT_BSTR;
 		var->bstrVal = bstr;
@@ -498,6 +539,7 @@ static void *HspVarVariant_ArrayObjectRead( PVal *pval, int *mptype )
 	int chk, id;
 	void *ptr;
 	static int vRet;
+	static HSPPTRINT vPtrRet;
 	SAFEARRAY *psa;
 	long dimension, lbound, ubound;
 	VariantParam *vprm;
@@ -595,7 +637,9 @@ static void *HspVarVariant_ArrayObjectRead( PVal *pval, int *mptype )
 		}
 		if ( psa == NULL ) throw HSPERR_ARRAY_OVERFLOW;
 		if ( id == HSPVAR_VARIANT_ARRAY_PTR ) {
-			vRet = (int)psa;
+			vPtrRet = (HSPPTRINT)psa;
+			ptr = &vPtrRet;
+			*mptype = get_hsp_ptr_type();
 			break;
 		}
 		dimension = code_getdi(1);
@@ -619,12 +663,16 @@ static void *HspVarVariant_ArrayObjectRead( PVal *pval, int *mptype )
 
 	case HSPVAR_VARIANT_BSTR_PTR:
 		if ( var->vt != VT_BSTR ) throw HSPERR_INVALID_PARAMETER;
-		vRet = (int)var->bstrVal;
+		vPtrRet = (HSPPTRINT)var->bstrVal;
+		ptr = &vPtrRet;
+		*mptype = get_hsp_ptr_type();
 		break;
 
 	case HSPVAR_VARIANT_REFPTR:
 		if ( (var->vt & VT_BYREF) == 0 ) throw HSPERR_INVALID_PARAMETER;
-		vRet = (int)var->byref;
+		vPtrRet = (HSPPTRINT)var->byref;
+		ptr = &vPtrRet;
+		*mptype = get_hsp_ptr_type();
 		break;
 
 	default:

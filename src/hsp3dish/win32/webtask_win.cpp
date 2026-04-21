@@ -50,9 +50,9 @@ void WebTask::Reset( void )
 	if ( proxy_url[0] != 0 ) {
 		char *local_prm = NULL;
 		if ( proxy_local ) local_prm = "<local>";
-		hSession = InternetOpen( agent, INTERNET_OPEN_TYPE_PROXY, proxy_url, local_prm, 0 );
+		hSession = InternetOpenA( agent, INTERNET_OPEN_TYPE_PROXY, proxy_url, local_prm, 0 );
 	} else {
-		hSession = InternetOpen( agent, INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0 );
+		hSession = InternetOpenA( agent, INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0 );
 	}
 	if ( hSession == NULL ) {
 		mode = CZHTTP_MODE_NONE;
@@ -199,7 +199,7 @@ int WebTask::Exec( void )
 		}
 
 		// HTTP要求の作成
-		hHttpRequest = ::HttpOpenRequestA( hHttpSession, varstr, req_url, HTTP_VERSION, NULL, NULL, INTERNET_FLAG_RELOAD|INTERNET_FLAG_NO_UI, 0 );
+		hHttpRequest = ::HttpOpenRequestA( hHttpSession, varstr, req_url, HTTP_VERSIONA, NULL, NULL, INTERNET_FLAG_RELOAD|INTERNET_FLAG_NO_UI, 0 );
 		if ( hHttpSession == NULL ) {
 			SetError( "無効なURLが指定されました" );
 			break;

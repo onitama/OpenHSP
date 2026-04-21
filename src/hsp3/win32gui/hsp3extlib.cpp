@@ -657,6 +657,9 @@ static int code_expand_next( char *prmbuf, const STRUCTDAT *st, int index )
 		case HSPVAR_FLAG_INT:
 			*(UINT_PTR *)out = (UINT_PTR)(*(int *)(mpval->pt));
 			break;
+		case HSPVAR_FLAG_INT64:
+			*(UINT_PTR *)out = (UINT_PTR)(*(int64_t *)(mpval->pt));
+			break;
 		case HSPVAR_FLAG_STR:
 			*(void ** )out = localbuf = prepare_localstr( mpval->pt, prm->mptype == MPTYPE_FLEXWPTR );
 			break;

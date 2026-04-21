@@ -3,6 +3,7 @@
 //	HSP3 External DLL manager
 //	onion software/onitama 2004/6
 //
+#include <cstddef>
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +51,7 @@ static int *type;
 static int *val;
 static int *exflg;
 static int reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_lvalue;
 //static PVal **pmpval;
 
 
@@ -364,8 +366,6 @@ void *comget_variant( VARIANT *var, int *restype, BOOL fvariantret /* = FALSE*/ 
 	case VT_UI2:
 	case VT_I1:
 	case VT_UI1:
-	case VT_I8:
-	case VT_UI8:
 	case VT_BOOL:
 		VariantChangeType( &comconv_var, &comconv_var, VARIANT_NOVALUEPROP, VT_I4 );
 	case VT_I4:
@@ -375,6 +375,11 @@ void *comget_variant( VARIANT *var, int *restype, BOOL fvariantret /* = FALSE*/ 
 	case VT_UINT:
 		*restype = HSPVAR_FLAG_INT;
 		return &comconv_var.lVal;
+	case VT_UI8:
+		VariantChangeType( &comconv_var, &comconv_var, VARIANT_NOVALUEPROP, VT_I8 );
+	case VT_I8:
+		*restype = HSPVAR_FLAG_INT64;
+		return &comconv_var.llVal;
 
 	default:
 		if ( comconv_var.vt & VT_ARRAY ) {
@@ -396,6 +401,10 @@ void comset_variant( VARIANT *var, void *data, int vtype )
 	case HSPVAR_FLAG_INT:
 		var->vt = VT_I4;
 		var->lVal = *(int *)data;
+		break;
+	case HSPVAR_FLAG_INT64:
+		var->vt = VT_I8;
+		var->llVal = *(int64_t *)data;
 		break;
 	case HSPVAR_FLAG_DOUBLE:
 		var->vt = VT_R8;
@@ -487,7 +496,7 @@ BSTR comget_bstr( char *ps )
 	return bstr;
 }
 
-
+#if !defined(HSP64)
 int call_method( void *iptr, int index, int *prm, int count )
 {
 	int *proc;
@@ -519,6 +528,7 @@ int call_method2( char *prmbuf, const STRUCTDAT *st )
 	punk2->Release();
 	return result;
 }
+#endif
 
 static BOOL GetIIDFromString( IID *iid, char *ps, bool fClsid = false )
 {
@@ -617,7 +627,11 @@ static int cmdfunc_ctrlcmd( int cmd )
 			piid2 = &IID_IUnknown;
 		}
 		inimode = code_getdi(0);				// 初期化モード
+#ifdef HSP64
+		punkDef = (IUnknown *)code_getdl(0);	// デフォルトオブジェクト
+#else
 		punkDef = (IUnknown *)code_getdi(0);	// デフォルトオブジェクト
+#endif
 
 		// 新規CLSIDからインスタンスを作成
 		hspctx->stat = 0;
@@ -891,31 +905,39 @@ static int cmdfunc_ctrlcmd( int cmd )
 		char *ps;
 		BMSCR *bm;
 		int i;
+#ifdef HSP64
+		int64_t prm[6];
+#else
 		int prm[6];
+#endif
 
 		ps = code_gets(); strncpy( clsname8, ps, 1023 );
 		ps = code_gets(); strncpy( winname8, ps, 1023 );
 
 		bm = GetBMSCR();
 		for(i=0;i<6;i++) {
+#ifdef HSP64
+			prm[i] = code_getdl(0);
+#else
 			prm[i] = code_getdi(0);
+#endif
 		}
 		if ( prm[2] <= 0 ) prm[2] = bm->ox;
 		if ( prm[3] <= 0 ) prm[3] = bm->oy;
 
 		hwnd = CreateWindowEx(
-		    (DWORD) prm[0],			// 拡張ウィンドウスタイル
-		    chartoapichar(clsname8,&clsname),	// ウィンドウクラス名
-		    chartoapichar(winname8,&winname),	// ウィンドウ名
-		    (DWORD) prm[1],			// ウィンドウスタイル
+			(DWORD) prm[0],			// 拡張ウィンドウスタイル
+			chartoapichar(clsname8,&clsname),	// ウィンドウクラス名
+			chartoapichar(winname8,&winname),	// ウィンドウ名
+			(DWORD) prm[1],			// ウィンドウスタイル
 			bm->cx, bm->cy, prm[2], prm[3],		// X,Y,SIZEX,SIZEY
 			bm->hwnd,				// 親ウィンドウのハンドル
-		    (HMENU) prm[4],			// メニューハンドルまたは子ウィンドウID
+			(HMENU) prm[4],			// メニューハンドルまたは子ウィンドウID
 			bm->hInst,				// インスタンスハンドル
-		    (PVOID) prm[5]			// ウィンドウ作成データ
-			);
-			freehac(&clsname);
-			freehac(&winname);
+			(PVOID) prm[5]			// ウィンドウ作成データ
+		);
+		freehac(&clsname);
+		freehac(&winname);
 
 		// AddHSPObject( hwnd, HSPOBJ_TAB_SKIP, prm[3], NULL, 0 );			// HSPのウインドゥオブジェクトとして登録する
 		AddHSPObject( hwnd, HSPOBJ_TAB_SKIP, prm[3] );
@@ -925,6 +947,38 @@ static int cmdfunc_ctrlcmd( int cmd )
 
 	case 0x07:								// 	sendmsg
 		{
+#ifdef HSP64
+		int p1;
+		WPARAM p2;
+		LPARAM p3;
+		HWND hw;
+		int fl;
+		char *vptr;
+		HSPAPICHAR *hactmp1 = 0;
+		HSPAPICHAR *hactmp2 = 0;
+		hw = (HWND)code_getdl(0);
+		p1 = code_getdi(0);
+
+		vptr = code_getsptr( &fl );
+		if ( fl == TYPE_STRING ) {
+			p2 = (WPARAM)chartoapichar(vptr,&hactmp1);
+		} else {
+			p2 = *(WPARAM *)vptr;
+		}
+
+		vptr = code_getsptr( &fl );
+		if ( fl == TYPE_STRING ) {
+			p3 = (LPARAM)chartoapichar(vptr,&hactmp2);
+		} else {
+			p3 = *(LPARAM *)vptr;
+		}
+
+		//Alertf( "SEND[%x][%x][%x]",p1,p2,p3 );
+		hspctx->stat = (HSPPTRINT)SendMessage( hw, p1, p2, p3 );
+		freehac(&hactmp1);
+		freehac(&hactmp2);
+		break;
+#else
 		int p1;
 		WPARAM p2;
 		LPARAM p3;
@@ -955,6 +1009,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 		freehac(&hactmp1);
 		freehac(&hactmp2);
 		break;
+#endif
 		}
 
 	case 0x08:								// 	comevent
@@ -1182,6 +1237,7 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 	//
 	void *ptr;
 	int p1,p2;
+	int64_t lp1;
 
 	//			'('で始まるかを調べる
 	//
@@ -1197,11 +1253,53 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 		{
 		PVal *pval;
 		PDAT *p;
+		char *sptr;
 		pval = code_getpval();
 		p = HspVarCorePtrAPTR( pval, 0 );
+#ifdef HSP64
+		lp1 = code_getl();
+		p2 = code_geti();
+		int fl = code_getdi(HSPVAR_FLAG_INT);
+		switch (fl) {
+		case HSPVAR_FLAG_NONE:
+		case HSPVAR_FLAG_STR:
+		case HSPVAR_FLAG_DOUBLE:
+		case HSPVAR_FLAG_INT:
+		case HSPVAR_FLAG_INT64:
+		  break;
+		case HSPVAR_FLAG_LABEL:
+		case HSPVAR_FLAG_STRUCT:
+		case HSPVAR_FLAG_COMSTRUCT:
+		case 7: // VARIANT
+		case HSPVAR_FLAG_USERDEF:
+		default:
+		  throw (HSPERR_TYPE_MISMATCH);
+		}
+		reffunc_intfunc_lvalue = call_extfunc( (void *)lp1, (int **)p, p2, fl );
+		switch( fl ) {
+		case HSPVAR_FLAG_STR:
+			ptr = sptr = code_stmp( strlen((char*)reffunc_intfunc_lvalue) + 1 );
+			strcpy( sptr, (char*) reffunc_intfunc_lvalue );
+			*type_res = HSPVAR_FLAG_STR;
+			break;
+		case HSPVAR_FLAG_INT:
+			reffunc_intfunc_ivalue = (int)reffunc_intfunc_lvalue;
+			ptr = &reffunc_intfunc_ivalue;
+			*type_res = HSPVAR_FLAG_INT;
+			break;
+		case HSPVAR_FLAG_INT64:
+			ptr = &reffunc_intfunc_lvalue;
+			*type_res = HSPVAR_FLAG_INT64;
+			break;
+		default:
+			// TODO INT以外の対応
+			break;
+		}
+#else
 		p1 = code_geti();
 		p2 = code_geti();
 		reffunc_intfunc_ivalue = call_extfunc( (void *)p1, (int *)p, p2 );
+#endif
 		break;
 		}
 	case 0x101:								// cnvwtos
@@ -1272,7 +1370,13 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 		code_next();
 		st = GetPRM( p1 );
 		//lib = &hspctx->mem_linfo[ st->index ];
+#ifdef HSP64
+		reffunc_intfunc_lvalue = (INT_PTR)st;
+		ptr = &reffunc_intfunc_lvalue;
+		*type_res = HSPVAR_FLAG_INT64;
+#else
 		reffunc_intfunc_ivalue = (int)((INT_PTR)st);
+#endif
 		break;
 		}
 
@@ -1323,9 +1427,14 @@ static void *reffunc_dllcmd( int *type_res, int arg )
 	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
 	if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
 
-	*type_res = HSPVAR_FLAG_INT;
 	exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
+#ifdef HSP64
+	*type_res = HSPVAR_FLAG_INT64;
+	reffunc_intfunc_lvalue = hspctx->stat;
+#else
+	*type_res = HSPVAR_FLAG_INT;
 	reffunc_intfunc_ivalue = hspctx->stat;
+#endif
 
 	//			')'で終わるかを調べる
 	//
@@ -1333,7 +1442,11 @@ static void *reffunc_dllcmd( int *type_res, int arg )
 	if ( *val != ')' ) throw ( HSPERR_INVALID_FUNCPARAM );
 	code_next();
 
+#ifdef HSP64
+	return &reffunc_intfunc_lvalue;
+#else
 	return &reffunc_intfunc_ivalue;
+#endif
 }
 
 
@@ -1404,7 +1517,7 @@ char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
 	DWORD* mss;
 	SYSTEM_INFO si;
 	MEMORYSTATUS ms;
-	int plen;
+	size_t plen;
 	char *p;
 
 	fl = HSPVAR_FLAG_INT;
@@ -1621,5 +1734,3 @@ void hsp3ext_execfile(char* stmp, char* ps, int mode)
 	}
 	if (i < 32) throw HSPERR_EXTERNAL_EXECUTE;
 }
-
-

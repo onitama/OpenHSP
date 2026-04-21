@@ -33,7 +33,10 @@ void dirinfo( char *p, int id );
 void Alert( const char *mes );
 void AlertW( const HSPAPICHAR *mes );
 void AlertV( const char *mes, int val );
-void Alertf( const HSPAPICHAR *format, ... );
+void Alertf( const char *format, ... );
+#ifdef HSPUTF8
+void Alertf( const HSPAPICHAR* format, ...);
+#endif
 
 int makedir( char *name );
 int changedir( char *name );

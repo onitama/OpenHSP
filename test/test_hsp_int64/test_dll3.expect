@@ -1,0 +1,4 @@
+gpiod initalize failed.
+c_strlen("Hello") = 5
+c_getpid() = 1
+ilogb(3.14) = 1

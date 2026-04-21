@@ -1,0 +1,30 @@
+; test_com_method.hsp
+; Windows 専用 COM メソッド呼び出しテスト (#usecom/#comfunc)
+#runtime "hsp3cl"
+
+#define CLSID_ShellLink  "{00021401-0000-0000-C000-000000000046}"
+#define IID_IShellLinkA  "{000214EE-0000-0000-C000-000000000046}"
+#define IID_IPersistFile "{0000010b-0000-0000-C000-000000000046}"
+
+#usecom IShellLinkA IID_IShellLinkA CLSID_ShellLink
+#comfunc IShellLink_SetPath 20 str
+
+#usecom IPersistFile IID_IPersistFile
+#comfunc IPersistFile_Save 6 wstr,int
+
+target = dirinfo(1) + "\\hsp3cl.exe"
+outfile = dirinfo(0) + "\\test_com_method.lnk"
+
+newcom slink, CLSID_ShellLink
+
+mes "=== com method ==="
+IShellLink_SetPath slink, target
+mes "SetPath stat=" + str(stat)
+
+IPersistFile_Save slink, outfile, 1
+mes "Save stat=" + str(stat)
+
+delcom slink
+delete outfile
+
+end

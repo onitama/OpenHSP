@@ -81,6 +81,8 @@ void ex_mref( PVal *pval, int prm )
 	} else {
 		switch( prm ) {
 		case 0x40:
+			t = HSPCTX_STAT_FLAG;
+			size = sizeof(HSPPTRINT);
 			ptr = &ctx->stat;
 			break;
 		case 0x41:

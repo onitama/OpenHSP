@@ -740,6 +740,12 @@ int CToken::GetToken( void )
 			wp++;
 		}
 		s3[a]=0;
+		if ( wp != NULL && ( *wp=='l' || *wp=='L' ) ) {
+			wp++;
+			val64 = (int64_t)strtoll( (char *)s3, nullptr, 16 );
+			if ( minmode ) val64 = -val64;
+			return TK_INT64;
+		}
 		return TK_NUM;
 	}
 
@@ -755,6 +761,12 @@ int CToken::GetToken( void )
 			wp++;
 		}
 		s3[a]=0;
+		if ( wp != NULL && ( *wp=='l' || *wp=='L' ) ) {
+			wp++;
+			val64 = (int64_t)strtoll( (char *)s3, nullptr, 2 );
+			if ( minmode ) val64 = -val64;
+			return TK_INT64;
+		}
 		return TK_NUM;
 	}
 /*
@@ -793,10 +805,11 @@ int CToken::GetToken( void )
 		}
 		s3[a]=0;
 		if ( wp != NULL ) {
-			if ( *wp=='k' ) { fpflag=1;wp++; }
-			if ( *wp=='f' ) { fpflag=2;wp++; }
-			if ( *wp=='d' ) { fpflag=3;wp++; }
-			if ( *wp=='e' ) { fpflag=4;wp++; }
+			if ( *wp=='k' || *wp=='K' ) { fpflag=1;wp++; }
+			if ( *wp=='f' || *wp=='F' ) { fpflag=2;wp++; }
+			if ( *wp=='d' || *wp=='D' ) { fpflag=3;wp++; }
+			if ( *wp=='e' || *wp=='E' ) { fpflag=4;wp++; }
+			if ( *wp=='l' || *wp=='L' ) { fpflag=5;wp++; }
 		}
 
 		if ( fpflag<0 ) {				// 小数値でない時は「.」までで終わり
@@ -843,6 +856,11 @@ int CToken::GetToken( void )
 			val_d = atof( (char *)s3 );
 			if ( minmode ) val_d=-val_d;
 			return TK_DNUM;
+
+		case 5:			// int64リテラル (Lサフィックス)
+			val64 = (int64_t)strtoll( (char *)s3, nullptr, 10 );
+			if ( minmode ) val64 = -val64;
+			return TK_INT64;
 		}
 		return TK_NUM;
 	}

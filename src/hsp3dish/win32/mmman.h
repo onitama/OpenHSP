@@ -52,6 +52,7 @@ public:
 	MMM *SetBank( int num, int flag, int opt, void *mempt, char *fname );
 
 	int SendMCI( char *mci_commands );
+	int SendMCIT( TCHAR *mci_commands );
 	char *GetMCIResult( void );
 
 	int Load( char *fname, int bank, int opt );

@@ -1,6 +1,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef HSPWIN
+#include <tchar.h>
+#endif
 #include "gamehsp.h"
 
 #include "../../hsp3/hsp3config.h"

@@ -134,6 +134,7 @@
     <ClCompile Include="..\hspvar_core.cpp" />
     <ClCompile Include="..\hspvar_double.cpp" />
     <ClCompile Include="..\hspvar_int.cpp" />
+    <ClCompile Include="..\hspvar_int64.cpp" />
     <ClCompile Include="..\hspvar_label.cpp" />
     <ClCompile Include="..\hspvar_str.cpp" />
     <ClCompile Include="..\hspvar_struct.cpp" />

@@ -1,0 +1,11 @@
+#runtime "hsp3cl"
+
+#uselib "libc.so.6"
+#cfunc c_strlen "strlen" sptr
+
+#uselib "libm.so.6"
+#cfunc c_sin "sin" double
+
+mes "strlen " + c_strlen("Hello")
+
+mes "sin(0.5) = " + c_sin(0.5)

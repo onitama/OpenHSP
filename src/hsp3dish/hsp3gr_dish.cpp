@@ -4,6 +4,7 @@
 //	(GUI関連コマンド・関数処理)
 //	onion software/onitama 2011/3
 //
+#include <cstdint>
 #ifdef HSPDISHGP
 #include "win32gp/gamehsp.h"
 char *hsp3dish_getlog(void);		// for gameplay3d log
@@ -56,7 +57,7 @@ static int cur_window;
 static int ckey,cklast,cktrg;
 static int msact;
 static int dispflg;
-static int sys_inst, sys_hwnd, sys_hdc;
+static HSPPTRINT sys_inst, sys_hwnd, sys_hdc;
 
 extern int resY0, resY1;
 
@@ -164,6 +165,8 @@ void ex_mref( PVal *pval, int prm )
 	} else {
 		switch( prm ) {
 		case 0x40:
+			t = HSPCTX_STAT_FLAG;
+			size = sizeof(HSPPTRINT);
 			ptr = &ctx->stat;
 			break;
 		case 0x41:
@@ -3975,7 +3978,7 @@ static int cmdfunc_extcmd( int cmd )
 
 		if (sprite->sprite_enable) {
 			ctx->stat = sprite->getMapAttribute(p1, p2);
-			code_setva(p_pval, p_aptr, HSPVAR_FLAG_INT, &ctx->stat);
+			code_setva(p_pval, p_aptr, HSPCTX_STAT_FLAG, &ctx->stat);
 		}
 		break;
 	}
@@ -4251,6 +4254,7 @@ static int get_ginfo( int arg )
 
 
 static int reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_lvalue;
 static HSPREAL reffunc_intfunc_dvalue;
 
 static void *reffunc_function( int *type_res, int arg )
@@ -4351,15 +4355,33 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		break;
 	case 0x003:								// hwnd
 		//ptr = (void *)(&(bmscr->hwnd));
+#ifdef HSP64
+		reffunc_intfunc_lvalue = sys_hwnd;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+#else
 		reffunc_intfunc_ivalue = sys_hwnd;
+#endif
 		break;
 	case 0x004:								// hinstance
 		//ptr = (void *)(&(bmscr->hInst));
+#ifdef HSP64
+		reffunc_intfunc_lvalue = sys_inst;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+#else
 		reffunc_intfunc_ivalue = sys_inst;
+#endif
 		break;
 	case 0x005:								// hdc
 		//ptr = (void *)(&(bmscr->hdc));
+#ifdef HSP64
+		reffunc_intfunc_lvalue = sys_hdc;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+#else
 		reffunc_intfunc_ivalue = sys_hdc;
+#endif
 		break;
 
 	default:
@@ -4507,7 +4529,7 @@ void hsp3extcmd_resume( void )
 }
 
 
-void hsp3extcmd_sysvars(int inst, int hwnd, int hdc)
+void hsp3extcmd_sysvars(HSPPTRINT inst, HSPPTRINT hwnd, HSPPTRINT hdc)
 {
 	sys_inst = inst;
 	sys_hwnd = hwnd;
@@ -4550,4 +4572,3 @@ void hsp3excmd_init_mmsystem(int flag)
 		}
 	}
 }
-

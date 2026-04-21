@@ -1,0 +1,16 @@
+=== variant int64 ===
+vtmask=20
+value=8589934592
+=== variant string ===
+vtmask=8
+bstrptr=1
+value=abc
+=== variant safearray ===
+isarray=1
+vtmask=3
+arrayptr=1
+count1=3
+lbound1=0
+ubound1=2
+elem0=10
+elem2=30

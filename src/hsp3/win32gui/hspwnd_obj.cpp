@@ -34,7 +34,7 @@
 */
 /*------------------------------------------------------------*/
 
-static int *notice_ptr;
+static HSPPTRINT *notice_ptr;
 static int bmscr_obj_ival;
 static double bmscr_obj_dval;
 static WNDPROC DefEditProc;
@@ -142,7 +142,7 @@ LRESULT CALLBACK MyButtonProc( HWND hwnd , UINT msg , WPARAM wp , LPARAM lp ) {
 	return CallWindowProc( DefButtonProc , hwnd , msg , wp , lp);
 }
 
-void SetObjectEventNoticePtr( int *ptr )
+void SetObjectEventNoticePtr( HSPPTRINT *ptr )
 {
 	//		イベント時の値ポインタを設定
 	//
@@ -1137,6 +1137,5 @@ int Bmscr::AddHSPObjectLayer(int sizex, int sizey, int layer, int val, int mode,
 
 	return id;
 }
-
 
 

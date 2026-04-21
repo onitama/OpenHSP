@@ -1,0 +1,17 @@
+gpiod initalize failed.
+=== deffunc int64 ===
+int64: 0
+int64: 42
+int64: -1
+int64: 2147483647
+int64: 2147483648
+=== deffunc int64,int64 ===
+int64+int64: 100 200
+int64+int64: 2147483647 2147483648
+int64+int64: 9007199254740992 9007199254740993
+int64+int64: 9223372036854775806 9223372036854775807
+=== deffunc int,int64 ===
+int+int64: 1 2147483648
+=== defcfunc int64 ===
+0
+2147483647000

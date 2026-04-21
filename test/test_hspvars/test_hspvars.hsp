@@ -1,0 +1,38 @@
+#include "hsp3cl.as"
+
+	mes "int"
+	dimtype var_int32, vartype("int"), 1
+	var_int32 += 2147483647
+	mes var_int32
+	repeat 10
+		var_int32 *= 2
+		mes str(cnt) + ":" + str(var_int32)
+	loop
+
+	mes "int64"
+	dimtype var_int64, vartype("int64"), 1
+	var_int64 += 2147483647
+	mes var_int64
+	repeat 10
+		var_int64 *= 2
+		mes str(cnt) + ":" + str(var_int64)
+	loop
+
+	mes "double"
+	dimtype var_double, vartype("double"), 1
+	var_double += 100000
+	mes var_double
+	repeat 10
+		var_double *= 10
+		mes str(cnt) + ":" + str(var_double)
+	loop
+
+	mes "float"
+	dimtype var_float, vartype("float"), 1
+	mes var_float
+	var_float += 100000
+	mes var_float
+	repeat 10
+		var_float *= 10
+		mes str(cnt) + ":" + str(var_float)
+	loop

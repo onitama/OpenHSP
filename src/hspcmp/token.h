@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <cstdint>
 
 // token type
 #define TK_NONE 0
@@ -16,6 +17,7 @@
 #define TK_STRING 2
 #define TK_DNUM 3
 #define TK_NUM 4
+#define TK_INT64 5
 #define TK_CODE 6
 #define TK_LABEL 7
 #define TK_VOID 0x1000
@@ -430,6 +432,7 @@ private:
 	char *lasttoken;				// last token point
 	float val_f;
 	double val_d;
+	int64_t val64;
 	double fpbit;
 	unsigned char *wp;
 	unsigned char s2[4096];

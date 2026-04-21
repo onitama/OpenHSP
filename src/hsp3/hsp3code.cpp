@@ -4,6 +4,10 @@
 //	(中間言語展開およびパラメーター取得)
 //	onion software/onitama 2004/6
 //
+#include "hsp3struct.h"
+#include "hspvar_core.h"
+#include <cstddef>
+#include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,7 +44,7 @@ static int val,type,exflg;
 static short csvalue, csvalue2;
 static int hspevent_opt;		// Event enable flag
 static MPModVarData modvar_init;
-static int sptr_res;
+static HSPPTRINT sptr_res;
 static int arrayobj_flag;
 
 static HSPEXINFO mem_exinfo;	// HSPEXINFO本体
@@ -131,7 +135,8 @@ static int parse_strmap(char* strmap, int mode)
 	//
 	int idmax = -1;
 	int curline;
-	int maxline, header_size;
+	int maxline;
+	size_t header_size;
 	CStrNote note;
 	char* p;
 	char* pres;
@@ -906,7 +911,7 @@ char *code_getas(void)
 	chartoapichar(s, &hactmp1);
 	apichartoansichar(hactmp1, &actmp1);
 	freehac(&hactmp1);
-	sbCopy(&hspctx->stmp,actmp1,strlen(actmp1)+1);
+	sbCopy(&hspctx->stmp,actmp1,(int)strlen(actmp1)+1);
 	freeac(&actmp1);
 	return hspctx->stmp;
 #else
@@ -927,7 +932,7 @@ char *code_getads(const char *defval)
 	chartoapichar(s, &hactmp1);
 	apichartoansichar(hactmp1, &actmp1);
 	freehac(&hactmp1);
-	sbCopy(&hspctx->stmp,actmp1,strlen(actmp1)+1);
+	sbCopy(&hspctx->stmp,actmp1,(int)strlen(actmp1)+1);
 	freeac(&actmp1);
 	return hspctx->stmp;
 #else
@@ -976,10 +981,49 @@ int code_getdi( const int defval )
 	chk = code_get();
 	if ( chk<=PARAM_END ) { return defval; }
 	if ( mpval->flag != HSPVAR_FLAG_INT ) {
-		if ( mpval->flag != HSPVAR_FLAG_DOUBLE ) throw HSPERR_TYPE_MISMATCH;
-		return (int)(*(double *)(mpval->pt));		// doubleの時はintに変換
+		if ( mpval->flag == HSPVAR_FLAG_DOUBLE )
+			return (int)(*(double *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_INT64 )
+			return (int)(*(int64_t *)(mpval->pt));
+		throw HSPERR_TYPE_MISMATCH;
 	}
 	return *(int *)(mpval->pt);
+}
+
+
+int64_t code_getl( void )
+{
+	//		数値パラメーターを取得
+	//
+	int chk;
+	chk = code_get();
+	if ( chk<=PARAM_END ) { throw HSPERR_NO_DEFAULT; }
+	if ( mpval->flag != HSPVAR_FLAG_INT64 ) {
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (int64_t)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_DOUBLE )
+			return (int64_t)(*(double *)(mpval->pt));
+		 throw HSPERR_TYPE_MISMATCH;
+	}
+	return *(int64_t *)(mpval->pt);
+}
+
+
+int64_t code_getdl( const int64_t defval )
+{
+	//		数値パラメーターを取得(デフォルト値あり)
+	//
+	int chk;
+	chk = code_get();
+	if ( chk<=PARAM_END ) { return defval; }
+	if ( mpval->flag != HSPVAR_FLAG_INT64 ) {
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (int64_t)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_DOUBLE )
+			return (int64_t)(*(double *)(mpval->pt));
+		 throw HSPERR_TYPE_MISMATCH;
+	}
+	return *(int64_t *)(mpval->pt);
 }
 
 
@@ -991,8 +1035,11 @@ double code_getd( void )
 	chk = code_get();
 	if ( chk<=PARAM_END ) { throw HSPERR_NO_DEFAULT; }
 	if ( mpval->flag != HSPVAR_FLAG_DOUBLE ) {
-		if ( mpval->flag != HSPVAR_FLAG_INT ) throw HSPERR_TYPE_MISMATCH;
-		return (double)(*(int *)(mpval->pt));		// intの時はdoubleに変換
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (double)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_INT64 )
+			return (double)(*(int64_t *)(mpval->pt));
+		throw HSPERR_TYPE_MISMATCH;
 	}
 	return *(double *)(mpval->pt);
 }
@@ -1006,8 +1053,11 @@ double code_getdd( const double defval )
 	chk = code_get();
 	if ( chk<=PARAM_END ) { return defval; }
 	if ( mpval->flag != HSPVAR_FLAG_DOUBLE ) {
-		if ( mpval->flag != HSPVAR_FLAG_INT ) throw HSPERR_TYPE_MISMATCH;
-		return (double)(*(int *)(mpval->pt));		// intの時はdoubleに変換
+		if ( mpval->flag == HSPVAR_FLAG_INT )
+			return (double)(*(int *)(mpval->pt));
+		if ( mpval->flag == HSPVAR_FLAG_INT64 )
+			return (double)(*(int64_t *)(mpval->pt));
+		throw HSPERR_TYPE_MISMATCH;
 	}
 	return *(double *)(mpval->pt);
 }
@@ -1532,6 +1582,15 @@ void code_expandstruct( char *p, STRUCTDAT *st, int option )
 			memcpy(out, &d, sizeof(double));
 			break;
 			}
+		case MPTYPE_INT64:
+			*(int64_t *)out = code_getdl(0);
+			break;
+		case MPTYPE_FLOAT:
+			{
+			float d = (float)code_getd();
+			memcpy(out, &d, sizeof(float));
+			break;
+			}
 		case MPTYPE_LOCALSTRING:
 			{
 			char *str;
@@ -1720,8 +1779,15 @@ char *code_getsptr( int *type )
 		bp = (char *)&sptr_res;
 	} else {
 		fl = mpval->flag;
-		bp = mpval->pt;
-		if (( fl != HSPVAR_FLAG_INT )&&( fl != HSPVAR_FLAG_STR )) {
+		if ( fl == HSPVAR_FLAG_INT ) {
+			sptr_res = *(int*)mpval->pt;
+			bp = (char *)&sptr_res;
+		} else if ( fl == HSPVAR_FLAG_INT64 ) {
+			sptr_res = *(int64_t*)mpval->pt;
+			bp = (char *)&sptr_res;
+		} else if ( fl == HSPVAR_FLAG_STR ) {
+			bp = mpval->pt;
+		} else {
 			throw HSPERR_TYPE_MISMATCH;
 		}
 	}
@@ -1736,6 +1802,7 @@ char *code_getsptr( int *type )
 /*------------------------------------------------------------*/
 
 static int reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_lvalue;
 
 /*
 	rev 43
@@ -1801,14 +1868,21 @@ static void *reffunc_custom( int *type_res, int arg )
 
 	*type_res = funcres;					// 返値のタイプを指定する
 	switch( funcres ) {						// 返値のポインタを設定する
-	case TYPE_STRING:
+	case HSPVAR_FLAG_STR:
 		ptr = hspctx->refstr;
 		break;
-	case TYPE_DNUM:
+	case HSPVAR_FLAG_DOUBLE:
 		ptr = &hspctx->refdval;
 		break;
-	case TYPE_INUM:
+	case HSPVAR_FLAG_INT:
 		ptr = &hspctx->stat;
+		break;
+	case HSPVAR_FLAG_INT64:
+#ifdef HSP64
+		ptr = &hspctx->stat;
+#else
+		ptr = &reffunc_intfunc_lvalue;
+#endif
 		break;
 	default:
 		if ( hspctx->runmode == RUNMODE_END ) {
@@ -1983,6 +2057,10 @@ static void cmdfunc_return_setval( void )
 	case HSPVAR_FLAG_DOUBLE:
 		hspctx->refdval = *(double *)mpval->pt;
 		break;
+	case HSPVAR_FLAG_INT64:
+		reffunc_intfunc_lvalue = *(int64_t *)mpval->pt;
+		hspctx->stat = (HSPPTRINT)reffunc_intfunc_lvalue;
+		break;
 	default:
 		throw HSPERR_TYPE_MISMATCH;
 	}
@@ -2036,6 +2114,7 @@ static int cmdfunc_prog( int cmd )
 	//
 
 	int p1,p2,p3,p4,p5;
+	int64_t lp1;
 
 	code_next();							// 次のコードを取得(最初に必ず必要です)
 
@@ -2237,13 +2316,21 @@ static int cmdfunc_prog( int cmd )
 		{
 		PVal *pval_m;
 		pval_m = code_getpval();
+#ifdef HSP64
+		lp1 = code_getl();
+#else
 		p1 = code_geti();
+#endif
 		p2 = code_geti();
 		p3 = code_getdi( HSPVAR_FLAG_INT );
 		if ( p2<=0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		if ( HspVarCoreGetProc(p3)->flag == 0 ) throw HSPERR_ILLEGAL_FUNCTION;
 		if (pval_m->support & HSPVAR_SUPPORT_FIXEDVALUE) throw HSPERR_FIXED_VARVALUE;
+#ifdef HSP64
+		HspVarCoreDupPtr( pval_m, p3, (void *)lp1, p2 );
+#else
 		HspVarCoreDupPtr( pval_m, p3, (void *)p1, p2 );
+#endif
 		break;
 		}
 
@@ -2473,7 +2560,8 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		reffunc_intfunc_ivalue = vercode | mvscode;
 		break;
 	case 0x003:								// stat
-		reffunc_intfunc_ivalue = hspctx->stat;
+		*type_res = HSPCTX_STAT_FLAG;
+		ptr = &hspctx->stat;
 		break;
 	case 0x004:								// cnt
 		reffunc_intfunc_ivalue = hspctx->mem_loop[hspctx->looplev].cnt;
@@ -2491,6 +2579,23 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		reffunc_intfunc_ivalue = hspctx->sublev;
 		break;
 
+#ifdef HSP64
+	case 0x009:								// iparam
+		reffunc_intfunc_lvalue = hspctx->iparam;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+		break;
+	case 0x00a:								// wparam
+		reffunc_intfunc_lvalue = hspctx->wparam;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+		break;
+	case 0x00b:								// lparam
+		reffunc_intfunc_lvalue = hspctx->lparam;
+		*type_res = HSPVAR_FLAG_INT64;
+		ptr = &reffunc_intfunc_lvalue;
+		break;
+#else
 	case 0x009:								// iparam
 		reffunc_intfunc_ivalue = hspctx->iparam;
 		break;
@@ -2500,6 +2605,7 @@ static void *reffunc_sysvar( int *type_res, int arg )
 	case 0x00b:								// lparam
 		reffunc_intfunc_ivalue = hspctx->lparam;
 		break;
+#endif
 	case 0x00c:								// refstr
 		*type_res = HSPVAR_FLAG_STR;
 		ptr = (void *)hspctx->refstr;
@@ -2508,7 +2614,6 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		*type_res = HSPVAR_FLAG_DOUBLE;
 		ptr = (void *)&hspctx->refdval;
 		break;
-
 	default:
 		throw HSPERR_UNSUPPORTED_FUNCTION;
 	}
@@ -2822,7 +2927,7 @@ int code_getdebug_varid(PVal* pv)
 	int id = -1;
 	if (mem_di_val) {
 		char *p = (char *)hspctx->mem_var;
-		id = (((char*)pv) - p ) / sizeof(PVal);
+		id = (int)(((char*)pv) - p ) / sizeof(PVal);
 		if ((id < 0) || (id >= maxvar)) return -1;
 	}
 	return id;
@@ -3292,7 +3397,7 @@ int code_execcmd2( void )
 */
 /*------------------------------------------------------------*/
 
-static int call_eventfunc( int option, int event, int prm1, int prm2, void *prm3 )
+static int call_eventfunc( int option, int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 {
 	//		各タイプのイベントコールバックを呼び出す
 	//
@@ -3332,7 +3437,7 @@ HSPEVENT_ENABLE_PICLOAD,	// HSPEVENT_GETPICSIZE
 HSPEVENT_ENABLE_PICLOAD,	// HSPEVENT_PICLOAD
 };
 
-int code_event( int event, int prm1, int prm2, void *prm3 )
+int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 {
 	//		HSP内部イベント実行
 	//		(result:0=Not care/1=Done)
@@ -3406,7 +3511,7 @@ int code_event( int event, int prm1, int prm2, void *prm3 )
 		{
 		char **p;
 		dirlist_target = sbAlloc( 0x1000 );
-		hspctx->stat = dirlist( hspctx->fnbuffer, &dirlist_target, prm1 );
+		hspctx->stat = dirlist( hspctx->fnbuffer, &dirlist_target, (int)prm1 );
 		p = (char **)prm3;
 		*p = dirlist_target;
 		break;
@@ -3497,7 +3602,7 @@ int code_isirq( int id )
 }
 
 
-int code_sendirq( int id, int iparam, int wparam, int lparam )
+int code_sendirq( int id, int iparam, HSPPTRINT wparam, HSPPTRINT lparam )
 {
 	//		指定したIRQイベントを発生
 	//
@@ -3520,7 +3625,7 @@ int code_isuserirq( void )
 }
 
 
-int code_irqresult( int *value )
+int code_irqresult( HSPPTRINT *value )
 {
 	//		IRQイベントの戻り値を取得する
 	//
@@ -3529,7 +3634,7 @@ int code_irqresult( int *value )
 }
 
 
-int code_checkirq( int id, int message, int wparam, int lparam )
+int code_checkirq( int id, int message, HSPPTRINT wparam, HSPPTRINT lparam )
 {
 	//		指定したメッセージに対応するイベントを発生
 	//
@@ -3599,7 +3704,7 @@ IRQDAT *code_addirq( void )
 }
 
 
-void code_execirq( IRQDAT *irq, int wparam, int lparam )
+void code_execirq( IRQDAT *irq, HSPPTRINT wparam, HSPPTRINT lparam )
 {
 	//		IRQを実行する
 	//
@@ -3792,6 +3897,18 @@ void code_adddbg( char *name, int val )
 	_itoa( val, tmp, 10 );
 #else
 	sprintf( tmp, "%d", val);
+#endif
+	code_adddbg( name, tmp );
+}
+
+
+void code_adddbg( char *name, int64_t val )
+{
+	char tmp[32];
+#ifdef HSPWIN
+	_i64toa( val, tmp, 10 );
+#else
+	sprintf( tmp, "%ld", val);
 #endif
 	code_adddbg( name, tmp );
 }
@@ -4137,5 +4254,3 @@ void code_dbgtrace( void )
 
 
 #endif
-
-

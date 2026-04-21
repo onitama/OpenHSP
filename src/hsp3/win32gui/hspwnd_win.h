@@ -329,7 +329,7 @@ public:
 	int GetActive( void );
 	void SetNotifyFunc( void *func );
 	int GetBmscrMax( void ) { return bmscr_max; };
-	void SetEventNoticePtr( int *ptr );
+	void SetEventNoticePtr( HSPPTRINT *ptr );
 	void SetParentWindow( void *hwnd ) { wnd_parent = hwnd; };
 	int GetEmptyBufferId(void);
 	int GetPreloadBufferId(char *fname);
@@ -351,9 +351,9 @@ private:
 	HINSTANCE hInst;
 	Bmscr **mem_bm;
 	int bmscr_max;
-	int bmscr_res;
+	HSPPTRINT bmscr_res;
 	int wfx,wfy,wbx,wby;
-	int *resptr;
+	HSPPTRINT *resptr;
 	TCHAR defcls[32];			// Default Window Class
 	void *wnd_parent;			// Parent Window Handle
 };
@@ -449,7 +449,7 @@ typedef struct BMSCR
 	std::string resname;				// Resource Name
 } BMSCR;
 
-void SetObjectEventNoticePtr( int *ptr );
+void SetObjectEventNoticePtr( HSPPTRINT *ptr );
 
 
 #endif

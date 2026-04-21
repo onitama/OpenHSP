@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <locale.h>
+#include <wchar.h>
 
 #ifndef HSPMAC
 #define USE_FFILIB
@@ -31,7 +32,11 @@ static int *type;
 static int *val;
 static int *exflg;
 static int reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_lvalue;
 static int reset_flag = 0;
+
+#define GetPRM(id) (&hspctx->mem_finfo[id])
+#define strp(dsptr) &hspctx->mem_mds[dsptr]
 
 /*------------------------------------------------------------*/
 /*
@@ -85,28 +90,167 @@ static void InitSystemInformation(void)
 /*------------------------------------------------------------*/
 
 #ifdef USE_FFILIB
+static int cmdfunc_ctrlcmd( int cmd )
+{
+	//		cmdfunc : TYPE_DLLCTRL
+	//		(拡張DLLコントロールコマンド)
+	//
+	code_next();							// 次のコードを取得(最初に必ず必要です)
+
+	switch( cmd ) {							// サブコマンドごとの分岐
+	default:
+		throw ( HSPERR_SYNTAX );
+	}
+	return RUNMODE_RUN;
+}
+
+
+static void *reffunc_ctrlfunc( int *type_res, int arg )
+{
+	//		reffunc : TYPE_DLLCTRL
+	//		(拡張DLLコントロール関数)
+	//
+	void *ptr;
+	int p1, p2;
+	int64_t lp1, lp2;
+
+	//			'('で始まるかを調べる
+	//
+	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
+	if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
+	code_next();
+
+	ptr = &reffunc_intfunc_ivalue;
+	*type_res = HSPVAR_FLAG_INT;
+
+	switch( arg ) {							// サブコマンドごとの分岐
+	case 0x100:								// callfunc
+		{
+		PVal *pval;
+		PDAT *p;
+		int fl;
+		char *sptr;
+		pval = code_getpval();
+		p = HspVarCorePtrAPTR( pval, 0 );
+		lp1 = code_getl();
+		p2 = code_geti();
+		fl = code_getdi(HSPVAR_FLAG_INT); // TODO MPTYPE_系を使うべきか？
+		switch( fl ) {
+		case HSPVAR_FLAG_NONE:
+		case HSPVAR_FLAG_STR:
+		case HSPVAR_FLAG_DOUBLE:
+		case HSPVAR_FLAG_INT:
+		case HSPVAR_FLAG_INT64:
+			break;
+		case HSPVAR_FLAG_LABEL:
+		case HSPVAR_FLAG_STRUCT:
+		case HSPVAR_FLAG_COMSTRUCT:
+		case 7: // VARIANT
+		case HSPVAR_FLAG_USERDEF:
+		default:
+			throw ( HSPERR_TYPE_MISMATCH );
+		}
+		reffunc_intfunc_lvalue = call_extfunc( (void *)lp1, (int**)p, p2, fl );
+		switch( fl ) {
+		case HSPVAR_FLAG_STR:
+			ptr = sptr = code_stmp( strlen((char*)reffunc_intfunc_lvalue) + 1 );
+			strcpy( sptr, (char*) reffunc_intfunc_lvalue );
+			*type_res = HSPVAR_FLAG_STR;
+			break;
+		case HSPVAR_FLAG_INT:
+			reffunc_intfunc_ivalue = (int)reffunc_intfunc_lvalue;
+			ptr = &reffunc_intfunc_ivalue;
+			*type_res = fl;
+			break;
+		case HSPVAR_FLAG_INT64:
+			ptr = &reffunc_intfunc_lvalue;
+			*type_res = fl;
+			break;
+		default:
+			// TODO INT以外の対応
+			break;
+		}
+		break;
+		}
+
+	case 0x103:								// 	libptr
+		{
+		//LIBDAT *lib;
+		STRUCTDAT *st;
+		switch( *type ) {
+		case TYPE_DLLFUNC:
+		case TYPE_MODCMD:
+			p1 = *val;
+			break;
+		case TYPE_DLLCTRL:
+			p1 = *val;
+			if ( p1 >= TYPE_OFFSET_COMOBJ ) {
+				p1 -= TYPE_OFFSET_COMOBJ;
+				break;
+			}
+		default:
+			throw ( HSPERR_TYPE_MISMATCH );
+		}
+		code_next();
+		st = GetPRM( p1 );
+		//lib = &hspctx->mem_linfo[ st->index ];
+#ifdef HSP64
+		reffunc_intfunc_lvalue = (uint64_t)st;
+		ptr = &reffunc_intfunc_lvalue;
+		*type_res = HSPVAR_FLAG_INT64;
+#else
+		reffunc_intfunc_ivalue = (int)st;
+		ptr = &reffunc_intfunc_ivalue;
+		*type_res = HSPVAR_FLAG_INT;
+#endif
+		break;
+		}
+
+	default:
+		throw ( HSPERR_SYNTAX );
+	}
+
+	//			')'で終わるかを調べる
+	//
+	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
+	if ( *val != ')' ) throw ( HSPERR_INVALID_FUNCPARAM );
+	code_next();
+
+	return ptr;
+}
+
+
 static void *reffunc_dllcmd( int *type_res, int arg )
 {
-    //		reffunc : TYPE_DLLFUNC
-    //		(拡張DLL関数)
-    //
-    
-    //			'('で始まるかを調べる
-    //
-    if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
-    if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
-    
-    *type_res = HSPVAR_FLAG_INT;
-    exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
-    reffunc_intfunc_ivalue = hspctx->stat;
-    
-    //			')'で終わるかを調べる
-    //
-    if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
-    if ( *val != ')' ) throw ( HSPERR_INVALID_FUNCPARAM );
-    code_next();
-    
-    return &reffunc_intfunc_ivalue;
+	//		reffunc : TYPE_DLLFUNC
+	//		(拡張DLL関数)
+	//
+
+	//			'('で始まるかを調べる
+	//
+	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
+	if ( *val != '(' ) throw ( HSPERR_INVALID_FUNCPARAM );
+
+	exec_dllcmd( arg, STRUCTDAT_OT_FUNCTION );
+#ifdef HSP64
+	*type_res = HSPVAR_FLAG_INT64;
+	reffunc_intfunc_lvalue = hspctx->stat;
+#else
+	*type_res = HSPVAR_FLAG_INT;
+	reffunc_intfunc_ivalue = hspctx->stat;
+#endif
+
+	//			')'で終わるかを調べる
+	//
+	if ( *type != TYPE_MARK ) throw ( HSPERR_INVALID_FUNCPARAM );
+	if ( *val != ')' ) throw ( HSPERR_INVALID_FUNCPARAM );
+	code_next();
+
+#ifdef HSP64
+	return &reffunc_intfunc_lvalue;
+#else
+	return &reffunc_intfunc_ivalue;
+#endif
 }
 #endif
 
@@ -139,6 +283,8 @@ void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 
 void hsp3typeinit_dllctrl( HSP3TYPEINFO *info )
 {
+	info->cmdfunc = cmdfunc_ctrlcmd;
+	info->reffunc = reffunc_ctrlfunc;
 }
 
 

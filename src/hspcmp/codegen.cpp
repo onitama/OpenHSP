@@ -57,6 +57,18 @@ static int is_statement_end( int type )
 	return ( type == TK_SEPARATE )||( type == TK_EOL )||( type == TK_EOF );
 }
 
+static void put_int64_literal_as_func( CToken *self, int64_t value, int exflag )
+{
+	char literal[32];
+
+	// Keep AX compatibility by lowering int64 literals to the existing int64() builtin call.
+	snprintf( literal, sizeof(literal), "%lld", (long long)value );
+	self->PutCS( TYPE_INTFUNC, 0x200, exflag );
+	self->PutCS( TYPE_MARK, '(', 0 );
+	self->PutCS( TYPE_STRING, self->PutDS( literal ), 0 );
+	self->PutCS( TYPE_MARK, ')', 0 );
+}
+
 
 void CToken::CalcCG_regmark( int mark )
 {
@@ -137,6 +149,12 @@ void CToken::CalcCG_factor( void )
 		return;
 	case TK_DNUM:
 		PutCS( TYPE_DNUM, val_d, texflag );
+		texflag = 0;
+		CalcCG_token();
+		calccount++;
+		return;
+	case TK_INT64:
+		put_int64_literal_as_func( this, val64, texflag );
 		texflag = 0;
 		CalcCG_token();
 		calccount++;
@@ -259,7 +277,7 @@ void CToken::CalcCG_compare( void )
 	int op;
 	CalcCG_shift();
 
-	while( 
+	while(
 		(ttype=='<')||(ttype=='>')||(ttype=='=')||(ttype=='!')||
 		(ttype==0x61)||(ttype==0x62)) {
 		op=ttype; CalcCG_token_exprbeg();
@@ -538,7 +556,7 @@ char *CToken::GetTokenCG( char *str, int option )
 		char *p;
 		vs++; cg_str = (char *)vs;
 		p = PickStringCG( (char *)vs, 0x27 );
-		ttype = TK_NUM; 
+		ttype = TK_NUM;
 		val = ((unsigned char *)cg_str)[0];
 		return p;
 	}
@@ -570,6 +588,12 @@ char *CToken::GetTokenCG( char *str, int option )
 			vs++;
 		}
 		cg_str[a]=0;
+		if ( *vs=='l' || *vs=='L' ) {
+			vs++;
+			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 16 );
+			ttype = TK_INT64;
+			return (char *)vs;
+		}
 		ttype = TK_NUM;
 		return (char *)vs;
 	}
@@ -586,6 +610,12 @@ char *CToken::GetTokenCG( char *str, int option )
 			vs++;
 		}
 		cg_str[a]=0;
+		if ( *vs=='l' || *vs=='L' ) {
+			vs++;
+			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 2 );
+			ttype = TK_INT64;
+			return (char *)vs;
+		}
 		ttype = TK_NUM;
 		return (char *)vs;
 	}
@@ -639,8 +669,16 @@ char *CToken::GetTokenCG( char *str, int option )
 			}
 			s2[a++]=a1;vs++;
 		}
-		if (( a1=='f' )||( a1=='d' )) { chk = 1; vs++; }
-		if ( a1=='e' ) {						// 指数部を取り込む
+		if (( a1=='f' )||( a1=='F' )||( a1=='d' )||( a1=='D' )) { chk = 1; vs++; }
+		if ( a1=='l' || a1=='L' ) {			// int64 suffix
+			s2[a]=0;
+			val64 = strtoll( (char *)s2, nullptr, 10 );
+			if ( is_negative_number ) val64 = -val64;
+			ttype = TK_INT64;
+			vs++;
+			return (char *)vs;
+		}
+		if ( a1=='e' || a1=='E' ) {						// 指数部を取り込む
 			chk = 1;
 			s2[a++] = 'e';
 			vs++;
@@ -1437,7 +1475,7 @@ void CToken::GenerateCodeLET( int id, bool first )
 	default:
 		break;
 	}
-	
+
 	if (( ttype == TK_NONE )&&( val == '=' )) {
 		GetTokenCG( GETTOKEN_DEFAULT );
 	}
@@ -1769,7 +1807,7 @@ int CToken::GetParameterTypeCG( char *name )
 	//
 	if ( !strcmp( cg_str,"int" ) ) return MPTYPE_INUM;
 	if ( !strcmp( cg_str,"var" ) ) return MPTYPE_SINGLEVAR;
-	if ( !strcmp( cg_str,"val" ) ) { 
+	if ( !strcmp( cg_str,"val" ) ) {
 #ifdef JPNMSG
 		Mesf( "警告:古いdeffunc表記があります 行%d.[%s]", cg_orgline, name );
 #else
@@ -1780,6 +1818,8 @@ int CToken::GetParameterTypeCG( char *name )
 	if ( !strcmp( cg_str,"str" ) ) return MPTYPE_LOCALSTRING;
 	if ( !strcmp( cg_str,"double" ) ) return MPTYPE_DNUM;
 	if ( !strcmp( cg_str,"label" ) ) return MPTYPE_LABEL;
+	if ( !strcmp( cg_str,"int64" ) ) return MPTYPE_INT64;
+	if ( !strcmp( cg_str,"float" ) ) return MPTYPE_FLOAT;
 	if ( !strcmp( cg_str,"local" ) ) return MPTYPE_LOCALVAR;
 	if ( !strcmp( cg_str,"array" ) ) return MPTYPE_ARRAYVAR;
 	if ( !strcmp( cg_str,"modvar" ) ) return MPTYPE_MODULEVAR;
@@ -1799,6 +1839,7 @@ int CToken::GetParameterStructTypeCG( char *name )
 	if ( !strcmp( cg_str,"str" ) ) return MPTYPE_LOCALSTRING;
 	if ( !strcmp( cg_str,"double" ) ) return MPTYPE_DNUM;
 	if ( !strcmp( cg_str,"label" ) ) return MPTYPE_LABEL;
+	if ( !strcmp( cg_str,"int64" ) ) return MPTYPE_INT64;
 	if ( !strcmp( cg_str,"float" ) ) return MPTYPE_FLOAT;
 	return MPTYPE_NONE;
 }
@@ -1813,6 +1854,7 @@ int CToken::GetParameterFuncTypeCG( char *name )
 	if ( !strcmp( cg_str,"str" ) ) return MPTYPE_LOCALSTRING;
 	if ( !strcmp( cg_str,"double" ) ) return MPTYPE_DNUM;
 //	if ( !strcmp( cg_str,"label" ) ) return MPTYPE_LABEL;
+	if ( !strcmp( cg_str,"int64" ) ) return MPTYPE_INT64;
 	if ( !strcmp( cg_str,"float" ) ) return MPTYPE_FLOAT;
 	if ( !strcmp( cg_str,"pval" ) ) return MPTYPE_PPVAL;
 	if ( !strcmp( cg_str,"bmscr" ) ) return MPTYPE_PBMSCR;
@@ -1843,6 +1885,7 @@ int CToken::GetParameterResTypeCG( char *name )
 	if ( !strcmp( cg_str,"str" ) ) return MPTYPE_STRING;
 	if ( !strcmp( cg_str,"double" ) ) return MPTYPE_DNUM;
 	if ( !strcmp( cg_str,"label" ) ) return MPTYPE_LABEL;
+	if ( !strcmp( cg_str,"int64" ) ) return MPTYPE_INT64;
 	if ( !strcmp( cg_str,"float" ) ) return MPTYPE_FLOAT;
 	return MPTYPE_NONE;
 }
@@ -2126,7 +2169,7 @@ void CToken::GenerateCodePP( char *buf )
 	int i;
 	GetTokenCG( GETTOKEN_DEFAULT );					// 最初の'#'を読み飛ばし
 	if (*cg_ptr != PickNextCodeCG()) {
-		// preprocesser command "#" 
+		// preprocesser command "#"
 		throw CGERROR_UNKNOWN;
 	}
 	GetTokenCG( GETTOKEN_DEFAULT );
@@ -2267,7 +2310,7 @@ int CToken::GenerateCodeSub( void )
 				lb->SetDefinition(i, cg_orgfilefull, cg_orgline);
 				GenerateLabelListAndTag(i, LABBUF_FLAG_LABEL);
 				SetOT( lb->GetOpt(i), GetCS() );
-				lab->type = TYPE_LABEL; 
+				lab->type = TYPE_LABEL;
 			} else {
 				i = lb->Regist( cg_str, TYPE_LABEL, ot_buf->GetSize() / sizeof(int), cg_orgfilefull, cg_orgline );
 				GenerateLabelListAndTag(i, LABBUF_FLAG_LABEL);
@@ -2369,7 +2412,7 @@ int CToken::GenerateCodeBlock( void )
 				id = lb->Search( cg_str );
 				if ( id >= 0 ) {
 					if (( lb->GetType(id)==TYPE_CMPCMD )&&( lb->GetOpt(id)==1 )) {
-						//ifscope[iflev-1] = CG_IFCHECK_LINE;					// line scope on	
+						//ifscope[iflev-1] = CG_IFCHECK_LINE;					// line scope on
 						ff = 1;
 					}
 				}
@@ -2461,7 +2504,7 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 				errend++;
 			}
 		}
-		
+
 		//		関数未処理チェック
 		for( a=0; a<GET_FI_SIZE(); a++ ) {
 			if ( GET_FI(a)->index == STRUCTDAT_INDEX_DUMMY ) {
@@ -2473,8 +2516,8 @@ int CToken::GenerateCodeMain( CMemBuf *buf )
 				errend++;
 			}
 		}
-		
-		//      ブレース対応チェック 
+
+		//      ブレース対応チェック
 		if ( iflev > 0 ) {
 #ifdef JPNMSG
 				Mesf( "#波括弧が閉じられていません" );
@@ -2561,7 +2604,7 @@ void CToken::PutCSSymbol( int label_id, int exflag )
 	if ( type == TYPE_MODCMD && value == -1 ) {
 		int id = *(int *)lb->GetData2(label_id);
 		tmp_lb->AddReference( id );
-		
+
 		HED_STRUCTDAT st = { STRUCTDAT_INDEX_DUMMY };
 		st.otindex = label_id;
 		value = GET_FI_SIZE();
@@ -2915,6 +2958,9 @@ int CToken::PutStructParam( short mptype, int extype )
 		break;
 	case MPTYPE_DNUM:
 		size = sizeof(double);
+		break;
+	case MPTYPE_INT64:
+		size = sizeof(int64_t);
 		break;
 	case MPTYPE_FLOAT:
 		size = sizeof(float);
@@ -3455,4 +3501,3 @@ void CToken::GenerateLabelListAndTagRef(int labelid, int flag )
 
 	GenerateLabelTag(lab->name, flag| LABBUF_FLAG_REFER, lab->type, cg_orgfilefull, cg_orgline );
 }
-

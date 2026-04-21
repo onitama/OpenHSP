@@ -205,6 +205,63 @@ char *strchr2( char *target, char code )
 }
 
 
+void getpath(char* stmp, char* outbuf, int p2)
+{
+  //	getpath
+  //
+  //	0 : 文字列のコピー(操作なし)
+  //	1 : 拡張子を除くファイル名
+  //	2 : 拡張子のみ(. ? ? ? )
+  //	8 : ディレクトリ情報を取り除く
+  //	16 : 文字列を小文字に変換する
+  //	32 : ディレクトリ情報のみ
+  char* p;
+  char workbuf[_MAX_PATH];
+
+  char p_drive[_MAX_PATH];
+  char p_dir[_MAX_DIR];
+  char p_fname[_MAX_FNAME];
+  char p_ext[_MAX_EXT];
+
+  p = outbuf;
+  strcpy(workbuf, stmp);
+  if (p2 & 16) strcase(workbuf);
+
+  //新しいVC++で0x5cコードが正しく処理されないためSJIS版の_splitpathは使用せず
+  //_splitpath( stmp, p_drive, p_dir, p_fname, p_ext );
+  wchar_t wszBufPath[_MAX_PATH], wdrive[_MAX_DRIVE], wdir[_MAX_DIR], wfname[_MAX_FNAME], wext[_MAX_EXT];
+
+  mbstowcs(wszBufPath, workbuf, strlen(workbuf) + 1);
+  _wsplitpath(wszBufPath, wdrive, wdir, wfname, wext);
+
+  wcstombs(p_drive, wdrive, _MAX_DRIVE);
+  wcstombs(p_dir, wdir, _MAX_DIR);
+  wcstombs(p_fname, wfname, _MAX_FNAME);
+  wcstombs(p_ext, wext, _MAX_EXT);
+
+  strcat(p_drive, p_dir);
+  if (p2 & 8) {
+	strcpy(workbuf, p_fname);
+	strcat(workbuf, p_ext);
+  }
+  else if (p2 & 32) {
+	strcpy(workbuf, p_drive);
+  }
+  switch (p2 & 7) {
+  case 1:			// Name only ( without ext )
+	workbuf[strlen(workbuf) - strlen(p_ext)] = 0;
+	strcpy(p, workbuf);
+	break;
+  case 2:			// Ext only
+	strcpy(p, p_ext);
+	break;
+  default:		// Direct Copy
+	strcpy(p, workbuf);
+	break;
+  }
+}
+
+
 void getpathW( HSPAPICHAR *p_stmp, HSPAPICHAR *outbuf, int p2 )
 {
 	HSPAPICHAR *p = 0;
@@ -882,6 +939,16 @@ void Alertf( const HSPAPICHAR *format, ... )
 	_vstprintf(textbf, format, args);
 	va_end(args);
 	MessageBox( NULL, textbf, TEXT("error"),MB_ICONINFORMATION | MB_OK );
+}
+
+void Alertf( const char *format, ... )
+{
+	char textbf[4096];
+	va_list args;
+	va_start(args, format);
+	vsprintf(textbf, format, args);
+	va_end(args);
+	MessageBoxA( NULL, textbf, "error",MB_ICONINFORMATION | MB_OK );
 }
 
 #endif

@@ -7,7 +7,7 @@
 
 struct BMSCR3;
 
-void init_bmscr3( Bmscr* bm, int _inst, int _wnd, int _hdc );
+void init_bmscr3( Bmscr* bm, HSPPTRINT _inst, HSPPTRINT _wnd, HSPPTRINT _hdc );
 BMSCR3 *get_bmscr3(void);
 
 #endif

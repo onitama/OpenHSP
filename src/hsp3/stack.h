@@ -55,7 +55,7 @@ extern STMDATA *stm_maxptr;
 #define StackPeek2 (stm_cur-2)
 #define PeekPtr ((void *)(stm_cur-1)->ptr)
 
-#define StackGetLevel (stm_cur-mem_stm)
+#define StackGetLevel ((int)(stm_cur-mem_stm))
 #define StackDecLevel stm_cur--
 
 inline void StackPushi( int val )

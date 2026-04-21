@@ -1495,12 +1495,21 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		break;
 	case 0x003:								// hwnd
 		ptr = (void *)(&(bmscr->hwnd));
+#ifdef HSP64
+		*type_res = HSPVAR_FLAG_INT64;
+#endif
 		break;
 	case 0x004:								// hinstance
 		ptr = (void *)(&(bmscr->hInst));
+#ifdef HSP64
+		*type_res = HSPVAR_FLAG_INT64;
+#endif
 		break;
 	case 0x005:								// hdc
 		ptr = (void *)(&(bmscr->hdc));
+#ifdef HSP64
+		*type_res = HSPVAR_FLAG_INT64;
+#endif
 		break;
 
 	default:
@@ -1571,7 +1580,8 @@ void ex_mref( PVal *pval, int prm )
 	} else {
 		switch( prm ) {
 		case 0x40:
-			size = sizeof(int);
+			t = HSPCTX_STAT_FLAG;
+			size = sizeof(HSPPTRINT);
 			ptr = &ctx->stat;
 			break;
 		case 0x41:

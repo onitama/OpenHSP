@@ -335,7 +335,7 @@ typedef struct {
 
 #define RESNAME_MAX 64
 
-void SetObjectEventNoticePtr( int *ptr );
+void SetObjectEventNoticePtr( HSPPTRINT *ptr );
 
 //	Bmscr class
 //
@@ -609,7 +609,7 @@ private:
 
 	Bmscr **mem_bm;
 	int bmscr_max;
-	int bmscr_res;
+	HSPPTRINT bmscr_res;
 
 	//	Info for HSP3Dish Device
 	HSP3DEVINFO devinfo;

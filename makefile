@@ -1,13 +1,22 @@
 CC = gcc
 CXX = g++
 AR = ar
+DEBUG ?= 0
+
+ifeq ($(DEBUG),1)
+DEBUG_CFLAGS = -g
+STRIPFLAGS =
+else
+DEBUG_CFLAGS =
+STRIPFLAGS = -s
+endif
 
 # CFLAGS_ENV = # 32bit
-CFLAGS_ENV =  -DHSP64 # 64bit
-CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
-CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11 $(CFLAGS_ENV)
-CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
-CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_ENV =  -DHSP64 -Werror=int-to-pointer-cast # 64bit
+CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
+CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11 $(CFLAGS_ENV) $(DEBUG_CFLAGS)
+CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
+CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
 PKG_CONFIG = pkg-config
 
 OBJS = \
@@ -27,6 +36,7 @@ OBJS = \
 	src/hsp3/hspvar_label.do \
 	src/hsp3/hspvar_str.do \
 	src/hsp3/hspvar_struct.do \
+	src/hsp3/hspvar_int64.do \
 	src/hsp3dish/hspwnd_dish.do \
 	src/hsp3dish/hspwnd_obj.do \
 	src/hsp3dish/hspwnd_edit.do \
@@ -87,6 +97,7 @@ OBJS_CL = \
 	src/hsp3/hspvar_label.o \
 	src/hsp3/hspvar_str.o \
 	src/hsp3/hspvar_struct.o \
+	src/hsp3/hspvar_int64.o \
 	src/hsp3/stack.o \
 	src/hsp3/strbuf.o \
 	src/hsp3/strnote.o \
@@ -119,6 +130,7 @@ OBJS_GP = \
 	src/hsp3/hspvar_label.gpo \
 	src/hsp3/hspvar_str.gpo \
 	src/hsp3/hspvar_struct.gpo \
+	src/hsp3/hspvar_int64.gpo \
 	src/hsp3dish/hspwnd_dish.gpo \
 	src/hsp3dish/hspwnd_obj.gpo \
 	src/hsp3dish/hspwnd_edit.gpo \
@@ -455,21 +467,21 @@ all: $(TARGETS)
 
 .SUFFIXES: .cpp
 hsp3dish: $(OBJS)
-	$(CXX) $(CFLAGS_DISH) $(OBJS) -s -o $@ $(LIBS1)
+	$(CXX) $(CFLAGS_DISH) $(OBJS) $(STRIPFLAGS) -o $@ $(LIBS1)
 %.do: %.c
 	$(CC) $(CFLAGS_DISH) -c $< -o $*.do
 %.do: %.cpp
 	$(CXX) $(CFLAGS_DISH) -c $< -o $*.do
 
 hsp3gp: $(OBJS_GP) $(LIBS_GP)
-	$(CXX) $(CFLAGS_GP) $(OBJS_GP) -s -o $@ $(LIBS2) $(LIBS_GP)
+	$(CXX) $(CFLAGS_GP) $(OBJS_GP) $(STRIPFLAGS) -o $@ $(LIBS2) $(LIBS_GP)
 %.gpo: %.c
 	$(CC) $(CFLAGS_GP) -c $< -o $*.gpo
 %.gpo: %.cpp
 	$(CXX) $(CFLAGS_GP) -c $< -o $*.gpo
 
 hspcmp: $(OBJS_CMP)
-	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) -s -o $@
+	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) $(STRIPFLAGS) -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CMP) -c $< -o $*.o
 %.o: %.cpp

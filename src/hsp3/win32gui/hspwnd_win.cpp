@@ -119,14 +119,14 @@ void WM_Paint( HWND hwnd, Bmscr *bm )
 LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam )
 {
 	int id;
-	int retval;
+	HSPPTRINT retval;
 	Bmscr *bm;
 
 	if ( code_isuserirq() ) {
 #ifdef HSPERR_HANDLE
 		try {
 #endif
-		if ( code_checkirq( (int)GetWindowLongPtr( hwnd, GWLP_USERDATA ), (int)uMessage, (int)wParam, (int)lParam ) ) {
+		if ( code_checkirq( (int)GetWindowLongPtr( hwnd, GWLP_USERDATA ), uMessage, (HSPPTRINT)wParam, (HSPPTRINT)lParam ) ) {
 			if ( code_irqresult( &retval ) ) return retval;
 		}
 #ifdef HSPERR_HANDLE
@@ -213,7 +213,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 			try {
 #endif
-				code_sendirq( HSPIRQ_ONCLICK, (int)uMessage - (int)WM_LBUTTONDOWN, (int)wParam, (int)lParam );
+				code_sendirq( HSPIRQ_ONCLICK, (HSPPTRINT)uMessage - (HSPPTRINT)WM_LBUTTONDOWN, (HSPPTRINT)wParam, (HSPPTRINT)lParam );
 #ifdef HSPERR_HANDLE
 			}
 			catch (HSPERROR code) {						// HSPエラー例外処理
@@ -468,7 +468,7 @@ void HspWnd::Reset( HANDLE instance, char *wndcls )
 }
 
 
-void HspWnd::SetEventNoticePtr( int *ptr )
+void HspWnd::SetEventNoticePtr( HSPPTRINT *ptr )
 {
 	resptr = ptr;
 	SetObjectEventNoticePtr( resptr );
@@ -2195,4 +2195,3 @@ void Bmscr::Viewcalc_calc(HSPREAL& axisx, HSPREAL& axisy)
 	//
 	if (vp_flag == 0) return;
 }
-
