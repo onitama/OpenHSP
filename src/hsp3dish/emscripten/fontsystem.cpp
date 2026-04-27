@@ -21,6 +21,7 @@
 #ifdef HSPWIN
 #define STRICT
 #include <windows.h>
+#include <tchar.h>
 #include <usp10.h>  // Uniscribe API (サロゲートペア対応)
 #endif
 
@@ -191,7 +192,7 @@ void hgio_fontsystem_init_uniscribe(void)
 			fontsystem_size, 0, 0, 0, FW_REGULAR, 0, 0, 0,
 			DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
 			PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN,
-			L"Arial Unicode MS"
+			_T("Arial Unicode MS")
 		);
 	}
 	if (hFontFallback2 == NULL) {
@@ -199,7 +200,7 @@ void hgio_fontsystem_init_uniscribe(void)
 			fontsystem_size, 0, 0, 0, FW_REGULAR, 0, 0, 0,
 			DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
 			PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN,
-			L"Segoe UI Symbol"
+			_T("Segoe UI Symbol")
 		);
 	}
 }
