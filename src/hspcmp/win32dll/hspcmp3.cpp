@@ -160,7 +160,7 @@ static void _sendstr2( HWND hw, char *p1 )
 
 //----------------------------------------------------------
 
-EXPORT BOOL WINAPI hsc_ini ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI hsc_ini ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		hsc_ini "src-file"  (type6)
@@ -176,7 +176,7 @@ EXPORT BOOL WINAPI hsc_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI hsc_refname ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI hsc_refname ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		hsc_refname "ref-file"  (type6)
@@ -186,7 +186,7 @@ EXPORT BOOL WINAPI hsc_refname ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI hsc_objname(BMSCR* bm, char* p1, int p2, int p3)
+EXPORT BOOL WINAPI hsc_objname(BMSCR* bm, char* p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//
 	//		hsc_objname "obj-file"  (type6)
@@ -196,7 +196,7 @@ EXPORT BOOL WINAPI hsc_objname(BMSCR* bm, char* p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI hsc3_analysis(BMSCR* bm, char* p1, int p2, int p3)
+EXPORT BOOL WINAPI hsc3_analysis(BMSCR* bm, char* p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//
 	//		hsc3_analysisname "name", mode, line  (type6)
@@ -208,23 +208,23 @@ EXPORT BOOL WINAPI hsc3_analysis(BMSCR* bm, char* p1, int p2, int p3)
 		strncpy(analysis_keyword, p1, _MAX_PATH - 1);
 		analysis_name = analysis_keyword;
 	}
-	analysis_mode = p2;
-	hsc3->InitAnalysisInfo(analysis_mode, analysis_name, p3);
+	analysis_mode = (int)p2;
+	hsc3->InitAnalysisInfo(analysis_mode, analysis_name, (int)p3);
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI hsc3_kwlineinfo(char* p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI hsc3_kwlineinfo(char* p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//
 	//		hsc3_kwlineinfo val, opt (type1)
 	//
-	strcpy(p1, hsc3->GetAnalysisLineInfo(p2));
+	strcpy(p1, hsc3->GetAnalysisLineInfo((int)p2));
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI hsc_ver ( int p1, int p2, int p3, char *p4 )
+EXPORT BOOL WINAPI hsc_ver (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, char *p4 )
 {
 	//
 	//		hsc_ver (type$10)
@@ -234,7 +234,7 @@ EXPORT BOOL WINAPI hsc_ver ( int p1, int p2, int p3, char *p4 )
 }
 
 
-EXPORT BOOL WINAPI hsc_bye ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc_bye (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		hsc_bye (type$100)
@@ -243,7 +243,7 @@ EXPORT BOOL WINAPI hsc_bye ( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI hsc_getmes ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc_getmes ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		hsc_getmes val (type1)
@@ -253,7 +253,7 @@ EXPORT BOOL WINAPI hsc_getmes ( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI hsc_clrmes ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc_clrmes (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		hsc_clrmes (type0)
@@ -263,7 +263,7 @@ EXPORT BOOL WINAPI hsc_clrmes ( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI hsc_compath ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI hsc_compath ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		hsc_compath "common-path"  (type6)
@@ -274,13 +274,13 @@ EXPORT BOOL WINAPI hsc_compath ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-static int hsc_comp_sub(int p1, int p2, int p3, int p4)
+static int hsc_comp_sub(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 
 }
 
 
-EXPORT BOOL WINAPI hsc_comp ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc_comp (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		hsc_comp mode,ppopt,dbgopt  (type0)
@@ -364,7 +364,7 @@ p1が16(bit4)の場合はキーワード解析リストを出力します
 
 //----------------------------------------------------------
 
-EXPORT BOOL WINAPI pack_ini ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI pack_ini ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		pack_ini "src-file"  (type6)
@@ -387,7 +387,7 @@ EXPORT BOOL WINAPI pack_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI pack_view ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI pack_view (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		pack_view encode  (type0)
@@ -404,7 +404,7 @@ EXPORT BOOL WINAPI pack_view ( int p1, int p2, int p3, int p4 )
 	char tmp[1024];
 
 	if (p1 == 0) p1 = -1;
-	int res = filepack.LoadPackFile(dpmname, p1);
+	int res = filepack.LoadPackFile(dpmname, (int)p1);
 	if (res<0) {
 		sprintf(tmp,"#Error %d in loading [%s].",res, dpmname);
 		filepack.Print(tmp);
@@ -420,7 +420,7 @@ EXPORT BOOL WINAPI pack_view ( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI pack_make ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI pack_make (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		pack_make mode, key(type0)
@@ -441,7 +441,7 @@ EXPORT BOOL WINAPI pack_make ( int p1, int p2, int p3, int p4 )
 #else
 	p1 = (int)time(0);			// Windows以外のランダムシード値
 #endif
-	if (filepack.SavePackFile(fname, PACKFILE, p1, p2) < 0) {
+	if (filepack.SavePackFile(fname, PACKFILE, (int)p1, (int)p2) < 0) {
 		st = 1;
 	}
 #endif
@@ -449,19 +449,19 @@ EXPORT BOOL WINAPI pack_make ( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI pack_opt ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI pack_opt (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		pack_opt sx,sy,disp_sw (type0)
 	//
-	opt1=p1;if (opt1==0) opt1=640;
-	opt2=p2;if (opt2==0) opt2=480;
-	opt3=p3;							// disp SW (1=blank window)
+	opt1=(int)p1;if (opt1==0) opt1=640;
+	opt2= (int)p2;if (opt2==0) opt2=480;
+	opt3= (int)p3;							// disp SW (1=blank window)
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI pack_rt ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI pack_rt ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		pack_rt "runtime-file"  (type6)
@@ -471,7 +471,7 @@ EXPORT BOOL WINAPI pack_rt ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI pack_exe ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI pack_exe (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		pack_exe mode (type0)
@@ -479,13 +479,13 @@ EXPORT BOOL WINAPI pack_exe ( int p1, int p2, int p3, int p4 )
 	int st;
 	st = 0;
 #ifdef DPM_SUPPORT
-	st=dpmc_mkexe(p1,hspexe,opt1,opt2,opt3);
+	st=dpmc_mkexe((int)p1,hspexe,opt1,opt2,opt3);
 #endif
 	return -st;
 }
 
 
-EXPORT BOOL WINAPI pack_get ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI pack_get ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		pack_get "get-file", enc  (type6)
@@ -493,10 +493,10 @@ EXPORT BOOL WINAPI pack_get ( BMSCR *bm, char *p1, int p2, int p3 )
 	int st;
 	st = 0;
 #ifdef DPM_SUPPORT
-	st=dpmc_get(p1);
+	st=dpmc_get((int)p1);
 #endif
 #ifdef DPM2_SUPPORT
-	if (filepack.ExtractFile(p1,NULL,p2) < 0) {
+	if (filepack.ExtractFile(p1,NULL, (int)p2) < 0) {
 		st = 1;
 	}
 #endif
@@ -508,7 +508,7 @@ EXPORT BOOL WINAPI pack_get ( BMSCR *bm, char *p1, int p2, int p3 )
 //		Additional service on 2.6
 //----------------------------------------------------------
 
-EXPORT BOOL WINAPI hsc3_getsym(int p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI hsc3_getsym(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//
 	//		hsc3_getsym val  (type1)
@@ -520,12 +520,12 @@ EXPORT BOOL WINAPI hsc3_getsym(int p1, int p2, int p3, int p4)
 		strcat(compath, "common\\");
 	}
 	hsc3->SetCommonPath(compath);
-	if (hsc3->GetCmdList(p1 | 2)) return -1;
+	if (hsc3->GetCmdList(((int)p1 | 2))) return -1;
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI hsc3_kwlbuf(char* p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI hsc3_kwlbuf(char* p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//
 	//		hsc3_kwlbuf bufvar, maxsize  (type1)
@@ -535,7 +535,7 @@ EXPORT BOOL WINAPI hsc3_kwlbuf(char* p1, int p2, int p3, int p4)
 		return -1;
 	}
 	if (p2) {
-		if (hsc3->GetAnalysisInfoSize() > p2) {
+		if (hsc3->GetAnalysisInfoSize() > (int)p2) {
 			return -1;
 		}
 	}
@@ -544,7 +544,7 @@ EXPORT BOOL WINAPI hsc3_kwlbuf(char* p1, int p2, int p3, int p4)
 }
 
 
-EXPORT BOOL WINAPI hsc3_kwlsize(int* p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI hsc3_kwlsize(int* p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//
 	//		hsc3_kwlsize var  (type1)
@@ -555,7 +555,7 @@ EXPORT BOOL WINAPI hsc3_kwlsize(int* p1, int p2, int p3, int p4)
 }
 
 
-EXPORT BOOL WINAPI hsc3_kwlclose(int p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI hsc3_kwlclose(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//
 	//		hsc3_kwlclose var  (type0)
@@ -565,7 +565,7 @@ EXPORT BOOL WINAPI hsc3_kwlclose(int p1, int p2, int p3, int p4)
 }
 
 
-EXPORT BOOL WINAPI hsc3_messize ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc3_messize ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		hsc3_messize val  (type1)
@@ -575,7 +575,7 @@ EXPORT BOOL WINAPI hsc3_messize ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		hsc3_make "myname",sw,0  (type6)
@@ -741,7 +741,7 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 //		Additional service on 3.0
 //----------------------------------------------------------
 
-EXPORT BOOL WINAPI hsc3_getruntime ( char *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc3_getruntime ( char *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		hsc3_getruntime val  (type5)
@@ -753,7 +753,7 @@ EXPORT BOOL WINAPI hsc3_getruntime ( char *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI hsc3_run ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI hsc3_run ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		hsc3_run path, debug_flag  (type1)
@@ -768,7 +768,7 @@ EXPORT BOOL WINAPI hsc3_run ( char *p1, int p2, int p3, int p4 )
 //		Additional service on 3.1
 //----------------------------------------------------------
 
-EXPORT BOOL WINAPI aht_source( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_source( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_source var, "aht_file", "path", id (type$202)
@@ -833,7 +833,7 @@ EXPORT BOOL WINAPI aht_source( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_ini ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_ini ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_ini "prj_file" (type6)
@@ -845,7 +845,7 @@ EXPORT BOOL WINAPI aht_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_stdbuf ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_stdbuf ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_stdbuf debug_buf  (type1)
@@ -856,7 +856,7 @@ EXPORT BOOL WINAPI aht_stdbuf ( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_stdsize ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_stdsize ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_stdsize var  (type1)
@@ -867,7 +867,7 @@ EXPORT BOOL WINAPI aht_stdsize ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_getopt( char *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getopt( char *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getopt var, "parameter", modelID, maxstr (type5)
@@ -877,10 +877,10 @@ EXPORT BOOL WINAPI aht_getopt( char *p1, char *p2, int p3, int p4 )
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
 
-	ahtmodel =aht->GetModel( p3 );
+	ahtmodel =aht->GetModel((int)p3 );
 	if ( ahtmodel == NULL ) return -1;
 	p = ahtmodel->GetAHTOption( p2 );
-	max = p4;
+	max = (int)p4;
 	if ( max <= 0 ) max = 64;
 	strcpy2( p1, p, max );
 
@@ -888,7 +888,7 @@ EXPORT BOOL WINAPI aht_getopt( char *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_getpropcnt ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getpropcnt ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getpropcnt var,modelID,sw  (type1)
@@ -896,7 +896,7 @@ EXPORT BOOL WINAPI aht_getpropcnt ( int *p1, int p2, int p3, int p4 )
 	//
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
-	ahtmodel =aht->GetModel( p2 );
+	ahtmodel =aht->GetModel((int)p2 );
 	if ( ahtmodel == NULL ) return -1;
 
 	switch( p3 ) {
@@ -911,21 +911,21 @@ EXPORT BOOL WINAPI aht_getpropcnt ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_getpropid ( int *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getpropid ( int *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getpropid var,"name",modelID  (type5)
 	//
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
-	ahtmodel =aht->GetModel( p3 );
+	ahtmodel =aht->GetModel((int)p3 );
 	if ( ahtmodel == NULL ) return -1;
 	*p1 = ahtmodel->GetPropertyID( p2 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_getprop( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getprop( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getprop var, DataID, propID, modelID (type1)
@@ -937,9 +937,9 @@ EXPORT BOOL WINAPI aht_getprop( char *p1, int p2, int p3, int p4 )
 	char *t;
 	if ( aht == NULL ) return -1;
 
-	ahtmodel =aht->GetModel( p4 );
+	ahtmodel =aht->GetModel((int)p4 );
 	if ( ahtmodel == NULL ) return -1;
-	prop = ahtmodel->GetProperty( p3 );
+	prop = ahtmodel->GetProperty((int)p3 );
 	p = (char **)(&prop->name);
 
 	max = 512;
@@ -952,7 +952,7 @@ EXPORT BOOL WINAPI aht_getprop( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_getproptype ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getproptype ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getproptype var, propID, modelID  (type1)
@@ -960,15 +960,15 @@ EXPORT BOOL WINAPI aht_getproptype ( int *p1, int p2, int p3, int p4 )
 	AHTPROP *prop;
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
-	ahtmodel =aht->GetModel( p3 );
+	ahtmodel =aht->GetModel((int)p3 );
 	if ( ahtmodel == NULL ) return -1;
-	prop = ahtmodel->GetProperty( p2 );
+	prop = ahtmodel->GetProperty((int)p2 );
 	*p1 = prop->ahttype;
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_getpropmode ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getpropmode ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getpropmode var, propID, modelID  (type1)
@@ -976,15 +976,15 @@ EXPORT BOOL WINAPI aht_getpropmode ( int *p1, int p2, int p3, int p4 )
 	AHTPROP *prop;
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
-	ahtmodel =aht->GetModel( p3 );
+	ahtmodel =aht->GetModel((int)p3 );
 	if ( ahtmodel == NULL ) return -1;
-	prop = ahtmodel->GetProperty( p2 );
+	prop = ahtmodel->GetProperty((int)p2 );
 	*p1 = prop->ahtmode;
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_make ( int *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_make ( int *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_make var, "outfile", modelID, mode (type5)
@@ -996,7 +996,7 @@ EXPORT BOOL WINAPI aht_make ( int *p1, char *p2, int p3, int p4 )
 	char fname2[_MAX_PATH];
 
 	if ( aht == NULL ) return -1;
-	ahtmodel =aht->GetModel( p3 );
+	ahtmodel =aht->GetModel((int)p3 );
 	if ( ahtmodel == NULL ) return -1;
 
 	strcpy( fname2, ahtmodel->GetSource() );
@@ -1036,7 +1036,7 @@ EXPORT BOOL WINAPI aht_make ( int *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_makeinit ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_makeinit (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_makeinit (type0)
@@ -1046,7 +1046,7 @@ EXPORT BOOL WINAPI aht_makeinit ( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_makeend ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_makeend ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_makeend "fname" (type6)
@@ -1059,7 +1059,7 @@ EXPORT BOOL WINAPI aht_makeend ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_makeput ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_makeput ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_makeput "message",sw (type6)
@@ -1073,7 +1073,7 @@ EXPORT BOOL WINAPI aht_makeput ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_setprop ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_setprop ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_setprop "defval", propID, modelID (type6)
@@ -1082,16 +1082,16 @@ EXPORT BOOL WINAPI aht_setprop ( BMSCR *bm, char *p1, int p2, int p3 )
 	AHTPROP *prop;
 	if ( aht == NULL ) return -1;
 
-	ahtmodel =aht->GetModel( p3 );
+	ahtmodel =aht->GetModel((int)p3 );
 	if ( ahtmodel == NULL ) return -1;
-	prop = ahtmodel->GetProperty( p2 );
+	prop = ahtmodel->GetProperty((int)p2 );
 	if ( prop == NULL ) return -1;
 	prop->SetNewVal( p1 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_sendstr ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_sendstr ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		send key event (type1)
 	//			aht_sendstr sendbuf, hwnd
@@ -1115,7 +1115,7 @@ EXPORT BOOL WINAPI aht_sendstr ( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_getmodcnt ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getmodcnt ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getmodcnt var  (type1)
@@ -1126,7 +1126,7 @@ EXPORT BOOL WINAPI aht_getmodcnt ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_getmodaxis ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_getmodaxis ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_getmodaxis var,modelID  (type1)
@@ -1134,7 +1134,7 @@ EXPORT BOOL WINAPI aht_getmodaxis ( int *p1, int p2, int p3, int p4 )
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
 
-	ahtmodel =aht->GetModel( p2 );
+	ahtmodel =aht->GetModel((int)p2 );
 	if ( ahtmodel == NULL ) return -1;
 
 	p1[0] = ahtmodel->GetCurX();
@@ -1147,7 +1147,7 @@ EXPORT BOOL WINAPI aht_getmodaxis ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI aht_setmodaxis ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_setmodaxis (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_setmodaxis modelID, x, y, page  (type0)
@@ -1155,16 +1155,16 @@ EXPORT BOOL WINAPI aht_setmodaxis ( int p1, int p2, int p3, int p4 )
 	AHTMODEL *ahtmodel;
 	if ( aht == NULL ) return -1;
 
-	ahtmodel =aht->GetModel( p1 );
+	ahtmodel =aht->GetModel((int)p1 );
 	if ( ahtmodel == NULL ) return -1;
 
-	ahtmodel->SetCur( p2, p3 );
-	ahtmodel->SetPage( p4 );
+	ahtmodel->SetCur((int)p2, (int)p3 );
+	ahtmodel->SetPage((int)p4 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_prjload ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_prjload ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_prjload "prj_file" (type6)
@@ -1177,7 +1177,7 @@ EXPORT BOOL WINAPI aht_prjload ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_prjsave ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_prjsave ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_prjsave "prj_file" (type6)
@@ -1190,7 +1190,7 @@ EXPORT BOOL WINAPI aht_prjsave ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_getprjmax( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_getprjmax( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_getprjmax var (type$202)
@@ -1209,7 +1209,7 @@ EXPORT BOOL WINAPI aht_getprjmax( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_getprjsrc( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_getprjsrc( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_getprjsrc var, var2, var3, id (type$202)
@@ -1243,7 +1243,7 @@ EXPORT BOOL WINAPI aht_getprjsrc( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_prjload2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_prjload2( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_prjload2 model_id, id (type$202)
@@ -1264,7 +1264,7 @@ EXPORT BOOL WINAPI aht_prjload2( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_prjloade( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_prjloade( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_prjloade (type$202)
@@ -1276,51 +1276,51 @@ EXPORT BOOL WINAPI aht_prjloade( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_delmod( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_delmod(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_delmod modelID  (type0)
 	//
 	if ( aht == NULL ) return -1;
-	aht->DeleteModel( p1 );
+	aht->DeleteModel((int)p1 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_linkmod( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_linkmod(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_linkmod modelID, NextID  (type0)
 	//
 	if ( aht == NULL ) return -1;
-	aht->LinkModel( p1, p2 );
+	aht->LinkModel((int)p1, (int)p2 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_unlinkmod( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_unlinkmod(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_unlinkmod modelID  (type0)
 	//
 	if ( aht == NULL ) return -1;
-	aht->UnlinkModel( p1 );
+	aht->UnlinkModel((int)p1 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_setpage( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aht_setpage(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		aht_setpage cur,max  (type0)
 	//
 	if ( aht == NULL ) return -1;
-	aht->SetPage( p1, p2 );
+	aht->SetPage((int)p1, (int)p2 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI aht_getpage( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_getpage( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_getpage var,var2 (type$202)
@@ -1345,7 +1345,7 @@ EXPORT BOOL WINAPI aht_getpage( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_propupdate( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_propupdate( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_propupdate model_id (type$202)
@@ -1359,7 +1359,7 @@ EXPORT BOOL WINAPI aht_propupdate( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_parts( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_parts( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_parts "path","list" (type$202)
@@ -1376,7 +1376,7 @@ EXPORT BOOL WINAPI aht_parts( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_getparts( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_getparts( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_getparts id, var,var2,var3 (type$202)
@@ -1410,7 +1410,7 @@ EXPORT BOOL WINAPI aht_getparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_listparts( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_listparts( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_listparts var,"clsname" (type$202)
@@ -1430,7 +1430,7 @@ EXPORT BOOL WINAPI aht_listparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_findstart( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_findstart( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_findstart var (type$202)
@@ -1443,7 +1443,7 @@ EXPORT BOOL WINAPI aht_findstart( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_findparts var (type$202)
@@ -1488,7 +1488,7 @@ EXPORT BOOL WINAPI aht_findparts( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_findend( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_findend( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_findend var, mode (type$202)
@@ -1526,7 +1526,7 @@ EXPORT BOOL WINAPI aht_findend( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aht_getexid( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aht_getexid( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		aht_getexid var, mode (type$202)
@@ -1565,7 +1565,7 @@ EXPORT BOOL WINAPI aht_getexid( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 #ifdef USE_HSMANAGER
 
-EXPORT BOOL WINAPI hman_init(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI hman_init(HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//
 	//		hman_init "pathname", mode (type$202)
@@ -1586,7 +1586,7 @@ EXPORT BOOL WINAPI hman_init(HSPEXINFO *hei, int p1, int p2, int p3)
 	return 0;
 }
 
-EXPORT BOOL WINAPI hman_search(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI hman_search(HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//
 	//		hman_search "keyword" (type$202)
@@ -1605,7 +1605,7 @@ EXPORT BOOL WINAPI hman_search(HSPEXINFO *hei, int p1, int p2, int p3)
 	return 0;
 }
 
-EXPORT BOOL WINAPI hman_getresult(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI hman_getresult(HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//
 	//		hman_getresult var,option (type$202)

@@ -1,11 +1,10 @@
-REM Batch build script for Visual Studio 2017/2019
+REM Batch build script for Visual Studio 2022
 echo off
 MSBuild win32/hspcmp.sln -t:Rebuild -p:Configuration=Release;Platform="x86"
 MSBuild win32dll/hspcmp.sln -t:Rebuild -p:Configuration=Release;Platform="x86"
-
-if not exist ..\hsp3\Release mkdir ..\hsp3\Release
-
-copy /B /Y win32\Release\hspcmp.exe ..\hsp3\Release
-copy /B /Y win32dll\Release\hspcmp.dll ..\hsp3\Release
-
-dir ..\hsp3\Release
+MSBuild win32/hspcmp.sln -t:Rebuild -p:Configuration=Release;Platform="x64"
+MSBuild win32dll/hspcmp.sln -t:Rebuild -p:Configuration=Release;Platform="x64"
+copy /B /Y win32\Release\hspcmp.exe ..\..\package\win32
+copy /B /Y win32dll\Release\hspcmp.dll ..\..\package\win32
+copy /B /Y win32\x64\Release\hspcmp.exe ..\..\package\win64
+copy /B /Y win32dll\x64\Release\hspcmp_64.dll ..\..\package\win64

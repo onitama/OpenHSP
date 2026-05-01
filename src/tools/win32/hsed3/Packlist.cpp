@@ -217,7 +217,7 @@ int pf_load( HWND hDlg )
 void set_dirlist( HWND hDlg )
 {
 	HWND h;
-	getcwd( szCDir, _MAX_PATH ) ;
+	_getcwd( szCDir, _MAX_PATH ) ;
 	h=GetDlgItem( hDlg,IDC_CDIR );SetWindowText( h,szCDir );
 	SendDlgItemMessage( hDlg,IDC_LIST1,LB_RESETCONTENT, 0, 0L );
 	SendDlgItemMessage( hDlg,IDC_LIST2,LB_RESETCONTENT, 0, 0L );
@@ -238,14 +238,14 @@ BOOL CALLBACK PlistDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 		h=GetDlgItem( hDlg,IDC_EDIT1 );
 		strcpy( szFilt,"*.*" );
 		SetWindowText( h,szFilt );
-		getcwd( szDefDir, 128 ) ;
+		_getcwd( szDefDir, 128 ) ;
 		set_dirlist( hDlg );
 		pf_ini();
 		pf_load( hDlg );
 		return TRUE ;
 
 	case WM_CLOSE:
-		chdir( szDefDir );
+		_chdir( szDefDir );
 		pf_bye();
 		EndDialog (hDlg, 0);
 		return TRUE;
@@ -258,9 +258,9 @@ BOOL CALLBACK PlistDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			if ( ctrl_id==IDC_LIST2 ) {
 				szText[strlen(szText)-1]=0;
 				if (szText[1]=='-') {
-					szText[3]=':';chdir(szText+2);
+					szText[3]=':';_chdir(szText+2);
 				}
-				else chdir(szText + 1);
+				else _chdir(szText + 1);
 				set_dirlist( hDlg );
 			}
 			if ( ctrl_id==IDC_LIST1 ) {
@@ -319,13 +319,13 @@ BOOL CALLBACK PlistDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			break;
 
 		case IDCM_BYE:
-			chdir( szDefDir );
+			_chdir( szDefDir );
 			pf_bye();
 			EndDialog (hDlg, 0);
 			return TRUE;
 
 		case IDOK:
-			chdir( szDefDir );
+			_chdir( szDefDir );
 			pf_save();
 			pf_bye();
 			EndDialog (hDlg, 0);

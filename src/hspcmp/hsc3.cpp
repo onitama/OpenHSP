@@ -252,7 +252,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2025(c)", HSC3TITLE, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2026(c)", HSC3TITLE, hspver );
 	tk.Mes( mm );
 
 	if (anabuf) {
@@ -361,7 +361,7 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 		tk.SetUTF8Input( 1 );
 	}
 
-	sprintf( mm,"#%s ver%s / onion software 1997-2025(c)", HSC3TITLE2, hspver );
+	sprintf( mm,"#%s ver%s / onion software 1997-2026(c)", HSC3TITLE2, hspver );
 	tk.Mes( mm );
 
 	if (genmode & HSC3_MODE_LABOUT) {

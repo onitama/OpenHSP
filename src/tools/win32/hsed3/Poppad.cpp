@@ -33,7 +33,7 @@ int getUnicodeOffset( char *text, int offset );
 		DLL support routines
 */
 
-typedef BOOL (CALLBACK *DLLFUNC)(int,int,int,int);
+typedef BOOL (CALLBACK *DLLFUNC)(INT_PTR, INT_PTR, INT_PTR, INT_PTR);
 
 DLLFUNC hsc_ini;
 DLLFUNC hsc_refname;
@@ -56,17 +56,20 @@ DLLFUNC hsc3_run;				// 3.0用の追加
 static	int dllflg=0;			// DLL uses flag
 static	HINSTANCE hDLL;			// Handle to DLL
 
-static char *SetDllFunc( char *name )
+static DLLFUNC SetDllFunc( char *name )
 {
 	//		DLL関数を割り当てる
 	//
-	char *ent;
+	DLLFUNC ent;
 	char fncname[128];
-	fncname[0]='_';
-	strcpy( fncname+1,name );
-	strcat( fncname,"@16" );
-	ent = (char *)GetProcAddress( hDLL, fncname );
-	if (ent==NULL) dllflg=-1;				// error flag
+	//fncname[0]='_';
+	strcpy( fncname,name );
+	//strcat( fncname,"@16" );
+	ent = (DLLFUNC)GetProcAddress( hDLL, fncname );
+	if (ent == NULL) {
+		MessageBox(NULL,"Error",name,0);
+		dllflg = -1;				// error flag
+	}
 	return ent;
 }
 
@@ -440,7 +443,7 @@ static int GetFileTitle2( char *bname, char *tname )
 	int a,b,len;
 	unsigned char a1;
 	b=-1;
-	len=strlen(bname);
+	len=(int)strlen(bname);
 	for(a=0;a<len;a++) {
 		a1=(unsigned char)bname[a];
 		if (a1=='\\') b=a;
@@ -465,7 +468,7 @@ static void packgo( void )
 		return;
 	}
 
-	pack_ini( 0,(int)"data",0,0 );	
+	pack_ini( 0,(INT_PTR)"data",0,0 );	
 	a=pack_make( 1,0,0,0 );
 	//dpmc_ini(errbuf,"data");
 	//a=dpmc_pack();
@@ -487,7 +490,7 @@ static void expack( int mode, char *exname, char *finmes )
 	char ftmp[_MAX_PATH];
 
 	strcpy(ftmp,exname);strcat(ftmp,".dpm");
-	pack_ini( 0,(int)exname,0,0 );	
+	pack_ini( 0,(INT_PTR)exname,0,0 );	
 	a=pack_make( 0,0,0,0 );
 	//dpmc_ini(errbuf,exname);
 	//a=dpmc_pack();
@@ -499,7 +502,7 @@ static void expack( int mode, char *exname, char *finmes )
 		wsprintf(hh,"%s\\runtime\\hspcl.hrt",szExeDir);
 	}
 
-	pack_rt( 0,(int)hh,0,0 );
+	pack_rt( 0,(INT_PTR)hh,0,0 );
 	pack_opt( hsp_wx,hsp_wy,(hsp_wd)|(hsp_orgpath<<1),0 );
 	a=pack_exe( mode,0,0,0 );
 	//a=dpmc_mkexe( hsp_fullscr,hh,hsp_wx,hsp_wy,hsp_wd );
@@ -578,7 +581,7 @@ static void hsprun( char *objname )
 	char cfname[256];
 	*cfname = 0;
 	if ( hsc3_getruntime != NULL ) {
-		hsc3_getruntime( (int)cfname, (int)objname, 0, 0 );
+		hsc3_getruntime( (INT_PTR)cfname, (INT_PTR)objname, 0, 0 );
 	}
 	if ( *cfname == 0 ) {
 		wsprintf( execmd,"\"%s\\%s\" ",szExeDir, DEFAULT_RUNTIME );
@@ -591,7 +594,7 @@ static void hsprun( char *objname )
 		strcat( execmd,hsp_cmdopt );
 	}
 
-	i = hsc3_run( (int)execmd, hsp_debug, 0, 0 );
+	i = hsc3_run( (INT_PTR)execmd, hsp_debug, 0, 0 );
 	if ( i ) {
 #ifdef JPMSG
 			TMes("実行用ランタイムファイルが見つかりません。");
@@ -688,7 +691,7 @@ static int mkobjfile( char *fname )
 	char a1;
 	char tmpst[_MAX_PATH];
 	char srcfn[_MAX_PATH];
-	a=strlen(fname)-1;
+	a=(int)strlen(fname)-1;
 	while(1) {
 		a1=fname[a];
 		if (a1==0x5c) { a++;break; }
@@ -703,9 +706,9 @@ static int mkobjfile( char *fname )
 	}
 	tmpst[a]=0;strcat(tmpst,".ax");
 
-	hsc_ini( 0,(int)srcfn, 0,0 );
-	hsc_refname( 0,(int)myfile(), 0,0 );
-	hsc_objname( 0,(int)tmpst, 0,0 );
+	hsc_ini( 0,(INT_PTR)srcfn, 0,0 );
+	hsc_refname( 0,(INT_PTR)myfile(), 0,0 );
+	hsc_objname( 0,(INT_PTR)tmpst, 0,0 );
 	a=hsc_comp( 0,hsp_extmacro^1,0,0 );
 	//a=tcomp_main( myfile(), srcfn, tmpst, errbuf, 0 );
 	return a;
@@ -722,9 +725,9 @@ static int mkobjfile2( char *fname )
 	strcpy(srcfn,fname);
 	strcpy(tmpst,"start.ax");
 
-	hsc_ini( 0,(int)srcfn, 0,0 );
-	hsc_refname( 0,(int)myfile(), 0,0 );
-	hsc_objname( 0,(int)tmpst, 0,0 );
+	hsc_ini( 0,(INT_PTR)srcfn, 0,0 );
+	hsc_refname( 0,(INT_PTR)myfile(), 0,0 );
+	hsc_objname( 0,(INT_PTR)tmpst, 0,0 );
 	a=hsc_comp( 0,hsp_extmacro^1,0,0 );
 	//a=tcomp_main( myfile(), srcfn, tmpst, errbuf, 0 );
 	return a;
@@ -742,14 +745,14 @@ static int mkexefile2( char *fname )
 	strcpy(srcfn,fname);
 	strcpy(tmpst,"start.ax");
 
-	hsc_ini( 0,(int)srcfn, 0,0 );
-	hsc_refname( 0,(int)myfile(), 0,0 );
-	hsc_objname( 0,(int)tmpst, 0,0 );
+	hsc_ini( 0,(INT_PTR)srcfn, 0,0 );
+	hsc_refname( 0,(INT_PTR)myfile(), 0,0 );
+	hsc_objname( 0,(INT_PTR)tmpst, 0,0 );
 	a=hsc_comp( 0,hsp_extmacro^1 | 4,0,0 );
 	if ( a ) return a;
 
 	sprintf( ftmp, "%s\\%s.dpm", szExeDir, srcfn );
-	a=hsc3_make( 0,(int)ftmp,1,0 );
+	a=hsc3_make( 0,(INT_PTR)ftmp,1,0 );
 	if ( a ) return a;
 	return 0;
 }
@@ -857,7 +860,7 @@ static void callhelp( void )
 	char mesb[512];
 
 	if (hsp_helpmode==0) {
-		a=strlen(kwstr);
+		a=(int)strlen(kwstr);
 
 		// 最初の6文字キー検索を廃止
 		//if (a>6) kwstr[6]=0;							// 始めの6文字
@@ -888,7 +891,7 @@ static void callhelp( void )
 #endif
 			return;
 		}
-		WinHelp( hwndEdit, helpopt, HELP_KEY, (DWORD)kwstr );
+		WinHelp( hwndEdit, helpopt, HELP_KEY, (ULONG_PTR)kwstr );
 		return;
 	}
 
@@ -915,7 +918,7 @@ static void callhelp( void )
 		link.pszMsgTitle = NULL;
 		link.pszWindow = NULL;
 		link.fIndexOnFail = TRUE;
-		rhw=HtmlHelp( GetDesktopWindow(), helpopt, HH_KEYWORD_LOOKUP, (DWORD)&link);
+		rhw=HtmlHelp( GetDesktopWindow(), helpopt, HH_KEYWORD_LOOKUP, (ULONG_PTR)&link);
 		if (rhw==NULL) {
 #ifdef JPMSG
 			TMes("HtmlHelpがインストールされていません。");
@@ -1308,7 +1311,7 @@ BOOL CALLBACK ErrDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
      switch (message)
           {
           case WM_INITDIALOG:
-				hsc_getmes( (int)errbuf,0,0,0 );
+				hsc_getmes( (INT_PTR)errbuf,0,0,0 );
 				SendMessage( GetDlgItem( hDlg, IDC_EDIT1 ), EM_LIMITTEXT, 0, 0L);
 				SetDlgItemText( hDlg,IDC_EDIT1,errbuf );
 				return TRUE ;
@@ -1346,7 +1349,7 @@ static void set_labellist( HWND hDlg, HWND hwndEdit )
 	GetWindowText( hwndEdit, buffer, len+1 );
 
 	SendMessage ( hwndEdit, EM_GETSEL, (WPARAM)&ln_s, (LPARAM)&ln_e );
-	myline = SendMessage ( hwndEdit, EM_LINEFROMCHAR, (WPARAM)ln_s, 0 )+1;
+	myline = (int)SendMessage ( hwndEdit, EM_LINEFROMCHAR, (WPARAM)ln_s, 0 )+1;
 
 	line = 1;
 	wp = buffer;
@@ -1406,7 +1409,7 @@ BOOL CALLBACK LabelDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
                switch (wParam)
                     {
                     case IDOK:
-						i=SendDlgItemMessage( hDlg,IDC_LIST2, LB_GETCURSEL,0,0L );
+						i=(int)SendDlgItemMessage( hDlg,IDC_LIST2, LB_GETCURSEL,0,0L );
 						if ( i != LB_ERR ) {
 							SendDlgItemMessage( hDlg,IDC_LIST2, LB_GETTEXT,i,(LPARAM)s1 );
 							cln=atoi(s1)-1;
@@ -1456,14 +1459,15 @@ int poppad_ini( HWND hwnd, LPARAM lParam )
                          0, 0, 0, 0,
                          hwnd, (HMENU) EDITID, hInst, NULL) ;
 
-               SendMessage (hwndEdit, EM_LIMITTEXT, 0, 0L) ;
-               Org_EditProc = (WNDPROC)GetWindowLong( hwndEdit, GWL_WNDPROC );
-               SetWindowLong( hwndEdit, GWL_WNDPROC, (LONG)MyEditProc );
+			   SendMessage (hwndEdit, EM_LIMITTEXT, 0, 0L) ;
+
+			   Org_EditProc = (WNDPROC)GetWindowLongPtr( hwndEdit, GWLP_WNDPROC );
+               SetWindowLongPtr( hwndEdit, GWLP_WNDPROC, (LONG_PTR)MyEditProc );
 			   DragAcceptFiles( hwndEdit, TRUE );
 
                // Initialize common dialog box stuff
 
-               PopFileInitialize (hwnd) ;
+			   PopFileInitialize (hwnd) ;
                PopFontInitialize (hwndEdit) ;
 
                iMsgFindReplace = RegisterWindowMessage (FINDMSGSTRING) ;
@@ -1506,13 +1510,13 @@ void poppad_reload( void )
 	if (strlen (szFileName) > 0)
 	{
 				    char a1,len;
-					len=strlen( szFileName );
+					len=(int)strlen( szFileName );
 					a1=szFileName[len-1];
 					if (a1==0x22) szFileName[len-1]=0;
 
                     GetFileTitle2( szFileName, szTitleName ) ;
 					strcpy( szDirName, szFileName );
-					len=strlen(szTitleName );
+					len=(int)strlen(szTitleName );
                     szDirName[strlen(szDirName)-len]=0;
                     _chdir(szDirName);
 					if (!PopFileRead (hwndEdit, szTitleName)) {
@@ -1632,7 +1636,7 @@ LRESULT poppad_term( UINT iMsg )
                if (!bNeedSave || IDCANCEL != AskAboutSave (hwbak, szTitleName))
 			   {
 					reg_save();					// config save to registry
-                    SetWindowLong( hwndEdit, GWL_WNDPROC, (LONG)Org_EditProc );
+                    SetWindowLongPtr( hwndEdit, GWLP_WNDPROC, (LONG_PTR)Org_EditProc );
                     DestroyWindow (hwbak) ;
 			   }
                break;
@@ -1651,7 +1655,7 @@ void PutLineNumber( void )
 	char szBuffer[256] ;
 	int ln,ln_s,ln_e;
 	SendMessage ( hwndEdit, EM_GETSEL, (WPARAM)&ln_s, (LPARAM)&ln_e );
-	ln=SendMessage ( hwndEdit, EM_LINEFROMCHAR, (WPARAM)ln_s, 0 );
+	ln=(int)SendMessage ( hwndEdit, EM_LINEFROMCHAR, (WPARAM)ln_s, 0 );
 	wsprintf (szBuffer, "line : %d", ln+1 ) ;
 	Statusbar_mes( szBuffer );
 }
@@ -1986,11 +1990,11 @@ LRESULT CALLBACK EditProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					case IDM_LOGCOMP:
 						PopFileWrite ( hwndEdit, "hsptmp" );
 						strcpy(tmpfn,"hsptmp");
-						hsc_ini( 0,(int)tmpfn, 0,0 );
+						hsc_ini( 0,(INT_PTR)tmpfn, 0,0 );
 						myfile();
-						hsc_refname( 0,(int)compfile, 0,0 );
+						hsc_refname( 0,(INT_PTR)compfile, 0,0 );
 						strcpy( objname,"obj" );
-						hsc_objname( 0,(int)objname, 0,0 );
+						hsc_objname( 0,(INT_PTR)objname, 0,0 );
 						a=hsc_comp( 1,hsp_extmacro^1,hsp_debug,0 );
 						if (a) {
 							err_prt(hwnd);
@@ -2020,8 +2024,8 @@ LRESULT CALLBACK EditProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 							strcpy( objname,hsp_extstr );
 							strcat( objname,".ax" );
 							strcat( hsp_extstr,".hsp" );
-							hsc_ini( 0,(int)hsp_extstr, 0,0 );
-							hsc_objname( 0,(int)objname, 0,0 );
+							hsc_ini( 0,(INT_PTR)hsp_extstr, 0,0 );
+							hsc_objname( 0,(INT_PTR)objname, 0,0 );
 							a=hsc_comp( 0,hsp_extmacro^1,0,0 );
 							//a=tcomp_main( hsp_extstr, hsp_extstr, objname, errbuf,0 );
 							if (a) { err_prt(hwnd);return 0; }
@@ -2034,8 +2038,8 @@ LRESULT CALLBACK EditProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 						}
 						strcpy( objname,"obj" );
 						strcat( hsp_extstr,".hsp" );
-						hsc_ini( 0,(int)hsp_extstr, 0,0 );
-						hsc_objname( 0,(int)objname, 0,0 );
+						hsc_ini( 0,(INT_PTR)hsp_extstr, 0,0 );
+						hsc_objname( 0,(INT_PTR)objname, 0,0 );
 						a=hsc_comp( 1,hsp_extmacro^1,hsp_debug,0 );
 						//a=tcomp_main( hsp_extstr, hsp_extstr, objname, errbuf,1 );
 						if (a) { err_prt(hwnd);return 0; }
@@ -2048,11 +2052,11 @@ LRESULT CALLBACK EditProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 					case IDM_HSPSYM:
 						strcpy(tmpfn,"hsptmp");
-						hsc_ini( 0,(int)tmpfn, 0,0 );
+						hsc_ini( 0,(INT_PTR)tmpfn, 0,0 );
 						myfile();
-						hsc_refname( 0,(int)compfile, 0,0 );
+						hsc_refname( 0,(INT_PTR)compfile, 0,0 );
 						strcpy( objname,"obj" );
-						hsc_objname( 0,(int)objname, 0,0 );
+						hsc_objname( 0,(INT_PTR)objname, 0,0 );
 						a=hsc3_getsym( hsp_extmacro^1,0,0,0 );
 						if (a) {
 #ifdef JPMSG

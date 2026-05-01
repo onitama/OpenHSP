@@ -1,4 +1,4 @@
-REM Batch build script for Visual Studio 2017/2019
+REM Batch build script for Visual Studio 2022
 echo off
 MSBuild win32gui/hsp3.sln -t:Clean -p:Configuration=Release;Platform="x86"
 MSBuild win32gui/hsp3.sln -t:Clean -p:Configuration=hsprt;Platform="x86"

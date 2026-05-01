@@ -7,6 +7,16 @@
 #define global _HSP3DISH
 #define global _HGIMG4
 
+#ifndef __hsp64__
+#define __hsp64__
+#runtime "hsp3_64"
+#bootopt hsp64 1
+#cmpopt utf8 1
+#ifndef _hsputf8
+#define _hsputf8
+#endif
+#endif
+
 #runtime "hsp3gp"
 #addition "dish_enhance.as"
 #addition "dish_sysreq.as"
@@ -134,6 +144,9 @@
 #const global GPANIM_OPT_PLAYING (5)
 #const global GPANIM_OPT_SPEED (6)
 #const global GPANIM_OPT_NAME (16)
+#const global GPANIM_OPT_ELAPSED_FLOAT (35)
+#const global GPANIM_OPT_BLEND_FLOAT (36)
+#const global GPANIM_OPT_SPEED_FLOAT (38)
 
 #const global GPGETMAT_OPT_OBJMAT (0)
 #const global GPGETMAT_OPT_SCRMAT (1)
