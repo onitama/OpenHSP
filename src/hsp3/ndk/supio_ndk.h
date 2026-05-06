@@ -15,7 +15,7 @@ HSPAPICHAR *ansichartoapichar(const char *, HSPAPICHAR **);
 char *apichartoansichar(const HSPAPICHAR *, char **);
 void freeac(char **);
 
-char *mem_ini( int size );
+char *mem_ini( size_t size );
 void mem_bye( void *ptr );
 int mem_save( char *fname, void *mem, int msize, int seekofs );
 void strcase( char *str );

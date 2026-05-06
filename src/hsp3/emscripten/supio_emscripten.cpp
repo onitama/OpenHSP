@@ -125,7 +125,7 @@ static int wildcard( char *text, char *wc )
 //		basic C I/O support
 //
 
-char *mem_ini( int size ) {
+char *mem_ini( size_t size ) {
 	return (char *)calloc(size,1);
 }
 
@@ -859,7 +859,7 @@ void Alertf( const char *format, ... )
 //
 //		Memory Manager
 //
-char *mem_alloc( void *base, int newsize, int oldsize )
+char *mem_alloc( void *base, size_t newsize, size_t oldsize )
 {
 	char *p;
 	if ( base == NULL ) {

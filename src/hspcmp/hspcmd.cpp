@@ -298,8 +298,8 @@ char 	s_rec[1]= "", *hsp_prestr[] =
 	"$18a 13 powf",						// (3.3)
 	"$18b 13 geteasef",					// (3.4)
 
-	// 3.7_64 int64 function
-	"$200 13 int64",					// (3.7_64)
+	// 3.8 function
+	"$200 13 int64",					// (3.8)
 
 	//	3.0 external sysvar,function
 

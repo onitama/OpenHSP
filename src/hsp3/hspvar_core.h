@@ -242,6 +242,7 @@ void HspVarCoreAllocPODArray( PVal *pval, const PVal *pval2, int basesize );
 #define HspVarCoreCnv( in1,in2,in3 ) hspvarproc[in2].Cnv( in3,in1 )		// in1->in2の型にin3ポインタを変換する
 
 #define HspVarCoreGetBlockSize( pv,in1,out ) hspvarproc[(pv)->flag].GetBlockSize( pv,in1,out )
+#define HspVarCoreGetBlockSize64( pv,in1,out ) hspvarproc[(pv)->flag].GetBlockSize64( pv,in1,out )
 #define HspVarCoreAllocBlock( pv,in1,in2 ) hspvarproc[(pv)->flag].AllocBlock( pv,in1,in2 )
 #define HspVarCoreGetUsing( pv,in1 ) hspvarproc[(pv)->flag].GetUsing( in1 )
 

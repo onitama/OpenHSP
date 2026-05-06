@@ -86,7 +86,7 @@ static int wildcard( char *text, char *wc )
 //
 static FILE *fp;
 
-char *mem_ini( int size ) {
+char *mem_ini( size_t size ) {
 	return (char *)calloc(size,1);
 }
 

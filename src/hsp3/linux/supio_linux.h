@@ -8,11 +8,11 @@
 
 size_t utf8strlen(const char *target);
 
-char *mem_ini( int size );
+char *mem_ini( size_t size );
 void mem_bye( void *ptr );
 int mem_save( char *fname, void *mem, int msize, int seekofs );
 void strcase( char *str );
-char *mem_alloc( void *base, int newsize, int oldsize );
+char *mem_alloc( void *base, size_t newsize, size_t oldsize );
 
 int strcpy2( char *str1, char *str2 );
 int strcat2( char *str1, char *str2 );

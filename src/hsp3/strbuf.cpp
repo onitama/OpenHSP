@@ -9,9 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "supio.h"
+#include "hsp3config.h"
 #include "strbuf.h"
-
+#include "supio.h"
 #include "hsp3debug.h"
 
 #define REALLOC realloc
@@ -88,9 +88,9 @@ static STRBUF *BlockEntry( void )
 	return buf;
 }
 
-static char *BlockAlloc( int size )
+static char *BlockAlloc(size_t size )
 {
-	int *p;
+	size_t*p;
 	STRBUF *st;
 	STRBUF *st2;
 	STRINF *inf;
@@ -99,13 +99,13 @@ static char *BlockAlloc( int size )
 	if ( size <= STRBUF_BLOCKSIZE ) {
 		inf->flag = STRINF_FLAG_USEINT;
 		inf->size = STRBUF_BLOCKSIZE;
-		p = (int *)st->data;
+		p = (size_t*)st->data;
 		inf->ptr = (char *)p;
 	} else {
 		inf->flag = STRINF_FLAG_USEEXT;
 		inf->size = size;
 		st2 = (STRBUF *)MALLOC( size + sizeof(STRINF) );
-		p = (int *)(st2->data);
+		p = (size_t*)(st2->data);
 		inf->extptr = st2;
 		inf->ptr = (char *)p;
 		st2->inf = *inf;
@@ -130,7 +130,7 @@ static void BlockFree( STRINF *inf )
 	inf->flag = STRINF_FLAG_NONE;
 }
 
-static char *BlockRealloc( STRBUF *st, int size )
+static char *BlockRealloc( STRBUF *st, size_t size )
 {
 	char *p;
 	STRINF *inf;
@@ -197,15 +197,15 @@ STRINF *sbGetSTRINF( char *ptr )
 }
 
 
-char *sbAlloc( int size )
+char *sbAlloc(size_t size )
 {
-	int sz;
+	size_t sz;
 	sz = size; if ( size < STRBUF_BLOCKSIZE ) sz = STRBUF_BLOCKSIZE;
 	return BlockAlloc( sz );
 }
 
 
-char *sbAllocClear( int size )
+char *sbAllocClear(size_t size )
 {
 	char *p;
 	p = sbAlloc( size );
@@ -227,7 +227,7 @@ void sbFree( void *ptr )
 }
 
 
-char *sbExpand( char *ptr, int size )
+char *sbExpand( char *ptr, size_t size )
 {
 	STRBUF *st;
 	st = (STRBUF *)( ptr - sizeof(STRINF) );
@@ -235,9 +235,9 @@ char *sbExpand( char *ptr, int size )
 }
 
 
-void sbCopy( char **pptr, char *data, int size )
+void sbCopy( char **pptr, char *data, size_t size )
 {
-	int sz;
+	size_t sz;
 	char *ptr;
 	char *p;
 	STRBUF *st;
@@ -250,10 +250,10 @@ void sbCopy( char **pptr, char *data, int size )
 }
 
 
-void sbAdd( char **pptr, char *data, int size, int mode )
+void sbAdd( char **pptr, char *data, size_t size, size_t mode )
 {
 	//		mode:0=normal/1=string
-	int sz,newsize;
+	size_t sz,newsize;
 	STRBUF *st;
 	char *ptr;
 	char *p;
@@ -278,13 +278,13 @@ void sbAdd( char **pptr, char *data, int size, int mode )
 
 void sbStrCopy( char **ptr, char *str )
 {
-	sbCopy( ptr, str, (int)strlen(str)+1 );
+	sbCopy( ptr, str, (size_t)strlen(str)+1 );
 }
 
 
 void sbStrAdd( char **ptr, char *str )
 {
-	sbAdd( ptr, str, (int)strlen(str)+1, 1 );
+	sbAdd( ptr, str, (size_t)strlen(str)+1, 1 );
 }
 
 

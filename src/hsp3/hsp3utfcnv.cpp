@@ -1,7 +1,7 @@
 //
 //	hsp3utfcnv.cpp functions
 //
-#include "hsp3config.h"
+#include "hsp3utfcnv.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -201,7 +201,7 @@ void freeac(char **ppc)
 //
 //		basic File I/O support
 //
-FILE *hsp3_fopen(char*name, int offset)
+FILE *hsp3_fopen(char*name, size_t offset)
 {
 	FILE* hsp3_fp = NULL;
 #ifdef HSPWIN
@@ -290,13 +290,13 @@ FILE *hsp3_fopen(char*name, int offset)
 #endif
 	if (hsp3_fp == NULL) return NULL;
 	if (offset > 0) {
-		fseek(hsp3_fp, offset, SEEK_SET);
+		hsp3_fseek(hsp3_fp, offset, SEEK_SET);
 	}
 	return hsp3_fp;
 }
 
 
-FILE* hsp3_fopenwrite(char* fname8, int offset)
+FILE* hsp3_fopenwrite(char* fname8, size_t offset)
 {
 	FILE* hsp3_fp = NULL;
 #ifdef HSPWIN
@@ -357,7 +357,7 @@ void hsp3_fclose(FILE* ptr)
 }
 
 
-int hsp3_flength(char* name)
+HSPPTRINT hsp3_flength(char* name)
 {
 #ifdef HSPIOS
     {
@@ -384,19 +384,23 @@ int hsp3_flength(char* name)
 	}
 	}
 #endif
-
+	HSPPTRINT length;
 	FILE* hsp3_fp = hsp3_fopen(name, 0);
 	if (hsp3_fp ==NULL) {
 		return -1;
 	}
 	fseek(hsp3_fp, 0, SEEK_END);
-	int length = (int)ftell(hsp3_fp);			// normal file size
+#if defined(HSPWIN)&&defined(HSP64)
+	length = (HSPPTRINT)_ftelli64(hsp3_fp);		// normal file size
+#else
+	length = (HSPPTRINT)ftell(hsp3_fp);			// normal file size
+#endif
 	hsp3_fclose(hsp3_fp);
 	return length;
 }
 
 
-int hsp3_fread( FILE* ptr, void *mem, int size )
+HSPPTRINT hsp3_fread( FILE* ptr, void *mem, size_t size )
 {
 	if (ptr == NULL) return -1;
 	if (mem == NULL) return -1;
@@ -408,12 +412,12 @@ int hsp3_fread( FILE* ptr, void *mem, int size )
 	}
 #endif
 
-	int len = (int)fread(mem, 1, size, ptr);
+	size_t len = fread(mem, 1, size, ptr);
 	return len;
 }
 
 
-int hsp3_fseek(FILE* ptr, int offset, int whence)
+int hsp3_fseek(FILE* ptr, size_t offset, int whence)
 {
 	if (ptr == NULL) return -1;
 
@@ -422,12 +426,15 @@ int hsp3_fseek(FILE* ptr, int offset, int whence)
 	return hgio_android_seek(ptr,offset,whence);
 	}
 #endif
-
-	return fseek(ptr,offset,whence);
+#if defined(HSPWIN)&&defined(HSP64)
+	return _fseeki64(ptr, offset, whence);
+#else
+	return fseek(ptr, offset, whence);
+#endif
 }
 
 
-int hsp3_binsave( char *fname8, void *mem, int msize, int seekofs )
+HSPPTRINT hsp3_binsave( char *fname8, void *mem, size_t msize, size_t seekofs )
 {
 #ifdef HSPIOS
     gb_savedata( fname8, (char *)mem, msize, seekofs );
@@ -436,7 +443,8 @@ int hsp3_binsave( char *fname8, void *mem, int msize, int seekofs )
 
 	FILE* hsp3_fp = hsp3_fopenwrite( fname8, seekofs );
 	if (hsp3_fp == NULL) return -1;
-	int flen = (int)fwrite( mem, 1, msize, hsp3_fp);
+	size_t flen = fwrite( mem, 1, msize, hsp3_fp);
+	if (flen < msize) flen = 0;
 
 #ifdef HSPNDK
 	fclose(hsp3_fp);
@@ -447,11 +455,11 @@ int hsp3_binsave( char *fname8, void *mem, int msize, int seekofs )
 #ifdef HSPWIN
 	_fcloseall();
 #endif
-	return flen;
+	return (HSPPTRINT)flen;
 }
 
 
-int hsp3_rawload(char* name, void* mem, int size, int seekofs)
+HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, size_t seekofs)
 {
 #ifdef HSPIOS
     int filesize = gb_existdata( name );

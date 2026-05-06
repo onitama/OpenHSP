@@ -14,6 +14,7 @@
 #include <limits.h>
 
 #include "hsp3config.h"
+#include "hsp3struct.h"
 
 #ifdef HSPRANDMT
 #include <random>
@@ -811,17 +812,18 @@ static int cmdfunc_intcmd( int cmd )
 		PVal *pval;
 		char *ptr;
 		int size;
-		int tmpsize;
+		size_t tmpsize;
+		size_t ep1, ep2;
 		code_event( HSPEVENT_FNAME, 0, 0, code_gets() );
 		ptr = code_getvptr( &pval, &size );
-		p1 = code_getdi( -1 );
-		p2 = code_getdi( -1 );
-		if (( p1 < 0 )||( p1 > size )) p1 = size;
+		ep1 = code_getdl( -1 );
+		ep2 = code_getdl( -1 );
+		if (( ep1 < 0 )||( ep1 > size )) ep1 = size;
 		if ( cmd == 0x16 ) {
-			tmpsize = p2;if ( tmpsize<0 ) tmpsize = 0;
-			code_event( HSPEVENT_FREAD, tmpsize, p1, ptr );
+			tmpsize = ep2;if ( tmpsize<0 ) tmpsize = 0;
+			code_event( HSPEVENT_FREAD, tmpsize, ep1, ptr );
 		} else {
-			code_event( HSPEVENT_FWRITE, p2, p1, ptr );
+			code_event( HSPEVENT_FWRITE, ep2, ep1, ptr );
 		}
 		break;
 		}
@@ -1032,19 +1034,20 @@ static int cmdfunc_intcmd( int cmd )
 		break;
 	case 0x25:								// noteload
 		{
-		int size;
+		HSPPTRINT size;
+		int64_t ep1;
 		char *ptr;
 		char *pdat;
 
 		code_event( HSPEVENT_FNAME, 0, 0, code_gets() );
-		p1 = code_getdi( -1 );
+		ep1 = code_getdl( -1 );
 		code_event( HSPEVENT_FEXIST, 0, 0, NULL );
 		size = ctx->strsize;
 		if ( size < 0 ) throw HSPERR_FILE_IO;
-		if ( p1>=0 ) if ( size >= p1 ) { ctx->strsize = size = p1; }
+		if ( ep1>=0 ) if ( size >= ep1 ) { ctx->strsize = size = (HSPPTRINT)ep1; }
 
 		pdat = note_update();
-		HspVarCoreAllocBlock( ctx->note_pval, (PDAT *)pdat, size+1 );
+		HspVarCoreAllocBlock( ctx->note_pval, (PDAT *)pdat, (int)size+1 );
 		ptr = (char *)note_update();
 		code_event( HSPEVENT_FREAD, 0, size, ptr );
 		ptr[size] = 0;
@@ -1538,7 +1541,7 @@ static void *reffunc_intfunc( int *type_res, int arg )
 #else
 		reffunc_intfunc_ivalue = (int)(size_t)(pdat);
 #endif
-		HspVarCoreGetBlockSize(pval, pdat, &ctx->strsize);
+		HspVarCoreGetBlockSize(pval, pdat, (int *) & ctx->strsize);
 		break;
 		}
 	case 0x00d:								// varuse

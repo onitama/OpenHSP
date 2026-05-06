@@ -605,7 +605,7 @@ AHTPROP *AHTMODEL::AddProperty( void )
 	AHTPROP *obj;
 	i = prop_cnt++;
 	sz = sizeof( void * ) * (( prop_cnt + 15 ) & 0xfff0 );
-	mem_prop = (AHTPROP **)mem_alloc( mem_prop, sz, mem_prop_size );
+	mem_prop = (AHTPROP **)mem_alloc( mem_prop, (size_t)sz, (size_t)mem_prop_size );
 	mem_prop_size = sz;
 	obj = new AHTPROP;
 	obj->SetId( i );

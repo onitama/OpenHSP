@@ -21,16 +21,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "hsp3gr_win.h"
-
 #include "../hsp3config.h"
+#include "hsp3gr_win.h"
 
 #include "../strbuf.h"
 #include "../hsp3.h"
 #include "../hsp3gr.h"
+#include "../hsp3ext.h"
 #include "../supio.h"
 
-#include "../win32gui/hsp3ext_win.h"
 #include "../win32gui/hsp3extlib.h"
 #include "../win32gui/hspvar_comobj.h"
 #include "../win32gui/hspvar_variant.h"
@@ -100,20 +99,33 @@ int hsp3win_debugopen( void )
 	//		デバッグウインドゥ表示
 	//
 #ifdef HSPDEBUG
-	if ( h_dbgwin != NULL ) return 0;
-	h_dbgwin = LoadLibrary( "hsp3debug.dll" );
-	if ( h_dbgwin != NULL ) {
-		dbgwin = (HSP3DBGFUNC)GetProcAddress( h_dbgwin, "_debugini@16" );
-		dbgnotice = (HSP3DBGFUNC)GetProcAddress( h_dbgwin, "_debug_notice@16" );
-		if (( dbgwin == NULL )||( dbgnotice == NULL )) h_dbgwin = NULL;
+	if (h_dbgwin != NULL) return 0;
+#ifdef HSP64
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE "_64.dll"));
+#else
+#ifndef HSPUTF8
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE ".dll"));
+#else
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE) TEXT("_u8.dll"));
+#endif
+#endif
+	if (h_dbgwin != NULL) {
+#ifdef HSP64
+		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, HSP3DEBUG_INIT);
+		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, HSP3DEBUG_NOTICE);
+#else
+		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_" HSP3DEBUG_INIT "@16");
+		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_" HSP3DEBUG_NOTICE "@16");
+#endif
+		if ((dbgwin == NULL) || (dbgnotice == NULL)) h_dbgwin = NULL;
 	}
-	if ( h_dbgwin == NULL ) {
-		hsp3win_dialog( "No debug module." );
+	if (h_dbgwin == NULL) {
+		hsp3win_dialog("No debug module.");
 		return -1;
 	}
 	dbginfo->get_value = hsp3win_debug;
-	dbgwin( dbginfo, 0, 0, 0 );
-	dbgwnd = (HWND)( dbginfo->dbgwin );
+	dbgwin(dbginfo, 0, 0, 0);
+	dbgwnd = (HWND)(dbginfo->dbgwin);
 #endif
 	return 0;
 }
@@ -228,13 +240,16 @@ int hsp3cl_init( char *startfile )
 	//		システム関連の初期化
 	//		( mode:0=debug/1=release )
 	//
-	int a,orgexe, mode;
+	int a,i,orgexe, mode;
 	int hsp_sum, hsp_dec;
 	char a1;
 	char *ss;
 #ifdef HSPDEBUG
-	char fname[_MAX_PATH+1];
-	int i;
+	char fname[_MAX_PATH + 1];
+#endif
+#ifndef HSPDEBUG
+	TCHAR fnamew[_MAX_PATH + 1];
+	TCHAR fnamew2[_MAX_PATH + 1];
 #endif
 
 #ifdef HSPCL_WIN
@@ -270,7 +285,11 @@ int hsp3cl_init( char *startfile )
 	hsp->SetFileName( fname );
 
 	if ( i == 0 ) {
-		printf( "OpenHSP CL ver%s / onion software 1997-2022\n", hspver );
+#ifdef HSP64
+		printf("OpenHSP CL64 ver%s / onion software 1997-2026\n", hspver);
+#else
+		printf("OpenHSP CL ver%s / onion software 1997-2026\n", hspver);
+#endif
 		return -1;
 	}
 #else
@@ -298,11 +317,10 @@ int hsp3cl_init( char *startfile )
 	//		起動ファイルのディレクトリをカレントにする
 	//
 #ifndef HSPDEBUG
-	if (( hsp_wd & 2 ) == 0 ) {
-		char fname[_MAX_PATH+1];
-		GetModuleFileName( NULL, fname, _MAX_PATH );
-		getpath( fname, fname, 32 );
-		changedir( fname );
+	if ((hsp_wd & 2) == 0) {
+		GetModuleFileName(NULL, fnamew, _MAX_PATH);
+		getpathW(fnamew, fnamew2, 32);
+		changedirW(fnamew2);
 	}
 #endif
 
@@ -354,8 +372,15 @@ static void hsp3cl_bye( void )
 {
 	//		HSP関連の解放
 	//
-	delete hsp;
 
+#ifdef HSPDEBUG
+	//		デバッグウインドゥの解放
+	//
+	if (h_dbgwin != NULL) { FreeLibrary(h_dbgwin); h_dbgwin = NULL; }
+#endif
+
+
+	if (hsp != NULL) { delete hsp; hsp = NULL; }
 	DllManager().free_all_library();
 
 	//		システム関連の解放
@@ -392,7 +417,7 @@ void hsp3cl_error( void )
 #ifdef HSPDEBUG
 	hsp3win_debugopen();
 	hsp3win_dialog( errmsg );
-	MessageBox( NULL, errmsg, "Error",MB_ICONEXCLAMATION | MB_OK );
+	//MessageBox( NULL, errmsg, "Error",MB_ICONEXCLAMATION | MB_OK );
 #else
 	hsp3win_dialog( errmsg );
 #endif

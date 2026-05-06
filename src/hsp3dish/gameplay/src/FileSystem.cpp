@@ -24,6 +24,8 @@
 
 #ifdef HSPDISH
 //	HSP3 DPM2に対応
+#include "../../../hsp3/hsp3config.h"
+#include "../../../hsp3/hsp3struct.h"
 #include "../../../hsp3/dpmread.h"
 #include "../../../hsp3/filepack.h"
 #endif

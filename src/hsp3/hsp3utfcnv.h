@@ -15,6 +15,9 @@
 
 #ifdef HSPWIN
 
+#include "hsp3config.h"
+#include "hsp3struct.h"
+
 //	Wide/Multibyte conversion
 //
 int hsp3_to_utf16(void* out, char* in, int bufsize);
@@ -110,13 +113,13 @@ int StrCopyLetter(char* source, char* dest);
 //
 //		File Service
 //
-FILE* hsp3_fopen(char* name, int offset=0);
-FILE* hsp3_fopenwrite(char* name, int offset=-1);
+FILE* hsp3_fopen(char* name, size_t offset=0);
+FILE* hsp3_fopenwrite(char* name, size_t offset=-1);
 void hsp3_fclose(FILE* ptr);
-int hsp3_flength(char* name);
-int hsp3_fread(FILE* ptr, void* mem, int size);
-int hsp3_fseek(FILE* ptr, int offset, int whence);
-int hsp3_binsave(char* fname8, void* mem, int msize, int seekofs=-1);
-int hsp3_rawload(char* name, void* mem, int size, int seekofs);
+HSPPTRINT hsp3_flength(char* name);
+HSPPTRINT hsp3_fread(FILE* ptr, void* mem, size_t size);
+int hsp3_fseek(FILE* ptr, size_t offset, int whence);
+HSPPTRINT hsp3_binsave(char* fname8, void* mem, size_t msize, size_t seekofs=-1);
+HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, size_t seekofs);
 
 #endif

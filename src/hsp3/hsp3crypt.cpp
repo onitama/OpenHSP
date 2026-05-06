@@ -103,19 +103,20 @@ char *HSP3Crypt::GetBasePath(void)
 }
 
 
-int HSP3Crypt::DataSet( char *ptr, int size, int crypt )
+int HSP3Crypt::DataSet( char *ptr, size_t size, int crypt )
 {
 	this->buffer = ptr;
 	this->size = size;
 	this->cur = 0;
 	this->bufcrypt = crypt;
+
 	if (this->buffer == NULL) {
 		return 1;
 	}
 	return 0;
 }
 
-void HSP3Crypt::SetOffset(int offset)
+void HSP3Crypt::SetOffset(size_t offset)
 {
 	//
 	// バッファのオフセット指定
@@ -149,7 +150,7 @@ int HSP3Crypt::DecryptBuffer( void )
 }
 
 
-int HSP3Crypt::GetSize( void )
+size_t HSP3Crypt::GetSize( void )
 {
 	return this->size;
 }
@@ -175,11 +176,11 @@ int HSP3Crypt::GetSalt(int value)
 }
 
 
-int HSP3Crypt::GetCRC32( char *pbuffer, int psize )
+int HSP3Crypt::GetCRC32( char *pbuffer, size_t psize )
 {
 	unsigned long crc = 0xffffffff;
 
-	for (int cnt = 0; cnt < psize; cnt++){
+	for (size_t cnt = 0; cnt < psize; cnt++){
 		crc = crc_table[(crc ^ pbuffer[cnt])&0xff] ^ (crc >> 8);
 	}
 	return ~crc;

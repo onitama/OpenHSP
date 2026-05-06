@@ -1725,7 +1725,7 @@ char* code_estmppush(char* ptr)
 	char* mystr = ptr;
 	if (mystr == NULL) mystr = "";
 
-	int size = strlen(mystr);
+	int size = (int)strlen(mystr);
 	int mysize = (size + 3) & 0xfffffffc;
 	int prevptr = hspctx->estmp_ptr;
 
@@ -1783,7 +1783,7 @@ char *code_getsptr( int *type )
 			sptr_res = *(int*)mpval->pt;
 			bp = (char *)&sptr_res;
 		} else if ( fl == HSPVAR_FLAG_INT64 ) {
-			sptr_res = *(int64_t*)mpval->pt;
+			sptr_res = *(HSPPTRINT *)mpval->pt;
 			bp = (char *)&sptr_res;
 		} else if ( fl == HSPVAR_FLAG_STR ) {
 			bp = mpval->pt;
@@ -2114,7 +2114,9 @@ static int cmdfunc_prog( int cmd )
 	//
 
 	int p1,p2,p3,p4,p5;
+#ifdef HSP64
 	int64_t lp1;
+#endif
 
 	code_next();							// 次のコードを取得(最初に必ず必要です)
 
@@ -2570,7 +2572,8 @@ static void *reffunc_sysvar( int *type_res, int arg )
 		reffunc_intfunc_ivalue = hspctx->err;
 		break;
 	case 0x006:								// strsize
-		reffunc_intfunc_ivalue = hspctx->strsize;
+		*type_res = HSPCTX_STAT_FLAG;
+		ptr = &hspctx->strsize;
 		break;
 	case 0x007:								// looplev
 		reffunc_intfunc_ivalue = hspctx->looplev;
@@ -3016,13 +3019,13 @@ static void *code_cnv_getv( void )
 	return (void *)ptr;
 }
 
-static int code_cnv_realloc( PVal *pv, int size, int mode )
+static int code_cnv_realloc( PVal *pv, HSPPTRINT size, int mode )
 {
 	//		変数データバッファを拡張(2.61互換用)
 	//
 	PDAT *ptr;
 	ptr = HspVarCorePtrAPTR( pv, 0 );
-	HspVarCoreAllocBlock( pv, ptr, size );
+	HspVarCoreAllocBlock( pv, ptr, (int)size );
 	return 0;
 }
 
@@ -3103,9 +3106,13 @@ void code_init( void )
 	//		3.1拡張フィールド
 	exinfo->HspFunc_varname = code_getdebug_varname;
 	exinfo->HspFunc_seekvar = code_getdebug_seekvar;
-
 	exinfo->HspFunc_prm_getns = code_gets;
 	exinfo->HspFunc_prm_getnds = code_getds;
+
+	//		3.8拡張フィールド
+	exinfo->HspFunc_prm_getl = code_getl;
+	exinfo->HspFunc_prm_getdl = code_getdl;
+
 	//		HSPCTXにコピーする
 	//
 	memcpy( &hspctx->exinfo, exinfo, sizeof(HSPEXINFO30) );
@@ -3443,6 +3450,7 @@ int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 	//		(result:0=Not care/1=Done)
 	//
 	int res;
+	size_t sz;
 	res = call_eventfunc( evcategory[event], event, prm1, prm2, prm3 ); 
 	if ( res ) return res;
 
@@ -3472,15 +3480,15 @@ int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 		break;
 	case HSPEVENT_FREAD:
 		// fread (fseek,size,loadptr)
-		res = dpm_read( hspctx->fnbuffer, prm3, prm2, prm1 );
-		if ( res < 0 ) throw HSPERR_FILE_IO;
-		hspctx->strsize = res;
+		sz = dpm_read( hspctx->fnbuffer, prm3, prm2, prm1 );
+		if ( sz < 0 ) throw HSPERR_FILE_IO;
+		hspctx->strsize = sz;
 		break;
 	case HSPEVENT_FWRITE:
 		// fwrite (fseek,size,saveptr)
-		res = hsp3_binsave(hspctx->fnbuffer, prm3, prm2, prm1);
-		if ( res < 0 ) throw HSPERR_FILE_IO;
-		hspctx->strsize = res;
+		sz = hsp3_binsave(hspctx->fnbuffer, prm3, prm2, prm1);
+		if ( sz < 0 ) throw HSPERR_FILE_IO;
+		hspctx->strsize = sz;
 		break;
 	case HSPEVENT_FEXIST:
 		// exist (n/a,n/a,n/a)

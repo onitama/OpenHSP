@@ -5,7 +5,7 @@
 
 #include "../hsp3utfcnv.h"
 
-char *mem_ini( int size );
+char *mem_ini(size_t size );
 void mem_bye( void *ptr );
 
 //void prtini( char *mes );

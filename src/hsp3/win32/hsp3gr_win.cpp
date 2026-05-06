@@ -107,32 +107,32 @@ void ex_mref( PVal *pval, int prm )
 */
 /*------------------------------------------------------------*/
 
-static void cmdfunc_dialog( void )
+static void cmdfunc_dialog(void)
 {
 	// dialog
 	int i;
-	char *ptr;
-	char *ps;
+	int p1, p2;
+	char* ptr;
+	char* ps;
 	char stmp[0x4000];
-	ptr = code_getdsi( "" );
-	strncpy( stmp, ptr, 0x4000-1 );
-	p1 = code_getdi( 0 );
+	HSPAPICHAR* hactmp1 = 0;
+	HSPAPICHAR* hactmp2 = 0;
+	ptr = code_getdsi("");
+	strncpy(stmp, ptr, 0x4000 - 1);
+	p1 = code_getdi(0);
 	ps = code_getds("");
+	p2 = code_getdi(0);
 
-	if (p1&16) {
-		ctx->stat = fd_dialog( NULL, p1&3, stmp, ps );
-			if ( ctx->stat == 0 ) {
-				ctx->refstr[0] = 0;
-			} else {
-				strncpy( ctx->refstr, fd_getfname(), HSPCTX_REFSTR_MAX-1 );
-			}
+	if (p1 >= 64) {
+		return;
 	}
-	else {
-		i=0;
-		if (p1&1) i|=MB_ICONEXCLAMATION; else i|=MB_ICONINFORMATION;
-		if (p1&2) i|=MB_YESNO; else i|=MB_OK;
-		ctx->stat = MessageBox( NULL, stmp, ps, i );
-	}
+	i = 0;
+	if (p1 & 1) i |= MB_ICONEXCLAMATION; else i |= MB_ICONINFORMATION;
+	if (p1 & 2) i |= MB_YESNO; else i |= MB_OK;
+	ctx->stat = MessageBox(NULL,
+		chartoapichar(stmp, &hactmp1), chartoapichar(ps, &hactmp2), i);
+	freehac(&hactmp1);
+	freehac(&hactmp2);
 }
 
 

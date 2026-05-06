@@ -63,8 +63,8 @@ typedef struct HFPHED
 
 typedef struct MEMFILE {
 	char* pt;				// target ptr
-	int		cur;				// current ptr
-	int		size;				// size
+	HFPSIZE		cur;				// current ptr
+	HFPSIZE		size;				// size
 } MEMFILE;
 
 class HSP3Crypt;
@@ -85,24 +85,24 @@ public:
 	void DeleteSlot(int slot = 0);
 	int GetEmptySlot(void);
 
-	int LoadPackFile(char* name, int encode = 0, int dpmoffset = 0, int slot = 0);
+	int LoadPackFile(char* name, int encode = 0, HFPSIZE dpmoffset = 0, int slot = 0);
 	void PrintFiles(void);
-	int GetFileSize( char *name );
-	int GetCurrentDPMOffset(void);
+	HFPSIZE GetFileSize( char *name );
+	HFPSIZE GetCurrentDPMOffset(void);
 	void SetCurrentSlot(int slot) { curnum = slot; };
 
 	//	File Service
 	//
-	FILE* pack_fopen(char* name, int offset=0);
+	FILE* pack_fopen(char* name, HFPSIZE offset=0);
 	void pack_fclose(FILE* ptr);
 	int pack_fgetc(FILE* ptr);
-	int pack_flength(char* name);
-	int pack_fread(FILE* ptr, void* mem, int size);
-	int pack_fread(char* name, void* mem, int size, int seekofs);
+	HFPSIZE pack_flength(char* name);
+	HFPSIZE pack_fread(FILE* ptr, void* mem, HFPSIZE size);
+	HFPSIZE pack_fread(char* name, void* mem, HFPSIZE size, HFPSIZE seekofs);
 	int pack_fbase(char* name);
 
 	void pack_memenable(bool sw);
-	void pack_memfile(void *mem, int size);
+	void pack_memfile(void *mem, HFPSIZE size);
 	void pack_getinfstr(char* mem);
 
 	//	For Save Process
@@ -142,7 +142,7 @@ private:
 	CMemBuf *wrtstr;
 	CMemBuf* errbuf;
 
-	MEMFILE memfile = { NULL, 0, -1 };
+	MEMFILE memfile = { NULL, 0, (HFPSIZE) - 1};
 	bool memfile_enable;
 	bool memfile_active;
 
@@ -151,7 +151,7 @@ private:
 	HFPSIZE wrtpos;
 
 	int exedpm_slot;
-	int exedpm_offset;
+	HFPSIZE exedpm_offset;
 	int filebase;
 	int fopen_crypt;
 
@@ -185,16 +185,16 @@ public:
 	size_t read(void* readmem, size_t size, size_t count);
 	char* readLine(char* str, int num);
 	bool rewind(void);
-	bool seek(int offset, int origin);
-	int position(void);
+	bool seek(size_t offset, int origin);
+	size_t position(void);
 	bool eof(void);
 	size_t length(void);
 
 private:
 	int filebase;
-	int cur;
-	int size;
-	int baseoffset;
+	size_t cur;
+	size_t size;
+	size_t baseoffset;
 	int fopen_crypt;
 	bool endflag;
 	FILE* _file;

@@ -145,12 +145,12 @@ void FilePack::pack_memenable(bool sw)
 }
 
 
-FILE* FilePack::pack_fopen(char* name, int offset)
+FILE* FilePack::pack_fopen(char* name, HFPSIZE offset)
 {
 	HFPHED* hed;
 	HFPOBJ* obj;
 	FILE* ff;
-	int ofs;
+	HFPSIZE ofs;
 	int encode;
 	filebase = HFP_FILEBASE_NORMAL;
 	encode = 0;
@@ -213,7 +213,7 @@ FILE* FilePack::pack_fopen(char* name, int offset)
 }
 
 
-int FilePack::GetCurrentDPMOffset(void)
+HFPSIZE FilePack::GetCurrentDPMOffset(void)
 {
 	if (curnum == exedpm_slot) {
 		return exedpm_offset;
@@ -236,20 +236,20 @@ void FilePack::pack_fclose(FILE* ptr)
 int FilePack::pack_fgetc(FILE* ptr)
 {
 	int i = 0;
-	int res = pack_fread(ptr,&i,1);
+	HFPSIZE res = pack_fread(ptr,&i,1);
 	if (res <= 0) return -1;
 	return i;
 }
 
 
-int FilePack::pack_flength(char* name)
+HFPSIZE FilePack::pack_flength(char* name)
 {
 
 	HFPOBJ* obj;
 	obj = SearchFileObject(name);
 	if (obj) return (int)obj->size;
 
-	int size = hsp3_flength(name);
+	HFPSIZE size = hsp3_flength(name);
 	if (size>=0) return size;
 
 	FILE* ff = pack_fopen(name);
@@ -266,9 +266,9 @@ int FilePack::pack_flength(char* name)
 }
 
 
-int FilePack::pack_fread(FILE* ptr, void* mem, int size)
+HFPSIZE FilePack::pack_fread(FILE* ptr, void* mem, HFPSIZE size)
 {
-	int len;
+	HFPSIZE len;
 	if (ptr == NULL) return -1;
 
 	if (memfile_active) {
@@ -287,7 +287,7 @@ int FilePack::pack_fread(FILE* ptr, void* mem, int size)
 		return len;
 	}
 	if (fopen_crypt) {
-		int i;
+		HFPSIZE i;
 		unsigned char* p = (unsigned char*)mem;
 		HSP3Crypt* cm = GetCurrentCryptManager();
 		for (i = 0; i < len; i++) {
@@ -308,7 +308,7 @@ int FilePack::pack_fbase(char* name)
 }
 
 
-void FilePack::pack_memfile(void* mem, int size)
+void FilePack::pack_memfile(void* mem, HFPSIZE size)
 {
 	memfile.pt = (char*)mem;
 	memfile.cur = 0;
@@ -323,12 +323,12 @@ void FilePack::pack_getinfstr(char* inf)
 		*inf = 0;
 		return;
 	}
-	int ofs = 0;
+	HFPSIZE ofs = 0;
 	HSP3Crypt* cm = hsp3crypt[0];
 	if (exedpm_slot == 0) {
 		ofs = exedpm_offset;
 	}
-	sprintf(inf, "%s,%d", cm->GetBasePath(), ofs );
+	sprintf(inf, "%s,%lld", cm->GetBasePath(), ofs );
 }
 
 
@@ -395,7 +395,7 @@ void FilePack::PrepareRead(int slot, int value)
 }
 
 
-int FilePack::LoadPackFile( char *fname, int encode, int dpmoffset, int slot)
+int FilePack::LoadPackFile( char *fname, int encode, HFPSIZE dpmoffset, int slot)
 {
 	FILE *ff;
 	HFPHED testhed;
@@ -566,7 +566,7 @@ char* FilePack::GetFolderName(HFPOBJ* obj)
 }
 
 
-int FilePack::GetFileSize(char* name)
+HFPSIZE FilePack::GetFileSize(char* name)
 {
 	HFPOBJ* obj;
 	obj = SearchFileObject(name);
@@ -636,13 +636,13 @@ HFPOBJ* FilePack::SearchFileObject(char* name)
 }
 
 
-int FilePack::pack_fread(char* name, void* mem, int size, int seekofs)
+HFPSIZE FilePack::pack_fread(char* name, void* mem, HFPSIZE size, HFPSIZE seekofs)
 {
 	FILE *pt = pack_fopen(name, seekofs);
 	if (pt == NULL) {
 		return hsp3_rawload(name, mem, size, seekofs);
 	}
-	int len = pack_fread(pt, mem, size);
+	HFPSIZE len = pack_fread(pt, mem, size);
 	pack_fclose(pt);
 	return len;
 }
@@ -673,7 +673,7 @@ bool DpmFile::open(FilePack* pack, char* fname)
 	HFPHED* hed;
 	HFPOBJ* obj;
 	FILE* ff;
-	int ofs, ofs2;
+	HFPSIZE ofs, ofs2;
 
 	filepack = pack;
 	if (filepack == NULL) return false;
@@ -809,7 +809,7 @@ char* DpmFile::readLine(char* str, int num)
 		if (size>0) {
 			if ( cur>=size ) break;
 		}
-		int res = hsp3_fread(_file, &a1, 1);
+		size_t res = hsp3_fread(_file, &a1, 1);
 		if ( res <= 0 ) {
 			endflag = true;
 			break;
@@ -841,14 +841,14 @@ bool DpmFile::rewind(void)
 }
 
 
-bool DpmFile::seek(int offset, int origin)
+bool DpmFile::seek(size_t offset, int origin)
 {
 	if ((filepack == NULL) || (_file == NULL)) return false;
 	//if (filebase == HFP_FILEBASE_NORMAL) {
 		//Alertf("SEEK:%d", offset);
 		//return hsp3_fseek(_file, offset, origin) == 0;
 	//}
-	int newpos;
+	size_t newpos;
 	switch (origin) {
 	case SEEK_CUR:
 		newpos = cur;
@@ -893,7 +893,7 @@ bool DpmFile::eof(void)
 }
 
 
-int DpmFile::position(void)
+size_t DpmFile::position(void)
 {
 	if ((filepack == NULL) || (_file == NULL)) return -1;
 	//if (filebase == HFP_FILEBASE_NORMAL) {

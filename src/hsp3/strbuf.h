@@ -6,6 +6,7 @@
 #define __strbuf_h
 
 #include "hsp3config.h"
+#include "hsp3struct.h"
 
 #define STRBUF_BLOCKSIZE 64
 #define STRBUF_BLOCK_DEFAULT 0x400
@@ -28,7 +29,7 @@ typedef struct
 	short flag;						// 使用フラグ(0=none/other=busy)
 	short exflag;					// 拡張フラグ(未使用)
 	STRBUF *intptr;					// 自身のアドレス
-	int size;						// 確保サイズ
+	size_t size;						// 確保サイズ
 	char *ptr;						// バッファポインタ
 	STRBUF *extptr;					// 外部バッファポインタ(STRINF)
 	void *opt;						// オプション(ユーザー定義用)
@@ -45,15 +46,15 @@ struct STRBUF
 void sbInit( void );
 void sbBye( void );
 
-char *sbAlloc( int size );
-char *sbAllocClear( int size );
+char *sbAlloc(size_t size );
+char *sbAllocClear(size_t size );
 void sbFree( void *ptr );
-char *sbExpand( char *ptr, int size );
+char *sbExpand( char *ptr, size_t size );
 STRINF *sbGetSTRINF( char *ptr );
 
-void sbCopy( char **ptr, char *data, int size );
+void sbCopy( char **ptr, char *data, size_t size );
 void sbStrCopy( char **ptr, char *str );
-void sbAdd( char **ptr, char *data, int size, int offset );
+void sbAdd( char **ptr, char *data, size_t size, size_t offset );
 void sbStrAdd( char **ptr, char *str );
 
 void *sbGetOption( char *ptr );

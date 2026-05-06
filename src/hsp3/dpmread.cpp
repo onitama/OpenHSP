@@ -21,6 +21,7 @@ extern HINSTANCE hDllInstance;
 #endif
 
 #include "hsp3config.h"
+#include "hsp3struct.h"
 #include "dpmread.h"
 #include "supio.h"
 
@@ -41,7 +42,7 @@ void dpm_close( FILE *fp )
 }
 
 
-int dpm_fread( void *mem, int size, FILE *stream )
+size_t dpm_fread( void *mem, size_t size, FILE *stream )
 {
 	return filepack.pack_fread(stream,mem,size);
 }
@@ -61,7 +62,7 @@ void* dpm_stream(char* fname)
 
 /*----------------------------------------------------------------------------------*/
 
-int dpm_ini( char *fname, long dpmofs, int chksum, int deckey, int slot )
+int dpm_ini( char *fname, size_t dpmofs, int chksum, int deckey, int slot )
 {
 	//
 	//		DPMファイル読み込みの初期化
@@ -108,13 +109,13 @@ void dpm_bye( void )
 }
 
 
-int dpm_read( char *fname, void *readmem, int rlen, int seekofs )
+size_t dpm_read( char *fname, void *readmem, size_t rlen, size_t seekofs )
 {
 	return filepack.pack_fread(fname, readmem, rlen, seekofs);
 }
 
 
-int dpm_exist( char *fname )
+size_t dpm_exist( char *fname )
 {
 	return filepack.pack_flength(fname);
 }
@@ -140,9 +141,9 @@ int dpm_filecopy( char *fname, char *sname )
 	FILE *fp1;
 	FILE *fp2;
 	int fres;
-	int flen;
-	int xlen;
-	int max=0x8000;
+	size_t flen;
+	size_t xlen;
+	size_t max=0x8000;
 	char *mem;
 #ifdef HSPWIN
 #ifdef HSPUTF8
@@ -198,7 +199,7 @@ void dpm_memfile( void *mem, int size )
 char *dpm_readalloc( char *fname )
 {
 	char *p;
-	int len;
+	size_t len;
 	len = filepack.pack_flength(fname);
 	if ( len < 0 ) return NULL;
 	p = mem_ini(len + 1);
