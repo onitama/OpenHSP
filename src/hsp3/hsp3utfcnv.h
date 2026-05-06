@@ -7,6 +7,9 @@
 
 #include <stdio.h>
 
+#include "hsp3config.h"
+#include "hsp3struct.h"
+
 //------------------------------------------------------------//
 /*
 	windows UTF8,UTF-16 / File 関連のユーティリティ
@@ -14,9 +17,6 @@
 //------------------------------------------------------------//
 
 #ifdef HSPWIN
-
-#include "hsp3config.h"
-#include "hsp3struct.h"
 
 //	Wide/Multibyte conversion
 //
