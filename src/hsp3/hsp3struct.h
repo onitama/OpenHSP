@@ -6,6 +6,7 @@
 #define __hsp3struct_h
 
 #include <cstdint>
+#include <stddef.h>
 #include "hspvar_core.h"
 #include "hsp3debug.h"
 
