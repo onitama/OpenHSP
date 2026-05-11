@@ -53,6 +53,7 @@ void bms_send( BMSCR *bm, int x, int y, int sx, int sy );
 #define code_getva exinfo->HspFunc_prm_getva
 #define code_setva exinfo->HspFunc_prm_setva
 #define hspmalloc exinfo->HspFunc_malloc
+#define hsprealloc exinfo->HspFunc_val_realloc
 #define hspfree exinfo->HspFunc_free
 #define hspexpand exinfo->HspFunc_expand
 
@@ -60,6 +61,19 @@ void bms_send( BMSCR *bm, int x, int y, int sx, int sy );
 #define registvar exinfo->HspFunc_registvar
 #define code_setpc exinfo->HspFunc_setpc
 #define code_call exinfo->HspFunc_call
+
+#define code_get exinfo->HspFunc_prm_get
+#define code_getv exinfo->HspFunc_prm_getv
+#define code_getd exinfo->HspFunc_prm_getd
+#define code_getdd exinfo->HspFunc_prm_getdd
+
+#define code_mref exinfo->HspFunc_mref
+#define code_fread exinfo->HspFunc_fread
+#define code_fsize exinfo->HspFunc_fsize
+
+#define code_dim exinfo->HspFunc_dim
+#define code_redim exinfo->HspFunc_redim
+#define code_array exinfo->HspFunc_array
 
 #define stat ctx->stat
 #define active_window (*exinfo->actscr)

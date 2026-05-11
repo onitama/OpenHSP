@@ -33,7 +33,7 @@
 //
 #ifdef HSP64
 #define HSPINT64 int64_t
-#define HSPPTRINT int64_t
+#define HSPPTRINT long long
 #define HSPCTX_STAT_FLAG HSPVAR_FLAG_INT64
 #else
 #define HSPINT64  int64_t

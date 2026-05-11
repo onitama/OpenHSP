@@ -1668,10 +1668,15 @@ void CToken::GenerateCodePP_func( int deftype )
 	}
 	if ( cg_libmode != CG_LIBMODE_DLL ) throw CGERROR_PP_NO_USELIB;
 
-	switch( ttype ) {
+	switch (ttype) {
 	case TK_OBJ:
-		sprintf( fname,"_%s@16",cg_str );
-		warn = 1;
+		if (hed_option & HEDINFO_HSP64) {
+			strncpy(fname, cg_str, 1023);
+		}
+		else {
+			sprintf(fname, "_%s@16", cg_str);
+			warn = 1;
+		}
 		break;
 	case TK_STRING:
 		strncpy( fname, cg_str, 1023 );
@@ -1688,7 +1693,12 @@ void CToken::GenerateCodePP_func( int deftype )
 	if ( ttype == TK_NUM ) {
 		int p1,p2,p3,p4,c1;
 		warn = 1;
-		p1 = p2 = p3 = p4 = MPTYPE_INUM;
+		if (hed_option & HEDINFO_HSP64) {
+			p1 = p2 = p3 = p4 = MPTYPE_INT64;
+		}
+		else {
+			p1 = p2 = p3 = p4 = MPTYPE_INUM;
+		}
 		c1 = val & 3;
 		if ( c1 == 1 ) p1 = MPTYPE_PVARPTR;
 		if ( c1 == 2 ) p1 = MPTYPE_PBMSCR;

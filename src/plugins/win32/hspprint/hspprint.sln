@@ -1,8 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37216.2 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hspinet", "hspinet.vcxproj", "{105EC53A-0067-442A-9BD0-EBD9DBC02C84}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hspprint", "hspprint.vcxproj", "{105EC53A-0067-442A-9BD0-EBD9DBC02C84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {47A6CEB3-D7B2-4232-90BF-318EC3078CB8}
+		SolutionGuid = {C7109E8A-A42C-473A-854D-71B677E30654}
 	EndGlobalSection
 EndGlobal

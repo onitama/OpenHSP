@@ -36,10 +36,10 @@ int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI prnflags( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI prnflags( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
-	//	ƒvƒŠƒ“ƒ^‚ð—ñ‹“‚·‚é‚½‚ß‚Ìƒtƒ‰ƒO‚ðÝ’è‚·‚é
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚’åˆ—æŒ™ã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚°ã‚’è¨­å®šã™ã‚‹
 	//		prnflags flags
 	//		
 	//		  PRINTER_ENUM_DEFAULT = 1
@@ -49,17 +49,17 @@ EXPORT BOOL WINAPI prnflags( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//		  PRINTER_ENUM_NETWORK = $40
 	//
 	int ep1;
-	ep1 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^1:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
 	DevSetPrinterFlags( ep1 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI enumprn( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI enumprn( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
-	//	ƒvƒŠƒ“ƒ^‚ð—ñ‹“‚·‚é
-	//		enumprn •Ï”
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚’åˆ—æŒ™ã™ã‚‹
+	//		enumprn å¤‰æ•°
 	//
 	char *ss;
 	PVal *pv;
@@ -67,13 +67,13 @@ EXPORT BOOL WINAPI enumprn( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int sz;
 	int num;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^1:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
 
 	sz = DevGetEnumPrinterName( NULL );
 	ss = (char *)malloc( sz+1 );
 	DevGetEnumPrinterName( ss );
 
-	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_STR, ss );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_STR, ss );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	free( ss );
 
 	num = DevGetNumPrinter();
@@ -81,30 +81,30 @@ EXPORT BOOL WINAPI enumprn( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI getdefprn( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI getdefprn( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
-	//	‹K’è‚ÌƒvƒŠƒ“ƒ^‚ðŽæ“¾‚·‚é
-	//		getdefprn •Ï”
+	//	è¦å®šã®ãƒ—ãƒªãƒ³ã‚¿ã‚’å–å¾—ã™ã‚‹
+	//		getdefprn å¤‰æ•°
 	//
 	char ss[512];
 	PVal *pv;
 	APTR ap;
 
 	*ss = 0;
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^1:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
 	DevGetDefaultPrinter( ss );
-	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_STR, ss );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_STR, ss );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI propprn( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI propprn( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
-	//	ƒvƒŠƒ“ƒ^î•ñ‚ÌŽæ“¾
-	//		propprn •Ï”,•Ï”2,id,type
+	//	ãƒ—ãƒªãƒ³ã‚¿æƒ…å ±ã®å–å¾—
+	//		propprn å¤‰æ•°,å¤‰æ•°2,id,type
 	//
 	PVal *pv;
 	APTR ap;
@@ -113,10 +113,10 @@ EXPORT BOOL WINAPI propprn( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int ep1,ep2,x,y;
 	DEVPRINTERDOC doc;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^2:•Ï”
-	ep1 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^3:”’l
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
 
 	if ( DevGetPrinterInfo( &doc, ep1 ) == false ) return -1;
 
@@ -140,18 +140,18 @@ EXPORT BOOL WINAPI propprn( HSPEXINFO *hei, int p1, int p2, int p3 )
 		break;
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_INT, &x );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, HSPVAR_FLAG_INT, &y );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_INT, &x );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, HSPVAR_FLAG_INT, &y );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI execprn( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI execprn( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
-	//	ƒvƒŠƒ“ƒ^‘—M
-	//		execprn ƒvƒŠƒ“ƒ^ID,x,y,sx,sy,bx,by,bsx,bsy,"name"
+	//	ãƒ—ãƒªãƒ³ã‚¿é€ä¿¡
+	//		execprn ãƒ—ãƒªãƒ³ã‚¿ID,x,y,sx,sy,bx,by,bsx,bsy,"name"
 	//
 	int ep1;
 	int x,y,sx,sy,bx,by,bsx,bsy;
@@ -160,7 +160,7 @@ EXPORT BOOL WINAPI execprn( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	bm = (BMSCR *)hei->HspFunc_getbmscr( *(hei->actscr) );
 
-	ep1 = hei->HspFunc_prm_getdi(0);	// ƒpƒ‰ƒ[ƒ^1:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
 	x = hei->HspFunc_prm_getdi(0);
 	y = hei->HspFunc_prm_getdi(0);
 	sx = hei->HspFunc_prm_getdi( bm->sx );
@@ -177,15 +177,15 @@ EXPORT BOOL WINAPI execprn( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI prndialog( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI prndialog( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
-	//	ƒvƒŠƒ“ƒ^‚ÌÝ’èƒ_ƒCƒAƒƒO‚ðŠJ‚­
+	//	ãƒ—ãƒªãƒ³ã‚¿ã®è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã
 	//		prndialog no
 	//
 	int ep1;
 	DEVPRINTERDOC doc;
-	ep1 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^1:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
 	DevGetPrinterProperty( &doc, ep1 );
 	return 0;
 }

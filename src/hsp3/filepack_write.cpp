@@ -52,11 +52,11 @@ void FilePack::PrepareWrite( int slot, int encode )
 }
 
 
-int FilePack::RegisterFile(char* name, int pcrypt, int orig)
+HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 {
 	//	HFPにファイルを追加
 	//
-	int length;
+	HSPPTRINT length;
 	int index;
 	int enc_crypt;
 	bool crypt_flag;
@@ -88,7 +88,7 @@ int FilePack::RegisterFile(char* name, int pcrypt, int orig)
 				getpath(name, fixname, 32);
 				strcat(fixname, ftmp);
 				strcat(fixname, "/*");
-				int res = RegisterFile(fixname, pcrypt);
+				HSPPTRINT res = RegisterFile(fixname, pcrypt);
 				if (res < 0) return res;
 			}
 			sbFree(flist);
@@ -103,7 +103,7 @@ int FilePack::RegisterFile(char* name, int pcrypt, int orig)
 				notelist.GetLine(ftmp, i);
 				strcpy(fixname, p_fdir);
 				strcat(fixname, ftmp);
-				int res = RegisterFile(fixname, pcrypt);
+				HSPPTRINT res = RegisterFile(fixname, pcrypt);
 				if (res < 0) return res;
 			}
 			sbFree(flist);
@@ -182,7 +182,11 @@ int FilePack::RegisterFile(char* name, int pcrypt, int orig)
 	obj.crypt = enc_crypt;
 
 	char msg[1024];
+#ifdef HSP64
+	sprintf(msg, "#%d %s (%lld)(%d)", wrtnum, name, length, enc_crypt);
+#else
 	sprintf(msg, "#%d %s (%d)(%d)", wrtnum, name, length, enc_crypt);
+#endif
 	Print(msg);
 
 	wrtpos += length;
@@ -233,7 +237,7 @@ int FilePack::RegisterFromPacklist( char *name, int def_crypt)
 			fn++; enc = crypt;
 			//	through
 		default:
-			int length;
+			HSPPTRINT length;
 			a1 = *fn;
 			if (a1 == '>') {
 				fn++;

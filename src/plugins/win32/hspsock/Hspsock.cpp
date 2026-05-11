@@ -7,7 +7,7 @@
 #include <windows.h>
 #include <winsock.h>
 #include <process.h>
-#include "hspdll.h"
+#include "../hpi3sample/hsp3plugin.h"
 
 
 int WINAPI hspsock_DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
@@ -36,11 +36,11 @@ int sockprep( void )
 	int  a,err;
 	WSADATA wsaData;
 
-	/* WinSock‚Ì‰Šú‰»‚ğs‚¤ */
-	wVersionRequested = MAKEWORD(1, 1);		/* ƒo[ƒWƒ‡ƒ“ 1.1 ‚ğ—v‹‚·‚é */
+	/* WinSockã®åˆæœŸåŒ–ã‚’è¡Œã† */
+	wVersionRequested = MAKEWORD(1, 1);		/* ãƒãƒ¼ã‚¸ãƒ§ãƒ³ 1.1 ã‚’è¦æ±‚ã™ã‚‹ */
 	err=WSAStartup(wVersionRequested, &wsaData);
 
-	//if (atexit((void (*)(void))(WSACleanup))) {		/* I—¹‚ÉWinSock‚ÌƒŠƒ\[ƒX‚ğ‰ğ•ú‚·‚é‚æ‚¤‚É‚µ‚Ä‚¨‚­ */
+	//if (atexit((void (*)(void))(WSACleanup))) {		/* çµ‚äº†æ™‚ã«WinSockã®ãƒªã‚½ãƒ¼ã‚¹ã‚’è§£æ”¾ã™ã‚‹ã‚ˆã†ã«ã—ã¦ãŠã */
 	//	return 1;
 	//}
 	if ( err!=0 ) return -1;
@@ -50,14 +50,14 @@ int sockprep( void )
 }
 
 
-EXPORT BOOL WINAPI sockopen ( int p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockopen ( HSPPTRINT p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
-	unsigned long serveraddr;		/* ƒT[ƒo‚ÌIPƒAƒhƒŒƒX */
-	struct hostent *serverhostent;	/* ƒT[ƒo‚ÌƒzƒXƒgî•ñ‚ğw‚·ƒ|ƒCƒ“ƒ^ */
-	struct  sockaddr_in     serversockaddr;		/* ƒT[ƒo‚ÌƒAƒhƒŒƒX */
+	unsigned long serveraddr;		/* ã‚µãƒ¼ãƒã®IPã‚¢ãƒ‰ãƒ¬ã‚¹ */
+	struct hostent *serverhostent;	/* ã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆæƒ…å ±ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿ */
+	struct  sockaddr_in     serversockaddr;		/* ã‚µãƒ¼ãƒã®ã‚¢ãƒ‰ãƒ¬ã‚¹ */
 	int port;
 
-	port=p3;
+	port=(int)p3;
 	if (sockf==0) {
 		if ( sockprep() ) return -1;
 	}
@@ -65,25 +65,25 @@ EXPORT BOOL WINAPI sockopen ( int p1, char *p2, int p3, int p4 )
 	soc[p1] = socket(PF_INET, SOCK_STREAM, 0);
 	if (soc[p1] == INVALID_SOCKET) return -2;
 
-	/* Name‚Éƒhƒbƒg‚Å‹æØ‚Á‚½10i”‚ÌIPƒAƒhƒŒƒX‚ª“ü‚Á‚Ä‚¢‚éê‡Aserveraddr‚É32bit®”‚ÌIPƒAƒhƒŒƒX‚ª•Ô‚è‚Ü‚· */
+	/* Nameã«ãƒ‰ãƒƒãƒˆã§åŒºåˆ‡ã£ãŸ10é€²æ•°ã®IPã‚¢ãƒ‰ãƒ¬ã‚¹ãŒå…¥ã£ã¦ã„ã‚‹å ´åˆã€serveraddrã«32bitæ•´æ•°ã®IPã‚¢ãƒ‰ãƒ¬ã‚¹ãŒè¿”ã‚Šã¾ã™ */
 	serveraddr = inet_addr(p2);
 	if (serveraddr == -1) {
-		/* ƒT[ƒo–¼‚©‚çƒT[ƒo‚ÌƒzƒXƒgî•ñ‚ğæ“¾‚µ‚Ü‚· */
+		/* ã‚µãƒ¼ãƒåã‹ã‚‰ã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆæƒ…å ±ã‚’å–å¾—ã—ã¾ã™ */
 		serverhostent = gethostbyname(p2);
 		if (serverhostent == NULL) {
 			return -3;
 		}else{
-			/* ƒT[ƒo‚ÌƒzƒXƒgî•ñ‚©‚çIPƒAƒhƒŒƒX‚ğserveraddr‚ÉƒRƒs[‚µ‚Ü‚· */
+			/* ã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆæƒ…å ±ã‹ã‚‰IPã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’serveraddrã«ã‚³ãƒ”ãƒ¼ã—ã¾ã™ */
 			serveraddr = *((unsigned long *)((serverhostent->h_addr_list)[0]));
 		}
 	}
 
-	/* ƒT[ƒo‚ÌƒAƒhƒŒƒX‚Ì\‘¢‘Ì‚ÉƒT[ƒo‚ÌIPƒAƒhƒŒƒX‚Æƒ|[ƒg”Ô†‚ğİ’è‚µ‚Ü‚· */
-	serversockaddr.sin_family       = AF_INET;		/* ƒCƒ“ƒ^[ƒlƒbƒg‚Ìê‡ */
-	serversockaddr.sin_addr.s_addr  = serveraddr;	/* ƒT[ƒo‚ÌIPƒAƒhƒŒƒX */
-	serversockaddr.sin_port         = htons((unsigned short)port);		/* ƒ|[ƒg”Ô† */
+	/* ã‚µãƒ¼ãƒã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã®æ§‹é€ ä½“ã«ã‚µãƒ¼ãƒã®IPã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ãƒãƒ¼ãƒˆç•ªå·ã‚’è¨­å®šã—ã¾ã™ */
+	serversockaddr.sin_family       = AF_INET;		/* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã®å ´åˆ */
+	serversockaddr.sin_addr.s_addr  = serveraddr;	/* ã‚µãƒ¼ãƒã®IPã‚¢ãƒ‰ãƒ¬ã‚¹ */
+	serversockaddr.sin_port         = htons((unsigned short)port);		/* ãƒãƒ¼ãƒˆç•ªå· */
 	memset(serversockaddr.sin_zero,(int)0,sizeof(serversockaddr.sin_zero));
-	/* w’è‚Ìƒ\ƒPƒbƒg‚ÅƒT[ƒo‚ÖƒRƒlƒNƒg‚µ‚Ü‚· */
+	/* æŒ‡å®šã®ã‚½ã‚±ãƒƒãƒˆã§ã‚µãƒ¼ãƒã¸ã‚³ãƒã‚¯ãƒˆã—ã¾ã™ */
 	if(connect(soc[p1],(struct sockaddr *)&serversockaddr,sizeof(serversockaddr)) == SOCKET_ERROR)
 	{
 		return -4;
@@ -95,7 +95,7 @@ EXPORT BOOL WINAPI sockopen ( int p1, char *p2, int p3, int p4 )
 
 DWORD WINAPI fnSockListen( LPVOID pVoid )
 {
-	//		listen‘Ò‹@—pƒXƒŒƒbƒh
+	//		listenå¾…æ©Ÿç”¨ã‚¹ãƒ¬ãƒƒãƒ‰
 	//
 	int p1;
 	p1=(int)pVoid;
@@ -109,13 +109,13 @@ DWORD WINAPI fnSockListen( LPVOID pVoid )
 }
 
 
-EXPORT BOOL WINAPI sockmake ( int p1, int p2, int p3, char *p4 )
+EXPORT BOOL WINAPI sockmake (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, char *p4 )
 {
 	//		sockmake id,port ( type $10 )
 	//
 	//
-	SOCKADDR_IN	addr;		/* ƒT[ƒo‚ÌƒAƒhƒŒƒX */
-	SOCKADDR_IN	from;		/* ƒNƒ‰ƒCƒAƒ“ƒg‚ÌƒAƒhƒŒƒX */
+	SOCKADDR_IN	addr;		/* ã‚µãƒ¼ãƒã®ã‚¢ãƒ‰ãƒ¬ã‚¹ */
+	SOCKADDR_IN	from;		/* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®ã‚¢ãƒ‰ãƒ¬ã‚¹ */
 	SOCKET mysoc;
 	int port,len;
 //	char s1[128];
@@ -123,7 +123,7 @@ EXPORT BOOL WINAPI sockmake ( int p1, int p2, int p3, char *p4 )
 //	DWORD dwThreadId=0;
 //	HANDLE hThread;
 	
-	port=p2;
+	port=(int)p2;
 	if (sockf==0) {
 		if ( sockprep() ) return -1;
 	}
@@ -137,9 +137,9 @@ EXPORT BOOL WINAPI sockmake ( int p1, int p2, int p3, char *p4 )
 		memset( &from,0,len );
 		memset( &addr,0,len );
 
-		addr.sin_family		 = AF_INET;						/* ƒCƒ“ƒ^[ƒlƒbƒg‚Ìê‡ */
-		addr.sin_port		 = htons((unsigned short)port);	/* ƒ|[ƒg”Ô† */
-		addr.sin_addr.s_addr = INADDR_ANY;					/* ƒT[ƒo‚ÌIPƒAƒhƒŒƒX */
+		addr.sin_family		 = AF_INET;						/* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã®å ´åˆ */
+		addr.sin_port		 = htons((unsigned short)port);	/* ãƒãƒ¼ãƒˆç•ªå· */
+		addr.sin_addr.s_addr = INADDR_ANY;					/* ã‚µãƒ¼ãƒã®IPã‚¢ãƒ‰ãƒ¬ã‚¹ */
 
 		if ( bind( mysoc,(LPSOCKADDR)&addr,sizeof(addr) ) ) return -3;
 
@@ -149,35 +149,18 @@ EXPORT BOOL WINAPI sockmake ( int p1, int p2, int p3, char *p4 )
 
 	svstat[p1]=1;
 	fnSockListen( (LPVOID)p1 );
-	//hThread = CreateThread( NULL, 0, fnSockListen, (LPVOID)p1, 0, &dwThreadId );
-	//svth[ p1 ] = hThread;
-/*
-	if ( listen(mysoc,5) ) return -4;
-
-	soc[p1]=accept(mysoc,(LPSOCKADDR)&from,&len);
-	if (soc[p1] == INVALID_SOCKET) return -5;
-
-	//(dllƒTƒCƒYíŒ¸‚Ì‚½‚ßˆÈ‰º‚ÌƒR[ƒh‚É·‚µ‘Ö‚¦)
-	//sprintf( s1,"%s:%d",inet_ntoa(from.sin_addr),ntohs(from.sin_port) );
-
-	strcpy( s1, inet_ntoa(from.sin_addr) );
-	strcat( s1,":" );
-	itoa( ntohs(from.sin_port),s2,10 );
-	strcat( s1,s2 );
-	strcpy( p4,s1 );
-*/  
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI sockwait ( int p1, int p2, int p3, char *p4 )
+EXPORT BOOL WINAPI sockwait (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, char *p4 )
 {
 	//		sockwait id ( type $10 )
 	//
 	//
 	int len;
     SOCKET soc2;
-	SOCKADDR_IN	from;		/* ƒNƒ‰ƒCƒAƒ“ƒg‚ÌƒAƒhƒŒƒX */
+	SOCKADDR_IN	from;		/* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®ã‚¢ãƒ‰ãƒ¬ã‚¹ */
 	char s1[128];
 	char s2[128];
 	int err;
@@ -213,7 +196,7 @@ EXPORT BOOL WINAPI sockwait ( int p1, int p2, int p3, char *p4 )
 		return -5;
 	}
 
-	//(dllƒTƒCƒYíŒ¸‚Ì‚½‚ßˆÈ‰º‚ÌƒR[ƒh‚É·‚µ‘Ö‚¦)
+	//(dllã‚µã‚¤ã‚ºå‰Šæ¸›ã®ãŸã‚ä»¥ä¸‹ã®ã‚³ãƒ¼ãƒ‰ã«å·®ã—æ›¿ãˆ)
 	//sprintf( s1,"%s:%d",inet_ntoa(from.sin_addr),ntohs(from.sin_port) );
 
 	if ( p2 == 0 ) {
@@ -225,7 +208,7 @@ EXPORT BOOL WINAPI sockwait ( int p1, int p2, int p3, char *p4 )
 
 	strcpy( s1, inet_ntoa(from.sin_addr) );
 	strcat( s1,":" );
-	itoa( ntohs(from.sin_port),s2,10 );
+	_itoa( ntohs(from.sin_port),s2,10 );
 	strcat( s1,s2 );
 	strcpy( p4,s1 );
 
@@ -233,12 +216,12 @@ EXPORT BOOL WINAPI sockwait ( int p1, int p2, int p3, char *p4 )
 }
 
 
-EXPORT BOOL WINAPI sockclose ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockclose (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
-	/* ƒVƒƒƒbƒgƒ_ƒEƒ“ */
+	/* ã‚·ãƒ£ãƒƒãƒˆãƒ€ã‚¦ãƒ³ */
 	if (socsv[p1]!=-1) shutdown( socsv[p1], 2 );
 	if (soc[p1]!=-1) shutdown(soc[p1], 2 );
-	/* ƒ\ƒPƒbƒg‚ğ”jŠü */
+	/* ã‚½ã‚±ãƒƒãƒˆã‚’ç ´æ£„ */
 	if (soc[p1]!=-1) closesocket(soc[p1]);
 	if (socsv[p1]!=-1) closesocket( socsv[p1] );
 
@@ -252,12 +235,12 @@ EXPORT BOOL WINAPI sockbye ( int p1, int p2, int p3, int p4 )
 	int a;
 	sockf=0;
 	for(a=0;a<SOCKMAX;a++) { sockclose( a,0,0,0 ); }
-	WSACleanup();						/* WinSock‚ÌƒŠƒ\[ƒX‚ğ‰ğ•ú‚·‚é */
+	WSACleanup();						/* WinSockã®ãƒªã‚½ãƒ¼ã‚¹ã‚’è§£æ”¾ã™ã‚‹ */
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI sockcheck( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockcheck(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		socket data recieve
@@ -282,33 +265,33 @@ EXPORT BOOL WINAPI sockcheck( int p1, int p2, int p3, int p4 )
 
 
 
-EXPORT BOOL WINAPI sockget ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockget ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		socket data recieve
 	//			sockget recv_buff, size, sockid
 	//
 	int recvsize;
-	int buf_len;		/* óM‚µ‚½ƒoƒCƒg” */
+	int buf_len;		/* å—ä¿¡ã—ãŸãƒã‚¤ãƒˆæ•° */
 	char *buf;
 
-	buf=p1;recvsize=p2;
+	buf=p1;recvsize=(int)p2;
 	if (recvsize==0) recvsize=64;
 
-	/* ƒ\ƒPƒbƒg‚©‚ç•¶š—ñ‚ğóM‚µ‚Ü‚· */
-	/* óM‚µ‚½•¶š—ñ‚Í buf ‚É“ü‚è‚Ü‚· */
-	/* óM‚·‚é•¶š—ñ‚ÍƒT[ƒo‚ª‘—M‚µ‚½‚à‚Ì‚Å‚· */
+	/* ã‚½ã‚±ãƒƒãƒˆã‹ã‚‰æ–‡å­—åˆ—ã‚’å—ä¿¡ã—ã¾ã™ */
+	/* å—ä¿¡ã—ãŸæ–‡å­—åˆ—ã¯ buf ã«å…¥ã‚Šã¾ã™ */
+	/* å—ä¿¡ã™ã‚‹æ–‡å­—åˆ—ã¯ã‚µãƒ¼ãƒãŒé€ä¿¡ã—ãŸã‚‚ã®ã§ã™ */
 	buf_len = recv(soc[p3], buf, recvsize - 1, 0);
 	if (buf_len == SOCKET_ERROR ){
 		return -1;
 	} else {
-		buf[buf_len] = 0;	/* óM‚µ‚½ƒoƒbƒtƒ@‚ÌŒã‚ë‚ÉNULL‚ğ•t‰Á‚·‚é */
+		buf[buf_len] = 0;	/* å—ä¿¡ã—ãŸãƒãƒƒãƒ•ã‚¡ã®å¾Œã‚ã«NULLã‚’ä»˜åŠ ã™ã‚‹ */
 	}
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI sockput ( BMSCR *bm, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockput ( BMSCR *bm, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		socket data send (type6)
@@ -318,8 +301,8 @@ EXPORT BOOL WINAPI sockput ( BMSCR *bm, char *p2, int p3, int p4 )
 
 	buf=p2;
 
-	/* w’è‚Ìƒ\ƒPƒbƒg‚É•¶š—ñ(buf)‚ğ‘—M‚µ‚Ü‚· */
-	/* ‘—M‚µ‚½•¶š—ñ‚ÍƒT[ƒo‚É“Í‚«‚Ü‚· */
+	/* æŒ‡å®šã®ã‚½ã‚±ãƒƒãƒˆã«æ–‡å­—åˆ—(buf)ã‚’é€ä¿¡ã—ã¾ã™ */
+	/* é€ä¿¡ã—ãŸæ–‡å­—åˆ—ã¯ã‚µãƒ¼ãƒã«å±Šãã¾ã™ */
 	if( send(soc[p3], buf, lstrlen(buf), 0) == SOCKET_ERROR ) {
 		return -1;
 	}
@@ -327,7 +310,7 @@ EXPORT BOOL WINAPI sockput ( BMSCR *bm, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI sockputc ( BMSCR *bm, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockputc ( BMSCR *bm, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		socket data send (1byte) type$02
@@ -338,7 +321,7 @@ EXPORT BOOL WINAPI sockputc ( BMSCR *bm, int p2, int p3, int p4 )
 	buf[0]=(char)p2;
 	buf[1]=0;
 
-	/* w’è‚Ìƒ\ƒPƒbƒg‚Ébuf‚ğ‘—M */
+	/* æŒ‡å®šã®ã‚½ã‚±ãƒƒãƒˆã«bufã‚’é€ä¿¡ */
 	if( send(soc[p3], buf, 1, 0) == SOCKET_ERROR ) {
 		return -1;
 	}
@@ -346,18 +329,18 @@ EXPORT BOOL WINAPI sockputc ( BMSCR *bm, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI sockgetc ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockgetc (HSPPTRINT*p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		socket data recieve (1byte)
 	//			sockgetc recv_val, sockid
 	//
-	int buf_len;		/* óM‚µ‚½ƒoƒCƒg” */
+	int buf_len;		/* å—ä¿¡ã—ãŸãƒã‚¤ãƒˆæ•° */
 	char buf[4];
 
-	/* ƒ\ƒPƒbƒg‚©‚ç•¶š—ñ‚ğóM‚µ‚Ü‚· */
-	/* óM‚µ‚½data‚Í buf ‚É“ü‚è‚Ü‚· */
-	/* óM‚·‚édata‚ÍƒT[ƒo‚ª‘—M‚µ‚½‚à‚Ì‚Å‚· */
+	/* ã‚½ã‚±ãƒƒãƒˆã‹ã‚‰æ–‡å­—åˆ—ã‚’å—ä¿¡ã—ã¾ã™ */
+	/* å—ä¿¡ã—ãŸdataã¯ buf ã«å…¥ã‚Šã¾ã™ */
+	/* å—ä¿¡ã™ã‚‹dataã¯ã‚µãƒ¼ãƒãŒé€ä¿¡ã—ãŸã‚‚ã®ã§ã™ */
 	buf_len = recv(soc[p2], buf, 1, 0);
 	if (buf_len == SOCKET_ERROR ) return -1;
 	if (buf_len == 0 ) {
@@ -368,44 +351,44 @@ EXPORT BOOL WINAPI sockgetc ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI sockputb ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockputb ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		socket data send (binary) type$01
 	//			sockputb send_buf, start, length, sockid
 	//
 	int sendsize;
-	int buf_len;		/* ‘—M‚µ‚½ƒoƒCƒg” */
+	int buf_len;		/* é€ä¿¡ã—ãŸãƒã‚¤ãƒˆæ•° */
 	char *buf;
 
 	buf=p1;buf+=p2;
-	sendsize=p3;
+	sendsize=(int)p3;
 	if (sendsize==0) sendsize=64;
 
-	/* w’è‚Ìƒ\ƒPƒbƒg‚Édata(buf)‚ğ‘—M‚µ‚Ü‚· */
-	/* ‘—M‚µ‚½data‚ÍƒT[ƒo‚É“Í‚«‚Ü‚· */
+	/* æŒ‡å®šã®ã‚½ã‚±ãƒƒãƒˆã«data(buf)ã‚’é€ä¿¡ã—ã¾ã™ */
+	/* é€ä¿¡ã—ãŸdataã¯ã‚µãƒ¼ãƒã«å±Šãã¾ã™ */
 	buf_len = send(soc[p4], buf, sendsize, 0);
 	if ( buf_len == SOCKET_ERROR ) return 0;
 	return -(buf_len);
 }
 
 
-EXPORT BOOL WINAPI sockgetb ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sockgetb ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		socket data recieve (binary) type$01
 	//			sockgetb recv_buf, start, length, sockid
 	//
 	int recvsize;
-	int buf_len;		/* óM‚µ‚½ƒoƒCƒg” */
+	int buf_len;		/* å—ä¿¡ã—ãŸãƒã‚¤ãƒˆæ•° */
 	char *buf;
 
 	buf=p1;buf+=p2;
-	recvsize=p3;
+	recvsize=(int)p3;
 	if (recvsize==0) recvsize=64;
 
-	/* óM‚µ‚½data‚Í buf ‚É“ü‚è‚Ü‚· */
-	/* óM‚·‚édata‚ÍƒT[ƒo‚ª‘—M‚µ‚½‚à‚Ì‚Å‚· */
+	/* å—ä¿¡ã—ãŸdataã¯ buf ã«å…¥ã‚Šã¾ã™ */
+	/* å—ä¿¡ã™ã‚‹dataã¯ã‚µãƒ¼ãƒãŒé€ä¿¡ã—ãŸã‚‚ã®ã§ã™ */
 	buf_len = recv(soc[p4], buf, recvsize , 0);
 	if (buf_len == SOCKET_ERROR ){
 		return 0;
@@ -414,7 +397,7 @@ EXPORT BOOL WINAPI sockgetb ( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI ipget(int a,int b,int c,char *d)
+EXPORT BOOL WINAPI ipget(HSPPTRINT a, HSPPTRINT b, HSPPTRINT c,char *d)
 {
 	char sh[256];
 	PHOSTENT hostent;

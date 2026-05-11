@@ -14,14 +14,14 @@
 
 #define DEBUGPRINTF printf
 
-//	—ñ‹“‚µ‚½‚¢ƒvƒŠƒ“ƒ^ƒIƒuƒWƒFƒNƒgƒ^ƒCƒv‚ğ
+//	åˆ—æŒ™ã—ãŸã„ãƒ—ãƒªãƒ³ã‚¿ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚¿ã‚¤ãƒ—ã‚’
 #define	DEV_PRINTE_ENUM	PRINTER_ENUM_LOCAL|PRINTER_ENUM_CONNECTIONS
 
 static int dev_printe_enum = DEV_PRINTE_ENUM;
 
 /**
- *	@brief	‹K’è‚ÌƒvƒŠƒ“ƒ^‚ğæ“¾(Windows2000ˆÈ~—p)
- *	@param[in]	pName	ƒvƒŠƒ“ƒ^–¼‚ªƒRƒs[‚³‚ê‚é
+ *	@brief	è¦å®šã®ãƒ—ãƒªãƒ³ã‚¿ã‚’å–å¾—(Windows2000ä»¥é™ç”¨)
+ *	@param[in]	pName	ãƒ—ãƒªãƒ³ã‚¿åãŒã‚³ãƒ”ãƒ¼ã•ã‚Œã‚‹
  */
 bool DevGetDefaultPrinter( char *pName ) {
 	DWORD dwSize = 512;
@@ -30,8 +30,8 @@ bool DevGetDefaultPrinter( char *pName ) {
 }
 
 /**
- *	@brief	ƒvƒŠƒ“ƒ^æ“¾ƒtƒ‰ƒO‚Ìİ’è
- *	@param[in]	printe_prm	PRINTER_ENUM_*‚Ì’l
+ *	@brief	ãƒ—ãƒªãƒ³ã‚¿å–å¾—ãƒ•ãƒ©ã‚°ã®è¨­å®š
+ *	@param[in]	printe_prm	PRINTER_ENUM_*ã®å€¤
  */
 void DevSetPrinterFlags(int printe_prm) {
 
@@ -43,12 +43,12 @@ void DevSetPrinterFlags(int printe_prm) {
 }
 
 /**
- *	@brief	ƒvƒŠƒ“ƒ^”æ“¾
- *	@return	ƒvƒŠƒ“ƒ^”
+ *	@brief	ãƒ—ãƒªãƒ³ã‚¿æ•°å–å¾—
+ *	@return	ãƒ—ãƒªãƒ³ã‚¿æ•°
  */
 int DevGetNumPrinter(void)
 {
-	//	ƒ[ƒJƒ‹ƒvƒŠƒ“ƒ^î•ñæ“¾
+	//	ãƒ­ãƒ¼ã‚«ãƒ«ãƒ—ãƒªãƒ³ã‚¿æƒ…å ±å–å¾—
 	DWORD	dwSize = 0;
 	DWORD	dwCount = 0;
 	::EnumPrinters( dev_printe_enum , NULL, 2, NULL, 0, &dwSize, &dwCount );
@@ -70,7 +70,7 @@ int DevGetNumPrinter(void)
 	}
 #endif
 
-	//	‰ğ•ú
+	//	è§£æ”¾
 	delete []pPrinter;
 
 	return dwCount;
@@ -78,7 +78,7 @@ int DevGetNumPrinter(void)
 
 bool DevGetEnumPrinterNameByNo( int No, char* pName )
 {
-	//	ƒ[ƒJƒ‹ƒvƒŠƒ“ƒ^î•ñæ“¾
+	//	ãƒ­ãƒ¼ã‚«ãƒ«ãƒ—ãƒªãƒ³ã‚¿æƒ…å ±å–å¾—
 	DWORD	dwSize = 0;
 	DWORD	dwCount = 0;
 	::EnumPrinters( dev_printe_enum , NULL, 2, NULL, 0, &dwSize, &dwCount );
@@ -98,20 +98,20 @@ bool DevGetEnumPrinterNameByNo( int No, char* pName )
 		pPI2++;
 	}
 
-	//	‰ğ•ú
+	//	è§£æ”¾
 	delete []pPrinter;
 
 	return bRet;
 }
 
 /**
- *	@brief	ƒvƒŠƒ“ƒ^–¼æ“¾
- *	@param[in]	*pName	ƒvƒŠƒ“ƒ^–¼‚ğæ“¾‚·‚éƒoƒbƒtƒ@ƒAƒhƒŒƒX
- *	@return		‘‚Ü‚ê‚½ƒoƒCƒgƒTƒCƒY
+ *	@brief	ãƒ—ãƒªãƒ³ã‚¿åå–å¾—
+ *	@param[in]	*pName	ãƒ—ãƒªãƒ³ã‚¿åã‚’å–å¾—ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚¢ãƒ‰ãƒ¬ã‚¹
+ *	@return		æ›¸è¾¼ã¾ã‚ŒãŸãƒã‚¤ãƒˆã‚µã‚¤ã‚º
  */
 int DevGetEnumPrinterName( char* pName )
 {
-	//	ƒ[ƒJƒ‹ƒvƒŠƒ“ƒ^î•ñæ“¾
+	//	ãƒ­ãƒ¼ã‚«ãƒ«ãƒ—ãƒªãƒ³ã‚¿æƒ…å ±å–å¾—
 	DWORD	dwSize = 0;
 	DWORD	dwCount = 0;
 	::EnumPrinters( dev_printe_enum , NULL, 2, NULL, 0, &dwSize, &dwCount );
@@ -133,25 +133,25 @@ int DevGetEnumPrinterName( char* pName )
 			dwSize++;	//	Null
 		}else{
 			if( pName != NULL )	::strcpy( &pName[dwSize], "\r\n" );
-			dwSize += 2;	//	‰üsƒR[ƒh
+			dwSize += 2;	//	æ”¹è¡Œã‚³ãƒ¼ãƒ‰
 		}
 		pPI2++;
 	}
 
-	//	‰ğ•ú
+	//	è§£æ”¾
 	delete []pPrinter;
 
 	return dwSize;
 }
 
 /**
- *	@brief	ƒvƒŠƒ“ƒ^ƒhƒ‰ƒCƒo–¼æ“¾
- *	@param[in]	*pName	ƒvƒŠƒ“ƒ^ƒhƒ‰ƒCƒo–¼‚ğæ“¾‚·‚éƒoƒbƒtƒ@ƒAƒhƒŒƒX
- *	@return		‘‚Ü‚ê‚½ƒoƒCƒgƒTƒCƒY
+ *	@brief	ãƒ—ãƒªãƒ³ã‚¿ãƒ‰ãƒ©ã‚¤ãƒåå–å¾—
+ *	@param[in]	*pName	ãƒ—ãƒªãƒ³ã‚¿ãƒ‰ãƒ©ã‚¤ãƒåã‚’å–å¾—ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚¢ãƒ‰ãƒ¬ã‚¹
+ *	@return		æ›¸è¾¼ã¾ã‚ŒãŸãƒã‚¤ãƒˆã‚µã‚¤ã‚º
  */
 int DevGetEnumPrinterDriverName( char* pName )
 {
-	//	ƒ[ƒJƒ‹ƒvƒŠƒ“ƒ^î•ñæ“¾
+	//	ãƒ­ãƒ¼ã‚«ãƒ«ãƒ—ãƒªãƒ³ã‚¿æƒ…å ±å–å¾—
 	DWORD	dwSize = 0;
 	DWORD	dwCount = 0;
 	::EnumPrinters( dev_printe_enum , NULL, 2, NULL, 0, &dwSize, &dwCount );
@@ -173,23 +173,23 @@ int DevGetEnumPrinterDriverName( char* pName )
 			dwSize++;	//	Null
 		}else{
 			if( pName != NULL )	::strcpy( &pName[dwSize], "\r\n" );
-			dwSize += 2;	//	‰üsƒR[ƒh
+			dwSize += 2;	//	æ”¹è¡Œã‚³ãƒ¼ãƒ‰
 		}
 		pPI2++;
 	}
 
-	//	‰ğ•ú
+	//	è§£æ”¾
 	delete []pPrinter;
 
 	return dwSize;
 }
 
 /**
- *	@brief	ƒvƒŠƒ“ƒ^ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒgî•ñæ“¾
+ *	@brief	ãƒ—ãƒªãƒ³ã‚¿ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆæƒ…å ±å–å¾—
  *	@param[out]	pPrinterDoc
- *	@param[in]	PrinterNo		ƒvƒŠƒ“ƒ^”Ô†
- *	@retval	true	¬Œ÷
- *	@retval	false	¸”s
+ *	@param[in]	PrinterNo		ãƒ—ãƒªãƒ³ã‚¿ç•ªå·
+ *	@retval	true	æˆåŠŸ
+ *	@retval	false	å¤±æ•—
  */
 bool DevGetPrinterInfo( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo )
 {
@@ -223,7 +223,7 @@ bool DevGetPrinterInfo( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo )
 		if( bFind == false )	return false;
 	}
 
-	//	ƒvƒŠƒ“ƒ^ƒI[ƒvƒ“
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚ªãƒ¼ãƒ—ãƒ³
 	HANDLE	hPrinter = NULL;
 	BOOL	Ret = ::OpenPrinter( PrinterName, &hPrinter, NULL );
 	assert( Ret != 0 );
@@ -234,11 +234,11 @@ bool DevGetPrinterInfo( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo )
 	LONG	lRet = ::DocumentProperties( NULL, hPrinter, NULL, (DEVMODE*)pDevMode, NULL, DM_OUT_BUFFER );
 	assert( lRet == IDOK );
 
-	//	ƒvƒŠƒ“ƒ^ƒNƒ[ƒY
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚¯ãƒ­ãƒ¼ã‚º
 	BOOL	bRet = ::ClosePrinter( hPrinter );
 	assert( bRet != 0 );
 
-	//	ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒgì¬
+	//	ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆä½œæˆ
 	HDC	hDC = ::CreateDC( DriverName, DeviceName, NULL, (DEVMODE*)pDevMode );
 	assert( hDC != NULL );
 
@@ -254,7 +254,7 @@ bool DevGetPrinterInfo( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo )
 	pPrinterDoc->PhysicalOffsetX = ::GetDeviceCaps( hDC, PHYSICALOFFSETX );
 	pPrinterDoc->PhysicalOffsetY = ::GetDeviceCaps( hDC, PHYSICALOFFSETY );
 
-	//	‰ğ•ú
+	//	è§£æ”¾
 	::DeleteDC( hDC );
 	delete	[]pDevMode;
 
@@ -262,10 +262,10 @@ bool DevGetPrinterInfo( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo )
 }
 
 /**
- *	@brief	ˆóüƒWƒ‡ƒuŠJn
+ *	@brief	å°åˆ·ã‚¸ãƒ§ãƒ–é–‹å§‹
  *	@param[out]	pPrinterDoc
- *	@param[in]	PrinterNo		ƒvƒŠƒ“ƒ^”Ô†
- *	@param[in]	pDocName		ˆóüƒWƒ‡ƒuƒhƒLƒ…ƒƒ“ƒg–¼
+ *	@param[in]	PrinterNo		ãƒ—ãƒªãƒ³ã‚¿ç•ªå·
+ *	@param[in]	pDocName		å°åˆ·ã‚¸ãƒ§ãƒ–ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆå
  */
 bool DevStartDocPrinter( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo, const char* pDocName )
 {
@@ -299,7 +299,7 @@ bool DevStartDocPrinter( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo, const 
 		if( bFind == false )	return false;
 	}
 
-	//	ƒvƒŠƒ“ƒ^ƒI[ƒvƒ“
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚ªãƒ¼ãƒ—ãƒ³
 	HANDLE	hPrinter = NULL;
 	BOOL	Ret = ::OpenPrinter( PrinterName, &hPrinter, NULL );
 	assert( Ret != 0 );
@@ -310,11 +310,11 @@ bool DevStartDocPrinter( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo, const 
 	LONG	lRet = ::DocumentProperties( NULL, hPrinter, NULL, (DEVMODE*)pDevMode, NULL, DM_OUT_BUFFER );
 	assert( lRet == IDOK );
 
-	//	ƒvƒŠƒ“ƒ^ƒNƒ[ƒY
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚¯ãƒ­ãƒ¼ã‚º
 	BOOL	bRet = ::ClosePrinter( hPrinter );
 	assert( bRet != 0 );
 
-	//	ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒgì¬
+	//	ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆä½œæˆ
 	HDC	hDC = ::CreateDC( DriverName, DeviceName, NULL, (DEVMODE*)pDevMode );
 	assert( hDC != NULL );
 	/*
@@ -332,9 +332,9 @@ bool DevStartDocPrinter( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo, const 
 	int	PhysicalOffsetX 	= ::GetDeviceCaps( hDC, PHYSICALOFFSETX );
 	int	PhysicalOffsetY		= ::GetDeviceCaps( hDC, PHYSICALOFFSETY );
 #ifdef	_DEBUG
-	DEBUGPRINTF( "Size( %d, %d )\n", HorzSize, VertSize );						//	ƒ~ƒŠƒ[ƒgƒ‹immj’PˆÊ‚Ì‰æ–Ê‚ÌƒTƒCƒY
-	DEBUGPRINTF( "Res( %d, %d )\n", HorzRes, VertRes );							//	ƒsƒNƒZƒ‹’PˆÊ‚Ì‰æ–Ê‚ÌƒTƒCƒY
-	DEBUGPRINTF( "LogPixels( %d, %d )\n", LogPixelsX, LogPixelsY );				//	˜_—ƒCƒ“ƒ`“–‚½‚è‚ÌƒsƒNƒZƒ‹”(DPI)
+	DEBUGPRINTF( "Size( %d, %d )\n", HorzSize, VertSize );						//	ãƒŸãƒªãƒ¡ãƒ¼ãƒˆãƒ«ï¼ˆmmï¼‰å˜ä½ã®ç”»é¢ã®ã‚µã‚¤ã‚º
+	DEBUGPRINTF( "Res( %d, %d )\n", HorzRes, VertRes );							//	ãƒ”ã‚¯ã‚»ãƒ«å˜ä½ã®ç”»é¢ã®ã‚µã‚¤ã‚º
+	DEBUGPRINTF( "LogPixels( %d, %d )\n", LogPixelsX, LogPixelsY );				//	è«–ç†ã‚¤ãƒ³ãƒå½“ãŸã‚Šã®ãƒ”ã‚¯ã‚»ãƒ«æ•°(DPI)
 	DEBUGPRINTF( "PhysicalSize( %d, %d )\n", PhysicalWidth, PhysicalHeight );	//	
 	DEBUGPRINTF( "PhysicalOffset( %d, %d )\n", PhysicalOffsetX, PhysicalOffsetY );
 #endif
@@ -349,7 +349,7 @@ bool DevStartDocPrinter( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo, const 
 	pPrinterDoc->PhysicalOffsetX = PhysicalOffsetX;
 	pPrinterDoc->PhysicalOffsetY = PhysicalOffsetY;
 
-	//	ƒhƒLƒ…ƒƒ“ƒgŠJn
+	//	ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆé–‹å§‹
 	DOCINFO	DocInfo;
 	ZeroMemory( &DocInfo, sizeof(DOCINFO) );
 	DocInfo.cbSize = sizeof(DOCINFO);
@@ -364,16 +364,16 @@ bool DevStartDocPrinter( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo, const 
 }
 
 /**
- *	@brief	ˆóüƒy[ƒWŠJn
+ *	@brief	å°åˆ·ãƒšãƒ¼ã‚¸é–‹å§‹
  */
 bool DevStartPagePrinter( DEVPRINTERDOC* pPrinterDoc )
 {
 	assert( pPrinterDoc != NULL );
 
-	//	ƒvƒŠƒ“ƒ^ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒgƒŠƒZƒbƒg
+	//	ãƒ—ãƒªãƒ³ã‚¿ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãƒªã‚»ãƒƒãƒˆ
 	ResetDC( pPrinterDoc->hDC, (DEVMODE*)pPrinterDoc->pDevMode );
 
-	//	ˆóüƒy[ƒWŠJn
+	//	å°åˆ·ãƒšãƒ¼ã‚¸é–‹å§‹
 	int	iRet = StartPage(pPrinterDoc->hDC);
 	if( iRet == 0 ){
 		DevAbortDocPrinter( pPrinterDoc );
@@ -384,7 +384,7 @@ bool DevStartPagePrinter( DEVPRINTERDOC* pPrinterDoc )
 }
 
 /**
- *	@brief	ˆóüƒy[ƒWI—¹
+ *	@brief	å°åˆ·ãƒšãƒ¼ã‚¸çµ‚äº†
  */
 bool DevEndPagePrinter( DEVPRINTERDOC* pPrinterDoc )
 {
@@ -400,7 +400,7 @@ bool DevEndPagePrinter( DEVPRINTERDOC* pPrinterDoc )
 }
 
 /**
- *	@brief	ˆóüƒWƒ‡ƒuI—¹
+ *	@brief	å°åˆ·ã‚¸ãƒ§ãƒ–çµ‚äº†
  */
 bool DevEndDocPrinter( DEVPRINTERDOC* pPrinterDoc )
 {
@@ -421,7 +421,7 @@ bool DevEndDocPrinter( DEVPRINTERDOC* pPrinterDoc )
 }
 
 /**
- *	@brief	Œ»İ‚ÌˆóüƒWƒ‡ƒu‚ğ’â~
+ *	@brief	ç¾åœ¨ã®å°åˆ·ã‚¸ãƒ§ãƒ–ã‚’åœæ­¢
  */
 void DevAbortDocPrinter( DEVPRINTERDOC* pPrinterDoc )
 {
@@ -438,7 +438,7 @@ void DevAbortDocPrinter( DEVPRINTERDOC* pPrinterDoc )
 }
 
 /**
- *	@brief	ƒrƒbƒgƒ}ƒbƒv“]‘—
+ *	@brief	ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—è»¢é€
  */
 bool DevPrintBitmapPrinter( const int PrinterNo, const char* pDocName, int DstX, int DstY, int DstW, int DstH, const BITMAPINFO* pBitmapInfo, const void* pBits, int SrcX, int SrcY, int SrcW, int SrcH )
 {
@@ -446,7 +446,7 @@ bool DevPrintBitmapPrinter( const int PrinterNo, const char* pDocName, int DstX,
 	DevStartDocPrinter( &PrinterDoc, PrinterNo, pDocName );
 	DevStartPagePrinter( &PrinterDoc );
 
-	//	ƒrƒbƒgƒ}ƒbƒv“]‘—
+	//	ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—è»¢é€
 	int	iRet = ::StretchDIBits( PrinterDoc.hDC, DstX, DstY, DstW, DstH, SrcX, SrcY, SrcW, SrcH, pBits, pBitmapInfo, DIB_RGB_COLORS, SRCCOPY );
 
 	DevEndPagePrinter( &PrinterDoc );
@@ -457,11 +457,11 @@ bool DevPrintBitmapPrinter( const int PrinterNo, const char* pDocName, int DstX,
 
 
 /**
- *	@brief	ƒvƒŠƒ“ƒ^ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒgî•ñæ“¾
+ *	@brief	ãƒ—ãƒªãƒ³ã‚¿ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆæƒ…å ±å–å¾—
  *	@param[out]	pPrinterDoc
- *	@param[in]	PrinterNo		ƒvƒŠƒ“ƒ^”Ô†
- *	@retval	true	¬Œ÷
- *	@retval	false	¸”s
+ *	@param[in]	PrinterNo		ãƒ—ãƒªãƒ³ã‚¿ç•ªå·
+ *	@retval	true	æˆåŠŸ
+ *	@retval	false	å¤±æ•—
  */
 bool DevGetPrinterProperty( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo )
 {
@@ -495,14 +495,14 @@ bool DevGetPrinterProperty( DEVPRINTERDOC* pPrinterDoc, const int PrinterNo )
 		if( bFind == false )	return false;
 	}
 
-	//	ƒvƒŠƒ“ƒ^ƒI[ƒvƒ“
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚ªãƒ¼ãƒ—ãƒ³
 	HANDLE	hPrinter = NULL;
 	BOOL	Ret = ::OpenPrinter( PrinterName, &hPrinter, NULL );
 	assert( Ret != 0 );
 
 	::PrinterProperties( NULL, hPrinter);
 
-	//	ƒvƒŠƒ“ƒ^ƒNƒ[ƒY
+	//	ãƒ—ãƒªãƒ³ã‚¿ã‚¯ãƒ­ãƒ¼ã‚º
 	BOOL	bRet = ::ClosePrinter( hPrinter );
 	assert( bRet != 0 );
 

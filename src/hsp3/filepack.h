@@ -161,7 +161,7 @@ private:
 	int CopyFileToDPM( FILE *ff, char *filename, HFPSIZE size, int encode );
 	void PrepareWrite(int slot = 0, int encode = 0);
 	int RegisterFromPacklist(char* name, int crypt = 1);
-	int RegisterFile(char* name, int crypt = 0, int orig = 0);
+	HSPPTRINT RegisterFile(char* name, int crypt = 0, int orig = 0);
 
 	//	Utility
 	//

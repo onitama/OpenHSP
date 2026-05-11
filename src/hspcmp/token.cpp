@@ -3368,30 +3368,37 @@ ppresult_t CToken::PP_CmpOpt( void )
 }
 
 
-ppresult_t CToken::PP_RuntimeOpt( void )
+void CToken::SetRuntime(char* runtime_name)
 {
-	//		#runtime解析
+	//		ランタイム名を設定
 	//
-	int i;
 	char tmp[1024];
-
-	i = GetToken();
-	if ( i != TK_STRING ) {
-		SetError("illegal runtime name"); return PPRESULT_ERROR;
-	}
-	strncpy( hed_runtime, (char *)s3, sizeof hed_runtime );
+	strncpy(hed_runtime, runtime_name, sizeof hed_runtime);
 	hed_runtime[sizeof hed_runtime - 1] = '\0';
 
-	if ( packbuf!=NULL ) {
-		sprintf( tmp, ";!runtime=%s.hrt", hed_runtime );
-		AddPackfile( tmp, 2 );
+	if (packbuf != NULL) {
+		sprintf(tmp, ";!runtime=%s.hrt", hed_runtime);
+		AddPackfile(tmp, 2);
 	}
 
 	hed_option |= HEDINFO_RUNTIME;
 
 	sprintf(tmp, "\"%s\"", hed_runtime);
 	RegistExtMacro("__runtime__", tmp);			// ランタイム名マクロを更新
+}
 
+
+ppresult_t CToken::PP_RuntimeOpt( void )
+{
+	//		#runtime解析
+	//
+	int i;
+
+	i = GetToken();
+	if ( i != TK_STRING ) {
+		SetError("illegal runtime name"); return PPRESULT_ERROR;
+	}
+	SetRuntime((char *)s3);
 	return PPRESULT_SUCCESS;
 }
 
@@ -4476,10 +4483,10 @@ int CToken::ConvUtf82SJis(char* pSource, char* pDist, int buffersize)
 #ifdef HSPWIN
 
 	// サイズを計算する
-	int iLenUnicode = ::MultiByteToWideChar(CP_UTF8, 0, pSource, strlen(pSource) + 1, NULL, 0);
+	int iLenUnicode = ::MultiByteToWideChar(CP_UTF8, 0, pSource, (int)strlen(pSource) + 1, NULL, 0);
 	BYTE* buffUtf16 = new BYTE[iLenUnicode * 2 + 2];
 
-	::MultiByteToWideChar(CP_UTF8, 0, pSource, strlen(pSource) + 1, (LPWSTR)buffUtf16, iLenUnicode);
+	::MultiByteToWideChar(CP_UTF8, 0, pSource, (int)strlen(pSource) + 1, (LPWSTR)buffUtf16, iLenUnicode);
 
 	size = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)buffUtf16, iLenUnicode, NULL, 0, NULL, NULL);
 	if (size > buffersize) size = buffersize;
@@ -4510,7 +4517,7 @@ char* CToken::to_hsp_string_literal(const char* src, bool filename) {
 #ifdef HSPWIN
 	if (filename) {
 		if (pp_utf8) {			// 入力がUTF8でファイル名の場合は変換する
-			int len = strlen(src) * 4 + 1;
+			int len = (int)strlen(src) * 4 + 1;
 			utftmp = (char*)malloc(len);
 			ConvSJis2Utf8((char*)src, utftmp, len);
 		}

@@ -224,6 +224,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 	//					 bit3=read AHT file(on)
 	//					 bit4=write AHT file(on)
 	//					 bit5=UTF8(input)(入力ソースがUTF8であることを示す)
+	//					 bit7=64bit runtime(ON)(64bitランタイムを規定にする)
 	//					 bit8=Emscripten mode(ON)(Emscripten向けであることを示す)
 	//
 	int res;
@@ -250,6 +251,11 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 
 	if ( option & HSC3_OPT_UTF8IN ) {
 		tk.SetUTF8Input( 1 );
+	}
+	if ( option & HSC3_OPT_RUNTIME64 ) {
+		tk.SetRuntime( "hsp3_64");
+		tk.RegistExtMacro("__hsp64__", "");
+		tk.RegistExtMacro("_hsputf8", "");
 	}
 
 	sprintf( mm,"#%s ver%s / onion software 1997-2026(c)", HSC3TITLE, hspver );

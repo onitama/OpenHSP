@@ -62,7 +62,7 @@ static int cnvNkf( char *srcbuf, int insize, int outsize, char *opt )
 	}
 	SetNkfOption( opt );
 	size = insize;
-	if ( size < 0 ) size = strlen( srcbuf );
+	if ( size < 0 ) size = (int)strlen( srcbuf );
 	NkfConvertSafe( nkfbuf, bufsize, (LPDWORD)&ressize, srcbuf, size );
 	return ressize;
 }
@@ -94,7 +94,7 @@ int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI netinit( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI netinit(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$00)
 	http = new CzHttp;
@@ -106,7 +106,7 @@ EXPORT BOOL WINAPI netinit( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netterm( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI netterm(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$00)
 	if ( http != NULL ) { delete http; http = NULL; }
@@ -114,7 +114,7 @@ EXPORT BOOL WINAPI netterm( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netexec( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI netexec( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$01)
 	*p1 = -1;
@@ -124,7 +124,7 @@ EXPORT BOOL WINAPI netexec( int *p1, int p2, int p3, int p4 )
 }
 
 #if 0
-EXPORT BOOL WINAPI netexec( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI netexec( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	PVal *pv;
@@ -144,7 +144,7 @@ EXPORT BOOL WINAPI netexec( HSPEXINFO *hei, int p1, int p2, int p3 )
 #endif
 
 
-EXPORT BOOL WINAPI netmode( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI netmode( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$01)
 	*p1 = -1;
@@ -154,7 +154,7 @@ EXPORT BOOL WINAPI netmode( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netsize( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI netsize( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$01)
 	*p1 = -1;
@@ -164,7 +164,7 @@ EXPORT BOOL WINAPI netsize( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI neturl( BMSCR *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI neturl( BMSCR *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$06)
 	if ( http == NULL ) return -1;
@@ -173,7 +173,7 @@ EXPORT BOOL WINAPI neturl( BMSCR *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netdlname( BMSCR *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI netdlname( BMSCR *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$06)
 	if ( http == NULL ) return -1;
@@ -182,16 +182,16 @@ EXPORT BOOL WINAPI netdlname( BMSCR *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netproxy( BMSCR *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI netproxy( BMSCR *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$06)
 	if ( http == NULL ) return -1;
-	http->SetProxy( p2, p3, p4 );
+	http->SetProxy( p2, (int)p3, (int)p4 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI netagent( BMSCR *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI netagent( BMSCR *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$06)
 	if ( http == NULL ) return -1;
@@ -200,7 +200,7 @@ EXPORT BOOL WINAPI netagent( BMSCR *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netheader( BMSCR *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI netheader( BMSCR *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$06)
 	if ( http == NULL ) return -1;
@@ -209,7 +209,7 @@ EXPORT BOOL WINAPI netheader( BMSCR *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netrequest( BMSCR *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI netrequest( BMSCR *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$06)
 	if ( http == NULL ) return -1;
@@ -218,7 +218,7 @@ EXPORT BOOL WINAPI netrequest( BMSCR *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI netfileinfo( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI netfileinfo( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	エラー文字列を得る
@@ -241,7 +241,7 @@ EXPORT BOOL WINAPI netfileinfo( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI neterror( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI neterror( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	エラー文字列を得る
@@ -259,7 +259,7 @@ EXPORT BOOL WINAPI neterror( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI filecrc( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI filecrc( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	ファイルのCRCを求める
@@ -291,7 +291,7 @@ EXPORT BOOL WINAPI filecrc( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI filemd5( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI filemd5( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	ファイルのMD5を求める
@@ -323,7 +323,7 @@ EXPORT BOOL WINAPI filemd5( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI filesha256(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI filesha256(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	ファイルのSHA256を求める
@@ -357,7 +357,7 @@ EXPORT BOOL WINAPI filesha256(HSPEXINFO* hei, int p1, int p2, int p3)
 /*----------------------------------------------------------------*/
 
 
-EXPORT BOOL WINAPI ftpresult( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpresult( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	FTPサーバー返信文字列を得る
@@ -375,7 +375,7 @@ EXPORT BOOL WINAPI ftpresult( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpopen( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpopen( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//		FTP接続
@@ -400,7 +400,7 @@ EXPORT BOOL WINAPI ftpopen( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpclose( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpclose( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTP切断
@@ -411,7 +411,7 @@ EXPORT BOOL WINAPI ftpclose( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpdir( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpdir( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	FTPサーバーディレクトリを得る
@@ -435,7 +435,7 @@ EXPORT BOOL WINAPI ftpdir( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpdirlist( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpdirlist( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTPファイルリスト
@@ -446,7 +446,7 @@ EXPORT BOOL WINAPI ftpdirlist( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpdirlist2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpdirlist2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTPファイルリスト取得
@@ -469,7 +469,7 @@ EXPORT BOOL WINAPI ftpdirlist2( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpcmd( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpcmd( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTPコマンド(結果はftpdirlist2で取得する)
@@ -481,7 +481,7 @@ EXPORT BOOL WINAPI ftpcmd( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftprmdir( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftprmdir( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTPディリクトリ削除
@@ -493,7 +493,7 @@ EXPORT BOOL WINAPI ftprmdir( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpmkdir( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpmkdir( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTPディレクトリ作成
@@ -505,7 +505,7 @@ EXPORT BOOL WINAPI ftpmkdir( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpget( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpget( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//		FTPファイル取得
@@ -522,7 +522,7 @@ EXPORT BOOL WINAPI ftpget( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpput( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpput( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//		FTPファイル送信
@@ -539,7 +539,7 @@ EXPORT BOOL WINAPI ftpput( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftprename( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftprename( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTPファイルリネーム
@@ -554,7 +554,7 @@ EXPORT BOOL WINAPI ftprename( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI ftpdelete( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI ftpdelete( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		FTPファイル削除
@@ -566,7 +566,7 @@ EXPORT BOOL WINAPI ftpdelete( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI fencode( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI fencode( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		ファイル暗号化
@@ -601,7 +601,7 @@ EXPORT BOOL WINAPI fencode( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI fdecode( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI fdecode( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		ファイル復号化
@@ -639,7 +639,7 @@ EXPORT BOOL WINAPI fdecode( HSPEXINFO *hei, int p1, int p2, int p3 )
 /*------------------------------------------------------------------------------------*/
 
 
-EXPORT BOOL WINAPI netgetv( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI netgetv( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		取得データを文字列として変数に代入する
@@ -665,7 +665,7 @@ EXPORT BOOL WINAPI netgetv( HSPEXINFO *hei, int p1, int p2, int p3 )
 	return -size;
 }
 
-EXPORT BOOL WINAPI netgetv4( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI netgetv4( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		取得データを文字列として変数に代入する
@@ -683,7 +683,7 @@ EXPORT BOOL WINAPI netgetv4( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//http->SetVarRequestGet( ss );
 	ss = http->getVarData();
 	hei->HspFunc_val_realloc( pv, http->getVarSize()+1, 0 );
-	ap = (APTR)ss;
+	//ap = (APTR)ss;
 	//hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_STR, ss );	// 変数に値を代入
 	return -http->getVarSize();
 }
@@ -723,7 +723,7 @@ EXPORT int WINAPI netget_resphead(char *buff, LPDWORD size)
 }
 
 
-EXPORT BOOL WINAPI netrequest_get( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI netrequest_get( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		ファイルデータをメモリに取得する(netgetvで取得)
@@ -740,7 +740,7 @@ EXPORT BOOL WINAPI netrequest_get( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI netrequest_post( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI netrequest_post( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		ファイルデータをメモリに取得する(netgetvで取得)
@@ -757,7 +757,7 @@ EXPORT BOOL WINAPI netrequest_post( HSPEXINFO *hei, int p1, int p2, int p3 )
 	return 0;
 }
 
-EXPORT BOOL WINAPI netrequest_post2( char *path, char *data, int size )
+EXPORT BOOL WINAPI netrequest_post2( char *path, char *data, HSPPTRINT size )
 {
 	//	(type$202)
 	//		ファイルデータをメモリに取得する(netgetvで取得)
@@ -766,11 +766,11 @@ EXPORT BOOL WINAPI netrequest_post2( char *path, char *data, int size )
 
 	if (http == NULL) return -1;
 
-	http->SetVarRequestPost2( path, data, size );
+	http->SetVarRequestPost2( path, data, (int)size );
 	return 0;
 }
 
-EXPORT BOOL WINAPI netrequest_put(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI netrequest_put(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	(type$202)
 	//		ファイルデータをメモリに取得する(netgetvで取得)
@@ -787,7 +787,7 @@ EXPORT BOOL WINAPI netrequest_put(HSPEXINFO *hei, int p1, int p2, int p3)
 	return 0;
 }
 
-EXPORT BOOL WINAPI netrequest_put2(char *path, char *data, int size)
+EXPORT BOOL WINAPI netrequest_put2(char *path, char *data, HSPPTRINT size)
 {
 	//	(type$202)
 	//		ファイルデータをメモリに取得する(netgetvで取得)
@@ -796,11 +796,11 @@ EXPORT BOOL WINAPI netrequest_put2(char *path, char *data, int size)
 	
 	if (http == NULL) return -1;
 
-	http->SetVarRequestPut2(path, data, size);
+	http->SetVarRequestPut2(path, data, (int)size);
 	return 0;
 }
 
-EXPORT BOOL WINAPI netrequest_delete(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI netrequest_delete(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	(type$202)
 	//		ファイルデータをメモリに取得する(netgetvで取得)
@@ -819,7 +819,7 @@ EXPORT BOOL WINAPI netrequest_delete(HSPEXINFO *hei, int p1, int p2, int p3)
 
 /*------------------------------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI varmd5( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI varmd5( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	変数バッファの内容からMD5を求める
@@ -844,7 +844,7 @@ EXPORT BOOL WINAPI varmd5( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI varsha256(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI varsha256(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	変数バッファの内容からSHA256を求める
@@ -869,7 +869,7 @@ EXPORT BOOL WINAPI varsha256(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI b64encode( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI b64encode( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	変数バッファの内容をBASE64にエンコードする
@@ -898,7 +898,7 @@ EXPORT BOOL WINAPI b64encode( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI b64decode( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI b64decode( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	変数バッファのBASE64文字列をデコードする
@@ -920,7 +920,7 @@ EXPORT BOOL WINAPI b64decode( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI rc4encode( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI rc4encode( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	変数バッファのBASE64文字列をデコードする
@@ -940,7 +940,7 @@ EXPORT BOOL WINAPI rc4encode( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI urlencode( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI urlencode( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	文字列をURLエンコードする
@@ -960,7 +960,7 @@ EXPORT BOOL WINAPI urlencode( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI urldecode( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI urldecode( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	文字列をURLデコードする
@@ -984,7 +984,7 @@ EXPORT BOOL WINAPI urldecode( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 static	cJSON *json = NULL;
 
-EXPORT BOOL WINAPI jsonopen( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsonopen( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		JSON形式を開く
@@ -1006,7 +1006,7 @@ EXPORT BOOL WINAPI jsonopen( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsonclose( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsonclose( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		JSON形式を閉じる
@@ -1018,7 +1018,7 @@ EXPORT BOOL WINAPI jsonclose( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsonout( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsonout( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//		JSON形式データを変数に出力する
@@ -1046,7 +1046,7 @@ EXPORT BOOL WINAPI jsonout( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsongetobj(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsongetobj(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSONオブジェクトを得る
@@ -1078,7 +1078,7 @@ EXPORT BOOL WINAPI jsongetobj(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsongetarrayobj(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsongetarrayobj(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSON配列オブジェクト内のオブジェクトを得る
@@ -1114,7 +1114,7 @@ EXPORT BOOL WINAPI jsongetarrayobj(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsongetarrayobjbyname(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsongetarrayobjbyname(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSON配列オブジェクト内のオブジェクトを得る
@@ -1159,7 +1159,7 @@ EXPORT BOOL WINAPI jsongetarrayobjbyname(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsonnext( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsonnext( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//	JSONオブジェクトを得る
@@ -1202,7 +1202,7 @@ EXPORT BOOL WINAPI jsonnext( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsongets( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsongets( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//	JSONオブジェクトから文字列を得る
@@ -1263,7 +1263,7 @@ EXPORT BOOL WINAPI jsongets( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsongeti(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsongeti(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSONオブジェクトから整数値を得る
@@ -1300,7 +1300,7 @@ EXPORT BOOL WINAPI jsongeti(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsongetd(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsongetd(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSONオブジェクトから実数値を得る
@@ -1338,7 +1338,7 @@ EXPORT BOOL WINAPI jsongetd(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsonnewobj( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsonnewobj( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//	JSONオブジェクトを新規作成
@@ -1371,7 +1371,7 @@ EXPORT BOOL WINAPI jsonnewobj( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsonputs( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsonputs( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//	JSONオブジェクトの文字列エントリ更新
@@ -1402,7 +1402,7 @@ EXPORT BOOL WINAPI jsonputs( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsonputi(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsonputi(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSONオブジェクトの数値エントリ更新
@@ -1441,7 +1441,7 @@ EXPORT BOOL WINAPI jsonputi(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsonputd(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsonputd(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSONオブジェクトの数値エントリ更新
@@ -1466,7 +1466,7 @@ EXPORT BOOL WINAPI jsonputd(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsonsetprm(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsonsetprm(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSONオブジェクトのパラメーター設定
@@ -1507,7 +1507,7 @@ EXPORT BOOL WINAPI jsonsetprm(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsonsetprmd(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI jsonsetprmd(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	(type$202)
 	//	JSONオブジェクトのパラメーター設定
@@ -1530,7 +1530,7 @@ EXPORT BOOL WINAPI jsonsetprmd(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI jsondelobj( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsondelobj( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//	JSONオブジェクトを削除
@@ -1548,7 +1548,7 @@ EXPORT BOOL WINAPI jsondelobj( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI jsonnkf( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI jsonnkf( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	JSONデータ変換オプション指定
@@ -1567,7 +1567,7 @@ EXPORT BOOL WINAPI jsonnkf( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 /*------------------------------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI nkfcnv( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI nkfcnv( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	NKFによる文字コード変換を行なう
@@ -1595,7 +1595,7 @@ EXPORT BOOL WINAPI nkfcnv( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI nkfguess( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI nkfguess( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	NKFによる文字コード認識結果を取得する
@@ -1742,7 +1742,7 @@ static int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
 
 
 
-EXPORT BOOL WINAPI getenv2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI getenv2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//	システム環境変数を取得します
@@ -1764,7 +1764,7 @@ EXPORT BOOL WINAPI getenv2( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI getctime( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI getctime( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//	システム環境変数を取得します
@@ -1775,11 +1775,12 @@ EXPORT BOOL WINAPI getctime( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char *ss;
 	char buf[128];
 	time_t timer;
+	int _p1;
 
 	ap = hei->HspFunc_prm_getva( &pv );		// パラメータ1:変数
-	p1 = hei->HspFunc_prm_getdi(0);			// パラメータ2:数値
+	_p1 = hei->HspFunc_prm_getdi(0);			// パラメータ2:数値
 
-	switch( p1 ) {
+	switch( _p1 ) {
 	case 0:
 		time( &timer );
 		ss = ctime( &timer );
@@ -1825,7 +1826,7 @@ EXPORT BOOL WINAPI getctime( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI getenvprm( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI getenvprm( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//	(type$202)
 	//	パラメーターを取得します
@@ -1839,19 +1840,20 @@ EXPORT BOOL WINAPI getenvprm( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char src[256];
 	char buf[0x8000];
 	int slen;
+	int _p1;
 
 	ap = hei->HspFunc_prm_getva( &pv );		// パラメータ1:変数
 	vptr = (char *)hei->HspFunc_prm_getv();	// パラメータ2:変数
 	ss = hei->HspFunc_prm_gets();			// パラメータ3:文字列
 	strncpy( src, ss, 255 ); 
 	slen = (int)strlen( src );
-	p1 = hei->HspFunc_prm_getdi('&');			// パラメータ4:数値
+	_p1 = hei->HspFunc_prm_getdi('&');			// パラメータ4:数値
 
 	*buf = 0;
 	res = strstr2( vptr, src );
 	if ( res != NULL ) {
 		strsp_ini();
-		strsp_get( res+slen, buf, p1, 0x7fff );
+		strsp_get( res+slen, buf, _p1, 0x7fff );
 	}
 
 	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_STR, buf );	// 変数に値を代入

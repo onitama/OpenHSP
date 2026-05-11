@@ -275,7 +275,7 @@ int ccsv::SearchSub( char *search )
 		AddResult( chkstr );
 	}
 	AddResult( orgstr );
-	AddResult( "\r\n" );
+	AddResult( (char *)"\r\n" );
 	return 1;
 }
 

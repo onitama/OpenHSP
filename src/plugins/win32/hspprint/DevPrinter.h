@@ -9,19 +9,19 @@
 #ifdef	WIN32
 
 /**
- *	@brief	�v�����^�h�L�������g�\����
+ *	@brief	プリンタドキュメント構造体
  */
 typedef struct _DEVPRINTERDOC{
 	void*	pDevMode;
 	HDC		hDC;
-	int		HorzRes;			//	�s�N�Z���P�ʂ̉�ʂ̕�
-	int		VertRes;			//	�s�N�Z���P�ʂ̍���
-	int		HorzSize;			//	mm�P�ʂ̕�
-	int		VertSize;			//	mm�P�ʂ̍���
-	int		PhysicalWidth;		//	����f�o�C�X�p�ł��B�y�[�W�̕����I�ȕ�
-	int		PhysicalHeight;		//	����f�o�C�X�p�ł��B�y�[�W�̕����I�ȍ���
-	int		PhysicalOffsetX;	//	����f�o�C�X�p�ł��B�����I�ȃy�[�W�̍��[�������\�̈�̍��[�܂ł̋������f�o�C�X�P��
-	int		PhysicalOffsetY;	//	����f�o�C�X�p�ł��B�����I�ȃy�[�W�̏�[�������\�̈�̏�[�܂ł̋������f�o�C�X�P��
+	int		HorzRes;			//	ピクセル単位の画面の幅
+	int		VertRes;			//	ピクセル単位の高さ
+	int		HorzSize;			//	mm単位の幅
+	int		VertSize;			//	mm単位の高さ
+	int		PhysicalWidth;		//	印刷デバイス用です。ページの物理的な幅
+	int		PhysicalHeight;		//	印刷デバイス用です。ページの物理的な高さ
+	int		PhysicalOffsetX;	//	印刷デバイス用です。物理的なページの左端から印刷可能領域の左端までの距離をデバイス単位
+	int		PhysicalOffsetY;	//	印刷デバイス用です。物理的なページの上端から印刷可能領域の上端までの距離をデバイス単位
 }DEVPRINTERDOC, *LPDEVPRINTERDOC;
 
 extern int DevGetNumPrinter(void);

@@ -15,6 +15,7 @@
 #define HSC3_OPT_MAKEAHT 16
 #define HSC3_OPT_UTF8IN 32			// UTF8ソースを入力
 #define HSC3_OPT_UTF8OUT 64			// UTF8コードを出力
+#define HSC3_OPT_RUNTIME64 128		// デフォルトランタイムを64bitに規定
 #define HSC3_OPT_EMSCRIPTEN 256		// Emscriptenソースとしてコンパイル
 
 #define HSC3_MODE_DEBUG 1
@@ -22,6 +23,7 @@
 #define HSC3_MODE_UTF8 4		// UTF8コードを出力
 #define HSC3_MODE_STRMAP 8		// strmapを出力
 #define HSC3_MODE_LABOUT 16		// キーワードを出力
+#define HSC3_MODE_RUNTIME64 128	// デフォルトランタイムを64bitに規定
 
 class CMemBuf;
 class CToken;

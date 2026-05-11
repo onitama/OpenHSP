@@ -966,8 +966,11 @@ int code_geti( void )
 	chk = code_get();
 	if ( chk<=PARAM_END ) { throw HSPERR_NO_DEFAULT; }
 	if ( mpval->flag != HSPVAR_FLAG_INT ) {
-		if ( mpval->flag != HSPVAR_FLAG_DOUBLE ) throw HSPERR_TYPE_MISMATCH;
-		return (int)(*(double *)(mpval->pt));		// doubleの時はintに変換
+		if (mpval->flag == HSPVAR_FLAG_DOUBLE)
+			return (int)(*(double*)(mpval->pt));
+		if (mpval->flag == HSPVAR_FLAG_INT64)
+			return (int)(*(int64_t*)(mpval->pt));
+		throw HSPERR_TYPE_MISMATCH;
 	}
 	return *(int *)(mpval->pt);
 }
@@ -3450,7 +3453,7 @@ int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 	//		(result:0=Not care/1=Done)
 	//
 	int res;
-	size_t sz;
+	HSPPTRINT sz;
 	res = call_eventfunc( evcategory[event], event, prm1, prm2, prm3 ); 
 	if ( res ) return res;
 

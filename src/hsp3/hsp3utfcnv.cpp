@@ -201,7 +201,7 @@ void freeac(char **ppc)
 //
 //		basic File I/O support
 //
-FILE *hsp3_fopen(char*name, size_t offset)
+FILE *hsp3_fopen(char*name, HSPPTRINT offset)
 {
 	FILE* hsp3_fp = NULL;
 #ifdef HSPWIN
@@ -296,20 +296,25 @@ FILE *hsp3_fopen(char*name, size_t offset)
 }
 
 
-FILE* hsp3_fopenwrite(char* fname8, size_t offset)
+FILE* hsp3_fopenwrite(char* fname8, HSPPTRINT offset)
 {
 	FILE* hsp3_fp = NULL;
+
 #ifdef HSPWIN
 #ifdef HSPUTF8
 	// Windows UTF
-	HSPAPICHAR* fnamew = 0;
+	HSPAPICHAR* hactmp1;
+	wchar_t *wfname;
+	wfname = chartoapichar(fname8, &hactmp1);
 	if (offset < 0) {
-		hsp3_fp = _tfopen(chartoapichar(fname8, &fnamew), TEXT("wb"));
+		hsp3_fp = _wfopen(wfname, L"wb");
 	}
 	else {
-		hsp3_fp = _tfopen(chartoapichar(fname8, &fnamew), TEXT("r+b"));
+		hsp3_fp = _wfopen(wfname, L"r+b");
+		if (hsp3_fp == NULL) return NULL;
+		hsp3_fseek(hsp3_fp, offset, SEEK_SET);
 	}
-	freehac(&fnamew);
+	freehac(&hactmp1);
 #else
 	// Windows SJIS
 	if (offset < 0) {
@@ -318,7 +323,7 @@ FILE* hsp3_fopenwrite(char* fname8, size_t offset)
 	else {
 		hsp3_fp = fopen(fname8, "r+b");
 		if (hsp3_fp == NULL) return NULL;
-		fseek(hsp3_fp, offset, SEEK_SET);
+		hsp3_fseek(hsp3_fp, offset, SEEK_SET);
 	}
 #endif
 
@@ -389,7 +394,7 @@ HSPPTRINT hsp3_flength(char* name)
 	if (hsp3_fp ==NULL) {
 		return -1;
 	}
-	fseek(hsp3_fp, 0, SEEK_END);
+	hsp3_fseek(hsp3_fp, 0, SEEK_END);
 #if defined(HSPWIN)&&defined(HSP64)
 	length = (HSPPTRINT)_ftelli64(hsp3_fp);		// normal file size
 #else
@@ -412,7 +417,7 @@ HSPPTRINT hsp3_fread( FILE* ptr, void *mem, size_t size )
 	}
 #endif
 
-	size_t len = fread(mem, 1, size, ptr);
+	HSPPTRINT len = (HSPPTRINT)fread(mem, 1, size, ptr);
 	return len;
 }
 
@@ -434,7 +439,7 @@ int hsp3_fseek(FILE* ptr, size_t offset, int whence)
 }
 
 
-HSPPTRINT hsp3_binsave( char *fname8, void *mem, size_t msize, size_t seekofs )
+HSPPTRINT hsp3_binsave( char *fname8, void *mem, size_t msize, HSPPTRINT seekofs )
 {
 #ifdef HSPIOS
     gb_savedata( fname8, (char *)mem, msize, seekofs );
@@ -459,7 +464,7 @@ HSPPTRINT hsp3_binsave( char *fname8, void *mem, size_t msize, size_t seekofs )
 }
 
 
-HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, size_t seekofs)
+HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, HSPPTRINT seekofs)
 {
 #ifdef HSPIOS
     int filesize = gb_existdata( name );

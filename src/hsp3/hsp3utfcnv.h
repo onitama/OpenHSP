@@ -113,13 +113,13 @@ int StrCopyLetter(char* source, char* dest);
 //
 //		File Service
 //
-FILE* hsp3_fopen(char* name, size_t offset=0);
-FILE* hsp3_fopenwrite(char* name, size_t offset=-1);
+FILE* hsp3_fopen(char* name, HSPPTRINT offset=0);
+FILE* hsp3_fopenwrite(char* name, HSPPTRINT offset=-1);
 void hsp3_fclose(FILE* ptr);
 HSPPTRINT hsp3_flength(char* name);
 HSPPTRINT hsp3_fread(FILE* ptr, void* mem, size_t size);
 int hsp3_fseek(FILE* ptr, size_t offset, int whence);
-HSPPTRINT hsp3_binsave(char* fname8, void* mem, size_t msize, size_t seekofs=-1);
-HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, size_t seekofs);
+HSPPTRINT hsp3_binsave(char* fname8, void* mem, size_t msize, HSPPTRINT seekofs=-1);
+HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, HSPPTRINT seekofs);
 
 #endif

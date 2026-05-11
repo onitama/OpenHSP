@@ -9,9 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "hsp3plugin.h"
-//#include "hsp3debug.h"
-//#include "hsp3struct.h"
-//#include "hspwnd.h"
 
 void DrawLine( BMSCR *bm, int x1, int y1, int x2, int y2, int color );
 
@@ -245,8 +242,8 @@ EXPORT void WINAPI hsp3cmdinit( HSP3TYPEINFO *info )
 
 /*------------------------------------------------------------*/
 
-/*
-EXPORT BOOL WINAPI test1( PVAL2 *pval, int p1, int p2, int p3 )
+
+EXPORT BOOL WINAPI test1( PVal *pval, int p1, int p2, int p3 )
 {
 	//	DLL test1 (type$83)
 	//		指定した変数に、「文字列テスト」を代入する。
@@ -255,7 +252,7 @@ EXPORT BOOL WINAPI test1( PVAL2 *pval, int p1, int p2, int p3 )
 	char *pt;
 	if (pval->flag==4) pval->flag=2;	// 文字列型に
 	pt=pval->pt;
-	strcpy( pt,"文字列テスト" );
+	strcpy( pt,"string test..." );
 	return 0;
 }
 
@@ -268,26 +265,22 @@ EXPORT BOOL WINAPI test2( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//		ファイルサイズに合わせて変数バッファを拡張する。
 	//		packfileで指定したファイルも読み込み可能。
 	//
-	int cursize, newsize;
-	PVAL2 *pval;
-	char *ep1;
+	size_t newsize;
+	PVal*pval;
+	APTR ap;
 	char *ep2;
-	ep1 = (char *)hei->HspFunc_prm_getv();	// パラメータ1:変数
-	pval = *hei->pval;						// 変数のPVAL2ポインタを取得
+	ap = hei->HspFunc_prm_getva(&pval);		// パラメータ1:変数
 	ep2 = hei->HspFunc_prm_gets();			// パラメータ2:文字列
 	if ( *hei->er ) return *hei->er;		// エラーチェック
-	cursize = valsize( pval );				// 変数のメモリサイズを取得
 	newsize = hei->HspFunc_fsize( ep2 );	// ファイルのサイズを取得
-	if ( newsize<0 ) return -1;				// ファイルがない場合は終了
-	if ( newsize>cursize ) {
-		//	ファイル読み込みに必要なバッファを確保
-		hei->HspFunc_val_realloc( pval,newsize,0 );
-	}
+	if ( newsize<=0 ) return -1;				// ファイルがない場合は終了
+	//	ファイル読み込みに必要なバッファを確保
+	hei->HspFunc_val_realloc( pval,newsize,0 );
 	hei->HspFunc_fread( ep2, pval->pt, newsize, 0 );	// ファイル読み込み
 	return 0;
 }
 
-
+/*
 EXPORT BOOL WINAPI test3( BMSCR *bm, int p1, int p2, char *p3 )
 {
 	//	DLL test3 (type$32)
@@ -313,7 +306,7 @@ EXPORT BOOL WINAPI test3( BMSCR *bm, int p1, int p2, char *p3 )
 	bms_update( bm );
 	return 0;
 }
-
+*/
 
 EXPORT BOOL WINAPI test4( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
@@ -366,7 +359,7 @@ EXPORT BOOL WINAPI test6( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char *es1;
 	char *refstr;
 	int ep1;
-	strsize = hei->strsize;
+	strsize = (int *)hei->strsize;
 	refstr = hei->refstr;
 	type = *hei->nptype;
 	val = *hei->npval;
@@ -379,16 +372,12 @@ EXPORT BOOL WINAPI test6( HSPEXINFO *hei, int p1, int p2, int p3 )
 		es1 = hei->HspFunc_prm_gets();			// パラメータ1:文字列
 		strcpy( refstr, es1 );
 		break;
-	case 4:
-		ep1 = hei->HspFunc_prm_getv();			// パラメータ1:変数
-		*strsize = ep1;
-		break;
 	default:
 		return 2;
 	}
 	return -type;
 }
-*/
+
 
 /*------------------------------------------------------------*/
 /*

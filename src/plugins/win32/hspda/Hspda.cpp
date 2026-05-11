@@ -4,7 +4,6 @@
 //				onion software/onitama 1999
 //				               onitama 2005/5
 //
-
 #include <windows.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -13,6 +12,8 @@
 #include "membuf.h"
 #include "ccsv.h"
 #include "MTRand.h"
+
+#define USE_SORT
 
 static ccsv *csv;
 
@@ -41,6 +42,8 @@ int WINAPI hspda_DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved
 	}
 	return TRUE ;
 }
+
+#ifdef USE_SORT
 
 /*------------------------------------------------------------*/
 /*
@@ -172,6 +175,8 @@ static void DataInc( int n )
 	dtmp[n].info ++;
 }
 
+#endif
+
 
 static void *Hsp3GetBlockSize( HSPEXINFO *hei, PVal *pv, APTR ap, int *size )
 {
@@ -187,7 +192,7 @@ static void *Hsp3GetBlockSize( HSPEXINFO *hei, PVal *pv, APTR ap, int *size )
 }
 
 
-EXPORT BOOL WINAPI csvnote( PVal *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI csvnote( PVal *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		csvnote val,csvdata,spchr  (type$87)
@@ -199,7 +204,7 @@ EXPORT BOOL WINAPI csvnote( PVal *p1, char *p2, int p3, int p4 )
 	unsigned char a1;
 	unsigned char spchr;
 
-	if ( p3==0 ) spchr=','; else spchr=p3;
+	if ( p3==0 ) spchr=','; else spchr=(unsigned char)p3;
 	len=p1->len[1];
 	p=(unsigned char *)p1->pt;
 	//p1->flag = 2;
@@ -234,7 +239,7 @@ EXPORT BOOL WINAPI csvnote( PVal *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI csvstr( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI csvstr( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		csvstr val,csvdata,sepchr  (type$202)
@@ -293,12 +298,14 @@ EXPORT BOOL WINAPI csvstr( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI sortbye( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sortbye(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		sortbye (type$100)
 	//
+#ifdef USE_SORT
 	DataBye();
+#endif
 	return 0;
 }
 
@@ -308,11 +315,13 @@ EXPORT BOOL WINAPI sortbye( int p1, int p2, int p3, int p4 )
 */
 /*------------------------------------------------------------*/
 
+#ifdef USE_SORT
+
 static	PVal	*xn_pval;
 static	APTR	xn_aptr;
 static	int		xn_count;
 
-EXPORT BOOL WINAPI xnotesel( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI xnotesel( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		xnotesel notedat, maxnum  (type$202)
@@ -388,7 +397,7 @@ static void addline( HSPEXINFO *hei, PVal *pval, APTR aptr, size_t len, char *st
 }
 
 
-EXPORT BOOL WINAPI xnoteadd( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI xnoteadd( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		xnoteadd "strings" (type$202)
@@ -416,26 +425,28 @@ EXPORT BOOL WINAPI xnoteadd( HSPEXINFO *hei, int p1, int p2, int p3 )
 	return -line;
 }
 
+#endif
+
 /*------------------------------------------------------------*/
 /*
 		Extra CSV Routines
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI csvsel( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI csvsel( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		csvsel val,sepchr  (type$1)
 	//			( sepchr=0 / "," )
 	//
 	csv->SetBuffer( p1 );
-	if ( p2 != 0 ) csv->SetSeparate( p2 );
+	if ( p2 != 0 ) csv->SetSeparate( (char)p2 );
 			  else csv->SetSeparate( ',' );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI csvres( PVal *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI csvres( PVal *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		csvres val  (type$83)
@@ -447,33 +458,33 @@ EXPORT BOOL WINAPI csvres( PVal *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI csvflag( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI csvflag(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		csvflag id,val  (type$0)
 	//
-	csv->SetFlag( p1, p2 );
+	csv->SetFlag( (int)p1, (int)p2 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI csvopt( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI csvopt(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		csvopt option  (type$0)
 	//
-	csv->SetOption( p1 );
+	csv->SetOption( (int)p1 );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI csvfind( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI csvfind( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		csvfind "strings",max,start (type$6)
 	//
 	int i;
-	i = csv->Search( p1, p2, p3 );
+	i = csv->Search( p1, (int)p2, (int)p3 );
 	return -i;
 }
 
@@ -490,7 +501,7 @@ EXPORT BOOL WINAPI csvfind( BMSCR *bm, char *p1, int p2, int p3 )
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI rndf_ini( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI rndf_ini( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		rndf_ini seed  (type$202)
@@ -502,7 +513,7 @@ EXPORT BOOL WINAPI rndf_ini( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI rndf_get( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI rndf_get( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		rndf_get var  (type$202)
@@ -517,7 +528,7 @@ EXPORT BOOL WINAPI rndf_get( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI rndf_geti( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI rndf_geti( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		rndf_geti var, range  (type$202)
@@ -1110,7 +1121,7 @@ static int varload_get( HSPEXINFO *hei, int varid, char *getname, int encode, in
 
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI getvarid( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI getvarid( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		getvarid var,"name"  (type$202)
@@ -1127,7 +1138,7 @@ EXPORT BOOL WINAPI getvarid( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI getvarname( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI getvarname( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		getvarname var,id  (type$202)
@@ -1144,7 +1155,7 @@ EXPORT BOOL WINAPI getvarname( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI getmaxvar( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI getmaxvar( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		getmaxvar var  (type$202)
@@ -1161,7 +1172,7 @@ EXPORT BOOL WINAPI getmaxvar( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vsave( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vsave( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vsave "filename"  (type$202)
@@ -1184,12 +1195,14 @@ EXPORT BOOL WINAPI vsave( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vload( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vload( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vload "filename"  (type$202)
 	//
-	int i,max,res;
+	int i;
+	int max, res;
+	HSPPTRINT sz;
 	char *p1;
 	char *tmp;
 	HSPCTX *hspctx;
@@ -1199,11 +1212,13 @@ EXPORT BOOL WINAPI vload( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 	hspctx = hei->hspctx;
 	max = hspctx->hsphed->max_val;
 
-	res = hei->HspFunc_fsize( p1 );
-	if ( res <= 0 ) return -1;
+	res = 0;
+	sz = hei->HspFunc_fsize( p1 );
+	if ( sz <= 0 ) return -1;
 
-	tmp = (char *)malloc( res );
-	hei->HspFunc_fread( p1, tmp, res, 0 );
+	tmp = (char *)malloc( sz+1 );
+	sz = hei->HspFunc_fread( p1, tmp, sz, 0 );
+	if (sz <= 0) res = -1;
 
 	res = varload_init( tmp );
 	if ( res == 0 ) {
@@ -1217,7 +1232,7 @@ EXPORT BOOL WINAPI vload( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vsave_start( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vsave_start( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vsave_start  (type$202)
@@ -1227,7 +1242,7 @@ EXPORT BOOL WINAPI vsave_start( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vsave_put( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vsave_put( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vsave_put var  (type$202)
@@ -1247,7 +1262,7 @@ EXPORT BOOL WINAPI vsave_put( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vsave_end( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vsave_end( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vsave_end "filename"  (type$202)
@@ -1260,21 +1275,23 @@ EXPORT BOOL WINAPI vsave_end( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vload_start( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vload_start( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vload_start "filename"  (type$202)
 	//
 	int res;
+	HSPPTRINT sz;
 	char *p1;
 
 	p1 = hei->HspFunc_prm_gets();			// パラメータ1:文字列
+	res = 0;
+	sz = hei->HspFunc_fsize( p1 );
+	if ( sz <= 0 ) return -1;
 
-	res = hei->HspFunc_fsize( p1 );
-	if ( res <= 0 ) return -1;
-
-	vload_tmp = (char *)malloc( res );
-	hei->HspFunc_fread( p1, vload_tmp, res, 0 );
+	vload_tmp = (char *)malloc( sz );
+	sz = hei->HspFunc_fread( p1, vload_tmp, sz, 0 );
+	if (sz <= 0) res = -1;
 
 	res = varload_init( vload_tmp );
 	if ( res ) {
@@ -1285,7 +1302,7 @@ EXPORT BOOL WINAPI vload_start( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vload_get( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vload_get( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vload_get var  (type$202)
@@ -1305,7 +1322,7 @@ EXPORT BOOL WINAPI vload_get( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 }
 
 
-EXPORT BOOL WINAPI vload_end( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
+EXPORT BOOL WINAPI vload_end( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//
 	//		vload_end  (type$202)
@@ -1319,7 +1336,7 @@ EXPORT BOOL WINAPI vload_end( HSPEXINFO *hei, int _p1, int _p2, int _p3 )
 /*------------------------------------------------------------*/
 
 
-EXPORT BOOL WINAPI binmatch(HSPEXINFO* hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI binmatch(HSPEXINFO* hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		binmatch var, var2, varsize, var2size, offset, option  (type$202)
