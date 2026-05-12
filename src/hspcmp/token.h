@@ -249,7 +249,8 @@ public:
 
 	int GetHeaderOption( void ) { return hed_option; }
 	char *GetHeaderRuntimeName( void ) { return hed_runtime; }
-	void SetHeaderOption( int opt, char *name ) { hed_option=opt; strcpy( hed_runtime, name ); }
+	void SetHeaderOption(int opt) { hed_option = opt; }
+	void SetHeaderOption(int opt, char* name) { hed_option = opt; strcpy(hed_runtime, name); }
 	int GetCmpOption( void ) { return hed_cmpmode; }
 	void SetCmpOption( int cmpmode ) { hed_cmpmode = cmpmode; }
 	void SetUTF8Input( int utf8mode ) { pp_utf8 = utf8mode; }

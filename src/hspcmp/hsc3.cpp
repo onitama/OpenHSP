@@ -253,6 +253,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 		tk.SetUTF8Input( 1 );
 	}
 	if ( option & HSC3_OPT_RUNTIME64 ) {
+		tk.SetHeaderOption(HEDINFO_HSP64);
 		tk.SetRuntime( "hsp3_64");
 		tk.RegistExtMacro("__hsp64__", "");
 		tk.RegistExtMacro("_hsputf8", "");

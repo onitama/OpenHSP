@@ -133,11 +133,11 @@ int cezdb::SendSQL( char *str )
 int cezdb::GetResult( char *buf, int size )
 {
 	RETCODE res;
-	int leftsize;
+	SQLLEN leftsize;
 	int column;
 	short maxcol;
-	int sz;
-	long len;
+	size_t sz;
+	SQLLEN len;
 	char *p;
 	
 	if ( flag != CEZDB_MODE_SQLFETCH ) return -1;
@@ -164,7 +164,7 @@ int cezdb::GetResult( char *buf, int size )
 		p += len;
 		leftsize -= len;
 
-		// セパレータを追加
+		// 繧ｻ繝代Ξ繝ｼ繧ｿ繧定ｿｽ蜉
 		if ( leftsize < 1 ) break;
 		*p++ = sepchr;
 		leftsize --;
@@ -174,7 +174,7 @@ int cezdb::GetResult( char *buf, int size )
 	if ( sz ) {
 		if ( buf[ sz-1 ] == sepchr ) buf[sz-1] = 0;
 	}
-	return sz;
+	return (int)sz;
 }
 
 

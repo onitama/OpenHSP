@@ -13,18 +13,20 @@
 #include "supio.h"
 #include "../hpi3sample/hsp3plugin.h"
 
-/* ƒ‰ƒCƒuƒ‰ƒŠ */
-#ifdef _DEBUG
+#pragma comment(lib, "legacy_stdio_definitions.lib")
 
-#pragma comment(lib, "cv_staticd.lib")
-#pragma comment(lib, "cxcore_staticd.lib")
-#pragma comment(lib, "highgui_staticd.lib")
+/* ãƒ©ã‚¤ãƒ–ãƒ©ãƒª */
+#ifdef HSP64
 
-#pragma comment(lib, "libjpegd.lib")
-#pragma comment(lib, "libjasperd.lib")
-#pragma comment(lib, "libtiffd.lib")
-#pragma comment(lib, "libpngd.lib")
-#pragma comment(lib, "zlibd.lib")
+#pragma comment(lib, "cv_static_64.lib")
+#pragma comment(lib, "cxcore_static_64.lib")
+#pragma comment(lib, "highgui_static_64.lib")
+
+#pragma comment(lib, "libjpeg_64.lib")
+#pragma comment(lib, "libjasper_64.lib")
+#pragma comment(lib, "libtiff_64.lib")
+#pragma comment(lib, "libpng_64.lib")
+#pragma comment(lib, "zlib_64.lib")
 
 #else
 
@@ -77,6 +79,10 @@ static	int wvideo_id;
 static	int cvideo_id;
 #endif
 
+FILE _iob[] = { *stdin, *stdout, *stderr };
+extern "C" FILE* __cdecl __iob_func(void) {
+	return _iob;
+}
 
 CVOBJ *getcvobj( int id )
 {
@@ -104,7 +110,7 @@ void hspcv_release( int id )
 
 void hspcv_exchange( int id, IplImage *img )
 {
-	//		id‚Ìƒoƒbƒtƒ@‚ð·‚µ‘Ö‚¦‚é
+	//		idã®ãƒãƒƒãƒ•ã‚¡ã‚’å·®ã—æ›¿ãˆã‚‹
 	//
 	CVOBJ *cv;
 	cv = getcvobj(id);
@@ -119,7 +125,7 @@ void hspcv_exchange( int id, IplImage *img )
 
 IplImage *hspcv_temp( int sx, int sy )
 {
-	//		ƒeƒ“ƒ|ƒ‰ƒŠƒoƒbƒtƒ@‚ðì¬‚·‚é
+	//		ãƒ†ãƒ³ãƒãƒ©ãƒªãƒãƒƒãƒ•ã‚¡ã‚’ä½œæˆã™ã‚‹
 	//
 	IplImage *img;
 	CvSize r_size;
@@ -131,7 +137,7 @@ IplImage *hspcv_temp( int sx, int sy )
 
 IplImage *hspcv_tempgray( int sx, int sy )
 {
-	//		ƒeƒ“ƒ|ƒ‰ƒŠƒoƒbƒtƒ@‚ðì¬‚·‚é
+	//		ãƒ†ãƒ³ãƒãƒ©ãƒªãƒãƒƒãƒ•ã‚¡ã‚’ä½œæˆã™ã‚‹
 	//
 	IplImage *img;
 	CvSize r_size;
@@ -143,7 +149,7 @@ IplImage *hspcv_tempgray( int sx, int sy )
 
 IplImage *hspcv_temp( int id )
 {
-	//		id‚Æ“¯‚¶ðŒ‚Åƒeƒ“ƒ|ƒ‰ƒŠƒoƒbƒtƒ@‚ðì¬‚·‚é
+	//		idã¨åŒã˜æ¡ä»¶ã§ãƒ†ãƒ³ãƒãƒ©ãƒªãƒãƒƒãƒ•ã‚¡ã‚’ä½œæˆã™ã‚‹
 	//
 	CVOBJ *cv;
 	int sx,sy;
@@ -167,7 +173,7 @@ int hspcv_picload( int id, char *fname )
 	CVOBJ *cv;
 	hspcv_release( id );
 	cv = getcvobj(id);
-	cv->img = cvLoadImage( fname, CV_LOAD_IMAGE_COLOR );	// ƒtƒ‹ƒJƒ‰[‚Å‰æ‘œ‚ðƒ[ƒh
+	cv->img = cvLoadImage( fname, CV_LOAD_IMAGE_COLOR );	// ãƒ•ãƒ«ã‚«ãƒ©ãƒ¼ã§ç”»åƒã‚’ãƒ­ãƒ¼ãƒ‰
 	if ( cv->img == NULL ) return -1;
 	cv->flag = CVOBJ_FLAG_USED;
 	cv->mode = 0;
@@ -268,7 +274,7 @@ int hspcv_getinfo( int id, int infoid )
 */
 /*------------------------------------------------------------*/
 
-//		cxcore‘¤‚ÌDllMain‚ðŽg—p‚·‚é
+//		cxcoreå´ã®DllMainã‚’ä½¿ç”¨ã™ã‚‹
 //
 int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
@@ -288,7 +294,7 @@ int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI cvreset( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI cvreset( HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3, HSPPTRINT p4 )
 {
 	//	(type$00)
 	hspcv_term();
@@ -296,33 +302,32 @@ EXPORT BOOL WINAPI cvreset( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI cvsel( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI cvsel( HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3, HSPPTRINT p4 )
 {
 	//	(type$00)
 	CVOBJ *cv;
-	curid = p1;
-	cv = getcvobj(p1);
+	curid = _p1;
+	cv = getcvobj(_p1);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI cvbuffer( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI cvbuffer( HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3, HSPPTRINT p4 )
 {
 	//	(type$00)
 	//		cvbuffer cvid, sx, sy
 	IplImage *img;
 	int sx,sy;
-
-	sx = p2; if ( sx <= 0 ) sx = 640;
-	sy = p3; if ( sy <= 0 ) sy = 480;
+	sx = _p2; if ( sx <= 0 ) sx = 640;
+	sy = _p3; if ( sy <= 0 ) sy = 480;
 	img = hspcv_temp( sx, sy );
-	hspcv_exchange( p1, img );
+	hspcv_exchange( _p1, img );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI cvgetimg( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvgetimg( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$02)
 	//		cvgetimg cvid
@@ -337,9 +342,9 @@ EXPORT BOOL WINAPI cvgetimg( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int ep1,ep2,ep3;
 	BMSCR *bm;
 
-	ep1 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^1:”’l
-	//ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	//ep3 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:”’l
+	ep1 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	//ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	//ep3 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
 	ep2 = 0;
 	ep3 = 0;
 
@@ -382,7 +387,7 @@ EXPORT BOOL WINAPI cvgetimg( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvputimg( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvputimg( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$02)
 	//		cvputimg cvid
@@ -396,7 +401,7 @@ EXPORT BOOL WINAPI cvputimg( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int ep1,ep2,ep3;
 	BMSCR *bm;
 
-	ep1 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^1:”’l
+	ep1 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
 	ep2 = 0;
 	ep3 = 0;
 
@@ -427,7 +432,7 @@ EXPORT BOOL WINAPI cvputimg( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvload( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvload( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvload "filename",id
@@ -435,14 +440,14 @@ EXPORT BOOL WINAPI cvload( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char *ep1;
 	int ep2;
 	int i;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	ep2 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^2:”’l
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	ep2 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 	i = hspcv_picload( ep2, ep1 );
 	return i;
 }
 
 
-EXPORT BOOL WINAPI cvsave( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvsave( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvsave "filename", id, opt
@@ -450,24 +455,24 @@ EXPORT BOOL WINAPI cvsave( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char *ep1;
 	int ep2,ep3;
 	int i;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	ep2 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep3 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:”’l
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	ep2 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
 	i = hspcv_picsave( ep2, ep1, ep3 );
 	return i;
 }
 
 
-EXPORT BOOL WINAPI cvj2opt( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvj2opt( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvj2opt "format", "option"
 	//
 	char *ep1;
 	char *ep2;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
 	strncpy( fmtstr, ep1, 15 );
-	ep2 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶Žš—ñ
+	ep2 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	strncpy( optstr, ep2, OPTSTR_MAX-1 );
 
 	//cvSaveSetJasperFormat( "jp2", "rate=0.1" );
@@ -476,26 +481,26 @@ EXPORT BOOL WINAPI cvj2opt( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvgetinfo( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvgetinfo( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//	î•ñ‚ð“¾‚é(•Ï”‚É’l‚ð‘ã“ü)
-	//		cvgetinfo •Ï”, infoid, id
+	//	æƒ…å ±ã‚’å¾—ã‚‹(å¤‰æ•°ã«å€¤ã‚’ä»£å…¥)
+	//		cvgetinfo å¤‰æ•°, infoid, id
 	//
 	PVal *pv;
 	APTR ap;
 	int ep1,ep2;
 	int res;
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep2 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^3:”’l
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
 	res = hspcv_getinfo( ep1, ep2 );
-	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_INT, &res );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, HSPVAR_FLAG_INT, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI cvresize( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvresize( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$00)
 	//		cvresize sx, sy, cvid, opt
@@ -503,10 +508,10 @@ EXPORT BOOL WINAPI cvresize( HSPEXINFO *hei, int p1, int p2, int p3 )
 	IplImage *img;
 	int ep1,ep2,ep3,ep4;
 
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep3 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep4 = hei->HspFunc_prm_getdi(CV_INTER_LINEAR);		// ƒpƒ‰ƒ[ƒ^4:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep4 = hei->HspFunc_prm_getdi(CV_INTER_LINEAR);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
 
 	cv = getcvobj(ep3);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -517,18 +522,18 @@ EXPORT BOOL WINAPI cvresize( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvsmooth( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvsmooth( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvsmooth type, opt1, opt2, opt3, id
 	CVOBJ *cv;
 	IplImage *img;
 	int ep1,ep2,ep3,ep4,ep5;
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep3 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep4 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^4:”’l
-	ep5 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^5:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep4 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
+	ep5 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿5:æ•°å€¤
 
 	cv = getcvobj(ep5);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -541,7 +546,7 @@ EXPORT BOOL WINAPI cvsmooth( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvthreshold( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvthreshold( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvthreshold type, opt1, opt2, id
@@ -549,10 +554,10 @@ EXPORT BOOL WINAPI cvthreshold( HSPEXINFO *hei, int p1, int p2, int p3 )
 	IplImage *img;
 	int ep1,ep4;
 	double ep2,ep3;
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdd(0.0);		// ƒpƒ‰ƒ[ƒ^2:ŽÀ”’l
-	ep3 = hei->HspFunc_prm_getdd(0.0);		// ƒpƒ‰ƒ[ƒ^3:ŽÀ”’l
-	ep4 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^4:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdd(0.0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å®Ÿæ•°å€¤
+	ep3 = hei->HspFunc_prm_getdd(0.0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:å®Ÿæ•°å€¤
+	ep4 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
 
 	cv = getcvobj(ep4);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -564,7 +569,7 @@ EXPORT BOOL WINAPI cvthreshold( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvrotate( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvrotate( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvrotate angle, scale, offsetx, offsety, type, id
@@ -579,13 +584,13 @@ EXPORT BOOL WINAPI cvrotate( HSPEXINFO *hei, int p1, int p2, int p3 )
 	scale = hei->HspFunc_prm_getdd( 1.0 );
 	ofsx = hei->HspFunc_prm_getdd( 0.0 );
 	ofsy = hei->HspFunc_prm_getdd( 0.0 );
-	ep1 = hei->HspFunc_prm_getdi(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS);		// ƒpƒ‰ƒ[ƒ^5:”’l
-	ep2 = hei->HspFunc_prm_getdi(curid);		// ƒpƒ‰ƒ[ƒ^6:”’l
+	ep1 = hei->HspFunc_prm_getdi(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿5:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(curid);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿6:æ•°å€¤
 	cv = getcvobj(ep2);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
 	img = hspcv_temp( ep2 );
-	center = cvPoint2D32f( (double)img->width/2.0+ofsx, (double)img->height/2.0+ofsy );	//‰ñ“]‚Ì’†S
-	rot_mat = cvCreateMat( 2, 3, CV_32FC1);				//    •ÏŠ·s—ñ
+	center = cvPoint2D32f( (double)img->width/2.0+ofsx, (double)img->height/2.0+ofsy );	//å›žè»¢ã®ä¸­å¿ƒ
+	rot_mat = cvCreateMat( 2, 3, CV_32FC1);				//    å¤‰æ›è¡Œåˆ—
 	cv2DRotationMatrix( center, ang, scale, rot_mat);
 	cvWarpAffine( cv->img, img, rot_mat, ep1 );
 	hspcv_exchange( ep2, img );
@@ -594,19 +599,19 @@ EXPORT BOOL WINAPI cvrotate( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvarea( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvarea( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvarea x,y,sx,sy
-	area_x  = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	area_y  = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	area_sx = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:”’l
-	area_sy = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^4:”’l
+	area_x  = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	area_y  = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	area_sx = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	area_sy = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI cvcopy( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvcopy( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvcopy src_id, dst_x, dst_y, dst_id, opt
@@ -616,11 +621,11 @@ EXPORT BOOL WINAPI cvcopy( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int dsx,dsy,ssx,ssy;
 	int res;
 
-	ep3 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep4 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^4:”’l
-	ep5 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^5:”’l
+	ep3 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep4 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
+	ep5 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿5:æ•°å€¤
 
 	cv_src = getcvobj(ep3);
 	cv_dst = getcvobj(ep4);
@@ -670,7 +675,7 @@ EXPORT BOOL WINAPI cvcopy( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvxors( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvxors( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvarea r,g,b,id
@@ -678,10 +683,10 @@ EXPORT BOOL WINAPI cvxors( HSPEXINFO *hei, int p1, int p2, int p3 )
 	IplImage *img;
 	int ep1,ep2,ep3,ep4;
 
-	ep1 = hei->HspFunc_prm_getdi(255);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(255);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep3 = hei->HspFunc_prm_getdi(255);		// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep4 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^4:”’l
+	ep1 = hei->HspFunc_prm_getdi(255);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(255);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(255);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep4 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
 
 	cv = getcvobj(ep4);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -692,7 +697,7 @@ EXPORT BOOL WINAPI cvxors( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvflip( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvflip( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvflip mode,id
@@ -700,8 +705,8 @@ EXPORT BOOL WINAPI cvflip( HSPEXINFO *hei, int p1, int p2, int p3 )
 	CVOBJ *cv;
 	int ep1,ep2;
 
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^2:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	cv = getcvobj(ep2);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -710,7 +715,7 @@ EXPORT BOOL WINAPI cvflip( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvconvert( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvconvert( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvconvert type, id
@@ -719,8 +724,8 @@ EXPORT BOOL WINAPI cvconvert( HSPEXINFO *hei, int p1, int p2, int p3 )
 	IplImage *img;
 	int ep1,ep2;
 	int sx,sy;
-	ep1 = hei->HspFunc_prm_getdi(0);				// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(curid);			// ƒpƒ‰ƒ[ƒ^2:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);				// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(curid);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	cv = getcvobj(ep2);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -742,20 +747,20 @@ EXPORT BOOL WINAPI cvconvert( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvloadxml( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvloadxml( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvloadxml "filename"
 	//
 	char *fname;
-	fname = hei->HspFunc_prm_gets();		// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
+	fname = hei->HspFunc_prm_gets();		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
     cascade = (CvHaarClassifierCascade*)cvLoad( fname, 0, 0, 0 );
 	if ( cascade == NULL ) return -1;
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI cvfacedetect( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvfacedetect( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvfacedetect id, scale
@@ -764,8 +769,8 @@ EXPORT BOOL WINAPI cvfacedetect( HSPEXINFO *hei, int p1, int p2, int p3 )
 	IplImage *img;
 	int ep1;
 
-	ep1 = hei->HspFunc_prm_getdi(curid);	// ƒpƒ‰ƒ[ƒ^1:”’l
-	cvface_scale = hei->HspFunc_prm_getdd(1.0);	// ƒpƒ‰ƒ[ƒ^2:”’l
+	ep1 = hei->HspFunc_prm_getdi(curid);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	cvface_scale = hei->HspFunc_prm_getdd(1.0);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	cv = getcvobj(ep1);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return 0;
@@ -804,7 +809,7 @@ EXPORT BOOL WINAPI cvfacedetect( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvgetface( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvgetface( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvgetface var_x, var_y, var_sx, var_sy
@@ -820,10 +825,10 @@ EXPORT BOOL WINAPI cvgetface( HSPEXINFO *hei, int p1, int p2, int p3 )
 	APTR ap4;
 	int x,y,sx,sy;
 
-	ap  = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^2:•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^3:•Ï”
-	ap4 = hei->HspFunc_prm_getva( &pv4 );		// ƒpƒ‰ƒ[ƒ^4:•Ï”
+	ap  = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:å¤‰æ•°
+	ap4 = hei->HspFunc_prm_getva( &pv4 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:å¤‰æ•°
 
 	if ( cvface_id >= cvface_total ) {
 		return -1;
@@ -836,14 +841,14 @@ EXPORT BOOL WINAPI cvgetface( HSPEXINFO *hei, int p1, int p2, int p3 )
 	sx = cvRound( r->width * cvface_scale );
 	sy = cvRound( r->height * cvface_scale );
 
-	hei->HspFunc_prm_setva( pv,  ap,  HSPVAR_FLAG_INT, &x );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, HSPVAR_FLAG_INT, &y );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, HSPVAR_FLAG_INT, &sx );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv4, ap4, HSPVAR_FLAG_INT, &sy );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv,  ap,  HSPVAR_FLAG_INT, &x );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, HSPVAR_FLAG_INT, &y );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, HSPVAR_FLAG_INT, &sx );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv4, ap4, HSPVAR_FLAG_INT, &sy );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	cvface_id++;
 	if ( cvface_id >= cvface_total ) {
-		//		ƒf[ƒ^‚ðÅŒã‚Ü‚ÅŽæ‚Á‚½‚çƒƒ‚ƒŠ‚ð‰ð•ú‚·‚é
+		//		ãƒ‡ãƒ¼ã‚¿ã‚’æœ€å¾Œã¾ã§å–ã£ãŸã‚‰ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹
 		cvReleaseMemStorage( &storage );
 		storage = NULL;
 	}
@@ -852,7 +857,7 @@ EXPORT BOOL WINAPI cvgetface( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvmatch( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvmatch( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvmatch x, y, mode, src_id, target_id
@@ -869,11 +874,11 @@ EXPORT BOOL WINAPI cvmatch( HSPEXINFO *hei, int p1, int p2, int p3 )
 	CvPoint min_loc, max_loc;
 	int x,y;
 
-	ap  = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^2:•Ï”
-	ep1 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^4:”’l
-	ep3 = hei->HspFunc_prm_getdi(curid);		// ƒpƒ‰ƒ[ƒ^5:”’l
+	ap  = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(curid);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿5:æ•°å€¤
 
 	cv_src = getcvobj(ep2);
 	if ( cv_src->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -886,8 +891,8 @@ EXPORT BOOL WINAPI cvmatch( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	x = min_loc.x;
 	y = min_loc.y;
-	hei->HspFunc_prm_setva( pv,  ap,  HSPVAR_FLAG_INT, &x );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, HSPVAR_FLAG_INT, &y );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv,  ap,  HSPVAR_FLAG_INT, &x );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, HSPVAR_FLAG_INT, &y );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	cvReleaseImage( &result );
 	return 0;
@@ -900,15 +905,15 @@ EXPORT BOOL WINAPI cvmatch( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 #ifdef HSPCV_USE_VIDEO
 
-EXPORT BOOL WINAPI cvcapture( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvcapture( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvcapture camid,id
 	int ep1,ep2;
 	CVOBJ *cv;
 
-	ep1  = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2  = hei->HspFunc_prm_getdi(curid);		// ƒpƒ‰ƒ[ƒ^2:”’l
+	ep1  = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2  = hei->HspFunc_prm_getdi(curid);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	cv = getcvobj(ep2);
 	//if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -926,7 +931,7 @@ EXPORT BOOL WINAPI cvcapture( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvgetcapture( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvgetcapture( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvgetcapture
@@ -936,13 +941,13 @@ EXPORT BOOL WINAPI cvgetcapture( HSPEXINFO *hei, int p1, int p2, int p3 )
 	cv = getcvobj(cvideo_id);
 	img = cvQueryFrame( cvideo );
 	hspcv_exchange( cvideo_id, img );
-	cv->flag = CVOBJ_FLAG_VIDEOCAP;			// ‚±‚ÌID‚Í‰ð•ú‚Ì•K—v‚È‚µ
+	cv->flag = CVOBJ_FLAG_VIDEOCAP;			// ã“ã®IDã¯è§£æ”¾ã®å¿…è¦ãªã—
 
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI cvendcapture( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvendcapture( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvendcapture
@@ -953,7 +958,7 @@ EXPORT BOOL WINAPI cvendcapture( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvopenavi( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvopenavi( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvmakeavi "filename",id
@@ -961,8 +966,8 @@ EXPORT BOOL WINAPI cvopenavi( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int ep1;
 	CVOBJ *cv;
 
-	fname = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	ep1  = hei->HspFunc_prm_getdi(curid);		// ƒpƒ‰ƒ[ƒ^2:”’l
+	fname = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	ep1  = hei->HspFunc_prm_getdi(curid);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 
 	cv = getcvobj(ep1);
 	//if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -975,7 +980,7 @@ EXPORT BOOL WINAPI cvopenavi( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvgetavi( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvgetavi( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvgetavi
@@ -986,13 +991,13 @@ EXPORT BOOL WINAPI cvgetavi( HSPEXINFO *hei, int p1, int p2, int p3 )
 	img = cvQueryFrame( cvideo );
 	if ( img == NULL ) return -1;
 	hspcv_exchange( cvideo_id, img );
-	cv->flag = CVOBJ_FLAG_VIDEOCAP;			// ‚±‚ÌID‚Í‰ð•ú‚Ì•K—v‚È‚µ
+	cv->flag = CVOBJ_FLAG_VIDEOCAP;			// ã“ã®IDã¯è§£æ”¾ã®å¿…è¦ãªã—
 
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI cvcloseavi( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvcloseavi( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvcloseavi
@@ -1003,7 +1008,7 @@ EXPORT BOOL WINAPI cvcloseavi( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvmakeavi( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvmakeavi( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvmakeavi "filename",codec,fps,id
@@ -1012,10 +1017,10 @@ EXPORT BOOL WINAPI cvmakeavi( HSPEXINFO *hei, int p1, int p2, int p3 )
 	double fps;
 	CVOBJ *cv;
 
-	fname = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	codec = hei->HspFunc_prm_getdi(-1);			// ƒpƒ‰ƒ[ƒ^2:”’l
-	fps = hei->HspFunc_prm_getdd(29.97);		// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep1  = hei->HspFunc_prm_getdi(curid);		// ƒpƒ‰ƒ[ƒ^4:”’l
+	fname = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	codec = hei->HspFunc_prm_getdi(-1);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	fps = hei->HspFunc_prm_getdd(29.97);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep1  = hei->HspFunc_prm_getdi(curid);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
 
 	cv = getcvobj(ep1);
 	if ( cv->flag == CVOBJ_FLAG_NONE ) return -1;
@@ -1031,7 +1036,7 @@ EXPORT BOOL WINAPI cvmakeavi( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvputavi( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvputavi( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvputavi
@@ -1044,7 +1049,7 @@ EXPORT BOOL WINAPI cvputavi( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI cvendavi( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI cvendavi( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		cvendavi

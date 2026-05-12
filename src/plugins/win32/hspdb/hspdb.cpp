@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "cezdb.h"
-#include "hspdll.h"
+#include "../hpi3sample/hsp3plugin.h"
 
 /*------------------------------------------------------------*/
 static	cezdb *db;
@@ -28,7 +28,7 @@ int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 
 char *getvptr( HSPEXINFO *hei, PVal **pval, int *size )
 {
-	//		•Ï”ƒ|ƒCƒ“ƒ^‚ğ“¾‚é
+	//		å¤‰æ•°ãƒã‚¤ãƒ³ã‚¿ã‚’å¾—ã‚‹
 	//
 	APTR aptr;
 	PDAT *pdat;
@@ -40,21 +40,6 @@ char *getvptr( HSPEXINFO *hei, PVal **pval, int *size )
 	return (char *)proc->GetBlockSize( *pval, pdat, size );
 }
 
-/*
-static int valsize( PVAL2 *pv )
-{
-	//		calc object memory used size
-	//			result : size(byte)
-	int i,j;
-	int vm=1;
-	i=1;
-	while(1) {
-		j=pv->len[i];if (j==0) break;
-		vm*=j;i++;if (i==5) break;
-	}
-	return vm<<2;
-}
-*/
 /*------------------------------------------------------------*/
 
 EXPORT BOOL WINAPI dbini( int p1, int p2, int p3, int p4 )
@@ -83,9 +68,9 @@ EXPORT BOOL WINAPI dbopen( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int res;
 	char *ep1;
 	int ep2;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶š—ñ
-	ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	if ( *hei->er ) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	if ( *hei->er ) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 	res = db->Connect( ep1, ep2 );
 	return res;
 }
@@ -114,8 +99,8 @@ EXPORT BOOL WINAPI dbsend( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//
 	int res;
 	char *ep1;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶š—ñ
-	if ( *hei->er ) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	if ( *hei->er ) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 	res = db->SendSQL( ep1 );
 	return res;
 }
@@ -123,7 +108,7 @@ EXPORT BOOL WINAPI dbsend( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 EXPORT BOOL WINAPI dbgets( HSPEXINFO *hei, int p1, int p2, int p3 )
 {
-	//	DLL dbgets •Ï” (type$202)
+	//	DLL dbgets å¤‰æ•° (type$202)
 	//
 	PVal *pval;
 	int i;
@@ -131,10 +116,10 @@ EXPORT BOOL WINAPI dbgets( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char *pt;
 
 	pt = getvptr( hei, &pval, &size );
-	//hei->HspFunc_prm_getv();				// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	//pval = *hei->mpval;						// •Ï”‚ÌPVAL2ƒ|ƒCƒ“ƒ^‚ğæ“¾
-	//if ( *hei->er ) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
-	//pval->flag=2;							// •¶š—ñŒ^‚É
+	//hei->HspFunc_prm_getv();				// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	//pval = *hei->mpval;						// å¤‰æ•°ã®PVAL2ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—
+	//if ( *hei->er ) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
+	//pval->flag=2;							// æ–‡å­—åˆ—å‹ã«
 	//pt=pval->pt;
 	*pt = 0;
 	//size = valsize( pval );
@@ -155,7 +140,7 @@ EXPORT BOOL WINAPI dbspchr( int p1, int p2, int p3, int p4 )
 
 static char *strstr2( char *target, char *src )
 {
-	//		strstrŠÖ”‚Ì‘SŠp‘Î‰”Å
+	//		strstré–¢æ•°ã®å…¨è§’å¯¾å¿œç‰ˆ
 	//
 	unsigned char *p;
 	unsigned char *s;
@@ -174,8 +159,8 @@ static char *strstr2( char *target, char *src )
 			a3=*p2++;if (a3==0) break;
 			if (a2!=a3) break;
 		}
-		p++;							// ŒŸõˆÊ’u‚ğˆÚ“®
-		if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 	}
@@ -196,13 +181,13 @@ EXPORT BOOL WINAPI dbcnvstr( HSPEXINFO *hei, int p1, int p2, int p3 )
 	char schstr[256];
 	char cnvstr[256];
 
-	vptr = (char *)hei->HspFunc_prm_getv();				// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	//pval = *hei->pval;						// •Ï”‚ÌPVAL2ƒ|ƒCƒ“ƒ^‚ğæ“¾
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶š—ñ
+	vptr = (char *)hei->HspFunc_prm_getv();				// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	//pval = *hei->pval;						// å¤‰æ•°ã®PVAL2ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	strcpy( schstr, ep1 );
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^3:•¶š—ñ
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ–‡å­—åˆ—
 	strcpy( cnvstr, ep1 );
-	if ( *hei->er ) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	if ( *hei->er ) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	stmp[0]=0;
 	vv = vptr;

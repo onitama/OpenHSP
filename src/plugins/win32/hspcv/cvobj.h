@@ -29,7 +29,7 @@ CVOBJ_INFO_BIT,
 };
 
 
-// CVOBJî•ñ
+// CVOBJæƒ…å ±
 typedef struct
 {
 short flag;			// enable flag
