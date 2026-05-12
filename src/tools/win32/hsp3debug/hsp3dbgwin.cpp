@@ -102,12 +102,12 @@ static void TabGeneralInit( void )
 	col.mask = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
 	col.fmt = LVCFMT_LEFT;
 	col.cx = 100;
-	col.pszText = TEXT("çÄñ⁄");
+	col.pszText = TEXT("Item");
 	col.iSubItem = 0;
 	ListView_InsertColumn( g_hGenList , 0 , &col);
 	col.cx = 400;
 	col.iSubItem = 1;
-	col.pszText = TEXT("ì‡óe");
+	col.pszText = TEXT("Values");
 	ListView_InsertColumn( g_hGenList , 1 , &col);
 }
 
@@ -126,7 +126,7 @@ static void TabGeneralReset( void )
 	tgmax = 0;
 
 	p0 = g_debug->get_value(DEBUGINFO_GENERAL);
-	p = chartoapichar(p0,&hactmp1);		// HSPë§Ç…ñ‚Ç¢çáÇÌÇπ
+	p = chartoapichar(p0,&hactmp1);		// HSPÂÅ¥„Å´Âïè„ÅÑÂêà„Çè„Åõ
 	strsp_ini();
 	while(1) {
 		chk = strsp_get( p, name, 0, 255 );
@@ -201,7 +201,7 @@ static void TabVarsReset( void )
 	SetWindowLong( g_hVarList, GWL_STYLE, style );
 */
 	SendMessage( g_hVarList, LB_RESETCONTENT, 0, 0L );
-	p0 = g_debug->get_varinf( NULL, opt );					// HSPë§Ç…ñ‚Ç¢çáÇÌÇπ
+	p0 = g_debug->get_varinf( NULL, opt );					// HSPÂÅ¥„Å´Âïè„ÅÑÂêà„Çè„Åõ
 	chartoapichar(p0, &p);
 	if ( opt & 1 ) SortNote( p );
 
@@ -226,7 +226,7 @@ static void TabVarsUpdate( void )
 	i = (int)SendMessage( g_hVarList, LB_GETCURSEL,0,0L );
 	if ( i < 0 ) return;
 	SendMessage( g_hVarList, LB_GETTEXT, i, (LPARAM)tmp );
-	p = g_debug->get_varinf( apichartohspchar(tmp,&hctmp1), GetTabVarsOption() );		// HSPë§Ç…ñ‚Ç¢çáÇÌÇπ
+	p = g_debug->get_varinf( apichartohspchar(tmp,&hctmp1), GetTabVarsOption() );		// HSPÂÅ¥„Å´Âïè„ÅÑÂêà„Çè„Åõ
 	freehc(&hctmp1);
 	SetWindowText( g_hVarEdit, chartoapichar(p,&hactmp1) );
 	freehac(&hactmp1);
@@ -248,7 +248,7 @@ static void TabLogAdd( LPTSTR str )
 
 LRESULT CALLBACK TabGeneralProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
-	//		GENERALÉ^Éu
+	//		GENERAL„Çø„Éñ
 	//
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -270,7 +270,7 @@ LRESULT CALLBACK TabGeneralProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 
 LRESULT CALLBACK TabVarsProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
-	//		VariablesÉ^Éu
+	//		Variables„Çø„Éñ
 	//
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -300,7 +300,7 @@ LRESULT CALLBACK TabVarsProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 
 LRESULT CALLBACK TabLogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
-	//		LogÉ^Éu
+	//		Log„Çø„Éñ
 	//
 	HFONT hf;
 	switch (msg) {
@@ -309,7 +309,7 @@ LRESULT CALLBACK TabLogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		g_hLogEdit = GetDlgItem( hDlg, IDC_EDIT1 );
 		SendMessageA(g_hLogEdit, EM_LIMITTEXT, 0, 0);
 		hf = (HFONT)GetStockObject( DEFAULT_GUI_FONT );
-		g_hBtn4 = GenerateObj( g_hLogPage, TEXT("button"), TEXT("ÉçÉOè¡ãé"), 266/*DIALOG_X0+168*/, 326/*DIALOG_Y1+4*/, 80, 24, ID_BTN4, hf );
+		g_hBtn4 = GenerateObj( g_hLogPage, TEXT("button"), TEXT("Clear"), 266/*DIALOG_X0+168*/, 326/*DIALOG_Y1+4*/, 80, 24, ID_BTN4, hf );
 	return TRUE;
 	case WM_COMMAND:
 		switch (LOWORD(wp)) {
@@ -325,7 +325,7 @@ LRESULT CALLBACK TabLogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 
 LRESULT CALLBACK TabCallstackProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
-	//      CallstackÉ^Éu
+	//      Callstack„Çø„Éñ
 	//
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -337,7 +337,7 @@ LRESULT CALLBACK TabCallstackProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 }
 
 
-// êeÉ_ÉCÉAÉçÉOÇÃÉRÅ[ÉãÉoÉbÉNä÷êî
+// Ë¶™„ÉÄ„Ç§„Ç¢„É≠„Ç∞„ÅÆ„Ç≥„Éº„É´„Éê„ÉÉ„ÇØÈñ¢Êï∞
 LRESULT CALLBACK DlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
 	TCITEM	tc;
@@ -348,36 +348,36 @@ LRESULT CALLBACK DlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 
 	switch (msg) {
 
-	// èâä˙âª
+	// ÂàùÊúüÂåñ
 	case WM_CREATE:
 
 		hf = (HFONT)GetStockObject( DEFAULT_GUI_FONT );
 		g_hTabCtrl = GenerateObj( hDlg, WC_TABCONTROL, TEXT(""), DIALOG_X0, DIALOG_Y0, DIALOG_X1, DIALOG_Y2, IDU_TAB, hf );
 		g_hSttCtrl = GenerateObj( hDlg, TEXT("static"), TEXT(""), DIALOG_X0+180, DIALOG_Y1+4, DIALOG_X1-180, 48, 0, hf );
-		g_hBtn1 = GenerateObj( hDlg, TEXT("button"), TEXT("é¿çs"), DIALOG_X0+8, DIALOG_Y1+4, 80, 24, ID_BTN1, hf );
-		g_hBtn2 = GenerateObj( hDlg, TEXT("button"), TEXT("éüçs"), DIALOG_X0+88, DIALOG_Y1+4, 40, 24, ID_BTN2, hf );
-		g_hBtn3 = GenerateObj( hDlg, TEXT("button"), TEXT("í‚é~"), DIALOG_X0+128, DIALOG_Y1+4, 40, 24, ID_BTN3, hf );
+		g_hBtn1 = GenerateObj( hDlg, TEXT("button"), TEXT("Run"), DIALOG_X0+8, DIALOG_Y1+4, 80, 24, ID_BTN1, hf );
+		g_hBtn2 = GenerateObj( hDlg, TEXT("button"), TEXT("Next"), DIALOG_X0+88, DIALOG_Y1+4, 40, 24, ID_BTN2, hf );
+		g_hBtn3 = GenerateObj( hDlg, TEXT("button"), TEXT("Stop"), DIALOG_X0+128, DIALOG_Y1+4, 40, 24, ID_BTN3, hf );
 
 		tc.mask = TCIF_TEXT;
-		tc.pszText = TEXT("ëSî ");
+		tc.pszText = TEXT("General");
 		TabCtrl_InsertItem(g_hTabCtrl , 0, &tc);
 		g_hTabSheet[0] = CreateDialog( myinst, TEXT("T_GENERAL"),
 			hDlg, (DLGPROC) TabGeneralProc );
 
 		tc.mask = TCIF_TEXT;
-		tc.pszText = TEXT("ïœêî");
+		tc.pszText = TEXT("Variables");
 		TabCtrl_InsertItem(g_hTabCtrl , 1, &tc);
 		g_hTabSheet[1] = CreateDialog( myinst, TEXT("T_VAR"),
 			hDlg, (DLGPROC) TabVarsProc );
 
 		tc.mask = TCIF_TEXT;
-		tc.pszText = TEXT("ÉçÉO");
+		tc.pszText = TEXT("Log");
 		TabCtrl_InsertItem(g_hTabCtrl , 2, &tc);
 		g_hTabSheet[2] = CreateDialog( myinst, TEXT("T_LOG"),
 			hDlg, (DLGPROC) TabLogProc );
 
 		tc.mask = TCIF_TEXT;
-		tc.pszText = TEXT("ÉRÅ[ÉãÉXÉ^ÉbÉN");
+		tc.pszText = TEXT("Call Stack");
 		TabCtrl_InsertItem(g_hTabCtrl , 3, &tc);
 		g_hTabSheet[3] = CreateDialog( myinst, TEXT("T_CALL"),
 			hDlg, (DLGPROC) TabCallstackProc );
@@ -387,20 +387,20 @@ LRESULT CALLBACK DlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		//TabCtrl_AdjustRect(g_hTabCtrl, FALSE, &rt);
 		//MapWindowPoints(g_hTabCtrl, hDlg, pt, 2);
 
-		// ê∂ê¨ÇµÇΩéqÉ_ÉCÉAÉçÉOÇÉ^ÉuÉVÅ[ÉgÇÃè„Ç…ì\ÇËïtÇØÇÈ
+		// ÁîüÊàê„Åó„ÅüÂ≠ê„ÉÄ„Ç§„Ç¢„É≠„Ç∞„Çí„Çø„Éñ„Ç∑„Éº„Éà„ÅÆ‰∏ä„Å´Ë≤º„Çä‰ªò„Åë„Çã
 		for (i=0;i<TABDLGMAX;i++) {
 			MoveWindow( g_hTabSheet[i], rt.left, rt.top,
 				rt.right - rt.left, rt.bottom - rt.top, FALSE);
 		}
 
-		// ÉfÉtÉHÉãÉgÇ≈ç∂ë§ÇÃÉ^ÉuÇï\é¶
+		// „Éá„Éï„Ç©„É´„Éà„ÅßÂ∑¶ÂÅ¥„ÅÆ„Çø„Éñ„ÇíË°®Á§∫
 		ShowWindow(g_hTabSheet[0], SW_SHOW);
 		return TRUE;
 
 	case WM_NOTIFY:
 		{
 		int cur;
-		NMHDR *nm = (NMHDR *) lp;		// É^ÉuÉRÉìÉgÉçÅ[ÉãÇÃÉVÅ[ÉgêÿÇËë÷Ç¶í ím
+		NMHDR *nm = (NMHDR *) lp;		// „Çø„Éñ„Ç≥„É≥„Éà„É≠„Éº„É´„ÅÆ„Ç∑„Éº„ÉàÂàá„ÇäÊõø„ÅàÈÄöÁü•
 		cur = TabCtrl_GetCurSel(g_hTabCtrl);
 		for (i=0;i<TABDLGMAX;i++) {
 			if ( i == cur ) {

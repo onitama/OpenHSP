@@ -13,7 +13,7 @@
 #include "supio.h"
 
 //
-//		API—p‚Ì•¶ŽšƒGƒ“ƒR[ƒh‚Ö•ÏŠ·
+//		APIç”¨ã®æ–‡å­—ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã¸å¤‰æ›
 //
 #ifdef HSPUTF8
 HSPAPICHAR *chartoapichar(const char *orig, HSPAPICHAR **pphac)
@@ -216,7 +216,7 @@ char *dpm_readalloc( char *fname )
 
 void strcase( LPTSTR target )
 {
-	//		str‚ð‚·‚×‚Ä¬•¶Žš‚É(‘SŠp‘Î‰ž”Å)
+	//		strã‚’ã™ã¹ã¦å°æ–‡å­—ã«(å…¨è§’å¯¾å¿œç‰ˆ)
 	//
 	unsigned char *p;
 	unsigned char a1;
@@ -224,9 +224,9 @@ void strcase( LPTSTR target )
 	while(1) {
 		a1=*p;if ( a1==0 ) break;
 		*p=tolower(a1);
-		p++;							// ŒŸõˆÊ’u‚ðˆÚ“®
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
 #ifndef HSPUTF8
-		if (a1>=129) {					// ‘SŠp•¶Žšƒ`ƒFƒbƒN
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 #endif
@@ -271,7 +271,7 @@ int strcat2( LPTSTR str1, LPTSTR str2 )
 
 char *strstr2( LPTSTR target, LPTSTR src )
 {
-	//		strstrŠÖ”‚Ì‘SŠp‘Î‰ž”Å
+	//		strstré–¢æ•°ã®å…¨è§’å¯¾å¿œç‰ˆ
 	//
 	unsigned char *p;
 	unsigned char *s;
@@ -290,9 +290,9 @@ char *strstr2( LPTSTR target, LPTSTR src )
 			a3=*p2++;if (a3==0) break;
 			if (a2!=a3) break;
 		}
-		p++;							// ŒŸõˆÊ’u‚ðˆÚ“®
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
 #ifndef HSPUTF8
-		if (a1>=129) {					// ‘SŠp•¶Žšƒ`ƒFƒbƒN
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 #endif
@@ -303,7 +303,7 @@ char *strstr2( LPTSTR target, LPTSTR src )
 
 char *strchr2( LPTSTR target, TCHAR code )
 {
-	//		str’†ÅŒã‚ÌcodeˆÊ’u‚ð’T‚·(‘SŠp‘Î‰ž”Å)
+	//		strä¸­æœ€å¾Œã®codeä½ç½®ã‚’æŽ¢ã™(å…¨è§’å¯¾å¿œç‰ˆ)
 	//
 	unsigned char *p;
 	unsigned char a1;
@@ -313,9 +313,9 @@ char *strchr2( LPTSTR target, TCHAR code )
 	while(1) {
 		a1=*p;if ( a1==0 ) break;
 		if ( a1==code ) res=(char *)p;
-		p++;							// ŒŸõˆÊ’u‚ðˆÚ“®
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
 #ifndef HSPUTF8
-		if (a1>=129) {					// ‘SŠp•¶Žšƒ`ƒFƒbƒN
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 #endif

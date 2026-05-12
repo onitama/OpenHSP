@@ -39,7 +39,7 @@ BOOL InitToolTip (HWND hwndToolBar, HWND hwndComboBox)
 	 ti.cbSize = sizeof (TOOLINFO) ;
      ti.uFlags = TTF_IDISHWND | TTF_CENTERTIP | TTF_SUBCLASS ;
      ti.hwnd   = hwndToolBar ;
-     ti.uId    = (UINT) (HWND) hwndComboBox ;
+     ti.uId    = (UINT_PTR) (HWND) hwndComboBox ;
      ti.lpszText = LPSTR_TEXTCALLBACK ;
      bSuccess = ToolTip_AddTool (hwndTT, &ti) ;
      if (!bSuccess)
@@ -47,7 +47,7 @@ BOOL InitToolTip (HWND hwndToolBar, HWND hwndComboBox)
 
      // Add tooltip for combo box's edit control
      hwndEdit = GetWindow (hwndComboBox, GW_CHILD) ;
-     ti.uId    = (UINT) (HWND) hwndEdit ;
+     ti.uId    = (UINT_PTR) (HWND) hwndEdit ;
      bSuccess = ToolTip_AddTool (hwndTT, &ti) ;
 
      return bSuccess ;
@@ -57,7 +57,7 @@ BOOL InitToolTip (HWND hwndToolBar, HWND hwndComboBox)
 void CopyToolTipText (LPTOOLTIPTEXT lpttt)
      {
      int i ;
-     int iButton = lpttt->hdr.idFrom ;
+     UINT_PTR iButton = lpttt->hdr.idFrom ;
      int cb ;
      int cMax ;
      LPSTR pString ;
@@ -66,8 +66,8 @@ void CopyToolTipText (LPTOOLTIPTEXT lpttt)
      // Check for combo box window handles
      if (lpttt->uFlags & TTF_IDISHWND)
           {
-          if ((iButton == (int) hwndCombo) ||
-              (iButton == (int) hwndEdit))
+          if ((iButton == (UINT_PTR) hwndCombo) ||
+              (iButton == (UINT_PTR) hwndEdit))
                {
                lstrcpy (pDest, "1-2-3 ComboBox") ;
                return ;

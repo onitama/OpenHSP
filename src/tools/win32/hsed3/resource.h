@@ -48,6 +48,7 @@
 #define IDM_START_RUNTIMEMAN            40022
 #define IDM_OPEN_SRCFOLDER              40024
 #define IDM_STARTDIR                    40026
+#define IDM_RUNTIME64                       40027
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

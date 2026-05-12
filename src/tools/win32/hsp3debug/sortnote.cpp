@@ -11,8 +11,8 @@
 #include "supio.h"
 
 typedef struct {
-    int key;
-    int info;
+	char* key;
+	int info;
 } SORTDATA;
 
 static	SORTDATA *dtmp = NULL;
@@ -21,8 +21,8 @@ static void swap(SORTDATA *a, SORTDATA *b)
 {
     SORTDATA t;
 
-    t.key   = a->key;
-    t.info  = a->info;
+	t.key = a->key;
+	t.info  = a->info;
     a->key  = b->key;
     a->info = b->info;
     b->key  = t.key;
@@ -55,7 +55,7 @@ static int NoteToData( LPTSTR adr, SORTDATA *data )
 	TCHAR a1;
 	p=adr;
 	line=0;
-	data[line].key=(int)p;
+	data[line].key=(char *)p;
 	data[line].info=line;
 
 	while(1) {
@@ -65,7 +65,7 @@ static int NoteToData( LPTSTR adr, SORTDATA *data )
 			*p++=0;					// Remove CR/LF
 			if (*p==10) p++;
 			line++;
-			data[line].key=(int)p;
+			data[line].key=(char *)p;
 			data[line].info=line;
 		}
 		else p++;
@@ -147,11 +147,12 @@ void SortNote( LPTSTR str )
 
 	DataIni( i );
 	stmp=(LPTSTR)malloc( len*sizeof(TCHAR) );
+	if (stmp == NULL) return;
 
 	i = NoteToData( p, dtmp );
 	BubbleSortStr( dtmp, i, 1 );
 	DataToNote( dtmp, stmp, i );
-	lstrcpy( p,stmp );
+	lstrcpy( p, (LPTSTR)stmp );
 
 	free(stmp);
 	DataBye();

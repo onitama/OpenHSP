@@ -289,6 +289,7 @@ EXPORT BOOL WINAPI hsc_comp (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT
 	//			(       4=UTF8 output mode )
 	//			(       8=strmap output mode )
 	//			(      16=keyword list mode )
+	//			(     128=64bit runtime mode )
 	//			(     256=emscripten mode )
 	//			( ppopt = preprocessor option )
 	//			(       0=default/1=ver2.6 mode )
@@ -302,6 +303,7 @@ p1が2(bit1)の場合はプリプロセス処理のみ行います。
 p1が4(bit2)の場合は文字列データをUTF-8コードに変換して出力します。
 p1が8(bit3)の場合は使用している文字列データファイル(strmap)を出力します
 p1が16(bit4)の場合はキーワード解析リストを出力します
+p1が128(bit7)の場合はデフォルトで64bitランタイムを選択します
 
 */
 	int st;
@@ -322,6 +324,7 @@ p1が16(bit4)の場合はキーワード解析リストを出力します
 	ppopt = 0;
 	if (p1 & 1) ppopt |= HSC3_OPT_DEBUGMODE;
 	if (p1 & 4) ppopt |= HSC3_OPT_UTF8OUT;
+	if (p1 & 128) ppopt |= HSC3_OPT_UTF8OUT | HSC3_OPT_RUNTIME64;
 	if (p1 & 256) ppopt |= HSC3_OPT_EMSCRIPTEN;
 
 	if ( p2&1 ) ppopt|=HSC3_OPT_NOHSPDEF;
@@ -343,6 +346,7 @@ p1が16(bit4)の場合はキーワード解析リストを出力します
 	cmpmode = p1 & HSC3_MODE_DEBUG;
 	if (p1 & 4) cmpmode |= HSC3_MODE_UTF8;
 	if (p1 & 8) cmpmode |= HSC3_MODE_STRMAP;
+	if (p1 & 128) cmpmode |= HSC3_MODE_RUNTIME64 | HSC3_MODE_UTF8;
 
 	if (p1 & 16) {
 		st = hsc3->CompileLabelOut(fname2, cmpmode);
