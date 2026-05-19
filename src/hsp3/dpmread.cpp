@@ -199,7 +199,7 @@ void dpm_memfile( void *mem, int size )
 char *dpm_readalloc( char *fname )
 {
 	char *p;
-	size_t len;
+	int64_t len;
 	len = filepack.pack_flength(fname);
 	if ( len < 0 ) return NULL;
 	p = mem_ini(len + 1);

@@ -23,7 +23,7 @@
 #define HFPOBJ_FLAG_EXE 8		// EXEファイル埋め込み
 #define HFPOBJ_FLAG_HSP36 16	// HSP3.6までの形式(階層なし)
 
-#define HFPSIZE uint64_t
+#define HFPSIZE int64_t
 
 #define HFP_FILEBASE_NORMAL 0
 #define HFP_FILEBASE_PACKEXE 1

@@ -88,7 +88,7 @@ HKEY keybase( int p1 )
 }
 
 
-EXPORT BOOL WINAPI regkey( int p1, int *p2, int p3, int p4 )
+EXPORT BOOL WINAPI regkey(HSPPTRINT p1, HSPPTRINT*p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		set registry key (type4)
 	//			regkey  keygroup, keydir, read/write sw , 0
@@ -113,7 +113,7 @@ EXPORT BOOL WINAPI regkey( int p1, int *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI regkill( int p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI regkill(HSPPTRINT p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		delete registry entry (type4)
@@ -128,7 +128,7 @@ EXPORT BOOL WINAPI regkill( int p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI getreg( void *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI getreg( void *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		get registry entry (type5)
@@ -147,7 +147,7 @@ EXPORT BOOL WINAPI getreg( void *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI setreg( void *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI setreg( void *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		set registry entry (type5)
@@ -168,7 +168,7 @@ EXPORT BOOL WINAPI setreg( void *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI reglist( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI reglist( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		listing registry entry (type1)
@@ -207,7 +207,7 @@ EXPORT BOOL WINAPI reglist( char *p1, int p2, int p3, int p4 )
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI sysexit ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI sysexit (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		System exit (type0)
 	//			sysexit type
@@ -279,7 +279,7 @@ EXPORT BOOL WINAPI sysinfo ( char *p1, int p2, int p3, int p4 )
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI clipsetg ( BMSCR *bm, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI clipsetg ( BMSCR *bm, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		screen->clipboard  (type2)
@@ -308,7 +308,7 @@ EXPORT BOOL WINAPI clipsetg ( BMSCR *bm, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI clipset ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI clipset ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		text->clipboard  (type6)
@@ -332,7 +332,7 @@ EXPORT BOOL WINAPI clipset ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI clipget ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI clipget ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		clipboard->text  (type1)

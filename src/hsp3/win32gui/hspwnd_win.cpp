@@ -655,7 +655,8 @@ int HspWnd::Picload( int id, char *fname, int mode )
 	void *pBuf;
     HGLOBAL h;
 	RECT rc;
-	int i,size,x,y,psx,psy;
+	int64_t size, i;
+	int x,y,psx,psy;
     HRESULT hr;
 	long hmWidth, hmHeight;
 	LPPICTURE gpPicture;							// IPicture
@@ -693,7 +694,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
 	if ( stbmode ) {						// stb_imageを使用して読み込む
 		int components;
 		unsigned char *sp_image;
-		sp_image = stbi_load_from_memory( (unsigned char *)pBuf, size, &psx, &psy, &components, 4 );
+		sp_image = stbi_load_from_memory( (unsigned char *)pBuf, (int)size, &psx, &psy, &components, 4 );
 		if ( sp_image == NULL ) return 3;
 
 		if (bm->palmode) return 3;
@@ -722,7 +723,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
 
 	hr = CreateStreamOnHGlobal( h, TRUE, &pstm );	// グローバル領域からIStreamを作成
     if( !SUCCEEDED(hr) ) return 3;
-    hr = OleLoadPicture( pstm, size, FALSE, IID_IPicture, (LPVOID *)&gpPicture );    // IPictureのオブジェクトのアドレスを取得
+    hr = OleLoadPicture( pstm, (LONG)size, FALSE, IID_IPicture, (LPVOID *)&gpPicture );    // IPictureのオブジェクトのアドレスを取得
     pstm->Release();							    // IStreamオブジェクトを開放
 	if( SUCCEEDED( hr ) == FALSE || gpPicture == NULL ) {
 		return 3;
@@ -1489,7 +1490,7 @@ void Bmscr::PrintLine( char *mes )
 		//TextOut( hdc, cx, cy , mes, a );
 		chartoapichar(mes,&hactmp1);
 
-		res = TabbedTextOut( hdc, cx, cy, hactmp1 , _tcslen(hactmp1), 0, NULL, 0 );
+		res = TabbedTextOut( hdc, cx, cy, hactmp1 , (int)_tcslen(hactmp1), 0, NULL, 0 );
 		freehac(&hactmp1);
 		size->cx = res & 0xffff;
 		size->cy = res>>16;

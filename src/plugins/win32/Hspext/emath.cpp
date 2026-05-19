@@ -26,7 +26,7 @@ static	double	emd_base=256;
 static	double	pi = 3.1415926535;
 static	double	parg = 40.74366543;
 
-EXPORT BOOL WINAPI emath ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI emath (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		ez-math initalize (type0)
 	//			emath fp-base
@@ -42,7 +42,7 @@ EXPORT BOOL WINAPI emath ( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI emstr ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI emstr ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		ez-math -> strings convert (type1)
 	//			emstr str_val, emval, length
@@ -59,7 +59,7 @@ EXPORT BOOL WINAPI emstr ( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI emcnv ( int *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI emcnv ( int *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		strings -> ez-math convert (type5)
 	//			emstr val, "1.123..."
@@ -71,7 +71,7 @@ EXPORT BOOL WINAPI emcnv ( int *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI emint ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI emint ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		strings -> ez-math convert (type1)
 	//			emint val, em_val
@@ -81,7 +81,7 @@ EXPORT BOOL WINAPI emint ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI emsin ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI emsin ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		ez-math sin (type1)
 	//			emsin val,arg
@@ -94,7 +94,7 @@ EXPORT BOOL WINAPI emsin ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI emcos ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI emcos ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		ez-math cos (type1)
 	//			emcos val,arg
@@ -107,7 +107,7 @@ EXPORT BOOL WINAPI emcos ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI ematan ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI ematan ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		ez-math atan (type1)
 	//			ematan val,x,y
@@ -119,7 +119,7 @@ EXPORT BOOL WINAPI ematan ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI emsqr ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI emsqr ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		ez-math square root (type1)
 	//			emsqr val,emval

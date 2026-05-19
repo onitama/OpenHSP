@@ -8,7 +8,7 @@
 #define PI2 6.28318530717958f
 #define HPI 1.570796326794895f
 
-// ®”AXIS2Œ^(UV•t‚«)
+// æ•´æ•°AXIS2å‹(UVä»˜ã)
 typedef struct {
 short x,y,tx,ty;
 } IAXIS2;
@@ -16,7 +16,7 @@ short x,y,tx,ty;
 #define setIAXIS( a,b,c ) a.x=(int)b;a.y=(int)c;
 #define setIAXIS2( a,b,c,d,e ) a.x=(int)b;a.y=(int)c;a.tx=(int)d;a.ty=(int)e;
 
-// lŠpŒ`ƒ|ƒŠƒSƒ“primitive
+// å››è§’å½¢ãƒãƒªã‚´ãƒ³primitive
 #define POLY4N 4
 typedef struct
 {
@@ -31,12 +31,12 @@ short specular;			// specular value (opt)
 } POLY4;
 
 
-//		attrƒR[ƒh
+//		attrã‚³ãƒ¼ãƒ‰
 //
 #define NODE_ATTR_COLKEY 0x8000
 #define NODE_ATTR_USEALPHA 0x4000
-#define NODE_ATTR_USEMATERIAL 0x400	// MaterialID(bit0-10)‚ğQÆ‚·‚é
-#define NODE_ATTR_GLOBALMAT 0x800	// ƒOƒ[ƒoƒ‹‚ÌMaterialID‚ğg—p‚·‚é
+#define NODE_ATTR_USEMATERIAL 0x400	// MaterialID(bit0-10)ã‚’å‚ç…§ã™ã‚‹
+#define NODE_ATTR_GLOBALMAT 0x800	// ã‚°ãƒ­ãƒ¼ãƒãƒ«ã®MaterialIDã‚’ä½¿ç”¨ã™ã‚‹
 #define NODE_ATTR_SHADE_NONE 0
 #define NODE_ATTR_SHADE_FLAT 1
 #define NODE_ATTR_SHADE_GOURAUD 2
@@ -48,7 +48,7 @@ short specular;			// specular value (opt)
 
 
 
-// ƒXƒLƒƒƒ“ƒ‰ƒCƒ“î•ñ
+// ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³æƒ…å ±
 typedef struct
 {
 int minX, maxX;		// left,right edge

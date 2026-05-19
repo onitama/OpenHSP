@@ -22,7 +22,7 @@
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI fxcopy ( char *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxcopy ( char *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		FileCopy srcfile,"distdir" (type5)
@@ -41,7 +41,7 @@ EXPORT BOOL WINAPI fxcopy ( char *p1, char *p2, int p3, int p4 )
 	return 0;
 }
 
-EXPORT BOOL WINAPI fxren ( char *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxren ( char *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		FileCopy srcfile,"distdir" (type5)
@@ -52,7 +52,7 @@ EXPORT BOOL WINAPI fxren ( char *p1, char *p2, int p3, int p4 )
 
 
 //
-//  ƒhƒ‰ƒCƒu‹ó‚«—e—Êæ“¾(FAT32‘Î‰)
+//  ãƒ‰ãƒ©ã‚¤ãƒ–ç©ºãå®¹é‡å–å¾—(FAT32å¯¾å¿œ)
 //
 static int GetDiskFree( char *path, DWORD *lword, DWORD *hword )
 {
@@ -94,7 +94,7 @@ static void GetDiskFreeStr( char *path, char *result )
 }
 
 
-EXPORT BOOL WINAPI fxinfo ( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxinfo ( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		Get Drive info  val, drive , type (type1)
@@ -111,7 +111,7 @@ EXPORT BOOL WINAPI fxinfo ( int *p1, int p2, int p3, int p4 )
 	//LPDWORD lpVolumeSerialNumber, 
 	//		address of volume serial number 
 	//LPDWORD lpMaximumComponentLength, 
-	//		address of systemfs maximum filename length 
+	//		address of systemâ€™s maximum filename length 
 	//LPDWORD lpFileSystemFlags, 
 	//		address of file system flags 
  
@@ -156,7 +156,7 @@ EXPORT BOOL WINAPI fxinfo ( int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI fxaset ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI fxaset ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		SetAttribute "file",type  (type6)
@@ -177,7 +177,7 @@ EXPORT BOOL WINAPI fxaset ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI fxaget ( int *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxaget ( int *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		GetAttribute val,"file" (type5)
@@ -190,7 +190,7 @@ EXPORT BOOL WINAPI fxaget ( int *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI fxtget ( int *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxtget ( int *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		GetFileTime  val,"file"  (type5)
@@ -222,7 +222,7 @@ EXPORT BOOL WINAPI fxtget ( int *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI fxtset ( int *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxtset ( int *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		SetFileTime  "file",type  (type5)
@@ -254,7 +254,7 @@ EXPORT BOOL WINAPI fxtset ( int *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI fxlong ( char *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxlong ( char *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		Get long file name
@@ -268,7 +268,7 @@ EXPORT BOOL WINAPI fxlong ( char *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI fxshort ( char *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxshort ( char *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		Get short file name
@@ -314,8 +314,8 @@ EXPORT BOOL WINAPI fxshort ( char *p1, char *p2, int p3, int p4 )
 */
 
 //*********************************************************
-// ŠÖ”SHGetSpecialFolderPath() ‚ªg—p‚Å‚«‚È‚¢ŠÂ‹«‚Å“ÁêƒtƒHƒ‹ƒ_‚ÌƒpƒX‚ğæ“¾‚·‚éB
-// ˆø”‚Í SHGetSpecialFolderPath() ‚Æ“¯‚¶B
+// é–¢æ•°SHGetSpecialFolderPath() ãŒä½¿ç”¨ã§ããªã„ç’°å¢ƒã§ç‰¹æ®Šãƒ•ã‚©ãƒ«ãƒ€ã®ãƒ‘ã‚¹ã‚’å–å¾—ã™ã‚‹ã€‚
+// å¼•æ•°ã¯ SHGetSpecialFolderPath() ã¨åŒã˜ã€‚
 //*********************************************************
 static BOOL GetSpecialFolderPath( HWND hWnd, int nFolder, char *Path )
 {
@@ -372,10 +372,10 @@ EXPORT BOOL WINAPI fxdir( char *p1, int p2, int p3, int p4 )
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI selfolder( char *p1, char *p2, int p3, char *p4 )
+EXPORT BOOL WINAPI selfolder( char *p1, char *p2, HSPPTRINT p3, char *p4 )
 {
 	//
-	//		ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO
+	//		ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 	//			(type$15)
 	//
 	BROWSEINFO BrowsingInfo;
@@ -389,7 +389,7 @@ EXPORT BOOL WINAPI selfolder( char *p1, char *p2, int p3, char *p4 )
 	BrowsingInfo.pszDisplayName = FolderName;
 
 	if (*p2==0) {
-		BrowsingInfo.lpszTitle      = "ƒtƒHƒ‹ƒ_‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢";
+		BrowsingInfo.lpszTitle      = "ãƒ•ã‚©ãƒ«ãƒ€ã‚’é¸æŠã—ã¦ãã ã•ã„";
 	}
 	else {
 		BrowsingInfo.lpszTitle      = p2;
@@ -400,7 +400,7 @@ EXPORT BOOL WINAPI selfolder( char *p1, char *p2, int p3, char *p4 )
 	if (ItemID==NULL) return -1;
 
 	SHGetPathFromIDList(ItemID, DirPath );
-	LocalFree( ItemID );						//ITEMIDLIST‚Ì‰ğ•ú
+	LocalFree( ItemID );						//ITEMIDLISTã®è§£æ”¾
 	strcpy( p1,DirPath );
 	strcpy( p4,FolderName );
 	return 0;
@@ -463,12 +463,12 @@ static void dirlist2adds( char *tmp )
 		if ( a1==0x22 ) { fl=2; break; }
 		if ( a1==',' ) fl=1;
 	}
-	if ( fl ) {											// "`" add
+	if ( fl ) {											// "ï½" add
 		dirlist_ptr[dirlist_cur++]=0x22;
 		if ( fl==2 ) dirlist_ptr[dirlist_cur++]=0x22;
 	}
 	dirlist2add( tmp );
-	if ( fl ) {											// "`" add
+	if ( fl ) {											// "ï½" add
 		dirlist_ptr[dirlist_cur++]=0x22;
 		if ( fl==2 ) dirlist_ptr[dirlist_cur++]=0x22;
 	}
@@ -508,7 +508,7 @@ static int dirlist2sub( char *filemask, int flag, char *prefix )
 	if (p3&2) fmask|=FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM;
 
 	if (p3&1) {
-		//		Ä‹AŒŸõ
+		//		å†å¸°æ¤œç´¢
 		//fmask|=FILE_ATTRIBUTE_DIRECTORY;
 		sh=FindFirstFile( "*.*", &fd );
 		if (sh==INVALID_HANDLE_VALUE) return 0;
@@ -660,10 +660,10 @@ static int dirlist2sub( char *filemask, int flag, char *prefix )
 }
 
 
-EXPORT BOOL WINAPI dirlist2( int *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI dirlist2( int *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
-	//		ƒtƒHƒ‹ƒ_“à—eæ“¾  sizeæ“¾•Ï”, "filemask", mode, split
+	//		ãƒ•ã‚©ãƒ«ãƒ€å†…å®¹å–å¾—  sizeå–å¾—å¤‰æ•°, "filemask", mode, split
 	//			(type$5)
 	//
 	int ff,rsize;
@@ -683,10 +683,10 @@ EXPORT BOOL WINAPI dirlist2( int *p1, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI dirlist2h( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI dirlist2h(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
-	//		ƒwƒbƒ_•¶š—ñİ’è  mode, split
+	//		ãƒ˜ãƒƒãƒ€æ–‡å­—åˆ—è¨­å®š  mode, split
 	//			(type$6)
 	//
 /*
@@ -707,7 +707,7 @@ EXPORT BOOL WINAPI dirlist2h( int p1, int p2, int p3, int p4 )
 EXPORT BOOL WINAPI dirlist2opt( char *p1, int p2, int p3, int p4 )
 {
 	//
-	//		option•¶š—ñİ’è  val, opt#
+	//		optionæ–‡å­—åˆ—è¨­å®š  val, opt#
 	//			(type$1)
 	//
 	dirlist_info_opt[ p2 ] = p1;
@@ -715,10 +715,10 @@ EXPORT BOOL WINAPI dirlist2opt( char *p1, int p2, int p3, int p4 )
 }
 */
 
-EXPORT BOOL WINAPI dirlist2r( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI dirlist2r( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
-	//		ƒtƒHƒ‹ƒ_“à—eæ“¾  æ“¾•Ï”
+	//		ãƒ•ã‚©ãƒ«ãƒ€å†…å®¹å–å¾—  å–å¾—å¤‰æ•°
 	//			(type$1)
 	//
 	*p1=0;

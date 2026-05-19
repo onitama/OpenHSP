@@ -12,7 +12,7 @@
 
 #include "fcpoly.h"
 
-extern int resY0, resY1;		// fcpoly.cpp‚Å’è‹`
+extern int resY0, resY1;		// fcpoly.cppã§å®šç¾©
 
 /*------------------------------------------------------------*/
 /*
@@ -33,12 +33,12 @@ static int calcofs2( BMSCR *bm, int px, int py )
 {
 	int vx,vy;
 	vx=bm->sx;vy=bm->sy;
-	gfvp2=vx*3;						// Y•ûŒü‚Ì‘•ªbyte”
+	gfvp2=vx*3;						// Yæ–¹å‘ã®å¢—åˆ†byteæ•°
 	return (vy-py-1)*gfvp2+(px*3);
 }
 
 
-EXPORT BOOL WINAPI gfini ( BMSCR *bm, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI gfini ( BMSCR *bm, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		clear vram area (type2)
 	//			gfini xsize,ysize
@@ -48,13 +48,13 @@ EXPORT BOOL WINAPI gfini ( BMSCR *bm, int p1, int p2, int p3 )
 	gfvx=bm->sx;gfvy=bm->sy;
 	if (gfsx==0) gfsx=gfvx;
 	if (gfsy==0) gfsy=gfvy;
-	gfvp=gfvx*3;						// Y•ûŒü‚Ì‘•ªbyte”
+	gfvp=gfvx*3;						// Yæ–¹å‘ã®å¢—åˆ†byteæ•°
 	vram=(bm->pBit)+calcofs(bm->cx,bm->cy);
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI gfcopy( BMSCR *bm, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI gfcopy( BMSCR *bm, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		copy vram area with halftone (type2)
 	//			gfcopy grade(0-100)
@@ -95,7 +95,7 @@ EXPORT BOOL WINAPI gfcopy( BMSCR *bm, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI gfdec ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI gfdec (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		clear vram area (type0)
 	//			gfdec r,g,b
@@ -122,7 +122,7 @@ EXPORT BOOL WINAPI gfdec ( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI gfinc ( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI gfinc (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		clear vram area (type0)
 	//			gfdec r,g,b
@@ -177,10 +177,10 @@ static void bms_setcol( BMSCR *bm, int a1, int a2, int a3 )
 	bm->hpn = CreatePen( PS_SOLID,0,bm->color );
 }
 
-EXPORT BOOL WINAPI hsvcolor( BMSCR *bm, int h, int s, int v )
+EXPORT BOOL WINAPI hsvcolor( BMSCR *bm, HSPPTRINT h, HSPPTRINT s, HSPPTRINT v )
 {
 	//
-	//		hsv‚É‚æ‚éFw’è
+	//		hsvã«ã‚ˆã‚‹è‰²æŒ‡å®š
 	//			h(0-191)/s(0-255)/v(0-255)
 	//
 	//
@@ -194,7 +194,7 @@ EXPORT BOOL WINAPI hsvcolor( BMSCR *bm, int h, int s, int v )
 	v = v&255;
 	s = s&255;		// /8
 
-	//		hsv -> rgb •ÏŠ·
+	//		hsv -> rgb å¤‰æ›
 	//
 	h %= 192;
 	i = h/32;
@@ -244,7 +244,7 @@ static void SetPolyAxis( POLY4 *poly, int num, int x, int y, int tx, int ty )
 
 static void DrawSquareEx( int mode, int color, int attr, int alpha, int *x, int *y, int *texx, int *texy )
 {
-	//		©—R•ÏŒ`ƒXƒvƒ‰ƒCƒg
+	//		è‡ªç”±å¤‰å½¢ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 	//		mode : 0=fullcolor/1=palette
 	//
 	POLY4 *poly;
@@ -281,9 +281,9 @@ static void DrawSquareEx( int mode, int color, int attr, int alpha, int *x, int 
 
 static void DrawSpriteEx( int mode, int attr, int alpha, int x, int y, int sx, int sy, float ang, int tx0, int ty0, int tx1, int ty1 )
 {
-	//		Šg‘å‰ñ“]ƒXƒvƒ‰ƒCƒg
+	//		æ‹¡å¤§å›è»¢ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 	//		mode : 0=fullcolor/1=palette
-	//		(x,y)’†SÀ•W / (sx,sy)ƒTƒCƒY / ang=Šp“x
+	//		(x,y)ä¸­å¿ƒåº§æ¨™ / (sx,sy)ã‚µã‚¤ã‚º / ang=è§’åº¦
 	//
 	POLY4 *poly;
 	IAXIS2 *iv;
@@ -348,9 +348,9 @@ static void DrawSpriteEx( int mode, int attr, int alpha, int x, int y, int sx, i
 
 static void DrawRectEx( int mode, int color, int alpha, int x, int y, int sx, int sy, float ang )
 {
-	//		‰ñ“]fill
+	//		å›è»¢fill
 	//		mode : 0=fullcolor/1=palette
-	//		(x,y)’†SÀ•W / ang=Šp“x
+	//		(x,y)ä¸­å¿ƒåº§æ¨™ / ang=è§’åº¦
 	//
 	POLY4 *poly;
 	IAXIS2 *iv;
@@ -419,7 +419,7 @@ static void DrawRectEx( int mode, int color, int alpha, int x, int y, int sx, in
 
 static int GetAlphaOperation( BMSCR *bm )
 {
-	//		gmode‚Ìƒ‚[ƒh‚ğAlphaOperation‚É•ÏŠ·‚·‚é
+	//		gmodeã®ãƒ¢ãƒ¼ãƒ‰ã‚’AlphaOperationã«å¤‰æ›ã™ã‚‹
 	//
 	int alpha;
 	alpha = bm->gfrate;
@@ -429,18 +429,18 @@ static int GetAlphaOperation( BMSCR *bm )
 		if ( bm->gmode >= 4 ) alpha = 255;
 	}
 	switch( bm->gmode ) {
-	case 3:					// ”¼“§–¾blend
+	case 3:					// åŠé€æ˜blend
 		break;
-	case 4:					// ”¼“§–¾blend+“§–¾F
+	case 4:					// åŠé€æ˜blend+é€æ˜è‰²
 		break;
-	case 5:					// F‰ÁZ
+	case 5:					// è‰²åŠ ç®—
 		alpha |= 0x200;
 		break;
-	case 6:					// FŒ¸Z
+	case 6:					// è‰²æ¸›ç®—
 		alpha |= 0x300;
 		break;
 	default:
-		alpha = 0x100;		// •W€
+		alpha = 0x100;		// æ¨™æº–
 		break;
 	}
 	return alpha;
@@ -464,7 +464,7 @@ static int CnvRGB( int color )
 }
 
 
-EXPORT BOOL WINAPI grect( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI grect( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		grect (type$202)
 	//
@@ -473,15 +473,15 @@ EXPORT BOOL WINAPI grect( HSPEXINFO *hei, int p1, int p2, int p3 )
 	BMSCR *bm;
 	int ep1,ep2,ep3,ep4,ep5,ep6;
 	float rot;
-	bm = (BMSCR *)hei->HspFunc_getbmscr( *hei->actscr );	// Œ»İ‚ÌBMSCR‚ğæ“¾
+	bm = (BMSCR *)hei->HspFunc_getbmscr( *hei->actscr );	// ç¾åœ¨ã®BMSCRã‚’å–å¾—
 
-	ep1 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep5 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^5:”’l
-	ep3 = hei->HspFunc_prm_getdi(bm->gx);		// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep4 = hei->HspFunc_prm_getdi(bm->gy);		// ƒpƒ‰ƒ[ƒ^4:”’l
-	ep6 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^6:”’l
-	if ( *hei->er ) return *hei->er;			// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep5 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿5:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(bm->gx);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep4 = hei->HspFunc_prm_getdi(bm->gy);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
+	ep6 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿6:æ•°å€¤
+	if ( *hei->er ) return *hei->er;			// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 	rot = ((float)ep5) * (PI2/4096.0f);
 
 	SetPolyDest( bm->pBit, bm->sx, bm->sy );
@@ -494,7 +494,7 @@ EXPORT BOOL WINAPI grect( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI grotate( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI grotate( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		grotate (type$202)
 	//
@@ -506,18 +506,18 @@ EXPORT BOOL WINAPI grotate( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int tx0,ty0,tx1,ty1;
 	int attr;
 	float rot;
-	bm = (BMSCR *)hei->HspFunc_getbmscr( *hei->actscr );	// Œ»İ‚ÌBMSCR‚ğæ“¾
+	bm = (BMSCR *)hei->HspFunc_getbmscr( *hei->actscr );	// ç¾åœ¨ã®BMSCRã‚’å–å¾—
 
-	ep1 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^2:”’l
-	ep3 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^3:”’l
-	ep6 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^6:”’l
-	ep4 = hei->HspFunc_prm_getdi(bm->gx);		// ƒpƒ‰ƒ[ƒ^4:”’l
-	ep5 = hei->HspFunc_prm_getdi(bm->gy);		// ƒpƒ‰ƒ[ƒ^5:”’l
-	if ( *hei->er ) return *hei->er;			// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	ep6 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿6:æ•°å€¤
+	ep4 = hei->HspFunc_prm_getdi(bm->gx);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:æ•°å€¤
+	ep5 = hei->HspFunc_prm_getdi(bm->gy);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿5:æ•°å€¤
+	if ( *hei->er ) return *hei->er;			// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
-	if (( ep1<0 )||( ep1>31 )) return 3;			// ƒoƒbƒtƒ@IDƒ`ƒFƒbƒN
-	bm2 = (BMSCR *)hei->HspFunc_getbmscr( ep1 );	// “]‘—Œ³‚ÌBMSCR‚ğæ“¾
+	if (( ep1<0 )||( ep1>31 )) return 3;			// ãƒãƒƒãƒ•ã‚¡IDãƒã‚§ãƒƒã‚¯
+	bm2 = (BMSCR *)hei->HspFunc_getbmscr( ep1 );	// è»¢é€å…ƒã®BMSCRã‚’å–å¾—
 	rot = ((float)ep6) * (PI2/4096.0f);
 
 	if ( bm->palmode != bm2->palmode ) return 21;
@@ -542,7 +542,7 @@ EXPORT BOOL WINAPI grotate( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI gsquare( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI gsquare( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		gsquare (type$202)
 	//
@@ -558,32 +558,32 @@ EXPORT BOOL WINAPI gsquare( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int *pty;
 	int tmp_x[4], tmp_y[4], tmp_tx[4], tmp_ty[4];
 	int color;
-	bm = (BMSCR *)hei->HspFunc_getbmscr( *hei->actscr );	// Œ»İ‚ÌBMSCR‚ğæ“¾
+	bm = (BMSCR *)hei->HspFunc_getbmscr( *hei->actscr );	// ç¾åœ¨ã®BMSCRã‚’å–å¾—
 	bm2 = NULL;
 	ptx = NULL;
 	pty = NULL;
 
-	ep1 = hei->HspFunc_prm_getdi(0);			// ƒpƒ‰ƒ[ƒ^1:”’l
+	ep1 = hei->HspFunc_prm_getdi(0);			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
 
-	px = (int *)hei->HspFunc_prm_getv();		// ƒpƒ‰ƒ[ƒ^2:•Ï”
-	py = (int *)hei->HspFunc_prm_getv();		// ƒpƒ‰ƒ[ƒ^3:•Ï”
+	px = (int *)hei->HspFunc_prm_getv();		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
+	py = (int *)hei->HspFunc_prm_getv();		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:å¤‰æ•°
 
 	if ( ep1 >= 0 ) {
-		ptx = (int *)hei->HspFunc_prm_getv();		// ƒpƒ‰ƒ[ƒ^4:•Ï”
-		pty = (int *)hei->HspFunc_prm_getv();		// ƒpƒ‰ƒ[ƒ^5:•Ï”
-		if ( ep1>31 ) return 3;						// ƒoƒbƒtƒ@IDƒ`ƒFƒbƒN
-		bm2 = (BMSCR *)hei->HspFunc_getbmscr( ep1 );	// “]‘—Œ³‚ÌBMSCR‚ğæ“¾
+		ptx = (int *)hei->HspFunc_prm_getv();		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿4:å¤‰æ•°
+		pty = (int *)hei->HspFunc_prm_getv();		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿5:å¤‰æ•°
+		if ( ep1>31 ) return 3;						// ãƒãƒƒãƒ•ã‚¡IDãƒã‚§ãƒƒã‚¯
+		bm2 = (BMSCR *)hei->HspFunc_getbmscr( ep1 );	// è»¢é€å…ƒã®BMSCRã‚’å–å¾—
 		if ( bm->palmode != bm2->palmode ) return 21;
 		SetPolySource( bm2->pBit, bm2->sx, bm2->sy );
 	}
-	if ( *hei->er ) return *hei->er;			// ƒGƒ‰[ƒ`ƒFƒbƒN
+	if ( *hei->er ) return *hei->er;			// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	for(i=0;i<4;i++) {
 		tmp_x[i] = px[i];
 		tmp_y[i] = py[i];
 		if ( ep1 >= 0 ) {
 			tmp_tx[i] = GetLimit( ptx[i], 0, bm2->sx );
-			tmp_ty[i] = bm2->sy - 1 - GetLimit( pty[i], 0, bm2->sy );	// UV‚Ìã‰º‹t‚É‚·‚é
+			tmp_ty[i] = bm2->sy - 1 - GetLimit( pty[i], 0, bm2->sy );	// UVã®ä¸Šä¸‹é€†ã«ã™ã‚‹
 		} else {
 			tmp_tx[i] = 0;
 			tmp_ty[i] = 0;

@@ -21,7 +21,7 @@ static OFSTRUCT srcinfo, dstinfo;
 static char dstdir[MAX_PATH];
 
 
-EXPORT BOOL WINAPI lzdist( BMSCR *bm, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI lzdist( BMSCR *bm, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		LZDIST (type6)
 	//			lzdist dist-dir
@@ -31,7 +31,7 @@ EXPORT BOOL WINAPI lzdist( BMSCR *bm, char *p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI lzcopy( BMSCR *bm, char *p2, int p3, char *p4 )
+EXPORT BOOL WINAPI lzcopy( BMSCR *bm, char *p2, HSPPTRINT p3, char *p4 )
 {
 	//		LZCOPY (type$16)
 	//			lzcopy fname
@@ -62,7 +62,7 @@ EXPORT BOOL WINAPI lzcopy( BMSCR *bm, char *p2, int p3, char *p4 )
 
 /*------------------------------------------------------------*/
 
-//	ショートカットを作る
+//	繧ｷ繝ｧ繝ｼ繝医き繝�繝医ｒ菴懊ｋ
 //
 static HRESULT CreateLink(LPCSTR lpszPathObj, LPSTR lpszPathLink)
 {
@@ -91,7 +91,7 @@ static HRESULT CreateLink(LPCSTR lpszPathObj, LPSTR lpszPathLink)
 }
 
 
-EXPORT BOOL WINAPI fxlink( char *p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI fxlink( char *p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		make shortcut file (type5)
 	//			fxlink a,"src file path"

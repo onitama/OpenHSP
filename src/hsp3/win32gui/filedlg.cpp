@@ -243,7 +243,7 @@ char *fd_getfname( void )
 	HSPCHAR *hctmp1 = 0;
 	int hclen;
 	apichartohspchar(szFileName,&hctmp1);
-	hclen = strlen(hctmp1);
+	hclen = (int)strlen(hctmp1);
 	memcpy(FileName8,hctmp1,hclen);
 	FileName8[hclen] = '\0';
 	freehc(&hctmp1);

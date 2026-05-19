@@ -3453,7 +3453,7 @@ int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 	//		(result:0=Not care/1=Done)
 	//
 	int res;
-	HSPPTRINT sz;
+	int64_t sz;
 	res = call_eventfunc( evcategory[event], event, prm1, prm2, prm3 ); 
 	if ( res ) return res;
 

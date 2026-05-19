@@ -207,7 +207,8 @@ int MMMan::Load( char *fname, int num, int opt )
 	//		Load sound to bank
 	//			opt : 0=normal/1=loop/2=wait/3=continuous
 	//
-	int a = 1,getlen;
+	int a = 1;
+	int64_t getlen;
 //	char fext[8];
 	char a1,a2,a3;
 	char *pt;
@@ -247,7 +248,7 @@ int MMMan::Load( char *fname, int num, int opt )
 			freehac(&hactmp1);
 			return 1;
 		}
-		if ( getlen < 2000000 ) {			// 2MB以上はMCIから再生
+		if ( getlen < 10000000 ) {			// 10MB以上はMCIから再生
 			pt = (char *)malloc( getlen+16 );
 			dpm_read( fname, pt, getlen, 0 );
 			flag = MMDATA_INTWAVE;

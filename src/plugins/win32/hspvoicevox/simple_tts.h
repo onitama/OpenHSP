@@ -4,7 +4,7 @@
 
 int tts_init(void);
 void tts_term(void);
-int tts_load(int id);
+int tts_load(char *filename);
 char* tts_getwav(char* utf8str, int speaker_id, int* size);
 void tts_closewav(void);
 const char *tts_geterror(void);

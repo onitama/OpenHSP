@@ -530,7 +530,7 @@ void DrawPolygonTex( POLY4 *lpPolyData )
 	//dwReadPoint = (DWORD)(nTexHeight-1-(ty>>16))*nTexWidth+(tx>>16);
 	//dwReadPoint = (DWORD)((ty>>16))*nTexWByte+((tx>>16)*3);
 //	i2 = ((tx>>16)*3);
-	i2 = ((ty>>16)*nTexWByte)+((tx>>16)*3);
+	i2 = ((int)(ty>>16)*nTexWByte)+((int)(tx>>16)*3);
 	
 	// コピー
 	if( i2 < (int)dwTexSize) {
@@ -601,7 +601,7 @@ p4trans:
 		for(x = minX; x < maxX; x++) {
 
 			// テクスチャデータを読み込む点を計算
-			i2 = ((ty>>16)*nTexWByte)+((tx>>16)*3);
+			i2 = ((int)(ty>>16)*nTexWByte)+((int)(tx>>16)*3);
 	
 			// コピー
 			if( i2 < (int)dwTexSize) {
@@ -662,7 +662,7 @@ p4_blend:
 		maxX = min(nDestWidth,maxX);
 		up = (unsigned char *)(dwDest + minX*3);
 		for(x = minX; x < maxX; x++) {
-			i2 = ((ty>>16)*nTexWByte)+((tx>>16)*3);
+			i2 = ((int)(ty>>16)*nTexWByte)+((int)(tx>>16)*3);
 			if( i2 < (int)dwTexSize) {
 				usrcp = (unsigned char *)lpTex + i2;
 				a1=((((short)usrcp[0])*alpha)+(((short)up[0])*ialpha))>>8;
@@ -710,7 +710,7 @@ p4_tblend:
 		maxX = min(nDestWidth,maxX);
 		up = (unsigned char *)(dwDest + minX*3);
 		for(x = minX; x < maxX; x++) {
-			i2 = ((ty>>16)*nTexWByte)+((tx>>16)*3);
+			i2 = ((int)(ty>>16)*nTexWByte)+((int)(tx>>16)*3);
 			if( i2 < (int)dwTexSize) {
 				usrcp = (unsigned char *)lpTex + i2;
 				if (( usrcp[0]==ck1 )&&( usrcp[1]==ck2 )&&( usrcp[2]==ck3 )) {
@@ -761,7 +761,7 @@ p4_modulate:
 		maxX = min(nDestWidth,maxX);
 		up = (unsigned char *)(dwDest + minX*3);
 		for(x = minX; x < maxX; x++) {
-			i2 = ((ty>>16)*nTexWByte)+((tx>>16)*3);
+			i2 = ((int)(ty>>16)*nTexWByte)+((int)(tx>>16)*3);
 			if( i2 < (int)dwTexSize) {
 				usrcp = (unsigned char *)lpTex + i2;
 				a1=((((short)usrcp[0])*alpha)>>8)+(short)up[0];
@@ -811,7 +811,7 @@ p4_substract:
 		maxX = min(nDestWidth,maxX);
 		up = (unsigned char *)(dwDest + minX*3);
 		for(x = minX; x < maxX; x++) {
-			i2 = ((ty>>16)*nTexWByte)+((tx>>16)*3);
+			i2 = ((int)(ty>>16)*nTexWByte)+((int)(tx>>16)*3);
 			if( i2 < (int)dwTexSize) {
 				usrcp = (unsigned char *)lpTex + i2;
 				a1=(short)up[0]-((((short)usrcp[0])*alpha)>>8);
@@ -979,7 +979,7 @@ void DrawPolygonTexP( POLY4 *lpPolyData )
 	for(x = minX; x < maxX; x++){
 	
 	// テクスチャデータを読み込む点を計算
-	i2 = ((ty>>16)*nTexWidth)+(tx>>16);
+	i2 = ((int)(ty>>16)*nTexWidth)+ (int)(tx>>16);
 	
 	// コピー
 	if( i2 < (int)dwTexSize) {
@@ -1048,7 +1048,7 @@ p4transp:
 		for(x = minX; x < maxX; x++) {
 
 			// テクスチャデータを読み込む点を計算
-			i2 = ((ty>>16)*nTexWidth)+(tx>>16);
+			i2 = ((int)(ty>>16)*nTexWidth)+(int)(tx>>16);
 	
 			// コピー
 			if( i2 < (int)dwTexSize) {

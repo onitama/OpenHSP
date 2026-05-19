@@ -74,7 +74,7 @@ static BOOL CALLBACK cbChild( HWND hwnd, LPARAM lParam )
 }
 
 
-EXPORT BOOL WINAPI aplsel ( BMSCR *bm, char *p1, int p2, char *p3 )
+EXPORT BOOL WINAPI aplsel ( BMSCR *bm, char *p1, HSPPTRINT p2, char *p3 )
 {
 	//		select window object (type$16)
 	//			aplsel "winname"
@@ -90,7 +90,7 @@ EXPORT BOOL WINAPI aplsel ( BMSCR *bm, char *p1, int p2, char *p3 )
 }
 
 
-EXPORT BOOL WINAPI aplact ( int p1, int p2, int p3, char *p4 )
+EXPORT BOOL WINAPI aplact (HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, char *p4 )
 {
 	//		select window object (type$10)
 	//			aplactive
@@ -102,7 +102,7 @@ EXPORT BOOL WINAPI aplact ( int p1, int p2, int p3, char *p4 )
 }
 
 
-EXPORT BOOL WINAPI aplobj ( BMSCR *bm, char *p1, int p2, char *p3 )
+EXPORT BOOL WINAPI aplobj ( BMSCR *bm, char *p1, HSPPTRINT p2, char *p3 )
 {
 	//		select child window object (type$16)
 	//			aplobj "winname"
@@ -133,7 +133,7 @@ static HWND GetFocusWindow( void )
 }
 
 
-EXPORT BOOL WINAPI aplget ( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI aplget ( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		get window text from current object (type1)
 	//			aplget var,maxstr
@@ -151,7 +151,7 @@ EXPORT BOOL WINAPI aplget ( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI apledit ( int *p1, int p2, int p3, char *p4 )
+EXPORT BOOL WINAPI apledit ( int *p1, HSPPTRINT p2, HSPPTRINT p3, char *p4 )
 {
 	//		get "Edit" control window status (type$11)
 	//			apledit var,statno,line#
@@ -175,7 +175,7 @@ EXPORT BOOL WINAPI apledit ( int *p1, int p2, int p3, char *p4 )
 
 static void _sendstr( char *p1 )
 {
-	//		Win9x—p
+	//		Win9xç”¨
 	LPARAM lprm;
 	HWND hw;
 	char mes[1024];
@@ -195,7 +195,7 @@ static void _sendstr( char *p1 )
 
 static void _sendstr2( char *p1 )
 {
-	//		Win2000ˆÈ~—p
+	//		Win2000ä»¥é™ç”¨
 	LPARAM lprm;
 	HWND hw;
 	unsigned char mes[1024];
@@ -223,7 +223,7 @@ static void _sendstr2( char *p1 )
 }
 
 
-EXPORT BOOL WINAPI aplstr ( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI aplstr ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		send key event (type6)
 	//			aplkey "strings"
@@ -239,7 +239,7 @@ EXPORT BOOL WINAPI aplstr ( BMSCR *bm, char *p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aplkeyd ( BMSCR *bm, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aplkeyd ( BMSCR *bm, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		send key event(keydown) (type2)
 	//			aplkeyd keycode, mode
@@ -290,7 +290,7 @@ EXPORT BOOL WINAPI aplkeyd ( BMSCR *bm, int p1, int p2, int p3 )
 
 
 
-EXPORT BOOL WINAPI aplkeyu ( BMSCR *bm, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aplkeyu ( BMSCR *bm, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		send key event(keyup) (type2)
 	//			aplkeyd keycode, mode
@@ -343,7 +343,7 @@ EXPORT BOOL WINAPI aplkeyu ( BMSCR *bm, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aplkey ( BMSCR *bm, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aplkey ( BMSCR *bm, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		send key event(up/down) (type2)
 	//			aplkeyd keycode, mode
@@ -355,7 +355,7 @@ EXPORT BOOL WINAPI aplkey ( BMSCR *bm, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI aplfocus ( BMSCR *bm, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI aplfocus ( BMSCR *bm, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//		focus fix off (type2)
 	//
@@ -390,8 +390,8 @@ static int dosp_readpt = 0;
 
 static char *Hsp3GetBlockSize(HSPEXINFO* hei, PVal* pv, APTR ap, int* size)
 {
-	//		(HSP3—p)
-	//		pv,ap‚©‚çƒƒ‚ƒŠƒuƒƒbƒN‚ðŽæ“¾‚·‚é
+	//		(HSP3ç”¨)
+	//		pv,apã‹ã‚‰ãƒ¡ãƒ¢ãƒªãƒ–ãƒ­ãƒƒã‚¯ã‚’å–å¾—ã™ã‚‹
 	//
 	PDAT* pd;
 	HspVarProc* proc;
@@ -401,7 +401,7 @@ static char *Hsp3GetBlockSize(HSPEXINFO* hei, PVal* pv, APTR ap, int* size)
 	return (char *)proc->GetBlockSize(pv, pd, size);
 }
 
-EXPORT BOOL WINAPI pipeexec(HSPEXINFO* hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI pipeexec(HSPEXINFO* hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//		process execute with pipe (type$202)
 	//			pipeexec buf, "command-line", hide_sw
@@ -413,10 +413,10 @@ EXPORT BOOL WINAPI pipeexec(HSPEXINFO* hei, int _p1, int _p2, int _p3)
 	PVal* pv;
 	APTR ap;
 	char* ss;
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ss = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶Žš—ñ
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ss = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	cmdline = ss;
-	hidesw = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:®”’l
+	hidesw = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•´æ•°å€¤
 
 	// Make StdOut Pipe
 	CreatePipe(&hPipe1Read, &hPipe1Write, NULL, 4096);
@@ -469,7 +469,7 @@ EXPORT BOOL WINAPI pipeexec(HSPEXINFO* hei, int _p1, int _p2, int _p3)
 
 static int GetBufferFromCursor(char *buf, BOOL linebreak)
 {
-	//		ƒoƒbƒtƒ@‚ðŽæ“¾‚·‚é
+	//		ãƒãƒƒãƒ•ã‚¡ã‚’å–å¾—ã™ã‚‹
 	//
 	int size = 0;
 	if (dosp_readpt >= dosp_cursor) return 0;
@@ -497,7 +497,7 @@ static int GetBufferFromCursor(char *buf, BOOL linebreak)
 }
 
 
-EXPORT BOOL WINAPI pipeget(PVal *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI pipeget(PVal *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		get process status (type$83)
 	//			pipeget var, mode
@@ -537,7 +537,7 @@ EXPORT BOOL WINAPI pipeget(PVal *p1, int p2, int p3, int p4 )
 			dosp_mode += 2;
 		} else {
 			if( 0 < ReadCount ) {
-				// StdOut‚ð“Ç‚Þ
+				// StdOutã‚’èª­ã‚€
 				ReadFile(hPipe1Read, pipebuf, min(PIPEGET_BUFFER_MAX -1, ReadCount), &ReadCount, NULL) ;
 				pipebuf[ReadCount] = 0;
 				dosp_cursor += ReadCount;
@@ -546,7 +546,7 @@ EXPORT BOOL WINAPI pipeget(PVal *p1, int p2, int p3, int p4 )
 				GetBufferFromCursor( Buf, lineBreak );
 				return -2;
 			} else if( 0 < ReadError ) {
-				// StdErr‚ð“Ç‚Þ
+				// StdErrã‚’èª­ã‚€
 				ReadFile(hPipe3Read, pipebuf, min(PIPEGET_BUFFER_MAX -1, ReadError), &ReadError, NULL) ;
 				pipebuf[ReadError] = 0;
 				dosp_cursor += ReadError;
@@ -562,10 +562,10 @@ EXPORT BOOL WINAPI pipeget(PVal *p1, int p2, int p3, int p4 )
 		}
 		return -2;
 	case 3:
-		// StdInPut‚ð‘—‚é
-		WriteFile(hPipe2Write, StdIn, strlen( StdIn ), &WriteSize, NULL); // EOF‚ð‘—‚é
+		// StdInPutã‚’é€ã‚‹
+		WriteFile(hPipe2Write, StdIn, strlen( StdIn ), &WriteSize, NULL); // EOFã‚’é€ã‚‹
 
-		// ‚ ‚Æ‚µ‚Ü‚Â
+		// ã‚ã¨ã—ã¾ã¤
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		CloseHandle(pi.hProcess);
 		CloseHandle(hPipe1Read);	  	// Close StdOut Pipe
@@ -581,7 +581,7 @@ EXPORT BOOL WINAPI pipeget(PVal *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI pipeput( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI pipeput(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//		send character to pipe (type0)
 	//			pipeput code

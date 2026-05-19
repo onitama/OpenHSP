@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "hspdll.h"
+#include "../hpi3sample/hsp3plugin.h"
 #include "simple_tts.h"
 
 static void Alertf(const char *format, ...)
@@ -136,7 +136,7 @@ char *ConvUtf82SJis(char* pSource, int *ressize)
 static int voicesize = 0;
 static char* voicedata = NULL;
 
-EXPORT BOOL WINAPI voicevoxinit( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI voicevoxinit( HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	voicevoxinit (type$00)
 	//
@@ -144,7 +144,7 @@ EXPORT BOOL WINAPI voicevoxinit( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI voicevoxbye(int p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI voicevoxbye(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//	voicevoxbye (type$00)
 	//
@@ -153,21 +153,27 @@ EXPORT BOOL WINAPI voicevoxbye(int p1, int p2, int p3, int p4)
 	return 0;
 }
 
-EXPORT BOOL WINAPI voicevoxload(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI voicevoxload(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
-	//	voicevoxload id (type$202)
+	//	voicevoxload "file" (type$202)
 	//
 	int res;
-	int ep1;
+	char *ep1;
+	char* utf8str;
 	res = 0;
-	ep1 = hei->HspFunc_prm_getdi(0);	// パラメータ1:数値
+	ep1 = hei->HspFunc_prm_gets();		// パラメータ1:文字列
 	if (*hei->er) return *hei->er;		// エラーチェック
 
+#ifdef HSPUTF8
+	utf8str = ep1;
+#else
+	utf8str = ConvSJis2Utf8(ep1, NULL);
+#endif
 	res = tts_load(ep1);
 	return res;
 }
 
-EXPORT BOOL WINAPI voicevoxexec(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI voicevoxexec(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	voicevoxexec "text",id (type$202)
 	//
@@ -181,16 +187,19 @@ EXPORT BOOL WINAPI voicevoxexec(HSPEXINFO* hei, int p1, int p2, int p3)
 	ep2 = hei->HspFunc_prm_getdi(0);	// パラメータ1:数値
 	if (*hei->er) return *hei->er;		// エラーチェック
 
+//#ifdef HSPUTF8
+//	utf8str = ep1;
+//#else
 	utf8str = ConvSJis2Utf8(ep1,NULL);
+//#endif
 	ctx = hei->hspctx;
-
 	voicedata = tts_getwav(utf8str,ep2,&voicesize);
 	if (voicedata == NULL) return -1;
 	ctx->strsize = voicesize;
 	return 0;
 }
 
-EXPORT BOOL WINAPI voicevoxgetdata(HSPEXINFO* hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI voicevoxgetdata(HSPEXINFO* hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3)
 {
 	//	voicevoxgetdata var (type$202)
 	//
@@ -212,7 +221,7 @@ EXPORT BOOL WINAPI voicevoxgetdata(HSPEXINFO* hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI voicevoxgeterror(HSPEXINFO* hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI voicevoxgeterror(HSPEXINFO* hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		voicevoxgeterror var  (type$202)
@@ -223,13 +232,17 @@ EXPORT BOOL WINAPI voicevoxgeterror(HSPEXINFO* hei, int _p1, int _p2, int _p3)
 	char* cnvres;
 	ap = hei->HspFunc_prm_getva(&pv);		// パラメータ1:変数
 	res = (char *)tts_geterror();
+#ifdef HSPUTF8
+	cnvres = res;
+#else
 	cnvres = ConvUtf82SJis(res, NULL);
+#endif
 	hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, cnvres);	// 変数に値を代入
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI voicevoxgetversion(HSPEXINFO* hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI voicevoxgetversion(HSPEXINFO* hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		voicevoxgetversion var  (type$202)
@@ -240,13 +253,17 @@ EXPORT BOOL WINAPI voicevoxgetversion(HSPEXINFO* hei, int _p1, int _p2, int _p3)
 	char* cnvres;
 	ap = hei->HspFunc_prm_getva(&pv);		// パラメータ1:変数
 	res = (char*)tts_getversion();
+#ifdef HSPUTF8
+	cnvres = res;
+#else
 	cnvres = ConvUtf82SJis(res, NULL);
+#endif
 	hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, cnvres);	// 変数に値を代入
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI voicevoxgetmetas(HSPEXINFO* hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI voicevoxgetmetas(HSPEXINFO* hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		voicevoxgetmetas var  (type$202)
@@ -257,7 +274,11 @@ EXPORT BOOL WINAPI voicevoxgetmetas(HSPEXINFO* hei, int _p1, int _p2, int _p3)
 	char* cnvres;
 	ap = hei->HspFunc_prm_getva(&pv);		// パラメータ1:変数
 	res = (char*)tts_getmetas();
+#ifdef HSPUTF8
+	cnvres = res;
+#else
 	cnvres = ConvUtf82SJis(res, NULL);
+#endif
 	hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, cnvres);	// 変数に値を代入
 	return 0;
 }

@@ -25,8 +25,8 @@ static	HANDLE comHandle = NULL;
 
 static void *Hsp3GetBlockSize( HSPEXINFO *hei, PVal *pv, APTR ap, int *size )
 {
-	//		(HSP3—p)
-	//		pv,ap‚©‚çƒƒ‚ƒŠƒuƒƒbƒN‚ðŽæ“¾‚·‚é
+	//		(HSP3ç”¨)
+	//		pv,apã‹ã‚‰ãƒ¡ãƒ¢ãƒªãƒ–ãƒ­ãƒƒã‚¯ã‚’å–å¾—ã™ã‚‹
 	//
 	PDAT *pd;
 	HspVarProc *proc;
@@ -37,7 +37,7 @@ static void *Hsp3GetBlockSize( HSPEXINFO *hei, PVal *pv, APTR ap, int *size )
 }
 
 
-EXPORT BOOL WINAPI comopen( int p1, char *p2, int p3, int p4 )
+EXPORT BOOL WINAPI comopen(HSPPTRINT p1, char *p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		open communication port (type4)
@@ -48,7 +48,7 @@ EXPORT BOOL WINAPI comopen( int p1, char *p2, int p3, int p4 )
 	COMMTIMEOUTS timeouts;
 	char ppstr[16];
 
-	// ƒ|[ƒg‚ðŠJ‚­
+	// ãƒãƒ¼ãƒˆã‚’é–‹ã
 	//
 	if (p1>0) {
 		sprintf(ppstr,"\\\\.\\COM%d", p1);
@@ -75,11 +75,11 @@ EXPORT BOOL WINAPI comopen( int p1, char *p2, int p3, int p4 )
 	//dcb.Parity = NOPARITY;
 	//dcb.StopBits = ONESTOPBIT;
 
-	// V‚µ‚¢Ý’è
+	// æ–°ã—ã„è¨­å®š
 	success = SetCommState(comHandle, &dcb);
 	if (!success) return -1;
 
-	// TimeoutÝ’è
+	// Timeoutè¨­å®š
 	timeouts.ReadIntervalTimeout = MAXDWORD; 
 	timeouts.ReadTotalTimeoutMultiplier = 0;
 	timeouts.ReadTotalTimeoutConstant = 0;
@@ -87,13 +87,13 @@ EXPORT BOOL WINAPI comopen( int p1, char *p2, int p3, int p4 )
 	timeouts.WriteTotalTimeoutConstant = 0;
 	SetCommTimeouts( comHandle, &timeouts );
 
-	// DTRÝ’è
+	// DTRè¨­å®š
 	EscapeCommFunction(comHandle, SETDTR);
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI comclose( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI comclose(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		close communication port (type0)
@@ -106,7 +106,7 @@ EXPORT BOOL WINAPI comclose( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI comput( BMSCR *bm, char *p1, int p2, int p3 )
+EXPORT BOOL WINAPI comput( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		send communication (type6)
@@ -115,15 +115,15 @@ EXPORT BOOL WINAPI comput( BMSCR *bm, char *p1, int p2, int p3 )
 	DWORD numWrite;
 	BOOL success;
 
-	// ƒf[ƒ^‘—M
-	// (\n‚Å‚Í‚È‚­\r‚ð‰üs‚É‚·‚é‚±‚Æ)
+	// ãƒ‡ãƒ¼ã‚¿é€ä¿¡
+	// (\nã§ã¯ãªã\rã‚’æ”¹è¡Œã«ã™ã‚‹ã“ã¨)
 	success = WriteFile(comHandle, p1, strlen(p1), &numWrite, 0);
 	if (!success) return 0;
 	return -(int)numWrite;
 }
 
 
-EXPORT BOOL WINAPI computc( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI computc(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		send communication (type0)
@@ -141,7 +141,7 @@ EXPORT BOOL WINAPI computc( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI computb( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI computb( HSPEXINFO *hei, HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3 )
 {
 	//
 	//		send binary (type$202)
@@ -155,9 +155,9 @@ EXPORT BOOL WINAPI computb( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int size;
 	int _p2;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
 	sd = (char *)Hsp3GetBlockSize( hei, pv, ap, &size );
-	_p2 = hei->HspFunc_prm_getdi(size-1);	// ƒpƒ‰ƒ[ƒ^2:®”’l
+	_p2 = hei->HspFunc_prm_getdi(size-1);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•´æ•°å€¤
 	if ( _p2 > size ) _p2=size;
 
 	success = WriteFile(comHandle, sd, _p2, &numWrite, 0);
@@ -166,7 +166,7 @@ EXPORT BOOL WINAPI computb( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI comget( char *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI comget( char *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		get communication (type1)
@@ -186,7 +186,7 @@ EXPORT BOOL WINAPI comget( char *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI comgetc( unsigned int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI comgetc( unsigned int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		get communication text (type1)
@@ -202,7 +202,7 @@ EXPORT BOOL WINAPI comgetc( unsigned int *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI comcontrol( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI comcontrol(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		put communication control (type0)
@@ -224,7 +224,7 @@ EXPORT BOOL WINAPI comcontrol( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI comstat( int *p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI comstat( int *p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//
 	//		get communication status (type1)
