@@ -17,6 +17,10 @@ class CMemBuf {
 public:
 	CMemBuf();
 	CMemBuf( int sz );
+
+	char *InitSubBuffer( int sz );
+	void ExchangeSubToMainBuffer(int size);
+
 	virtual ~CMemBuf();
 	void AddIndexBuffer( void );
 	void AddIndexBuffer( int sz );
@@ -67,6 +71,8 @@ private:
 	int		*idxbuf;			// Index Buffer
 	int		idxmax;				// Index Buffer Max
 	int		curidx;				// Current Index
+
+	char	*sub_buf;			// Sub Buffer
 
 	char	name[256];			// File Name
 };

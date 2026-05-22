@@ -44,6 +44,7 @@ static 	char *p[] = {
 	"       -r    execute runtime with result",
 	"       -s    output string map",
 	"       -m    compile for Emscripten",
+	"       -x    use 32bit runtime",
 	"       ---------------------------------",
 	"       -h??? print command help",
 	"       -lk???  print HSP3 keyword list",
@@ -67,7 +68,7 @@ int main( int argc, char *argv[] )
 {
 	char a1,a2,a3;
 	int b,st;
-	int cmpopt,ppopt,utfopt,pponly,execobj,strmap,hsphelp;
+	int cmpopt,ppopt,utfopt,pponly,execobj,strmap,hsphelp,hsp64;
 	char *opt_lk = NULL;
 	char *opt_ls = NULL;
 	int opt_lsref, opt_lsmode;
@@ -83,7 +84,7 @@ int main( int argc, char *argv[] )
 
 	if (argc<2) { usage1();return -1; }
 
-	st = 0; ppopt = 0; cmpopt = 0; utfopt = 0; pponly = 0; strmap = 0; hsphelp = 0; opt_lsref = 0; opt_lsmode = 0;
+	st = 0; ppopt = 0; cmpopt = 0; utfopt = 0; pponly = 0; strmap = 0; hsphelp = 0; opt_lsref = 0; opt_lsmode = 0; hsp64 = 1;
 	execobj = 0;
 	fname[0]=0;
 	fname2[0]=0;
@@ -173,6 +174,8 @@ int main( int argc, char *argv[] )
 				}
 				st = 1;
 				break;
+			case 'x':
+				hsp64 = 0; break;
 			default:
 				st = 1;break;
 			}
@@ -220,6 +223,11 @@ int main( int argc, char *argv[] )
 	strcpy( fname2, fname ); cutext( fname2 ); addext( fname2,"i" );
 	addext( fname,"hsp" );			// 拡張子がなければ追加する
 
+	//		HSP64 check
+	if (hsp64) {
+		ppopt |= HSC3_OPT_RUNTIME64 | HSC3_OPT_UTF8OUT;
+	}
+
 	//		label pick
 	if (opt_ls) {
 		if (*opt_ls == 0) opt_ls = NULL;
@@ -228,6 +236,11 @@ int main( int argc, char *argv[] )
 		hsc3->InitAnalysisInfo(opt_lsmode | opt_lsref, opt_ls);
 		st = hsc3->PreProcess(fname, fname2, ppopt, fname);
 		if ((pponly == 0) && (st == 0)) {
+			if (hsp64) {
+				if (hsc3->GetHeaderOption() & HEDINFO_HSP64) {
+					cmpopt |= HSC3_MODE_RUNTIME64 | HSC3_MODE_UTF8;
+				}
+			}
 			st = hsc3->CompileLabelOut(fname2, cmpopt);
 		}
 		if (st >= 0) {
@@ -294,6 +307,11 @@ int main( int argc, char *argv[] )
 		//		通常のコンパイル
 		st = hsc3->PreProcess( fname, fname2, ppopt, fname );
 		if (( pponly == 0 )&&( st == 0 )) {
+			if (hsp64) {
+				if (hsc3->GetHeaderOption() & HEDINFO_HSP64) {
+					cmpopt |= HSC3_MODE_RUNTIME64 | HSC3_MODE_UTF8;
+				}
+			}
 			st = hsc3->Compile( fname2, oname, cmpopt );
 		}
 		puts( hsc3->GetError() );

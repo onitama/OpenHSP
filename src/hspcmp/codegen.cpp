@@ -2668,12 +2668,15 @@ int CToken::PutDSStr(char *str, bool converts_to_utf8)
 	//		Register strings to data segment (caching)
 
 	char *p;
+	p = str;
 
 	// output as UTF8 format
 	if ( converts_to_utf8 ) {
-		p = ExecSCNV(str, SCNV_OPT_SJISUTF8);
+		//ソースコードがUTF-8の場合は変換は必要ない
+		if (pp_utf8 == 0) {
+			p = ExecSCNV(str, SCNV_OPT_SJISUTF8);
+		}
 	} else {
-		p = str;
 		if (pp_utf8) {
 			if ((hed_cmpmode & CMPMODE_UTF8OUT)==0) {
 				p = ExecSCNV(str, SCNV_OPT_UTF8SJIS);
@@ -3149,7 +3152,6 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 	cg_utf8out = mode & COMP_MODE_UTF8;
 	cg_strmap = mode & COMP_MODE_STRMAP;
 	cg_skiperror = mode & COMP_MODE_SKIPERROR;
-	if ( pp_utf8 ) cg_utf8out = 0;						// ソースコードがUTF-8の場合は変換は必要ない
 
 	if (cg_utf8out) {
 		Mes("#use UTF-8 strings.");
@@ -3171,7 +3173,7 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 
 	if ( res ) {
 		//		エラー終了
-		char tmp[512];
+		char tmp[8192];
 		CStrNote note;
 		CMemBuf srctmp;
 #ifdef JPNMSG
@@ -3182,6 +3184,14 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		if ( cg_errline > 0 ) {
 			note.Select( bakbuf.GetBuffer() );
 			note.GetLine( tmp, cg_errline-1, 510 );
+#ifdef HSPWIN
+			if (pp_utf8) {
+				//	UTF-8 -> Shift-JIS
+				char stmp[8192];
+				strcpy(stmp,tmp);
+				ConvUtf82SJis(stmp, tmp, (int)strlen(stmp));
+			}
+#endif
 			Mesf( "--> %s",tmp );
 		}
 	} else {

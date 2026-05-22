@@ -65,6 +65,7 @@ public:
 	int GetRuntimeFromHeader( char *fname, char *res );
 	int SaveOutbuf( char *fname );
 	int SaveAHTOutbuf( char *fname );
+	int GetHeaderOption(void);
 
 	//		Analyse
 	void InitAnalysisInfo(int mode, char* match, int line=0 );

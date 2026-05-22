@@ -343,6 +343,12 @@ void CHsc3::PreProcessEnd( void )
 }
 
 
+int CHsc3::GetHeaderOption(void)
+{
+	return hed_option;
+}
+
+
 int CHsc3::Compile( char *fname, char *outname, int mode )
 {
 	//		Compile
@@ -354,7 +360,9 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 	CToken tk;
 
 	genmode = mode;
-	if ( cmpopt & CMPMODE_UTF8OUT ) genmode |= HSC3_MODE_UTF8;
+	if (cmpopt & CMPMODE_UTF8OUT) {
+		genmode |= HSC3_MODE_UTF8;
+	}
 
 	if ( lb_info != NULL ) tk.SetLabelInfo( lb_info );		// プリプロセッサのラベル情報
 

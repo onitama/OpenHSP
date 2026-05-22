@@ -253,7 +253,7 @@ public:
 	void SetHeaderOption(int opt, char* name) { hed_option = opt; strcpy(hed_runtime, name); }
 	int GetCmpOption( void ) { return hed_cmpmode; }
 	void SetCmpOption( int cmpmode ) { hed_cmpmode = cmpmode; }
-	void SetUTF8Input( int utf8mode ) { pp_utf8 = utf8mode; }
+	void SetUTF8Input(int utf8mode) { pp_utf8 = utf8mode; }
 
 	void GenerateLabelList(int mode, char* match);
 	char* GetLabelListLineModule(void);
@@ -411,6 +411,7 @@ private:
 	int atoi_allow_overflow(const char* s);
 	int ConvSJis2Utf8(char* pSource, char* pDist, int buffersize);
 	int ConvUtf82SJis(char* pSource, char* pDist, int buffersize);
+	int IsUTF8Text(char* pSource);
 
 	//		Data
 	//

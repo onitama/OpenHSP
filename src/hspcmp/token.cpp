@@ -3832,6 +3832,7 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 	//
 	char *p = src->GetBuffer();
 	int pline = 1;
+	bool utf8text = false;
 	enumgc = 0;
 	mulstr = LMODE_ON;
 	*errtmp = 0;
@@ -3851,10 +3852,38 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 #endif
 				}
 				p += 3;
+				utf8text = true;
 			}
 		}
 	}
 
+#ifdef HSPWIN
+	//	Windows版のみ、入力のテキスト文字コードを指定に合わせて変換する
+	//
+	int currentsize = (int)strlen(p);
+	if (utf8text==false) utf8text = IsUTF8Text(p);
+	if (pp_utf8 == 0){
+		if (utf8text) {
+			//	UTF-8 -> Shift-JIS
+			Mesf("#Convert to SJIS [%s].",refname);
+			char *p_sjis = src->InitSubBuffer(currentsize);
+			int newsize = ConvUtf82SJis(p, p_sjis, currentsize);
+			src->ExchangeSubToMainBuffer(newsize);
+			p = src->GetBuffer();
+		}
+	}
+	else {
+		if (!utf8text) {
+			//	Shift-JIS -> UTF-8
+			Mesf("#Convert to UTF8 [%s].", refname);
+			currentsize = currentsize * 4 + 1;
+			char* p_utf8 = src->InitSubBuffer(currentsize);
+			int newsize = ConvSJis2Utf8(p, p_utf8, currentsize);
+			src->ExchangeSubToMainBuffer(newsize);
+			p = src->GetBuffer();
+		}
+	}
+#endif
 	while(1) {
 		RegistExtMacro( "__line__", pline );			// 行番号マクロを更新
 		pp_orgline = pline;
@@ -3871,14 +3900,15 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 		}
 
 		while(1) {
-			a1 = *(unsigned char *)p;
 			if ( a1 == ' ' || a1 == '\t' ) {
 				p++; continue;
 			}
 #ifdef HSPWIN
 			if ( hed_cmpmode & CMPMODE_SKIPJPSPC ) {
-				if ( a1 == 0x81 && p[1] == 0x40 ) {		// 全角スペースチェック
-					p+=2; continue;
+				if (pp_utf8 == 0) {
+					if (a1 == 0x81 && p[1] == 0x40) {		// 全角スペースチェック
+						p += 2; continue;
+					}
 				}
 			}
 #endif
@@ -4499,6 +4529,24 @@ int CToken::ConvUtf82SJis(char* pSource, char* pDist, int buffersize)
 	pDist[size] = 0;
 #endif
 	return size;
+}
+
+
+int CToken::IsUTF8Text(char* pSource)
+{
+	//	文字列がUTF-8であるかを判定する
+	//
+	while (*pSource) {
+		unsigned char c = (unsigned char)*pSource;
+		if (c <= 0x7f) {
+			pSource++;
+			continue;
+		}
+		int skip = CheckByteUTF8(c);
+		if (skip == 0) return 0;	// UTF-8の形式に合わないバイトがあった
+		pSource += skip + 1;
+	}
+	return 1;
 }
 
 

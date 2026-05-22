@@ -48,7 +48,7 @@
 #define IDM_START_RUNTIMEMAN            40022
 #define IDM_OPEN_SRCFOLDER              40024
 #define IDM_STARTDIR                    40026
-#define IDM_RUNTIME64                       40027
+#define IDM_RUNTIME32                   40027
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -57,7 +57,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        110
-#define _APS_NEXT_COMMAND_VALUE         40027
+#define _APS_NEXT_COMMAND_VALUE         40028
 #define _APS_NEXT_CONTROL_VALUE         1037
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

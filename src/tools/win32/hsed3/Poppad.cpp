@@ -62,12 +62,16 @@ static DLLFUNC SetDllFunc( char *name )
 	//
 	DLLFUNC ent;
 	char fncname[128];
-	//fncname[0]='_';
-	strcpy( fncname,name );
-	//strcat( fncname,"@16" );
+#ifdef HSP64
+	strcpy(fncname, name);
+#else
+	fncname[0]='_';
+	strcpy(fncname+1, name);
+	strcat( fncname,"@16" );
+#endif
 	ent = (DLLFUNC)GetProcAddress( hDLL, fncname );
 	if (ent == NULL) {
-		MessageBox(NULL,"Error",name,0);
+		//MessageBox(NULL,"Error",name,0);
 		dllflg = -1;				// error flag
 	}
 	return ent;
@@ -274,7 +278,7 @@ static int		hsp_wy;
 static int		hsp_wd;
 static int		hsp_orgpath;
 static int		hsp_debug;
-static int		hsp_runtime64;
+static int		hsp_runtime32;
 static int		hsp_extobj;
 static int		hsp_helpmode;
 
@@ -393,7 +397,7 @@ static int hsc_comp_bridge(int p1, int p2, int p3, int p4)
 {
 	int chk64 = 0;
 	int res;
-	if (hsp_runtime64) chk64 |= 128;
+	if (hsp_runtime32 == 0) chk64 |= 128;
 	res = (int)hsc_comp( (INT_PTR)(p1| chk64), (INT_PTR)(p2|(hsp_extmacro^1)), (INT_PTR)p3, (INT_PTR)p4);
 	return res;
 }
@@ -996,7 +1000,7 @@ void reg_save( void )
 	reg_setkey( hKey,"exewy", hsp_wy );
 	reg_setkey( hKey,"exewd", hsp_wd );
 	reg_setkey( hKey, "debug", hsp_debug);
-	reg_setkey( hKey, "runtime64", hsp_runtime64);
+	reg_setkey( hKey, "runtime32", hsp_runtime32);
 	reg_setkey( hKey,"extobj", hsp_extobj );
 	reg_ssetkey( hKey,"extstr", hsp_extstr );
 	reg_setkey( hKey,"helpmode", hsp_helpmode );
@@ -1031,7 +1035,7 @@ void reg_load( void )
 	hsp_wd=0;
 	hsp_orgpath=0;
 	hsp_debug=0;
-	hsp_runtime64 = 0;
+	hsp_runtime32 = 0;
 	hsp_extobj=0;
 	hsp_extstr[0]=0;
 	hsp_helpmode=2;
@@ -1066,7 +1070,7 @@ void reg_load( void )
 		reg_getkey( hKey,"exewy", &hsp_wy );
 		reg_getkey( hKey,"exewd", &hsp_wd );
 		reg_getkey( hKey, "debug", &hsp_debug);
-		reg_getkey( hKey, "runtime64", &hsp_runtime64);
+		reg_getkey( hKey, "runtime32", &hsp_runtime32);
 		reg_sgetkey( hKey,"extstr", hsp_extstr );
 		reg_getkey( hKey,"extobj", &hsp_extobj );
 		reg_getkey( hKey,"helpmode", &hsp_helpmode );
@@ -1629,8 +1633,8 @@ int poppad_menupop( WPARAM wParam, LPARAM lParam )
 						CheckMenuItem ((HMENU) wParam, IDM_FULLSCR, iEnable) ;
                         iEnable = hsp_debug ? MF_CHECKED : MF_UNCHECKED ;
 						CheckMenuItem ((HMENU) wParam, IDM_DEBUG, iEnable) ;
-                        iEnable = hsp_runtime64 ? MF_CHECKED : MF_UNCHECKED ;
-						CheckMenuItem ((HMENU) wParam, IDM_RUNTIME64, iEnable) ;
+                        iEnable = hsp_runtime32 ? MF_CHECKED : MF_UNCHECKED ;
+						CheckMenuItem ((HMENU) wParam, IDM_RUNTIME32, iEnable) ;
                         iEnable = hsp_clmode ? MF_CHECKED : MF_UNCHECKED ;
 						CheckMenuItem ((HMENU) wParam, IDM_HSPCLMODE, iEnable) ;
 						break;
@@ -2098,8 +2102,8 @@ LRESULT CALLBACK EditProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 						hsp_debug ^= 1;
 						return 0;
 
-					case IDM_RUNTIME64:
-						hsp_runtime64 ^= 1;
+					case IDM_RUNTIME32:
+						hsp_runtime32 ^= 1;
 						return 0;
 
 					case IDM_CMDOPT:

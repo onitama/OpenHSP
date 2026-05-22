@@ -346,7 +346,11 @@ p1が128(bit7)の場合はデフォルトで64bitランタイムを選択しま�
 	cmpmode = p1 & HSC3_MODE_DEBUG;
 	if (p1 & 4) cmpmode |= HSC3_MODE_UTF8;
 	if (p1 & 8) cmpmode |= HSC3_MODE_STRMAP;
-	if (p1 & 128) cmpmode |= HSC3_MODE_RUNTIME64 | HSC3_MODE_UTF8;
+	if (p1 & 128) {
+		if (hsc3->GetHeaderOption() & HEDINFO_HSP64) {
+			cmpmode |= HSC3_MODE_RUNTIME64 | HSC3_MODE_UTF8;
+		}
+	}
 
 	if (p1 & 16) {
 		st = hsc3->CompileLabelOut(fname2, cmpmode);
@@ -672,7 +676,7 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 #else
 	myseed1 = (int)time(0);			// Windows以外のランダムシード値
 #endif
-	myseed2 = hsp3_flength(PACKFILE);
+	myseed2 = (int)hsp3_flength(PACKFILE);
 
 	filepack.Reset();
 	filepack.SetErrorBuffer(hsc3->errbuf);

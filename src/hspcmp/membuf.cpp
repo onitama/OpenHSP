@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <assert.h>
 #include "membuf.h"
+#include "supio.h"
 
 //-------------------------------------------------------------
 //		Routines
@@ -45,6 +46,42 @@ void CMemBuf::InitIndexBuf( int sz )
 	idxmax = sz;
 	curidx = 0;
 	idxbuf = (int *)malloc( sizeof(int)*sz );
+}
+
+
+char *CMemBuf::InitSubBuffer(int sz)
+{
+	sub_buf = (char*)malloc(sz);
+	return sub_buf;
+}
+
+
+void CMemBuf::ExchangeSubToMainBuffer(int size)
+{
+	if (mem_buf != NULL) {
+		free(mem_buf);
+	}
+	if (idxbuf != NULL) {
+		free(idxbuf);
+	}
+
+	limit_size = size;
+	mem_buf = (char*)malloc(limit_size);
+	mem_buf[0] = 0;
+	memcpy( mem_buf, sub_buf, limit_size);
+
+	if (sub_buf != NULL) {
+		free(sub_buf);
+		sub_buf = NULL;
+	}
+
+	cur = size;
+
+	//	Indexバッファ初期化
+	idxflag = 0;
+	idxmax = -1;
+	curidx = 0;
+	idxbuf = NULL;
 }
 
 
