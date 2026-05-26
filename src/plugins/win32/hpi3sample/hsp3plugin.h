@@ -75,7 +75,7 @@ void bms_send( BMSCR *bm, int x, int y, int sx, int sy );
 #define code_redim exinfo->HspFunc_redim
 #define code_array exinfo->HspFunc_array
 
-#define stat ctx->stat
+#define hsp3_stat ctx->stat
 #define active_window (*exinfo->actscr)
 
 #endif

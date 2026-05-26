@@ -277,7 +277,7 @@ void cutlast2( char *st )
 
 char *strchr2( char *target, char code )
 {
-	//		str’†ÅŒã‚ÌcodeˆÊ’u‚ğ’T‚·(‘SŠp‘Î‰”Å)
+	//		strä¸­æœ€å¾Œã®codeä½ç½®ã‚’æ¢ã™(å…¨è§’å¯¾å¿œç‰ˆ)
 	//
 	unsigned char *p;
 	unsigned char a1;
@@ -287,8 +287,8 @@ char *strchr2( char *target, char code )
 	while(1) {
 		a1=*p;if ( a1==0 ) break;
 		if ( a1==code ) res=(char *)p;
-		p++;							// ŒŸõˆÊ’u‚ğˆÚ“®
-		if (a1>=129) {					// ‘SŠp•¶šƒ`ƒFƒbƒN
+		p++;							// æ¤œç´¢ä½ç½®ã‚’ç§»å‹•
+		if (a1>=129) {					// å…¨è§’æ–‡å­—ãƒã‚§ãƒƒã‚¯
 			if ((a1<=159)||(a1>=224)) p++;
 		}
 	}
@@ -298,7 +298,7 @@ char *strchr2( char *target, char code )
 
 void CutLastChr( char *p, char code )
 {
-	//		ÅŒã‚Ì'\\'‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®'\\'ã‚’å–ã‚Šé™¤ã
 	//
 	char *ss;
 	char *ss2;
@@ -382,22 +382,22 @@ int ExecFile( char *stmp, char *ps, int mode, void *hwnd )
 
 void dirinfo( char *p, int id )
 {
-	//		dirinfo–½—ß‚Ì“à—e‚ğstmp‚Éİ’è‚·‚é
+	//		dirinfoå‘½ä»¤ã®å†…å®¹ã‚’stmpã«è¨­å®šã™ã‚‹
 	//
 	char fname[_MAX_PATH+1];
 
 	switch( id ) {
-	case 0:				//    ƒJƒŒƒ“ƒg(Œ»İ‚Ì)ƒfƒBƒŒƒNƒgƒŠ
+	case 0:				//    ã‚«ãƒ¬ãƒ³ãƒˆ(ç¾åœ¨ã®)ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		_getcwd( p, _MAX_PATH );
 		break;
-	case 1:				//    Àsƒtƒ@ƒCƒ‹‚ª‚ ‚éƒfƒBƒŒƒNƒgƒŠ
+	case 1:				//    å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		GetModuleFileName( NULL,fname,_MAX_PATH );
 		getpath( fname, p, 32 );
 		break;
-	case 2:				//    WindowsƒfƒBƒŒƒNƒgƒŠ
+	case 2:				//    Windowsãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		GetWindowsDirectory( p, _MAX_PATH );
 		break;
-	case 3:				//    Windows‚ÌƒVƒXƒeƒ€ƒfƒBƒŒƒNƒgƒŠ
+	case 3:				//    Windowsã®ã‚·ã‚¹ãƒ†ãƒ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		GetSystemDirectory( p, _MAX_PATH );
 		break;
 	default:
@@ -409,7 +409,7 @@ void dirinfo( char *p, int id )
 		return;
 	}
 
-	//		ÅŒã‚Ì'\\'‚ğæ‚èœ‚­
+	//		æœ€å¾Œã®'\\'ã‚’å–ã‚Šé™¤ã
 	//
 	CutLastChr( p, '\\' );
 }

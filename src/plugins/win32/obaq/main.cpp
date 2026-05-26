@@ -76,7 +76,7 @@ static void OmkeReset( void )
 	game->init(pVessel);
 	game->random2.setseed(rand() & 32767);
 
-	pVessel->rockbase.setGravity( 0.0f, 0.005f);	// „‘Ì, ƒfƒtƒHƒ‹ƒg‚Í(0.0f, 0.0025f)
+	pVessel->rockbase.setGravity( 0.0f, 0.005f);	// å‰›ä½“, ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯(0.0f, 0.0025f)
 
 	find_id = GetSysReqInt( SYSREQ_MAXOBJ );
 }
@@ -102,7 +102,7 @@ static void OmkeBMSCR( BMSCR *bm, float zx, float zy, float ofsx, float ofsy  )
 
 static int OmkeCnvX( float x )
 {
-	//		À•W•ÏŠ·(X)
+	//		åº§æ¨™å¤‰æ›(X)
 	//
 	return (int)(x * zoom_sx + offset_x);
 }
@@ -110,7 +110,7 @@ static int OmkeCnvX( float x )
 
 static int OmkeCnvY( float y )
 {
-	//		À•W•ÏŠ·(Y)
+	//		åº§æ¨™å¤‰æ›(Y)
 	//
 	return (int)(y * zoom_sy + offset_y);
 }
@@ -118,7 +118,7 @@ static int OmkeCnvY( float y )
 
 static float OmkeCnvXR( int x )
 {
-	//		À•W‹t•ÏŠ·(X)
+	//		åº§æ¨™é€†å¤‰æ›(X)
 	//
 	return ((float)x - offset_x ) / zoom_sx;
 }
@@ -126,7 +126,7 @@ static float OmkeCnvXR( int x )
 
 static float OmkeCnvYR( int y )
 {
-	//		À•W‹t•ÏŠ·(Y)
+	//		åº§æ¨™é€†å¤‰æ›(Y)
 	//
 	return ((float)y - offset_y ) / zoom_sy;
 }
@@ -134,7 +134,7 @@ static float OmkeCnvYR( int y )
 
 static void OmkeDrawDebug( BMSCR *bm, ROCK* pR )
 {
-	//		ƒIƒuƒWƒFƒNƒg‚ÌDebug—pƒƒCƒ„[ƒtƒŒ[ƒ€•`‰æ
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Debugç”¨ãƒ¯ã‚¤ãƒ¤ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ æç”»
 	//
 	int col;
 	int rate = GetSysReqInt(SYSREQ_PHYSICS_RATE);
@@ -165,7 +165,7 @@ static void OmkeDrawDebug( BMSCR *bm, ROCK* pR )
 
 	OmkeDrawLineEnd( bm );
 
-	//		’†Sdot
+	//		ä¸­å¿ƒdot
 	//
 	int group = pR->group;
 	col = 0x808080;
@@ -186,11 +186,11 @@ static void OmkeDrawDebug( BMSCR *bm, ROCK* pR )
 
 static void OmkeDrawObjectSprite( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 {
-	//		ƒIƒuƒWƒFƒNƒg‚ÌƒXƒvƒ‰ƒCƒg•`‰æ
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 	//
 	BMSCR *bm2;
 
-	//		’†S‚©‚çƒXƒvƒ‰ƒCƒg‚ð•`‰æ(ƒCƒ[ƒW“™”{)
+	//		ä¸­å¿ƒã‹ã‚‰ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æç”»(ã‚¤ãƒ¡ãƒ¼ã‚¸ç­‰å€)
 	//
 	bm2 = (BMSCR *)main_hei->HspFunc_getbmscr( gr->material_id );
 	OmkeDrawSetGMode( gr->material_gmode, gr->material_grate, gr->material_offsetx, gr->material_offsety );
@@ -200,11 +200,11 @@ static void OmkeDrawObjectSprite( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 
 static void OmkeDrawObjectSpriteFit( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 {
-	//		ƒIƒuƒWƒFƒNƒg‚ÌƒXƒvƒ‰ƒCƒg•`‰æ
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 	//
 	BMSCR *bm2;
 
-	//		’†S‚©‚çƒXƒvƒ‰ƒCƒg‚ð•`‰æ(Œ`óƒtƒBƒbƒg)
+	//		ä¸­å¿ƒã‹ã‚‰ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æç”»(å½¢çŠ¶ãƒ•ã‚£ãƒƒãƒˆ)
 	//
 	int cx,cy;
 	int sx,sy;
@@ -254,7 +254,7 @@ static void OmkeDrawObjectSpriteFit( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 
 static void OmkeDrawObjectLine( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 {
-	//		ƒIƒuƒWƒFƒNƒg‚ÌƒƒCƒ„[ƒtƒŒ[ƒ€•`‰æ
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ¯ã‚¤ãƒ¤ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ æç”»
 	//
 	int col;
 
@@ -283,12 +283,12 @@ static void OmkeDrawObjectLine( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 
 static void OmkeDrawObjectLine2( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 {
-	//		ƒIƒuƒWƒFƒNƒg‚ÌƒƒCƒ„[ƒtƒŒ[ƒ€•`‰æ(—ÖŠs‚ ‚è)
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ¯ã‚¤ãƒ¤ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ æç”»(è¼ªéƒ­ã‚ã‚Š)
 	//
 	int col;
 	int x1,y1,x2,y2;
 
-	//		—ÖŠs
+	//		è¼ªéƒ­
 	col = gr->material_subid;
 	OmkeDrawLineStart( bm, col );
 
@@ -315,7 +315,7 @@ static void OmkeDrawObjectLine2( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 	OmkeDrawLineEnd( bm );
 
 
-	//		ƒƒCƒ“
+	//		ãƒ¡ã‚¤ãƒ³
 	col = gr->material_id;
 	OmkeDrawLineStart( bm, col );
 
@@ -342,7 +342,7 @@ static void OmkeDrawObjectLine2( BMSCR *bm, ROCK* pR, GAMEROCK *gr )
 
 static void OmkeDraw( BMSCR *bm, int mode )
 {
-	//		‚·‚×‚Ä‚ÌƒIƒuƒWƒFƒNƒg‚ð•`‰æ
+	//		ã™ã¹ã¦ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æç”»
 	//
 	int i,max;
 	int rate = GetSysReqInt(SYSREQ_PHYSICS_RATE);
@@ -414,7 +414,7 @@ static void OmkeDraw( BMSCR *bm, int mode )
 
 static int AddModelSub( float x1, float y1, float rot, float sx, float sy, void *ptr, int nvertex, int vtype, int colsw, int mygroup, int exgroup, int loggroup )
 {
-	//		Ž©—RÝ’èƒIƒuƒWƒFƒNƒg’Ç‰Á
+	//		è‡ªç”±è¨­å®šã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¿½åŠ 
 	//
 	int i;
 	int val;
@@ -506,7 +506,7 @@ int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI qreset( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qreset( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	int *act;
@@ -521,13 +521,13 @@ EXPORT BOOL WINAPI qreset( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	if ( game == NULL ) return -1;
 
-	//	ƒfƒtƒHƒ‹ƒg‚ÌŠO•Ç
+	//	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®å¤–å£
 	game->setBorder( center_x * -0.9f, center_y * -0.9f, center_x * 0.9f, center_y * 0.9f, center_x, center_y );
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qterm( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI qterm( HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$00)
 	OmkeTerm();
@@ -535,16 +535,16 @@ EXPORT BOOL WINAPI qterm( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI qexec( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI qexec( HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	(type$00)
 	if ( game == NULL ) return -1;
 
-	//	GAME‚ÌXV
+	//	GAMEã®æ›´æ–°
 	game->proc();
 	game->ExecuteAutoWipe();
 
-	// ƒRƒŠƒWƒ‡ƒ“ƒƒOŽæ“¾ƒTƒ“ƒvƒ‹
+	// ã‚³ãƒªã‚¸ãƒ§ãƒ³ãƒ­ã‚°å–å¾—ã‚µãƒ³ãƒ—ãƒ«
 	/*
 	COLLISIONLOG* pCL;
 	while(pCL = pVessel->spu.rockbase.getCollisionLog(0), pCL) {
@@ -560,7 +560,7 @@ EXPORT BOOL WINAPI qexec( int p1, int p2, int p3, int p4 )
 EXPORT BOOL WINAPI qdraw( BMSCR *p1, int p2, int p3, int p4 )
 {
 	//	(type$02)
-	//		ƒIƒuƒWƒFƒNƒg‚ð•`‰æ
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æç”»
 	//		qdraw mode
 	//
 	if ( game == NULL ) return -1;
@@ -570,10 +570,10 @@ EXPORT BOOL WINAPI qdraw( BMSCR *p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI qview( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qview( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒrƒ…[Ý’è
+	//		ãƒ“ãƒ¥ãƒ¼è¨­å®š
 	//		qview zoomx,zoomy,ofsx,ofsy
 	//
 	int *act;
@@ -594,10 +594,10 @@ EXPORT BOOL WINAPI qview( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qsetreq( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qsetreq( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒVƒXƒeƒ€ƒŠƒNƒGƒXƒgÝ’è
+	//		ã‚·ã‚¹ãƒ†ãƒ ãƒªã‚¯ã‚¨ã‚¹ãƒˆè¨­å®š
 	//		qsetreq reqid,val
 	//
 	int type;
@@ -609,10 +609,10 @@ EXPORT BOOL WINAPI qsetreq( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetreq( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetreq( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒVƒXƒeƒ€ƒŠƒNƒGƒXƒgŽæ“¾
+	//		ã‚·ã‚¹ãƒ†ãƒ ãƒªã‚¯ã‚¨ã‚¹ãƒˆå–å¾—
 	//		qgetreq var,reqid
 	//
 	int type;
@@ -620,19 +620,19 @@ EXPORT BOOL WINAPI qgetreq( HSPEXINFO *hei, int p1, int p2, int p3 )
 	PVal *pv;
 	APTR ap;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
 	type = hei->HspFunc_prm_getdi(0);
 	val = (double)GetSysReq( type );
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &val );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &val );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetptr( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetptr( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		“à•”ƒf[ƒ^ƒ|ƒCƒ“ƒ^‚ðŽæ“¾
+	//		å†…éƒ¨ãƒ‡ãƒ¼ã‚¿ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—
 	//		qgetptr var1,option
 	//
 	PVal *pv;
@@ -640,7 +640,7 @@ EXPORT BOOL WINAPI qgetptr( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int resx;
 	int opt;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 	opt = hei->HspFunc_prm_getdi(0);
 
 	if ( game == NULL ) return -1;
@@ -653,7 +653,7 @@ EXPORT BOOL WINAPI qgetptr( HSPEXINFO *hei, int p1, int p2, int p3 )
 		resx = 0;
 		break;
 	}
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &resx );			// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &resx );			// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 
 	return 0;
 }
@@ -661,10 +661,10 @@ EXPORT BOOL WINAPI qgetptr( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 /*------------------------------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI qborder( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qborder( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ŠO•Ç‚ðÝ’è
+	//		å¤–å£ã‚’è¨­å®š
 	//		qborder x1,y1,x2,y2
 	//
 	float x1,y1,x2,y2;
@@ -681,10 +681,10 @@ EXPORT BOOL WINAPI qborder( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgravity( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgravity( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		d—Í‚ðÝ’è
+	//		é‡åŠ›ã‚’è¨­å®š
 	//		qgravity gx,gy
 	//
 	float x1,y1;
@@ -698,10 +698,10 @@ EXPORT BOOL WINAPI qgravity( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qcnvaxis( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qcnvaxis( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		“à•”À•W‚ð•\Ž¦À•W‚É•ÏŠ·
+	//		å†…éƒ¨åº§æ¨™ã‚’è¡¨ç¤ºåº§æ¨™ã«å¤‰æ›
 	//		qcnvaxis var_x,var_y,x,y,option
 	//
 	PVal *pv;
@@ -712,8 +712,8 @@ EXPORT BOOL WINAPI qcnvaxis( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int resx,resy;
 	int opt;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 	x = hei->HspFunc_prm_getdd(0.0);
 	y = hei->HspFunc_prm_getdd(0.0);
 	opt = hei->HspFunc_prm_getdi(0);
@@ -726,24 +726,24 @@ EXPORT BOOL WINAPI qcnvaxis( HSPEXINFO *hei, int p1, int p2, int p3 )
 		resy = (int)y;
 		x = OmkeCnvXR(resx);
 		y = OmkeCnvYR(resy);
-		hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &x );			// •Ï”‚É’l‚ð‘ã“ü
-		hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &y );			// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &x );			// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+		hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &y );			// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 		break;
 	default:
 		resx = OmkeCnvX((float)x);
 		resy = OmkeCnvY((float)y);
-		hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &resx );			// •Ï”‚É’l‚ð‘ã“ü
-		hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &resy );		// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &resx );			// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+		hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &resy );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 		break;
 	}
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetaxis( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetaxis( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		“à•”À•W‚ðŽæ“¾
+	//		å†…éƒ¨åº§æ¨™ã‚’å–å¾—
 	//		qgetaxis num,var_x,var_y,type
 	//
 	PVal *pv;
@@ -754,8 +754,8 @@ EXPORT BOOL WINAPI qgetaxis( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int resx,resy;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 	type = hei->HspFunc_prm_getdi(0);
 
 	if ( game == NULL ) return -1;
@@ -777,18 +777,18 @@ EXPORT BOOL WINAPI qgetaxis( HSPEXINFO *hei, int p1, int p2, int p3 )
 		break;
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &resx );			// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &resy );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &resx );			// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &resy );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
 /*------------------------------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI qaddpoly( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qaddpoly( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		‘½ŠpŒ`ƒIƒuƒWƒFƒNƒg’Ç‰Á
+	//		å¤šè§’å½¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¿½åŠ 
 	//		qaddpoly var, shape, x, y, r, sx, sy, colsw, mygroup, exgroup, loggroup
 	//
 	float x1,y1,rot,sx,sy;
@@ -797,7 +797,7 @@ EXPORT BOOL WINAPI qaddpoly( HSPEXINFO *hei, int p1, int p2, int p3 )
 	PVal *pv;
 	APTR ap;
 
-	ap = hei->HspFunc_prm_getva( &pv );		// ƒpƒ‰ƒ[ƒ^1:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
 	type = hei->HspFunc_prm_getdi(3);
 	x1 = (float)hei->HspFunc_prm_getdd(0.0);
 	y1 = (float)hei->HspFunc_prm_getdd(0.0);
@@ -814,15 +814,15 @@ EXPORT BOOL WINAPI qaddpoly( HSPEXINFO *hei, int p1, int p2, int p3 )
 		val = game->addShape( type, ROCK::stat_active, ROCK::type_normal, x1, y1, rot, sx, sy, colsw, mygroup, exgroup, loggroup );
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &val );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &val );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qdel( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qdel( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒIƒuƒWƒFƒNƒgíœ
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
 	//		qdel id
 	//
 	int id;
@@ -838,10 +838,10 @@ EXPORT BOOL WINAPI qdel( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qpos( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qpos( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ˆÊ’uAŠp“xƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		ä½ç½®ã€è§’åº¦ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qpos num,x,y,angle
 	//
 	int id;
@@ -859,10 +859,10 @@ EXPORT BOOL WINAPI qpos( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetpos( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetpos( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ˆÊ’uAŠp“xƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		ä½ç½®ã€è§’åº¦ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetpos num,x,y,angle
 	//
 	int id;
@@ -875,9 +875,9 @@ EXPORT BOOL WINAPI qgetpos( HSPEXINFO *hei, int p1, int p2, int p3 )
 	double d1,d2,d3;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -887,17 +887,17 @@ EXPORT BOOL WINAPI qgetpos( HSPEXINFO *hei, int p1, int p2, int p3 )
 	d2 = (double)pR->center.y;
 	d3 = (double)pR->angle;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &d3 );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &d3 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qweight( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qweight( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		d‚³‚È‚Ç‚Ìƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		é‡ã•ãªã©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qweight num,weight,moment
 	//
 	int id;
@@ -913,10 +913,10 @@ EXPORT BOOL WINAPI qweight( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetweight( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetweight( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		d‚³‚È‚Ç‚Ìƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		é‡ã•ãªã©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetweight num,weight,moment
 	//
 	int id;
@@ -932,10 +932,10 @@ EXPORT BOOL WINAPI qgetweight( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//double d3,d4;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	//ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	//ap4 = hei->HspFunc_prm_getva( &pv4 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	//ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	//ap4 = hei->HspFunc_prm_getva( &pv4 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -946,18 +946,18 @@ EXPORT BOOL WINAPI qgetweight( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//d3 = (double)pR->friction;
 	//d4 = (double)pR->buoyancy;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// •Ï”‚É’l‚ð‘ã“ü
-	//hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &d3 );	// •Ï”‚É’l‚ð‘ã“ü
-	//hei->HspFunc_prm_setva( pv4, ap4, TYPE_DNUM, &d4 );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	//hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &d3 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	//hei->HspFunc_prm_setva( pv4, ap4, TYPE_DNUM, &d4 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qspeed( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qspeed( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		‰Á‘¬ƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		åŠ é€Ÿãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qspeed num,px,py,pr,opt
 	//
 	int id,opt;
@@ -977,10 +977,10 @@ EXPORT BOOL WINAPI qspeed( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 
 
-EXPORT BOOL WINAPI qgetspeed( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetspeed( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		‰Á‘¬ƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		åŠ é€Ÿãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetspeed num,px,py,pr
 	//
 	int id;
@@ -993,9 +993,9 @@ EXPORT BOOL WINAPI qgetspeed( HSPEXINFO *hei, int p1, int p2, int p3 )
 	double d1,d2,d3;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -1005,18 +1005,18 @@ EXPORT BOOL WINAPI qgetspeed( HSPEXINFO *hei, int p1, int p2, int p3 )
 	d2 = (double)pR->speed.y;
 	d3 = (double)pR->rSpeed;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &d3 );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &d3 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
 
-EXPORT BOOL WINAPI qgroup( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgroup( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒOƒ‹[ƒvƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		ã‚°ãƒ«ãƒ¼ãƒ—ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qspeed num,group,exgroup,loggroup
 	//
 	int id;
@@ -1033,10 +1033,10 @@ EXPORT BOOL WINAPI qgroup( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetgroup( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetgroup( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒOƒ‹[ƒvƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		ã‚°ãƒ«ãƒ¼ãƒ—ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetgroup num,group,exgroup,loggroup
 	//
 	int id;
@@ -1049,9 +1049,9 @@ EXPORT BOOL WINAPI qgetgroup( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int gr1,gr2,gr3;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -1061,17 +1061,17 @@ EXPORT BOOL WINAPI qgetgroup( HSPEXINFO *hei, int p1, int p2, int p3 )
 	gr2 = (int)pR->exceptGroup;
 	gr3 = (int)pR->recordGroup;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &gr1 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &gr2 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &gr3 );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &gr1 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &gr2 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &gr3 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qtype( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qtype( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		typeƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		typeãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qtype num,type,op
 	//		(op:0=set,1=on,2=off)
 	//
@@ -1088,10 +1088,10 @@ EXPORT BOOL WINAPI qtype( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgettype( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgettype( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		typeƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		typeãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgettype num,type
 	//
 	int id;
@@ -1100,7 +1100,7 @@ EXPORT BOOL WINAPI qgettype( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int type;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -1108,15 +1108,15 @@ EXPORT BOOL WINAPI qgettype( HSPEXINFO *hei, int p1, int p2, int p3 )
 
 	type = (int)pR->type;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &type );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &type );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qstat( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qstat( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		statƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		statãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qstat num,stat,sleepcount
 	//
 	int id;
@@ -1133,10 +1133,10 @@ EXPORT BOOL WINAPI qstat( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetstat( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetstat( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		typeƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		typeãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetstat num,stat,sleepcount
 	//
 	int id;
@@ -1147,8 +1147,8 @@ EXPORT BOOL WINAPI qgetstat( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int stat,count;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -1157,16 +1157,16 @@ EXPORT BOOL WINAPI qgetstat( HSPEXINFO *hei, int p1, int p2, int p3 )
 	stat = (int)pR->stat;
 	count = (int)pR->sleepCount;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &stat );			// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &count );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &stat );			// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &count );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qcollision( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qcollision( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒRƒŠƒWƒ‡ƒ“Žæ“¾ŠJŽn
+	//		ã‚³ãƒªã‚¸ãƒ§ãƒ³å–å¾—é–‹å§‹
 	//		qcollision num, target
 	//
 	int id,target;
@@ -1181,10 +1181,10 @@ EXPORT BOOL WINAPI qcollision( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetcol( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetcol( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒRƒŠƒWƒ‡ƒ“Žæ“¾
+	//		ã‚³ãƒªã‚¸ãƒ§ãƒ³å–å¾—
 	//		qgetcol var,x,y
 	//
 	PVal *pv;
@@ -1197,9 +1197,9 @@ EXPORT BOOL WINAPI qgetcol( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int id;
 	double x,y;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	log = game->getCollisionLog();
@@ -1215,17 +1215,17 @@ EXPORT BOOL WINAPI qgetcol( HSPEXINFO *hei, int p1, int p2, int p3 )
 		y = (double)log->position.y;
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &id );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &x );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &y );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &id );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &x );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &y );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetcol2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetcol2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒRƒŠƒWƒ‡ƒ“Ú×î•ñŽæ“¾
+	//		ã‚³ãƒªã‚¸ãƒ§ãƒ³è©³ç´°æƒ…å ±å–å¾—
 	//		qgetcol2 depth,nx,ny
 	//
 	PVal *pv;
@@ -1238,9 +1238,9 @@ EXPORT BOOL WINAPI qgetcol2( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int id;
 	double dep,x,y;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	log = game->curlog;
@@ -1256,17 +1256,17 @@ EXPORT BOOL WINAPI qgetcol2( HSPEXINFO *hei, int p1, int p2, int p3 )
 		}
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &dep );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &x );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &y );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &dep );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &x );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &y );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetcol3( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetcol3( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒRƒŠƒWƒ‡ƒ“Ú×î•ñŽæ“¾
+	//		ã‚³ãƒªã‚¸ãƒ§ãƒ³è©³ç´°æƒ…å ±å–å¾—
 	//		qgetcol3 bound,slide
 	//
 	PVal *pv;
@@ -1276,8 +1276,8 @@ EXPORT BOOL WINAPI qgetcol3( HSPEXINFO *hei, int p1, int p2, int p3 )
 	COLLISIONLOG *log;
 	double x,y;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	log = game->curlog;
@@ -1288,16 +1288,16 @@ EXPORT BOOL WINAPI qgetcol3( HSPEXINFO *hei, int p1, int p2, int p3 )
 		y = (double)log->slide;
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &x );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &y );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &x );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &y );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qmat( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qmat( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ}ƒeƒŠƒAƒ‹ƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		ãƒžãƒ†ãƒªã‚¢ãƒ«ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qmat num,type,id,subid
 	//
 	int id,type,matid,matsub;
@@ -1316,10 +1316,10 @@ EXPORT BOOL WINAPI qmat( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qmat2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qmat2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ}ƒeƒŠƒAƒ‹Ú×ƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		ãƒžãƒ†ãƒªã‚¢ãƒ«è©³ç´°ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qmat2 num,offsetx,offsety,zoomx,zoomy
 	//
 	int id,offsetx,offsety;
@@ -1338,10 +1338,10 @@ EXPORT BOOL WINAPI qmat2( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qmat3( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qmat3( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ}ƒeƒŠƒAƒ‹•\Ž¦ƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		ãƒžãƒ†ãƒªã‚¢ãƒ«è¡¨ç¤ºãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qmat3 num,gmode,rate
 	//
 	int id,ip1,ip2;
@@ -1357,10 +1357,10 @@ EXPORT BOOL WINAPI qmat3( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetmat( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetmat( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ}ƒeƒŠƒAƒ‹ƒpƒ‰ƒ[ƒ^[‚ðŽæ“¾
+	//		ãƒžãƒ†ãƒªã‚¢ãƒ«ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å–å¾—
 	//		qgetmat num,type,id,subid
 	//
 	PVal *pv;
@@ -1373,9 +1373,9 @@ EXPORT BOOL WINAPI qgetmat( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int u1,u2,u3;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	GAMEROCK *gr = game->getGameRock( id );
@@ -1385,17 +1385,17 @@ EXPORT BOOL WINAPI qgetmat( HSPEXINFO *hei, int p1, int p2, int p3 )
 	u2 = gr->material_id;
 	u3 = gr->material_subid;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &u3 );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &u3 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetmat2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetmat2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ}ƒeƒŠƒAƒ‹Ú×ƒpƒ‰ƒ[ƒ^[‚ðŽæ“¾
+	//		ãƒžãƒ†ãƒªã‚¢ãƒ«è©³ç´°ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å–å¾—
 	//		qgetmat2 num,offsetx,offsety,zoomx,zoomy
 	//
 	PVal *pv;
@@ -1411,10 +1411,10 @@ EXPORT BOOL WINAPI qgetmat2( HSPEXINFO *hei, int p1, int p2, int p3 )
 	double u3,u4;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap4 = hei->HspFunc_prm_getva( &pv4 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap4 = hei->HspFunc_prm_getva( &pv4 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	GAMEROCK *gr = game->getGameRock( id );
@@ -1425,18 +1425,18 @@ EXPORT BOOL WINAPI qgetmat2( HSPEXINFO *hei, int p1, int p2, int p3 )
 	u3 = (double)gr->material_zoomx;
 	u4 = (double)gr->material_zoomy;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &u3 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv4, ap4, TYPE_DNUM, &u4 );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &u3 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv4, ap4, TYPE_DNUM, &u4 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetmat3( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetmat3( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ}ƒeƒŠƒAƒ‹•\Ž¦ƒpƒ‰ƒ[ƒ^[‚ðŽæ“¾
+	//		ãƒžãƒ†ãƒªã‚¢ãƒ«è¡¨ç¤ºãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å–å¾—
 	//		qgetmat3 num,gmode,rate
 	//
 	PVal *pv;
@@ -1447,8 +1447,8 @@ EXPORT BOOL WINAPI qgetmat3( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int u1,u2;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	GAMEROCK *gr = game->getGameRock( id );
@@ -1457,16 +1457,16 @@ EXPORT BOOL WINAPI qgetmat3( HSPEXINFO *hei, int p1, int p2, int p3 )
 	u1 = gr->material_gmode;
 	u2 = gr->material_grate;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI quser( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI quser( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ†[ƒU[’è‹`ƒf[ƒ^‚ðÝ’è
+	//		ãƒ¦ãƒ¼ã‚¶ãƒ¼å®šç¾©ãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®š
 	//		quser num,user1,user2,user3
 	//
 	int id;
@@ -1483,10 +1483,10 @@ EXPORT BOOL WINAPI quser( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI quser2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI quser2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ†[ƒU[’è‹`ƒf[ƒ^‚ðÝ’è2
+	//		ãƒ¦ãƒ¼ã‚¶ãƒ¼å®šç¾©ãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®š2
 	//		quser2 num,user4,user5,user6
 	//
 	int id;
@@ -1503,10 +1503,10 @@ EXPORT BOOL WINAPI quser2( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetuser( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetuser( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ†[ƒU[’è‹`ƒf[ƒ^‚ðŽæ“¾
+	//		ãƒ¦ãƒ¼ã‚¶ãƒ¼å®šç¾©ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 	//		qgetuser var,u1,u2,u3
 	//
 	PVal *pv;
@@ -1519,9 +1519,9 @@ EXPORT BOOL WINAPI qgetuser( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int u1,u2,u3;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	GAMEROCK *gr = game->getGameRock( id );
@@ -1531,17 +1531,17 @@ EXPORT BOOL WINAPI qgetuser( HSPEXINFO *hei, int p1, int p2, int p3 )
 	u2 = gr->user2;
 	u3 = gr->user3;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &u3 );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &u1 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_INUM, &u2 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_INUM, &u3 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetuser2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetuser2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ†[ƒU[’è‹`ƒf[ƒ^‚ðŽæ“¾2
+	//		ãƒ¦ãƒ¼ã‚¶ãƒ¼å®šç¾©ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—2
 	//		qgetuser2 var,u4,u5,u6
 	//
 	PVal *pv;
@@ -1554,9 +1554,9 @@ EXPORT BOOL WINAPI qgetuser2( HSPEXINFO *hei, int p1, int p2, int p3 )
 	double u4,u5,u6;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap3 = hei->HspFunc_prm_getva( &pv3 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	GAMEROCK *gr = game->getGameRock( id );
@@ -1566,17 +1566,17 @@ EXPORT BOOL WINAPI qgetuser2( HSPEXINFO *hei, int p1, int p2, int p3 )
 	u5 = (double)gr->user5;
 	u6 = (double)gr->user6;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &u4 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &u5 );		// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &u6 );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &u4 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &u5 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv3, ap3, TYPE_DNUM, &u6 );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qdamper( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qdamper( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		‹zU‚È‚Ç‚Ìƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		å¸æŒ¯ãªã©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qdamper num,damper,friction
 	//
 	int id;
@@ -1592,10 +1592,10 @@ EXPORT BOOL WINAPI qdamper( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetdamper( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetdamper( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		‹zU‚È‚Ç‚Ìƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		å¸æŒ¯ãªã©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetdamper num,damper,friction
 	//
 	int id;
@@ -1606,8 +1606,8 @@ EXPORT BOOL WINAPI qgetdamper( HSPEXINFO *hei, int p1, int p2, int p3 )
 	double d1,d2;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -1616,16 +1616,16 @@ EXPORT BOOL WINAPI qgetdamper( HSPEXINFO *hei, int p1, int p2, int p3 )
 	d1 = (double)pR->damper;
 	d2 = (double)pR->friction;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qpush( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qpush( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		”CˆÓ‚ÌêŠ‚É—Í‚ð—^‚¦‚é
+	//		ä»»æ„ã®å ´æ‰€ã«åŠ›ã‚’ä¸Žãˆã‚‹
 	//		qpush num,xw,yw,ax,ay,sw
 	//
 	int id,sw;
@@ -1651,10 +1651,10 @@ EXPORT BOOL WINAPI qpush( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qblast( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qblast( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		”CˆÓ‚ÌêŠ‚É—Í‚ð—^‚¦‚é
+	//		ä»»æ„ã®å ´æ‰€ã«åŠ›ã‚’ä¸Žãˆã‚‹
 	//		qblast xw,yw,power,near,far
 	//
 	int sw;
@@ -1675,10 +1675,10 @@ EXPORT BOOL WINAPI qblast( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qaddmodel( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qaddmodel( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		Ž©—RÝ’èƒIƒuƒWƒFƒNƒg’Ç‰Á
+	//		è‡ªç”±è¨­å®šã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¿½åŠ 
 	//		qaddmodel var, shape_var, nvertex, x, y, r, sx, sy, colsw, mygroup, exgroup, loggroup
 	//
 	float x1,y1,rot,sx,sy;
@@ -1699,8 +1699,8 @@ EXPORT BOOL WINAPI qaddmodel( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//float start_x,start_y;
 	//float xx,yy;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^2:•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
 	nvertex = hei->HspFunc_prm_getdi(-1);
 	x1 = (float)hei->HspFunc_prm_getdd(0.0);
 	y1 = (float)hei->HspFunc_prm_getdd(0.0);
@@ -1774,15 +1774,15 @@ EXPORT BOOL WINAPI qaddmodel( HSPEXINFO *hei, int p1, int p2, int p3 )
 		}
 	}
 */
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &val );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &val );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qfind( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qfind( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒIƒuƒWƒFƒNƒg‚ÌŒŸõ
+	//		ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ¤œç´¢
 	//		qfind group, stat
 	//
 	int group,stt;
@@ -1798,10 +1798,10 @@ EXPORT BOOL WINAPI qfind( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qnext( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qnext( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ŒŸõ‚³‚ê‚½ƒIƒuƒWƒFƒNƒg‚ðŽæ“¾
+	//		æ¤œç´¢ã•ã‚ŒãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—
 	//		qnext var
 	//
 	PVal *pv;
@@ -1809,7 +1809,7 @@ EXPORT BOOL WINAPI qnext( HSPEXINFO *hei, int p1, int p2, int p3 )
 	int id;
 	ROCK* pR;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 
@@ -1833,15 +1833,15 @@ EXPORT BOOL WINAPI qnext( HSPEXINFO *hei, int p1, int p2, int p3 )
 		find_id++;
 	}
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &id );		// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &id );		// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qinertia( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qinertia( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		d‚³‚È‚Ç‚Ìƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		é‡ã•ãªã©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qinertia num,inertia,gravity
 	//
 	int id;
@@ -1857,10 +1857,10 @@ EXPORT BOOL WINAPI qinertia( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qgetinertia( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetinertia( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		‹zU‚È‚Ç‚Ìƒpƒ‰ƒ[ƒ^[‚ð•Ï”‚ÉŽæ“¾
+	//		å¸æŒ¯ãªã©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetinertia num,inertia,gravity
 	//
 	int id;
@@ -1871,8 +1871,8 @@ EXPORT BOOL WINAPI qgetinertia( HSPEXINFO *hei, int p1, int p2, int p3 )
 	double d1,d2;
 
 	id = hei->HspFunc_prm_getdi(0);
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 
 	if ( game == NULL ) return -1;
 	ROCK* pR = game->getRock( id );
@@ -1881,31 +1881,31 @@ EXPORT BOOL WINAPI qgetinertia( HSPEXINFO *hei, int p1, int p2, int p3 )
 	d1 = (double)pR->inertia;
 	d2 = (double)pR->gravity;
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// •Ï”‚É’l‚ð‘ã“ü
-	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_DNUM, &d1 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
+	hei->HspFunc_prm_setva( pv2, ap2, TYPE_DNUM, &d2 );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qgetversion( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qgetversion( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒo[ƒWƒ‡ƒ“•¶Žš—ñ‚ð•Ï”‚ÉŽæ“¾
+	//		ãƒãƒ¼ã‚¸ãƒ§ãƒ³æ–‡å­—åˆ—ã‚’å¤‰æ•°ã«å–å¾—
 	//		qgetversion var
 	//
 	PVal *pv;
 	APTR ap;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
-	hei->HspFunc_prm_setva( pv, ap, TYPE_STRING, VERINFO );	// •Ï”‚É’l‚ð‘ã“ü
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
+	hei->HspFunc_prm_setva( pv, ap, TYPE_STRING, VERINFO );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI qinner( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qinner( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		À•W‚ªƒIƒuƒWƒFƒNƒg“à‚É‚ ‚é‚©‚ðŽæ“¾
+	//		åº§æ¨™ãŒã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå†…ã«ã‚ã‚‹ã‹ã‚’å–å¾—
 	//		qinner var,x,y,num
 	//
 	int id,res;
@@ -1913,7 +1913,7 @@ EXPORT BOOL WINAPI qinner( HSPEXINFO *hei, int p1, int p2, int p3 )
 	APTR ap;
 	float d1,d2;
 
-	ap = hei->HspFunc_prm_getva( &pv );			// ƒpƒ‰ƒ[ƒ^•Ï”
+	ap = hei->HspFunc_prm_getva( &pv );			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å¤‰æ•°
 	d1 = (float)hei->HspFunc_prm_getdd( 0.0 );
 	d2 = (float)hei->HspFunc_prm_getdd( 0.0 );
 	id = hei->HspFunc_prm_getdi(-1);
@@ -1921,17 +1921,17 @@ EXPORT BOOL WINAPI qinner( HSPEXINFO *hei, int p1, int p2, int p3 )
 	if ( game == NULL ) return -1;
 	res = game->CheckInsidePosition( id, d1, d2 );
 
-	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva( pv, ap, TYPE_INUM, &res );	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
 #ifdef _TACSCAN
 
-EXPORT BOOL WINAPI qguide( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qguide( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		‰Á‘¬ƒpƒ‰ƒ[ƒ^[‚ðÝ’è
+	//		åŠ é€Ÿãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®š
 	//		qguide num,x,y,r,maxsp,maxrsp,opt
 	//
 	int id,opt;
@@ -1952,10 +1952,10 @@ EXPORT BOOL WINAPI qguide( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qtarget( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qtarget( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ^[ƒQƒbƒg‚ÌÝ’è
+	//		ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®è¨­å®š
 	//		qtarget id,target_id,x,y,speed,opt
 	//
 	int id,opt,target;
@@ -1974,10 +1974,10 @@ EXPORT BOOL WINAPI qtarget( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qtargetarea( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qtargetarea( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ^[ƒQƒbƒg‚ÌŒÅ—LƒGƒŠƒAÝ’è
+	//		ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å›ºæœ‰ã‚¨ãƒªã‚¢è¨­å®š
 	//		qtargetarea px,py,sx,sy
 	//
 	float d1,d2,d3,d4;
@@ -1993,10 +1993,10 @@ EXPORT BOOL WINAPI qtargetarea( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qtargetadd( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qtargetadd( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ^[ƒQƒbƒg‚ÌŒÅ—L‘•ªÝ’è
+	//		ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å›ºæœ‰å¢—åˆ†è¨­å®š
 	//		qtargetadd px,py
 	//
 	float d1,d2;
@@ -2010,10 +2010,10 @@ EXPORT BOOL WINAPI qtargetadd( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qautoarea( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qautoarea( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ^[ƒQƒbƒg‚ÌŽ©“®ˆÚ“®”ÍˆÍƒGƒŠƒAÝ’è
+	//		ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®è‡ªå‹•ç§»å‹•ç¯„å›²ã‚¨ãƒªã‚¢è¨­å®š
 	//		qautoarea x1,y1,x2,y2
 	//
 	float d1,d2,d3,d4;
@@ -2029,10 +2029,10 @@ EXPORT BOOL WINAPI qautoarea( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qtargetint( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qtargetint( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ^[ƒQƒbƒgƒCƒ“ƒ^[ƒoƒ‹‚ÌÝ’è
+	//		ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«ã®è¨­å®š
 	//		qtargetint id,timer
 	//
 	int id,opt;
@@ -2046,10 +2046,10 @@ EXPORT BOOL WINAPI qtargetint( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qtargetpos( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qtargetpos( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ^[ƒQƒbƒgÀ•W‚ÌÄÝ’è
+	//		ã‚¿ãƒ¼ã‚²ãƒƒãƒˆåº§æ¨™ã®å†è¨­å®š
 	//		qtargetpos id,x1,y1,x2,y2
 	//
 	int id;
@@ -2144,13 +2144,13 @@ static void newRockMutil( int id, float x, float y, float spd, int target, int n
 }
 
 
-EXPORT BOOL WINAPI qmulti( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qmulti( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		ƒ^[ƒQƒbƒg‚ÉŒü‚¯‚ÄƒIƒuƒWƒFƒNƒg¶¬
-	//		(id:ƒx[ƒXID/target:ƒ^[ƒQƒbƒgID)
-	//		(ofsx,ofsy:À•W/speed:‘¬“x)
-	//		(num:ŒÂ”/opt:option)
+	//		ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«å‘ã‘ã¦ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ
+	//		(id:ãƒ™ãƒ¼ã‚¹ID/target:ã‚¿ãƒ¼ã‚²ãƒƒãƒˆID)
+	//		(ofsx,ofsy:åº§æ¨™/speed:é€Ÿåº¦)
+	//		(num:å€‹æ•°/opt:option)
 	//		qmulti id,ofsx,ofsy,speed,target,num,opt,offset
 	//
 	int id,num,opt,target,ofs;
@@ -2171,10 +2171,10 @@ EXPORT BOOL WINAPI qmulti( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qmultiprm( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qmultiprm( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
-	//		Ž©—RÝ’èƒIƒuƒWƒFƒNƒg’Ç‰Á
+	//		è‡ªç”±è¨­å®šã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¿½åŠ 
 	//		qmultiprm shape_var, nvertex, sx, sy, colsw, mygroup, exgroup, loggroup
 	//
 	//float x1,y1,rot,sx,sy;
@@ -2193,7 +2193,7 @@ EXPORT BOOL WINAPI qmultiprm( HSPEXINFO *hei, int p1, int p2, int p3 )
 	//float start_x,start_y;
 	//float xx,yy;
 
-	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ƒpƒ‰ƒ[ƒ^2:•Ï”
+	ap2 = hei->HspFunc_prm_getva( &pv2 );		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:å¤‰æ•°
 	nvertex = hei->HspFunc_prm_getdi(-1);
 	qm_sx = (float)hei->HspFunc_prm_getdd(10.0);
 	qm_sy = (float)hei->HspFunc_prm_getdd(10.0);
@@ -2219,7 +2219,7 @@ EXPORT BOOL WINAPI qmultiprm( HSPEXINFO *hei, int p1, int p2, int p3 )
 }
 
 
-EXPORT BOOL WINAPI qmultiprm2( HSPEXINFO *hei, int p1, int p2, int p3 )
+EXPORT BOOL WINAPI qmultiprm2( HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3 )
 {
 	//	(type$202)
 	//		qmultiprm2 mat,tex,subid,line, user1, user2, user3

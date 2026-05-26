@@ -812,12 +812,17 @@ static int cmdfunc_intcmd( int cmd )
 		PVal *pval;
 		char *ptr;
 		int size;
-		size_t tmpsize;
-		size_t ep1, ep2;
+		HSPPTRINT tmpsize;
+		HSPPTRINT ep1, ep2;
 		code_event( HSPEVENT_FNAME, 0, 0, code_gets() );
 		ptr = code_getvptr( &pval, &size );
-		ep1 = code_getdl( -1 );
-		ep2 = code_getdl( -1 );
+#ifdef HSP64
+		ep1 = (HSPPTRINT)code_getdl( -1 );
+		ep2 = (HSPPTRINT)code_getdl( -1 );
+#else
+		ep1 = (HSPPTRINT)code_getdi(-1);
+		ep2 = (HSPPTRINT)code_getdi(-1);
+#endif
 		if (( ep1 < 0 )||( ep1 > size )) ep1 = size;
 		if ( cmd == 0x16 ) {
 			tmpsize = ep2;if ( tmpsize<0 ) tmpsize = 0;

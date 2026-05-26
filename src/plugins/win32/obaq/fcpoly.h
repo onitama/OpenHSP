@@ -8,7 +8,7 @@
 #define PI2 6.28318530717958f
 #define HPI 1.570796326794895f
 
-// ®”AXIS2Œ^(UV•t‚«)
+// æ•´æ•°AXIS2å‹(UVä»˜ã)
 typedef struct {
 short x,y,tx,ty;
 } IAXIS2;
@@ -16,7 +16,7 @@ short x,y,tx,ty;
 #define setIAXIS( a,b,c ) a.x=(int)b;a.y=(int)c;
 #define setIAXIS2( a,b,c,d,e ) a.x=(int)b;a.y=(int)c;a.tx=(int)d;a.ty=(int)e;
 
-// lŠpŒ`ƒ|ƒŠƒSƒ“primitive
+// å››è§’å½¢ãƒãƒªã‚´ãƒ³primitive
 #define POLY4N 4
 typedef struct
 {
@@ -31,11 +31,11 @@ short specular;			// specular value (opt)
 } POLY4;
 
 
-//		attrƒR[ƒh
+//		attrã‚³ãƒ¼ãƒ‰
 //
 #define NODE_ATTR_COLKEY 0x8000
 
-// ƒXƒLƒƒƒ“ƒ‰ƒCƒ“î•ñ
+// ã‚¹ã‚­ãƒ£ãƒ³ãƒ©ã‚¤ãƒ³æƒ…å ±
 typedef struct
 {
 int minX, maxX;		// left,right edge

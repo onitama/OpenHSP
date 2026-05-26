@@ -14,7 +14,7 @@
 
 void CMemBuf::InitMemBuf( int sz )
 {
-	//	ƒoƒbƒtƒ@‰Šú‰»
+	//	ãƒãƒƒãƒ•ã‚¡åˆæœŸåŒ–
 	size = sz;
 	if ( size<0x1000 ) {
 		size = 0x1000;
@@ -28,7 +28,7 @@ void CMemBuf::InitMemBuf( int sz )
 	mem_buf[0] = 0;
 	name[0] = 0;
 	cur = 0;
-	//	Indexƒoƒbƒtƒ@‰Šú‰»
+	//	Indexãƒãƒƒãƒ•ã‚¡åˆæœŸåŒ–
 	idxflag = 0;
 	idxmax = -1;
 	curidx = 0;
@@ -38,7 +38,7 @@ void CMemBuf::InitMemBuf( int sz )
 
 void CMemBuf::InitIndexBuf( int sz )
 {
-	//	Indexƒoƒbƒtƒ@‰Šú‰»
+	//	Indexãƒãƒƒãƒ•ã‚¡åˆæœŸåŒ–
 	idxflag = 1;
 	idxmax = sz;
 	curidx = 0;
@@ -48,9 +48,9 @@ void CMemBuf::InitIndexBuf( int sz )
 
 char *CMemBuf::PreparePtr( int sz )
 {
-	//	ƒoƒbƒtƒ@Šg’£ƒ`ƒFƒbƒN
-	//	(szƒTƒCƒY‚ð‘‚«ž‚Ý‰Â”\‚Èƒoƒbƒtƒ@‚ð•Ô‚·)
-	//		(return:‚à‚Æ‚Ìƒoƒbƒtƒ@æ“ªptr)
+	//	ãƒãƒƒãƒ•ã‚¡æ‹¡å¼µãƒã‚§ãƒƒã‚¯
+	//	(szã‚µã‚¤ã‚ºã‚’æ›¸ãè¾¼ã¿å¯èƒ½ãªãƒãƒƒãƒ•ã‚¡ã‚’è¿”ã™)
+	//		(return:ã‚‚ã¨ã®ãƒãƒƒãƒ•ã‚¡å…ˆé ­ptr)
 	//
 	int i;
 	char *p;
@@ -59,7 +59,7 @@ char *CMemBuf::PreparePtr( int sz )
 		cur += sz;
 		return p;
 	}
-	//	expand buffer (VC‚Ìrealloc‚Í•|‚¢‚Ì‚ÅŽg‚í‚È‚¢)
+	//	expand buffer (VCã®reallocã¯æ€–ã„ã®ã§ä½¿ã‚ãªã„)
 	i = size;
 	while( i<=(cur+sz) ) i+=limit_size;
 	p = (char *)malloc( i );
@@ -75,7 +75,7 @@ char *CMemBuf::PreparePtr( int sz )
 
 void CMemBuf::RegistIndex( int val )
 {
-	//	ƒCƒ“ƒfƒbƒNƒX‚ð“o˜^
+	//	ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’ç™»éŒ²
 	int *p;
 	if ( idxflag==0 ) return;
 	idxbuf[ curidx++ ]= val;
@@ -177,8 +177,8 @@ void CMemBuf::PutData( void *data, int sz )
 
 int CMemBuf::PutFile( char *fname )
 {
-	//		ƒoƒbƒtƒ@‚ÉŽw’èƒtƒ@ƒCƒ‹‚Ì“à—e‚ð’Ç‰Á
-	//		(return:ƒtƒ@ƒCƒ‹ƒTƒCƒY(-1=error))
+	//		ãƒãƒƒãƒ•ã‚¡ã«æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã®å†…å®¹ã‚’è¿½åŠ 
+	//		(return:ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚º(-1=error))
 	//
 	char *p;
 	int length;
@@ -208,7 +208,7 @@ int CMemBuf::PutFile( char *fname )
 
 CMemBuf::CMemBuf( void )
 {
-	//		‹ó‚Ìƒoƒbƒtƒ@‚ð‰Šú‰»(64K)
+	//		ç©ºã®ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–(64K)
 	//
 	InitMemBuf( 0x10000 );
 }
@@ -216,7 +216,7 @@ CMemBuf::CMemBuf( void )
 
 CMemBuf::CMemBuf( int sz )
 {
-	//		Žw’èƒTƒCƒY‚Ìƒoƒbƒtƒ@‚ð‰Šú‰»(64K)
+	//		æŒ‡å®šã‚µã‚¤ã‚ºã®ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–(64K)
 	//
 	InitMemBuf( sz );
 }
@@ -301,8 +301,8 @@ int CMemBuf::SearchIndexValue( int val )
 
 int CMemBuf::SaveFile( char *fname )
 {
-	//		ƒoƒbƒtƒ@‚ðƒtƒ@ƒCƒ‹‚ÉƒZ[ƒu
-	//		(return:ƒtƒ@ƒCƒ‹ƒTƒCƒY(-1=error))
+	//		ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚»ãƒ¼ãƒ–
+	//		(return:ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚º(-1=error))
 	//
 	FILE *fp;
 	int flen;
@@ -317,7 +317,7 @@ int CMemBuf::SaveFile( char *fname )
 
 char *CMemBuf::GetFileName( void )
 {
-	//		ƒtƒ@ƒCƒ‹–¼‚ðŽæ“¾
+	//		ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—
 	//
 	return name;
 }

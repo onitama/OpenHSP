@@ -452,8 +452,8 @@ typedef struct HSPEXINFO
 	char *(*HspFunc_prm_gets)( void );
 	char *(*HspFunc_prm_getds)( const char *defstr );
 	int (*HspFunc_val_realloc)( PVal *pv, HSPPTRINT size, int mode );
-	size_t(*HspFunc_fread)( char *fname, void *readmem, size_t rlen, size_t seekofs );
-	size_t(*HspFunc_fsize)( char *fname );
+	ptrdiff_t(*HspFunc_fread)( char *fname, void *readmem, ptrdiff_t rlen, ptrdiff_t seekofs );
+	ptrdiff_t(*HspFunc_fsize)( char *fname );
 	void *(*HspFunc_getbmscr)( int wid );
 	int (*HspFunc_getobj)( int wid, int id, void *inf );
 	int (*HspFunc_setobj)( int wid, int id, const void *inf );

@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 #include "hspsteam.h"
-#include "hspdll.h"
+#include "../hpi3sample/hsp3plugin.h"
 
 static void Alertf(char *format, ...)
 {
@@ -59,7 +59,7 @@ int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 
 char *getvptr( HSPEXINFO *hei, PVal **pval, int *size )
 {
-	//		•Ï”ƒ|ƒCƒ“ƒ^‚ð“¾‚é
+	//		å¤‰æ•°ãƒã‚¤ãƒ³ã‚¿ã‚’å¾—ã‚‹
 	//
 	APTR aptr;
 	PDAT *pdat;
@@ -88,7 +88,7 @@ static int valsize( PVAL2 *pv )
 */
 /*------------------------------------------------------------*/
 
-EXPORT BOOL WINAPI steaminit( int p1, int p2, int p3, int p4 )
+EXPORT BOOL WINAPI steaminit( HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4 )
 {
 	//	DLL steaminit (type$00)
 	//
@@ -99,7 +99,7 @@ EXPORT BOOL WINAPI steaminit( int p1, int p2, int p3, int p4 )
 }
 
 
-EXPORT BOOL WINAPI steambye(int p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI steambye(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//	DLL steambye (type$00)
 	//
@@ -108,15 +108,15 @@ EXPORT BOOL WINAPI steambye(int p1, int p2, int p3, int p4)
 }
 
 
-EXPORT BOOL WINAPI steamunlock_achievement(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamunlock_achievement(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamunlock_achievement id (type$202)
 	//
 	int res;
 	int ep1;
 	res = 0;
-	ep1 = hei->HspFunc_prm_getdi(0);	// ƒpƒ‰ƒ[ƒ^1:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) _hspsteam->unlockAchievement(ep1);
 
@@ -124,15 +124,15 @@ EXPORT BOOL WINAPI steamunlock_achievement(HSPEXINFO *hei, int p1, int p2, int p
 }
 
 
-EXPORT BOOL WINAPI steamunlock_achievementkey(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamunlock_achievementkey(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamunlock_achievementkey "apikey" (type$202)
 	//
 	int res;
 	char *ep1;
 	res = 0;
-	ep1 = hei->HspFunc_prm_gets();		// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_gets();		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) _hspsteam->unlockAchievement(ep1);
 
@@ -140,15 +140,15 @@ EXPORT BOOL WINAPI steamunlock_achievementkey(HSPEXINFO *hei, int p1, int p2, in
 }
 
 
-EXPORT BOOL WINAPI steamclear_achievement(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamclear_achievement(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamclear_achievement (type$202)
 	//
 	int res;
 	int ep1;
 	res = 0;
-	ep1 = hei->HspFunc_prm_getdi(0);	// ƒpƒ‰ƒ[ƒ^1:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) _hspsteam->clearAchievement(ep1);
 
@@ -156,15 +156,15 @@ EXPORT BOOL WINAPI steamclear_achievement(HSPEXINFO *hei, int p1, int p2, int p3
 }
 
 
-EXPORT BOOL WINAPI steamclear_achievementkey(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamclear_achievementkey(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamclear_achievementkey "apikey" (type$202)
 	//
 	int res;
 	char *ep1;
 	res = 0;
-	ep1 = hei->HspFunc_prm_gets();		// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_gets();		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) _hspsteam->clearAchievement(ep1);
 
@@ -172,7 +172,7 @@ EXPORT BOOL WINAPI steamclear_achievementkey(HSPEXINFO *hei, int p1, int p2, int
 }
 
 
-EXPORT BOOL WINAPI steamset_max(int p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI steamset_max(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//	DLL steamset_max (type$00)
 	//
@@ -180,19 +180,19 @@ EXPORT BOOL WINAPI steamset_max(int p1, int p2, int p3, int p4)
 	return 0;
 }
 
-EXPORT BOOL WINAPI steamupdate(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamupdate(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamupdate option (type$00)
 	//
 	PVal *pv;
 	APTR ap;
 	int p1, p2;
-	ap = hei->HspFunc_prm_getva(&pv);	// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	p1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
+	ap = hei->HspFunc_prm_getva(&pv);	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	p1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 	if (_hspsteam) {
 		_hspsteam->update();
 		p2 = _hspsteam->flag;
-		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &p2);	// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &p2);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	}
 	else {
 		return -1;
@@ -200,7 +200,7 @@ EXPORT BOOL WINAPI steamupdate(HSPEXINFO *hei, int _p1, int _p2, int _p3)
 	return 0;
 }
 
-EXPORT BOOL WINAPI steamreq_status(int p1, int p2, int p3, int p4)
+EXPORT BOOL WINAPI steamreq_status(HSPPTRINT p1, HSPPTRINT p2, HSPPTRINT p3, HSPPTRINT p4)
 {
 	//	DLL steamset_max (type$00)
 	//
@@ -208,7 +208,7 @@ EXPORT BOOL WINAPI steamreq_status(int p1, int p2, int p3, int p4)
 	return 0;
 }
 
-EXPORT BOOL WINAPI steamget_achievement(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamget_achievement(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		steamget_achievement var, index  (type$202)
@@ -216,11 +216,11 @@ EXPORT BOOL WINAPI steamget_achievement(HSPEXINFO *hei, int _p1, int _p2, int _p
 	PVal *pv;
 	APTR ap;
 	int p1, p2;
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	p1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	p1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
 	if (_hspsteam) {
 		p2 = _hspsteam->getAchivementFlag(p1);
-		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &p2);	// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &p2);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	}
 	else {
 		return -1;
@@ -229,7 +229,7 @@ EXPORT BOOL WINAPI steamget_achievement(HSPEXINFO *hei, int _p1, int _p2, int _p
 }
 
 
-EXPORT BOOL WINAPI steamget_achievementstr(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamget_achievementstr(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		steamget_achievementstr var, index, type  (type$202)
@@ -238,12 +238,12 @@ EXPORT BOOL WINAPI steamget_achievementstr(HSPEXINFO *hei, int _p1, int _p2, int
 	APTR ap;
 	int p1,p2;
 	char *res;
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	p1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	p2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:”’l
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	p1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	p2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
 	if (_hspsteam) {
 		res = _hspsteam->getAchivementString( p1, p2 );
-		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, res);	// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, res);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	}
 	else {
 		return -1;
@@ -252,7 +252,7 @@ EXPORT BOOL WINAPI steamget_achievementstr(HSPEXINFO *hei, int _p1, int _p2, int
 }
 
 
-EXPORT BOOL WINAPI steamreg_achievement(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamreg_achievement(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamreg_achievement index,"APINAME" (type$202)
 	//
@@ -260,9 +260,9 @@ EXPORT BOOL WINAPI steamreg_achievement(HSPEXINFO *hei, int p1, int p2, int p3)
 	int ep1;
 	char *ep2 = "";
 	res = 0;
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶Žš—ñ
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) _hspsteam->setAchivementId(ep1, ep2);
 
@@ -270,15 +270,15 @@ EXPORT BOOL WINAPI steamreg_achievement(HSPEXINFO *hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI steamset_achievement(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamset_achievement(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamset_achievement option (type$202)
 	//
 	int res;
 	int ep1;
 	res = 0;
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) {
 		res = _hspsteam->setAchivementAuto();
@@ -288,7 +288,7 @@ EXPORT BOOL WINAPI steamset_achievement(HSPEXINFO *hei, int p1, int p2, int p3)
 
 
 
-EXPORT BOOL WINAPI steamget_status(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamget_status(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		steamget_status var, "apikey"  (type$202)
@@ -297,12 +297,12 @@ EXPORT BOOL WINAPI steamget_status(HSPEXINFO *hei, int _p1, int _p2, int _p3)
 	APTR ap;
 	char *ep1 = "";
 	int res,ep2;
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶Žš—ñ
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	if (_hspsteam) {
 		ep2 = 0;
 		res = _hspsteam->getStatInt(ep1,&ep2);
-		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &ep2);	// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &ep2);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 		if (res) return -1;
 	}
 	else {
@@ -312,7 +312,7 @@ EXPORT BOOL WINAPI steamget_status(HSPEXINFO *hei, int _p1, int _p2, int _p3)
 }
 
 
-EXPORT BOOL WINAPI steamget_statusf(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamget_statusf(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		steamget_statusf var, "apikey"  (type$202)
@@ -322,12 +322,12 @@ EXPORT BOOL WINAPI steamget_statusf(HSPEXINFO *hei, int _p1, int _p2, int _p3)
 	char *ep1 = "";
 	int res;
 	double ep2;
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^2:•¶Žš—ñ
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ–‡å­—åˆ—
 	if (_hspsteam) {
 		ep2 = 0;
 		res = _hspsteam->getStatDouble(ep1, &ep2);
-		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_DOUBLE, &ep2);	// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_DOUBLE, &ep2);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 		if (res) return -1;
 	}
 	else {
@@ -337,15 +337,15 @@ EXPORT BOOL WINAPI steamget_statusf(HSPEXINFO *hei, int _p1, int _p2, int _p3)
 }
 
 
-EXPORT BOOL WINAPI steamset_status(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamset_status(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamset_status "name",value (type$202)
 	//
 	char *ep1;
 	int ep2;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) {
 		_hspsteam->updateStatusInt(ep1, ep2);
@@ -354,15 +354,15 @@ EXPORT BOOL WINAPI steamset_status(HSPEXINFO *hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI steamset_statusf(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamset_statusf(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamset_statusf "name",value (type$202)
 	//
 	char *ep1;
 	double ep2;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	ep2 = hei->HspFunc_prm_getdd(0.0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	ep2 = hei->HspFunc_prm_getdd(0.0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) {
 		_hspsteam->updateStatusDouble(ep1, ep2);
@@ -371,15 +371,15 @@ EXPORT BOOL WINAPI steamset_statusf(HSPEXINFO *hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI steamreq_leaderboard(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamreq_leaderboard(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamreq_leaderboard "name",type (type$202)
 	//
 	char *ep1;
 	int ep2;
-	ep1 = hei->HspFunc_prm_gets();			// ƒpƒ‰ƒ[ƒ^1:•¶Žš—ñ
-	ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_gets();			// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ–‡å­—åˆ—
+	ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	if (_hspsteam) {
 		_hspsteam->request_Leaderboard(ep1, ep2);
@@ -388,15 +388,15 @@ EXPORT BOOL WINAPI steamreq_leaderboard(HSPEXINFO *hei, int p1, int p2, int p3)
 }
 
 
-EXPORT BOOL WINAPI steamreq_leaderboarddata(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamreq_leaderboarddata(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamreq_leaderboarddata type,start,end (type$202)
 	//
 	int res,ep1,ep2,ep3;
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(1);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep3 = hei->HspFunc_prm_getdi(10);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(1);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep3 = hei->HspFunc_prm_getdi(10);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	res = -1;
 	if (_hspsteam) {
@@ -406,7 +406,7 @@ EXPORT BOOL WINAPI steamreq_leaderboarddata(HSPEXINFO *hei, int p1, int p2, int 
 }
 
 
-EXPORT BOOL WINAPI steamget_leaderboardmax(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamget_leaderboardmax(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		steamget_leaderboardmax var  (type$202)
@@ -414,18 +414,18 @@ EXPORT BOOL WINAPI steamget_leaderboardmax(HSPEXINFO *hei, int _p1, int _p2, int
 	PVal *pv;
 	APTR ap;
 	int p2;
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 	p2 = 0;
 	if (_hspsteam) {
 		p2 = _hspsteam->getLeaderboardMax();
 	}
-	hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &p2);	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &p2);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI steamget_leaderboard(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamget_leaderboard(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		steamget_leaderboard var, type, index  (type$202)
@@ -435,28 +435,28 @@ EXPORT BOOL WINAPI steamget_leaderboard(HSPEXINFO *hei, int _p1, int _p2, int _p
 	int p1, p2;
 	int res = 0;
 	char stemp[256];
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	p1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	p2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^3:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	p1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	p2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿3:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 	if (p1 & 16) {
 		*stemp = 0;
 		if (_hspsteam) {
 			_hspsteam->getLeaderboardString(stemp, p1 & 15, p2);
 		}
-		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, stemp);	// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, stemp);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	}
 	else {
 		if (_hspsteam) {
 			res = _hspsteam->getLeaderboardValue(p1, p2);
 		}
-		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &res);	// •Ï”‚É’l‚ð‘ã“ü
+		hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_INT, &res);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	}
 	return 0;
 }
 
 
-EXPORT BOOL WINAPI steamget_name(HSPEXINFO *hei, int _p1, int _p2, int _p3)
+EXPORT BOOL WINAPI steamget_name(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//
 	//		steamget_name var,p1  (type$202)
@@ -465,27 +465,27 @@ EXPORT BOOL WINAPI steamget_name(HSPEXINFO *hei, int _p1, int _p2, int _p3)
 	APTR ap;
 	int p1;
 	char stemp[256];
-	ap = hei->HspFunc_prm_getva(&pv);		// ƒpƒ‰ƒ[ƒ^1:•Ï”
-	p1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^2:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ap = hei->HspFunc_prm_getva(&pv);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:å¤‰æ•°
+	p1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿2:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 	*stemp = 0;
 	if (_hspsteam) {
 		_hspsteam->getPlayerName(stemp, p1);
 	}
-	hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, stemp);	// •Ï”‚É’l‚ð‘ã“ü
+	hei->HspFunc_prm_setva(pv, ap, HSPVAR_FLAG_STR, stemp);	// å¤‰æ•°ã«å€¤ã‚’ä»£å…¥
 	return 0;
 }
 
 
 
-EXPORT BOOL WINAPI steamset_leaderboarddata(HSPEXINFO *hei, int p1, int p2, int p3)
+EXPORT BOOL WINAPI steamset_leaderboarddata(HSPEXINFO *hei, HSPPTRINT _p1, HSPPTRINT _p2, HSPPTRINT _p3)
 {
 	//	DLL steamset_leaderboarddata score,option (type$202)
 	//
 	int res, ep1, ep2;
-	ep1 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	ep2 = hei->HspFunc_prm_getdi(0);		// ƒpƒ‰ƒ[ƒ^1:”’l
-	if (*hei->er) return *hei->er;		// ƒGƒ‰[ƒ`ƒFƒbƒN
+	ep1 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	ep2 = hei->HspFunc_prm_getdi(0);		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿1:æ•°å€¤
+	if (*hei->er) return *hei->er;		// ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯
 
 	res = -1;
 	if (_hspsteam) {

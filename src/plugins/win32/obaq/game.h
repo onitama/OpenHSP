@@ -5,15 +5,15 @@
 #include "random.h"
 #include "sysreq.h"
 
-const int target_optposx	= 1;	// –Ú“I’n(X)‚ğ©“®İ’è‚·‚é
-const int target_optposy	= 2;	// –Ú“I’n(Y)‚ğ©“®İ’è‚·‚é
-const int target_optincy	= 4;	// –Ú“I’n(Y)‚ğ©“®XV‚·‚é
-const int target_optflipx	= 8;	// –Ú“I’n(X)‚ğ©“®”½“]‚·‚é
-const int target_optflipy	= 16;	// –Ú“I’n(Y)‚ğ©“®”½“]‚·‚é
-const int target_optdirect	= 32;	// –Ú“I’n‚Ö‚Ìƒ_ƒCƒŒƒNƒgˆÚ“®
-const int target_nowipe		= 64;	// ©“®Á‹‚ğ–³Œø‚É‚·‚é
-const int target_addpos		= 128;	// ƒXƒs[ƒh‰ÁZ‚Ì‚İ(guide‚È‚µ)
-const int target_addpos2	= 256;	// ƒXƒs[ƒh‰ÁZ‚Ì‚İ(‘Š‘Î)(guide‚È‚µ)
+const int target_optposx	= 1;	// ç›®çš„åœ°(X)ã‚’è‡ªå‹•è¨­å®šã™ã‚‹
+const int target_optposy	= 2;	// ç›®çš„åœ°(Y)ã‚’è‡ªå‹•è¨­å®šã™ã‚‹
+const int target_optincy	= 4;	// ç›®çš„åœ°(Y)ã‚’è‡ªå‹•æ›´æ–°ã™ã‚‹
+const int target_optflipx	= 8;	// ç›®çš„åœ°(X)ã‚’è‡ªå‹•åè»¢ã™ã‚‹
+const int target_optflipy	= 16;	// ç›®çš„åœ°(Y)ã‚’è‡ªå‹•åè»¢ã™ã‚‹
+const int target_optdirect	= 32;	// ç›®çš„åœ°ã¸ã®ãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆç§»å‹•
+const int target_nowipe		= 64;	// è‡ªå‹•æ¶ˆå»ã‚’ç„¡åŠ¹ã«ã™ã‚‹
+const int target_addpos		= 128;	// ã‚¹ãƒ”ãƒ¼ãƒ‰åŠ ç®—ã®ã¿(guideãªã—)
+const int target_addpos2	= 256;	// ã‚¹ãƒ”ãƒ¼ãƒ‰åŠ ç®—ã®ã¿(ç›¸å¯¾)(guideãªã—)
 
 class GAMEROCK {
 	public:
@@ -24,17 +24,17 @@ class GAMEROCK {
 			mattype_wire		= 3,
 			mattype_wire2		= 4,
 			mattype_basetype	= 0xfff,
-			mattype_delay		= 0x1000,		// ‚ ‚Æ‚Å•`‰æ
+			mattype_delay		= 0x1000,		// ã‚ã¨ã§æç”»
 		};
 
-		// ŠÇ——p
+		// ç®¡ç†ç”¨
 		class GAMEROCK*	next;
 		class GAMEROCK*	prev;
 
-		// ‘Î‰‚·‚éROCK‚ğ¦‚·
+		// å¯¾å¿œã™ã‚‹ROCKã‚’ç¤ºã™
 		class ROCK*		pRock;
 
-		// ƒ[ƒN—Ş
+		// ãƒ¯ãƒ¼ã‚¯é¡
 		int		material_type;
 		int		material_id;
 		int		material_subid;
@@ -45,11 +45,11 @@ class GAMEROCK {
 		short	material_gmode;
 		short	material_grate;
 
-		// ƒ†[ƒU[—˜—pƒf[ƒ^
+		// ãƒ¦ãƒ¼ã‚¶ãƒ¼åˆ©ç”¨ãƒ‡ãƒ¼ã‚¿
 		int		user1,user2,user3;
 		float	user4,user5,user6;
 
-		// ƒ‚ƒfƒ‹‚ÌƒTƒCƒYî•ñ
+		// ãƒ¢ãƒ‡ãƒ«ã®ã‚µã‚¤ã‚ºæƒ…å ±
 		float	minx,miny,maxx,maxy;
 
 		GAMEROCK() {
@@ -64,16 +64,16 @@ class GAME {
 	public:
 		enum {
 			objtype_normal		= 0x80000000,
-			objtype_player		= 0x00000001,	// ƒvƒŒƒCƒ„[
-			objtype_enemy		= 0x00000002,	// “G
-			objtype_deathobj	= 0x00000004,	// “G‚ğ”š”­‚³‚¹‚é•¨‘Ì
-			objtype_target		= 0x00000008,	// ƒ^[ƒQƒbƒg
-			objtype_wall		= 0x00000010,	// •Ç—Ş
-			objtype_item		= 0x00000020,	// ƒAƒCƒeƒ€
-			objtype_targetenemy	= 0x00000040,	// ƒ^[ƒQƒbƒg“G
-			objtype_helper		= 0x00000080,	// ƒvƒŒƒCƒ„[
-			objtype_rock		= 0x00000100,	// Šâ
-			objtype_sponge		= 0x00000200,	// ”š–ò‹Ÿ‹‹Œ¹
+			objtype_player		= 0x00000001,	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
+			objtype_enemy		= 0x00000002,	// æ•µ
+			objtype_deathobj	= 0x00000004,	// æ•µã‚’çˆ†ç™ºã•ã›ã‚‹ç‰©ä½“
+			objtype_target		= 0x00000008,	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
+			objtype_wall		= 0x00000010,	// å£é¡
+			objtype_item		= 0x00000020,	// ã‚¢ã‚¤ãƒ†ãƒ 
+			objtype_targetenemy	= 0x00000040,	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ•µ
+			objtype_helper		= 0x00000080,	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
+			objtype_rock		= 0x00000100,	// å²©
+			objtype_sponge		= 0x00000200,	// çˆ†è–¬ä¾›çµ¦æº
 		};
 
 		enum {
@@ -92,7 +92,7 @@ class GAME {
 		VESSEL*	pVessel;
 
 
-		// ƒQ[ƒ€is—p
+		// ã‚²ãƒ¼ãƒ é€²è¡Œç”¨
 		int		gameTick;
 		float	border_x1, border_y1, border_x2, border_y2;
 

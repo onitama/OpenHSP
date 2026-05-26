@@ -8,7 +8,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef HSP64
+#pragma comment(lib, "steam_api64.lib" )
+#else
 #pragma comment(lib, "steam_api.lib" )
+#endif
 
 static void Alertf(char *format, ...)
 {
@@ -21,7 +25,7 @@ static void Alertf(char *format, ...)
 }
 
 //
-//		•¶ŽšƒGƒ“ƒR[ƒh•ÏŠ·(UTF8->SJIS)
+//		æ–‡å­—ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰å¤‰æ›(UTF8->SJIS)
 //
 #define BUFSIZE 4096
 static int cnvmode = 0;
@@ -189,7 +193,7 @@ void hspsteam::setUTF8Mode(int mode)
 
 void hspsteam::setResultString(char *result, char *src)
 {
-	//	src -> result‚É•¶Žš—ñ‚ðƒRƒs[(UTF8•ÏŠ·‚ðl—¶‚·‚é)
+	//	src -> resultã«æ–‡å­—åˆ—ã‚’ã‚³ãƒ”ãƒ¼(UTF8å¤‰æ›ã‚’è€ƒæ…®ã™ã‚‹)
 	//
 	if (utf8mode) {
 		strcpy(result, src);
@@ -434,6 +438,7 @@ void hspsteam::updateStatusDouble(char *apikey, double value)
 void hspsteam::requestAchivement(void)
 {
 	// request our stats
+#if 0
 	if (m_pSteamUserStats) {
 		bool bSuccess = m_pSteamUserStats->RequestCurrentStats();
 		if (bSuccess) {
@@ -443,6 +448,7 @@ void hspsteam::requestAchivement(void)
 			flag = STEAM_ERROR;
 		}
 	}
+#endif
 }
 
 
@@ -501,9 +507,9 @@ void hspsteam::request_Leaderboard(char *name, int type)
 	ELeaderboardSortMethod sort = k_ELeaderboardSortMethodDescending;
 	ELeaderboardDisplayType dtype = k_ELeaderboardDisplayTypeNumeric;
 
-	if (type & 1) { sort = k_ELeaderboardSortMethodAscending; }					// ‹t‡
-	if (type & 2) { dtype = k_ELeaderboardDisplayTypeTimeSeconds; }				// •b
-	if (type & 4) { dtype = k_ELeaderboardDisplayTypeTimeMilliSeconds; }			// ƒ~ƒŠ•b
+	if (type & 1) { sort = k_ELeaderboardSortMethodAscending; }					// é€†é †
+	if (type & 2) { dtype = k_ELeaderboardDisplayTypeTimeSeconds; }				// ç§’
+	if (type & 4) { dtype = k_ELeaderboardDisplayTypeTimeMilliSeconds; }			// ãƒŸãƒªç§’
 
 	// find/create a leaderboard for the quickest win
 	hSteamAPICall = SteamUserStats()->FindOrCreateLeaderboard( (const char *)name, sort, dtype );

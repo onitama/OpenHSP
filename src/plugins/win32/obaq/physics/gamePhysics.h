@@ -23,7 +23,7 @@ const int RATE_PHYSICS = 4;
 const int VWIDTH = 192;
 const int VHEIGHT = 108;
 
-const int MAX_GRAIN = 1;		// Å‘å—±q”
+const int MAX_GRAIN = 1;		// æœ€å¤§ç²’å­æ•°
 
 #define VERINFO "OBAQ.DLL ver.090707\r\nCopyright 2009(C) Zener Works, Inc./kuni/onitama"
 

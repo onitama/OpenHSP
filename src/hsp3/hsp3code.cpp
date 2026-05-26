@@ -3485,13 +3485,13 @@ int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 		// fread (fseek,size,loadptr)
 		sz = dpm_read( hspctx->fnbuffer, prm3, prm2, prm1 );
 		if ( sz < 0 ) throw HSPERR_FILE_IO;
-		hspctx->strsize = sz;
+		hspctx->strsize = (HSPPTRINT)sz;
 		break;
 	case HSPEVENT_FWRITE:
 		// fwrite (fseek,size,saveptr)
 		sz = hsp3_binsave(hspctx->fnbuffer, prm3, prm2, prm1);
 		if ( sz < 0 ) throw HSPERR_FILE_IO;
-		hspctx->strsize = sz;
+		hspctx->strsize = (HSPPTRINT)sz;
 		break;
 	case HSPEVENT_FEXIST:
 		// exist (n/a,n/a,n/a)

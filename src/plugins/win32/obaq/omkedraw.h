@@ -2,7 +2,7 @@
 //
 //	omkedraw.cpp functions
 //
-#include "hsp3plugin.h"
+#include "../hpi3sample/hsp3plugin.h"
 
 void OmkeDrawLineStart( BMSCR *bm, int col );
 void OmkeDrawLineEnd( BMSCR *bm );

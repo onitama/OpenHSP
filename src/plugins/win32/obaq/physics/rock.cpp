@@ -20,7 +20,7 @@ void ROCKBASE::proc(int procCount, bool wake)
 {
 //	DebugMessage(0, "nSide %d, nVertex %d, nVertexW %d\n", nSide, nVertex, nVertexW);
 
-	// ƒtƒŒ[ƒ€–ˆ‰Šú‰»
+	// ãƒ•ãƒ¬ãƒ¼ãƒ æ¯åˆæœŸåŒ–
 	for(int i = 0; i < MAX_ROCK; i ++) {
 		ROCK* pR = &rock[i];
 		if(pR->stat == ROCK::stat_sleep) {
@@ -79,7 +79,7 @@ void ROCKBASE::proc(int procCount, bool wake)
 	//	if(pR->stat == ROCK::stat_active) {
 		//	pR->calcVertexW();
 
-			// ŠâŠÔƒRƒŠƒWƒ‡ƒ“
+			// å²©é–“ã‚³ãƒªã‚¸ãƒ§ãƒ³
 			for(int j = 0; j < MAX_ROCK; j ++) {
 				ROCK* pR2 = &rock[j];
 #ifdef ENABLE_COLLISIONLOG
@@ -110,7 +110,7 @@ void ROCKBASE::proc2(void)
 	static float maxturn = 0.0f;
 	FVECTOR2 tpos;
 
-	// eqƒp[ƒc‹z’…
+	// è¦ªå­ãƒ‘ãƒ¼ãƒ„å¸ç€
 	for(int i = 0; i < MAX_ROCK; i ++) {
 		ROCK* pR = &rock[i];
 		if(pR->stat == ROCK::stat_active) {
@@ -143,11 +143,11 @@ void ROCKBASE::proc2(void)
 
 	float ga = gravity.x * gravity.x + gravity.y * gravity.y;
 
-	// ˆÚ“®
+	// ç§»å‹•
 	for(int i = 0; i < MAX_ROCK; i ++) {
 		ROCK* pR = &rock[i];
 		if(pR->stat == ROCK::stat_active) {
-			// ƒƒCƒ„ˆ—
+			// ãƒ¯ã‚¤ãƒ¤å‡¦ç†
 			for(int j = 0; j < MAX_ROCK_WIRE; j ++) {
 				if(pR->wirenum[j] >= 0) {
 					WIRE* pW = &wire[pR->wirenum[j]];
@@ -371,7 +371,7 @@ void ROCKBASE::proc2(void)
 //	tick ++;
 }
 
-// Šâ‚Ì‘¶İƒe[ƒuƒ‹‚ğì¬
+// å²©ã®å­˜åœ¨ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ä½œæˆ
 /*
 void ROCKBASE::makeRockMap(unsigned char* pMap, int width, int height)
 {
@@ -411,7 +411,7 @@ void ROCKBASE::makeRockMap(unsigned char* pMap, int width, int height)
 }
 */
 
-// V‚µ‚¢Šâ‚ğ“o˜^
+// æ–°ã—ã„å²©ã‚’ç™»éŒ²
 int ROCKBASE::addRock(int stat, int type, float weight, float moment, float buoyancy, float x, float y, float angle, float xsize, float ysize, int nvertex, const FVECTOR2* pVec, float margin, int collisionCheck, unsigned int group, unsigned int exceptGroup)
 {
 	for(int i = 0; i < MAX_ROCK; i ++) {
@@ -729,7 +729,7 @@ void ROCKBASE::sync(ROCKBASE* pSrc, int cont)
 // rock
 //
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void ROCK::init(void)
 {
 	stat = stat_reserve;
@@ -830,7 +830,7 @@ void ROCK::deleteSide(void)
 */
 }
 
-// Ø•Ğî•ñ‚ğ“o˜^
+// åˆ‡ç‰‡æƒ…å ±ã‚’ç™»éŒ²
 void ROCK::setSide(float margin)
 {
 	radius = 0.0f;
@@ -904,7 +904,7 @@ void ROCK::setSide(float margin)
 	marginOrg = margin;
 }
 
-// ’¸“_À•W‚ğXV
+// é ‚ç‚¹åº§æ¨™ã‚’æ›´æ–°
 void ROCK::calcVertexW(void)
 {
 	float c = cost = cosf(angle);
@@ -950,7 +950,7 @@ void ROCK::calcVertexW(void)
 
 const float margin_vertex = 3.0f;
 
-// Šâ‚ÉŠÜ‚Ü‚ê‚é“_‚ÆA‘¼‚ÌŠâ‚Æ‚Ì”»’èiÕ“Ë‹““®•t‚«j
+// å²©ã«å«ã¾ã‚Œã‚‹ç‚¹ã¨ã€ä»–ã®å²©ã¨ã®åˆ¤å®šï¼ˆè¡çªæŒ™å‹•ä»˜ãï¼‰
 float ROCK::collision_rock(ROCK* pR2)
 {
 	float r = -FLT_MAX;
@@ -1058,7 +1058,7 @@ float ROCK::collision_rock(ROCK* pR2)
 	return r;
 }
 
-// Šâ‚ÉŠÜ‚Ü‚ê‚é“_‚ÆA‘¼‚ÌŠâ‚Æ‚Ì”»’èi”»’è‚Ì‚İj
+// å²©ã«å«ã¾ã‚Œã‚‹ç‚¹ã¨ã€ä»–ã®å²©ã¨ã®åˆ¤å®šï¼ˆåˆ¤å®šã®ã¿ï¼‰
 float ROCK::check_rock(ROCK* pR2)
 {
 	float r = -FLT_MAX;
@@ -1103,7 +1103,7 @@ float ROCK::check_rock(ROCK* pR2)
 	return r;
 }
 
-// Šâ‚ÉŠÜ‚Ü‚ê‚é“_‚ÆA‘¼‚ÌŠâ‚Æ‚Ì”»’èi”»’è‚Ì‚İj
+// å²©ã«å«ã¾ã‚Œã‚‹ç‚¹ã¨ã€ä»–ã®å²©ã¨ã®åˆ¤å®šï¼ˆåˆ¤å®šã®ã¿ï¼‰
 float ROCK::check_rock_rev(ROCK* pR2)
 {
 	int dummy;
@@ -1121,7 +1121,7 @@ float ROCK::check_rock_rev(ROCK* pR2)
 	return r;
 }
 
-// Šâ‚ÉŠÜ‚Ü‚ê‚é•Ó‚ÆA”CˆÓ‚Ì“_‚Æ‚Ì”»’è
+// å²©ã«å«ã¾ã‚Œã‚‹è¾ºã¨ã€ä»»æ„ã®ç‚¹ã¨ã®åˆ¤å®š
 float ROCK::collision_point_n(float xw, float yw, ROCK* pR, int &nvv, FVECTOR2* pVertex)
 {
 //	if(xw < minPos.x || xw > maxPos.x || yw < minPos.y || yw > maxPos.y) {
@@ -1239,20 +1239,20 @@ float ROCK::collision_point_n(float xw, float yw, ROCK* pR, int &nvv, FVECTOR2* 
 				for(pCLt = &base->pCollisionLog[0]; pCLt != &base->pCollisionLog[base->nCollisionLog]; pCLt ++) {
 					if(pCLt->rockNum == rocknum && pCLt->vertexID == pVertex) {
 						if(md <= pCLt->depth) {
-							// ‚æ‚è[‚¢ÚG‚ª‚ ‚é‚½‚ßŒ©‘—‚è
+							// ã‚ˆã‚Šæ·±ã„æ¥è§¦ãŒã‚ã‚‹ãŸã‚è¦‹é€ã‚Š
 							goto tl;
 						}
-						// ã‘‚«
+						// ä¸Šæ›¸ã
 						break;
 					}
 				}
 				if(pCLt == &base->pCollisionLog[base->nCollisionLog]) {
 					if(base->nCollisionLog == base->maxCollisionLog) {
-						// ƒI[ƒo[ƒtƒ[
+						// ã‚ªãƒ¼ãƒãƒ¼ãƒ•ãƒ­ãƒ¼
 						base->overflowCollisionLog ++;
 						goto tl;
 					} else {
-						// ’Ç‰Á
+						// è¿½åŠ 
 						base->nCollisionLog ++;
 					}
 				}
@@ -1361,7 +1361,7 @@ tl:;
 	return md;
 }
 
-// Šâ‚ÉŠÜ‚Ü‚ê‚é•Ó‚ÆA—±q‚Æ‚Ì”»’è
+// å²©ã«å«ã¾ã‚Œã‚‹è¾ºã¨ã€ç²’å­ã¨ã®åˆ¤å®š
 float ROCK::collision_fluid(float xw, float yw, FVECTOR2* pFr)
 {
 	float xd = xw - center.x;
@@ -1464,7 +1464,7 @@ float ROCK::collision_fluid(float xw, float yw, FVECTOR2* pFr)
 	return md;
 }
 
-// Šâ‚ÉŠÜ‚Ü‚ê‚é•Ó‚ÆA“_‚Æ‚Ì‹——£‚ğZo
+// å²©ã«å«ã¾ã‚Œã‚‹è¾ºã¨ã€ç‚¹ã¨ã®è·é›¢ã‚’ç®—å‡º
 float ROCK::collision_circle(float xw, float yw)
 {
 	float xd = xw - center.x;
@@ -1533,7 +1533,7 @@ float ROCK::collision_circle(float xw, float yw)
 	return md;
 }
 
-// ”CˆÓ‚ÌêŠ‚É—Í‚ğ‰Á‚¦‚é
+// ä»»æ„ã®å ´æ‰€ã«åŠ›ã‚’åŠ ãˆã‚‹
 void ROCK::push(float xw, float yw, float ax, float ay)
 {
 	if((type & type_float) && ay > 0.0f) {
@@ -1545,7 +1545,7 @@ void ROCK::push(float xw, float yw, float ax, float ay)
 	torque += (xw - center.x) * ay - (yw - center.y) * ax;
 }
 
-// ‘¬“x•Ï‰»•t‚Ìpush
+// é€Ÿåº¦å¤‰åŒ–ä»˜ã®push
 void ROCK::pushMove(float xw, float yw, float ax, float ay)
 {
 	force.x = force.y = 0.0f;
@@ -1558,10 +1558,10 @@ void ROCK::pushMove(float xw, float yw, float ax, float ay)
 	rSpeed += torque / moment;
 }
 
-// (xw, yw)‚ğ’†S‚Æ‚µ‚ÄA‹——£‚É”½”ä—á‚·‚é—Í‚ğ‰Á‚¦‚éB
-// power‚Í‹——£1.0f‚ÌÛ‚É‰Á‚í‚é—Í‚Ì‘å‚«‚³B
-// nearClip‚æ‚è‹ß‚¢ˆÊ’u‚ÍA”½”ä—á‚¹‚¸nearClip‚Æ“¯‚¶—Í‚Ì‘å‚«‚³‚Æ‚È‚éB
-// farClip‚æ‚è‰“‚­‚É‚ ‚éê‡‚Í—Í‚Í‰Á‚í‚ç‚È‚¢B
+// (xw, yw)ã‚’ä¸­å¿ƒã¨ã—ã¦ã€è·é›¢ã«åæ¯”ä¾‹ã™ã‚‹åŠ›ã‚’åŠ ãˆã‚‹ã€‚
+// powerã¯è·é›¢1.0fã®éš›ã«åŠ ã‚ã‚‹åŠ›ã®å¤§ãã•ã€‚
+// nearClipã‚ˆã‚Šè¿‘ã„ä½ç½®ã¯ã€åæ¯”ä¾‹ã›ãšnearClipã¨åŒã˜åŠ›ã®å¤§ãã•ã¨ãªã‚‹ã€‚
+// farClipã‚ˆã‚Šé ãã«ã‚ã‚‹å ´åˆã¯åŠ›ã¯åŠ ã‚ã‚‰ãªã„ã€‚
 void ROCK::blast(float xw, float yw, float power, float nearClip, float farClip)
 {
 	if(farClip < FLT_MAX) {
@@ -1615,7 +1615,7 @@ void ROCK::blast(float xw, float yw, float power, float nearClip, float farClip)
 	} while(*pNv != 0);
 }
 
-// ‘¬“x•Ï‰»•t‚Ìblast
+// é€Ÿåº¦å¤‰åŒ–ä»˜ã®blast
 void ROCK::blastMove(float xw, float yw, float power, float nearClip, float farClip)
 {
 	force.x = force.y = 0.0f;

@@ -104,7 +104,7 @@ static void SetPolyAxis( POLY4 *poly, int num, int x, int y, int tx, int ty )
 
 static void DrawSquareEx( int mode, int color, int attr, int alpha, int *x, int *y, int *texx, int *texy )
 {
-	//		©—R•ÏŒ`ƒXƒvƒ‰ƒCƒg
+	//		è‡ªç”±å¤‰å½¢ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 	//		mode : 0=fullcolor/1=palette
 	//
 	POLY4 *poly;
@@ -141,9 +141,9 @@ static void DrawSquareEx( int mode, int color, int attr, int alpha, int *x, int 
 
 static void DrawSpriteEx( int mode, int attr, int alpha, int x, int y, int sx, int sy, double ang, int tx0, int ty0, int tx1, int ty1, int opx, int opy )
 {
-	//		Šg‘å‰ñ“]ƒXƒvƒ‰ƒCƒg
+	//		æ‹¡å¤§å›è»¢ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 	//		mode : 0=fullcolor/1=palette
-	//		(x,y)Šî“_À•W / (sx,sy)ƒTƒCƒY / (opx,opy)ƒIƒtƒZƒbƒg / ang=Šp“x
+	//		(x,y)åŸºç‚¹åº§æ¨™ / (sx,sy)ã‚µã‚¤ã‚º / (opx,opy)ã‚ªãƒ•ã‚»ãƒƒãƒˆ / ang=è§’åº¦
 	//
 	POLY4 *poly;
 	IAXIS2 *iv;
@@ -163,13 +163,13 @@ static void DrawSpriteEx( int mode, int attr, int alpha, int x, int y, int sx, i
 	x1 = mx1 * ofsx;
 	y1 = my1 * ofsx;
 
-	//		Šî“_‚ÌZo
+	//		åŸºç‚¹ã®ç®—å‡º
 	xx = ( (double)x - (-x0+x1) );
 	yy = ( (double)y - (-y0+y1) );
 
 	/*-------------------------------*/
 
-	//		‰ñ“]À•W‚ÌZo
+	//		å›è»¢åº§æ¨™ã®ç®—å‡º
 	ofsx = (double)-sx;
 	ofsy = (double)-sy;
 	x0 = mx0 * ofsy;
@@ -227,9 +227,9 @@ static void DrawSpriteEx( int mode, int attr, int alpha, int x, int y, int sx, i
 
 static void DrawRectEx( int mode, int color, int alpha, int x, int y, int sx, int sy, double ang )
 {
-	//		‰ñ“]fill
+	//		å›è»¢fill
 	//		mode : 0=fullcolor/1=palette
-	//		(x,y)’†SÀ•W / ang=Šp“x
+	//		(x,y)ä¸­å¿ƒåº§æ¨™ / ang=è§’åº¦
 	//
 	POLY4 *poly;
 	IAXIS2 *iv;
@@ -308,7 +308,7 @@ static int CnvRGB( int color )
 
 static int GetAttrOperation( void )
 {
-	//		gmode‚Ìƒ‚[ƒh‚ğHGIMGŒİŠ·‚Ìattr’l‚É•ÏŠ·‚·‚é
+	//		gmodeã®ãƒ¢ãƒ¼ãƒ‰ã‚’HGIMGäº’æ›ã®attrå€¤ã«å¤‰æ›ã™ã‚‹
 	//
 	int attr;
 	attr = 0;
@@ -319,7 +319,7 @@ static int GetAttrOperation( void )
 
 static int GetAlphaOperation( void )
 {
-	//		gmode‚Ìƒ‚[ƒh‚ğHGIMGŒİŠ·‚ÌAlphaOperation‚É•ÏŠ·‚·‚é
+	//		gmodeã®ãƒ¢ãƒ¼ãƒ‰ã‚’HGIMGäº’æ›ã®AlphaOperationã«å¤‰æ›ã™ã‚‹
 	//
 	int alpha;
 	alpha = mem_grate;
@@ -329,18 +329,18 @@ static int GetAlphaOperation( void )
 		if ( mem_gmode >= 4 ) alpha = 255;
 	}
 	switch( mem_gmode ) {
-	case 3:					// ”¼“§–¾blend
+	case 3:					// åŠé€æ˜blend
 		break;
-	case 4:					// ”¼“§–¾blend+“§–¾F
+	case 4:					// åŠé€æ˜blend+é€æ˜è‰²
 		break;
-	case 5:					// F‰ÁZ
+	case 5:					// è‰²åŠ ç®—
 		alpha |= 0x200;
 		break;
-	case 6:					// FŒ¸Z
+	case 6:					// è‰²æ¸›ç®—
 		alpha |= 0x300;
 		break;
 	default:
-		alpha = 0x100;		// •W€
+		alpha = 0x100;		// æ¨™æº–
 		break;
 	}
 	return alpha;
@@ -380,7 +380,7 @@ void OmkeDrawSetGMode( int gmode, int grate, int ofsx, int ofsy )
 void OmkeDrawSprite( BMSCR *bm, BMSCR *bm2, int celid, int putx, int puty, float rot, float zx, float zy )
 {
 	//		sprite
-	//		(CEL‚Åİ’è‚³‚ê‚½’†SÀ•W‚ğg—p‚·‚é)
+	//		(CELã§è¨­å®šã•ã‚ŒãŸä¸­å¿ƒåº§æ¨™ã‚’ä½¿ç”¨ã™ã‚‹)
 	//
 	int x,y,srcsx,srcsy,putsx,putsy,centerx,centery;
 
@@ -399,7 +399,7 @@ void OmkeDrawSprite( BMSCR *bm, BMSCR *bm2, int celid, int putx, int puty, float
 void OmkeDrawSprite2( BMSCR *bm, BMSCR *bm2, int celid, int putx, int puty, float rot, float zx, float zy )
 {
 	//		sprite
-	//		(CEL‚Åİ’è‚³‚ê‚½’†SÀ•W‚ğg—p‚µ‚È‚¢)
+	//		(CELã§è¨­å®šã•ã‚ŒãŸä¸­å¿ƒåº§æ¨™ã‚’ä½¿ç”¨ã—ãªã„)
 	//
 	int x,y,srcsx,srcsy,putsx,putsy;
 	//int centerx,centery;

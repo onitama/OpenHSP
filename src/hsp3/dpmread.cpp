@@ -42,9 +42,9 @@ void dpm_close( FILE *fp )
 }
 
 
-size_t dpm_fread( void *mem, size_t size, FILE *stream )
+ptrdiff_t dpm_fread( void *mem, ptrdiff_t size, FILE *stream )
 {
-	return filepack.pack_fread(stream,mem,size);
+	return (ptrdiff_t)filepack.pack_fread(stream,mem,size);
 }
 
 void* dpm_stream(char* fname)
@@ -62,7 +62,7 @@ void* dpm_stream(char* fname)
 
 /*----------------------------------------------------------------------------------*/
 
-int dpm_ini( char *fname, size_t dpmofs, int chksum, int deckey, int slot )
+int dpm_ini( char *fname, ptrdiff_t dpmofs, int chksum, int deckey, int slot )
 {
 	//
 	//		DPMファイル読み込みの初期化
@@ -109,15 +109,15 @@ void dpm_bye( void )
 }
 
 
-size_t dpm_read( char *fname, void *readmem, size_t rlen, size_t seekofs )
+ptrdiff_t dpm_read( char *fname, void *readmem, ptrdiff_t rlen, ptrdiff_t seekofs )
 {
-	return filepack.pack_fread(fname, readmem, rlen, seekofs);
+	return (ptrdiff_t)filepack.pack_fread(fname, readmem, rlen, seekofs);
 }
 
 
-size_t dpm_exist( char *fname )
+ptrdiff_t dpm_exist( char *fname )
 {
-	return filepack.pack_flength(fname);
+	return (ptrdiff_t)filepack.pack_flength(fname);
 }
 
 
@@ -140,7 +140,7 @@ int dpm_filecopy( char *fname, char *sname )
 {
 	FILE *fp1;
 	FILE *fp2;
-	int fres;
+	size_t fres;
 	size_t flen;
 	size_t xlen;
 	size_t max=0x8000;
@@ -151,7 +151,7 @@ int dpm_filecopy( char *fname, char *sname )
 #endif
 #endif
 
-	flen= filepack.pack_flength(fname);
+	flen= (size_t)filepack.pack_flength(fname);
 	if (flen<0) return 1;
 
 #ifdef HSPWIN
@@ -176,7 +176,7 @@ int dpm_filecopy( char *fname, char *sname )
 		if (flen==0) break;
 		if (flen<max) xlen=flen; else xlen=max;
 		filepack.pack_fread(fp1, mem, xlen);
-		fres = (int)fwrite( mem, 1, xlen, fp2 );
+		fres = fwrite( mem, 1, xlen, fp2 );
 		if (fres<xlen) break;
 		flen-=xlen;
 	}
@@ -202,8 +202,8 @@ char *dpm_readalloc( char *fname )
 	int64_t len;
 	len = filepack.pack_flength(fname);
 	if ( len < 0 ) return NULL;
-	p = mem_ini(len + 1);
-	dpm_read(fname, p, len, 0);
+	p = mem_ini((size_t)len + 1);
+	dpm_read(fname, p, (ptrdiff_t)len, 0);
 	p[len] = 0;
 	return p;
 }

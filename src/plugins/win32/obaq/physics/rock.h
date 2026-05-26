@@ -39,16 +39,16 @@ const float maxRockSpeed = 9.9f;
 class ROCK {
 	public:
 		enum {
-			stat_reserve	= 0x00,	// ‹ó‚«
-			stat_sleep		= 0x01,	// ƒpƒ‰ƒ[ƒ^’è‹`‚Í‚µ‚½‚¯‚ÇoŒ»‚µ‚Ä‚¢‚È‚¢B
-			stat_active		= 0x02,	// oŒ»‚µ‚Ä‚¢‚éB
+			stat_reserve	= 0x00,	// ç©ºã
+			stat_sleep		= 0x01,	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å®šç¾©ã¯ã—ãŸã‘ã©å‡ºç¾ã—ã¦ã„ãªã„ã€‚
+			stat_active		= 0x02,	// å‡ºç¾ã—ã¦ã„ã‚‹ã€‚
 		};
 
 		enum {
-			collisionCheck_none		= 0,	// oŒ»ƒRƒŠƒWƒ‡ƒ“ƒ`ƒFƒbƒN–³‚µ
-			collisionCheck_active	= 1,	// oŒ»activeó‘Ô‚ÌŠâ‚Æ‚ÌÚG‚ğ”ğ‚¯‚é
-			collisionCheck_all		= 2,	// oŒ»reserveó‘ÔˆÈŠO‚ÌŠâ‚Æ‚ÌÚG‚ğ”ğ‚¯‚é
-			collisionCheck_nest		= 3,	// nestƒtƒ‰ƒO‚Ì—§‚Á‚Ä‚¢‚éŠâ‚©‚çoŒ»‚³‚¹‚é
+			collisionCheck_none		= 0,	// å‡ºç¾æ™‚ã‚³ãƒªã‚¸ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯ç„¡ã—
+			collisionCheck_active	= 1,	// å‡ºç¾æ™‚activeçŠ¶æ…‹ã®å²©ã¨ã®æ¥è§¦ã‚’é¿ã‘ã‚‹
+			collisionCheck_all		= 2,	// å‡ºç¾æ™‚reserveçŠ¶æ…‹ä»¥å¤–ã®å²©ã¨ã®æ¥è§¦ã‚’é¿ã‘ã‚‹
+			collisionCheck_nest		= 3,	// nestãƒ•ãƒ©ã‚°ã®ç«‹ã£ã¦ã„ã‚‹å²©ã‹ã‚‰å‡ºç¾ã•ã›ã‚‹
 		};
 
 		enum {
@@ -57,24 +57,24 @@ class ROCK {
 		};
 
 		enum {
-			// Šm’è
+			// ç¢ºå®š
 			type_normal		= 0x0000,
-			type_inner		= 0x0001,	// — •\‚ğ‹t‚Æ‚µ‚Ä”»’èi‚Ù‚ÚŠOüê—pj
-			type_puppet		= 0x0002,	// §Œä‚Ìˆê•”‚ğƒQ[ƒ€‘¤‚ÉˆÚ‚µAˆÚ“®ˆ—‚ğƒLƒƒƒ“ƒZƒ‹B
-										// ¦‰Á‚í‚Á‚½ŠO—Í‚Í force, torque ‚É“ü‚Á‚Ä‚¢‚é‚½‚ßA weight, moment‚ÅŠ„‚Á‚½’l‚Æd—Í‰Á‘¬“x‚ğ speed, rSpeed ‚É‰ÁZ‚·‚ê‚Î’Êí‚Ì•¨—‹““®B
-										// ¦À•W‚ÌXVŒã‚É‚ÍAcalcVertexW()‚ğŒÄ‚ÑA’¸“_‚²‚Æ‚Ìƒ[ƒ‹ƒhÀ•W‚àXV‚·‚é•K—v‚ª‚ ‚é‚Ì‚Å’ˆÓB
-			type_explode	= 0x0004,	// ‹@—‹‚â‘¼‚Ì”š”­Atype_ignite‚ªİ’è‚³‚ê‚½ROCK‚ÉG‚ê‚é‚ÆAV‚½‚É”š”­‚ª”­¶‚·‚éB
-			type_ignite		= 0x0008,	// ÚG‚É‚æ‚èAtype_explode‚ªİ’è‚³‚ê‚½ROCK‚ğ”š”­‚³‚¹‚éB
+			type_inner		= 0x0001,	// è£è¡¨ã‚’é€†ã¨ã—ã¦åˆ¤å®šï¼ˆã»ã¼å¤–å‘¨å°‚ç”¨ï¼‰
+			type_puppet		= 0x0002,	// åˆ¶å¾¡ã®ä¸€éƒ¨ã‚’ã‚²ãƒ¼ãƒ å´ã«ç§»ã—ã€ç§»å‹•å‡¦ç†ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã€‚
+										// â€»åŠ ã‚ã£ãŸå¤–åŠ›ã¯ force, torque ã«å…¥ã£ã¦ã„ã‚‹ãŸã‚ã€ weight, momentã§å‰²ã£ãŸå€¤ã¨é‡åŠ›åŠ é€Ÿåº¦ã‚’ speed, rSpeed ã«åŠ ç®—ã™ã‚Œã°é€šå¸¸ã®ç‰©ç†æŒ™å‹•ã€‚
+										// â€»åº§æ¨™ã®æ›´æ–°å¾Œã«ã¯ã€calcVertexW()ã‚’å‘¼ã³ã€é ‚ç‚¹ã”ã¨ã®ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‚‚æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã®ã§æ³¨æ„ã€‚
+			type_explode	= 0x0004,	// æ©Ÿé›·ã‚„ä»–ã®çˆ†ç™ºã€type_igniteãŒè¨­å®šã•ã‚ŒãŸROCKã«è§¦ã‚Œã‚‹ã¨ã€æ–°ãŸã«çˆ†ç™ºãŒç™ºç”Ÿã™ã‚‹ã€‚
+			type_ignite		= 0x0008,	// æ¥è§¦ã«ã‚ˆã‚Šã€type_explodeãŒè¨­å®šã•ã‚ŒãŸROCKã‚’çˆ†ç™ºã•ã›ã‚‹ã€‚
 
-			// ŒŸØ’†
-			type_cancelShot	= 0x0010,	// ƒVƒ‡ƒbƒg‚Æ‚ÌÕ“Ë”»’è‚ğs‚í‚È‚¢B
-		//	type_sponge		= 0x0020,	// …‚ğ‹z‚¤B
+			// æ¤œè¨¼ä¸­
+			type_cancelShot	= 0x0010,	// ã‚·ãƒ§ãƒƒãƒˆã¨ã®è¡çªåˆ¤å®šã‚’è¡Œã‚ãªã„ã€‚
+		//	type_sponge		= 0x0020,	// æ°´ã‚’å¸ã†ã€‚
 
-			type_bindX		= 0x0040,	// x²ˆÚ“®‚ğŒÅ’è‚·‚éB
-			type_bindY		= 0x0080,	// y²ˆÚ“®‚ğŒÅ’è‚·‚éB
-			type_bindXY		= 0x00c0,	// xy²ˆÚ“®‚ğŒÅ’è‚·‚éB
-			type_bindR		= 0x0100,	// ‰ñ“]‚ğŒÅ’è‚·‚éB
-			type_bind		= 0x01c0,	// Š®‘S‚ÉŒÅ’è‚·‚éB
+			type_bindX		= 0x0040,	// xè»¸ç§»å‹•ã‚’å›ºå®šã™ã‚‹ã€‚
+			type_bindY		= 0x0080,	// yè»¸ç§»å‹•ã‚’å›ºå®šã™ã‚‹ã€‚
+			type_bindXY		= 0x00c0,	// xyè»¸ç§»å‹•ã‚’å›ºå®šã™ã‚‹ã€‚
+			type_bindR		= 0x0100,	// å›è»¢ã‚’å›ºå®šã™ã‚‹ã€‚
+			type_bind		= 0x01c0,	// å®Œå…¨ã«å›ºå®šã™ã‚‹ã€‚
 
 			type_attract	= 0x0600,
 			type_attractW	= 0x0200,
@@ -96,16 +96,16 @@ class ROCK {
 
 			type_bar		= 0x40000,
 
-			type_autowipe	= 0x100000,		// ÚG‚Å©“®“I‚ÉÁ‹‚·‚é
-			type_rewind		= 0x80000,		// Šp“x‚ğ©“®“I‚É•œ‹A‚³‚¹‚é
-			type_autoguide	= 0x200000,		// –Ú“I’n‚ğ—LŒø‚É‚·‚é
+			type_autowipe	= 0x100000,		// æ¥è§¦ã§è‡ªå‹•çš„ã«æ¶ˆå»ã™ã‚‹
+			type_rewind		= 0x80000,		// è§’åº¦ã‚’è‡ªå‹•çš„ã«å¾©å¸°ã•ã›ã‚‹
+			type_autoguide	= 0x200000,		// ç›®çš„åœ°ã‚’æœ‰åŠ¹ã«ã™ã‚‹
 
 			type_debug		= 0x80000000,
 		};
 
 		unsigned int	type;
 
-		unsigned short	sleepCount;		// ƒfƒNƒŠƒƒ“ƒg‚³‚êAƒ[ƒ‚É‚È‚Á‚½‚çactive‚Éó‘Ô•ÏXBÅ‰‚©‚çƒ[ƒ‚Ìê‡‚ÍƒfƒNƒŠƒƒ“ƒg‚³‚ê‚¸sleepŒp‘±B
+		unsigned short	sleepCount;		// ãƒ‡ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã•ã‚Œã€ã‚¼ãƒ­ã«ãªã£ãŸã‚‰activeã«çŠ¶æ…‹å¤‰æ›´ã€‚æœ€åˆã‹ã‚‰ã‚¼ãƒ­ã®å ´åˆã¯ãƒ‡ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã•ã‚Œãšsleepç¶™ç¶šã€‚
 
 		unsigned char	stat;
 
@@ -113,10 +113,10 @@ class ROCK {
 		char			nArea;
 
 		float			damage;
-		float			damageLimit;	// ‹–—eƒ_ƒ[ƒW, ƒ}ƒCƒiƒX‚Í–³“G, ƒ[ƒ‚Í‘¦€, ”j‰ó”»’è‚ÍƒQ[ƒ€‘¤‚Ö‚ÌˆÚŠÇ‚ª‘Ã“–
-		float			damageShave;	// •ú…‚É‚æ‚éƒ_ƒ[ƒW‘‰Á—Ê
+		float			damageLimit;	// è¨±å®¹ãƒ€ãƒ¡ãƒ¼ã‚¸, ãƒã‚¤ãƒŠã‚¹ã¯ç„¡æ•µ, ã‚¼ãƒ­ã¯å³æ­», ç ´å£Šåˆ¤å®šã¯ã‚²ãƒ¼ãƒ å´ã¸ã®ç§»ç®¡ãŒå¦¥å½“
+		float			damageShave;	// æ”¾æ°´ã«ã‚ˆã‚‹ãƒ€ãƒ¡ãƒ¼ã‚¸å¢—åŠ é‡
 
-		bool			shave;			// í‚ç‚ê‚Ä‚¢‚ê‚Îtrue
+		bool			shave;			// å‰Šã‚‰ã‚Œã¦ã„ã‚Œã°true
 
 		short			startAreaVertex;
 		short			startVertex;
@@ -152,14 +152,14 @@ class ROCK {
 		float			parentAngle;
 		float			parentDistance;
 
-		unsigned int	group;				// Š‘®‚·‚éƒOƒ‹[ƒv‚Ìƒrƒbƒg‚ªON‚É‚È‚é
-		unsigned int	exceptGroup;		// Õ“Ë”»’è‚ğœŠO‚·‚éƒOƒ‹[ƒv‚Ìƒrƒbƒg‚ªON‚É‚È‚é
-		unsigned int	recordGroup;		// Õ“ËƒƒO‚ğ‹L˜^‚·‚éƒOƒ‹[ƒv‚Ìƒrƒbƒg‚ªON‚É‚È‚é
+		unsigned int	group;				// æ‰€å±ã™ã‚‹ã‚°ãƒ«ãƒ¼ãƒ—ã®ãƒ“ãƒƒãƒˆãŒONã«ãªã‚‹
+		unsigned int	exceptGroup;		// è¡çªåˆ¤å®šã‚’é™¤å¤–ã™ã‚‹ã‚°ãƒ«ãƒ¼ãƒ—ã®ãƒ“ãƒƒãƒˆãŒONã«ãªã‚‹
+		unsigned int	recordGroup;		// è¡çªãƒ­ã‚°ã‚’è¨˜éŒ²ã™ã‚‹ã‚°ãƒ«ãƒ¼ãƒ—ã®ãƒ“ãƒƒãƒˆãŒONã«ãªã‚‹
 
-		char			ground;				// Ú’ni‘¼„‘Ì‚Éã‘¤‚©‚çÚGj‚µ‚Ä‚¢‚éê‡‚É|=1, •ûŒü–â‚í‚¸ÚG‚Å |=2
-		char			bombarded;			// ”š”­‚É‚æ‚Á‚Äƒ_ƒ[ƒW‚ğó‚¯‚½Û‚É—§‚Âƒtƒ‰ƒO
+		char			ground;				// æ¥åœ°ï¼ˆä»–å‰›ä½“ã«ä¸Šå´ã‹ã‚‰æ¥è§¦ï¼‰ã—ã¦ã„ã‚‹å ´åˆã«|=1, æ–¹å‘å•ã‚ãšæ¥è§¦ã§ |=2
+		char			bombarded;			// çˆ†ç™ºã«ã‚ˆã£ã¦ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ãŸéš›ã«ç«‹ã¤ãƒ•ãƒ©ã‚°
 
-		unsigned char	mineral;			// ”j‰ó‚É•úo‚³‚ê‚é”š–ò”
+		unsigned char	mineral;			// ç ´å£Šæ™‚ã«æ”¾å‡ºã•ã‚Œã‚‹çˆ†è–¬æ•°
 
 		unsigned char	stop;
 
@@ -168,27 +168,27 @@ class ROCK {
 		int				num;
 		class ROCKBASE* base;
 
-		float			inertia;			// ‘Ä«(0.0f <= inertia <= 1.0f, default 0.999f), 0.0f‚É‹ß‚Ã‚­‚Ù‚Ç“ä’ïR‚Å‚Ë‚Á‚Æ‚è‚µ‚½“®‚«‚É‚È‚é
-		float			friction;			// –€C(0.0f <= friction <= 1.0f, default - 0.7f), ÚG‚·‚é•¨‘Ì‚Ìfriction‚ÆæZ‚µ‚½”’l‚ªQÆ‚³‚ê‚é
-		float			damper;				// ‹zU(0.0f <= damper <= 1.0f, default - 0.7f), ÚG‚·‚é•¨‘Ì‚Ìdamper‚ÆæZ‚µ‚½”’l‚ªQÆ‚³‚ê‚é
+		float			inertia;			// æƒ°æ€§(0.0f <= inertia <= 1.0f, default 0.999f), 0.0fã«è¿‘ã¥ãã»ã©è¬æŠµæŠ—ã§ã­ã£ã¨ã‚Šã—ãŸå‹•ãã«ãªã‚‹
+		float			friction;			// æ‘©æ“¦(0.0f <= friction <= 1.0f, default - 0.7f), æ¥è§¦ã™ã‚‹ç‰©ä½“ã®frictionã¨ä¹—ç®—ã—ãŸæ•°å€¤ãŒå‚ç…§ã•ã‚Œã‚‹
+		float			damper;				// å¸æŒ¯(0.0f <= damper <= 1.0f, default - 0.7f), æ¥è§¦ã™ã‚‹ç‰©ä½“ã®damperã¨ä¹—ç®—ã—ãŸæ•°å€¤ãŒå‚ç…§ã•ã‚Œã‚‹
 
 		float			gravity;
 
 		FVECTOR2		minPos, maxPos;
 		float			marginOrg;
 
-		// ƒQ[ƒ€‘¤‚Å—˜—p‚·‚éƒpƒ‰ƒ[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
+		// ã‚²ãƒ¼ãƒ å´ã§åˆ©ç”¨ã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 		class GAMEROCK*	pGameRock;
 
-		short			target_id;				// ƒ^[ƒQƒbƒgID
-		short			target_opt;				// ƒ^[ƒQƒbƒgoption
-		short			target_timer;			// ƒ^[ƒQƒbƒgtimer
-		short			target_int;				// ƒ^[ƒQƒbƒgƒCƒ“ƒ^[ƒoƒ‹
-		float			target_x,target_y;		// ƒ^[ƒQƒbƒgX,Y
-		float			target_px,target_py;	// ƒ^[ƒQƒbƒgXV’lX,Y
-		float			target_x1,target_x2;	// ƒ^[ƒQƒbƒgXİ’è”ÍˆÍ
-		float			target_y1,target_y2;	// ƒ^[ƒQƒbƒgYİ’è”ÍˆÍ
-		float			target_maxsp;			// ƒ^[ƒQƒbƒgÚ‹ßÅ‘å‘¬“x
+		short			target_id;				// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆID
+		short			target_opt;				// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆoption
+		short			target_timer;			// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆtimer
+		short			target_int;				// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«
+		float			target_x,target_y;		// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆX,Y
+		float			target_px,target_py;	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ›´æ–°å€¤X,Y
+		float			target_x1,target_x2;	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆXè¨­å®šç¯„å›²
+		float			target_y1,target_y2;	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆYè¨­å®šç¯„å›²
+		float			target_maxsp;			// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ¥è¿‘æœ€å¤§é€Ÿåº¦
 
 		ROCK() {
 			init();
@@ -210,16 +210,16 @@ class ROCK {
 			buoyancy = buoyancy_;
 		}
 
-		// ˆÊ’u‚ğŒˆ’è
+		// ä½ç½®ã‚’æ±ºå®š
 		void setPosition(float x, float y) {
 			center.x = x;
 			center.y = y;
 		}
-		// Šp“x‚ğŒˆ’è
+		// è§’åº¦ã‚’æ±ºå®š
 		void setAngle(float r) {
 			angle = r;
 		}
-		// ˆÊ’u‚ğˆÚ“®i‘¬“x‚àİ’èj
+		// ä½ç½®ã‚’ç§»å‹•ï¼ˆé€Ÿåº¦ã‚‚è¨­å®šï¼‰
 		void movePosition(float x, float y) {
 			FVECTOR2 oc = center;
 			center.x = x;
@@ -227,14 +227,14 @@ class ROCK {
 			speed.x = x - oc.x;
 			speed.y = y - oc.y;
 		}
-		// Šp“x‚ğ‰ñ“]iŠp‘¬“x‚àİ’èj
+		// è§’åº¦ã‚’å›è»¢ï¼ˆè§’é€Ÿåº¦ã‚‚è¨­å®šï¼‰
 		void turnAngle(float r) {
 			float oa = angle;
 			angle = r;
 			rSpeed = r - oa;
 		}
 
-		// type_inner‚ğŒã‚©‚ç•ÏX‚µ‚½Û‚ÌƒŠƒZƒbƒg—p
+		// type_innerã‚’å¾Œã‹ã‚‰å¤‰æ›´ã—ãŸéš›ã®ãƒªã‚»ãƒƒãƒˆç”¨
 		void reset(void) {
 			setSide(marginOrg);
 			calcVertexW();
@@ -256,11 +256,11 @@ class ROCK {
 
 class WIRE {
 	public:
-		short		vertex;		// Ú‘±Œ³‚Ì’¸“_”Ô†
-		short		rock;		// Ú‘±æ‚ÌŠâ”Ô†iƒ}ƒCƒiƒX‚Å”wŒi‚ÉŒÅ’èj
-		float		length;		// ƒƒCƒ„[’·‚³(ƒ}ƒCƒiƒX‚Å–¢“o˜^)
+		short		vertex;		// æ¥ç¶šå…ƒã®é ‚ç‚¹ç•ªå·
+		short		rock;		// æ¥ç¶šå…ˆã®å²©ç•ªå·ï¼ˆãƒã‚¤ãƒŠã‚¹ã§èƒŒæ™¯ã«å›ºå®šï¼‰
+		float		length;		// ãƒ¯ã‚¤ãƒ¤ãƒ¼é•·ã•(ãƒã‚¤ãƒŠã‚¹ã§æœªç™»éŒ²)
 		float		tension;
-		FVECTOR2	position;	// Ú‘±æ‚ÌÀ•W
+		FVECTOR2	position;	// æ¥ç¶šå…ˆã®åº§æ¨™
 
 		short		nPoint;
 		char		unfix;
@@ -278,14 +278,14 @@ class WIRE {
 };
 
 struct COLLISIONLOG {
-	unsigned int	rockNum;	// ÚG‚µ‚½rock‚Ì”Ô†B‰ºˆÊ16bit‚ÆãˆÊ16bit‚Å•Ê‚Ì”Ô†‚ª“ü‚Á‚Ä‚¢‚é‚Ì‚Å’ˆÓB
-	FVECTOR2*		vertexID;	// “à•”ˆ——pB
+	unsigned int	rockNum;	// æ¥è§¦ã—ãŸrockã®ç•ªå·ã€‚ä¸‹ä½16bitã¨ä¸Šä½16bitã§åˆ¥ã®ç•ªå·ãŒå…¥ã£ã¦ã„ã‚‹ã®ã§æ³¨æ„ã€‚
+	FVECTOR2*		vertexID;	// å†…éƒ¨å‡¦ç†ç”¨ã€‚
 
-	FVECTOR2		position;	// ÚGˆÊ’uB 
-	FVECTOR2		normal;		// rockNum‚Ì’l‚ª¬‚³‚¢‘¤‚©‚çŒ©‚½AÚG–Ê‚Ì–@ü•ûŒüB
-	float			depth;		// ÚG–Ê‚É‚ß‚è‚±‚ñ‚¾‹——£B
-	float			bound;		// ÚG–Ê‚Æ‚’¼i‚Í‚Ë‚éj•ûŒü‚Ì‘¬“xBƒvƒ‰ƒX‘¤‚ª‚ß‚è‚±‚İ•ûŒüB
-	float			slide;		// ÚG–Ê‚Æ…•½i‚Ğ‚«‚¸‚éj•ûŒü‚Ì‘¬“xB
+	FVECTOR2		position;	// æ¥è§¦ä½ç½®ã€‚ 
+	FVECTOR2		normal;		// rockNumã®å€¤ãŒå°ã•ã„å´ã‹ã‚‰è¦‹ãŸã€æ¥è§¦é¢ã®æ³•ç·šæ–¹å‘ã€‚
+	float			depth;		// æ¥è§¦é¢ã«ã‚ã‚Šã“ã‚“ã è·é›¢ã€‚
+	float			bound;		// æ¥è§¦é¢ã¨å‚ç›´ï¼ˆã¯ã­ã‚‹ï¼‰æ–¹å‘ã®é€Ÿåº¦ã€‚ãƒ—ãƒ©ã‚¹å´ãŒã‚ã‚Šã“ã¿æ–¹å‘ã€‚
+	float			slide;		// æ¥è§¦é¢ã¨æ°´å¹³ï¼ˆã²ããšã‚‹ï¼‰æ–¹å‘ã®é€Ÿåº¦ã€‚
 };
 
 class ROCKBASE {
@@ -324,7 +324,7 @@ class ROCKBASE {
 			}
 		}
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		void init(int _maxCollisionLog = 0) {
 			nAreaVertex = 0;
 			nVertex = 0;
@@ -347,7 +347,7 @@ class ROCKBASE {
 			gravity.y = y;
 		}
 
-		// ƒRƒŠƒWƒ‡ƒ“ƒƒO‚ÌƒŠƒZƒbƒg
+		// ã‚³ãƒªã‚¸ãƒ§ãƒ³ãƒ­ã‚°ã®ãƒªã‚»ãƒƒãƒˆ
 		void resetCollisionLog(void) {
 			nCollisionLog = 0;
 			overflowCollisionLog = 0;
@@ -355,13 +355,13 @@ class ROCKBASE {
 			getCollisionParam[1] = -1;
 		}
 
-		// rocknumA‚ÆrocknumB‚ªÕ“Ë‚µ‚Ä‚¢‚éê‡‚ÉACOLLISIONLOG‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·B
-		// ¦ Õ“Ë‚Í•¡”‰ÓŠ‚Å‹N‚±‚é‚±‚Æ‚à‚ ‚é‚½‚ßAŒÄ‚Î‚ê‚é‚²‚Æ‚ÉŸ‚ÌÕ“Ë‚Ö‚Æ‘ÎÛ‚ªˆÚ‚éB
-		// ¦ NULL‚ª•Ô‚é‚æ‚¤‚É‚È‚Á‚½‚çA‚»‚êˆÈã‚ÌÕ“Ë‚Í‘¶İ‚µ‚È‚¢B
-		// ¦ rocknumB‚ªƒ}ƒCƒiƒX‚Ìê‡‚ÍArocknumA‚ÉŠÖ‚·‚é‘S‚Ä‚ÌÕ“Ë‚ğæ“¾‚·‚éƒƒCƒ‹ƒhƒJ[ƒh‚É‚È‚éB
-		// ¦ rocknumA‚©rocknumB‚Ì’l‚ª‘O‰ñ‚ÌŒÄ‚Ño‚µ‚ÆˆÙ‚È‚éê‡‚ÍA“Ç‚İo‚µ‚Ìƒ|ƒCƒ“ƒ^‚ªƒŠƒZƒbƒg‚³‚ê‚éB
-		// ¦ è“®‚ÅƒŠƒZƒbƒgŒã‚ÉŒÄ‚Ño‚µ‚ğs‚¢‚½‚¢ê‡‚ÍAreset‚ğtrue‚É‚µ‚ÄŒÄ‚Ño‚·B
-		// ¦ COLLISIONLOG‚Ì–@ü•ûŒü‚ÍArocknum*‚Ì’l¬‚³‚¢‘¤‚©‚çŒ©‚½–@ü•ûŒüB
+		// rocknumAã¨rocknumBãŒè¡çªã—ã¦ã„ã‚‹å ´åˆã«ã€COLLISIONLOGã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ã€‚
+		// â€» è¡çªã¯è¤‡æ•°ç®‡æ‰€ã§èµ·ã“ã‚‹ã“ã¨ã‚‚ã‚ã‚‹ãŸã‚ã€å‘¼ã°ã‚Œã‚‹ã”ã¨ã«æ¬¡ã®è¡çªã¸ã¨å¯¾è±¡ãŒç§»ã‚‹ã€‚
+		// â€» NULLãŒè¿”ã‚‹ã‚ˆã†ã«ãªã£ãŸã‚‰ã€ãã‚Œä»¥ä¸Šã®è¡çªã¯å­˜åœ¨ã—ãªã„ã€‚
+		// â€» rocknumBãŒãƒã‚¤ãƒŠã‚¹ã®å ´åˆã¯ã€rocknumAã«é–¢ã™ã‚‹å…¨ã¦ã®è¡çªã‚’å–å¾—ã™ã‚‹ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰ã«ãªã‚‹ã€‚
+		// â€» rocknumAã‹rocknumBã®å€¤ãŒå‰å›ã®å‘¼ã³å‡ºã—ã¨ç•°ãªã‚‹å ´åˆã¯ã€èª­ã¿å‡ºã—ã®ãƒã‚¤ãƒ³ã‚¿ãŒãƒªã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚
+		// â€» æ‰‹å‹•ã§ãƒªã‚»ãƒƒãƒˆå¾Œã«å‘¼ã³å‡ºã—ã‚’è¡Œã„ãŸã„å ´åˆã¯ã€resetã‚’trueã«ã—ã¦å‘¼ã³å‡ºã™ã€‚
+		// â€» COLLISIONLOGã®æ³•ç·šæ–¹å‘ã¯ã€rocknum*ã®å€¤å°ã•ã„å´ã‹ã‚‰è¦‹ãŸæ³•ç·šæ–¹å‘ã€‚
 		COLLISIONLOG* getCollisionLog(int rocknumA, int rocknumB = -1, bool reset = false) {
 			if(rocknumA != getCollisionParam[0] || rocknumB != getCollisionParam[1] || reset == true) {
 				getCollisionParam[0] = rocknumA;

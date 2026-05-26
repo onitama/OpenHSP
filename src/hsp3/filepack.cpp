@@ -174,7 +174,7 @@ FILE* FilePack::pack_fopen(char* name, HFPSIZE offset)
 	obj = SearchFileObject(name);
 	if (obj == NULL) {
 		filebase = HFP_FILEBASE_NORMAL;
-		return hsp3_fopen(name,offset);
+		return hsp3_fopen(name,(HSPPTRINT)offset);
 	}
 
 	if (offset < 0) return NULL;
@@ -190,7 +190,7 @@ FILE* FilePack::pack_fopen(char* name, HFPSIZE offset)
 		filebase = HFP_FILEBASE_PACKDPM;
 	}
 	HSP3Crypt* cm = GetCurrentCryptManager();
-	ff = hsp3_fopen(cm->GetBasePath(), ofs);
+	ff = hsp3_fopen(cm->GetBasePath(), (HSPPTRINT)ofs);
 	if (ff == NULL) return NULL;
 
 	fopen_crypt = obj->crypt;
@@ -207,7 +207,7 @@ FILE* FilePack::pack_fopen(char* name, HFPSIZE offset)
 			return NULL;
 		}
 		cm->DataSet(NULL, size, obj->crypt);
-		cm->SetOffset(offset);
+		cm->SetOffset((size_t)offset);
 	}
 	return ff;
 }
@@ -275,13 +275,13 @@ HFPSIZE FilePack::pack_fread(FILE* ptr, void* mem, HFPSIZE size)
 		len = size;
 		if ((memfile.cur + size) >= memfile.size) len = memfile.size - memfile.cur;
 		if (len > 0) {
-			memcpy(mem, memfile.pt + memfile.cur, len);
+			memcpy(mem, memfile.pt + memfile.cur, (size_t)len);
 			memfile.cur += len;
 		}
 		return len;
 	}
 
-	len = (int)hsp3_fread(ptr, mem, size);
+	len = (int)hsp3_fread(ptr, mem, (HSPPTRINT)size);
 
 	if (filebase == HFP_FILEBASE_NORMAL) {
 		return len;
@@ -430,7 +430,7 @@ int FilePack::LoadPackFile( char *fname, int encode, HFPSIZE dpmoffset, int slot
 	//strcat(dpmname, DPMFILEEXT);
 	dpmname[HFP_PATH_MAX] = 0;
 
-	ff = hsp3_fopen(dpmname, dpmoffset);
+	ff = hsp3_fopen(dpmname, (HSPPTRINT)dpmoffset);
 	if (ff==NULL) return -2;
 
 	hsp3_fread(ff, &testhed, sizeof(HFPHED));
@@ -445,7 +445,7 @@ int FilePack::LoadPackFile( char *fname, int encode, HFPSIZE dpmoffset, int slot
 	if (hedsize < sizeof(HFPHED)) return -2;
 
 	p = (HFPHED *)_MALLOC( hedsize );
-	ff=hsp3_fopen(dpmname, dpmoffset);
+	ff=hsp3_fopen(dpmname, (HSPPTRINT)dpmoffset);
 	if (ff == NULL) {
 		_FREE(p);
 		return -2;
@@ -640,7 +640,7 @@ HFPSIZE FilePack::pack_fread(char* name, void* mem, HFPSIZE size, HFPSIZE seekof
 {
 	FILE *pt = pack_fopen(name, seekofs);
 	if (pt == NULL) {
-		return hsp3_rawload(name, mem, size, seekofs);
+		return hsp3_rawload(name, mem, (size_t)size, (HSPPTRINT)seekofs);
 	}
 	HFPSIZE len = pack_fread(pt, mem, size);
 	pack_fclose(pt);
@@ -698,7 +698,7 @@ bool DpmFile::open(FilePack* pack, char* fname)
 	hed = filepack->GetCurrentHeader();
 	ofs = hed->filetable + (int)obj->offset;
 	ofs2 = filepack->GetCurrentDPMOffset();
-	baseoffset = ofs + ofs2;
+	baseoffset = (size_t)(ofs + ofs2);
 	if (ofs2>0) {
 		filebase = HFP_FILEBASE_PACKEXE;
 	}
