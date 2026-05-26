@@ -4,6 +4,7 @@
 //
 #ifndef __dpmread_h
 #define __dpmread_h
+#include <stddef.h>
 
 int dpm_ini( char *dpmfile, ptrdiff_t dpmofs, int chksum, int deckey, int slot=0 );
 void dpm_bye( void );
