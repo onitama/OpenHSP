@@ -300,7 +300,8 @@ private:
 	ppresult_t PP_Ahtout( void );
 	ppresult_t PP_Ahtmes( void );
 	ppresult_t PP_BootOpt(void);
-	ppresult_t PP_VarFix( char *word );
+	ppresult_t PP_VarFix(char* word);
+	ppresult_t PP_Notice( void );
 
 	void SetModuleName( char *name );
 	char *GetModuleName( void );

@@ -65,7 +65,7 @@ void CMemBuf::ExchangeSubToMainBuffer(int size)
 		free(idxbuf);
 	}
 
-	limit_size = size;
+	limit_size = size+1;
 	mem_buf = (char*)malloc(limit_size);
 	mem_buf[0] = 0;
 	memcpy( mem_buf, sub_buf, limit_size);

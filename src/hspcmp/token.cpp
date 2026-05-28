@@ -2465,6 +2465,41 @@ ppresult_t CToken::PP_VarFix(char* rootword)
 	return PPRESULT_WROTE_LINE;
 }
 
+ppresult_t CToken::PP_Notice(void)
+{
+	//		#notice解析
+	//
+	int i;
+	char* noticemsg = NULL;
+	char* word = (char*)s3;
+	char strtmp[512];
+	ppresult_t res = PPRESULT_SUCCESS;
+
+	i = GetToken();
+	if (i != TK_OBJ) { SetError("invalid notice name"); return PPRESULT_ERROR; }
+	strcase(word);
+	// キーワード
+	if (tstrcmp(word, "error")) {
+		res = PPRESULT_ERROR;
+		i = GetToken();
+		if (i != TK_STRING) return res;
+		noticemsg = word;
+		if (*word != 0) {
+			strncpy(strtmp, noticemsg, 511);
+			SetError(strtmp);
+		}
+	}
+	if (tstrcmp(word, "warning")) {
+		i = GetToken();
+		if (i != TK_STRING) return res;
+		if (*word != 0) {
+			noticemsg = word;
+			strtmp[0] = '#'; strncpy(strtmp + 1, noticemsg, 511);
+			Mes(strtmp);
+		}
+	}
+	return res;
+}
 
 
 /*
@@ -3506,6 +3541,7 @@ ppresult_t CToken::PreprocessNM( char *str )
 	type = GetToken();
 	if ( topUChar != *s3 ) return PPRESULT_UNKNOWN_DIRECTIVE;
 	if ( type != TK_OBJ ) return PPRESULT_UNKNOWN_DIRECTIVE;
+	strcase(word);
 
 	//		ソース生成コントロール
 	//
@@ -3598,6 +3634,7 @@ ppresult_t CToken::Preprocess( char *str )
 	//		ソース生成コントロール
 	//
 	if (type == TK_OBJ) {
+		strcase(word);
 		if (tstrcmp(word, "if")) {			// generate control
 			if (mulstr == LMODE_OFF) {
 				res = PP_SwitchStart(0);
@@ -3765,6 +3802,10 @@ ppresult_t CToken::Preprocess( char *str )
 			res = PP_VarFix(word);
 			return res;
 		}
+		if (tstrcmp(word, "notice")) {		// Notice
+			res = PP_Notice();
+			return res;
+		}
 	}
 	//		登録キーワード以外はコンパイラに渡す
 	//
@@ -3861,26 +3902,29 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 	//	Windows版のみ、入力のテキスト文字コードを指定に合わせて変換する
 	//
 	int currentsize = (int)strlen(p);
-	if (utf8text==false) utf8text = IsUTF8Text(p);
-	if (pp_utf8 == 0){
-		if (utf8text) {
-			//	UTF-8 -> Shift-JIS
-			Mesf("#Convert to SJIS [%s].",refname);
-			char *p_sjis = src->InitSubBuffer(currentsize);
-			int newsize = ConvUtf82SJis(p, p_sjis, currentsize);
-			src->ExchangeSubToMainBuffer(newsize);
-			p = src->GetBuffer();
+	if (currentsize > 0) {
+		if (utf8text == false) utf8text = IsUTF8Text(p)!=0;
+		currentsize++;
+		if (pp_utf8 == 0) {
+			if (utf8text) {
+				//	UTF-8 -> Shift-JIS
+				Mesf("#Convert to SJIS [%s].", refname);
+				char* p_sjis = src->InitSubBuffer(currentsize);
+				int newsize = ConvUtf82SJis(p, p_sjis, currentsize);
+				src->ExchangeSubToMainBuffer(newsize);
+				p = src->GetBuffer();
+			}
 		}
-	}
-	else {
-		if (!utf8text) {
-			//	Shift-JIS -> UTF-8
-			Mesf("#Convert to UTF8 [%s].", refname);
-			currentsize = currentsize * 4 + 1;
-			char* p_utf8 = src->InitSubBuffer(currentsize);
-			int newsize = ConvSJis2Utf8(p, p_utf8, currentsize);
-			src->ExchangeSubToMainBuffer(newsize);
-			p = src->GetBuffer();
+		else {
+			if (!utf8text) {
+				//	Shift-JIS -> UTF-8
+				Mesf("#Convert to UTF8 [%s].", refname);
+				currentsize = currentsize * 4;
+				char* p_utf8 = src->InitSubBuffer(currentsize);
+				int newsize = ConvSJis2Utf8(p, p_utf8, currentsize);
+				src->ExchangeSubToMainBuffer(newsize);
+				p = src->GetBuffer();
+			}
 		}
 	}
 #endif
@@ -3900,6 +3944,7 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 		}
 
 		while(1) {
+			a1 = *(unsigned char*)p;
 			if ( a1 == ' ' || a1 == '\t' ) {
 				p++; continue;
 			}
@@ -4536,17 +4581,22 @@ int CToken::IsUTF8Text(char* pSource)
 {
 	//	文字列がUTF-8であるかを判定する
 	//
-	while (*pSource) {
-		unsigned char c = (unsigned char)*pSource;
-		if (c <= 0x7f) {
-			pSource++;
-			continue;
+	unsigned char a1;
+	unsigned char* p;
+	int i;
+	int utfflag=0;
+	p = (unsigned char*)pSource;
+	while (1) {
+		a1 = *p++;
+		if (a1 == 0) break;
+		if (a1 >= 0x80) {
+			i = CheckByteUTF8(a1);
+			if (i == 0) return 0;		// UTF8ではない
+			p += i;
+			utfflag = 1;
 		}
-		int skip = CheckByteUTF8(c);
-		if (skip == 0) return 0;	// UTF-8の形式に合わないバイトがあった
-		pSource += skip + 1;
 	}
-	return 1;
+	return utfflag;
 }
 
 
