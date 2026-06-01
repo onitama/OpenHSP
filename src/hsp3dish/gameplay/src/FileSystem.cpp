@@ -273,7 +273,7 @@ char* FileSystem::readAll(const char* filePath, int* fileSize)
 
 #ifdef HSPDISH
 	{
-		size_t size = (size_t)dpm_exist((char *)filePath);
+        ptrdiff_t size = (ptrdiff_t)dpm_exist((char *)filePath);
 		if (size < 0) {
 			GP_ERROR("Failed to load file: %s", filePath);
 			return NULL;

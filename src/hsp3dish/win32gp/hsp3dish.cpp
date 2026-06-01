@@ -676,34 +676,38 @@ void hsp3dish_drawoff( void )
 }
 
 
-int hsp3dish_debugopen( void )
+int hsp3dish_debugopen(void)
 {
 	//		デバッグウインドゥ表示
 	//
 #ifdef HSPDEBUG
-	if ( h_dbgwin != NULL ) return 0;
+	if (h_dbgwin != NULL) return 0;
 #ifdef HSP64
-	h_dbgwin = LoadLibrary( L"hsp3debug_64.dll" );
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE "_64.dll"));
 #else
-	h_dbgwin = LoadLibrary("hsp3debug.dll");
+#ifndef HSPUTF8
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE ".dll"));
+#else
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE) TEXT("_u8.dll"));
 #endif
-	if ( h_dbgwin != NULL ) {
+#endif
+	if (h_dbgwin != NULL) {
 #ifdef HSP64
-		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "debugini");
-		dbgnotice = (HSP3DBGFUNC)GetProcAddress( h_dbgwin, "debug_notice" );
+		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, HSP3DEBUG_INIT);
+		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, HSP3DEBUG_NOTICE);
 #else
-		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_debugini@16");
-		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_debug_notice@16");
+		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_" HSP3DEBUG_INIT "@16");
+		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_" HSP3DEBUG_NOTICE "@16");
 #endif
 		if ((dbgwin == NULL) || (dbgnotice == NULL)) h_dbgwin = NULL;
 	}
-	if ( h_dbgwin == NULL ) {
-		hsp3dish_dialog( "No debug module." );
+	if (h_dbgwin == NULL) {
+		hsp3dish_dialog("No debug module.");
 		return -1;
 	}
 	dbginfo->get_value = hsp3dish_debug;
-	dbgwin( dbginfo, 0, 0, 0 );
-	dbgwnd = (HWND)( dbginfo->dbgwin );
+	dbgwin(dbginfo, 0, 0, 0);
+	dbgwnd = (HWND)(dbginfo->dbgwin);
 #endif
 	return 0;
 }

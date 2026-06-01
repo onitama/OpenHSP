@@ -92,7 +92,11 @@ int hgio_dialog_ex(HSPCTX* ctx, Bmscr* bmscr, int mode, char* str1, char* str2);
 #else
 #pragma comment(lib, "OpenGL32.lib")
 #pragma comment(lib, "GLU32.lib")
+#ifdef NDEBUG
 #pragma comment(lib, "gameplay.lib")
+#else
+#pragma comment(lib, "gameplay_debug.lib")
+#endif
 #endif
 
 //#pragma comment(lib, "glew32.lib")
@@ -158,7 +162,7 @@ void InitMemFile( void )
 
 int OpenMemFilePtr( char *fname )
 {
-	int fsize;
+	ptrdiff_t fsize;
 	fsize = dpm_exist( fname );		// ファイルのサイズを取得
 	if ( fsize <= 0 ) return -1;
 	mfptr_depth++;

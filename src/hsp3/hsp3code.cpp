@@ -3495,7 +3495,7 @@ int code_event( int event, HSPPTRINT prm1, HSPPTRINT prm2, void *prm3 )
 		break;
 	case HSPEVENT_FEXIST:
 		// exist (n/a,n/a,n/a)
-		hspctx->strsize = dpm_exist( hspctx->fnbuffer );
+		hspctx->strsize = (HSPPTRINT)dpm_exist( hspctx->fnbuffer );
 		break;
 	case HSPEVENT_FDELETE:
 		// delete (n/a,n/a,n/a)
