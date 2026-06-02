@@ -127,7 +127,7 @@ UINT WinExec(LPCTSTR lpCmdLine, UINT uCmdShow)
 		0,
 		0,
 		STARTF_USESHOWWINDOW,
-		uCmdShow,
+		(WORD)uCmdShow,
 		NULL,
 		NULL,
 		NULL,
@@ -773,7 +773,7 @@ static int cmdfunc_ctrlcmd( int cmd )
         char *ptr;
         char *ps;
         int size;
-        int sizew;
+		size_t sizew;
 		HSPAPICHAR *hactmp1 = 0;
         ptr = code_getvptr(&pval, &size);
         ps = code_gets();
@@ -782,7 +782,7 @@ static int cmdfunc_ctrlcmd( int cmd )
         if (size < sizew*(int)sizeof(HSPAPICHAR)){
             memcpy(ptr, hactmp1, size);
 			*(HSPAPICHAR*)(ptr + (size - 1) / sizeof(HSPAPICHAR)) = TEXT('\0');
-            hspctx->stat = -sizew*sizeof(HSPAPICHAR);
+            hspctx->stat = - (HSPINT64)( sizew * sizeof(HSPAPICHAR));
 		}
         else{
             memcpy(ptr, hactmp1, (sizew - 1)*sizeof(HSPAPICHAR));
@@ -930,7 +930,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 			chartoapichar(clsname8,&clsname),	// ウィンドウクラス名
 			chartoapichar(winname8,&winname),	// ウィンドウ名
 			(DWORD) prm[1],			// ウィンドウスタイル
-			bm->cx, bm->cy, prm[2], prm[3],		// X,Y,SIZEX,SIZEY
+			bm->cx, bm->cy, (int)prm[2], (int)prm[3],		// X,Y,SIZEX,SIZEY
 			bm->hwnd,				// 親ウィンドウのハンドル
 			(HMENU) prm[4],			// メニューハンドルまたは子ウィンドウID
 			bm->hInst,				// インスタンスハンドル
@@ -940,7 +940,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 		freehac(&winname);
 
 		// AddHSPObject( hwnd, HSPOBJ_TAB_SKIP, prm[3], NULL, 0 );			// HSPのウインドゥオブジェクトとして登録する
-		AddHSPObject( hwnd, HSPOBJ_TAB_SKIP, prm[3] );
+		AddHSPObject( hwnd, HSPOBJ_TAB_SKIP, (int)prm[3] );
 		break;
 #endif	// HSPDISH
 		}
@@ -1200,7 +1200,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 		char *ptr;
 		char *ps;
 		int size;
-		int sizea;
+		size_t sizea;
 		HSPAPICHAR *hactmp1 = 0;
 		char *actmp1 = 0;
 		ptr = code_getvptr(&pval, &size);
@@ -1211,7 +1211,7 @@ static int cmdfunc_ctrlcmd( int cmd )
 		if (size <= sizea){
 			memcpy(ptr, actmp1, size - 1);
 			((char*)ptr)[size - 1] = '\0';
-			hspctx->stat = -sizea;
+			hspctx->stat = -(HSPPTRINT)sizea;
 		}
 		else{
 			memcpy(ptr, actmp1, sizea - 1);
@@ -1278,7 +1278,7 @@ static void *reffunc_ctrlfunc( int *type_res, int arg )
 		reffunc_intfunc_lvalue = call_extfunc( (void *)lp1, (int **)p, p2, fl );
 		switch( fl ) {
 		case HSPVAR_FLAG_STR:
-			ptr = sptr = code_stmp( strlen((char*)reffunc_intfunc_lvalue) + 1 );
+			ptr = sptr = code_stmp( (int)strlen((char*)reffunc_intfunc_lvalue) + 1 );
 			strcpy( sptr, (char*) reffunc_intfunc_lvalue );
 			*type_res = HSPVAR_FLAG_STR;
 			break;
@@ -1509,14 +1509,12 @@ char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
 	//		System strings get
 	//
 	int fl;
-	TCHAR pp[128];
 	char* p1;
 	BOOL success;
-	DWORD version;
 	DWORD size;
-	DWORD* mss;
+	DWORDLONG *mss;
 	SYSTEM_INFO si;
-	MEMORYSTATUS ms;
+	MEMORYSTATUSEX ms;
 	size_t plen;
 	char *p;
 
@@ -1528,26 +1526,31 @@ char *hsp3ext_sysinfo(int p2, int* res, char* outbuf)
 		GetSystemInfo(&si);
 	}
 	if (p2 & 32) {
-		GlobalMemoryStatus(&ms);
-		mss = (DWORD*)&ms;
-		*(int*)p1 = (int)mss[p2 & 15];
+		int id = p2 & 31;
+		ZeroMemory(&ms, sizeof(MEMORYSTATUSEX));
+		ms.dwLength = sizeof(MEMORYSTATUSEX);
+		GlobalMemoryStatusEx(&ms);
+		if (id <= 1) {
+			*(int*)p1 = ms.dwMemoryLoad;
+			*res = fl;
+			return p1;
+		}
+		fl = HSPVAR_FLAG_INT64;
+		id -= 2;
+		mss = &ms.ullTotalPhys;
+		*(DWORDLONG*)p1 = mss[id];
 		*res = fl;
 		return p1;
 	}
 
 	switch (p2) {
 	case 0:
-		_tcscpy((TCHAR*)p1, TEXT("Windows"));
-		version = GetVersion();
-		if ((version & 0x80000000) == 0) _tcscat((TCHAR*)p1, TEXT("NT"));
-		else _tcscat((TCHAR*)p1, TEXT("9X"));
-		/*
-			rev 43
-			mingw : warning : 仮引数int 実引数long unsigned
-			に対処
-		*/
-		_stprintf(pp, TEXT(" ver%d.%d"), static_cast<int>(version & 0xff), static_cast<int>((version & 0xff00) >> 8));
-		_tcscat((TCHAR*)p1, pp);
+		OSVERSIONINFO osvi;
+		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&osvi);
+
+		_stprintf((TCHAR*)p1, TEXT("Windows NT ver%d.%d build:%d"), osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
 		apichartohspchar((TCHAR*)p1, &p);
 		plen = strlen(p);
 		if (p1 != p) {

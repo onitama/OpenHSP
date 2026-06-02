@@ -642,8 +642,21 @@ static char *cnvformat( void )
 			break;
 		case 'f': case 'e': case 'E': case 'g': case 'G':
 			val_type = HSPVAR_FLAG_DOUBLE;
-			val_ptr = HspVarCoreCnvPtr( mpval, HSPVAR_FLAG_DOUBLE );
+			val_ptr = HspVarCoreCnvPtr(mpval, HSPVAR_FLAG_DOUBLE);
 			break;
+		case 'l':
+			if (*fp == 'l') {
+				int chk = fp[1];
+				if ((chk == 'd') || (chk == 'D') || (chk == 'u') || (chk == 'U') || (chk == 'x') || (chk == 'X')) {
+					memcpy(fmt + i + 1, fp, 3);
+					fmt[i + 4] = 0;
+					fp+=3;
+					val_type = HSPVAR_FLAG_INT64;
+					val_ptr = HspVarCoreCnvPtr(mpval, HSPVAR_FLAG_INT64);
+					break;
+				}
+			}
+			throw HSPERR_INVALID_FUNCPARAM;
 		case 's':
 			val_type = HSPVAR_FLAG_STR;
 			val_ptr = HspVarCoreCnvPtr( mpval, HSPVAR_FLAG_STR );
@@ -658,9 +671,14 @@ static char *cnvformat( void )
 			int space = capacity - len - 1;
 			if ( val_type == HSPVAR_FLAG_INT ) {
 				n = SNPRINTF( p + len, space, fmt, *(int *)val_ptr );
-			} else if ( val_type == HSPVAR_FLAG_DOUBLE ) {
-				n = SNPRINTF( p + len, space, fmt, *(HSPREAL *)val_ptr );
-			} else {
+			}
+			else if (val_type == HSPVAR_FLAG_DOUBLE) {
+				n = SNPRINTF(p + len, space, fmt, *(HSPREAL*)val_ptr);
+			}
+			else if (val_type == HSPVAR_FLAG_INT64) {
+				n = SNPRINTF(p + len, space, fmt, *(int64_t *)val_ptr);
+			}
+			else {
 				n = SNPRINTF( p + len, space, fmt, (char *)val_ptr );
 			}
 

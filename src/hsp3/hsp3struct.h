@@ -32,11 +32,11 @@
 //		HSPが使用する64bit整数値型
 //
 #ifdef HSP64
-#define HSPINT64 int64_t
-#define HSPPTRINT int64_t
+#define HSPINT64 ptrdiff_t
+#define HSPPTRINT ptrdiff_t
 #define HSPCTX_STAT_FLAG HSPVAR_FLAG_INT64
 #else
-#define HSPINT64  int64_t
+#define HSPINT64  ptrdiff_t
 #define HSPPTRINT int
 #define HSPCTX_STAT_FLAG HSPVAR_FLAG_INT
 #endif
