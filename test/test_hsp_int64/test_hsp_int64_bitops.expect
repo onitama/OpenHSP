@@ -1,0 +1,8 @@
+gpiod initalize failed.
+=== int64 bitops ===
+or: 1099511628031
+and: 1099511627776
+xor: 280375465082879
+shl: 1099511627776
+shr: 4294967296
+sign-shr: -1

@@ -152,6 +152,28 @@ static void HspVarInt64_ModI( PDAT *pval, const void *val )
 }
 
 
+// And
+static void HspVarInt64_AndI( PDAT *pval, const void *val )
+{
+	*GetPtr(pval) &= *((int64_t *)(val));
+	*aftertype = HSPVAR_FLAG_INT64;
+}
+
+// Or
+static void HspVarInt64_OrI( PDAT *pval, const void *val )
+{
+	*GetPtr(pval) |= *((int64_t *)(val));
+	*aftertype = HSPVAR_FLAG_INT64;
+}
+
+// Xor
+static void HspVarInt64_XorI( PDAT *pval, const void *val )
+{
+	*GetPtr(pval) ^= *((int64_t *)(val));
+	*aftertype = HSPVAR_FLAG_INT64;
+}
+
+
 // Eq
 static void HspVarInt64_EqI( PDAT *pval, const void *val )
 {
@@ -192,6 +214,20 @@ static void HspVarInt64_LtEqI( PDAT *pval, const void *val )
 {
 	*((int *)pval) = ( *GetPtr(pval) <= *((int64_t *)(val)) );
 	*aftertype = HSPVAR_FLAG_INT;
+}
+
+// Rr
+static void HspVarInt64_RrI( PDAT *pval, const void *val )
+{
+	*GetPtr(pval) >>= *((int64_t *)(val));
+	*aftertype = HSPVAR_FLAG_INT64;
+}
+
+// Lr
+static void HspVarInt64_LrI( PDAT *pval, const void *val )
+{
+	*GetPtr(pval) <<= *((int64_t *)(val));
+	*aftertype = HSPVAR_FLAG_INT64;
 }
 
 /*
@@ -237,9 +273,9 @@ void HspVarInt64_Init( HspVarProc *p )
 	p->DivI = HspVarInt64_DivI;
 	p->ModI = HspVarInt64_ModI;
 
-//	p->AndI = HspVarInt64_Invalid;
-//	p->OrI  = HspVarInt64_Invalid;
-//	p->XorI = HspVarInt64_Invalid;
+	p->AndI = HspVarInt64_AndI;
+	p->OrI  = HspVarInt64_OrI;
+	p->XorI = HspVarInt64_XorI;
 
 	p->EqI = HspVarInt64_EqI;
 	p->NeI = HspVarInt64_NeI;
@@ -248,8 +284,8 @@ void HspVarInt64_Init( HspVarProc *p )
 	p->GtEqI = HspVarInt64_GtEqI;
 	p->LtEqI = HspVarInt64_LtEqI;
 
-//	p->RrI = HspVarInt64_Invalid;
-//	p->LrI = HspVarInt64_Invalid;
+	p->RrI = HspVarInt64_RrI;
+	p->LrI = HspVarInt64_LrI;
 
 	p->vartype_name = "int64";				// タイプ名
 	p->version = 0x001;					// 型タイプランタイムバージョン(0x100 = 1.0)
@@ -259,4 +295,3 @@ void HspVarInt64_Init( HspVarProc *p )
 }
 
 /*------------------------------------------------------------*/
-

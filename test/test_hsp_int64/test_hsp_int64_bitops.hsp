@@ -1,0 +1,26 @@
+; Test for int64 bitwise and shift operations
+#include "hsp3cl.as"
+
+mes "=== int64 bitops ==="
+dimtype a, vartype("int64"), 1
+
+a = int64("1099511627776")
+a |= int64("255")
+mes "or: " + str(a)
+
+a &= int64("1099511628032")
+mes "and: " + str(a)
+
+a ^= int64("281474976710655")
+mes "xor: " + str(a)
+
+a = int64("1")
+a <<= 40
+mes "shl: " + str(a)
+
+a >>= 8
+mes "shr: " + str(a)
+
+a = int64("-9223372036854775808")
+a >>= 63
+mes "sign-shr: " + str(a)

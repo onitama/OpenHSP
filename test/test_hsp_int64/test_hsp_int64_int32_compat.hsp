@@ -1,0 +1,60 @@
+; Test that int64 operations match int operations within the int32 range
+#include "hsp3cl.as"
+
+mes "=== int64 int32 compat ==="
+dimtype l, vartype("int64"), 1
+
+i = 305419896
+i &= 252645135
+l = 305419896L
+l &= 252645135L
+mes "and: " + str(i) + " " + str(l)
+
+i = 305419896
+i |= 252645135
+l = 305419896L
+l |= 252645135L
+mes "or: " + str(i) + " " + str(l)
+
+i = 305419896
+i ^= 252645135
+l = 305419896L
+l ^= 252645135L
+mes "xor: " + str(i) + " " + str(l)
+
+i = 1024
+i <<= 20
+l = 1024L
+l <<= 20
+mes "shl: " + str(i) + " " + str(l)
+
+i = 2147483647
+i >>= 3
+l = 2147483647L
+l >>= 3
+mes "shr: " + str(i) + " " + str(l)
+
+i = -1073741824
+i >>= 4
+l = -1073741824L
+l >>= 4
+mes "neg-shr: " + str(i) + " " + str(l)
+
+i = -123456789
+i &= 2147483647
+l = -123456789L
+l &= 2147483647L
+mes "neg-and: " + str(i) + " " + str(l)
+
+i = -2147483647
+i -= 1
+i |= 1024
+l = -2147483648L
+l |= 1024L
+mes "neg-or: " + str(i) + " " + str(l)
+
+i = -1
+i ^= 2147483647
+l = -1L
+l ^= 2147483647L
+mes "neg-xor: " + str(i) + " " + str(l)
