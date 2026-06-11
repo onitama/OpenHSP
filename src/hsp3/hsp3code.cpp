@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#ifdef HSPEMSCRIPTEN
+#include <deque>
+#endif
 #include <map>
 using namespace std;
 
@@ -1344,17 +1347,99 @@ static void customstack_delete( STRUCTDAT *st, char *stackptr )
 	}
 }
 
+#ifdef HSPEMSCRIPTEN
+// Emscripten advances HSP from the browser/node main loop, so C++ callers
+// cannot rely on nested interpreter calls completing synchronously. Callback
+// frames snapshot callback-visible system variables and are resumed by the root
+// executor; command-style #deffunc calls use the normal custom function stack
+// frame and still unwind through cmdfunc_return().
+struct HspEmscriptenContinuationFrame {
+	const unsigned short *target_pc;
+	const unsigned short *return_pc;
+	int callback_flag;
+	HSPPTRINT iparam;
+	HSPPTRINT wparam;
+	HSPPTRINT lparam;
+	HSPPTRINT stat;
+	int strsize;
+	char refstr[HSPCTX_REFSTR_MAX];
+	double refdval;
+};
+
+static deque<HspEmscriptenContinuationFrame> emscripten_continuation_queue;
+static int emscripten_continuation_active = 0;
+static int emscripten_continuation_stacklev = -1;
+static int emscripten_continuation_old_callback_flag = 0;
+
+static void code_emscripten_reset_continuation( void )
+{
+	emscripten_continuation_queue.clear();
+	emscripten_continuation_active = 0;
+	emscripten_continuation_stacklev = -1;
+	emscripten_continuation_old_callback_flag = 0;
+}
+
+static void code_emscripten_finish_continuation( int type, int stacklev )
+{
+	if (( emscripten_continuation_active == 0 ) || ( type != TYPE_EX_SUBROUTINE )) return;
+	if ( stacklev != emscripten_continuation_stacklev ) return;
+
+	hspctx->callback_flag = emscripten_continuation_old_callback_flag;
+	emscripten_continuation_active = 0;
+	emscripten_continuation_stacklev = -1;
+}
+
+static void code_emscripten_enqueue_callback( const unsigned short *pc, const unsigned short *retpc, int callback_flag )
+{
+	HspEmscriptenContinuationFrame frame;
+	frame.target_pc = pc;
+	frame.return_pc = retpc;
+	frame.callback_flag = callback_flag;
+	frame.iparam = hspctx->iparam;
+	frame.wparam = hspctx->wparam;
+	frame.lparam = hspctx->lparam;
+	frame.stat = hspctx->stat;
+	frame.strsize = hspctx->strsize;
+	if ( hspctx->refstr != NULL ) {
+		strncpy( frame.refstr, hspctx->refstr, HSPCTX_REFSTR_MAX - 1 );
+		frame.refstr[HSPCTX_REFSTR_MAX - 1] = 0;
+	} else {
+		frame.refstr[0] = 0;
+	}
+	frame.refdval = hspctx->refdval;
+	emscripten_continuation_queue.push_back( frame );
+}
+
+int code_emscripten_has_continuation( void )
+{
+	return (( emscripten_continuation_active == 0 ) && ( emscripten_continuation_queue.empty() == false ));
+}
+
+int code_emscripten_is_continuation_active( void )
+{
+	return (( emscripten_continuation_active != 0 ) || ( emscripten_continuation_queue.empty() == false ));
+}
+#endif
+
 void cmdfunc_return( void )
 {
 	//		return execute
 	//
 	STMDATA *stm;
 	HSPROUTINE *r;
+#ifdef HSPEMSCRIPTEN
+	int return_type;
+	int return_stacklev;
+#endif
 
 	if ( StackGetLevel == 0 ) throw HSPERR_RETURN_WITHOUT_GOSUB;
 
 	stm = StackPeek;
 	r = (HSPROUTINE *)STM_GETPTR(stm);
+#ifdef HSPEMSCRIPTEN
+	return_type = stm->type;
+	return_stacklev = r->stacklev;
+#endif
 
 	if ( stm->type == TYPE_EX_CUSTOMFUNC ) {
 		customstack_delete( r->param, (char *)(r+1) );	// カスタム命令のローカルメモリを解放
@@ -1367,12 +1452,15 @@ void cmdfunc_return( void )
 	code_next();
 
 	StackPop();
+#ifdef HSPEMSCRIPTEN
+	code_emscripten_finish_continuation( return_type, return_stacklev );
+#endif
 
 	hspctx->runmode = RUNMODE_RUN;
 }
 
 #ifdef HSPEMSCRIPTEN
-static void cmdfunc_gosub( unsigned short *subr, unsigned short *retpc )
+static int cmdfunc_gosub( unsigned short *subr, unsigned short *retpc )
 {
 	//		gosub execute
 	//
@@ -1384,6 +1472,35 @@ static void cmdfunc_gosub( unsigned short *subr, unsigned short *retpc )
 	StackPush( TYPE_EX_SUBROUTINE, (char *)&r, sizeof(HSPROUTINE) );
 
 	code_setpc( subr );
+	return r.stacklev;
+}
+
+int code_emscripten_run_continuation_step( void )
+{
+	HspEmscriptenContinuationFrame frame;
+
+	if ( code_emscripten_has_continuation() == 0 ) return RUNMODE_RUN;
+
+	frame = emscripten_continuation_queue.front();
+	emscripten_continuation_queue.pop_front();
+
+	hspctx->iparam = frame.iparam;
+	hspctx->wparam = frame.wparam;
+	hspctx->lparam = frame.lparam;
+	hspctx->stat = frame.stat;
+	hspctx->strsize = frame.strsize;
+	if ( hspctx->refstr != NULL ) {
+		strncpy( hspctx->refstr, frame.refstr, HSPCTX_REFSTR_MAX - 1 );
+		hspctx->refstr[HSPCTX_REFSTR_MAX - 1] = 0;
+	}
+	hspctx->refdval = frame.refdval;
+
+	emscripten_continuation_active = 1;
+	emscripten_continuation_old_callback_flag = hspctx->callback_flag;
+	hspctx->callback_flag = frame.callback_flag;
+	emscripten_continuation_stacklev = cmdfunc_gosub( (unsigned short *)frame.target_pc, (unsigned short *)frame.return_pc );
+
+	return RUNMODE_RUN;
 }
 #else
 static int cmdfunc_gosub( unsigned short *subr )
@@ -1427,9 +1544,9 @@ static int cmdfunc_gosub( unsigned short *subr )
 #endif
 
 
-static int code_callfunc( int cmd )
+static void code_callfunc_enter( int cmd )
 {
-	//	ユーザー拡張命令を呼び出す
+	//	ユーザー拡張命令を呼び出す準備
 	//
 	STRUCTDAT *st;
 	HSPROUTINE *r;
@@ -1452,6 +1569,13 @@ static int code_callfunc( int cmd )
 
 	mcs = (unsigned short *)( hspctx->mem_mcs + (hspctx->mem_ot[ st->otindex ]) );
 	code_next();
+}
+
+static int code_callfunc( int cmd )
+{
+	//	ユーザー拡張命令を呼び出す
+	//
+	code_callfunc_enter( cmd );
 
 	//		命令内で呼び出しを完結させる
 	//
@@ -1842,7 +1966,12 @@ static int cmdfunc_custom( int cmd )
 	st = &hspctx->mem_finfo[cmd];
 	if ( st->index != STRUCTDAT_INDEX_FUNC ) throw HSPERR_SYNTAX;
 
+#ifdef HSPEMSCRIPTEN
+	code_callfunc_enter( cmd );
+	return RUNMODE_RUN;
+#else
 	return code_callfunc( cmd );
+#endif
 }
 
 
@@ -2739,6 +2868,9 @@ void code_resetctx( HSPCTX *ctx )
 	ctx->notep_pval = NULL;
 	ctx->msgfunc = code_def_msgfunc;
 	ctx->callback_flag = 0;
+#ifdef HSPEMSCRIPTEN
+	code_emscripten_reset_continuation();
+#endif
 }
 
 HSPCTX *code_getctx( void )
@@ -2789,7 +2921,7 @@ void code_call( const unsigned short *pc )
 	//
 	mcs = mcsbak;
 #ifdef HSPEMSCRIPTEN
-	cmdfunc_gosub( (unsigned short *)pc, mcs );
+	code_emscripten_enqueue_callback( pc, mcs, 0 );
 #else
 	cmdfunc_gosub( (unsigned short *)pc );
 #endif
@@ -2802,13 +2934,13 @@ void code_callback(const unsigned short *pc)
 	//		コールバックのサブルーチンジャンプを行なう
 	//
 	mcs = mcsbak;
-	hspctx->callback_flag = 1;
 #ifdef HSPEMSCRIPTEN
-	cmdfunc_gosub((unsigned short *)pc, mcs);
+	code_emscripten_enqueue_callback( pc, mcs, 1 );
 #else
+	hspctx->callback_flag = 1;
 	cmdfunc_gosub((unsigned short *)pc);
-#endif
 	hspctx->callback_flag = 0;
+#endif
 	if (hspctx->runmode == RUNMODE_END) return;
 	hspctx->runmode = RUNMODE_RUN;
 }
@@ -3344,10 +3476,17 @@ rerun:
 			if ( dbgmode ) code_dbgtrace();					// トレースモード時の処理
 #endif
 
+			if ( code_emscripten_has_continuation() ) {
+				return code_emscripten_run_continuation_step();
+			}
+
 			if ( GetTypeInfoPtr( type )->cmdfunc( val ) ) {	// タイプごとの関数振り分け
 				if ( hspctx->runmode == RUNMODE_RETURN ) {
 					cmdfunc_return();
 				} else {
+					if (hspctx->callback_flag) {
+						if ((hspctx->runmode != RUNMODE_RUN) && (hspctx->runmode != RUNMODE_END) && (hspctx->runmode != RUNMODE_LOGMES)) throw HSPERR_INVALID_CALLBACK;
+					}
 					hspctx->msgfunc( hspctx );
 				}
 				if ((hspctx->runmode == RUNMODE_END) || (hspctx->runmode == RUNMODE_ERROR)) {

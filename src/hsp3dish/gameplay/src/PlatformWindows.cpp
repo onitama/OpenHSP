@@ -2,7 +2,9 @@
 #ifdef WIN32
 #define HSPWIN
 #ifdef _UNICODE
+#ifndef HSPUTF8
 #define HSPUTF8
+#endif
 #endif
 
 #include "Base.h"

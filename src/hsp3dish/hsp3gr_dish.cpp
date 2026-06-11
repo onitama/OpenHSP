@@ -94,6 +94,82 @@ static essprite* sprite;
 static int sprite_target_window;
 #endif
 
+#ifdef HSPEMSCRIPTEN
+// Layer callbacks can enqueue HSP continuations. Split redraw into native
+// phases so POSTEFF/MAX callbacks complete before the final hgio_redraw(), and
+// so redraw 0 BG/NORMAL callbacks run after the native redraw step.
+static Bmscr *emscripten_redraw_bmscr;
+static int emscripten_redraw_flag;
+static int emscripten_redraw_phase;
+
+static void hsp3dish_start_redraw_continuation( Bmscr *target, int flag )
+{
+	emscripten_redraw_bmscr = target;
+	emscripten_redraw_flag = flag;
+	emscripten_redraw_phase = 1;
+}
+
+int hsp3dish_has_native_continuation( void )
+{
+	return emscripten_redraw_phase != 0;
+}
+
+int hsp3dish_run_native_continuation_step( void )
+{
+	Bmscr *target;
+
+	if ( emscripten_redraw_phase == 0 ) return RUNMODE_RUN;
+	target = emscripten_redraw_bmscr;
+
+	if ( emscripten_redraw_flag & 1 ) {
+		switch( emscripten_redraw_phase ) {
+		case 1:
+			target->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_POSTEFF, HSPOBJ_LAYER_CMD_DRAW);
+			emscripten_redraw_phase = 2;
+			break;
+		case 2:
+			target->DrawAllObjects();
+			target->SetDefaultFont();
+			emscripten_redraw_phase = 3;
+			break;
+		case 3:
+			target->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_MAX, HSPOBJ_LAYER_CMD_DRAW);
+			emscripten_redraw_phase = 4;
+			break;
+		default:
+			ctx->stat = hgio_redraw( (BMSCR *)target, emscripten_redraw_flag );
+#ifdef USE_ESSPRITE
+			if (target->wid==0) {
+				sprite->updateFrame();
+			}
+#endif
+			emscripten_redraw_phase = 0;
+			break;
+		}
+	} else {
+		switch( emscripten_redraw_phase ) {
+		case 1:
+			ctx->stat = hgio_redraw( (BMSCR *)target, emscripten_redraw_flag );
+			emscripten_redraw_phase = 2;
+			break;
+		case 2:
+			target->SetDefaultFont();
+			target->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_BG, HSPOBJ_LAYER_CMD_DRAW);
+			target->SendHSPLayerObjectNotice(HSPOBJ_OPTION_LAYER_NORMAL, HSPOBJ_LAYER_CMD_DRAW);
+			emscripten_redraw_phase = 3;
+			break;
+		default:
+			target->SetDefaultFont();
+			emscripten_redraw_phase = 0;
+			break;
+		}
+	}
+
+	return RUNMODE_RUN;
+}
+#endif
+
+
 
 /*----------------------------------------------------------*/
 //					HGIMG4 system support
@@ -648,6 +724,12 @@ static int cmdfunc_extcmd( int cmd )
 			}
 		}
 #endif
+#endif
+#ifdef HSPEMSCRIPTEN
+		if (bmscr->objmax) {
+			hsp3dish_start_redraw_continuation( bmscr, p1 );
+			return RUNMODE_RUN;
+		}
 #endif
 		if (p1 & 1) {
 			if (bmscr->objmax) {

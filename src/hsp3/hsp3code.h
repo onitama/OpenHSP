@@ -26,6 +26,12 @@ void cmdfunc_return( void );
 unsigned short *code_getpcbak( void );
 
 int code_execcmd( void );
+#ifdef HSPEMSCRIPTEN
+int code_execcmd_one( int& prev );
+int code_emscripten_has_continuation( void );
+int code_emscripten_is_continuation_active( void );
+int code_emscripten_run_continuation_step( void );
+#endif
 int code_execcmd2( void );
 int code_exec_wait( int tick );
 int code_exec_await( int tick );

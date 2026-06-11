@@ -19,6 +19,7 @@
 #include "../../hsp3/hsp3config.h"
 #include "../../hsp3/strbuf.h"
 #include "../../hsp3/hsp3.h"
+#include "../../hsp3/hsp3code.h"
 #include "../hsp3gr.h"
 #include "../supio.h"
 #include "../hgio.h"
@@ -902,6 +903,8 @@ char *hsp3dish_getlog(void)
 
 
 extern int code_execcmd_one( int& prev );
+extern int hsp3dish_has_native_continuation( void );
+extern int hsp3dish_run_native_continuation_step( void );
 
 void hsp3dish_exec_one( void )
 {
@@ -937,7 +940,14 @@ void hsp3dish_exec_one( void )
 	int i;
 	for (i = 0; !stop && i < hsp_limit_step_per_frame; i++) {
 	//for (int i = 0; !stop; i++) {
-		runmode = code_execcmd_one(code_execcmd_state);
+		// Native redraw phases must wait while HSP callback continuations are
+		// queued or active; otherwise a redraw caller can advance before its
+		// layer callbacks have reached return.
+		if (( code_emscripten_is_continuation_active() == 0 ) && hsp3dish_has_native_continuation()) {
+			runmode = hsp3dish_run_native_continuation_step();
+		} else {
+			runmode = code_execcmd_one(code_execcmd_state);
+		}
 		switch ( ctx->runmode ){
 		case RUNMODE_RUN:
 			break;
