@@ -44,6 +44,7 @@ public:
 	int hash;			// Text Hashcode
 	int life;			// Text Cache life
 	char* text;			// Long Text Message
+	std::string fontname;		// Fontname
 	int textsize;		// Long Text Message size
 	int font_size;		// Text font size
 	int font_style;		// Text font style
