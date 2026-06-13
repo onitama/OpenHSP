@@ -31,8 +31,8 @@ CFLAGS_EXTLIB = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
 		  -I src/hsp3dish/emscripten/extlib/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src
 
 LINK_FLAGS_CORE =  -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
-	-s "EXPORTED_RUNTIME_METHODS=['addRunDependency', 'removeRunDependency', 'FS_createPreloadedFile', 'FS_createPath', 'ccall', 'cwrap']" \
-	-s "EXPORTED_FUNCTIONS=['_main', '_malloc', '_free']"
+	-sEXPORTED_RUNTIME_METHODS=addRunDependency,removeRunDependency,FS_createPreloadedFile,FS_createPath,ccall,cwrap,HEAPU8,HEAPF32,HEAPF64 \
+	-sEXPORTED_FUNCTIONS=_main,_malloc,_free
 
 LINK_FLAGS = $(LINK_FLAGS_CORE)
 LINK_FLAGS_GP = $(LINK_FLAGS_CORE) \

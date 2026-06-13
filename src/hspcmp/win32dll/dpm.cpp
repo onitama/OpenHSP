@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef EMSCRIPTEN
+#ifdef HSPEMSCRIPTEN
 #ifndef _MAX_PATH
 #define _MAX_PATH       256
 #endif

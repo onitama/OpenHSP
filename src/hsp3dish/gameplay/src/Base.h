@@ -214,9 +214,11 @@ extern int strcmpnocase(const char* s1, const char* s2);
 #elif __APPLE__
     #include <OpenAL/al.h>
     #include <OpenAL/alc.h>
-#elif EMSCRIPTEN
+#elif __EMSCRIPTEN__
 	#include <AL/al.h>
 	#include <AL/alc.h>
+#else
+    #warning "Audio not supported on this platform."
 #endif
 
 // Compressed Media
