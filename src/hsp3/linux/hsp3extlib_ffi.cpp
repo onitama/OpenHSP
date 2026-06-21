@@ -600,7 +600,7 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 			ffi_cif cif;
 			// TODO intと互換性のない返り値の受け取り
 #ifdef HSP64
-			rtype = &ffi_type_slong;
+			rtype = &ffi_type_sint64;
 #else
 			rtype = &ffi_type_sint;
 #endif
@@ -651,7 +651,7 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 	case MPTYPE_INT64:
 		p.l = (int64_t)code_getdl(0);
 		prm_values[index] = &p.l;
-		prm_args[index] = &ffi_type_slong;
+		prm_args[index] = &ffi_type_sint64;
 		break;
 	case MPTYPE_PVARPTR:
 		aptr = code_getva( &pval );
