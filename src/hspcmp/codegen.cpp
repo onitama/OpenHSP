@@ -590,7 +590,7 @@ char *CToken::GetTokenCG( char *str, int option )
 		cg_str[a]=0;
 		if ( *vs=='l' || *vs=='L' ) {
 			vs++;
-			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 16 );
+			val64 = strtoull_as_int64( (char *)cg_str, 16 );
 			ttype = TK_INT64;
 			return (char *)vs;
 		}
@@ -612,7 +612,7 @@ char *CToken::GetTokenCG( char *str, int option )
 		cg_str[a]=0;
 		if ( *vs=='l' || *vs=='L' ) {
 			vs++;
-			val64 = (int64_t)strtoll( (char *)cg_str, nullptr, 2 );
+			val64 = strtoull_as_int64( (char *)cg_str, 2 );
 			ttype = TK_INT64;
 			return (char *)vs;
 		}

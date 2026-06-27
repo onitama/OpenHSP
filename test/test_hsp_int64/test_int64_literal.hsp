@@ -22,6 +22,14 @@ mes d
 e = $100000000L
 mes e
 
+; 負の16進数リテラル
+j = $FFFFFFFFFFFFFFFFL
+mes j
+
+; 負の16進数リテラル (32bitを超える値)
+k = $FFFFFFFF00000000L
+mes k
+
 ; 2進数リテラル (32bitを超える値)
 f = %100000000000000000000000000000000L
 mes f
