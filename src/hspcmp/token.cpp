@@ -1520,7 +1520,7 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 			}
 			s2[a++]=a1;vs++;
 		}
-		if (( a1=='k' )||( a1=='f' )||( a1=='d' )) { s2[a++]=a1; vs++; }
+		if (( a1=='k' )||( a1=='f' )||( a1=='d' )||( a1=='l' )) { s2[a++]=a1; vs++; }
 		if ( a1 == 'e' ) {
 			s2[a++]=a1; vs++;
 			a1=*vs;

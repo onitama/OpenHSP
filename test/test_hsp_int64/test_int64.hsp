@@ -29,3 +29,12 @@ mes "a \\= 11.0 => " + a
 
 a \= 11
 mes "a \\= 11 => " + a
+
+#module int64_literal_module
+
+#defcfunc module_decimal_literal
+return 3000000000l
+
+#global
+
+mes "module decimal literal => " + module_decimal_literal()
