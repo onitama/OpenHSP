@@ -1,0 +1,26 @@
+#runtime "hsp3cl"
+
+#module int64_literal_module
+
+#defcfunc module_decimal_literal
+return 3000000000l
+
+#defcfunc module_float_suffix
+return 1F
+
+#defcfunc module_double_suffix
+return 1D
+
+#defcfunc module_exp_suffix
+return 1E3
+
+#defcfunc module_int64_upper_suffix
+return 3000000000L
+
+#global
+
+mes "module decimal literal => " + module_decimal_literal()
+mes "module float suffix => " + module_float_suffix()
+mes "module double suffix => " + module_double_suffix()
+mes "module exp suffix => " + module_exp_suffix()
+mes "module int64 upper suffix => " + module_int64_upper_suffix()

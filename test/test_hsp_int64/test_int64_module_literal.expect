@@ -1,0 +1,6 @@
+gpiod initalize failed.
+module decimal literal => 3000000000
+module float suffix => 1.000000
+module double suffix => 1.000000
+module exp suffix => 1000.000000
+module int64 upper suffix => 3000000000
