@@ -1,8 +1,8 @@
 gpiod initalize failed.
 === type conversion ===
-int->int64: 42
-int64->int: 1
-double->int64: 15000000000.000000
-int64->double: 0
-neg int64->int: -1
-zero: 0
+int->int64: 42 type 8
+int64->int: 1 type 4
+double->int64: 15000000000 type 8
+int64->double: 9007199254740992 type 3
+neg int64->int: -1 type 4
+zero: 0 type 8
