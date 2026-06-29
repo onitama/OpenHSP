@@ -591,7 +591,7 @@ static void *HspVarVariant_ArrayObjectRead( PVal *pval, int *mptype )
 				hr = SafeArrayGetVartype( psa, &vt );
 				if ( FAILED(hr) || vt == VT_EMPTY ) throw HSPERR_INVALID_TYPE;
 			}
-			comcheck_variant_conv( vt, *mptype );
+			//comcheck_variant_conv( vt, *mptype );
 			// いったん一時 VARIANT に格納してから型変換
 			VariantInit( &varTemp );
 			ptr = &varTemp.lVal;

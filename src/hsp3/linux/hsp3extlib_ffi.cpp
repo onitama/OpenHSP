@@ -523,7 +523,7 @@ static HSPPTRINT call_method2_ffi(ffi_type **prm_args, void **prm_values, const 
 	IUnknown *punk = *(IUnknown **)prm_values[0];
 	IUnknown *punk2 = NULL;
 	HRESULT hr;
-	int result = 0;
+	HSPPTRINT result = 0;
 
 	if (st->otindex < 0 || punk == NULL) throw (HSPERR_COMDLL_ERROR);
 
@@ -835,7 +835,7 @@ HSPPTRINT call_extfunc( void *proc, int **prm, int prms, int rettype )
 
 	for (int i = 0; i < prms; i++) {
 		args[i] = &ffi_type_pointer;
-		values[i] = prm[i];
+		values[i] = &prm[i];
 	}
 	if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, prms, result_type, args.data()) != FFI_OK) {
 		throw ( HSPERR_DLL_ERROR );

@@ -485,7 +485,7 @@ static int cmdfunc_extcmd( int cmd )
 		p1 = bmscr->imgbtn;
 		if ( p1 >= 0 ) {
 			bmsrc = wnd->GetBmscrSafe( p1 );
-			bmscr->SetButtonImage( ctx->stat, p1, bmscr->btn_x1, bmscr->btn_y1, bmscr->btn_x2, bmscr->btn_y2, bmscr->btn_x3, bmscr->btn_y3 );
+			bmscr->SetButtonImage( (int)ctx->stat, p1, bmscr->btn_x1, bmscr->btn_y1, bmscr->btn_x2, bmscr->btn_y2, bmscr->btn_x3, bmscr->btn_y3 );
 		}
 		break;
 		}
@@ -1404,7 +1404,41 @@ static int get_ginfo( int arg )
 }
 
 
-static int reffunc_intfunc_ivalue;
+static int *reffunc_intfunc_ivalue;
+static int64_t reffunc_intfunc_i64value;
+
+#define OBJINFO_RESULT_INT(x) *reffunc_intfunc_ivalue = (int)(x); break;
+#ifdef HSP64
+#define OBJINFO_RESULT_PTR(x) reffunc_intfunc_i64value = (int64_t)&(x); *type_res = HSPVAR_FLAG_INT64; break;
+#else
+#define OBJINFO_RESULT_PTR(x) *reffunc_intfunc_ivalue = (int)(x); break;
+#endif
+
+static void get_objinfo(int* type_res, int objid, int type)
+{
+	HSPOBJINFO* optr = bmscr->GetHSPObject(objid);
+	switch (type) {
+		case 0: OBJINFO_RESULT_INT(*(int*)optr);
+		case 1: OBJINFO_RESULT_PTR(optr->bm);
+		case 2: OBJINFO_RESULT_PTR(optr->hCld);
+		case 3: OBJINFO_RESULT_INT(optr->owid);
+		case 4: OBJINFO_RESULT_INT(optr->owsize);
+		case 5: OBJINFO_RESULT_INT(optr->varset.type);
+		case 6: OBJINFO_RESULT_PTR(optr->varset.pval);
+		case 7: OBJINFO_RESULT_INT(optr->varset.aptr);
+		case 8: OBJINFO_RESULT_PTR(optr->varset.ptr);
+		case 9: OBJINFO_RESULT_PTR(optr->func_notice);
+		case 10: OBJINFO_RESULT_PTR(optr->func_objprm);
+		case 11: OBJINFO_RESULT_PTR(optr->func_delete);
+		case 12: OBJINFO_RESULT_PTR(optr->br_back);
+		case 13: OBJINFO_RESULT_INT(optr->color_back);
+		case 14: OBJINFO_RESULT_INT(optr->color_text);
+		case 15: OBJINFO_RESULT_INT(optr->exinfo1);
+		case 16: OBJINFO_RESULT_INT(optr->exinfo2);
+		case 17: OBJINFO_RESULT_PTR(optr->hspctx);
+		default: throw HSPERR_ILLEGAL_FUNCTION;
+	}
+}
 
 static void *reffunc_function( int *type_res, int arg )
 {
@@ -1414,7 +1448,8 @@ static void *reffunc_function( int *type_res, int arg )
 	//		返値のタイプを設定する
 	//
 	*type_res = HSPVAR_FLAG_INT;			// 返値のタイプを指定する
-	ptr = &reffunc_intfunc_ivalue;			// 返値のポインタ
+	ptr = &reffunc_intfunc_i64value;		// 返値のポインタ
+	reffunc_intfunc_ivalue = (int *)ptr;
 
 	//			'('で始まるかを調べる
 	//
@@ -1426,18 +1461,15 @@ static void *reffunc_function( int *type_res, int arg )
 
 	//	int function
 	case 0x000:								// ginfo
-		reffunc_intfunc_ivalue = get_ginfo( code_geti() );
+		*reffunc_intfunc_ivalue = get_ginfo( code_geti() );
 		break;
 
 	case 0x001:								// objinfo
 		{
-		int *iptr;
 		p1 = code_geti();
 		p2 = code_geti();
 		if (( p1 < 0 )||( p1 >= bmscr->objmax )) throw HSPERR_ILLEGAL_FUNCTION;
-		iptr = (int *)bmscr->GetHSPObject( p1 );
-		if (p2 < 0) throw HSPERR_ILLEGAL_FUNCTION;
-		reffunc_intfunc_ivalue = iptr[p2];
+		get_objinfo(type_res,p1,p2);
 		break;
 		}
 
@@ -1478,19 +1510,20 @@ static void *reffunc_sysvar( int *type_res, int arg )
 	//		返値のタイプを設定する
 	//
 	*type_res = HSPVAR_FLAG_INT;			// 返値のタイプを指定する
-	ptr = &reffunc_intfunc_ivalue;			// 返値のポインタ
+	ptr = &reffunc_intfunc_i64value;		// 返値のポインタ
+	reffunc_intfunc_ivalue = (int*)ptr;
 
 	switch( arg ) {
 
 	//	int function
 	case 0x000:								// mousex
-		reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEX ];
+		*reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEX ];
 		break;
 	case 0x001:								// mousey
-		reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEY ];
+		*reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEY ];
 		break;
 	case 0x002:								// mousew
-		reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEW ];
+		*reffunc_intfunc_ivalue = bmscr->savepos[ BMSCR_SAVEPOS_MOSUEW ];
 		bmscr->savepos[ BMSCR_SAVEPOS_MOSUEW ] = 0;
 		break;
 	case 0x003:								// hwnd

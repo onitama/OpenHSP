@@ -246,11 +246,12 @@ static void Object_StrInput( HSPOBJINFO *info, int wparam )
 	cid = GetDlgCtrlID( info->hCld );
 	
 	if (size < 0x8000) {
-			bigbuf = minp;
-		val = GetDlgItemText( hwnd, cid, minp, 0x7fff );
-	} else {
-		bigbuf = (HSPAPICHAR*)sbAlloc( size+1 );
-		val = GetDlgItemText( hwnd, cid, bigbuf, size );
+		bigbuf = minp;
+		val = GetDlgItemText(hwnd, cid, minp, 0x8000);
+	}
+	else {
+		bigbuf = (TCHAR*)sbAlloc((size + 1) * sizeof(TCHAR));
+		val = GetDlgItemText(hwnd, cid, bigbuf, size + 1);
 	}
 
 	if ( val == 0 ) {
