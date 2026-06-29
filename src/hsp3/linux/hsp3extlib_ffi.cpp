@@ -595,20 +595,39 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 		case STRUCTPRM_SUBID_DLLINIT:
 		case STRUCTPRM_SUBID_OLDDLL:
 		case STRUCTPRM_SUBID_OLDDLLINIT:
+		{
 			// 外部 DLL 関数の呼び出し
 			//Alertf("%s:%d call_extfun(%p, *, %d)\n", __func__, __LINE__, st->proc, st->prmmax);
 			ffi_cif cif;
+			void *rvalue = &result;
+			bool olddll = (st->subid == STRUCTPRM_SUBID_OLDDLL || st->subid == STRUCTPRM_SUBID_OLDDLLINIT);
 			// TODO intと互換性のない返り値の受け取り
 #ifdef HSP64
-			rtype = &ffi_type_slong;
+			if (olddll) {
+				rtype = &ffi_type_sint32;
+			} else {
+				rtype = &ffi_type_sint64;
+			}
 #else
 			rtype = &ffi_type_sint;
 #endif
 			if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, st->prmmax, rtype, prm_args) != FFI_OK) {
 				throw HSPERR_INVALID_FUNCPARAM;
 			}
-			ffi_call(&cif, FFI_FN(st->proc), &result, prm_values);
+#ifdef HSP64
+			if (olddll) {
+				int olddll_result;
+				rvalue = &olddll_result;
+				ffi_call(&cif, FFI_FN(st->proc), rvalue, prm_values);
+				result = olddll_result;
+			} else {
+				ffi_call(&cif, FFI_FN(st->proc), rvalue, prm_values);
+			}
+#else
+			ffi_call(&cif, FFI_FN(st->proc), rvalue, prm_values);
+#endif
 			break;
+		}
 #ifndef HSP_COM_UNSUPPORTED
 		case STRUCTPRM_SUBID_COMOBJ:
 			// COM メソッドの呼び出し
@@ -651,7 +670,7 @@ static HSPPTRINT code_expand_next( ffi_type **prm_args, void **prm_values, const
 	case MPTYPE_INT64:
 		p.l = (int64_t)code_getdl(0);
 		prm_values[index] = &p.l;
-		prm_args[index] = &ffi_type_slong;
+		prm_args[index] = &ffi_type_sint64;
 		break;
 	case MPTYPE_PVARPTR:
 		aptr = code_getva( &pval );

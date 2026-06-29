@@ -742,7 +742,7 @@ int CToken::GetToken( void )
 		s3[a]=0;
 		if ( wp != NULL && ( *wp=='l' || *wp=='L' ) ) {
 			wp++;
-			val64 = (int64_t)strtoll( (char *)s3, nullptr, 16 );
+			val64 = strtoull_as_int64( (char *)s3, 16 );
 			if ( minmode ) val64 = -val64;
 			return TK_INT64;
 		}
@@ -763,7 +763,7 @@ int CToken::GetToken( void )
 		s3[a]=0;
 		if ( wp != NULL && ( *wp=='l' || *wp=='L' ) ) {
 			wp++;
-			val64 = (int64_t)strtoll( (char *)s3, nullptr, 2 );
+			val64 = strtoull_as_int64( (char *)s3, 2 );
 			if ( minmode ) val64 = -val64;
 			return TK_INT64;
 		}
@@ -1520,8 +1520,8 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 			}
 			s2[a++]=a1;vs++;
 		}
-		if (( a1=='k' )||( a1=='f' )||( a1=='d' )) { s2[a++]=a1; vs++; }
-		if ( a1 == 'e' ) {
+		if (( a1=='k' )||( a1=='f' )||( a1=='F' )||( a1=='d' )||( a1=='D' )||( a1=='l' )||( a1=='L' )) { s2[a++]=a1; vs++; }
+		if (( a1=='e' )||( a1=='E' )) {
 			s2[a++]=a1; vs++;
 			a1=*vs;
 			if (( a1=='-' )||( a1=='+' )) {
@@ -4712,6 +4712,14 @@ int CToken::atoi_allow_overflow(const char* s)
 	return result;
 }
 
+int64_t CToken::strtoull_as_int64(const char* s, int base)
+{
+	uint64_t value = (uint64_t)strtoull(s, nullptr, base);
+	int64_t result;
+	memcpy(&result, &value, sizeof(result));
+	return result;
+}
+
 
 void CToken::GenerateLabelListAndTagPP(char *name, int flag)
 {
@@ -4740,4 +4748,3 @@ int CToken::GetLabelListLineCaseFlag(void)
 	if (labbuf == NULL) return 0;
 	return cg_labout_caseflag;
 }
-

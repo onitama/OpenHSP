@@ -410,6 +410,7 @@ private:
 	//	UTF-8 service
 	char* to_hsp_string_literal(const char* src, bool filename=false);
 	int atoi_allow_overflow(const char* s);
+	int64_t strtoull_as_int64(const char* s, int base);
 	int ConvSJis2Utf8(char* pSource, char* pDist, int buffersize);
 	int ConvUtf82SJis(char* pSource, char* pDist, int buffersize);
 	int IsUTF8Text(char* pSource);
