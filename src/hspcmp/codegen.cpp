@@ -2117,7 +2117,7 @@ void CToken::GenerateCodePP_struct( void )
 
 void CToken::GenerateCodePP_defvars( int fixedvalue )
 {
-	//		HSP3Codeを展開する(var,varint,vardouble,varstr)
+	//		HSP3Codeを展開する(var,varint,vardouble,varstr...)
 	//
 	int id;
 	int prms;
@@ -2232,6 +2232,7 @@ void CToken::GenerateCodePP( char *buf )
 	if ( !strcmp(cg_str, "varlabel") ) { GenerateCodePP_defvars(LAB_TYPEFIX_LABEL); return; }
 	if ( !strcmp( cg_str, "varstr") ) { GenerateCodePP_defvars(LAB_TYPEFIX_STR); return; }
 	if ( !strcmp( cg_str,"vardouble" ) ) { GenerateCodePP_defvars( LAB_TYPEFIX_DOUBLE ); return; }
+	if ( !strcmp(cg_str, "varint64" ) ) { GenerateCodePP_defvars(LAB_TYPEFIX_INT64); return; }
 	if ( !strcmp( cg_str, "varmod") ) { GenerateCodePP_defvars(LAB_TYPEFIX_STRUCT); return; }
 }
 

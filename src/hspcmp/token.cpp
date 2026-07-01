@@ -3802,6 +3802,10 @@ ppresult_t CToken::Preprocess( char *str )
 			res = PP_VarFix(word);
 			return res;
 		}
+		if (tstrcmp(word, "varint64")) {	// VAR definition
+			res = PP_VarFix(word);
+			return res;
+		}
 		if (tstrcmp(word, "notice")) {		// Notice
 			res = PP_Notice();
 			return res;

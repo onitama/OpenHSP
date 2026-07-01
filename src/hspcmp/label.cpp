@@ -668,7 +668,7 @@ int CLabel::DumpHSPLabelById(int id, char* str, int option)
 	}
 
 	*p = 0;
-	return (p-str);
+	return (int)(p-str);
 }
 
 

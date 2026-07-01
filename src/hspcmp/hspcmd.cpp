@@ -368,6 +368,7 @@ char 	*hsp_prepp[] =
 	"$000 0 #ahtmes",
 	"$000 0 #packdir",
 	"$000 0 #epackdir",
+	"$000 0 #varint64",					// (3.8)
 
 	"*"
 };

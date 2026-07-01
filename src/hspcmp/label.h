@@ -47,6 +47,7 @@
 #define LAB_TYPEFIX_DOUBLE 3
 #define LAB_TYPEFIX_INT 4
 #define LAB_TYPEFIX_STRUCT 5
+#define LAB_TYPEFIX_INT64 8
 
 
 typedef std::set<std::string> FileNameSet;

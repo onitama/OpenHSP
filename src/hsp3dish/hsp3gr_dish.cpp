@@ -4341,7 +4341,7 @@ static HSPREAL reffunc_intfunc_dvalue;
 
 #define OBJINFO_RESULT_INT(x) *reffunc_intfunc_ivalue = (int)(x); break;
 #ifdef HSP64
-#define OBJINFO_RESULT_PTR(x) reffunc_intfunc_lvalue = (int64_t)&(x); *type_res = HSPVAR_FLAG_INT64; break;
+#define OBJINFO_RESULT_PTR(x) reffunc_intfunc_lvalue = (int64_t)(x); *type_res = HSPVAR_FLAG_INT64; break;
 #else
 #define OBJINFO_RESULT_PTR(x) *reffunc_intfunc_ivalue = (int)(x); break;
 #endif
