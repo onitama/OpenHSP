@@ -19,6 +19,17 @@
 #include <direct.h>
 #endif
 
+static int append_path_text(char* destination, size_t destination_size, const char* text)
+{
+	if (destination == NULL || text == NULL || destination_size == 0) return -1;
+	size_t destination_length = strlen(destination);
+	size_t text_length = strlen(text);
+	if (destination_length >= destination_size ||
+		text_length > destination_size - destination_length - 1) return -1;
+	memcpy(destination + destination_length, text, text_length + 1);
+	return 0;
+}
+
 void dirinfo(char* p, int id)
 {
 	//		dirinfo命令の内容をstmpに設定する
@@ -850,8 +861,13 @@ int CAht::BuildParts( char *list, char *path )
 	mem_parts = (AHTPARTS *)mem_ini( sizeof(AHTPARTS) * maxparts );
 	for(i=0;i<maxparts;i++) {
 		note.GetLine( fname, i, 255 );
-		strcpy( fullpath, path );
-		strcat( fullpath, fname );
+		fullpath[0] = 0;
+		if (append_path_text(fullpath, sizeof(fullpath), path) != 0 ||
+			append_path_text(fullpath, sizeof(fullpath), fname) != 0) {
+			DisposeParts();
+			maxparts = 0;
+			return -1;
+		}
 		//Alertf( "#%d [%s]",i, fullpath );
 		BuildPartsSub( i, fullpath );
 	}
@@ -971,4 +987,3 @@ int CAht::tstrcmp(const char* str1, const char* str2)
 	}
 	return -1;
 }
-

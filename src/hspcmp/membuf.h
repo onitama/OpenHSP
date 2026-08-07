@@ -5,6 +5,8 @@
 #ifndef __membuf_h
 #define __membuf_h
 
+#include <string>
+
 //  growmem class
 
 /*
@@ -74,7 +76,7 @@ private:
 
 	char	*sub_buf;			// Sub Buffer
 
-	char	name[256];			// File Name
+	std::string name;			// File Name
 };
 
 

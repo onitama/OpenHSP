@@ -3334,7 +3334,11 @@ ppresult_t CToken::PP_PackOpt( void )
 		if (( i != TK_OBJ )&&( i != TK_NUM )&&( i != TK_STRING )) {
 			SetError("illegal option parameter"); return PPRESULT_ERROR;
 		}
-		sprintf( tmp, ";!%s=%s", optname, (char *)s3 );
+		int option_length = snprintf( tmp, sizeof(tmp), ";!%s=%s", optname, (char *)s3 );
+		if ( option_length < 0 || (size_t)option_length >= sizeof(tmp) ) {
+			SetError("pack option is too long");
+			return PPRESULT_ERROR;
+		}
 		AddPackfile( tmp, 2 );
 	}
 	return PPRESULT_SUCCESS;

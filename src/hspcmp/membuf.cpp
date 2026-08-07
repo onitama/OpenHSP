@@ -29,7 +29,7 @@ void CMemBuf::InitMemBuf( int sz )
 	limit_size = size;
 	mem_buf = (char *)malloc( limit_size );
 	mem_buf[0] = 0;
-	name[0] = 0;
+	name.clear();
 	cur = 0;
 	//	Indexバッファ初期化
 	idxflag = 0;
@@ -318,7 +318,7 @@ int CMemBuf::PutFile( char *fname )
 	fclose(ff);
 	p[length]=0;
 	
-	strcpy( name,fname );
+	name = fname;
 	return length;
 }
 
@@ -455,7 +455,7 @@ int CMemBuf::SaveFile( char *fname )
 	if (fp==NULL) return -1;
 	flen = fwrite( mem_buf, 1, cur, fp );
 	fclose(fp);
-	strcpy( name,fname );
+	name = fname;
 	return flen;
 }
 
@@ -464,7 +464,6 @@ char *CMemBuf::GetFileName( void )
 {
 	//		ファイル名を取得
 	//
-	return name;
+	return const_cast<char*>(name.c_str());
 }
-
 

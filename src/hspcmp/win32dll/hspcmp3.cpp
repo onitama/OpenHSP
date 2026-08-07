@@ -625,10 +625,16 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 
 	i = hsc3->OpenPackfile();
 	if (i) { Alert( "packfileが見つかりません" ); return -1; }
-	hsc3->GetPackfileOption( hspexe, "runtime", "hsprt" );
+	if (hsc3->GetPackfileOption( hspexe, sizeof(hspexe), "runtime", "hsprt" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	strcat( libpath, hspexe );
 	strcpy( hspexe, libpath );
-	hsc3->GetPackfileOption( fname, "name", "hsptmp" );
+	if (hsc3->GetPackfileOption( fname, sizeof(fname), "name", "hsptmp" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	cutext( fname );
 	type = hsc3->GetPackfileOptionInt( "type", 0 );
 	opt1 = hsc3->GetPackfileOptionInt( "xsize", 640 );
@@ -640,15 +646,30 @@ EXPORT BOOL WINAPI hsc3_make ( BMSCR *bm, char *p1, HSPPTRINT p2, HSPPTRINT p3 )
 	if ( opt3b ) opt3 |= 2;
 
 #ifdef ICONINS_SUPPORT
-	hsc3->GetPackfileOption( ici_icon, "icon", "" );
+	if (hsc3->GetPackfileOption( ici_icon, sizeof(ici_icon), "icon", "" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	if ( ici_icon[0] != 0 ) { ici_use_icon = 1; }
-	hsc3->GetPackfileOption( ici_version, "version", "" );
+	if (hsc3->GetPackfileOption( ici_version, sizeof(ici_version), "version", "" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	if ( ici_version[0] != 0 ) { ici_use_version = 1; }
-	hsc3->GetPackfileOption( ici_manifest, "manifest", "" );
+	if (hsc3->GetPackfileOption( ici_manifest, sizeof(ici_manifest), "manifest", "" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	if ( ici_manifest[0] != 0 ) { ici_use_manifest = 1; }
-	hsc3->GetPackfileOption( ici_lang, "lang", "" );
+	if (hsc3->GetPackfileOption( ici_lang, sizeof(ici_lang), "lang", "" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	if ( ici_lang[0] != 0 ) { ici_use_lang = 1; }
-	hsc3->GetPackfileOption( ici_upx, "upx", "" );
+	if (hsc3->GetPackfileOption( ici_upx, sizeof(ici_upx), "upx", "" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	if ( ici_upx[0] != 0 ) { ici_use_upx = 1; }
 
 	strcpy( ici_target, ici_current );

@@ -60,7 +60,7 @@ public:
 	int GetCmdList(int option, char *match=NULL);
 	int OpenPackfile( void );
 	void ClosePackfile( void );
-	void GetPackfileOption( char *out, char *keyword, char *defval );
+	int GetPackfileOption( char *out, int out_size, char *keyword, char *defval );
 	int GetPackfileOptionInt( char *keyword, int defval );
 	int GetRuntimeFromHeader( char *fname, char *res );
 	int SaveOutbuf( char *fname );

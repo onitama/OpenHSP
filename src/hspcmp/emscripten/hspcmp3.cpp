@@ -417,10 +417,16 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 
 	i = hsc3->OpenPackfile();
 	if (i) { Alert( "packfileが見つかりません" ); return -1; }
-	hsc3->GetPackfileOption( hspexe, "runtime", "hsprt" );
+	if (hsc3->GetPackfileOption( hspexe, sizeof(hspexe), "runtime", "hsprt" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	strcat( libpath, hspexe );
 	strcpy( hspexe, libpath );
-	hsc3->GetPackfileOption( fname, "name", "hsptmp" );
+	if (hsc3->GetPackfileOption( fname, sizeof(fname), "name", "hsptmp" ) != 0) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	cutext( fname );
 	type = hsc3->GetPackfileOptionInt( "type", 0 );
 	opt1 = hsc3->GetPackfileOptionInt( "xsize", 640 );
