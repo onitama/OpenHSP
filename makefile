@@ -67,23 +67,23 @@ OBJS = \
 	src/hsp3/linux/supio_linux.do
 
 OBJS_CMP = \
-	src/hspcmp/ahtmodel.o \
-	src/hspcmp/ahtobj.o \
-	src/hspcmp/codegen.o \
-	src/hspcmp/comutil.o \
-	src/hspcmp/errormsg.o \
-	src/hspcmp/hsc3.o \
-	src/hspcmp/hspcmd.o \
-	src/hspcmp/label.o \
-	src/hspcmp/localinfo.o \
-	src/hspcmp/main.o \
-	src/hspcmp/membuf.o \
-	src/hsp3/strnote.o \
-	src/hspcmp/tagstack.o \
-	src/hspcmp/hsmanager.o \
-	src/hspcmp/token.o \
-	src/hsp3/strbuf.o \
-	src/hsp3/linux/supio_linux.o
+	src/hspcmp/ahtmodel.cmp.o \
+	src/hspcmp/ahtobj.cmp.o \
+	src/hspcmp/codegen.cmp.o \
+	src/hspcmp/comutil.cmp.o \
+	src/hspcmp/errormsg.cmp.o \
+	src/hspcmp/hsc3.cmp.o \
+	src/hspcmp/hspcmd.cmp.o \
+	src/hspcmp/label.cmp.o \
+	src/hspcmp/localinfo.cmp.o \
+	src/hspcmp/main.cmp.o \
+	src/hspcmp/membuf.cmp.o \
+	src/hsp3/strnote.cmp.o \
+	src/hspcmp/tagstack.cmp.o \
+	src/hspcmp/hsmanager.cmp.o \
+	src/hspcmp/token.cmp.o \
+	src/hsp3/strbuf.cmp.o \
+	src/hsp3/linux/supio_linux.cmp.o
 
 OBJS_CL = \
 	src/hsp3/linux/main.o \
@@ -482,6 +482,10 @@ hsp3gp: $(OBJS_GP) $(LIBS_GP)
 
 hspcmp: $(OBJS_CMP)
 	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) $(STRIPFLAGS) -o $@
+%.cmp.o: %.c
+	$(CC) $(CFLAGS_CMP) -c $< -o $@
+%.cmp.o: %.cpp
+	$(CXX) $(CFLAGS_CMP) -c $< -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CMP) -c $< -o $*.o
 %.o: %.cpp
@@ -515,4 +519,3 @@ libLinearMath.a: $(OBJS_LINEAR_MATH)
 
 clean:
 	rm -f $(OBJS) $(OBJS_GP) $(OBJS_CMP) $(OBJS_CL) $(OBJS_GAMEPLAY) $(TARGETS) $(LIBS_GP)
-
