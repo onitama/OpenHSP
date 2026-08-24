@@ -20,8 +20,8 @@
 
 //	Wide/Multibyte conversion
 //
-int hsp3_to_utf16(void* out, char* in, int bufsize);
-int utf16_to_hsp3(char* out, void* in, int bufsize);
+int hsp3_to_utf16(void* out, const char* in, int bufsize);
+int utf16_to_hsp3(char* out, const void* in, int bufsize);
 
 
 #ifdef HSPUTF8
@@ -106,20 +106,20 @@ public:
 
 //		String Service
 //
-int hsp3_to_utf8(void* out, char* in, int bufsize);
-int utf8_to_hsp3(void* out, char* in, int bufsize);
-int StrCopyLetter(char* source, char* dest);
+int hsp3_to_utf8(void* out, const char* in, int bufsize);
+int utf8_to_hsp3(void* out, const char* in, int bufsize);
+int StrCopyLetter(const char* source, char* dest);
 
 //
 //		File Service
 //
-FILE* hsp3_fopen(char* name, HSPPTRINT offset=0);
-FILE* hsp3_fopenwrite(char* name, HSPPTRINT offset=-1);
+FILE* hsp3_fopen(const char* name, HSPPTRINT offset=0);
+FILE* hsp3_fopenwrite(const char* name, HSPPTRINT offset=-1);
 void hsp3_fclose(FILE* ptr);
-HSPPTRINT hsp3_flength(char* name);
+HSPPTRINT hsp3_flength(const char* name);
 HSPPTRINT hsp3_fread(FILE* ptr, void* mem, size_t size);
 int hsp3_fseek(FILE* ptr, size_t offset, int whence);
-HSPPTRINT hsp3_binsave(char* fname8, void* mem, size_t msize, HSPPTRINT seekofs=-1);
-HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, HSPPTRINT seekofs);
+HSPPTRINT hsp3_binsave(const char* fname8, void* mem, size_t msize, HSPPTRINT seekofs=-1);
+HSPPTRINT hsp3_rawload(const char* name, void* mem, size_t size, HSPPTRINT seekofs);
 
 #endif

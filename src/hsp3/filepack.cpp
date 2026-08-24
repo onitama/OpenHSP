@@ -52,12 +52,12 @@ void FilePack::StrCase(char* str)
 	}
 }
 
-void FilePack::StrSplit(char *target, char *fpath, char *filename)
+void FilePack::StrSplit(const char *target, char *fpath, char *filename)
 {
 	//		targetをパスとファイル名に分離(utf8/sjis対応版)
 	//
-	unsigned char *p;
-	unsigned char *div;
+	const unsigned char *p;
+	const unsigned char *div;
 	unsigned char a1;
 	unsigned char *dst;
 	int i;
@@ -65,7 +65,7 @@ void FilePack::StrSplit(char *target, char *fpath, char *filename)
 
 	fpath[0] = 0;
 	filename[0] = 0;
-	p = (unsigned char*)target;
+	p = (const unsigned char*)target;
 	div = p;
 	while (1) {
 		a1 = *p; if (a1 == 0) break;
@@ -79,7 +79,7 @@ void FilePack::StrSplit(char *target, char *fpath, char *filename)
 	}
 
 	i = 0;
-	p = (unsigned char*)target;
+	p = (const unsigned char*)target;
 	if (div != p) {
 		dst = (unsigned char*)fpath;
 		while (1) {
@@ -395,7 +395,7 @@ void FilePack::PrepareRead(int slot, int value)
 }
 
 
-int FilePack::LoadPackFile( char *fname, int encode, HFPSIZE dpmoffset, int slot)
+int FilePack::LoadPackFile( const char *fname, int encode, HFPSIZE dpmoffset, int slot)
 {
 	FILE *ff;
 	HFPHED testhed;
@@ -519,7 +519,7 @@ HSP3Crypt *FilePack::GetCurrentCryptManager(void)
 }
 
 
-int FilePack::GetFileNum( HFPHED *hed )
+int FilePack::GetFileNum( const HFPHED *hed )
 {
 	return hed->max_file;
 }
@@ -566,7 +566,7 @@ char* FilePack::GetFolderName(HFPOBJ* obj)
 }
 
 
-HFPSIZE FilePack::GetFileSize(char* name)
+HFPSIZE FilePack::GetFileSize(const char* name)
 {
 	HFPOBJ* obj;
 	obj = SearchFileObject(name);
@@ -577,7 +577,7 @@ HFPSIZE FilePack::GetFileSize(char* name)
 }
 
 
-HFPOBJ *FilePack::SearchFileObject( HFPHED *hed, char *name )
+HFPOBJ *FilePack::SearchFileObject( HFPHED *hed, const char *name )
 {
 	//	ファイル情報を検索する
 	//
@@ -616,7 +616,7 @@ HFPOBJ *FilePack::SearchFileObject( HFPHED *hed, char *name )
 }
 
 
-HFPOBJ* FilePack::SearchFileObject(char* name)
+HFPOBJ* FilePack::SearchFileObject(const char* name)
 {
 	int i;
 	HFPOBJ* obj;

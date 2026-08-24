@@ -201,7 +201,7 @@ void freeac(char **ppc)
 //
 //		basic File I/O support
 //
-FILE *hsp3_fopen(char*name, HSPPTRINT offset)
+FILE *hsp3_fopen(const char*name, HSPPTRINT offset)
 {
 	FILE* hsp3_fp = NULL;
 #ifdef HSPWIN
@@ -254,7 +254,7 @@ FILE *hsp3_fopen(char*name, HSPPTRINT offset)
 
 #ifdef HSPNDK
 	{
-	char *fname = name;
+	const char *fname = name;
 	if ( *name == '*' ) {
 		fname = hgio_getstorage(name+1);
 	}
@@ -296,7 +296,7 @@ FILE *hsp3_fopen(char*name, HSPPTRINT offset)
 }
 
 
-FILE* hsp3_fopenwrite(char* fname8, HSPPTRINT offset)
+FILE* hsp3_fopenwrite(const char* fname8, HSPPTRINT offset)
 {
 	FILE* hsp3_fp = NULL;
 
@@ -329,7 +329,7 @@ FILE* hsp3_fopenwrite(char* fname8, HSPPTRINT offset)
 
 #else
 
-	char *fname;
+	const char *fname;
 	fname = fname8;
 #ifdef HSPNDK
 	if ( *fname != '/' ) {
@@ -362,7 +362,7 @@ void hsp3_fclose(FILE* ptr)
 }
 
 
-HSPPTRINT hsp3_flength(char* name)
+HSPPTRINT hsp3_flength(const char* name)
 {
 #ifdef HSPIOS
     {
@@ -376,7 +376,7 @@ HSPPTRINT hsp3_flength(char* name)
 	{
 	int length = hgio_file_exist( name );
 	if ( length>=0 ) return length;
-	char *fname = name;
+	const char *fname = name;
 	if ( *fname != '/' ) {
 		fname = hgio_getstorage(name);
 	}
@@ -439,7 +439,7 @@ int hsp3_fseek(FILE* ptr, size_t offset, int whence)
 }
 
 
-HSPPTRINT hsp3_binsave( char *fname8, void *mem, size_t msize, HSPPTRINT seekofs )
+HSPPTRINT hsp3_binsave( const char *fname8, void *mem, size_t msize, HSPPTRINT seekofs )
 {
 #ifdef HSPIOS
     gb_savedata( fname8, (char *)mem, msize, seekofs );
@@ -464,7 +464,7 @@ HSPPTRINT hsp3_binsave( char *fname8, void *mem, size_t msize, HSPPTRINT seekofs
 }
 
 
-HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, HSPPTRINT seekofs)
+HSPPTRINT hsp3_rawload(const char* name, void* mem, size_t size, HSPPTRINT seekofs)
 {
 #ifdef HSPIOS
     int filesize = gb_existdata( name );
@@ -475,7 +475,7 @@ HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, HSPPTRINT seekofs)
     }
 #endif
 #ifdef HSPNDK
-	char *fname = name;
+	const char *fname = name;
 	if ( *fname != '/' ) {
 		fname = hgio_getstorage(name);
 	}
@@ -496,7 +496,7 @@ HSPPTRINT hsp3_rawload(char* name, void* mem, size_t size, HSPPTRINT seekofs)
 //		UTF Conversion Service (Windows Only)
 //
 #ifdef HSPWIN
-int hsp3_to_utf16(void* out, char* in, int bufsize)
+int hsp3_to_utf16(void* out, const char* in, int bufsize)
 {
 	//	hspchar->UTF16 に変換
 	//
@@ -508,7 +508,7 @@ int hsp3_to_utf16(void* out, char* in, int bufsize)
 }
 
 
-int utf16_to_hsp3(char* out, void* in, int bufsize)
+int utf16_to_hsp3(char* out, const void* in, int bufsize)
 {
 	//	UTF16->hspchar に変換
 	//
@@ -523,7 +523,7 @@ int utf16_to_hsp3(char* out, void* in, int bufsize)
 #endif
 
 
-int hsp3_to_utf8(void* out, char* in, int bufsize)
+int hsp3_to_utf8(void* out, const char* in, int bufsize)
 {
 	//	hspchar->UTF8 に変換
 	//
@@ -544,7 +544,7 @@ int hsp3_to_utf8(void* out, char* in, int bufsize)
 }
 
 
-int utf8_to_hsp3(void* out, char* in, int bufsize)
+int utf8_to_hsp3(void* out, const char* in, int bufsize)
 {
 	//	UTF8->hspchar に変換
 	//
@@ -565,7 +565,7 @@ int utf8_to_hsp3(void* out, char* in, int bufsize)
 }
 
 
-int StrCopyLetter(char* source, char* dest)
+int StrCopyLetter(const char* source, char* dest)
 {
 	//		1文字をコピー(utf8/sjis対応版)
 	//		(移動したbyte数を返します)
@@ -601,7 +601,6 @@ int StrCopyLetter(char* source, char* dest)
 	}
 	return i;
 }
-
 
 
 

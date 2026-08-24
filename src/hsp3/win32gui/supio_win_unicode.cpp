@@ -111,12 +111,12 @@ void strcaseW( HSPAPICHAR *target )
 }
 
 
-int strcpy2( char *str1, char *str2 )
+int strcpy2( char *str1, const char *str2 )
 {
 	//	string copy (ret:length)
 	//
 	char *p;
-	char *src;
+	const char *src;
 	char a1;
 	src = str2;
 	p = str1;
@@ -129,7 +129,7 @@ int strcpy2( char *str1, char *str2 )
 }
 
 
-int strcat2( char *str1, char *str2 )
+int strcat2( char *str1, const char *str2 )
 {
 	//	string cat (ret:length)
 	//
@@ -146,12 +146,12 @@ int strcat2( char *str1, char *str2 )
 }
 
 
-char *strstr2( char *target, char *src )
+char *strstr2( char *target, const char *src )
 {
 	//		strstr関数のutf8対応版
 	//
 	unsigned char *p;
-	unsigned char *s;
+	const unsigned char *s;
 	unsigned char *p2;
 	unsigned char a1;
 	unsigned char a2;
@@ -297,7 +297,7 @@ void getpathW( HSPAPICHAR *p_stmp, HSPAPICHAR *outbuf, int p2 )
 	}
 }
 
-int makedir( char *name8 )
+int makedir( const char *name8 )
 {
 #ifdef HSPWIN
 	HSPAPICHAR *namew = 0;
@@ -312,7 +312,7 @@ int makedir( char *name8 )
 }
 
 
-int changedir( char *name8 )
+int changedir( const char *name8 )
 {
 #ifdef HSPWIN
 	HSPAPICHAR *namew = 0;
@@ -325,7 +325,7 @@ int changedir( char *name8 )
 #endif
 }
 
-int changedirW( HSPAPICHAR *name )
+int changedirW( const HSPAPICHAR *name )
 {
 #ifdef HSPWIN
 	int res;
@@ -337,7 +337,7 @@ int changedirW( HSPAPICHAR *name )
 }
 
 
-int delfile( char *name8 )
+int delfile( const char *name8 )
 {
 #ifdef HSPWIN
 	HSPAPICHAR *namew = 0;
@@ -352,7 +352,7 @@ int delfile( char *name8 )
 }
 
 
-int dirlist( char *fname8, char **target, int p3 )
+int dirlist( const char *fname8, char **target, int p3 )
 {
 #ifdef HSPWIN
 	TCHAR *pw;
@@ -446,7 +446,7 @@ int strsp_getptr( void )
 	return splc;
 }
 
-int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
+int strsp_get( const char *srcstr, char *dststr, char splitchr, int len )
 {
 	//		split string with parameters
 	//
@@ -501,7 +501,7 @@ int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
 	return (int)a1;
 }
 
-int strsp_getW( HSPAPICHAR *srcstr, HSPAPICHAR *dststr, HSPAPICHAR splitchr, int len )
+int strsp_getW( const HSPAPICHAR *srcstr, HSPAPICHAR *dststr, HSPAPICHAR splitchr, int len )
 {
 	//		split string with parameters
 	//
@@ -629,7 +629,7 @@ static int htoi_sub( char hstr )
 }
 
 
-int htoi( char *str )
+int htoi( const char *str )
 {
 	char a1;
 	int d;

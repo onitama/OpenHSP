@@ -119,14 +119,14 @@ public:
 
 	//		Reference
 	void SetId( int val ) { id = val; }
-	void SetSource( char *filename );
-	void SetSourcePath( char *filename );
+	void SetSource( const char *filename );
+	void SetSourcePath( const char *filename );
 
-	void SetName( char *name );
-	void SetClass( char *name );
-	void SetAuthor( char *name );
-	void SetVersion( char *name );
-	void SetIconFile( char *name );
+	void SetName( const char *name );
+	void SetClass( const char *name );
+	void SetAuthor( const char *name );
+	void SetVersion( const char *name );
+	void SetIconFile( const char *name );
 	void SetIconId( int id );
 	void SetStdBuffer( CMemBuf *buf );
 	void TerminateExp( void ) { exp->Put(0); };

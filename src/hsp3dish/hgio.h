@@ -70,7 +70,7 @@ void hgio_setinfo( int type, HSPREAL val );
 HSPREAL hgio_getinfo( int type );
 char *hgio_sysinfo( int p2, int *res, char *outbuf );
 void hgio_setstorage( char *path );
-char *hgio_getstorage( char *fname );
+const char *hgio_getstorage( const char *fname );
 char *hgio_getdir( int id );
 void hgio_setmainarg( char *hsp_mainpath, char *cmdprm );
 
@@ -129,4 +129,3 @@ CLSMODE_MAX,
 
 
 #endif
-

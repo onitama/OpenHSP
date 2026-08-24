@@ -2395,7 +2395,7 @@ int hgio_file_read( char *fname, void *ptr, int size, int offset )
 
 
 #ifdef HSPNDK
-FILE *hgio_android_fopen( char *fname, int offset )
+FILE *hgio_android_fopen( const char *fname, int offset )
 {
 	AAssetManager* mgr = appengine->app->activity->assetManager;
 	if (mgr == NULL) return NULL;
@@ -2444,7 +2444,7 @@ void hgio_setstorage( char *path )
 }
 
 
-char *hgio_getstorage( char *fname )
+const char *hgio_getstorage( const char *fname )
 {
 #ifdef HSPNDK
 	strcpy( my_storage_path, storage_path );
@@ -2551,5 +2551,4 @@ void hgio_cnvview(BMSCR* bm, int* xaxis, int* yaxis)
 	*xaxis = (int)v2.x;
 	*yaxis = (int)-v2.y;
 }
-
 

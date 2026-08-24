@@ -45,14 +45,14 @@ public:
 	void Put( unsigned char data );
 	void Put( float data );
 	void Put( double data );
-	void PutStr( char *data );
+	void PutStr( const char *data );
 	void PutStrDQ( char *data );
 	void PutStrBlock( char *data );
 	void PutCR( void );
 	void PutData( void *data, int sz );
 	void PutStrf( char *format, ... );
-	int PutFile( char *fname );
-	int SaveFile( char *fname );
+	int PutFile( const char *fname );
+	int SaveFile( const char *fname );
 	char *GetFileName( void );
 	int GetSize( void ) { return cur; }
 	void ReduceSize( int new_cur );

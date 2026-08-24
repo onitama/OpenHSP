@@ -7,16 +7,16 @@ char *mem_ini( int size );
 void mem_bye( void *ptr );
 char *mem_alloc( void *base, int newsize, int oldsize );
 
-int dpm_exist( char *fname );
-int dpm_read( char *fname, void *readmem, int rlen, int seekofs );
-char *dpm_readalloc( char *fname );
-int dpm_save( char *fname, void *mem, int msize, int seekofs );
+int dpm_exist( const char *fname );
+int dpm_read( const char *fname, void *readmem, int rlen, int seekofs );
+char *dpm_readalloc( const char *fname );
+int dpm_save( const char *fname, void *mem, int msize, int seekofs );
 
 void strsp_ini( void );
 int strsp_getptr( void );
-int strsp_get( char *srcstr, char *dststr, char splitchr, int len );
+int strsp_get( const char *srcstr, char *dststr, char splitchr, int len );
 
-char *strstr2( char *target, char *src );
+char *strstr2( char *target, const char *src );
 char *strchr2( char *target, char code );
 
 int tstrcmp( const char *str1, const char *str2 );
@@ -43,4 +43,3 @@ void TrimCodeL( char *p, int code );
 void TrimCodeR( char *p, int code );
 
 char *gethsperror( int error );
-

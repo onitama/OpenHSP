@@ -89,7 +89,7 @@ void freeac(char **ppc)
 //
 //		Internal function support (without Windows API)
 //
-static void _splitpath( char *path, char *p_drive, char *dir, char *fname, char *ext )
+static void _splitpath( const char *path, char *p_drive, char *dir, char *fname, char *ext )
 {
 	//		Linux用ファイルパス切り出し
 	//
@@ -116,7 +116,7 @@ static void _splitpath( char *path, char *p_drive, char *dir, char *fname, char 
 	}
 }
 
-static int wildcard( char *text, char *wc )
+static int wildcard( const char *text, const char *wc )
 {
 	//		textに対してワイルドカード処理を適応
 	//		return value: yes 1, no 0
@@ -160,7 +160,7 @@ void mem_bye( void *ptr ) {
 }
 
 
-int mem_save( char *fname, void *mem, int msize, int seekofs )
+int mem_save( const char *fname, void *mem, int msize, int seekofs )
 {
 	FILE *fp;
 	int flen;
@@ -224,12 +224,12 @@ void strcase( char *target )
 	}
 }
 
-int strcpy2( char *str1, char *str2 )
+int strcpy2( char *str1, const char *str2 )
 {
 	//	string copy (ret:length)
 	//
 	char *p;
-	char *src;
+	const char *src;
 	char a1;
 	src = str2;
 	p = str1;
@@ -242,7 +242,7 @@ int strcpy2( char *str1, char *str2 )
 }
 
 
-int strcat2( char *str1, char *str2 )
+int strcat2( char *str1, const char *str2 )
 {
 	//	string cat (ret:length)
 	//
@@ -259,12 +259,12 @@ int strcat2( char *str1, char *str2 )
 }
 
 
-char *strstr2( char *target, char *src )
+char *strstr2( char *target, const char *src )
 {
 	//		strstr関数のutf8対応版
 	//
 	unsigned char *p;
-	unsigned char *s;
+	const unsigned char *s;
 	unsigned char *p2;
 	unsigned char a1;
 	unsigned char a2;
@@ -354,26 +354,26 @@ void getpath( char *stmp, char *outbuf, int p2 )
 }
 
 
-int makedir( char *name )
+int makedir( const char *name )
 {
 	return mkdir( name, 0755 );
 }
 
 
-int changedir( char *name )
+int changedir( const char *name )
 {
 	return chdir( name );
 }
 
 
-int delfile( char *name )
+int delfile( const char *name )
 {
 	return unlink( name );
 	//return remove( name );		// ディレクトリにもファイルにも対応
 }
 
 
-int dirlist( char *fname, char **target, int p3 )
+int dirlist( const char *fname, char **target, int p3 )
 {
 	//		Linux System
 	//
@@ -494,7 +494,7 @@ int strsp_getptr( void )
 	return splc;
 }
 
-int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
+int strsp_get( const char *srcstr, char *dststr, char splitchr, int len )
 {
 	//		split string with parameters
 	//
@@ -603,7 +603,7 @@ static int htoi_sub( char hstr )
 }
 
 
-int htoi( char *str )
+int htoi( const char *str )
 {
 	char a1;
 	int d;
@@ -858,18 +858,18 @@ int ReplaceDone( void )
 //
 //		linux debug support
 //
-void Alert( char *mes )
+void Alert( const char *mes )
 {
 	printf( "%s", mes );
 	printf( "\r\n" );
 }
 
-void AlertV( char *mes, int val )
+void AlertV( const char *mes, int val )
 {
 	printf( "%s%d\r\n",mes,val );
 }
 
-void Alertf( char *format, ... )
+void Alertf( const char *format, ... )
 {
 	char textbf[4096];
 	va_list args;
@@ -898,4 +898,3 @@ char *mem_alloc( void *base, size_t newsize, size_t oldsize )
 	free( base );
 	return p;
 }
-

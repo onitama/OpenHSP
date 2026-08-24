@@ -1928,7 +1928,7 @@ int hgio_file_read( char *fname, void *ptr, int size, int offset )
 
 
 #ifdef HSPNDK
-FILE *hgio_android_fopen( char *fname, int offset )
+FILE *hgio_android_fopen( const char *fname, int offset )
 {
 	AAssetManager* mgr = appengine->app->activity->assetManager;
 	if (mgr == NULL) return NULL;
@@ -1986,7 +1986,7 @@ void hgio_setstorage( char *path )
 }
 
 
-char *hgio_getstorage( char *fname )
+const char *hgio_getstorage( const char *fname )
 {
 	strcpy( my_storage_path, storage_path );
 	strcat( my_storage_path, fname );
@@ -2110,7 +2110,7 @@ int hgio_getmousebtn( void )
 
 #if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
 
-char *hgio_getstorage( char *fname )
+const char *hgio_getstorage( const char *fname )
 {
 	return fname;
 }
@@ -2432,5 +2432,3 @@ void hgio_autoscale( int mode )
 
     //Alertf( "Scale(%f,%f)",_scaleX,_scaleY );
 }
-
-
