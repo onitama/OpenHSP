@@ -3,10 +3,10 @@ CXX = g++
 AR = ar
 
 CFLAGS_ENV = # 32bit
-CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
-CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11 $(CFLAGS_ENV)
-CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
-CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_DISH = -Wno-write-strings -std=c++17 --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++17 $(CFLAGS_ENV)
+CFLAGS_CL = -Wno-write-strings -std=c++17 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
+CFLAGS_CMP = -Wno-write-strings -std=c++17 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSPCMP -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV)
 PKG_CONFIG = pkg-config
 
 OBJS = \
@@ -14,6 +14,7 @@ OBJS = \
 	src/hsp3/filepack.do \
 	src/hsp3/hsp3crypt.do \
 	src/hsp3/hsp3utfcnv.do \
+	src/hsp3/hsp3pathio.do \
 	src/hsp3dish/geometry.do \
 	src/hsp3/hsp3.do \
 	src/hsp3/hsp3code.do \
@@ -71,6 +72,8 @@ OBJS_CMP = \
 	src/hspcmp/localinfo.cmp.o \
 	src/hspcmp/membuf.cmp.o \
 	src/hsp3/strnote.cmp.o \
+	src/hsp3/hsp3utfcnv.cmp.o \
+	src/hsp3/hsp3pathio.cmp.o \
 	src/hspcmp/hsmanager.cmp.o \
 	src/hspcmp/tagstack.cmp.o
 
@@ -93,6 +96,7 @@ OBJS_CL = \
 	src/hsp3/filepack.o \
 	src/hsp3/hsp3crypt.o \
 	src/hsp3/hsp3utfcnv.o \
+	src/hsp3/hsp3pathio.o \
 	src/hsp3/linux/supio_linux.o \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
@@ -112,14 +116,14 @@ all: $(TARGETS)
 
 .SUFFIXES: .cpp
 hsp3dish: $(OBJS)
-	$(CXX) $(CFLAGS_DISH) $(OBJS) $(LDFLAGS) -s -o $@
+	$(CXX) $(CFLAGS_DISH) $(OBJS) $(LDFLAGS) -lstdc++fs -s -o $@
 %.do: %.c
 	$(CC) $(CFLAGS_DISH) -c $< -o $*.do
 %.do: %.cpp
 	$(CXX) $(CFLAGS_DISH) -c $< -o $*.do
 
 hspcmp: $(OBJS_CMP)
-	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) -s -o $@
+	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) -lstdc++fs -s -o $@
 %.cmp.o: %.c
 	$(CC) $(CFLAGS_CMP) -c $< -o $@
 %.cmp.o: %.cpp
@@ -130,7 +134,7 @@ hspcmp: $(OBJS_CMP)
 	$(CXX) $(CFLAGS_CMP) -c $< -o $*.o
 
 hsp3cl: $(OBJS_CL)
-	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -lcurl -s -o $@
+	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -lstdc++fs -lcurl -s -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CL) -c $< -o $*.o
 %.o: %.cpp

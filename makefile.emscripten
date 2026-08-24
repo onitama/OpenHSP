@@ -18,7 +18,16 @@ CFLAGS = $(CFLAGS_CORE) $(CFLAGS_DEBUG) -DUSE_OBAQ\
 	   -O3 \
 	   -s LEGACY_GL_EMULATION=1
 
+CXXFLAGS = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
+	   -std=c++17 \
+	   -DUSE_OBAQ \
+	   -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -s USE_SDL_MIXER=2 \
+	   -s "SDL2_MIXER_FORMATS=['ogg', 'mp3']" \
+	   -O3 \
+	   -s LEGACY_GL_EMULATION=1
+
 CFLAGS_GP = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
+		  -std=c++17 \
 		  -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 \
 		  -s "SDL2_MIXER_FORMATS=['ogg', 'mp3']" \
 		  -D_LARGEFILE64_SOURCE -O3\
@@ -26,6 +35,7 @@ CFLAGS_GP = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
 		  -I src/hsp3dish/emscripten/extlib/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src -I src/hsp3dish/win32gp
 
 CFLAGS_EXTLIB = $(CFLAGS_CORE) $(CFLAGS_DEBUG) \
+		  -std=c++17 \
 		  -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
 		  -D_LARGEFILE64_SOURCE -O3\
 		  -I src/hsp3dish/emscripten/extlib/include -I src/hsp3dish/extlib/src -I src/hsp3dish/gameplay/src
@@ -43,6 +53,7 @@ OBJS = \
 	src/hsp3/filepack.js.o \
 	src/hsp3/hsp3crypt.js.o \
 	src/hsp3/hsp3utfcnv.js.o \
+	src/hsp3/hsp3pathio.js.o \
 	src/hsp3dish/geometry.js.o \
 	src/hsp3/hsp3.js.o \
 	src/hsp3/hsp3code.js.o \
@@ -87,6 +98,7 @@ OBJS_GP = \
 	src/hsp3/filepack.g.o \
 	src/hsp3/hsp3crypt.g.o \
 	src/hsp3/hsp3utfcnv.g.o \
+	src/hsp3/hsp3pathio.g.o \
 	src/hsp3dish/geometry.g.o \
 	src/hsp3/hsp3.g.o \
 	src/hsp3/hsp3code.g.o \
@@ -439,7 +451,7 @@ all: $(TARGETS)
 .SUFFIXES: .cpp
 
 hsp3dish.js: $(OBJS) $(JS_LILBS)
-	$(CXX) $(CFLAGS) $(LINK_FLAGS) $(OBJS) -o $@ $(LIBS) \
+	$(CXX) $(CXXFLAGS) $(LINK_FLAGS) $(OBJS) -o $@ $(LIBS) \
 	--post-js src/hsp3/emscripten/utils.js \
 	--extern-pre-js src/hsp3dish/emscripten/license.js
 
@@ -468,17 +480,16 @@ libLinearMath.js.a: $(OBJS_LINEAR_MATH)
 	echo $(CC) $(CFLAGS) -c $< -o $*.js.o
 	$(CC) $(CFLAGS) -c $< -o $*.js.o
 %.js.o: %.cpp
-	echo $(CC) $(CFLAGS) -c $< -o $*.js.o
-	$(CXX) $(CFLAGS) -c $< -o $*.js.o
+	echo $(CC) $(CXXFLAGS) -c $< -o $*.js.o
+	$(CXX) $(CXXFLAGS) -c $< -o $*.js.o
 
 
 %.g.o: %.c
 	echo $(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.g.o
 	$(CC) $(CFLAGS_GP) -std=c11 -c $< -o $*.g.o
 %.g.o: %.cpp
-	echo $(CC) $(CFLAGS_GP) -std=c++11 -c $< -o $*.g.o
-	$(CXX) $(CFLAGS_GP) -std=c++11 -c $< -o $*.g.o
+	echo $(CC) $(CFLAGS_GP) -std=c++17 -c $< -o $*.g.o
+	$(CXX) $(CFLAGS_GP) -std=c++17 -c $< -o $*.g.o
 
 clean:
 	rm -f $(OBJS) $(OBJS_GP) $(OBJS_GAMEPLAY) $(TARGETS)
-

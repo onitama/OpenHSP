@@ -1,12 +1,12 @@
 CC = em++
 # CFLAGS = -Wall --input-charset=cp932 --exec-charset=cp932 -DHSPLINUX -DHSPDEBUG
 #CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -O2 -s NO_EXIT_RUNTIME=1
-#CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -g4 --js-opts 0 -s NO_EXIT_RUNTIME=1 -std=gnu++11
+#CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -g4 --js-opts 0 -s NO_EXIT_RUNTIME=1 -std=gnu++17
 CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive \
-	   -std=gnu++11 \
+	   -std=gnu++17 \
 	   -s NO_EXIT_RUNTIME=1 \
 	   -s DISABLE_EXCEPTION_CATCHING=0 -O2
-#CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -g4 --js-opts 0 -s SAFE_HEAP=1 -s NO_EXIT_RUNTIME=1 -std=gnu++11
+#CFLAGS = -Wall -DHSPEMSCRIPTEN -fpermissive -g4 --js-opts 0 -s SAFE_HEAP=1 -s NO_EXIT_RUNTIME=1 -std=gnu++17
 
 OBJS = ahtmodel.cmp.o ahtobj.cmp.o codegen.cmp.o comutil.cmp.o errormsg.cmp.o hsc3.cmp.o \
     hspcmd.cmp.o label.cmp.o localinfo.cmp.o membuf.cmp.o ../hsp3/strnote.cmp.o \
@@ -15,6 +15,7 @@ OBJS = ahtmodel.cmp.o ahtobj.cmp.o codegen.cmp.o comutil.cmp.o errormsg.cmp.o hs
     ../hsp3/filepack_write.cmp.o \
     ../hsp3/hsp3crypt.cmp.o \
     ../hsp3/hsp3utfcnv.cmp.o \
+    ../hsp3/hsp3pathio.cmp.o \
     ../hsp3/strbuf.cmp.o \
 	../hsp3/emscripten/supio_emscripten.cmp.o emscripten/hspcmp3.cmp.o
 TARGET = hspcmp.js

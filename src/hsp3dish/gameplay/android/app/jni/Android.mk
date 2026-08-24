@@ -15,7 +15,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := gameplay
 LOCAL_CFLAGS := -D__ANDROID__ -Wno-narrowing -DHSPNDK -DHSPEMBED -DHSPDISH -DHSPDISHGP
-LOCAL_CPPFLAGS  += -fexceptions -std=c++11 -frtti -Wno-switch-enum -Wno-switch -Wno-narrowing
+LOCAL_CPPFLAGS  += -fexceptions -std=c++17 -frtti -Wno-switch-enum -Wno-switch -Wno-narrowing
 LOCAL_ARM_MODE := arm
 LOCAL_SHORT_COMMANDS := true
 
