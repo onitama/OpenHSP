@@ -319,7 +319,8 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 	hed_option = tk.GetHeaderOption();
 	if ( cmpopt & CMPMODE_UTF8OUT ) hed_option |= HEDINFO_UTF8;
 
-	strcpy( hed_runtime, tk.GetHeaderRuntimeName() );
+	strncpy(hed_runtime, tk.GetHeaderRuntimeName(), sizeof(hed_runtime) - 1);
+	hed_runtime[sizeof(hed_runtime) - 1] = 0;
 	lb_info = tk.GetLabelInfo();
 
 	return 0;
