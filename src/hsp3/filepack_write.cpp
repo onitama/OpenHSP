@@ -89,7 +89,10 @@ HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 				strcat(fixname, ftmp);
 				strcat(fixname, "/*");
 				HSPPTRINT res = RegisterFile(fixname, pcrypt);
-				if (res < 0) return res;
+				if (res < 0) {
+					sbFree(flist);
+					return res;
+				}
 			}
 			sbFree(flist);
 
@@ -104,7 +107,10 @@ HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 				strcpy(fixname, p_fdir);
 				strcat(fixname, ftmp);
 				HSPPTRINT res = RegisterFile(fixname, pcrypt);
-				if (res < 0) return res;
+				if (res < 0) {
+					sbFree(flist);
+					return res;
+				}
 			}
 			sbFree(flist);
 			return 0;
