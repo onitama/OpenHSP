@@ -80,10 +80,15 @@ Hsp3::~Hsp3()
 */
 /*------------------------------------------------------------*/
 
-void Hsp3::SetFileName( char *name )
+void Hsp3::SetFileName( const char *name )
 {
-	if ( *name == 0 ) { axname = NULL; return; }
-	axname = name;
+	axname_storage.clear();
+	if (name == NULL || *name == 0) {
+		axname = NULL;
+		return;
+	}
+	axname_storage.assign(name);
+	axname = (char *)axname_storage.c_str();
 }
 
 
@@ -435,5 +440,3 @@ STRUCTDAT *Hsp3::copy_STRUCTDAT(HSPHED *hsphed, char *ptr, size_t size)
 	hsphed->max_finfo = newsize;
 	return mem_dst;
 }
-
-
