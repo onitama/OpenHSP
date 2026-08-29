@@ -20,12 +20,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "../hsp3config.h"
 #include "hsp3gr_win.h"
 
 #include "../strbuf.h"
 #include "../hsp3.h"
+#include "../hsp3pathio.h"
 #include "../hsp3gr.h"
 #include "../hsp3ext.h"
 #include "../supio.h"
@@ -235,7 +237,7 @@ void hsp3cl_msgfunc( HSPCTX *hspctx )
 }
 
 
-int hsp3cl_init( char *startfile )
+int hsp3cl_init( const char *startfile )
 {
 	//		システム関連の初期化
 	//		( mode:0=debug/1=release )
@@ -244,14 +246,6 @@ int hsp3cl_init( char *startfile )
 	int hsp_sum, hsp_dec;
 	char a1;
 	char *ss;
-#ifdef HSPDEBUG
-	char fname[_MAX_PATH + 1];
-#endif
-#ifndef HSPDEBUG
-	TCHAR fnamew[_MAX_PATH + 1];
-	TCHAR fnamew2[_MAX_PATH + 1];
-#endif
-
 #ifdef HSPCL_WIN
 #ifndef HSP_COM_UNSUPPORTED
 	if ( FAILED( CoInitializeEx( NULL, COINIT_APARTMENTTHREADED) ) ) {
@@ -273,16 +267,8 @@ int hsp3cl_init( char *startfile )
 	h_dbgwin = NULL;
 	dbgwnd = NULL;
 
-	ss = strsp_cmds( startfile );
-	i = (int)( ss - startfile );
-	ss = startfile;
-	if ( ss[i-1] == 32 ) i--;
-	if ( *ss == 0x22 ) {
-		ss++;i-=2;
-	}
-	strncpy( fname, ss, i );
-	fname[i] = 0;
-	hsp->SetFileName( fname );
+	i = startfile == NULL ? 0 : (int)strlen(startfile);
+	hsp->SetFileName(startfile);
 
 	if ( i == 0 ) {
 #ifdef HSP64
@@ -294,7 +280,7 @@ int hsp3cl_init( char *startfile )
 	}
 #else
 	if ( startfile != NULL ) {
-		hsp->SetFileName( startfile );
+		hsp->SetFileName(startfile);
 	}
 #endif
 
@@ -318,9 +304,9 @@ int hsp3cl_init( char *startfile )
 	//
 #ifndef HSPDEBUG
 	if ((hsp_wd & 2) == 0) {
-		GetModuleFileName(NULL, fnamew, _MAX_PATH);
-		getpathW(fnamew, fnamew2, 32);
-		changedirW(fnamew2);
+		std::string module_directory;
+		if (hsp_path_get_module_directory(module_directory) != 0 ||
+			changedir(module_directory.data()) != 0) return -1;
 	}
 #endif
 
@@ -457,14 +443,14 @@ rerun:
 		return -1;
 	}
 	if ( runmode == RUNMODE_EXITRUN ) {
-		char fname[_MAX_PATH];
+		std::string fname(ctx->refstr);
 		char cmd[1024];
 		int res;
-		strncpy( fname, ctx->refstr, _MAX_PATH-1 );
 		strncpy( cmd, ctx->stmp, 1023 );
+		cmd[1023] = 0;
 
 		hsp3cl_bye();
-		res = hsp3cl_init( fname );
+		res = hsp3cl_init( fname.c_str() );
 		if ( res ) return res;
 
 		strncpy( ctx->cmdline, cmd, 1023 );

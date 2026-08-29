@@ -59,26 +59,6 @@ int main()
 
 //----------------------------------------------------------
 
-static int GetFilePath( char *bname )
-{
-	//		フルパス名から、ファイルパスの取得(\を残す)
-	//
-	int a,b,len;
-	char a1;
-	b=-1;
-	len=strlen(bname);
-	for(a=0;a<len;a++) {
-		a1=bname[a];
-		if (a1=='/') b=a;
-		if (a1<0) a++; 
-	}
-	if (b<0) return 1;
-	bname[b+1]=0;
-	return 0;
-}
-
-//----------------------------------------------------------
-
 EXPORT BOOL hsc_ini ( BMSCR *bm, char *p1, int p2, int p3 )
 {
 	//
@@ -404,7 +384,10 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	//
 	//		hsc3_make "myname"  (type6)
 	//
-	char libpath[HSP_MAX_PATH];
+	std::string libpath;
+	char runtime_name[HSP_MAX_PATH];
+	char dpmname[HSP_MAX_PATH + 5];
+	int dpmname_length;
 	int i,type;
 	int opt3a,opt3b;
 	int st;
@@ -412,17 +395,19 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	if ( hsc3==NULL ) Alert( "#No way." );
 	hsc3->ResetError();
 
-	strcpy( libpath, p1 );
-	GetFilePath( libpath );
+	if (p1 == NULL || !getpath(std::string(p1), libpath, 32)) return -1;
 
 	i = hsc3->OpenPackfile();
 	if (i) { Alert( "packfileが見つかりません" ); return -1; }
-	if (hsc3->GetPackfileOption( hspexe, sizeof(hspexe), "runtime", "hsprt" ) != 0) {
+	if (hsc3->GetPackfileOption( runtime_name, sizeof(runtime_name), "runtime", "hsprt" ) != 0) {
 		hsc3->ClosePackfile();
 		return -1;
 	}
-	strcat( libpath, hspexe );
-	strcpy( hspexe, libpath );
+	int runtime_path_length = snprintf(hspexe, sizeof(hspexe), "%s%s", libpath.c_str(), runtime_name);
+	if (runtime_path_length < 0 || (size_t)runtime_path_length >= sizeof(hspexe)) {
+		hsc3->ClosePackfile();
+		return -1;
+	}
 	if (hsc3->GetPackfileOption( fname, sizeof(fname), "name", "hsptmp" ) != 0) {
 		hsc3->ClosePackfile();
 		return -1;
@@ -446,8 +431,11 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 	st=dpmc_pack( 0 );
 	if ( st ) return -st;
 	st=dpmc_mkexe( type, hspexe, opt1, opt2, opt3 );
-	strcat( fname, ".dpm" );
-	delfile( fname );
+	dpmname_length = snprintf(dpmname, sizeof(dpmname), "%s.dpm", fname);
+	if (dpmname_length < 0 || (size_t)dpmname_length >= sizeof(dpmname)) {
+		return -1;
+	}
+	delfile( dpmname );
 #endif
 #ifdef DPM2_SUPPORT
 	int myseed1,myseed2;
@@ -456,7 +444,7 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 #else
 	myseed1 = (int)time(0);			// Windows以外のランダムシード値
 #endif
-	myseed2 = hsp3_flength(PACKFILE);
+	myseed2 = (HSPPTRINT)hsp_path_filesize(hsp_path::path_view(PACKFILE));
 
 	filepack.Reset();
 	filepack.SetErrorBuffer(hsc3->errbuf);
@@ -465,8 +453,11 @@ EXPORT BOOL hsc3_make ( BMSCR *bm, char *p1, int p2, int p3 )
 		return -1;
 	}
 	st = filepack.MakeEXEFile(type, hspexe, fname, myseed2, opt1, opt2, opt3);
-	strcat(fname, ".dpm");
-	delfile( fname );
+	dpmname_length = snprintf(dpmname, sizeof(dpmname), "%s.dpm", fname);
+	if (dpmname_length < 0 || (size_t)dpmname_length >= sizeof(dpmname)) {
+		return -1;
+	}
+	delfile( dpmname );
 #endif
 	return -st;
 }
@@ -482,7 +473,9 @@ EXPORT BOOL hsc3_getruntime ( char *p1, char *p2, int p3, int p4 )
 	//		hsc3_getruntime val  (type5)
 	//
 	int i;
-	i = hsc3->GetRuntimeFromHeader( p2, p1 );
+	std::string runtime;
+	i = hsc3->GetRuntimeFromHeader( p2, runtime );
 	if ( i != 1 ) { *p1 = 0; }
+	else { strcpy2(p1, runtime.c_str(), HSC3_RUNTIME_OUTPUT_SIZE); }
 	return 0;
 }

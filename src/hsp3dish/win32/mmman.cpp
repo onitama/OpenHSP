@@ -36,6 +36,7 @@
 #include "../../hsp3/dpmread.h"
 #include "../../hsp3/strbuf.h"
 #include "../../hsp3/hsp3utfcnv.h"
+#include "../../hsp3/hsp3pathio.h"
 #include "mmman.h"
 
 #ifdef MMMAN_USE_DXSND
@@ -246,7 +247,7 @@ int MMMan::Load( char *fname, int num, int opt )
 	//		Load sound to bank
 	//			opt : 0=normal/1=loop/2=wait/3=continuous
 	//
-	char fext[8];
+	std::string fext;
 	char *pt;
 	int flag;
 	int track;
@@ -273,7 +274,7 @@ int MMMan::Load( char *fname, int num, int opt )
 	}
 #endif
 
-	getpath(fname,fext,16+2);				// 拡張子を小文字で取り出す
+	if (!getpath(std::string(fname != NULL ? fname : ""), fext, 16+2)) fext.clear();				// 拡張子を小文字で取り出す
 
 #if 0
 	if (!strcmp(fext,".avi")) {				// when "AVI"
@@ -289,7 +290,7 @@ int MMMan::Load( char *fname, int num, int opt )
 	}
 #endif
 
-	if (!strcmp(fext,".wav")) {				// when "WAV"
+	if (fext == ".wav") {				// when "WAV"
 #ifdef MMMAN_USE_DXSND
 		char *mp;
 		mp = dpm_readalloc( fname );		// HSPリソースを含めて検索する
@@ -606,5 +607,3 @@ void MMMan::StopBank( int num )
 		break;
 	}
 }
-
-

@@ -2,14 +2,18 @@
 //	hsp3utfcnv.cpp functions
 //
 #include "hsp3utfcnv.h"
+#include "hsp3pathio.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
+#if defined(HSPDEBUG) && !defined(HSPCMP)
 char* hsp3ext_getdir(int id);
+#endif
 
-#ifdef HSPWIN
+#if defined(HSPWIN) || defined(_WIN32)
 #include <windows.h>
 #include <tchar.h>
 #endif
@@ -197,96 +201,50 @@ void freeac(char **ppc)
 #endif
 #endif
 
-
 //
 //		basic File I/O support
 //
 FILE *hsp3_fopen(const char*name, HSPPTRINT offset)
 {
 	FILE* hsp3_fp = NULL;
-#ifdef HSPWIN
-#ifdef HSPUTF8
-	HSPAPICHAR* hactmp1;
-#endif
-
-#ifdef HSPUTF8
-	// Windows UTF
-	hsp3_fp = _wfopen(chartoapichar(name, &hactmp1), L"rb");
-	freehac(&hactmp1);
-#else
-	// Windows SJIS
-	hsp3_fp = fopen(name, "rb");
-#endif
-
-	//	Read HSPTV resource
-#ifdef HSPDEBUG
-
-	if (hsp3_fp == NULL) {
-		//	hsptvフォルダを検索する
-		char fn[2048];
-		TCHAR fporg[_MAX_PATH];
-		TCHAR fporg_tmp[_MAX_PATH];
-		char* resp8;
-		GetModuleFileName(NULL, fporg, _MAX_PATH);
-		getpathW(fporg, fporg_tmp, 32);
-		apichartohspchar(fporg_tmp, &resp8);
-		strcpy(fn, resp8);
-		CutLastChr(fn, '\\');
-		freehc(&resp8);
-		strcat(fn, "\\hsptv\\");
-		if ((strlen(name) + strlen(fn)) < 2047) {
-			strcat(fn, name);
-
-#ifdef HSPUTF8
-			// Windows UTF
-			hsp3_fp = _wfopen(chartoapichar(fn, &hactmp1), L"rb");
-#else
-			// Windows SJIS
-			hsp3_fp = fopen(fn, "rb");
-#endif
-		}
-	}
-
-#endif
-
-#else
-
-
 #ifdef HSPNDK
 	{
-	const char *fname = name;
-	if ( *name == '*' ) {
-		fname = hgio_getstorage(name+1);
-	}
-	hsp3_fp = hgio_android_fopen(fname,offset);
-	if (hsp3_fp == NULL) return NULL;
-	return hsp3_fp;
+		const char *fname = name;
+		if ( *name == '*' ) {
+			fname = hgio_getstorage(name+1);
+		}
+		hsp3_fp = hgio_android_fopen(fname,offset);
+		if (hsp3_fp == NULL) return NULL;
+		return hsp3_fp;
 	}
 #endif
 
 #ifdef HSPIOS
-    {
-        char* path = gb_filepath(name);
-        //printf("Load %s", path);
-        hsp3_fp = fopen(path, "rb");
-        if (hsp3_fp == NULL) return NULL;
-        return  hsp3_fp;
-    }
-#endif
-    
-	// Linux
-	hsp3_fp = fopen(name, "rb");
-#ifdef HSPDEBUG
-	if (hsp3_fp == NULL) {
-		//	hsptvフォルダを検索する
-		char fn[2048];
-		strcpy(fn, hsp3ext_getdir(5));		// tv folder
-		strcat(fn, name);
-		hsp3_fp = fopen(fn, "rb");
+	{
+		char* path = gb_filepath(name);
+		//printf("Load %s", path);
+		hsp3_fp = fopen(path, "rb");
+		if (hsp3_fp == NULL) return NULL;
+		return  hsp3_fp;
 	}
 #endif
 
-
+	hsp3_fp = hsp_path_fopen(hsp_path::path_view(name), "rb");
+#if defined(HSPDEBUG) && !defined(HSPCMP)
+	if (hsp3_fp == NULL) {
+		//	hsptvフォルダを検索する
+		std::string fn;
+#if defined(HSPWIN)
+		if (hsp_path_get_hsptv_path(fn, hsp_path::path_view(name)) == 0) {
+			hsp3_fp = hsp_path_fopen(hsp_path::path_view(fn.c_str()), "rb");
+		}
+#else
+		if (hsp_path_get_hsptv_path_utf8(fn,
+			hsp_path::utf8_view(hsp3ext_getdir(5)), hsp_path::utf8_view(name)) == 0) {
+			hsp3_fp = hsp_path_fopen_utf8(hsp_path::utf8_view(fn.c_str()), "rb");
+		}
+#endif
+	}
 #endif
 	if (hsp3_fp == NULL) return NULL;
 	if (offset > 0) {
@@ -298,54 +256,25 @@ FILE *hsp3_fopen(const char*name, HSPPTRINT offset)
 
 FILE* hsp3_fopenwrite(const char* fname8, HSPPTRINT offset)
 {
-	FILE* hsp3_fp = NULL;
-
-#ifdef HSPWIN
-#ifdef HSPUTF8
-	// Windows UTF
-	HSPAPICHAR* hactmp1;
-	wchar_t *wfname;
-	wfname = chartoapichar(fname8, &hactmp1);
-	if (offset < 0) {
-		hsp3_fp = _wfopen(wfname, L"wb");
-	}
-	else {
-		hsp3_fp = _wfopen(wfname, L"r+b");
-		if (hsp3_fp == NULL) return NULL;
-		hsp3_fseek(hsp3_fp, offset, SEEK_SET);
-	}
-	freehac(&hactmp1);
-#else
-	// Windows SJIS
-	if (offset < 0) {
-		hsp3_fp = fopen(fname8, "w+b");
-	}
-	else {
-		hsp3_fp = fopen(fname8, "r+b");
-		if (hsp3_fp == NULL) return NULL;
-		hsp3_fseek(hsp3_fp, offset, SEEK_SET);
-	}
-#endif
-
-#else
-
-	const char *fname;
-	fname = fname8;
+	const char* mode = offset < 0 ? "w+b" : "r+b";
+	FILE* hsp3_fp;
 #ifdef HSPNDK
+	char *fname = fname8;
 	if ( *fname != '/' ) {
 		fname = hgio_getstorage(fname8);
 	}
+	hsp3_fp = fopen(fname, mode);
+#else
+	hsp3_fp = hsp_path_fopen(hsp_path::path_view(fname8), mode);
 #endif
-	// Linux
-	if (offset < 0) {
-		hsp3_fp = fopen(fname, "w+b");
-	}
-	else {
-		hsp3_fp = fopen(fname, "r+b");
-		if (hsp3_fp == NULL) return NULL;
+	if (hsp3_fp == NULL) return NULL;
+	if (offset >= 0) {
+#ifdef HSPNDK
 		fseek(hsp3_fp, offset, SEEK_SET);
-	}
+#else
+		hsp3_fseek(hsp3_fp, offset, SEEK_SET);
 #endif
+	}
 	return hsp3_fp;
 }
 
@@ -522,47 +451,47 @@ int utf16_to_hsp3(char* out, const void* in, int bufsize)
 
 #endif
 
-
-int hsp3_to_utf8(void* out, const char* in, int bufsize)
+#if defined(HSPWIN) || defined(_WIN32)
+int utf8_to_utf16_strict(void* out, const char* in, int bufsize)
 {
-	//	hspchar->UTF8 に変換
-	//
-#ifdef HSPWIN
-#ifdef HSPUTF8 
-	strncpy((char*)out, in, bufsize);
-	return -1;
-#else
-	int reslen = MultiByteToWideChar(CP_ACP, 0, in, -1, (LPWSTR)NULL, 0);
-	char* tmpbuf = hsp3cnv_gettmp(reslen);
-	MultiByteToWideChar(CP_ACP, 0, in, -1, (LPWSTR)tmpbuf, hsp3cnv_tmpsize);
-	return WideCharToMultiByte(CP_UTF8, 0, (LPWSTR)tmpbuf, -1, (LPSTR)out, bufsize, NULL, NULL);
-#endif
-#else
-	strncpy((char*)out, in, bufsize);
-	return -1;
-#endif
+	if (in == NULL || bufsize < 0) return 0;
+	return MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, in, -1,
+		(LPWSTR)out, bufsize);
 }
 
 
-int utf8_to_hsp3(void* out, const char* in, int bufsize)
+int utf16_to_utf8_strict(char* out, const void* in, int bufsize)
 {
-	//	UTF8->hspchar に変換
-	//
-#ifdef HSPWIN
-#ifdef HSPUTF8 
-	strncpy((char*)out, in, bufsize);
-	return -1;
-#else
-	int reslen = MultiByteToWideChar(CP_UTF8, 0, in, -1, (LPWSTR)NULL, 0);
-	char* tmpbuf = hsp3cnv_gettmp(reslen);
-	MultiByteToWideChar(CP_UTF8, 0, in, -1, (LPWSTR)tmpbuf, hsp3cnv_tmpsize);
-	return WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)tmpbuf, -1, (LPSTR)out, bufsize, NULL, NULL);
-#endif
-#else
-	strncpy((char*)out, in, bufsize);
-	return -1;
-#endif
+	if (in == NULL || bufsize < 0) return 0;
+	return WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS,
+		(LPCWSTR)in, -1, (LPSTR)out, bufsize, NULL, NULL);
 }
+
+
+int ansi_to_utf16_strict(void* out, const char* in, int bufsize)
+{
+	if (in == NULL || bufsize < 0) return 0;
+	return MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, in, -1,
+		(LPWSTR)out, bufsize);
+}
+
+
+int utf16_to_ansi_strict(char* out, const void* in, int bufsize)
+{
+	if (in == NULL || bufsize < 0) return 0;
+
+	BOOL used_default = FALSE;
+	int length = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS,
+		(LPCWSTR)in, -1, NULL, 0, NULL, &used_default);
+	if (length <= 0 || used_default) return 0;
+	if (out == NULL || bufsize == 0) return length;
+
+	used_default = FALSE;
+	int result = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS,
+		(LPCWSTR)in, -1, (LPSTR)out, bufsize, NULL, &used_default);
+	return result == 0 || used_default ? 0 : result;
+}
+#endif
 
 
 int StrCopyLetter(const char* source, char* dest)
@@ -576,7 +505,7 @@ int StrCopyLetter(const char* source, char* dest)
 	int i = 1;
 
 	a1 = *p;
-#ifdef HSPUTF8 
+#ifdef HSP_PATHIO_UTF8
 	if (a1 >= 128) {					// 多バイト文字チェック
 		if (a1 >= 192) i++;
 		if (a1 >= 224) i++;
@@ -601,6 +530,3 @@ int StrCopyLetter(const char* source, char* dest)
 	}
 	return i;
 }
-
-
-

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <string>
 #include <stdint.h>
 
 #include "../hsp3/hsp3config.h"
@@ -20,41 +21,81 @@
 #include <direct.h>
 #endif
 
-static int append_path_text(char* destination, size_t destination_size, const char* text)
+#if defined(HSP_PATHIO_UTF8) && defined(HSPWIN)
+static int copy_wide_dirinfo_path(char* destination, size_t destination_size, const wchar_t* source)
 {
-	if (destination == NULL || text == NULL || destination_size == 0) return -1;
-	size_t destination_length = strlen(destination);
-	size_t text_length = strlen(text);
-	if (destination_length >= destination_size ||
-		text_length > destination_size - destination_length - 1) return -1;
-	memcpy(destination + destination_length, text, text_length + 1);
+	std::string utf8_path;
+	if (hsp_path_utf8_from_wide(utf8_path, source) != 0 || utf8_path.size() >= destination_size) {
+		return -1;
+	}
+	strcpy(destination, utf8_path.c_str());
 	return 0;
 }
+#endif
 
 void dirinfo(char* p, int id)
 {
 	//		dirinfo命令の内容をstmpに設定する
 	//
 #ifdef HSPWIN
-	char fname[_MAX_PATH + 1];
-
 	switch (id) {
 	case 0:				//    カレント(現在の)ディレクトリ
-		_getcwd(p, _MAX_PATH);
+	{
+		std::string current_directory;
+		if (hsp_path_get_current_directory(current_directory) != 0 ||
+			current_directory.size() >= _MAX_PATH) p[0] = 0;
+		else strcpy(p, current_directory.c_str());
+	}
 		break;
 	case 1:				//    実行ファイルがあるディレクトリ
-		GetModuleFileName(NULL, fname, _MAX_PATH);
-		getpath(fname, p, 32);
+	{
+		std::string module_filename;
+		if (hsp_path_get_module_filename(module_filename) != 0) {
+			p[0] = 0;
+			break;
+		}
+		std::string module_directory;
+		if (!getpath(module_filename, module_directory, 32) || module_directory.size() >= 512) {
+			p[0] = 0;
+		}
+		else {
+			strcpy(p, module_directory.c_str());
+		}
 		break;
+	}
 	case 2:				//    Windowsディレクトリ
+	#ifdef HSP_PATHIO_UTF8
+		{
+			wchar_t wide_path[_MAX_PATH];
+			UINT path_length = GetWindowsDirectoryW(wide_path, _MAX_PATH);
+			if (path_length == 0 || path_length >= _MAX_PATH ||
+				copy_wide_dirinfo_path(p, _MAX_PATH, wide_path) != 0) p[0] = 0;
+		}
+	#else
 		GetWindowsDirectory(p, _MAX_PATH);
+	#endif
 		break;
 	case 3:				//    Windowsのシステムディレクトリ
+	#ifdef HSP_PATHIO_UTF8
+		{
+			wchar_t wide_path[_MAX_PATH];
+			UINT path_length = GetSystemDirectoryW(wide_path, _MAX_PATH);
+			if (path_length == 0 || path_length >= _MAX_PATH ||
+				copy_wide_dirinfo_path(p, _MAX_PATH, wide_path) != 0) p[0] = 0;
+		}
+	#else
 		GetSystemDirectory(p, _MAX_PATH);
+	#endif
 		break;
 	default:
 		if (id & 0x10000) {
+	#ifdef HSP_PATHIO_UTF8
+			wchar_t wide_path[_MAX_PATH];
+			if (!SHGetSpecialFolderPathW(NULL, wide_path, id & 0xffff, FALSE) ||
+				copy_wide_dirinfo_path(p, _MAX_PATH, wide_path) != 0) p[0] = 0;
+	#else
 			SHGetSpecialFolderPath(NULL, p, id & 0xffff, FALSE);
+	#endif
 			break;
 		}
 		*p = 0;
@@ -492,20 +533,17 @@ int CAht::LoadProject( const char *fname )
 {
 	FILE *fp;
 	char *p;
+	int res;
 	int bufsize,strsize;
 	int64_t file_size;
 
 	Reset();
 
-	if (fname == NULL) return -1;
-	fp=fopen( fname, "rb" );
+	res = 0;
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "rb");
 	if (fp == NULL) return -1;
-	if (fseek(fp, 0, SEEK_END) != 0) {
-		fclose(fp);
-		return -3;
-	}
-	file_size = (int64_t)ftell(fp);
-	if (file_size < (int64_t)sizeof(HTPHED) || fseek(fp, 0, SEEK_SET) != 0) {
+	file_size = hsp_path_filesize(hsp_path::path_view(fname));
+	if (file_size < (int64_t)sizeof(HTPHED)) {
 		fclose(fp);
 		return -3;
 	}
@@ -542,24 +580,30 @@ int CAht::LoadProject( const char *fname )
 	strbuf = new CMemBuf;
 
 	if ( bufsize ) {
-		p = objbuf->PreparePtr( bufsize );
-		if (p == NULL || fread(p, 1, bufsize, fp) != (size_t)bufsize) {
-			DisposeObj();
+		if (!objbuf->TryPreparePtr(bufsize, &p) ||
+			fread(p, 1, bufsize, fp) != (size_t)bufsize) {
+			delete objbuf;
+			delete strbuf;
+			objbuf = NULL;
+			strbuf = NULL;
 			fclose(fp);
 			return -3;
 		}
 	}
 	if ( strsize ) {
-		p = strbuf->PreparePtr( strsize );
-		if (p == NULL || fread(p, 1, strsize, fp) != (size_t)strsize) {
-			DisposeObj();
+		if (!strbuf->TryPreparePtr(strsize, &p) ||
+			fread(p, 1, strsize, fp) != (size_t)strsize) {
+			delete objbuf;
+			delete strbuf;
+			objbuf = NULL;
+			strbuf = NULL;
 			fclose(fp);
 			return -3;
 		}
 	}
 
 	fclose(fp);
-	return 0;
+	return res;
 }
 
 
@@ -751,7 +795,7 @@ int CAht::SaveProject( const char *fname )
 	//	Output file
 	//
 	res = 0;
-	fp=fopen( fname, "wb" );
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "w+b");
 	if (fp != NULL) {
 
 		strsize = strbuf->GetSize() & 15;
@@ -855,7 +899,7 @@ void CAht::PickLineBuffer( char *out, size_t out_size )
 }
 
 
-int CAht::BuildPartsSub( int id, char *fname )
+int CAht::BuildPartsSub( int id, const char *fname )
 {
 	//		簡易ahtパース
 	//
@@ -864,9 +908,6 @@ int CAht::BuildPartsSub( int id, char *fname )
 	CMemBuf tmp;
 	AHTPARTS *p;
 	char s1[256];
-	char component_name[256];
-
-	if (fname == NULL) return -1;
 
 	p = GetParts( id );
 	if ( p == NULL ) return -2;
@@ -881,9 +922,10 @@ int CAht::BuildPartsSub( int id, char *fname )
 	}
 	note.Select( tmp.GetBuffer() );
 	maxline = note.GetMaxLine();
-	getpath( fname, component_name, 1+8+16 );
-	if (strlen(component_name) >= sizeof(p->name)) return -1;
-	strcpy(p->name, component_name);			// 仮にファイル名を入れておく
+	std::string component_name;
+	if (fname == NULL || !getpath(std::string(fname), component_name, 1+8+16) ||
+		component_name.size() >= sizeof(p->name)) return -1;
+	strcpy(p->name, component_name.c_str());			// 仮にファイル名を入れておく
 
 	for(i=0;i<maxline;i++) {
 		pickptr = 0;
@@ -914,11 +956,10 @@ int CAht::BuildPartsSub( int id, char *fname )
 }
 
 
-int CAht::BuildParts( char *list, char *path )
+int CAht::BuildParts( char *list, const char *path )
 {
 	int i;
 	int part_count;
-	char fullpath[256];
 	char fname[256];
 	CStrNote note;
 	if (list == NULL || path == NULL) return -1;
@@ -939,15 +980,10 @@ int CAht::BuildParts( char *list, char *path )
 	}
 	for(i=0;i<maxparts;i++) {
 		note.GetLine( fname, i, 255 );
-		fullpath[0] = 0;
-		if (append_path_text(fullpath, sizeof(fullpath), path) != 0 ||
-			append_path_text(fullpath, sizeof(fullpath), fname) != 0) {
-			DisposeParts();
-			maxparts = 0;
-			return -1;
-		}
+		std::string fullpath = path;
+		fullpath += fname;
 		//Alertf( "#%d [%s]",i, fullpath );
-		if (BuildPartsSub(i, fullpath) < 0) {
+		if (BuildPartsSub(i, fullpath.c_str()) < 0) {
 			DisposeParts();
 			return -1;
 		}

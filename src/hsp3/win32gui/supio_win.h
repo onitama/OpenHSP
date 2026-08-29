@@ -22,8 +22,6 @@ void cutlast2( char *st );
 void strcpy2( char *dest, const char *src, size_t size );
 char *strchr2( char *target, char code );
 
-void getpath( char *src, char *outbuf, int p2 );
-void getpathW( HSPAPICHAR *src, HSPAPICHAR *outbuf, int p2 );
 
 void ExecFile( char *stmp, char *ps, int mode );
 void dirinfo( char *p, int id );
@@ -38,7 +36,6 @@ int makedir( const char *name );
 int changedir( const char *name );
 int changedirW( const HSPAPICHAR *name );
 int delfile( const char *name );
-int dirlist( const char *fname, char **target, int p3 );
 int gettime( int index );
 
 int strcat2( char *str1, const char *str2 );

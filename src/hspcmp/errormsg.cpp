@@ -70,6 +70,7 @@ static char *err[]={
 	"指定できない変数名です",								// 40
 	"既に属性が設定された変数名です",						// 41
 	"既に定義されている変数名です",							// 42
+	"不正なソースファイルパスです",								// 43
 	"*"
 };
 #else
@@ -117,6 +118,7 @@ static char *err[]={
 	"Wrong name for variable",								// 40
 	"Already defined type of variable",						// 41
 	"Already defined variable",								// 42
+	"Invalid source file path",										// 43
 	"*"
 };
 #endif
@@ -126,4 +128,3 @@ char *cg_geterror( CGERROR error )
 	if ((error<0)||(error>=CGERROR_MAX)) return err[0];
 	return err[error];
 }
-

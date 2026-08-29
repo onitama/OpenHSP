@@ -8,6 +8,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 #include <objbase.h>
 #include <commctrl.h>
 
@@ -17,6 +18,7 @@
 
 #include "hsp3dish.h"
 #include "../../hsp3/hsp3config.h"
+#include "../../hsp3/hsp3pathio.h"
 #include "../../hsp3/strbuf.h"
 #include "../../hsp3/hsp3.h"
 #include "../hsp3gr.h"
@@ -1045,9 +1047,9 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 	//
 #ifndef HSPDEBUG
 	if (( hsp_wd & 2 ) == 0 ) {
-		GetModuleFileName( NULL, fname, _MAX_PATH );
-		getpath( fname, fname, 32 );
-		changedir( fname );
+		std::string module_directory;
+		if (hsp_path_get_module_directory(module_directory) != 0 ||
+			changedir(module_directory.data()) != 0) return 1;
 	}
 #endif
 
@@ -1293,5 +1295,3 @@ int hsp3dish_exec( void )
 	hsp3dish_bye();
 	return endcode;
 }
-
-

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #ifdef HSPEMSCRIPTEN
 #ifndef _MAX_PATH
 #define _MAX_PATH       256
@@ -182,7 +183,7 @@ static long chkfile( char *filename )
 
 	FILE *ff;
 	long filesize;
-	ff=fopen( filename,"rb" );
+	ff=hsp_path_fopen(hsp_path::path_view(filename), "rb");
 	if (ff==NULL) return -1;
 	filesize=0;
 	while(1) {
@@ -193,21 +194,15 @@ static long chkfile( char *filename )
 	return filesize;
 }
 
-static char *gettvfolder( char *name )
+static int gettvfolder(std::string& path, char* name)
 {
 	//	get HSPTV resource folder path
 
 #ifdef HSPWIN
-	static char p[_MAX_PATH];
-	char ifname[_MAX_PATH];
-	GetModuleFileName( NULL,ifname,_MAX_PATH );
-	getpath( ifname, p, 32 );
-	CutLastChr( p, '\\' );
-	strcat( p, "\\hsptv\\" );
-	strcat( p, name );
-	return p;
+	if (hsp_path_get_hsptv_path(path, hsp_path::path_view(name)) != 0) return -1;
+	return 0;
 #endif
-	return NULL;
+	return -1;
 }
 
 
@@ -218,12 +213,11 @@ static void cpyfile( FILE *ff, char *filename, int encode )
 	int a;
 	FILE *ff2;
 
-	ff2 = fopen( filename, "rb" );
+	ff2 = hsp_path_fopen(hsp_path::path_view(filename), "rb");
 	if (ff2==NULL) {
-		char *name2;
-		name2 = gettvfolder( filename );
-		if ( name2 == NULL ) return;
-		ff2 = fopen( name2, "rb" );
+		std::string name2;
+		if (gettvfolder(name2, filename) != 0) return;
+		ff2 = hsp_path_fopen(hsp_path::path_view(name2.c_str()), "rb");
 		if ( ff2 == NULL ) return;
 	}
 
@@ -244,7 +238,7 @@ static int getfile( void )
 	long la;
 	int a1,a2;
 
-	fp=fopen(fname,"rb");
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "rb");
 	if (fp==NULL) {
 		sprintf(tmp,"#No pack file [%s].\r\n",fname);
 		prt(tmp);
@@ -267,9 +261,9 @@ static int getfile( void )
 		return -1;
 	}
 
-	fp=fopen(fname,"rb");
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "rb");
 	fseek(fp,fptr+optr,0);
-		fp2=fopen( aname,"wb" );
+		fp2=hsp_path_fopen(hsp_path::path_view(aname), "wb");
 		for(la=0;la<fs;la++) {
 			a2=fgetc(fp);if (a2<0) break;
 			fputc(a2,fp2);
@@ -291,7 +285,7 @@ static int viewfile( void )
 	int a1;
 	int ee;
 
-	fp=fopen(fname,"rb");
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "rb");
 	if (fp==NULL) {
 		sprintf( tmp,"#No pack file [%s].\r\n",fname );
 		prt(tmp);
@@ -350,7 +344,7 @@ static int newfile( int mode )
 
 	//	open packfile list
 
-	fp2=fopen(aname,"rb");
+	fp2=hsp_path_fopen(hsp_path::path_view(aname), "rb");
 	if (fp2==NULL) {
 		sprintf(tmp,"#Listing file [%s] not found.\r\n",aname);
 		prt(tmp);
@@ -377,13 +371,9 @@ static int newfile( int mode )
 
 			res=chkfile(s1);
 			if (res<0) {
-				char *name2;
-				name2 = gettvfolder( s1 );
-				if ( name2 != NULL ) {
-					res = chkfile( name2 );
-					if ( res < 0 ) name2 = NULL;
-				}
-				if ( name2 == NULL ) {
+				std::string name2;
+				bool found = gettvfolder(name2, s1) == 0 && (res = chkfile((char*)name2.c_str())) >= 0;
+				if (!found) {
 					sprintf(tmp,"#No File [%s]\r\n",s1);
 					prt(tmp);efl++;
 					break;
@@ -418,7 +408,7 @@ static int newfile( int mode )
 
 	//	write header
 
-	fp=fopen(fname,"wb");
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "wb");
 	if (fp==NULL) {
 		free( mem_nam );
 		prt("#File write error.\r\n");
@@ -435,7 +425,7 @@ static int newfile( int mode )
 	//	write directories
 
 	a1=0;
-	fp2=fopen(aname,"rb");
+	fp2=hsp_path_fopen(hsp_path::path_view(aname), "rb");
 	while(1) {
 		if (fgets(s1,255,fp2)==NULL) break;
 		cutlast2(s1);
@@ -465,7 +455,7 @@ static int newfile( int mode )
 	//	write file image
 
 	a1=0;
-	fp2=fopen(aname,"rb");
+	fp2=hsp_path_fopen(hsp_path::path_view(aname), "rb");
 	while(1) {
 		if (fgets(s1,255,fp2)==NULL) break;
 		cutlast(s1);
@@ -484,7 +474,7 @@ static int newfile( int mode )
 }
 
 
-static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
+static int makexe( int mode, const char *hspexe, int opt1, int opt2, int opt3 )
 {
 	//	make custom EXE file
 	//		mode : 0=normal
@@ -502,25 +492,24 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	int *ip;
 	int chksum, sum, sumseed, sumsize;
 
-	char hrtfile[_MAX_PATH];
-	char p_drive[_MAX_PATH];
-	char p_dir[_MAX_DIR];
-	char p_fname[_MAX_FNAME];
-	char p_ext[_MAX_EXT];
+	std::string hrtfile;
+	std::string runtime_directory;
+	std::string runtime_filename;
 
 
 	//		HSPヘッダーを検索
 	//
-	strcpy( hrtfile, hspexe );
-	_splitpath( hrtfile, p_drive, p_dir, p_fname, p_ext );
-	fp=fopen( hrtfile, "rb" );
+	if (hspexe == NULL || !getpath(std::string(hspexe), runtime_directory, 32) ||
+		!getpath(std::string(hspexe), runtime_filename, 8)) return -1;
+	hrtfile = hspexe;
+	fp=hsp_path_fopen(hsp_path::path_view(hrtfile.c_str()), "rb");
 	if (fp==NULL) {
-		sprintf( hrtfile,"%s%sruntime\\%s%s", p_drive, p_dir, p_fname, p_ext ); 
-		fp=fopen( hrtfile, "rb" );
+		hrtfile = runtime_directory + "runtime\\" + runtime_filename;
+		fp=hsp_path_fopen(hsp_path::path_view(hrtfile.c_str()), "rb");
 		//
 		if (fp==NULL) {
-			sprintf( hrtfile,"%s%s", p_fname, p_ext ); 
-			fp=fopen( hrtfile, "rb" );
+			hrtfile = runtime_filename;
+			fp=hsp_path_fopen(hsp_path::path_view(hrtfile.c_str()), "rb");
 			if (fp==NULL) {
 				sprintf( tmp,"#No file [%s].\r\n",hspexe );
 				prt(tmp);
@@ -554,7 +543,7 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 
 	//		DPMのチェックサムを作成
 	//
-	fp=fopen(fname,"rb");
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "rb");
 	if (fp==NULL) {
 		sprintf(tmp,"#No file [%s].\r\n",fname);
 		prt(tmp);
@@ -589,14 +578,14 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 	s4[28]='s';s4[29]=chksum&0xff;s4[30]=(chksum>>8)&0xff;
 	s4[31]='k'; ip = (int *)(s4+32); *ip = deckey;
 
-	fp2=fopen(fname,"rb");
-	fp=fopen( hrtfile, "rb");
+	fp2=hsp_path_fopen(hsp_path::path_view(fname), "rb");
+	fp=hsp_path_fopen(hsp_path::path_view(hrtfile.c_str()), "rb");
 	if (fp==NULL) {
 		sprintf(tmp,"#No file [%s].\r\n",hspexe );
 		prt(tmp);
 		return -1;
 	}
-	fp3=fopen(sname,"wb");
+	fp3=hsp_path_fopen(hsp_path::path_view(sname), "wb");
 	if (fp3==NULL) {
 		sprintf(tmp,"#Write error [%s].\r\n",sname );
 		prt(tmp);
@@ -626,13 +615,13 @@ static int makexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
 
 /*----------------------------------------------------------*/
 
-void dpmc_ini( CMemBuf *mesbuf, char *infile )
+void dpmc_ini( CMemBuf *mesbuf, const char *infile )
 {
 	prtini(mesbuf);
-	strcpy(fname,infile);
-	strcpy(bname,fname);
+	snprintf(fname, sizeof(fname), "%s", infile);
+	snprintf(bname, sizeof(bname), "%s", fname);
 	addext(fname,"dpm");
-	strcpy(aname,"packfile");
+	snprintf(aname, sizeof(aname), "%s", "packfile");
 	prt("Datafile Pack Manager ver.3.0 / onion software 1997-2012\r\n");
 	defseed1 = 0xaa; defseed2 = 0x55;			// data.dpm用のデフォルトSEED
 }
@@ -649,7 +638,7 @@ int dpmc_pack( int mode )
 	return 0;
 }
 
-int dpmc_mkexe( int mode, char *hspexe, int opt1, int opt2, int opt3 )
+int dpmc_mkexe( int mode, const char *hspexe, int opt1, int opt2, int opt3 )
 {
 	if ( makexe(mode,hspexe,opt1,opt2,opt3) ) return 1;
 	return 0;
@@ -674,4 +663,3 @@ void dpmc_dpmkey( int key )
 	defseed1 = defseed1 & 0xff;
 	defseed2 = (defseed2 & 0xff)^0xaa;
 }
-

@@ -6,7 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <cctype>
+#include <string>
 
 #ifdef HSPWIN
 #include <direct.h>
@@ -19,14 +21,49 @@
 #include "strnote.h"
 #include "strbuf.h"
 #include "hsp3crypt.h"
+#include "hsp3pathio.h"
 #include "../hspcmp/membuf.h"
 
 #define _MALLOC malloc
 #define _FREE free
 
+static int hsp_pack_path_append(char* target, size_t target_size, const char* suffix)
+{
+	if (target == NULL || suffix == NULL || target_size == 0) return 0;
+	size_t target_length = strlen(target);
+	size_t suffix_length = strlen(suffix);
+	if (target_length >= target_size || suffix_length > target_size - target_length - 1) return 0;
+	memcpy(target + target_length, suffix, suffix_length + 1);
+	return 1;
+}
+
 #define WELCOMEMSG "DPM2 Manager 1.1"
 #define DPMFILEEXT ".dpm"
 #define DPMENCODE_DEFVAL 0
+
+#if ( WIN32 || _WIN32 ) && ! __CYGWIN__
+# define FILEPACK_VSNPRINTF _vsnprintf
+#else
+# define FILEPACK_VSNPRINTF vsnprintf
+#endif
+
+static std::string format_message(const char* format, ...)
+{
+	size_t capacity = 256;
+	while (true) {
+		std::string result(capacity, '\0');
+		va_list args;
+		va_start(args, format);
+		int length = FILEPACK_VSNPRINTF(result.data(), result.size(), format, args);
+		va_end(args);
+		if (length >= 0 && static_cast<size_t>(length) < result.size()) {
+			result.resize(length);
+			return result;
+		}
+		if (length >= 0) capacity = static_cast<size_t>(length) + 1;
+		else capacity *= 2;
+	}
+}
 
 /*------------------------------------------------------------*/
 /*
@@ -52,7 +89,7 @@ void FilePack::PrepareWrite( int slot, int encode )
 }
 
 
-HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
+HSPPTRINT FilePack::RegisterFile(const char* name, int pcrypt, int orig)
 {
 	//	HFPにファイルを追加
 	//
@@ -67,28 +104,38 @@ HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 	char foldername[HFP_PATH_MAX + 1];
 	char foldername_hsp3[HFP_PATH_MAX + 1];
 	char pathname[HFP_PATH_MAX + 1];
+	std::string fname_utf8;
+	std::string foldername_utf8;
 
 	if (orig == 0) {
 		char* findptr;
-		strchr3(name, '*', 0, &findptr);
+		strchr3(const_cast<char*>(name), '*', 0, &findptr);
 		if (findptr != NULL) {
 			//	ワイルドカード使用時
 			CStrNote notelist;
 			char ftmp[1024];
-			char fixname[1024];
-			char p_fdir[HSP_MAX_PATH];
+			std::string fixname;
+			std::string p_fdir;
 			int listmax;
 			char* flist = sbAlloc(0x4000);
-			dirlist(name, &flist, 5);
+			if (dirlist(name, &flist, 5) < 0) {
+				sbFree(flist);
+				Print((char*)"#Directory listing failed.");
+				return -1;
+			}
 			notelist.Select(flist);
 			listmax = notelist.GetMaxLine();
 			// ディレクトリを再帰する
 			for (int i = 0; i < listmax; i++) {
 				notelist.GetLine(ftmp, i);
-				getpath(name, fixname, 32);
-				strcat(fixname, ftmp);
-				strcat(fixname, "/*");
-				HSPPTRINT res = RegisterFile(fixname, pcrypt);
+				if (name == NULL || !getpath(std::string(name), fixname, 32)) {
+					sbFree(flist);
+					Print((char*)"#Path is too long or invalid.");
+					return -1;
+				}
+				fixname += ftmp;
+				fixname += "/*";
+				HSPPTRINT res = RegisterFile(fixname.c_str(), pcrypt);
 				if (res < 0) {
 					sbFree(flist);
 					return res;
@@ -97,16 +144,22 @@ HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 			sbFree(flist);
 
 			// すべてのファイルを追加する
-			getpath(name, p_fdir, 32);
+			if (name == NULL || !getpath(std::string(name), p_fdir, 32)) {
+				Print((char*)"#Path is too long or invalid.");
+				return -1;
+			}
 			flist = sbAlloc(0x4000);
-			dirlist(name, &flist, 1);
+			if (dirlist(name, &flist, 1) < 0) {
+				sbFree(flist);
+				Print((char*)"#Directory listing failed.");
+				return -1;
+			}
 			notelist.Select(flist);
 			listmax = notelist.GetMaxLine();
 			for (int i = 0; i < listmax; i++) {
 				notelist.GetLine(ftmp, i);
-				strcpy(fixname, p_fdir);
-				strcat(fixname, ftmp);
-				HSPPTRINT res = RegisterFile(fixname, pcrypt);
+				fixname = p_fdir + ftmp;
+				HSPPTRINT res = RegisterFile(fixname.c_str(), pcrypt);
 				if (res < 0) {
 					sbFree(flist);
 					return res;
@@ -121,12 +174,22 @@ HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 	StrCase(fname_hsp3);
 	StrCase(foldername_hsp3);
 
-	// UTF8に変換する
-	hsp3_to_utf8(fname, fname_hsp3, HFP_PATH_MAX);
-	hsp3_to_utf8(foldername, foldername_hsp3, HFP_PATH_MAX);
+	fname[0] = 0;
+	foldername[0] = 0;
+	if (hsp_path_to_utf8(fname_utf8, hsp_path::path_view(fname_hsp3)) != 0 ||
+		hsp_path_to_utf8(foldername_utf8, hsp_path::path_view(foldername_hsp3)) != 0 ||
+		!hsp_pack_path_append(fname, sizeof(fname), fname_utf8.c_str()) ||
+		!hsp_pack_path_append(foldername, sizeof(foldername), foldername_utf8.c_str())) {
+		Print((char*)"#Path is too long.");
+		return -1;
+	}
 
-	strcpy(pathname, foldername);
-	strcat(pathname, fname);
+	pathname[0] = 0;
+	if (!hsp_pack_path_append(pathname, sizeof(pathname), foldername) ||
+		!hsp_pack_path_append(pathname, sizeof(pathname), fname)) {
+		Print((char*)"#Path is too long.");
+		return -1;
+	}
 
 	HSP3Crypt* cm = GetCurrentCryptManager();
 	enc_crypt = 0;
@@ -148,9 +211,7 @@ HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 
 	length = hsp3_flength(name);
 	if (length <= 0) {
-		char msg[1024];
-		sprintf(msg, "#File not found [%s]", name);
-		Print(msg);
+		Print(format_message("#File not found [%s]", name).c_str());
 		return -1;
 	}
 
@@ -187,13 +248,11 @@ HSPPTRINT FilePack::RegisterFile(char* name, int pcrypt, int orig)
 	obj.slot = curnum;
 	obj.crypt = enc_crypt;
 
-	char msg[1024];
 #ifdef HSP64
-	sprintf(msg, "#%d %s (%lld)(%d)", wrtnum, name, length, enc_crypt);
+	Print(format_message("#%d %s (%lld)(%d)", wrtnum, name, length, enc_crypt).c_str());
 #else
-	sprintf(msg, "#%d %s (%d)(%d)", wrtnum, name, length, enc_crypt);
+	Print(format_message("#%d %s (%d)(%d)", wrtnum, name, length, enc_crypt).c_str());
 #endif
-	Print(msg);
 
 	wrtpos += length;
 	wrtnum++;
@@ -261,7 +320,7 @@ int FilePack::RegisterFromPacklist( const char *name, int def_crypt)
 }
 
 
-int FilePack::CopyFileToDPM( FILE *ff, char *filename, HFPSIZE psize, int encode )
+int FilePack::CopyFileToDPM( FILE *ff, const char *filename, HFPSIZE psize, int encode )
 {
 	//	copy file to pack
 	//
@@ -314,18 +373,21 @@ int FilePack::SavePackFile( const char *name, const char *packname, int encode, 
 	char *p;
 	char fname[HFP_PATH_MAX +1];
 	char refname[(HFP_PATH_MAX + 1)];
-	char refname_hsp3[(HFP_PATH_MAX + 1)];
+	std::string refname_hsp3;
 	HFPOBJ* obj_bak;
+
+	fname[0] = 0;
+	if (!hsp_pack_path_append(fname, sizeof(fname), name) ||
+		!hsp_pack_path_append(fname, sizeof(fname), DPMFILEEXT)) {
+		Print((char*)"#Path is too long.");
+		return -1;
+	}
+	StrCase( fname );
 
 	PrepareWrite( 0, encode );
 	if (RegisterFromPacklist(packname, opt_encode) <= 0) {
 		return -1;
 	}
-
-	strcpy( fname, name );
-	strcat( fname, DPMFILEEXT);
-	fname[HFP_PATH_MAX] = 0;
-	StrCase( fname );
 
 	HSP3Crypt *cm = GetCurrentCryptManager();
 
@@ -378,17 +440,25 @@ int FilePack::SavePackFile( const char *name, const char *packname, int encode, 
 
 		for(i=0;i<wrtnum;i++) {
 			p = strbase + obj->name;
+			refname[0] = 0;
 			if (obj->folder == 0) {
-				refname[0] = 0;
+				// no folder
 			}
-			else {
-				strcpy(refname, strbase + obj->folder);
+			else if (!hsp_pack_path_append(refname, sizeof(refname), strbase + obj->folder)) {
+				res = -1;
+				break;
 			}
-			strcat(refname, p);
-			utf8_to_hsp3(refname_hsp3, refname, HFP_PATH_MAX);
+			if (!hsp_pack_path_append(refname, sizeof(refname), p)) {
+				res = -1;
+				break;
+			}
+			if (hsp_path_from_utf8(refname_hsp3, hsp_path::utf8_view(refname)) != 0) {
+				res = -1;
+				break;
+			}
 
 			//printf( "#%d : %x : %s ( %d bytes ) %s packing...\n", i, obj->offset, p, obj->size, refname );
-			int sz = CopyFileToDPM( fp, refname_hsp3, obj->size, obj->crypt );
+			int sz = CopyFileToDPM( fp, refname_hsp3.c_str(), obj->size, obj->crypt );
 			if (sz < 0) {
 				res = -1;
 			}
@@ -422,15 +492,13 @@ int FilePack::ExtractFile( HFPHED *hed, const char *fname, char *savename, int e
 	int bufsize;
 	int i;
 	int a2;
-	char* sname = savename;
-	char namebuf[HFP_PATH_MAX];
+	const char* sname = savename;
+	std::string namebuf;
 	char namebuf_utf8[HFP_PATH_MAX];
 
 	obj = SearchFileObject( hed, fname );
 	if (obj == NULL) {
-		char msg[1024];
-		sprintf(msg, "#Not found [%s](%d).", fname, encode);
-		Print(msg);
+		Print(format_message("#Not found [%s](%d).", fname, encode).c_str());
 		return -1;
 	}
 
@@ -438,8 +506,12 @@ int FilePack::ExtractFile( HFPHED *hed, const char *fname, char *savename, int e
 	bufsize = (int)obj->size;
 
 	HSP3Crypt* cm = GetCurrentCryptManager();
-	strcpy(namebuf_utf8, GetFolderName(obj));
-	strcat(namebuf_utf8, GetFileName(obj));
+	namebuf_utf8[0] = 0;
+	if (!hsp_pack_path_append(namebuf_utf8, sizeof(namebuf_utf8), GetFolderName(obj)) ||
+		!hsp_pack_path_append(namebuf_utf8, sizeof(namebuf_utf8), GetFileName(obj))) {
+		Print((char*)"#Path is too long.");
+		return -1;
+	}
 	int enc_crypt = cm->GetCRC32(namebuf_utf8, strlen(namebuf_utf8));			// ファイルパスを暗号キーにする
 	enc_crypt = cm->GetSalt(enc_crypt);
 	if (enc_crypt == 0) enc_crypt = 1;
@@ -460,8 +532,8 @@ int FilePack::ExtractFile( HFPHED *hed, const char *fname, char *savename, int e
 	cm->DataSet(NULL, bufsize, obj->crypt);
 
 	if (sname == NULL) {
-		utf8_to_hsp3(namebuf, GetFileName(obj), HFP_PATH_MAX);
-		sname = namebuf;
+		if (hsp_path_from_utf8(namebuf, hsp_path::utf8_view(GetFileName(obj))) != 0) return -2;
+		sname = namebuf.c_str();
 	}
 	fp = hsp3_fopenwrite( sname );
 	if ( fp == NULL ) return -2;
@@ -483,9 +555,7 @@ int FilePack::ExtractFile( HFPHED *hed, const char *fname, char *savename, int e
 	_fcloseall();
 #endif
 
-	char msg[1024];
-	sprintf(msg, "#%s extracted.(%d)", sname, bufsize);
-	Print(msg);
+	Print(format_message("#%s extracted.(%d)", sname, bufsize).c_str());
 
 	return 0;
 }
@@ -512,13 +582,11 @@ void FilePack::PrintFiles(void)
 	HFPOBJ* obj;
 	obj = GetCurrentObjectHeader();
 	for (i = 0; i < hed->max_file; i++) {
-		char msg[1024];
-		char name[HFP_PATH_MAX];
-		char foldername[HFP_PATH_MAX];
-		utf8_to_hsp3(name, GetFileName(obj), HFP_PATH_MAX);
-		utf8_to_hsp3(foldername, GetFolderName(obj), HFP_PATH_MAX);
-		sprintf(msg, "#%d [%s%s] %d", i, foldername, name, (int)obj->size);
-		Print(msg);
+		std::string name;
+		std::string foldername;
+		if (hsp_path_from_utf8(name, hsp_path::utf8_view(GetFileName(obj))) != 0 ||
+			hsp_path_from_utf8(foldername, hsp_path::utf8_view(GetFolderName(obj))) != 0) return;
+		Print(format_message("#%d [%s%s] %d", i, foldername.c_str(), name.c_str(), (int)obj->size).c_str());
 		obj++;
 	}
 }
@@ -561,24 +629,36 @@ int FilePack::MakeEXEFile(int mode, const char* hspexe, const char* basename, in
 	char c;
 	int* ip;
 	int chksum, sum, sumseed, sumsize;
-	char tmp[1024];
 
 	//		HSPランタイムを検索
 	//
-	strcpy(hrtfile, hspexe);
+	hrtfile[0] = 0;
+	if (!hsp_pack_path_append(hrtfile, sizeof(hrtfile), hspexe)) {
+		Print((char*)"#Path is too long.");
+		return -1;
+	}
 	StrSplit(hspexe, foldername, filename);
 
 	fp = hsp3_fopen(hrtfile);
 	if (fp == NULL) {
-		sprintf(hrtfile, "%sruntime\\%s", foldername, filename);
+		hrtfile[0] = 0;
+		if (!hsp_pack_path_append(hrtfile, sizeof(hrtfile), foldername) ||
+			!hsp_pack_path_append(hrtfile, sizeof(hrtfile), "runtime\\") ||
+			!hsp_pack_path_append(hrtfile, sizeof(hrtfile), filename)) {
+			Print((char*)"#Path is too long.");
+			return -1;
+		}
 		fp = hsp3_fopen(hrtfile);
 		//
 		if (fp == NULL) {
-			strcpy(hrtfile, filename);
+			hrtfile[0] = 0;
+			if (!hsp_pack_path_append(hrtfile, sizeof(hrtfile), filename)) {
+				Print((char*)"#Path is too long.");
+				return -1;
+			}
 			fp = hsp3_fopen(hrtfile);
 			if (fp == NULL) {
-				sprintf(tmp, "#No file [%s].", hspexe);
-				Print(tmp);
+				Print(format_message("#No file [%s].", hspexe).c_str());
 				return -1;
 			}
 		}
@@ -600,27 +680,39 @@ int FilePack::MakeEXEFile(int mode, const char* hspexe, const char* basename, in
 		Print("#Not found hsp index.");
 		return -1;
 	}
-	sprintf(tmp, "#Found hsp index in $%05lx/$%05lx.", sidx, x1);
-	Print(tmp);
+	Print(format_message("#Found hsp index in $%05lx/$%05lx.", sidx, x1).c_str());
 
 	//		作成される実行ファイル名
 	//
-	strcpy(sname, basename);
+	sname[0] = 0;
+	if (!hsp_pack_path_append(sname, sizeof(sname), basename)) {
+		Print((char*)"#Path is too long.");
+		return -1;
+	}
 	if (mode == 2) {
-		strcat(sname, ".scr");
+		if (!hsp_pack_path_append(sname, sizeof(sname), ".scr")) {
+			Print((char*)"#Path is too long.");
+			return -1;
+		}
 	}
 	else {
-		strcat(sname, ".exe");
+		if (!hsp_pack_path_append(sname, sizeof(sname), ".exe")) {
+			Print((char*)"#Path is too long.");
+			return -1;
+		}
 	}
 
 	//		DPMのチェックサムを作成
 	//
-	strcpy(dpmname, basename);
-	strcat(dpmname, DPMFILEEXT);
+	dpmname[0] = 0;
+	if (!hsp_pack_path_append(dpmname, sizeof(dpmname), basename) ||
+		!hsp_pack_path_append(dpmname, sizeof(dpmname), DPMFILEEXT)) {
+		Print((char*)"#Path is too long.");
+		return -1;
+	}
 	fp = hsp3_fopen(dpmname);
 	if (fp == NULL) {
-		sprintf(tmp, "#No file [%s].", dpmname);
-		Print(tmp);
+		Print(format_message("#No file [%s].", dpmname).c_str());
 		return -1;
 	}
 	sum = 0; sumsize = 0;
@@ -650,22 +742,19 @@ int FilePack::MakeEXEFile(int mode, const char* hspexe, const char* basename, in
 
 	fp2 = hsp3_fopen(dpmname);
 	if (fp2 == NULL) {
-		sprintf(tmp, "#No file [%s].", dpmname);
-		Print(tmp);
+		Print(format_message("#No file [%s].", dpmname).c_str());
 		return -1;
 	}
 	fp = hsp3_fopen(hrtfile);
 	if (fp == NULL) {
 		hsp3_fclose(fp2);
-		sprintf(tmp, "#No file [%s].", hspexe);
-		Print(tmp);
+		Print(format_message("#No file [%s].", hspexe).c_str());
 		return -1;
 	}
 	fp3 = hsp3_fopenwrite(sname);
 	if (fp3 == NULL) {
 		hsp3_fclose(fp2); hsp3_fclose(fp);
-		sprintf(tmp, "#Write error [%s].", sname);
-		Print(tmp);
+		Print(format_message("#Write error [%s].", sname).c_str());
 		return -1;
 	}
 
@@ -689,9 +778,6 @@ int FilePack::MakeEXEFile(int mode, const char* hspexe, const char* basename, in
 	_fcloseall();
 #endif
 
-	sprintf(tmp, "Make custom execute file [%s].", sname);
-	Print(tmp);
+	Print(format_message("Make custom execute file [%s].", sname).c_str());
 	return 0;
 }
-
-

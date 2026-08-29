@@ -22,6 +22,7 @@
 #endif
 
 #include "../supio.h"
+#include "../hsp3pathio.h"
 #include "../dpmread.h"
 #include "../strbuf.h"
 #include "mmman.h"
@@ -214,8 +215,7 @@ int MMMan::Load( char *fname, int num, int opt )
 	char *pt;
 	int flag;
 	MMM *mmm;
-	HSPAPICHAR *hactmp1 = 0;
-	HSPAPICHAR wfext[9];
+	std::string wfext;
 
 	flag = MMDATA_MCIVOICE;
 	pt = NULL;
@@ -228,24 +228,24 @@ int MMMan::Load( char *fname, int num, int opt )
 		a = atoi( fname+3 );if ( a<1 ) a=1;
 	}
 
-	getpathW(chartoapichar(fname,&hactmp1),wfext,16+2);				// 拡張子を小文字で取り出す
+	// 拡張子を小文字で取り出す
+	if (!getpath(std::string(fname != NULL ? fname : ""), wfext, 16+2)) wfext.clear();
 
-	if (!_tcscmp(wfext,TEXT(".avi"))) {				// when "AVI"
+	if (wfext == ".avi") {				// when "AVI"
 		flag = MMDATA_MCIVIDEO;
 	}
 
-	if (!_tcscmp(wfext,TEXT(".wmv"))) {				// when "WMV"
+	if (wfext == ".wmv") {				// when "WMV"
 		flag = MMDATA_MCIVIDEO;
 	}
 
-	if (!_tcscmp(wfext,TEXT(".mpg"))) {				// when "MPG"
+	if (wfext == ".mpg") {				// when "MPG"
 		flag = MMDATA_MPEGVIDEO;
 	}
 
-	if (!_tcscmp(wfext,TEXT(".wav"))) {				// when "WAV"
+	if (wfext == ".wav") {				// when "WAV"
 		getlen = dpm_exist( fname );
 		if (getlen == -1) {
-			freehac(&hactmp1);
 			return 1;
 		}
 		if ( getlen < 10000000 ) {			// 10MB以上はMCIから再生
@@ -254,8 +254,6 @@ int MMMan::Load( char *fname, int num, int opt )
 			flag = MMDATA_INTWAVE;
 		}
 	}
-	freehac(&hactmp1);
-
 	mmm = SetBank( num, flag, opt, pt, fname );
 
 	if ( flag == MMDATA_CDAUDIO ) {
@@ -509,5 +507,3 @@ void MMMan::StopBank(int num)
 		break;
 	}
 }
-
-

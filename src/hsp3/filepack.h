@@ -158,10 +158,10 @@ private:
 	//	Internal Use
 	//
 	void PrepareRead(int slot = 0, int encode = 0);
-	int CopyFileToDPM( FILE *ff, char *filename, HFPSIZE size, int encode );
+	int CopyFileToDPM( FILE *ff, const char *filename, HFPSIZE size, int encode );
 	void PrepareWrite(int slot = 0, int encode = 0);
 	int RegisterFromPacklist(const char* name, int crypt = 1);
-	HSPPTRINT RegisterFile(char* name, int crypt = 0, int orig = 0);
+	HSPPTRINT RegisterFile(const char* name, int crypt = 0, int orig = 0);
 
 	//	Utility
 	//

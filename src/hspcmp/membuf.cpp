@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <limits.h>
 #include "membuf.h"
 #include "supio.h"
 
@@ -85,30 +86,46 @@ void CMemBuf::ExchangeSubToMainBuffer(int size)
 }
 
 
-char *CMemBuf::PreparePtr( int sz )
+bool CMemBuf::TryPreparePtr( int sz, char **result )
 {
 	//	バッファ拡張チェック
 	//	(szサイズを書き込み可能なバッファを返す)
-	//		(return:もとのバッファ先頭ptr)
+	//		(result:もとのバッファ先頭ptr)
 	//
-	int i;
-	char *p;
-	if ( (cur+sz) < size ) {
-		p = mem_buf + cur;
-		cur += sz;
-		return p;
+	if (result == NULL || sz < 0 || cur < 0 || size < 0 || limit_size <= 0) {
+		return false;
 	}
+	size_t required = (size_t)cur + (size_t)sz;
+	if (required > INT_MAX) return false;
+	if (required < (size_t)size) {
+		*result = mem_buf + cur;
+		cur += sz;
+		return true;
+	}
+
 	//	expand buffer (VCのreallocは怖いので使わない)
-	i = size;
-	while( i<=(cur+sz) ) i+=limit_size;
-	p = (char *)malloc( i );
-	memcpy( p, mem_buf, size );
+	int new_size = size;
+	while ((size_t)new_size <= required) {
+		if (new_size > INT_MAX - limit_size) return false;
+		new_size += limit_size;
+	}
+	char *p = (char *)malloc((size_t)new_size);
+	if (p == NULL) return false;
+	memcpy(p, mem_buf, (size_t)size);
 	free( mem_buf );
-	size = i;
+	size = new_size;
 	mem_buf = p;
-	p = mem_buf + cur;
+	*result = mem_buf + cur;
 	cur += sz;
-	return p;
+	return true;
+}
+
+
+char *CMemBuf::PreparePtr( int sz )
+{
+	char *result = NULL;
+	if (!TryPreparePtr(sz, &result)) return NULL;
+	return result;
 }
 
 
@@ -142,63 +159,78 @@ void CMemBuf::IndexExclusive(void)
 }
 
 
-void CMemBuf::Put( int data )
+bool CMemBuf::Put( int data )
 {
 	char *p;
 	p = PreparePtr( sizeof(int) );
+	if (p == NULL) return false;
 	memcpy( p, &data, sizeof(int) );
+	return true;
 }
 
 
-void CMemBuf::Put( short data )
+bool CMemBuf::Put( short data )
 {
 	char *p;
 	p = PreparePtr( sizeof(short) );
+	if (p == NULL) return false;
 	memcpy( p, &data, sizeof(short) );
+	return true;
 }
 
 
-void CMemBuf::Put( char data )
+bool CMemBuf::Put( char data )
 {
 	char *p;
 	p = PreparePtr( 1 );
+	if (p == NULL) return false;
 	*p = data;
+	return true;
 }
 
 
-void CMemBuf::Put( unsigned char data )
+bool CMemBuf::Put( unsigned char data )
 {
 	unsigned char *p;
 	p = (unsigned char *) PreparePtr( 1 );
+	if (p == NULL) return false;
 	*p = data;
+	return true;
 }
 
 
-void CMemBuf::Put( float data )
+bool CMemBuf::Put( float data )
 {
 	char *p;
 	p = PreparePtr( sizeof(float) );
+	if (p == NULL) return false;
 	memcpy( p, &data, sizeof(float) );
+	return true;
 }
 
 
-void CMemBuf::Put( double data )
+bool CMemBuf::Put( double data )
 {
 	char *p;
 	p = PreparePtr( sizeof(double) );
+	if (p == NULL) return false;
 	memcpy( p, &data, sizeof(data) );
+	return true;
 }
 
 
-void CMemBuf::PutStr( const char *data )
+bool CMemBuf::PutStr( const char *data )
 {
 	char *p;
+	if (data == NULL) return false;
 	p = PreparePtr( strlen(data) );
+	if (p == NULL) return false;
 	strcpy( p, data );
+	return true;
 }
 
 
-void CMemBuf::PutStrDQ( char *data )
+bool CMemBuf::PutStrDQ( char *data )
 {
 	//		ダブルクォート内専用str
 	//
@@ -207,6 +239,7 @@ void CMemBuf::PutStrDQ( char *data )
 	unsigned char a1;
 	unsigned char a2;
 	int fl;
+	if (data == NULL) return false;
 	src = (unsigned char *)data;
 
 	while(1) {
@@ -216,6 +249,7 @@ void CMemBuf::PutStrDQ( char *data )
 		fl = 0;
 		if ( a1 == '\\' ) {					// \を\\に
 			p = (unsigned char *) PreparePtr( 1 );
+			if (p == NULL) return false;
 			*p = a1;
 		}
 		if ( a1 == 13 ) {					// CRを\nに
@@ -230,37 +264,48 @@ void CMemBuf::PutStrDQ( char *data )
 		}
 		if ( fl ) {
 			p = (unsigned char *) PreparePtr( 2 );
+			if (p == NULL) return false;
 			p[0] = a1;
 			p[1] = a2;
 			continue;
 		}
 		p = (unsigned char *) PreparePtr( 1 );
+		if (p == NULL) return false;
 		*p = a1;
 	}
+	return true;
 }
 
 
-void CMemBuf::PutStrBlock( char *data )
+bool CMemBuf::PutStrBlock( char *data )
 {
 	char *p;
+	if (data == NULL) return false;
 	p = PreparePtr( strlen(data)+1 );
+	if (p == NULL) return false;
 	strcpy( p, data );
+	return true;
 }
 
 
-void CMemBuf::PutCR( void )
+bool CMemBuf::PutCR( void )
 {
 	char *p;
 	p = PreparePtr( 2 );
+	if (p == NULL) return false;
 	*p++ = 13; *p++ = 10;
+	return true;
 }
 
 
-void CMemBuf::PutData( void *data, int sz )
+bool CMemBuf::PutData( void *data, int sz )
 {
 	char *p;
+	if (data == NULL || sz < 0) return false;
 	p = PreparePtr( sz );
+	if (p == NULL) return false;
 	memcpy( p, (char *)data, sz );
+	return true;
 }
 
 
@@ -270,13 +315,15 @@ void CMemBuf::PutData( void *data, int sz )
 # define VSNPRINTF vsnprintf
 #endif
 
-void CMemBuf::PutStrf( char *format, ... )
+bool CMemBuf::PutStrf( char *format, ... )
 {
 	va_list args;
 	int c = cur;
 	int space = size - cur;
+	if (format == NULL) return false;
 	while(1) {
 		char *p = PreparePtr(space - 1);
+		if (p == NULL) return false;
 		cur = c;
 		space = size - cur;
 		int n;
@@ -285,7 +332,7 @@ void CMemBuf::PutStrf( char *format, ... )
 		va_end(args);
 		if ( 0 <= n && n < space ) {
 			cur += n;
-			return;
+			return true;
 		}
 		if ( 0 <= n ) {
 			space = n + 1;
@@ -305,16 +352,22 @@ int CMemBuf::PutFile( const char *fname )
 	int length;
 	FILE *ff;
 
-	ff=fopen( fname,"rb" );
-	if (ff==NULL) return -1;
-	fseek( ff,0,SEEK_END );
-	length=(int)ftell( ff );			// normal file size
-	fclose(ff);
-	if (length < 0) return -1;
+	int64_t file_size = hsp_path_filesize(hsp_path::path_view(fname));
+	if (file_size < 0 || file_size >= INT_MAX) return -1;
+	length = (int)file_size;
+	ff = hsp_path_fopen(hsp_path::path_view(fname), "rb");
+	if (ff == NULL) return -1;
 
-	p = PreparePtr( length+1 );
-	ff=fopen( fname,"rb" );
-	fread( p, 1, length, ff );
+	int original_size = cur;
+	if (!TryPreparePtr(length + 1, &p)) {
+		fclose(ff);
+		return -1;
+	}
+	if (fread(p, 1, length, ff) != (size_t)length) {
+		fclose(ff);
+		ReduceSize(original_size);
+		return -1;
+	}
 	fclose(ff);
 	p[length]=0;
 	
@@ -451,7 +504,7 @@ int CMemBuf::SaveFile( const char *fname )
 	//
 	FILE *fp;
 	int flen;
-	fp=fopen(fname,"wb");
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "w+b");
 	if (fp==NULL) return -1;
 	flen = fwrite( mem_buf, 1, cur, fp );
 	fclose(fp);
@@ -466,4 +519,3 @@ char *CMemBuf::GetFileName( void )
 	//
 	return const_cast<char*>(name.c_str());
 }
-

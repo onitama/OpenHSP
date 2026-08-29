@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <filesystem>
 
 #include "../hsp3/hsp3config.h"
 #include "../hsp3/hsp3debug.h"
@@ -21,6 +22,10 @@
 #include "comutil.h"
 
 #include "errormsg.h"
+
+namespace {
+namespace fs = std::filesystem;
+}
 
 //-------------------------------------------------------------
 //		Routines
@@ -1549,7 +1554,7 @@ void CToken::GenerateCodePP_cmd( void )
 	if ( ttype != TK_NUM ) throw CGERROR_PP_NO_REGCMD;
 	id = val;
 
-	id = lb->Regist( cmd, cg_pptype, id , cg_orgfilefull, cg_orgline );
+	id = lb->Regist( cmd, cg_pptype, id , cg_orgfilefull.c_str(), cg_orgline );
 	GenerateLabelListAndTag(id, LABBUF_FLAG_EXCMD);
 	//Mesf( "#%x:%d [%s]",cg_pptype, id, cmd );
 }
@@ -1610,7 +1615,7 @@ void CToken::GenerateCodePP_usecom( void )
 
 	PutStructStart();
 	prmid = PutStructEndDll( "*", cg_libindex, STRUCTPRM_SUBID_COMOBJ, -1 );
-	int id = lb->Regist( libname, TYPE_DLLCTRL, prmid | TYPE_OFFSET_COMOBJ, cg_orgfilefull, cg_orgline );
+	int id = lb->Regist( libname, TYPE_DLLCTRL, prmid | TYPE_OFFSET_COMOBJ, cg_orgfilefull.c_str(), cg_orgline );
 	GenerateLabelListAndTag(id, LABBUF_FLAG_EXCMD);
 
 	//Mesf( "#usecom %s [%s][%s]",libname,clsname,iidname );
@@ -1752,7 +1757,7 @@ void CToken::GenerateCodePP_func( int deftype )
 		//Mesf( "Warning:Old func expression [%s]", fbase );
 	}
 	i = PutStructEndDll( fname, cg_libindex, subid, otflag );
-	int id = lb->Regist( fbase, TYPE_DLLFUNC, i, cg_orgfilefull, cg_orgline );
+	int id = lb->Regist( fbase, TYPE_DLLFUNC, i, cg_orgfilefull.c_str(), cg_orgline );
 	GenerateLabelListAndTag(id, LABBUF_FLAG_EXCMD);
 
 	//Mesf( "#func [%s][%s][%d]",fbase, fname, i );
@@ -1804,7 +1809,7 @@ void CToken::GenerateCodePP_comfunc( void )
 	}
 	subid = STRUCTPRM_SUBID_COMOBJ;
 	i = PutStructEndDll( "*", cg_libindex, subid, imp_index );
-	int id = lb->Regist(fbase, TYPE_DLLCTRL, i | TYPE_OFFSET_COMOBJ, cg_orgfilefull, cg_orgline);
+	int id = lb->Regist(fbase, TYPE_DLLCTRL, i | TYPE_OFFSET_COMOBJ, cg_orgfilefull.c_str(), cg_orgline);
 	GenerateLabelListAndTag(id, LABBUF_FLAG_EXCMD);
 
 	//Mesf( "#comfunc [%s][%d][%d]",fbase, imp_index, i );
@@ -1999,7 +2004,7 @@ void CToken::GenerateCodePP_deffunc0( int is_command )
 					CG_MesLabelDefinition(i);
 					throw CGERROR_PP_ALREADY_USE_PARAM;
 				}
-				i = lb->Regist( cg_str, TYPE_STRUCT, prmid, cg_orgfilefull, cg_orgline );
+				i = lb->Regist( cg_str, TYPE_STRUCT, prmid, cg_orgfilefull.c_str(), cg_orgline );
 				cg_localstruct[ cg_localcur++ ] = i;
 				GetTokenCG( GETTOKEN_DEFAULT );
 			}
@@ -2013,9 +2018,9 @@ void CToken::GenerateCodePP_deffunc0( int is_command )
 	ot = PutOT( GetCS() );
 	if ( index == -1 ) {
 		index = GET_FI_SIZE();
-		fi_buf->PreparePtr( sizeof(HED_STRUCTDAT) );
+		if (fi_buf->PreparePtr( sizeof(HED_STRUCTDAT) ) == NULL) throw CGERROR_FATAL;
 		if ( regflag ) {
-			lb->Regist( funcname, TYPE_MODCMD, index, cg_orgfilefull, cg_orgline);
+			lb->Regist( funcname, TYPE_MODCMD, index, cg_orgfilefull.c_str(), cg_orgline);
 		}
 	}
 	if ( label_id >= 0 ) {
@@ -2085,7 +2090,7 @@ void CToken::GenerateCodePP_struct( void )
 
 	PutStructStart();
 	prmid = PutStructParamTag();					// modinit用のTAG
-	lb->Regist( funcname, TYPE_STRUCT, prmid, cg_orgfilefull, cg_orgline);
+	lb->Regist( funcname, TYPE_STRUCT, prmid, cg_orgfilefull.c_str(), cg_orgline);
 	//Mesf( "%d:%s",prmid, funcname );
 
 	while(1) {
@@ -2104,7 +2109,7 @@ void CToken::GenerateCodePP_struct( void )
 		if ( i >= 0 ) {
 			CG_MesLabelDefinition(i); throw CGERROR_PP_ALREADY_USE_PARAM;
 		}
-		lb->Regist( cg_str, TYPE_STRUCT, prmid, cg_orgfilefull, cg_orgline);
+		lb->Regist( cg_str, TYPE_STRUCT, prmid, cg_orgfilefull.c_str(), cg_orgline);
 
 		GetTokenCG( GETTOKEN_DEFAULT );
 		if ( ttype >= TK_EOL ) break;
@@ -2159,7 +2164,7 @@ int CToken::SetVarsFixed( char *varname, int fixedvalue )
 	int id;
 	id = lb->Search( varname );
 	if ( id < 0 ) {
-		id = lb->Regist( varname, TYPE_VAR, cg_valcnt, cg_orgfilefull, cg_orgline);
+		id = lb->Regist( varname, TYPE_VAR, cg_valcnt, cg_orgfilefull.c_str(), cg_orgline);
 		cg_valcnt++;
 	}
 	if (fixedvalue != LAB_TYPEFIX_NONE) {
@@ -2191,8 +2196,20 @@ void CToken::GenerateCodePP( char *buf )
 		cg_orgline = val;
 		GetTokenCG( GETTOKEN_DEFAULT );
 		if ( ttype == TK_STRING ) {
-			strcpy(cg_orgfilefull, cg_str);
-			getpath(cg_orgfilefull,cg_orgfile,8);
+			std::string cg_orgfile_utf8 = cg_str;
+#if defined(HSPWIN) && defined(HSP_PATHIO_UTF8) && !defined(HSPUTF8)
+			if (!pp_utf8) {
+				std::string converted_path;
+				if (hsp_path_from_ansi(converted_path, hsp_path::ansi_view(cg_str)) != 0) {
+					throw CGERROR_PP_BAD_SOURCE_PATH;
+				}
+				cg_orgfile_utf8 = converted_path;
+			}
+#endif
+			cg_orgfilefull = cg_orgfile_utf8;
+			if (!getpath(cg_orgfile_utf8, cg_orgfile, 8)) {
+				throw CGERROR_PP_BAD_SOURCE_PATH;
+			}
 			if ( cg_debug ) {
 				i = PutDSBuf( cg_str );
 				PutDI( 254, i, cg_orgline );				// ファイル名をデバッグ情報として登録
@@ -2318,12 +2335,12 @@ int CToken::GenerateCodeSub( void )
 				LABOBJ *lab;
 				lab = lb->GetLabel( i );
 				if ( lab->type != TYPE_XLABEL ) throw CGERROR_LABELEXIST;
-				lb->SetDefinition(i, cg_orgfilefull, cg_orgline);
+				lb->SetDefinition(i, cg_orgfilefull.c_str(), cg_orgline);
 				GenerateLabelListAndTag(i, LABBUF_FLAG_LABEL);
 				SetOT( lb->GetOpt(i), GetCS() );
 				lab->type = TYPE_LABEL;
 			} else {
-				i = lb->Regist( cg_str, TYPE_LABEL, ot_buf->GetSize() / sizeof(int), cg_orgfilefull, cg_orgline );
+				i = lb->Regist( cg_str, TYPE_LABEL, ot_buf->GetSize() / sizeof(int), cg_orgfilefull.c_str(), cg_orgline );
 				GenerateLabelListAndTag(i, LABBUF_FLAG_LABEL);
 				PutOT( GetCS() );
 			}
@@ -2466,8 +2483,8 @@ void CToken::ResetGenerator(unsigned char *ptr)
 	cg_iflev = 0;
 	cg_wp = ptr;
 	cg_ptr = GetLineCG();
-	cg_orgfile[0] = 0;
-	cg_orgfilefull[0] = 0;
+	cg_orgfile.clear();
+	cg_orgfilefull.clear();
 	cg_libindex = -1;
 	cg_libmode = CG_LIBMODE_NONE;
 	cg_lastcs = 0;
@@ -3068,7 +3085,7 @@ int CToken::PutStructEnd( int i, char *name, int libindex, int otindex, int func
 int CToken::PutStructEnd( char *name, int libindex, int otindex, int funcflag )
 {
 	int i = GET_FI_SIZE();
-	fi_buf->PreparePtr( sizeof(HED_STRUCTDAT) );
+	if (fi_buf->PreparePtr( sizeof(HED_STRUCTDAT) ) == NULL) throw CGERROR_FATAL;
 	return PutStructEnd( i, name, libindex, otindex, funcflag );
 }
 
@@ -3114,7 +3131,7 @@ void CToken::PutHPI( short flag, short option, char *libname, char *funcname )
 }
 
 
-int CToken::GenerateCode( char *fname, char *oname, int mode )
+int CToken::GenerateCode( const char *fname, const char *oname, int mode )
 {
 	CMemBuf srcbuf;
 	if ( srcbuf.PutFile( fname ) < 0 ) {
@@ -3125,7 +3142,7 @@ int CToken::GenerateCode( char *fname, char *oname, int mode )
 }
 
 
-int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
+int CToken::GenerateCode( CMemBuf *srcbuf, const char *oname, int mode )
 {
 	//		ファイルをHSP3Codeに展開する
 	//		mode			COMP_MODE_DEBUG Debug code (0=off 1=on)
@@ -3177,10 +3194,25 @@ int CToken::GenerateCode( CMemBuf *srcbuf, char *oname, int mode )
 		char tmp[8192];
 		CStrNote note;
 		CMemBuf srctmp;
+#ifdef HSPCMP_DLL
+		hspcmp_message_path message_cg_orgfile(cg_orgfile.c_str());
+#endif
 #ifdef JPNMSG
-		Mesf( "%s(%d) : error %d : %s (%d行目)", cg_orgfile, cg_orgline, res, cg_geterror((CGERROR)res), cg_orgline );
+		Mesf( "%s(%d) : error %d : %s (%d行目)",
+#ifdef HSPCMP_DLL
+			message_cg_orgfile.c_str(),
 #else
-		Mesf("%s(%d) : error %d : %s (line %d)", cg_orgfile, cg_orgline, res, cg_geterror((CGERROR)res), cg_orgline);
+			cg_orgfile.c_str(),
+#endif
+			cg_orgline, res, cg_geterror((CGERROR)res), cg_orgline );
+#else
+		Mesf("%s(%d) : error %d : %s (line %d)",
+#ifdef HSPCMP_DLL
+			message_cg_orgfile.c_str(),
+#else
+			cg_orgfile.c_str(),
+#endif
+			cg_orgline, res, cg_geterror((CGERROR)res), cg_orgline);
 #endif
 		if ( cg_errline > 0 ) {
 			note.Select( bakbuf.GetBuffer() );
@@ -3409,16 +3441,29 @@ void CToken::CG_MesLabelDefinition(int label_id)
 
 	LABOBJ* const labobj = lb->GetLabel(label_id);
 	if ( labobj->def_file ) {
+#ifdef HSPCMP_DLL
+		hspcmp_message_path message_def_file(labobj->def_file);
+#endif
 #ifdef JPNMSG
-		Mesf("#識別子「%s」の定義位置: line %d in [%s]", lb->GetName(label_id), labobj->def_line, labobj->def_file);
+		Mesf("#識別子「%s」の定義位置: line %d in [%s]", lb->GetName(label_id), labobj->def_line,
+#ifdef HSPCMP_DLL
+			message_def_file.c_str());
 #else
-		Mesf("#Identifier '%s' has already defined in line %d in [%s]", lb->GetName(label_id), labobj->def_line, labobj->def_file);
+			labobj->def_file);
+#endif
+#else
+		Mesf("#Identifier '%s' has already defined in line %d in [%s]", lb->GetName(label_id), labobj->def_line,
+#ifdef HSPCMP_DLL
+			message_def_file.c_str());
+#else
+			labobj->def_file);
+#endif
 #endif
 	}
 }
 
 
-int	CToken::SaveStringMap(char* fname)
+int	CToken::SaveStringMap(const char* fname)
 {
 	//	Output String Map
 	//
@@ -3452,7 +3497,7 @@ int	CToken::SaveStringMap(char* fname)
 }
 
 
-void CToken::GenerateLabelTag(char* name, int flag, int type, char* fname, int line)
+void CToken::GenerateLabelTag(char* name, int flag, int type, const char* fname, int line)
 {
 	//	クロスリファレンス用のメッセージを出力する
 	if (labbuf == NULL) return;
@@ -3495,14 +3540,14 @@ void CToken::GenerateLabelListAndTag(int labelid, int flag)
 	lab = lb->GetLabel(labelid);
 	if (lab == NULL) return;
 
-	GenerateLabelTag(lab->name, flag, lab->type, (char*)lab->def_file, lab->def_line);
+	GenerateLabelTag(lab->name, flag, lab->type, lab->def_file, lab->def_line);
 }
 
 
 void CToken::GenerateLabelListAndTag(char *name, int flag)
 {
 	if (labbuf == NULL) return;
-	GenerateLabelTag(name, flag , 0, cg_orgfilefull, cg_orgline);
+	GenerateLabelTag(name, flag , 0, cg_orgfilefull.c_str(), cg_orgline);
 }
 
 
@@ -3520,5 +3565,5 @@ void CToken::GenerateLabelListAndTagRef(int labelid, int flag )
 	}
 	if ((cg_labout_mode & LABLIST_MODE_REFERENCE) == 0) return;
 
-	GenerateLabelTag(lab->name, flag| LABBUF_FLAG_REFER, lab->type, cg_orgfilefull, cg_orgline );
+	GenerateLabelTag(lab->name, flag| LABBUF_FLAG_REFER, lab->type, cg_orgfilefull.c_str(), cg_orgline );
 }

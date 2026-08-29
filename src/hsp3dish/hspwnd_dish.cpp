@@ -15,6 +15,7 @@
 #include "../hsp3/hsp3debug.h"
 #include "../hsp3/strbuf.h"
 #include "../hsp3/strnote.h"
+#include "../hsp3/hsp3pathio.h"
 
 HspWnd *curwnd;
 
@@ -277,17 +278,17 @@ int HspWnd::GetPreloadBufferId(char* fname)
 	//
 	int i;
 	Bmscr* bm;
-	char basename[HSP_MAX_PATH];
-	getpath( fname, basename, 8+16 );
+	std::string basename;
+	if (!getpath(std::string(fname != NULL ? fname : ""), basename, 8+16)) basename.clear();
 
 	for (i = 1; i < bmscr_max; i++) {
 		bm = GetBmscr(i);
 		if (bm != NULL) {
 			if (bm->type == HSPWND_TYPE_BUFFER) {
 				if (bm->flag == BMSCR_FLAG_INUSE) {
-					char bname[HSP_MAX_PATH];
-					getpath(bm->resname, bname, 8 + 16);
-					if (strcmp(bname, basename) == 0) {
+					std::string bname;
+					if (!getpath(std::string(bm->resname), bname, 8 + 16)) bname.clear();
+					if (bname == basename) {
 						return bm->wid;
 					}
 				}
@@ -1390,5 +1391,3 @@ int Bmscr::Viewcalc_set(int type, HSPREAL x, HSPREAL y, HSPREAL p_sx, HSPREAL p_
 	hgio_setview((BMSCR*)this);
 	return 0;
 }
-
-

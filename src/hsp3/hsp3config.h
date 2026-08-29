@@ -64,6 +64,10 @@
 #define HSPUTF8			// UTF8使用フラグ
 #endif
 
+#if defined(HSPUTF8)
+#define HSP_PATHIO_UTF8		// UTF-8 path I/O flag
+#endif
+
 #if defined(HSPEMSCRIPTEN)
 #define HSPRANDMT // Use std::mt19937
 #endif

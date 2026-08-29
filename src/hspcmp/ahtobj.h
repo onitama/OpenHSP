@@ -120,7 +120,7 @@ public:
 	char *GetPartsName( int id );
 	char *GetPartsClassName( int id );
 	int GetPartsIconID( int id );
-	int BuildParts( char *list, char *path );
+	int BuildParts( char *list, const char *path );
 	void BuildGlobalID( void );
 	char *SearchModelByClassName( char *clsname );
 	void FindModelStart( void );
@@ -140,7 +140,7 @@ private:
 	void DisposeModel( void );
 	void SaveProjectSub( AHTMODEL *model );
 	void DisposeParts( void );
-	int BuildPartsSub( int id, char *fname );
+	int BuildPartsSub( int id, const char *fname );
 	void PickLineBuffer( char *out, size_t out_size );
 	int BuildGlobalIDSub( const char *fname, const char *pname, int i );
 	int tstrcmp(const char* str1, const char* str2);

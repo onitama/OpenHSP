@@ -152,66 +152,6 @@ char *strchr2( char *target, char code )
 }
 
 
-void getpath( char *stmp, char *outbuf, int p2 )
-{
-	//	getpath
-	// 
-	//	0 : 文字列のコピー(操作なし)
-	//	1 : 拡張子を除くファイル名
-	//	2 : 拡張子のみ(. ? ? ? )
-	//	8 : ディレクトリ情報を取り除く
-	//	16 : 文字列を小文字に変換する
-	//	32 : ディレクトリ情報のみ
-	char *p;
-	char workbuf[_MAX_PATH];
-
-	char p_drive[_MAX_PATH];
-	char p_dir[_MAX_DIR];
-	char p_fname[_MAX_FNAME];
-	char p_ext[_MAX_EXT];
-
-	p = outbuf;
-	strcpy(workbuf,stmp);
-	if (p2&16) strcase(workbuf);
-
-	//新しいVC++で0x5cコードが正しく処理されないためSJIS版の_splitpathは使用せず
-	//_splitpath( stmp, p_drive, p_dir, p_fname, p_ext );
-	wchar_t wszBufPath[_MAX_PATH], wdrive[_MAX_DRIVE], wdir[_MAX_DIR], wfname[_MAX_FNAME], wext[_MAX_EXT];
-
-	mbstowcs(wszBufPath, workbuf, strlen(workbuf) + 1);
-	_wsplitpath(wszBufPath, wdrive, wdir, wfname, wext);
-
-	wcstombs(p_drive, wdrive, _MAX_DRIVE);
-	wcstombs(p_dir, wdir, _MAX_DIR);
-	wcstombs(p_fname, wfname, _MAX_FNAME);
-	wcstombs(p_ext, wext, _MAX_EXT);
-
-	strcat( p_drive, p_dir );
-	if ( p2&8 ) {
-		strcpy(workbuf, p_fname );
-		strcat(workbuf, p_ext );
-	} else if ( p2&32 ) {
-		strcpy(workbuf, p_drive );
-	}
-	switch( p2&7 ) {
-	case 1:			// Name only ( without ext )
-		workbuf[ strlen(workbuf)-strlen(p_ext) ] = 0;
-		strcpy( p, workbuf);
-		break;
-	case 2:			// Ext only
-		strcpy( p, p_ext );
-		break;
-	default:		// Direct Copy
-		strcpy( p, workbuf);
-		break;
-	}
-}
-
-void getpathW( HSPAPICHAR *stmp, HSPAPICHAR *outbuf, int p2 )
-{
-	getpath(stmp,outbuf,p2);
-}
-
 int makedir( const char *name )
 {
 #ifdef HSPWIN
@@ -246,53 +186,6 @@ int delfile( const char *name )
 }
 
 
-int dirlist( const char *fname, char **target, int p3 )
-{
-#ifdef HSPWIN
-	char *p;
-	int fl;
-	int stat_main;
-	HANDLE sh;
-	WIN32_FIND_DATA fd;
-	DWORD fmask;
-	BOOL ff;
-
-	fmask=0;
-	if (p3&1) fmask|=FILE_ATTRIBUTE_DIRECTORY;
-	if (p3&2) fmask|=FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM;
-
-	stat_main=0;
-
-	sh=FindFirstFile( fname, &fd );
-	if (sh==INVALID_HANDLE_VALUE) return 0;
-
-	while(1) {
-		ff=( fd.dwFileAttributes & fmask )>0;
-		if ((p3&4)==0) ff=!ff;
-		if (ff) {
-			p = fd.cFileName; fl = 1;
-			if ( *p==0 ) fl=0;			// 空行を除外
-			if ( *p=='.') {				// '.','..'を除外
-				if ( p[1]==0 ) fl=0;
-				if ((p[1]=='.')&&(p[2]==0)) fl=0;
-			}
-			if (fl) {
-				stat_main++;
-				sbStrAdd( target, p );
-				sbStrAdd( target,"\r\n" );
-			}
-		}
-		if (!FindNextFile(sh, &fd)) {
-			int res = GetLastError();
-			if (res == ERROR_NO_MORE_FILES) break;
-		}
-	}
-	FindClose(sh);
-	return stat_main;
-#else
-	return 0;
-#endif
-}
 
 
 int gettime( int index )

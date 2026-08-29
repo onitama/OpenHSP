@@ -6,6 +6,9 @@
 #ifdef WIN32
 #include <tchar.h>
 #include <direct.h>
+#ifdef HSPUTF8
+#include "../../../hsp3/hsp3utfcnv.h"
+#endif
 #endif
 
 #define OPENGL_ES_DEFINE  "OPENGL_ES"
@@ -71,11 +74,29 @@ Effect* Effect::createFromFile(const char* vshPath, const char* fshPath, const c
     }
 
 #ifdef WIN32
-    TCHAR pw[1024];
+#ifdef HSPUTF8
+    wchar_t pw[4096];
+#else
+    TCHAR pw[4096];
+#endif
     const char* basedir = __default_folder.c_str();
+    bool directoryChanged = false;
     if (*basedir != 0) {
-        _tgetcwd(pw, 1024);
-        chdir(basedir);
+#ifdef HSPUTF8
+        if (_wgetcwd(pw, sizeof(pw) / sizeof(pw[0])) != NULL) {
+            int basedirLength = utf8_to_utf16_strict(NULL, basedir, 0);
+            if (basedirLength > 0) {
+                std::vector<wchar_t> basedirw((size_t)basedirLength);
+                if (utf8_to_utf16_strict(basedirw.data(), basedir, basedirLength) != 0) {
+                    directoryChanged = (_wchdir(basedirw.data()) == 0);
+                }
+            }
+        }
+#else
+        if (_tgetcwd(pw, sizeof(pw) / sizeof(pw[0])) != NULL) {
+            directoryChanged = (chdir(basedir) == 0);
+        }
+#endif
     }
 #endif
 	// Read source from file.
@@ -83,6 +104,15 @@ Effect* Effect::createFromFile(const char* vshPath, const char* fshPath, const c
     if (vshSource == NULL)
     {
         GP_ERROR("Failed to read vertex shader from file '%s'.", vshPath);
+#ifdef WIN32
+        if (directoryChanged) {
+#ifdef HSPUTF8
+            _wchdir(pw);
+#else
+            _tchdir(pw);
+#endif
+        }
+#endif
         return NULL;
     }
     char* fshSource = FileSystem::readAll(fshPath);
@@ -90,14 +120,27 @@ Effect* Effect::createFromFile(const char* vshPath, const char* fshPath, const c
     {
         GP_ERROR("Failed to read fragment shader from file '%s'.", fshPath);
         SAFE_DELETE_ARRAY(vshSource);
+#ifdef WIN32
+        if (directoryChanged) {
+#ifdef HSPUTF8
+            _wchdir(pw);
+#else
+            _tchdir(pw);
+#endif
+        }
+#endif
         return NULL;
     }
 
     Effect* effect = createFromSource(vshPath, vshSource, fshPath, fshSource, defines);
     
 #ifdef WIN32
-    if (*basedir != 0) {
+    if (directoryChanged) {
+#ifdef HSPUTF8
+        _wchdir(pw);
+#else
         _tchdir(pw);
+#endif
     }
 #endif
 

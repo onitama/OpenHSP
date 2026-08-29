@@ -6,7 +6,7 @@
 #define __hsp3win_h
 
 int hsp3win_exec( void );
-int hsp3win_init( HINSTANCE hInstance, char *startfile );
+int hsp3win_init( HINSTANCE hInstance, const char *startfile );
 void hsp3win_dialog( char *mes );
 void hsp3win_bye( void );
 

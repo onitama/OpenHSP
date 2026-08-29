@@ -1,6 +1,7 @@
 #include "gamehsp.h"
 
 #include "../../hsp3/hsp3config.h"
+#include "../../hsp3/hsp3pathio.h"
 #include "../supio.h"
 #include "../sysreq.h"
 #include "../hspwnd.h"
@@ -2228,7 +2229,10 @@ int gamehsp::makeModelNode(char *fname, char *idname, char *defs)
 	gpobj *obj = addObj();
 	if (obj == NULL) return -1;
 
-	getpath(fname, fn, 1);
+	std::string component_name;
+	if (fname == NULL || !getpath(std::string(fname), component_name, 1) ||
+		component_name.size() >= sizeof(fn)) fn[0] = 0;
+	else strcpy(fn, component_name.c_str());
 	strcpy(fn2, fn);
 	strcpy(fn3, fn);
 
@@ -4069,5 +4073,3 @@ int gamehsp::setNodeInfoMaterial(int objid, int option, char* name, int matid)
 	}
 	return result;
 }
-
-

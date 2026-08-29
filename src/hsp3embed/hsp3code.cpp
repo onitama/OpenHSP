@@ -22,6 +22,7 @@
 #include "../hsp3/hsp3int.h"
 #include "../hsp3dish/hspwnd.h"
 #include "../hsp3/hsp3utfcnv.h"
+#include "../hsp3/hsp3pathio.h"
 
 #define strp(dsptr) &hspctx->mem_mds[dsptr]
 
@@ -3688,5 +3689,4 @@ void code_dbgtrace( void )
 }
 
 #endif
-
 

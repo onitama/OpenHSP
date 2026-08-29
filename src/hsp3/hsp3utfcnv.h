@@ -104,10 +104,17 @@ public:
 
 #endif
 
+// Explicit UTF-8/UTF-16 conversion for path and other OS boundaries.
+// These functions do not depend on HSPUTF8 or the target's HSP string encoding.
+#if defined(HSPWIN) || defined(_WIN32)
+int utf8_to_utf16_strict(void* out, const char* in, int bufsize);
+int utf16_to_utf8_strict(char* out, const void* in, int bufsize);
+int ansi_to_utf16_strict(void* out, const char* in, int bufsize);
+int utf16_to_ansi_strict(char* out, const void* in, int bufsize);
+#endif
+
 //		String Service
 //
-int hsp3_to_utf8(void* out, const char* in, int bufsize);
-int utf8_to_hsp3(void* out, const char* in, int bufsize);
 int StrCopyLetter(const char* source, char* dest);
 
 //

@@ -21,6 +21,7 @@
 #include "hsp3config.h"
 #include "supio.h"
 #include "filepack.h"
+#include "hsp3pathio.h"
 #include "hsp3crypt.h"
 
 #define _MALLOC malloc
@@ -415,17 +416,18 @@ int FilePack::LoadPackFile( const char *fname, int encode, HFPSIZE dpmoffset, in
 	*dpmname = 0;
 #ifdef HSPWIN
 	if (dpmoffset == 0) {
-		bool addcurrent = true;
-		char a1 = *fname;
 		//	fnameがフルパスの場合はパスを補完しない
-		if ((a1 == 0x5c) || (a1 == '/')) addcurrent = false;
-		if ((a1 != 0)&&(fname[1]==':')) addcurrent = false;
+		bool addcurrent = !hsp_path_is_absolute(fname);
 		if (addcurrent) {
-			_getcwd(dpmname, HFP_PATH_MAX);
+			std::string current_directory;
+			if (hsp_path_get_current_directory(current_directory) != 0) return -2;
+			if (current_directory.size() + 1 + strlen(fname) > HFP_PATH_MAX) return -2;
+			strcpy(dpmname, current_directory.c_str());
 			strcat(dpmname, "/");
 		}
 	}
 #endif
+	if (strlen(dpmname) + strlen(fname) > HFP_PATH_MAX) return -2;
 	strcat(dpmname, fname);
 	//strcat(dpmname, DPMFILEEXT);
 	dpmname[HFP_PATH_MAX] = 0;
@@ -584,9 +586,9 @@ HFPOBJ *FilePack::SearchFileObject( HFPHED *hed, const char *name )
 	int i;
 	HFPOBJ *obj;
 	char fname[HFP_PATH_MAX + 1];
-	char fname_utf8[HFP_PATH_MAX + 1];
 	char foldername[HFP_PATH_MAX + 1];
-	char foldername_utf8[HFP_PATH_MAX + 1];
+	std::string fname_utf8;
+	std::string foldername_utf8;
 
 	if (hed == NULL) return NULL;
 
@@ -594,21 +596,20 @@ HFPOBJ *FilePack::SearchFileObject( HFPHED *hed, const char *name )
 	StrCase(fname);
 	StrCase(foldername);
 
-	// UTF8に変換する
-	hsp3_to_utf8(fname_utf8, fname, HFP_PATH_MAX);
-	hsp3_to_utf8(foldername_utf8, foldername, HFP_PATH_MAX);
+	if (hsp_path_to_utf8(fname_utf8, hsp_path::path_view(fname)) != 0 ||
+		hsp_path_to_utf8(foldername_utf8, hsp_path::path_view(foldername)) != 0) return NULL;
 
 	obj = (HFPOBJ *)(hed+1);
 	for(i=0;i<hed->max_file;i++) {
 		bool fchk = true;
 		if (obj->folder != 0) {
-			if (strcmp(foldername_utf8, GetFolderName(obj)) != 0) fchk = false;
+			if (strcmp(foldername_utf8.c_str(), GetFolderName(obj)) != 0) fchk = false;
 		}
 		else {
 			if (*foldername != 0) fchk = false;
 		}
 		if (fchk) {
-			if (strcmp(fname_utf8, GetFileName(obj)) == 0) return obj;
+			if (strcmp(fname_utf8.c_str(), GetFileName(obj)) == 0) return obj;
 		}
 		obj++;
 	}

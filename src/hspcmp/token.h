@@ -167,7 +167,7 @@ public:
 	void SetErrorBuf( CMemBuf *buf );
 	void SetAHT( AHTMODEL *aht );
 	void SetAHTBuffer(CMemBuf* aht);
-	void SetLabelListBuffer(CMemBuf* buf, int mode, char* match, int line=0, char *filename=NULL);
+	void SetLabelListBuffer(CMemBuf* buf, int mode, char* match, int line=0, const char *filename=NULL);
 	char* GetLabelListHeader(int flag);
 
 	void ResetCompiler( void );
@@ -184,9 +184,9 @@ public:
 	void PreprocessCommentCheck( char *str );
 
 	int ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname );
-	int ExpandFile( CMemBuf *buf, char *fname, char *refname );
+	int ExpandFile( CMemBuf *buf, const char *fname, const char *refname );
 	void FinishPreprocess( CMemBuf *buf );
-	void SetCommonPath( char *path );
+	void SetCommonPath( const char *path );
 	int SetAdditionMode( int mode );
 
 	void SetLook( char *buf );
@@ -214,8 +214,8 @@ public:
 
 	//		For Code Generate
 	//
-	int GenerateCode( char *fname, char *oname, int mode );
-	int GenerateCode( CMemBuf *srcbuf, char *oname, int mode );
+	int GenerateCode( const char *fname, const char *oname, int mode );
+	int GenerateCode( CMemBuf *srcbuf, const char *oname, int mode );
 
 	void PutCS( int type, int value, int exflg );
 	void PutCSSymbol( int label_id, int exflag );
@@ -369,7 +369,7 @@ private:
 	void GenerateCodePP_comfunc( void );
 	void GenerateCodePP_defvars( int fixedvalue );
 
-	void GenerateLabelTag(char* name, int flag, int type, char* fname, int line);
+	void GenerateLabelTag(char* name, int flag, int type, const char* fname, int line);
 	void GenerateLabelListAndTag(int labelid, int flag = 0);
 	void GenerateLabelListAndTag(char* name, int flag = 0);
 	void GenerateLabelListAndTagRef(int labelid, int flag = 0);
@@ -414,7 +414,7 @@ private:
 	bool CG_optInfo() const { return (hed_cmpmode & CMPMODE_OPTINFO) != 0; }
 	void CG_MesLabelDefinition(int label_id);
 
-	int	SaveStringMap(char* fname);
+	int	SaveStringMap(const char* fname);
 
 	//	UTF-8 service
 	char* to_hsp_string_literal(const char* src, bool filename=false);
@@ -436,8 +436,8 @@ private:
 	CMemBuf *labbuf;
 	CStrNote *note;
 	AHTMODEL *ahtmodel;				// AHT process data
-	char common_path[HSP_MAX_PATH];	// common path
-	char search_path[HSP_MAX_PATH];	// search path
+	std::string common_path;	// common path
+	std::string search_path;	// search path
 
 	int line;
 	int val;
@@ -507,7 +507,7 @@ private:
 	char **cg_labout_header;
 	char cg_labout_modname[MODNAME_MAX + 2];	// Module Name Prefix
 	int cg_labout_caseflag;
-	char cg_labout_orgfile[HSP_MAX_PATH];
+	std::string cg_labout_orgfile;
 
 	int	replev;
 	int repend[CG_REPLEV_MAX];
@@ -553,12 +553,12 @@ private:
 	//		for Error
 	//
 	int pp_orgline;
-	char pp_orgfile[HSP_MAX_PATH];
-	char pp_orgfilefull[HSP_MAX_PATH];
+	std::string pp_orgfile;
+	std::string pp_orgfilefull;
 	int cg_errline;
 	int cg_orgline;
-	char cg_orgfile[HSP_MAX_PATH];
-	char cg_orgfilefull[HSP_MAX_PATH];
+	std::string cg_orgfile;
+	std::string cg_orgfilefull;
 
 	//		for SCNV
 	//

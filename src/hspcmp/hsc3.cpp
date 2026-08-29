@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
+#include <vector>
 
 #include "../hsp3/hsp3config.h"
 #include "../hsp3/hsp3debug.h"
@@ -123,7 +125,7 @@ CHsc3::CHsc3( void )
 	anabuf = NULL;
 	lb_info = NULL;
 	addkw = NULL;
-	common_path[0] = 0;
+	common_path.clear();
 	analyse_mode = 0;
 	analyse_line = 0;
 	analyse_caseflag = 0;
@@ -179,7 +181,7 @@ void CHsc3::AddSystemMacros( CToken *tk, int option )
 }
 
 
-int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
+int CHsc3::PreProcessAht( const char *fname, void *ahtoption, int mode )
 {
 	//		Preprocess execute (AHT)
 	//		(終了時にPreProcessEndを呼ぶこと)
@@ -191,7 +193,7 @@ int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 	lb_info = NULL;
 	ahtbuf = NULL;
 	tk.SetErrorBuf( errbuf );
-	tk.SetCommonPath( common_path );
+	tk.SetCommonPath( common_path.c_str() );
 	tk.SetAHT( (AHTMODEL *)ahtoption );
 	outbuf = new CMemBuf;
 
@@ -214,7 +216,7 @@ int CHsc3::PreProcessAht( char *fname, void *ahtoption, int mode )
 	問題なさそう、一応対処。
 */
 
-int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void *ahtoption )
+int CHsc3::PreProcess( const char *fname, const char *outname, int option, const char *rname, void *ahtoption )
 {
 	//		Preprocess execute
 	//		(終了時にPreProcessEndを呼ぶこと)
@@ -237,7 +239,7 @@ int CHsc3::PreProcess( char *fname, char *outname, int option, char *rname, void
 	ahtbuf = NULL;
 
 	tk.SetErrorBuf( errbuf );
-	tk.SetCommonPath( common_path );
+	tk.SetCommonPath( common_path.c_str() );
 	tk.LabelRegist2( hsp_prestr );
 	AddSystemMacros( &tk, option );
 
@@ -350,7 +352,7 @@ int CHsc3::GetHeaderOption(void)
 }
 
 
-int CHsc3::Compile( char *fname, char *outname, int mode )
+int CHsc3::Compile( const char *fname, const char *outname, int mode )
 {
 	//		Compile
 	//
@@ -368,7 +370,7 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 	if ( lb_info != NULL ) tk.SetLabelInfo( lb_info );		// プリプロセッサのラベル情報
 
 	tk.SetErrorBuf( errbuf );
-	tk.SetCommonPath( common_path );
+	tk.SetCommonPath( common_path.c_str() );
 	tk.LabelRegist( hsp_prestr, 1 );
 	tk.SetHeaderOption( hed_option, hed_runtime );
 	tk.SetCmpOption( cmpopt );
@@ -397,22 +399,21 @@ int CHsc3::Compile( char *fname, char *outname, int mode )
 }
 
 
-int CHsc3::CompileStrMap(char* fname, char* outname, int mode)
+int CHsc3::CompileStrMap(const char* fname, const char* outname, int mode)
 {
 	return Compile(fname, outname, mode | HSC3_MODE_STRMAP);
 }
 
 
-int CHsc3::CompileLabelOut(char* fname, int mode)
+int CHsc3::CompileLabelOut(const char* fname, int mode)
 {
 	return Compile(fname, "", mode | HSC3_MODE_LABOUT);
 }
 
 
-void CHsc3::SetCommonPath( char *path )
+void CHsc3::SetCommonPath( const char *path )
 {
-	if ( path==NULL ) { common_path[0]=0; return; }
-	strcpy( common_path, path );
+	common_path = path != NULL ? path : "";
 }
 
 
@@ -423,7 +424,7 @@ int CHsc3::GetCmdList( int option, char* match )
 	CMemBuf outbuf;
 
 	tk.SetErrorBuf(errbuf);
-	tk.SetCommonPath(common_path);
+	tk.SetCommonPath(common_path.c_str());
 	tk.LabelRegist3(hsp_prestr);			// 標準キーワード
 	tk.LabelRegist3(hsp_prepp);			// プリプロセッサキーワード
 	AddSystemMacros(&tk, option);
@@ -446,30 +447,28 @@ int CHsc3::OpenPackfile( void )
 
 int CHsc3::GetPackfileOption( char *out, int out_size, char *keyword, char *defval )
 {
-	int max,i;
-	char tmp[512];
-	char *s;
-	char a1;
 	if (out == NULL || out_size <= 0 || defval == NULL || keyword == NULL) return -1;
+	std::string result;
+	if (GetPackfileOption(result, keyword, defval) != 0) return -1;
+	if ((int)result.size() >= out_size) return -1;
+	strcpy(out, result.c_str());
+	return 0;
+}
+
+int CHsc3::GetPackfileOption(std::string& out, const char* keyword, const char* defval)
+{
+	if (keyword == NULL || defval == NULL || pfbuf == NULL) return -1;
+	out = defval;
 	CStrNote note;
-	note.Select( pfbuf->GetBuffer() );
-	max = note.GetMaxLine();
-	if ((int)strlen(defval) >= out_size) return -1;
-	strcpy(out, defval);
-	for( i=0;i<max;i++ ) {
-		note.GetLine( tmp, i, sizeof(tmp) - 1 );
-		if (( tmp[0]==';' )&&( tmp[1]=='!' )) {
-			s = tmp+2;while(1) {
-				a1 = *s;if (( a1==0 )||( a1=='=' )) break;
-				s++;
-			}
-			if ( a1 != 0 ) {
-				s[0]=0;
-				if ( strcmp( tmp+2, keyword )==0 ) {
-					if ((int)strlen(s + 1) >= out_size) return -1;
-					strcpy(out, s + 1);
-				}
-			}
+	note.Select(pfbuf->GetBuffer());
+	for (int i = 0; i < note.GetMaxLine(); ++i) {
+		char* line = note.GetLineDirect(i);
+		std::string text = line != NULL ? line : "";
+		note.ResumeLineDirect();
+		if (text.size() < 2 || text[0] != ';' || text[1] != '!') continue;
+		size_t separator = text.find('=', 2);
+		if (separator != std::string::npos && text.compare(2, separator - 2, keyword) == 0) {
+			out = text.substr(separator + 1);
 		}
 	}
 	return 0;
@@ -493,44 +492,54 @@ void CHsc3::ClosePackfile( void )
 }
 
 
-int CHsc3::GetRuntimeFromHeader( char *fname, char *res )
+int CHsc3::GetRuntimeFromHeader( const char *fname, std::string& res )
 {
 	FILE *fp;
 	HSPHED hsphed;
-	int hedsize;
-	int exsize;
-	int ires;
-	char *data;
+	const int hedsize = sizeof(hsphed);
+	res.clear();
 
-	fp=fopen( fname, "rb" );
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "rb");
 	if ( fp == NULL ) return -1;
-	hedsize = sizeof(hsphed);
-	fread( &hsphed, 1, hedsize, fp );
-	exsize = hsphed.pt_cs - hedsize;
-
-	if ( exsize == 0 ) {
+	int64_t file_size = hsp_path_filesize(hsp_path::path_view(fname));
+	if (file_size < hedsize || fread(&hsphed, 1, hedsize, fp) != (size_t)hedsize) {
+		fclose(fp);
+		return -1;
+	}
+	if (hsphed.h1 != 'H' || hsphed.h2 != 'S' || hsphed.h3 != 'P' || hsphed.h4 != '3' ||
+		hsphed.pt_cs < hedsize || (int64_t)hsphed.pt_cs > file_size) {
+		fclose(fp);
+		return -1;
+	}
+	if ((hsphed.bootoption & HSPHED_BOOTOPT_RUNTIME) == 0) {
 		fclose(fp);
 		return 0;
 	}
-
-	data = (char *)malloc( exsize );
-	fread( data, 1, exsize, fp );
-	fclose(fp);
-	ires = 0;
-	if ( hsphed.bootoption & HSPHED_BOOTOPT_RUNTIME ) {
-		char runtime[HSP_MAX_PATH];
-		strcpy( runtime, data + (hsphed.runtime - hedsize) );
-		cutext( runtime );
-		addext( runtime, "exe" );
-		strcpy( res, runtime );
-		ires = 1;
+	if (hsphed.runtime < hedsize || hsphed.runtime >= hsphed.pt_cs ||
+		fseek(fp, hsphed.runtime, SEEK_SET) != 0) {
+		fclose(fp);
+		return -1;
 	}
-	free( data );
-	return ires;
+
+	int64_t remaining = (int64_t)hsphed.pt_cs - hsphed.runtime;
+	const size_t max_runtime_length = HSC3_RUNTIME_OUTPUT_SIZE - sizeof(".exe");
+	size_t read_size = (size_t)std::min<int64_t>(remaining, max_runtime_length + 1);
+	std::vector<char> runtime_data(read_size);
+	if (runtime_data.empty() || fread(runtime_data.data(), 1, read_size, fp) != read_size) {
+		fclose(fp);
+		return -1;
+	}
+	fclose(fp);
+	char* terminator = (char*)memchr(runtime_data.data(), 0, runtime_data.size());
+	if (terminator == NULL) return -1;
+	res.assign(runtime_data.data(), (size_t)(terminator - runtime_data.data()));
+	hsp_path_cut_extension(res);
+	res += ".exe";
+	return 1;
 }
 
 
-int CHsc3::SaveOutbuf( char *fname )
+int CHsc3::SaveOutbuf( const char *fname )
 {
 	int res;
 	res = outbuf->SaveFile( fname );
@@ -541,7 +550,7 @@ int CHsc3::SaveOutbuf( char *fname )
 }
 
 
-int CHsc3::SaveAHTOutbuf( char *fname )
+int CHsc3::SaveAHTOutbuf( const char *fname )
 {
 	int res;
 	res = ahtbuf->SaveFile( fname );
@@ -557,4 +566,3 @@ void CHsc3::Print(char* mes)
 	errbuf->PutStr(mes);
 	errbuf->PutStr("\r\n");
 }
-

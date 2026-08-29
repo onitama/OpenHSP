@@ -361,12 +361,13 @@ class Suite:
                          run_argument=argument, expected_rejection=True)
 
         # This existing path remains below the Windows character limit and the
-        # baseline CP932 byte limit, while exceeding the current UTF-8 byte cap.
+        # baseline CP932 byte limit. UTF-8 runtimes must keep the full path
+        # rather than applying the legacy byte-sized _MAX_PATH limit.
         long_component = "日" * 70
         self.execute("launch-limit-multibyte-existing", "launch-limit", "cp932",
                      "utf8-byte-length", 'mes "RESULT PASS"\nend\n', {}, {},
                      ax_dir_name=long_component,
-                     expected_rejection=self.target.utf8_input)
+                     expected_rejection=False)
 
         if os.name != "nt":
             for length in (261, 512, 1024, 2048, 4090):

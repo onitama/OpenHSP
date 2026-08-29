@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <string>
 
 #ifdef HSPWIN
 #include <windows.h>
@@ -24,6 +25,7 @@ extern HINSTANCE hDllInstance;
 #include "hsp3struct.h"
 #include "dpmread.h"
 #include "supio.h"
+#include "hsp3pathio.h"
 
 #include "filepack.h"
 
@@ -68,31 +70,19 @@ int dpm_ini( char *fname, ptrdiff_t dpmofs, int chksum, int deckey, int slot )
 	//		DPMファイル読み込みの初期化
 	//
 	char dpmfile[HSP_MAX_PATH];
-
+	if (fname == NULL || strlen(fname) >= sizeof(dpmfile)) return -1;
 	strcpy(dpmfile, fname);
 
 #ifdef HSPWIN
-#ifdef HSPUTF8
-	WCHAR dpmfile_w[HSP_MAX_PATH];
-#endif
 	if ( *fname == 0 ) {
-#ifndef HSPUTF8
-#ifndef HSPWINDLL
-		GetModuleFileName( NULL, dpmfile,_MAX_PATH );
+		std::string module_filename;
+#ifdef HSPWINDLL
+		if (hsp_path_get_module_filename(module_filename, (void*)hDllInstance) != 0) return -1;
 #else
-		GetModuleFileName(hDllInstance, dpmfile, _MAX_PATH);
+		if (hsp_path_get_module_filename(module_filename) != 0) return -1;
 #endif
-#else
-#ifndef HSPWINDLL
-		GetModuleFileName(NULL, dpmfile_w, _MAX_PATH);
-#else
-		GetModuleFileName(hDllInstance, dpmfile_w, _MAX_PATH);
-#endif
-#endif
-
-#ifdef HSPUTF8
-		utf16_to_hsp3(dpmfile, (char *)dpmfile_w, _MAX_PATH);
-#endif
+		if (module_filename.size() >= sizeof(dpmfile)) return -1;
+		memcpy(dpmfile, module_filename.c_str(), module_filename.size() + 1);
 	}
 #endif
 
@@ -145,26 +135,11 @@ int dpm_filecopy( char *fname, char *sname )
 	size_t xlen;
 	size_t max=0x8000;
 	char *mem;
-#ifdef HSPWIN
-#ifdef HSPUTF8
-	HSPAPICHAR *hactmp1;
-#endif
-#endif
-
 	flen= (size_t)filepack.pack_flength(fname);
 	if (flen<0) return 1;
 
-#ifdef HSPWIN
-#ifdef HSPUTF8
-	fp2=_wfopen(chartoapichar(sname,&hactmp1),L"wb");
-	freehac(&hactmp1);
+	fp2=hsp_path_fopen(hsp_path::path_view(sname), "wb");
 	if (fp2==NULL) return 1;
-#else
-	fp2=fopen(sname,"wb");if (fp2==NULL) return 1;
-#endif
-#else
-	fp2=fopen(sname,"wb");if (fp2==NULL) return 1;
-#endif
 	fp1 = filepack.pack_fopen(fname);
 	if (fp1 == NULL) {
 		fclose(fp2);
@@ -214,5 +189,3 @@ void* dpm_getfilepack(void)
 {
 	return &filepack;
 }
-
-

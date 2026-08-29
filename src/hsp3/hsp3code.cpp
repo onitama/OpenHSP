@@ -29,6 +29,7 @@ using namespace std;
 #include "hsp3debug.h"
 #include "hsp3int.h"
 #include "hsp3utfcnv.h"
+#include "hsp3pathio.h"
 
 /*------------------------------------------------------------*/
 /*
