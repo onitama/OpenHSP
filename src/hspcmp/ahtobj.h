@@ -88,9 +88,9 @@ public:
 
 	//		Service
 	void Mesf( char *format, ... );
-	void SetPrjDir( char *name ) { strncpy( prjdir, name, _FNMAX-1 ); };
-	void SetPrjFile( char *name ) { strncpy( fname, name, _FNMAX-1 ); };
-	void SetToolDir( char *name ) { strncpy( tooldir, name, _FNMAX-1 ); };
+	void SetPrjDir( const char *name ) { strncpy( prjdir, name, _FNMAX-1 ); };
+	void SetPrjFile( const char *name ) { strncpy( fname, name, _FNMAX-1 ); };
+	void SetToolDir( const char *name ) { strncpy( tooldir, name, _FNMAX-1 ); };
 	void SetPage( int cur, int max );
 	int GetCurrentPage( void );
 	int GetMaxPage( void );
@@ -104,10 +104,10 @@ public:
 	void LinkModel( int id, int next_id );
 	void UnlinkModel( int id );
 
-	int LoadProject( char *fname );
+	int LoadProject( const char *fname );
 	int LoadProjectApply( int modelid, int fileid );
 	void LoadProjectEnd( void );
-	int SaveProject( char *fname );
+	int SaveProject( const char *fname );
 
 	int GetProjectFileModelMax( void );
 	char *GetProjectFileModel( int id );
@@ -129,7 +129,7 @@ public:
 	void UpdateModelProperty( int id );
 
 	void InitMakeBuffer( void );
-	int SaveMakeBuffer( char *fname );
+	int SaveMakeBuffer( const char *fname );
 	void AddMakeBufferInit( char *str, int size=0 );
 	void AddMakeBufferMain( char *str, int size=0 );
 	void DisposeMakeBuffer( void );
@@ -141,8 +141,8 @@ private:
 	void SaveProjectSub( AHTMODEL *model );
 	void DisposeParts( void );
 	int BuildPartsSub( int id, char *fname );
-	void PickLineBuffer( char *out );
-	int BuildGlobalIDSub( char *fname, char *pname, int i );
+	void PickLineBuffer( char *out, size_t out_size );
+	int BuildGlobalIDSub( const char *fname, const char *pname, int i );
 	int tstrcmp(const char* str1, const char* str2);
 
 
