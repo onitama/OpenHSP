@@ -368,7 +368,7 @@ int changedir( char *name )
 
 int delfile( char *name )
 {
-	return unlink( name );
+	return unlink( name ) == 0;
 	//return remove( name );		// ディレクトリにもファイルにも対応
 }
 
