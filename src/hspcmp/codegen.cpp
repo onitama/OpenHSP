@@ -3222,7 +3222,7 @@ int CToken::GenerateCode( CMemBuf *srcbuf, const char *oname, int mode )
 				//	UTF-8 -> Shift-JIS
 				char stmp[8192];
 				strcpy(stmp,tmp);
-				ConvUtf82SJis(stmp, tmp, (int)strlen(stmp));
+				ConvUtf82SJis(stmp, tmp, (int)sizeof(tmp));
 			}
 #endif
 			Mesf( "--> %s",tmp );

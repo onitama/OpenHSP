@@ -243,7 +243,7 @@ public:
 	int PutStructEnd( char *name, int libindex, int otindex, int funcflag );
 	int PutStructEnd( int i, char *name, int libindex, int otindex, int funcflag );
 	int PutStructEndDll( char *name, int libindex, int subid, int otindex );
-	void SetRuntime(char* runtime_name);
+	ppresult_t SetRuntime(char* runtime_name);
 
 	void CalcCG( int ex );
 

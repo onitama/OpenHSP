@@ -292,13 +292,15 @@ static int hsp_path_enumerate_utf8(hsp_path::utf8_view pattern, int flags, hsp_p
 FILE* hsp_path_fopen_utf8(hsp_path::utf8_view path, const char* mode)
 {
 	if (path.c_str() == NULL || mode == NULL) return NULL;
-	fs::path fs_path;
-	if (!hsp_path_make_fs_path(path.c_str(), fs_path)) return NULL;
 	std::wstring wide_mode;
 	for (const char* character = mode; *character != 0; ++character) {
 		wide_mode.push_back((wchar_t)(unsigned char)*character);
 	}
-	return _wfopen(fs_path.c_str(), wide_mode.c_str());
+	wchar_t* wide_path = hsp_path_utf8_to_wide(path.c_str());
+	if (wide_path == NULL) return NULL;
+	FILE* result = _wfopen(wide_path, wide_mode.c_str());
+	free(wide_path);
+	return result;
 }
 
 static int hsp_path_get_module_filename_utf8_for_module(std::string& result, void* module)
@@ -609,9 +611,20 @@ int hsp_path_remove_utf8(hsp_path::utf8_view path)
 
 static void hsp_path_ascii_lower(std::string& path)
 {
-	for (char& character : path) {
+	for (size_t i = 0; i < path.size(); ++i) {
+		unsigned char character = (unsigned char)path[i];
+		// 旧来のWindowsビルドではパスにシステムのANSIコードページを使う。
+		// Shift-JISの2バイト目がASCII大文字の範囲になることがあるため、
+		// 独立した文字として小文字化しない。
+#if (defined(HSPWIN) || defined(_WIN32)) && !defined(HSP_PATHIO_UTF8)
+		if (((character >= 0x81 && character <= 0x9f) ||
+			(character >= 0xe0 && character <= 0xfc)) && i + 1 < path.size()) {
+			++i;
+			continue;
+		}
+#endif
 		if (character >= 'A' && character <= 'Z') {
-			character = (char)(character - 'A' + 'a');
+			path[i] = (char)(character - 'A' + 'a');
 		}
 	}
 }

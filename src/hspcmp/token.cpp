@@ -3468,7 +3468,7 @@ ppresult_t CToken::PP_CmpOpt( void )
 }
 
 
-void CToken::SetRuntime(char* runtime_name)
+ppresult_t CToken::SetRuntime(char* runtime_name)
 {
 	//		ランタイム名を設定
 	//
@@ -3478,13 +3478,17 @@ void CToken::SetRuntime(char* runtime_name)
 
 	if (packbuf != NULL) {
 		sprintf(tmp, ";!runtime=%s.hrt", hed_runtime);
-		AddPackfile(tmp, 2);
+		if (AddPackfile(tmp, 2) == hspcmp_pack_path_error) {
+			SetError("pack path is too long or invalid UTF-8");
+			return PPRESULT_ERROR;
+		}
 	}
 
 	hed_option |= HEDINFO_RUNTIME;
 
 	sprintf(tmp, "\"%s\"", hed_runtime);
 	RegistExtMacro("__runtime__", tmp);			// ランタイム名マクロを更新
+	return PPRESULT_SUCCESS;
 }
 
 
@@ -3498,8 +3502,7 @@ ppresult_t CToken::PP_RuntimeOpt( void )
 	if ( i != TK_STRING ) {
 		SetError("illegal runtime name"); return PPRESULT_ERROR;
 	}
-	SetRuntime((char *)s3);
-	return PPRESULT_SUCCESS;
+	return SetRuntime((char *)s3);
 }
 
 
@@ -4684,6 +4687,7 @@ int CToken::ConvSJis2Utf8(char* pSource, char* pDist, int buffersize)
 int CToken::ConvUtf82SJis(char* pSource, char* pDist, int buffersize)
 {
 	int size = 0;
+	if (pDist == NULL || buffersize <= 0) return -1;
 
 #ifdef HSPWIN
 
@@ -4694,7 +4698,8 @@ int CToken::ConvUtf82SJis(char* pSource, char* pDist, int buffersize)
 	::MultiByteToWideChar(CP_UTF8, 0, pSource, (int)strlen(pSource) + 1, (LPWSTR)buffUtf16, iLenUnicode);
 
 	size = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)buffUtf16, iLenUnicode, NULL, 0, NULL, NULL);
-	if (size > buffersize) size = buffersize;
+	// Reserve one byte for the terminator written below.
+	if (size >= buffersize) size = buffersize - 1;
 	::WideCharToMultiByte(CP_ACP, 0,
 				(LPCWSTR)buffUtf16, iLenUnicode,
 				pDist, size,
