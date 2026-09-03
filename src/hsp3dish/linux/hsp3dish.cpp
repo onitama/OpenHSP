@@ -446,7 +446,9 @@ static int hsp3dish_initwindow( engine* p_engine, int sx, int sy, int autoscale,
 		printf("Unable to set GLContext: %s\n", SDL_GetError());
 		return -1;
 	}
-	
+
+	// hgio_init の前にシステム情報 (modfilename 等) を初期化する
+	hsp3ext_initsys( code_gettypeinfo( TYPE_DLLFUNC ) );
 
 	// 描画APIに渡す
 	hgio_init( 0, sx, sy, p_engine );
@@ -635,9 +637,6 @@ int hsp3dish_init_sub( int sx, int sy, int autoscale )
 	res = hsp3dish_initwindow( NULL, sx, sy, autoscale, "HSPDish ver" hspver );
 	if (res) return res;
 
-	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
-	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
-
 #ifdef HSPDISHGP
 	//		Initalize gameplay
 	//
@@ -743,9 +742,6 @@ int hsp3dish_init( char *startfile )
 	hsp->SetCommandLinePrm( cl_cmdline );		// コマンドラインパラメーターを保存
 	hsp->SetModuleFilePrm( cl_modname );			// モジュール名を保存
 
-	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
-	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
-
 	// Slightly different SDL initialization
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
 		hsp3dish_dialog("Unable to initialize SDL");
@@ -783,6 +779,10 @@ int hsp3dish_init( char *startfile )
 	tinfo->hspexinfo = exinfo;
 	hsp3typeinit_sock_extcmd( tinfo );
 	}
+
+	//		Load external plugins (after built-in types are registered)
+	hsp3typeinit_dllcmd( code_gettypeinfo( TYPE_DLLFUNC ) );
+	hsp3typeinit_dllctrl( code_gettypeinfo( TYPE_DLLCTRL ) );
 
 	//		Initalize DEVINFO
 	HSP3DEVINFO *devinfo;
