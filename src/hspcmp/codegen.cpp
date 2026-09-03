@@ -2702,6 +2702,8 @@ int CToken::PutDSStr(char *str, bool converts_to_utf8)
 		}
 	}
 
+	if (p == NULL) throw CGERROR_FATAL;
+
 	int i = ds_buf->GetSize();
 
 	if ( CG_optCode() ) {
@@ -3221,8 +3223,10 @@ int CToken::GenerateCode( CMemBuf *srcbuf, const char *oname, int mode )
 			if (pp_utf8) {
 				//	UTF-8 -> Shift-JIS
 				char stmp[8192];
-				strcpy(stmp,tmp);
-				ConvUtf82SJis(stmp, tmp, (int)sizeof(tmp));
+				strcpy(stmp, tmp);
+				if (ConvUtf82SJis(stmp, tmp, (int)sizeof(tmp)) < 0) {
+					strcpy(tmp, stmp);
+				}
 			}
 #endif
 			Mesf( "--> %s",tmp );

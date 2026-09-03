@@ -37,6 +37,7 @@ void CMemBuf::InitMemBuf( int sz )
 	idxmax = -1;
 	curidx = 0;
 	idxbuf = NULL;
+	sub_buf = NULL;
 }
 
 
@@ -52,6 +53,11 @@ void CMemBuf::InitIndexBuf( int sz )
 
 char *CMemBuf::InitSubBuffer(int sz)
 {
+	if (sub_buf != NULL) {
+		free(sub_buf);
+		sub_buf = NULL;
+	}
+	if (sz <= 0) return NULL;
 	sub_buf = (char*)malloc(sz);
 	return sub_buf;
 }
@@ -412,6 +418,10 @@ CMemBuf::~CMemBuf( void )
 	if ( idxbuf != NULL ) {
 		free( idxbuf );
 		idxbuf = NULL;
+	}
+	if ( sub_buf != NULL ) {
+		free( sub_buf );
+		sub_buf = NULL;
 	}
 }
 

@@ -4001,7 +4001,16 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 #endif
 				char* p_sjis = src->InitSubBuffer(currentsize);
 				int newsize = ConvUtf82SJis(p, p_sjis, currentsize);
-				src->ExchangeSubToMainBuffer(newsize);
+				if (newsize < 0) {
+#ifdef HSPCMP_DLL
+					hspcmp_message_path message_refname_err(refname);
+					Mesf("#Source conversion failed [%s].", message_refname_err.c_str());
+#else
+					Mesf("#Source conversion failed [%s].", refname);
+#endif
+					return -1;
+				}
+				src->ExchangeSubToMainBuffer(newsize - 1); // CMemBuf size excludes the terminating NUL.
 				p = src->GetBuffer();
 			}
 		}
@@ -4017,7 +4026,16 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 				currentsize = currentsize * 4;
 				char* p_utf8 = src->InitSubBuffer(currentsize);
 				int newsize = ConvSJis2Utf8(p, p_utf8, currentsize);
-				src->ExchangeSubToMainBuffer(newsize);
+				if (newsize < 0) {
+#ifdef HSPCMP_DLL
+					hspcmp_message_path message_refname_err(refname);
+					Mesf("#Source conversion failed [%s].", message_refname_err.c_str());
+#else
+					Mesf("#Source conversion failed [%s].", refname);
+#endif
+					return -1;
+				}
+				src->ExchangeSubToMainBuffer(newsize - 1); // CMemBuf size excludes the terminating NUL.
 				p = src->GetBuffer();
 			}
 		}
@@ -4118,6 +4136,10 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 				pline += 1+mline;
 
 				char *fname_literal = to_hsp_string_literal( refname, true );
+				if (fname_literal == NULL) {
+					Mesf("#Source path conversion failed [%s].", refname != NULL ? refname : "");
+					return -1;
+				}
 				RegistExtMacro( "__file__", fname_literal );			// ファイル名マクロを更新
 				pp_orgfile = refname;
 
@@ -4237,12 +4259,25 @@ int CToken::ExpandFile( CMemBuf *buf, const char *fname, const char *refname )
 	}
 
 	char *fname_literal = to_hsp_string_literal( refname, true );
+	if (fname_literal == NULL) {
+		Mesf("#Source path conversion failed [%s].", refname != NULL ? refname : "");
+		pp_orgfilefull = org_filenamefull;
+		return -1;
+	}
 	RegistExtMacro( "__file__", fname_literal );			// ファイル名マクロを更新
 	pp_orgfile = refname != NULL ? refname : "";
 
-	fname_literal = to_hsp_string_literal( pp_orgfilefull.c_str(), true );
-	buf->PutStrf( "##0 %s\r\n", fname_literal );
+	char *full_fname_literal = to_hsp_string_literal( pp_orgfilefull.c_str(), true );
+	if (full_fname_literal == NULL) {
+		free( fname_literal );
+		Mesf("#Source path conversion failed [%s].", pp_orgfilefull.c_str());
+		pp_orgfile = org_filename;
+		pp_orgfilefull = org_filenamefull;
+		return -1;
+	}
+	buf->PutStrf( "##0 %s\r\n", full_fname_literal );
 	free( fname_literal );
+	free( full_fname_literal );
 
 	std::vector<char> refname_copy(refname != NULL ? strlen(refname) + 1 : 1, 0);
 	if (refname != NULL) memcpy(refname_copy.data(), refname, refname_copy.size());
@@ -4563,9 +4598,10 @@ void CToken::InitSCNV( int size )
 		free( scnvbuf );
 		scnvbuf = NULL;
 	}
+	scnvsize = 0;
 	if ( size <= 0 ) return;
 	scnvbuf = (char *)malloc(size);
-	scnvsize = size;
+	if ( scnvbuf != NULL ) scnvsize = size;
 }
 
 
@@ -4576,25 +4612,48 @@ char *CToken::ExecSCNV( char *srcbuf, int opt )
 	//int ressize;
 	int size;
 
+	if ( srcbuf == NULL ) return NULL;
 	if ( scnvbuf == NULL ) InitSCNV( SCNVBUF_DEFAULTSIZE );
+	if ( scnvbuf == NULL ) return NULL;
 
 	size = (int)strlen( srcbuf );
 	switch( opt ) {
 	case SCNV_OPT_NONE:
-		strcpy( scnvbuf, srcbuf );
+		if (size >= scnvsize) {
+			SetError((char*)"String conversion buffer overflow");
+			return NULL;
+		} else {
+			strcpy( scnvbuf, srcbuf );
+		}
 		break;
 	case SCNV_OPT_SJISUTF8:
 #ifdef HSPWIN
-		ConvSJis2Utf8( srcbuf, scnvbuf, scnvsize );
+		if (ConvSJis2Utf8( srcbuf, scnvbuf, scnvsize ) < 0) {
+			SetError((char*)"String conversion failed");
+			return NULL;
+		}
 #else
-		strcpy( scnvbuf, srcbuf );
+		if (size >= scnvsize) {
+			SetError((char*)"String conversion buffer overflow");
+			return NULL;
+		} else {
+			strcpy( scnvbuf, srcbuf );
+		}
 #endif
 		break;
 	case SCNV_OPT_UTF8SJIS:
 #ifdef HSPWIN
-		ConvUtf82SJis(srcbuf, scnvbuf, scnvsize);
+		if (ConvUtf82SJis(srcbuf, scnvbuf, scnvsize) < 0) {
+			SetError((char*)"String conversion failed");
+			return NULL;
+		}
 #else
-		strcpy(scnvbuf, srcbuf);
+		if (size >= scnvsize) {
+			SetError((char*)"String conversion buffer overflow");
+			return NULL;
+		} else {
+			strcpy(scnvbuf, srcbuf);
+		}
 #endif
 		break;
 	default:
@@ -4659,56 +4718,47 @@ int CToken::SkipMultiByte( unsigned char byte )
 
 int CToken::ConvSJis2Utf8(char* pSource, char* pDist, int buffersize)
 {
-	int size = 0;
-	if (pDist == NULL) return -1;
+	if (pSource == NULL || pDist == NULL || buffersize <= 0) return -1;
 
 #ifdef HSPWIN
 	//ShiftJISからUTF-16へ変換
 	const int nSize = ::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, NULL, 0);
+	if (nSize <= 0) return -1;
 
-	BYTE* buffUtf16 = new BYTE[nSize * 2 + 2];
-	::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, (LPWSTR)buffUtf16, nSize);
+	std::vector<wchar_t> buffUtf16((size_t)nSize);
+	if (::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, (LPWSTR)buffUtf16.data(), nSize) == 0) return -1;
 
 	//UTF-16からUTF-8へ変換
-	size = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16, -1, NULL, 0, NULL, NULL);
-	size *= 2;
-	if (size > buffersize) size = buffersize;
-	ZeroMemory(pDist, size);
-	::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16, -1, (LPSTR)pDist, size, NULL, NULL);
+	int needed = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16.data(), -1, NULL, 0, NULL, NULL);
+	if (needed <= 0 || needed > buffersize) return -1;
 
-	size = lstrlen((char*)pDist) + 1;
-
-	delete [] buffUtf16;
+	if (::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16.data(), -1, (LPSTR)pDist, buffersize, NULL, NULL) == 0) return -1;
+	return needed; // Keep the legacy return contract: include the terminating NUL.
+#else
+	return -1;
 #endif
-	return size;
 }
 
 
 int CToken::ConvUtf82SJis(char* pSource, char* pDist, int buffersize)
 {
-	int size = 0;
-	if (pDist == NULL || buffersize <= 0) return -1;
+	if (pSource == NULL || pDist == NULL || buffersize <= 0) return -1;
 
 #ifdef HSPWIN
+	int iLenUnicode = ::MultiByteToWideChar(CP_UTF8, 0, pSource, -1, NULL, 0);
+	if (iLenUnicode <= 0) return -1;
 
-	// サイズを計算する
-	int iLenUnicode = ::MultiByteToWideChar(CP_UTF8, 0, pSource, (int)strlen(pSource) + 1, NULL, 0);
-	BYTE* buffUtf16 = new BYTE[iLenUnicode * 2 + 2];
+	std::vector<wchar_t> buffUtf16((size_t)iLenUnicode);
+	if (::MultiByteToWideChar(CP_UTF8, 0, pSource, -1, buffUtf16.data(), iLenUnicode) == 0) return -1;
 
-	::MultiByteToWideChar(CP_UTF8, 0, pSource, (int)strlen(pSource) + 1, (LPWSTR)buffUtf16, iLenUnicode);
+	int needed = ::WideCharToMultiByte(CP_ACP, 0, buffUtf16.data(), -1, NULL, 0, NULL, NULL);
+	if (needed <= 0 || needed > buffersize) return -1;
 
-	size = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)buffUtf16, iLenUnicode, NULL, 0, NULL, NULL);
-	// Reserve one byte for the terminator written below.
-	if (size >= buffersize) size = buffersize - 1;
-	::WideCharToMultiByte(CP_ACP, 0,
-				(LPCWSTR)buffUtf16, iLenUnicode,
-				pDist, size,
-				NULL, NULL);
-
-	delete [] buffUtf16;
-	pDist[size] = 0;
+	if (::WideCharToMultiByte(CP_ACP, 0, buffUtf16.data(), -1, pDist, buffersize, NULL, NULL) == 0) return -1;
+	return needed; // Keep the legacy return contract: include the terminating NUL.
+#else
+	return -1;
 #endif
-	return size;
 }
 
 
@@ -4758,7 +4808,10 @@ char* CToken::to_hsp_string_literal(const char* src, bool filename) {
 			utftmp = (char*)malloc(len);
 			if (utftmp == NULL) return NULL;
 			owns_utftmp = true;
-			ConvUtf82SJis((char*)src, utftmp, len);
+			if (ConvUtf82SJis((char*)src, utftmp, len) < 0) {
+				free(utftmp);
+				return NULL;
+			}
 		}
 		#elif !defined(HSP_PATHIO_UTF8)
 		if (pp_utf8) {			// DLLの既存ACPパスをUTF-8へ変換する
@@ -4766,7 +4819,10 @@ char* CToken::to_hsp_string_literal(const char* src, bool filename) {
 			utftmp = (char*)malloc(len);
 			if (utftmp == NULL) return NULL;
 			owns_utftmp = true;
-			ConvSJis2Utf8((char*)src, utftmp, len);
+			if (ConvSJis2Utf8((char*)src, utftmp, len) < 0) {
+				free(utftmp);
+				return NULL;
+			}
 		}
 		#endif
 	}

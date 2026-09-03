@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <algorithm>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -697,16 +698,18 @@ bool getpath(const std::string& source, std::string& result, int mode)
 		std::vector<wchar_t> wide_source;
 		if (!hsp_path_convert_internal_to_wide(normalized, wide_source)) return false;
 
-		// _wsplitpath has no buffer-size arguments. Each component is no longer
-		// than the source, so these dynamically sized buffers retain its API while
-		// avoiding the legacy _MAX_PATH overflow hazard.
-		const size_t component_size = wide_source.size();
+		// _wsplitpath_s receives explicit buffer sizes. Ensure buffers are at least
+		// _MAX_PATH so the CRT component maximums are always satisfied, while also
+		// expanding to the full path length to prevent truncation for long paths.
+		const size_t component_size = (std::max)(wide_source.size() + 1, (size_t)_MAX_PATH);
 		std::vector<wchar_t> drive(component_size);
 		std::vector<wchar_t> directory_wide(component_size);
 		std::vector<wchar_t> filename_wide(component_size);
 		std::vector<wchar_t> extension_wide(component_size);
-		_wsplitpath(wide_source.data(), drive.data(), directory_wide.data(),
-			filename_wide.data(), extension_wide.data());
+		if (_wsplitpath_s(wide_source.data(), drive.data(), component_size, directory_wide.data(), component_size,
+			filename_wide.data(), component_size, extension_wide.data(), component_size) != 0) {
+			return false;
+		}
 
 		std::string drive_component;
 		std::string directory_component;
