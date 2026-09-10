@@ -561,7 +561,7 @@ int hgio_buffer(BMSCR *bm)
 	//
 	int option = 0;
 	if (bm->type == HSPWND_TYPE_OFFSCREEN) {
-		bm->master_buffer = game->makeFremeBuffer(bm->resname, bm->sx, bm->sy);
+		bm->master_buffer = game->makeFremeBuffer((char *)bm->resname.c_str(), bm->sx, bm->sy);
 		if (bm->master_buffer  == NULL) {
 			return -1;
 		}

@@ -510,7 +510,7 @@ public:
 	short	divsx, divsy;				// CEL size
 	short	celofsx, celofsy;			// CEL center offset
 
-	char	resname[RESNAME_MAX];		// Resource Name
+	std::string resname;				// Resource Name
 	int		texid;						// Texture ID
 
 	short	tapstat;					// TapStatus
@@ -695,7 +695,7 @@ typedef struct BMSCR
 	short	divsx, divsy;				// CEL size
 	short	celofsx, celofsy;			// CEL center offset
 
-	char	resname[RESNAME_MAX];		// Resource Name
+	std::string resname;				// Resource Name
 	int		texid;						// Texture ID
 
 	short	tapstat;					// TapStatus
