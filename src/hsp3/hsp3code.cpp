@@ -2818,9 +2818,12 @@ HSP3TYPEINFO *code_gettypeinfo( int type )
 	}
 
 	if ( id >= tinfo_cur ) {
+		int old_cur = tinfo_cur;
 		tinfo_cur = id + 1;
 		hsp3tinfo = (HSP3TYPEINFO *)sbExpand( (char *)hsp3tinfo, sizeof(HSP3TYPEINFO) * tinfo_cur );
-		hsp3typeinit_default( id );
+		for ( int i = old_cur; i < tinfo_cur; i++ ) {
+			hsp3typeinit_default( i );
+		}
 	}
 	info = GetTypeInfoPtr( id );
 	return info;
@@ -3282,7 +3285,7 @@ void code_init( void )
 
 	//		プラグイン追加の準備
 	//
-	tinfo_cur = HSP3_TYPE_USER;
+	// tinfo_cur はビルトイン拡張が使用した値のまま残す (リセットしない)
 
 #ifdef HSPDEBUG
 	//		デバッグ情報の初期化

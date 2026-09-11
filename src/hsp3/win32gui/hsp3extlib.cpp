@@ -223,6 +223,7 @@ static int Hsp3ExtAddPlugin( void )
 	//		プラグインの登録
 	//
 	int i;
+	int typefunc_count = 0;
 	HSPHED *hed;
 	char *ptr;
 	char *libname;
@@ -250,9 +251,14 @@ static int Hsp3ExtAddPlugin( void )
 
 		libname = strp(hpi->libname);
 		funcname = strp(hpi->funcname);
-		info = code_gettypeinfo(-1);
-
 		if ( hpi->flag == HPIDAT_FLAG_TYPEFUNC ) {
+			int plugin_type = hpi->option;
+			if ( plugin_type < HSP3_TYPE_PLUGIN ) {
+				plugin_type = HSP3_TYPE_PLUGIN + typefunc_count;
+			}
+			info = code_gettypeinfo( plugin_type );
+			typefunc_count++;
+
 		 	hd = DllManager().load_library( libname );
 			if ( hd == NULL ) {
 #ifdef HSPUTF8

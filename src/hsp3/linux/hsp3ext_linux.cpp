@@ -261,6 +261,17 @@ static int termfunc_dllcmd( int option )
 	return 0;
 }
 
+void hsp3ext_initsys( HSP3TYPEINFO *info )
+{
+	//		システム情報の初期化のみ行う (hgio_init より前に呼ぶ必要がある)
+	hspctx = info->hspctx;
+	exinfo = info->hspexinfo;
+	type = exinfo->nptype;
+	val = exinfo->npval;
+	exflg = exinfo->npexflg;
+	InitSystemInformation();
+}
+
 void hsp3typeinit_dllcmd( HSP3TYPEINFO *info )
 {
 	hspctx = info->hspctx;
