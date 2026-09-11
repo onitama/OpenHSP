@@ -1338,6 +1338,10 @@ char *CToken::ExpandHex( char *str, int *val )
 		if (b>=0) { s3[a++]=a1;num=(num<<4)+b; }
 		vs++;
 	}
+	if ( *vs=='l' || *vs=='L' ) {
+		s3[a++]=*vs;
+		vs++;
+	}
 	s3[a]=0;
 	if (wrtbuf!=NULL) wrtbuf->PutData( s3, a );
 	*val = num;
@@ -1363,6 +1367,10 @@ char *CToken::ExpandBin( char *str, int *val )
 			if (b>=0) { s3[a++]=a1;num=(num<<1)+b; }
 			vs++;
 		}
+	if ( *vs=='l' || *vs=='L' ) {
+		s3[a++]=*vs;
+		vs++;
+	}
 	s3[a]=0;
 	if (wrtbuf!=NULL) wrtbuf->PutData( s3, a );
 	return (char *)vs;
@@ -1451,7 +1459,7 @@ char *CToken::ExpandToken( char *str, int *type, int ppmode )
 	}
 
 	if (a1=='0') {
-		a2=vs[1];
+		a2=tolower(vs[1]);
 		if (a2=='x') { vs++;a1='$'; }		// when hex code (0x)
 		if (a2=='b') { vs++;a1='%'; }		// when bin code (0b)
 	}

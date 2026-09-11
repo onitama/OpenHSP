@@ -5,14 +5,41 @@
 #defcfunc module_decimal_literal
 return 3000000000l
 
+#defcfunc module_hex_literal
+return $100000000L
+
+#defcfunc module_hex_prefix_lower
+return 0x100000000L
+
+#defcfunc module_hex_prefix_upper
+return 0X100000000L
+
+#defcfunc module_binary_literal
+return %100000000000000000000000000000000L
+
+#defcfunc module_binary_prefix_lower
+return 0b100000000000000000000000000000000L
+
+#defcfunc module_binary_prefix_upper
+return 0B100000000000000000000000000000000L
+
 #defcfunc module_float_suffix
 return 1F
+
+#defcfunc module_float_lower_suffix
+return 1f
 
 #defcfunc module_double_suffix
 return 1D
 
+#defcfunc module_double_lower_suffix
+return 1d
+
 #defcfunc module_exp_suffix
 return 1E3
+
+#defcfunc module_exp_lower_suffix
+return 1e3
 
 #defcfunc module_int64_upper_suffix
 return 3000000000L
@@ -20,7 +47,31 @@ return 3000000000L
 #global
 
 mes "module decimal literal => " + module_decimal_literal()
+mes "module hex literal => " + module_hex_literal()
+mes "module hex 0x literal => " + module_hex_prefix_lower()
+mes "module hex 0X literal => " + module_hex_prefix_upper()
+mes "module binary literal => " + module_binary_literal()
+mes "module binary 0b literal => " + module_binary_prefix_lower()
+mes "module binary 0B literal => " + module_binary_prefix_upper()
 mes "module float suffix => " + module_float_suffix()
+mes "module float lower suffix => " + module_float_lower_suffix()
 mes "module double suffix => " + module_double_suffix()
+mes "module double lower suffix => " + module_double_lower_suffix()
 mes "module exp suffix => " + module_exp_suffix()
+mes "module exp lower suffix => " + module_exp_lower_suffix()
 mes "module int64 upper suffix => " + module_int64_upper_suffix()
+
+mes "global decimal literal => " + 3000000000l
+mes "global int64 upper suffix => " + 3000000000L
+mes "global hex literal => " + $100000000L
+mes "global hex 0x literal => " + 0x100000000L
+mes "global hex 0X literal => " + 0X100000000L
+mes "global binary literal => " + %100000000000000000000000000000000L
+mes "global binary 0b literal => " + 0b100000000000000000000000000000000L
+mes "global binary 0B literal => " + 0B100000000000000000000000000000000L
+mes "global float suffix => " + 1F
+mes "global float lower suffix => " + 1f
+mes "global double suffix => " + 1D
+mes "global double lower suffix => " + 1d
+mes "global exp suffix => " + 1E3
+mes "global exp lower suffix => " + 1e3
