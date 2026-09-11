@@ -19,6 +19,7 @@ void HspHelpManager::strsp_ini(char *src)
 	srcstr = src;
 }
 
+
 char *HspHelpManager::strsp_getptr(void)
 {
 	return srcstr + splc;
@@ -149,7 +150,7 @@ void HspHelpManager::terminate(void)
 }
 
 
-int HspHelpManager::initalize(char * pathname)
+int HspHelpManager::initalize(const char * pathname)
 {
 	//		indexを初期化して.HSを使用可能にする
 	//
@@ -167,7 +168,7 @@ int HspHelpManager::initalize(char * pathname)
 	m_message += m_filename;
 	m_message += "]\r\n";
 
-	res = indexbuf->PutFile( (char *)m_filename.c_str() );
+	res = indexbuf->PutFile(m_filename.c_str());
 	if (res<0) {
 		m_message += "Index not found.\r\n";
 		delete indexbuf; indexbuf = NULL;
@@ -183,7 +184,8 @@ int HspHelpManager::initalize(char * pathname)
 }
 
 
-int HspHelpManager::searchIndex(char * key)
+
+int HspHelpManager::searchIndex(const char * key)
 {
 	//		keywordをindexから検索する
 	//		(返値が0の場合は成功、詳細が取得可能になる、それ以外はエラー)
@@ -208,7 +210,7 @@ int HspHelpManager::searchIndex(char * key)
 	//m_message += std::to_string(offset);
 	//m_message += "\r\n";
 
-	int res = openHSFile((char *)m_id_hsfile.c_str(), offset);
+	int res = openHSFile(m_id_hsfile.c_str(), offset);
 	if (res < 0) return -3;
 
 	//m_message += "result : \r\n";
@@ -221,7 +223,7 @@ int HspHelpManager::searchIndex(char * key)
 }
 
 
-int HspHelpManager::getKeywordFromIndex(char * key)
+int HspHelpManager::getKeywordFromIndex(const char * key)
 {
 	//		keywordをindexから検索する
 	//		(返値が0の場合は成功、それ以外はエラー)
@@ -268,7 +270,7 @@ int HspHelpManager::getKeywordFromIndex(char * key)
 }
 
 
-int HspHelpManager::openHSFile(char * fname, int offset)
+int HspHelpManager::openHSFile(const char * fname, int offset)
 {
 	//		.HSファイルを読み込む
 	//
@@ -280,7 +282,7 @@ int HspHelpManager::openHSFile(char * fname, int offset)
 
 	m_hsfilename = m_pathname + "/" + fname;
 
-	res = hsbuf->PutFile((char *)m_hsfilename.c_str());
+	res = hsbuf->PutFile(m_hsfilename.c_str());
 	if (res<=0) {
 		m_message += "File not found [";
 		m_message += m_hsfilename;
@@ -500,4 +502,3 @@ int HspHelpManager::getTypesFromHS(char *start, char *limit_addr)
 	}
 	return 0;
 }
-

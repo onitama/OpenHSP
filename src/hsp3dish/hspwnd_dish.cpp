@@ -15,6 +15,7 @@
 #include "../hsp3/hsp3debug.h"
 #include "../hsp3/strbuf.h"
 #include "../hsp3/strnote.h"
+#include "../hsp3/hsp3pathio.h"
 
 HspWnd *curwnd;
 
@@ -194,7 +195,7 @@ void HspWnd::MakeBmscr( int id, int type, int x, int y, int sx, int sy, int opti
 	bm->buffer_option = option;
 
 	if (type == HSPWND_TYPE_OFFSCREEN) {
-		sprintf( bm->resname, "*buffer%d", bm->wid );
+		bm->resname = "*buffer" + std::to_string(bm->wid);
 		hgio_buffer( (BMSCR *)bm );
 	}
 }
@@ -277,17 +278,17 @@ int HspWnd::GetPreloadBufferId(char* fname)
 	//
 	int i;
 	Bmscr* bm;
-	char basename[HSP_MAX_PATH];
-	getpath( fname, basename, 8+16 );
+	std::string basename;
+	if (fname == NULL || !getpath(std::string(fname), basename, 8+16) || basename.empty()) return -1;
 
 	for (i = 1; i < bmscr_max; i++) {
 		bm = GetBmscr(i);
 		if (bm != NULL) {
 			if (bm->type == HSPWND_TYPE_BUFFER) {
-				if (bm->flag == BMSCR_FLAG_INUSE) {
-					char bname[HSP_MAX_PATH];
-					getpath(bm->resname, bname, 8 + 16);
-					if (strcmp(bname, basename) == 0) {
+				if (bm->flag == BMSCR_FLAG_INUSE && !bm->resname.empty()) {
+					std::string bname;
+					if (!getpath(bm->resname, bname, 8 + 16)) bname.clear();
+					if (bname == basename) {
 						return bm->wid;
 					}
 				}
@@ -322,7 +323,9 @@ void HspWnd::Resume( void )
 		if ( bm != NULL ) {
 			if ( bm->type == HSPWND_TYPE_BUFFER ) {
 				bm->flag = BMSCR_FLAG_NOUSE;
-				hgio_texload((BMSCR*)bm, bm->resname);
+				if (!bm->resname.empty()) {
+					hgio_texload((BMSCR*)bm, (char *)bm->resname.c_str());
+				}
 				bm->flag = BMSCR_FLAG_INUSE;
 			}
 			if ( bm->type == HSPWND_TYPE_OFFSCREEN ) {
@@ -383,7 +386,7 @@ void Bmscr::Init( int p_sx, int p_sy )
 	fl_dispw = 1;
 	fl_udraw = 1;
 
-	resname[0] = 0;
+	resname.clear();
 }
 
 
@@ -396,9 +399,7 @@ void Bmscr::Init( char *fname )
 	}
 	Init( sx, sy );
 
-	//char _name[HSP_MAX_PATH];
-	//getpath( fname, _name, 8 );
-	strncpy( resname, fname, RESNAME_MAX-1 );
+	resname = (fname != NULL ? fname : "");
 	//Alertf( "(%d,%d)",sx,sy );
 }
 
@@ -406,7 +407,7 @@ void Bmscr::Init( char *fname )
 char* Bmscr::getPixelMaskBuffer(void)
 {
 #ifdef HSPWIN
-	return hgio_texmaskbuffer((BMSCR*)this, resname);
+	return hgio_texmaskbuffer((BMSCR*)this, (char *)resname.c_str());
 #else
 	return NULL;
 #endif
@@ -1390,5 +1391,3 @@ int Bmscr::Viewcalc_set(int type, HSPREAL x, HSPREAL y, HSPREAL p_sx, HSPREAL p_
 	hgio_setview((BMSCR*)this);
 	return 0;
 }
-
-

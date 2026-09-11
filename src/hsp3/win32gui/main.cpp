@@ -44,7 +44,23 @@ int APIENTRY WinMain ( HINSTANCE hInstance,
 	res = hsp3win_init( hInstance, sptr);
 	LocalFree(szArglist);
 #else
-	res = hsp3win_init(hInstance, lpCmdParam);
+	char fname[_MAX_PATH + 1];
+	char *ss = lpCmdParam;
+	if (lpCmdParam != NULL) {
+		ss = strsp_cmds(lpCmdParam);
+		int i = (int)(ss - lpCmdParam);
+		ss = lpCmdParam;
+		if (i > 0 && ss[i - 1] == 32) i--;
+		if (*ss == 0x22) {
+			ss++;
+			i = i >= 2 ? i - 2 : 0;
+		}
+		if (i > _MAX_PATH) return 1;
+		if (i > 0) memcpy(fname, ss, (size_t)i);
+		fname[i] = 0;
+		ss = fname;
+	}
+	res = hsp3win_init(hInstance, ss);
 #endif
 #else
 	res = hsp3win_init( hInstance, NULL );
@@ -54,6 +70,3 @@ int APIENTRY WinMain ( HINSTANCE hInstance,
 	}
 	return res;
 }
-
-
-

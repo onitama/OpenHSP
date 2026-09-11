@@ -5,6 +5,8 @@
 #ifndef __membuf_h
 #define __membuf_h
 
+#include <string>
+
 //  growmem class
 
 /*
@@ -37,23 +39,24 @@ public:
 	void RegistIndex( int val );
 	void Index( void );
 	void IndexExclusive( void );
-	void Put( int data );
-	void Put( short data );
-	void Put( char data );
-	void Put( unsigned char data );
-	void Put( float data );
-	void Put( double data );
-	void PutStr( char *data );
-	void PutStrDQ( char *data );
-	void PutStrBlock( char *data );
-	void PutCR( void );
-	void PutData( void *data, int sz );
-	void PutStrf( char *format, ... );
-	int PutFile( char *fname );
-	int SaveFile( char *fname );
+	bool Put( int data );
+	bool Put( short data );
+	bool Put( char data );
+	bool Put( unsigned char data );
+	bool Put( float data );
+	bool Put( double data );
+	bool PutStr( const char *data );
+	bool PutStrDQ( char *data );
+	bool PutStrBlock( char *data );
+	bool PutCR( void );
+	bool PutData( void *data, int sz );
+	bool PutStrf( char *format, ... );
+	int PutFile( const char *fname );
+	int SaveFile( const char *fname );
 	char *GetFileName( void );
 	int GetSize( void ) { return cur; }
 	void ReduceSize( int new_cur );
+	bool TryPreparePtr( int sz, char **result );
 	char *PreparePtr( int sz );
 
 private:
@@ -74,7 +77,7 @@ private:
 
 	char	*sub_buf;			// Sub Buffer
 
-	char	name[256];			// File Name
+	std::string name;			// File Name
 };
 
 

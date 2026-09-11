@@ -22,8 +22,6 @@ void cutlast2( char *st );
 void strcpy2( char *dest, const char *src, size_t size );
 char *strchr2( char *target, char code );
 
-void getpath( char *src, char *outbuf, int p2 );
-void getpathW( HSPAPICHAR *src, HSPAPICHAR *outbuf, int p2 );
 
 void ExecFile( char *stmp, char *ps, int mode );
 void dirinfo( char *p, int id );
@@ -34,24 +32,23 @@ void AlertV( const char *mes, int val );
 void Alertf( const char *format, ... );
 #define AlertfW Alertf
 
-int makedir( char *name );
-int changedir( char *name );
-int changedirW( HSPAPICHAR *name );
-int delfile( char *name );
-int dirlist( char *fname, char **target, int p3 );
+int makedir( const char *name );
+int changedir( const char *name );
+int changedirW( const HSPAPICHAR *name );
+int delfile( const char *name );
 int gettime( int index );
 
-int strcat2( char *str1, char *str2 );
-char *strstr2( char *target, char *src );
+int strcat2( char *str1, const char *str2 );
+char *strstr2( char *target, const char *src );
 
 void strsp_ini( void );
 int strsp_getptr( void );
-int strsp_get( char *srcstr, char *dststr, char splitchr, int len );
+int strsp_get( const char *srcstr, char *dststr, char splitchr, int len );
 int GetLimit( int num, int min, int max );
 void CutLastChr( char *p, char code );
 char *strsp_cmds( char *srcstr );
 #define strsp_cmdsW strsp_cmds
-int htoi( char *str );
+int htoi( const char *str );
 
 int SecurityCheck( char *name );
 
@@ -63,4 +60,3 @@ void TrimCodeR( char *p, int code );
 void ReplaceSetMatch( char *src, char *match, char *result, int in_src, int in_match, int in_result );
 char *ReplaceStr( char *repstr );
 int ReplaceDone( void );
-

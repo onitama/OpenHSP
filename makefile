@@ -13,10 +13,10 @@ endif
 
 # CFLAGS_ENV = # 32bit
 CFLAGS_ENV =  -DHSP64 -Werror=int-to-pointer-cast # 64bit
-CFLAGS_DISH = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
-CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++11 $(CFLAGS_ENV) $(DEBUG_CFLAGS)
-CFLAGS_CL = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
-CFLAGS_CMP = -Wno-write-strings -std=c++11 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
+CFLAGS_DISH = -Wno-write-strings -std=c++17 --exec-charset=UTF-8 -DHSPDISH -DHSPLINUX -DHSPDEBUG -DUSE_OBAQ -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
+CFLAGS_GP = -Wno-write-strings --exec-charset=UTF-8 -DHSPDISH -DHSPDISHGP -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED -DPNG_ARM_NEON_OPT=0 -I src/hsp3dish/extlib/src -I src/hsp3dish/extlib/src/glew -I src/hsp3dish/gameplay/src -std=c++17 $(CFLAGS_ENV) $(DEBUG_CFLAGS)
+CFLAGS_CL = -Wno-write-strings -std=c++17 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
+CFLAGS_CMP = -Wno-write-strings -std=c++17 --exec-charset=UTF-8 -DHSPLINUX -DHSPDEBUG -DHSPCMP -DHSP_COM_UNSUPPORTED $(CFLAGS_ENV) $(DEBUG_CFLAGS)
 PKG_CONFIG = pkg-config
 
 OBJS = \
@@ -24,6 +24,7 @@ OBJS = \
 	src/hsp3/filepack.do \
 	src/hsp3/hsp3crypt.do \
 	src/hsp3/hsp3utfcnv.do \
+	src/hsp3/hsp3pathio.do \
 	src/hsp3dish/geometry.do \
 	src/hsp3/hsp3.do \
 	src/hsp3/hsp3code.do \
@@ -67,23 +68,25 @@ OBJS = \
 	src/hsp3/linux/supio_linux.do
 
 OBJS_CMP = \
-	src/hspcmp/ahtmodel.o \
-	src/hspcmp/ahtobj.o \
-	src/hspcmp/codegen.o \
-	src/hspcmp/comutil.o \
-	src/hspcmp/errormsg.o \
-	src/hspcmp/hsc3.o \
-	src/hspcmp/hspcmd.o \
-	src/hspcmp/label.o \
-	src/hspcmp/localinfo.o \
-	src/hspcmp/main.o \
-	src/hspcmp/membuf.o \
-	src/hsp3/strnote.o \
-	src/hspcmp/tagstack.o \
-	src/hspcmp/hsmanager.o \
-	src/hspcmp/token.o \
-	src/hsp3/strbuf.o \
-	src/hsp3/linux/supio_linux.o
+	src/hspcmp/ahtmodel.cmp.o \
+	src/hspcmp/ahtobj.cmp.o \
+	src/hspcmp/codegen.cmp.o \
+	src/hspcmp/comutil.cmp.o \
+	src/hspcmp/errormsg.cmp.o \
+	src/hspcmp/hsc3.cmp.o \
+	src/hspcmp/hspcmd.cmp.o \
+	src/hspcmp/label.cmp.o \
+	src/hspcmp/localinfo.cmp.o \
+	src/hspcmp/main.cmp.o \
+	src/hspcmp/membuf.cmp.o \
+	src/hsp3/strnote.cmp.o \
+	src/hsp3/hsp3utfcnv.cmp.o \
+	src/hsp3/hsp3pathio.cmp.o \
+	src/hspcmp/tagstack.cmp.o \
+	src/hspcmp/hsmanager.cmp.o \
+	src/hspcmp/token.cmp.o \
+	src/hsp3/strbuf.cmp.o \
+	src/hsp3/linux/supio_linux.cmp.o
 
 OBJS_CL = \
 	src/hsp3/linux/main.o \
@@ -105,6 +108,7 @@ OBJS_CL = \
 	src/hsp3/filepack.o \
 	src/hsp3/hsp3crypt.o \
 	src/hsp3/hsp3utfcnv.o \
+	src/hsp3/hsp3pathio.o \
 	src/hsp3/linux/supio_linux.o \
 	src/hsp3/linux/hsp3cl.o \
 	src/hsp3/linux/hsp3ext_linux.o \
@@ -118,6 +122,7 @@ OBJS_GP = \
 	src/hsp3/filepack.gpo \
 	src/hsp3/hsp3crypt.gpo \
 	src/hsp3/hsp3utfcnv.gpo \
+	src/hsp3/hsp3pathio.gpo \
 	src/hsp3dish/geometry.gpo \
 	src/hsp3/hsp3.gpo \
 	src/hsp3/hsp3code.gpo \
@@ -455,8 +460,8 @@ OBJS_LINEAR_MATH = \
 	src/hsp3dish/extlib/src/LinearMath/btVector3.gpo
 
 TARGETS = hsp3dish hsp3gp hsp3cl hspcmp hsed
-LIBS1 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lcurl -lgpiod -lpthread -lffi
-LIBS2 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lcurl -lgpiod -lpthread -lffi
+LIBS1 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lstdc++fs -lcurl -lgpiod -lpthread -lffi
+LIBS2 = -lm -lGL -lEGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lstdc++ -lstdc++fs -lcurl -lgpiod -lpthread -lffi
 LIBS_GP = \
 	libgameplay.a \
 	libBulletDynamics.a \
@@ -481,14 +486,18 @@ hsp3gp: $(OBJS_GP) $(LIBS_GP)
 	$(CXX) $(CFLAGS_GP) -c $< -o $*.gpo
 
 hspcmp: $(OBJS_CMP)
-	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) $(STRIPFLAGS) -o $@
+	$(CXX) $(CFLAGS_CMP) $(OBJS_CMP) $(STRIPFLAGS) -o $@ -lstdc++fs
+%.cmp.o: %.c
+	$(CC) $(CFLAGS_CMP) -c $< -o $@
+%.cmp.o: %.cpp
+	$(CXX) $(CFLAGS_CMP) -c $< -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CMP) -c $< -o $*.o
 %.o: %.cpp
 	$(CXX) $(CFLAGS_CMP) -c $< -o $*.o
 
 hsp3cl: $(OBJS_CL)
-	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -lcurl -lgpiod -lpthread -lffi -o $@
+	$(CXX) $(CFLAGS_CL) $(OBJS_CL) -lm -lstdc++ -lstdc++fs -lcurl -lgpiod -lpthread -lffi -o $@
 %.o: %.c
 	$(CC) $(CFLAGS_CL) -c $< -o $*.o
 %.o: %.cpp
@@ -515,4 +524,3 @@ libLinearMath.a: $(OBJS_LINEAR_MATH)
 
 clean:
 	rm -f $(OBJS) $(OBJS_GP) $(OBJS_CMP) $(OBJS_CL) $(OBJS_GAMEPLAY) $(TARGETS) $(LIBS_GP)
-

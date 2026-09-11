@@ -20,7 +20,7 @@
 
 char *mem_ini( int size ) { return (char *)malloc(size); }
 void mem_bye( void *ptr ) { free(ptr); }
-int mem_load( char *fname, void *mem, int msize )
+int mem_load( const char *fname, void *mem, int msize )
 {
 	FILE *fp;
 	int flen;
@@ -30,7 +30,7 @@ int mem_load( char *fname, void *mem, int msize )
 	fclose(fp);
 	return flen;
 }
-int mem_save( char *fname, void *mem, int msize )
+int mem_save( const char *fname, void *mem, int msize )
 {
 	FILE *fp;
 	int flen;
@@ -41,7 +41,7 @@ int mem_save( char *fname, void *mem, int msize )
 	return flen;
 }
 
-int filecopy( char *fname, char *sname )
+int filecopy( const char *fname, const char *sname )
 {
 	FILE *fp;
 	FILE *fp2;
@@ -75,7 +75,7 @@ void prtini( char *mes )
 	mespt=0;
 }
 
-void prt( char *mes )
+void prt( const char *mes )
 {
 	//		message buffer send
 	//
@@ -108,7 +108,7 @@ void strcase( char *str )
 	}
 }
 
-int tstrcmp( char *str1, char *str2 )
+int tstrcmp( const char *str1, const char *str2 )
 {
 	//	string compare (0=not same/-1=same)
 	//
@@ -169,7 +169,7 @@ int strsp_getptr(void)
 	return splc;
 }
 
-int strsp_get(char* srcstr, char* dststr, char splitchr, int len)
+int strsp_get(const char* srcstr, char* dststr, char splitchr, int len)
 {
 	//		split string with parameters
 	//
@@ -203,12 +203,12 @@ int strsp_get(char* srcstr, char* dststr, char splitchr, int len)
 }
 
 
-char* strstr2(char* target, char* src)
+char* strstr2(char* target, const char* src)
 {
 	//		strstrŠÖ”‚Ì‘SŠp‘Î‰”Å
 	//
 	unsigned char* p;
-	unsigned char* s;
+	const unsigned char* s;
 	unsigned char* p2;
 	unsigned char a1;
 	unsigned char a2;

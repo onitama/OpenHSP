@@ -15,6 +15,7 @@
 #include "../strbuf.h"
 #include "../strnote.h"
 #include "../supio.h"
+#include "../hsp3pathio.h"
 
 #ifndef HSP_COMPACT
 #include "fcpoly.h"
@@ -663,8 +664,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
     LPSTREAM pstm = NULL;							// IStreamを取得する
 	//char fext[8];
 	int stbmode;
-	HSPAPICHAR *hactmp1 = 0;
-	HSPAPICHAR wfext[8];
+	std::string wfext;
 
 	bm = GetBmscr( id );
 	if ( bm == NULL ) return 1;
@@ -684,12 +684,12 @@ int HspWnd::Picload( int id, char *fname, int mode )
 
 #ifdef USE_STBIMAGE
 	stbmode = 0;
-	getpathW(chartoapichar(fname,&hactmp1),wfext,16+2);				// 拡張子を小文字で取り出す
+	// 拡張子を小文字で取り出す
+	if (!getpath(std::string(fname != NULL ? fname : ""), wfext, 16+2)) wfext.clear();
 
-	if (!_tcscmp(wfext,TEXT(".png"))) stbmode++;	// ".png"の時
-	if (!_tcscmp(wfext,TEXT(".psd"))) stbmode++;	// ".psd"の時
-	if (!_tcscmp(wfext,TEXT(".tga"))) stbmode++;	// ".tga"の時
-	freehac(&hactmp1);
+	if (wfext == ".png") stbmode++;	// ".png"の時
+	if (wfext == ".psd") stbmode++;	// ".psd"の時
+	if (wfext == ".tga") stbmode++;	// ".tga"の時
 
 	if ( stbmode ) {						// stb_imageを使用して読み込む
 		int components;
@@ -792,36 +792,21 @@ int HspWnd::GetPreloadBufferId(char* fname)
 	//
 	int i;
 	Bmscr* bm;
-	char basename[HSP_MAX_PATH];
-
-	HSPAPICHAR* hactmp1 = 0;
-	HSPAPICHAR basenameW[HSP_MAX_PATH];
-	HSPCHAR* hctmp1 = 0;
-	getpathW(chartoapichar(fname, &hactmp1), basenameW, 8+16);
-	freehac(&hactmp1);
-
-	apichartohspchar(basenameW, &hctmp1);
-	strncpy(basename, hctmp1, HSP_MAX_PATH - 1);
-	freehc(&hctmp1);
+	std::string basename;
+	if (fname == NULL || !getpath(std::string(fname), basename, 8+16)) return -1;
 
 	for (i = 1; i < bmscr_max; i++) {
 		bm = GetBmscr(i);
 		if (bm != NULL) {
 			if (bm->flag == BMSCR_FLAG_INUSE) {
-				char bname[_MAX_PATH];
+				std::string bname;
 				char* p = (char *)bm->resname.c_str();
 				if (*p != 0) {
-					HSPAPICHAR* hactmp2 = 0;
-					HSPAPICHAR bnameW[HSP_MAX_PATH];
-					HSPCHAR* hctmp2 = 0;
-					getpathW(chartoapichar(p, &hactmp2), bnameW, 8 + 16);
-					freehac(&hactmp2);
+					if (!getpath(std::string(p), bname, 8 + 16)) {
+						continue;
+					}
 
-					apichartohspchar(bnameW, &hctmp2);
-					strncpy(bname, hctmp2, HSP_MAX_PATH - 1);
-					freehc(&hctmp2);
-
-					if (strcmp(bname, basename) == 0) {
+					if (bname == basename) {
 						return bm->wid;
 					}
 				}

@@ -235,7 +235,7 @@ char *sbExpand( char *ptr, size_t size )
 }
 
 
-void sbCopy( char **pptr, char *data, size_t size )
+void sbCopy( char **pptr, const char *data, size_t size )
 {
 	size_t sz;
 	char *ptr;
@@ -250,7 +250,7 @@ void sbCopy( char **pptr, char *data, size_t size )
 }
 
 
-void sbAdd( char **pptr, char *data, size_t size, size_t mode )
+void sbAdd( char **pptr, const char *data, size_t size, size_t mode )
 {
 	//		mode:0=normal/1=string
 	size_t sz,newsize;
@@ -276,13 +276,13 @@ void sbAdd( char **pptr, char *data, size_t size, size_t mode )
 }
 
 
-void sbStrCopy( char **ptr, char *str )
+void sbStrCopy( char **ptr, const char *str )
 {
 	sbCopy( ptr, str, (size_t)strlen(str)+1 );
 }
 
 
-void sbStrAdd( char **ptr, char *str )
+void sbStrAdd( char **ptr, const char *str )
 {
 	sbAdd( ptr, str, (size_t)strlen(str)+1, 1 );
 }
@@ -314,4 +314,3 @@ void sbInfo( char *ptr )
 	Alertf( "size:%d (%x)",st->inf.size, st->inf.ptr );
 }
 */
-

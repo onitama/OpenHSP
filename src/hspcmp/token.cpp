@@ -10,6 +10,8 @@
 #include <ctype.h>
 #include <math.h>
 #include <assert.h>
+#include <filesystem>
+#include <vector>
 
 #include "../hsp3/hsp3config.h"
 #include "supio.h"
@@ -21,6 +23,34 @@
 #include "ahtobj.h"
 
 #define s3size 0x8000
+
+namespace {
+
+namespace fs = std::filesystem;
+
+static bool hspcmp_path_component(const char* source, int mode, std::string& result)
+{
+	if (source == NULL) return false;
+	return getpath(std::string(source), result, mode);
+}
+
+static bool hspcmp_join_paths(std::initializer_list<std::string> parts, std::string& output)
+{
+	try {
+		fs::path result;
+		for (const std::string& part : parts) {
+			if (!part.empty()) result /= fs::u8path(part);
+		}
+		output = result.u8string();
+		return true;
+	}
+	catch (const std::exception&) {
+		output.clear();
+		return false;
+	}
+}
+
+}
 
 #ifdef HSPWIN
 #include <windows.h>
@@ -37,6 +67,8 @@ static inline int tstrcmp(const char* str1, const char* str2)
 	if (strcmp(str1, str2) == 0) return -1;
 	return 0;
 }
+
+static const int hspcmp_pack_path_error = -2;
 
 //-------------------------------------------------------------
 //		String Service
@@ -149,12 +181,20 @@ void CToken::Mesf( char *format, ...)
 	//		メッセージ登録
 	//		(フォーマット付き)
 	//
-	char textbf[1024];
 	va_list args;
 	va_start(args, format);
-	vsprintf(textbf, format, args);
+	va_list measure_args;
+	va_copy(measure_args, args);
+	int length = vsnprintf(NULL, 0, format, measure_args);
+	va_end(measure_args);
+	if (length < 0) {
+		va_end(args);
+		return;
+	}
+	std::vector<char> textbf((size_t)length + 1);
+	vsnprintf(textbf.data(), textbf.size(), format, args);
 	va_end(args);
-	errbuf->PutStr( textbf );
+	errbuf->PutStr( textbf.data() );
 	errbuf->PutStr( "\r\n" );
 }
 
@@ -174,7 +214,12 @@ void CToken::LineError( char *mes, int line, char *fname )
 	//		エラーメッセージ登録(line/filename)
 	//
 	char tmp[256];
+#ifdef HSPCMP_DLL
+	hspcmp_message_path message_fname(fname);
+	snprintf( tmp, sizeof(tmp), "#Error:%s in line %d [%s]\r\n", mes, line, message_fname.c_str() );
+#else
 	sprintf( tmp, "#Error:%s in line %d [%s]\r\n", mes, line, fname );
+#endif
 	errbuf->PutStr( tmp );
 }
 
@@ -211,58 +256,52 @@ int CToken::AddPackfile( char *name, int mode )
 	//
 	CStrNote note;
 	int i,max;
-	char fname[HSP_MAX_PATH];
-	char p_fdir[HSP_MAX_PATH];
-	char p_fname[HSP_MAX_PATH];
-	char packadd[1024];
+	std::string fname;
+	std::string p_fdir;
+	std::string p_fname;
+	std::string packadd;
 	char tmp[1024];
 	char *s;
-	char* findptr;
-	bool absolutePath = false;					// 絶対パスか?
+	bool absolutePath;					// 絶対パスか?
 
-	getpath(name, p_fdir, 32);
-	getpath(name, p_fname, 8);
-
-#ifdef HSPWIN
-	strchr3(p_fdir, ':', 0, &findptr);			// ドライブ文字があった
-	if (findptr != NULL) {
-		absolutePath = true;
+	if (!hspcmp_path_component(name, 32, p_fdir) || !hspcmp_path_component(name, 8, p_fname)) {
+		return hspcmp_pack_path_error;
 	}
-	if (*p_fdir == '\\') {
-		absolutePath = true;
-	}
-#endif
-	if (*p_fdir == '/') {
-		absolutePath = true;
-	}
+	absolutePath = hsp_path_is_absolute(name) != 0;
 
 	if (absolutePath==false) {
-		strcpy(fname, search_path);
-		strcat(fname, p_fdir);
-		strcpy(p_fdir, fname);
-		strcat(fname, p_fname);
+		if (!hspcmp_join_paths({ search_path, p_fdir, p_fname }, fname)) return hspcmp_pack_path_error;
 	}
 	else {
-		strcpy(fname, name);
+		fname = name;
 	}
 
-	strcpy( packadd, fname);
+	packadd = fname;
 
 	if ( mode<2 ) {
 #ifdef HSPWIN
-		strcase(packadd);
+		// Not strcase(): on Windows, HSP_PATHIO_UTF8 builds keep packadd
+		// UTF-8 encoded, but strcase() here resolves to supio_win.cpp's
+		// Shift-JIS-oriented lead-byte skip logic, which can misalign on
+		// UTF-8 continuation bytes and skip case-folding an ASCII letter
+		// that follows a multibyte character. This ASCII-only pass is
+		// immune to that since it never treats bytes as multibyte lead/
+		// trail pairs.
+		for (char& character : packadd) {
+			if (character >= 'A' && character <= 'Z') character = (char)(character - 'A' + 'a');
+		}
 #endif
 		note.Select( packbuf->GetBuffer() );
 		max = note.GetMaxLine();
 		for( i=0;i<max;i++ ) {
-			note.GetLine( tmp, i );
+			note.GetLine( tmp, i, sizeof(tmp) - 1 );
 			s = tmp;if ( *s=='+' ) s++;
-			if ( strcmp( s, packadd ) == 0 ) return -1;
+			if ( strcmp( s, packadd.c_str() ) == 0 ) return -1;
 		}
 		if ( mode==1 ) packbuf->PutStr( "+" );
 		packbuf->PutStr(">");
 	}
-	packbuf->PutStr( packadd );
+	packbuf->PutStr( (char*)packadd.c_str() );
 	packbuf->PutStr( "\r\n" );
 	return 0;
 }
@@ -275,56 +314,44 @@ int CToken::AddPackfileOrig(char* name, int mode)
 	//
 	CStrNote note;
 	int i, max;
-	char fname[HSP_MAX_PATH];
-	char p_fdir[HSP_MAX_PATH];
-	char p_fname[HSP_MAX_PATH];
-	char packadd[1024];
+	std::string fname;
+	std::string p_fdir;
+	std::string p_fname;
+	std::string packadd;
 	char tmp[1024];
 	char* s;
-	char* findptr;
-	bool absolutePath = false;					// 絶対パスか?
+	bool absolutePath;					// 絶対パスか?
 
-	getpath(name, p_fdir, 32);
-	getpath(name, p_fname, 8);
-
-#ifdef HSPWIN
-	strchr3(p_fdir, ':', 0, &findptr);			// ドライブ文字があった
-	if (findptr != NULL) {
-		absolutePath = true;
+	if (!hspcmp_path_component(name, 32, p_fdir) || !hspcmp_path_component(name, 8, p_fname)) {
+		return hspcmp_pack_path_error;
 	}
-	if (*p_fdir == '\\') {
-		absolutePath = true;
-	}
-#endif
-	if (*p_fdir == '/') {
-		absolutePath = true;
-	}
+	absolutePath = hsp_path_is_absolute(name) != 0;
 
 	if (absolutePath == false) {
-		strcpy(fname, search_path);
-		strcat(fname, p_fdir);
-		strcpy(p_fdir, fname);
-		strcat(fname, p_fname);
+		if (!hspcmp_join_paths({ search_path, p_fdir, p_fname }, fname)) return hspcmp_pack_path_error;
 	}
 	else {
-		strcpy(fname, name);
+		fname = name;
 	}
 
-	strcpy(packadd, fname);
+	packadd = fname;
 	if (mode < 2) {
 #ifdef HSPWIN
-		strcase(packadd);
+		// See the comment in AddPackfile(): strcase() is not UTF-8 safe here.
+		for (char& character : packadd) {
+			if (character >= 'A' && character <= 'Z') character = (char)(character - 'A' + 'a');
+		}
 #endif
 		note.Select(packbuf->GetBuffer());
 		max = note.GetMaxLine();
 		for (i = 0; i < max; i++) {
-			note.GetLine(tmp, i);
+		note.GetLine(tmp, i, sizeof(tmp) - 1);
 			s = tmp; if (*s == '+') s++;
-			if (strcmp(s, packadd) == 0) return -1;
+			if (strcmp(s, packadd.c_str()) == 0) return -1;
 		}
 		if (mode == 1) packbuf->PutStr("+");
 	}
-	packbuf->PutStr(packadd);
+	packbuf->PutStr((char*)packadd.c_str());
 	packbuf->PutStr("\r\n");
 	return 0;
 }
@@ -411,18 +438,13 @@ void CToken::SetLabelInfo( CLabel *lbinfo )
 }
 
 
-void CToken::SetLabelListBuffer(CMemBuf *buf, int mode, char* match, int line, char *filename)
+void CToken::SetLabelListBuffer(CMemBuf *buf, int mode, char* match, int line, const char *filename)
 {
 	labbuf = buf;
 	cg_labout_mode = mode;
 	cg_labout_match = match;
 	cg_labout_line = line;
-	if (filename == NULL) {
-		*cg_labout_orgfile = 0;
-	}
-	else {
-		strcpy(cg_labout_orgfile, filename);
-	}
+	cg_labout_orgfile = filename != NULL ? filename : "";
 
 	static char* p[] = {
 		"---",
@@ -453,12 +475,12 @@ void CToken::ResetCompiler( void )
 	incinf = 0;
 	swsp = 0; swmode = 0; swlevel = 0;
 	SetModuleName( "" ); modgc = 0;
-	search_path[0] = 0;
+	search_path.clear();
 	lb->Reset();
 	fileadd = 0;
 	pp_orgline = 0;
-	pp_orgfile[0] = 0;
-	pp_orgfilefull[0] = 0;
+	pp_orgfile.clear();
+	pp_orgfilefull.clear();
 
 	//		reset header info
 	hed_option = 0;
@@ -2192,7 +2214,7 @@ ppresult_t CToken::PP_SwitchReverse( void )
 
 ppresult_t CToken::PP_IncludeSub(char* word, int is_addition)
 {
-	char tmp_spath[HSP_MAX_PATH];
+	std::string tmp_spath = search_path;
 	int add_bak;
 
 	incinf++;
@@ -2200,11 +2222,10 @@ ppresult_t CToken::PP_IncludeSub(char* word, int is_addition)
 		SetError("too many include level");
 		return PPRESULT_ERROR;
 	}
-	strcpy(tmp_spath, search_path);
 	if (is_addition) add_bak = SetAdditionMode(1);
 	int res = ExpandFile(wrtbuf, word, word);
 	if (is_addition) SetAdditionMode(add_bak);
-	strcpy(search_path, tmp_spath);
+	search_path = tmp_spath;
 	incinf--;
 	if (res) {
 		if (is_addition && res == -1) return PPRESULT_SUCCESS;
@@ -2217,24 +2238,34 @@ ppresult_t CToken::PP_IncludeSub(char* word, int is_addition)
 ppresult_t CToken::PP_Include( int is_addition )
 {
 	char* word = (char*)s3;
+	std::string converted_word;
 	int type = GetToken();
 	switch (type) {
 	case TK_STRING:
-		return PP_IncludeSub(word, is_addition);
+		break;
 	case TK_OBJ:
 		strcat(word,".as");
-		return PP_IncludeSub(word, is_addition);
-	default:
 		break;
+	default:
+		if (is_addition) {
+			SetError("invalid addition suffix");
+		}
+		else {
+			SetError("invalid include suffix");
+		}
+		return PPRESULT_ERROR;
 	}
 
-	if (is_addition) {
-		SetError("invalid addition suffix");
+	#if defined(HSPWIN) && defined(HSP_PATHIO_UTF8)
+	if (!pp_utf8) {
+		if (hsp_path_from_ansi(converted_word, hsp_path::ansi_view(word)) != 0) {
+			SetError("include path conversion failed");
+			return PPRESULT_ERROR;
+		}
+		word = converted_word.data();
 	}
-	else {
-		SetError("invalid include suffix");
-	}
-	return PPRESULT_ERROR;
+	#endif
+	return PP_IncludeSub(word, is_addition);
 }
 
 
@@ -2816,7 +2847,7 @@ ppresult_t CToken::PP_Defcfunc( int mode )
 	}
 
 	if ( id == -1 ) {
-		id = lb->Regist( fixname, premode, 0, pp_orgfilefull, pp_orgline);
+		id = lb->Regist( fixname, premode, 0, pp_orgfilefull.c_str(), pp_orgline);
 		if ( glmode == 0 ) lb->SetEternal( id );
 		if ( *mod != 0 ) { lb->AddRelation( mod, id ); }		// モジュールラベルに依存を追加
 	} else {
@@ -2925,7 +2956,7 @@ ppresult_t CToken::PP_Deffunc( int mode )
 		}
 
 		if ( id == -1 ) {
-			id = lb->Regist( fixname, premode, 0, pp_orgfilefull, pp_orgline);
+			id = lb->Regist( fixname, premode, 0, pp_orgfilefull.c_str(), pp_orgline);
 			if ( glmode == 0 ) lb->SetEternal( id );
 			if ( *mod != 0 ) { lb->AddRelation( mod, id ); }		// モジュールラベルに依存を追加
 		} else {
@@ -3309,16 +3340,30 @@ ppresult_t CToken::PP_Pack( int mode )
 	//		#pack,#epack解析
 	//			(mode:0=normal/1=encrypt)
 	int i;
+	char* pack_name;
+	std::string converted_name;
 	if ( packbuf!=NULL ) {
 		i = GetToken();
 		if ( i != TK_STRING ) {
 			SetError("invalid pack name"); return PPRESULT_ERROR;
 		}
+		pack_name = (char*)s3;
+#if defined(HSPWIN) && defined(HSP_PATHIO_UTF8)
+		if (!pp_utf8) {
+			if (hsp_path_from_ansi(converted_name, hsp_path::ansi_view(pack_name)) != 0) return PPRESULT_ERROR;
+			pack_name = converted_name.data();
+		}
+#endif
+		int pack_result;
 		if (mode & 2) {
-			AddPackfile((char*)s3, mode&1);
+			pack_result = AddPackfile(pack_name, mode&1);
 		}
 		else {
-			AddPackfileOrig((char*)s3, mode);
+			pack_result = AddPackfileOrig(pack_name, mode);
+		}
+		if (pack_result == hspcmp_pack_path_error) {
+			SetError("pack path is too long or invalid UTF-8");
+			return PPRESULT_ERROR;
 		}
 	}
 	return PPRESULT_SUCCESS;
@@ -3332,18 +3377,38 @@ ppresult_t CToken::PP_PackOpt( void )
 	int i;
 	char tmp[1024];
 	char optname[1024];
+	char* optvalue;
+	std::string converted_value;
 	if ( packbuf!=NULL ) {
 		i = GetToken();
 		if ( i != TK_OBJ ) {
 			SetError("illegal option name"); return PPRESULT_ERROR;
 		}
-		strncpy( optname, (char *)s3, 128 );
+		int option_name_length = snprintf(optname, sizeof(optname), "%s", (char *)s3);
+		if (option_name_length < 0 || (size_t)option_name_length >= sizeof(optname)) {
+			SetError("pack option name is too long");
+			return PPRESULT_ERROR;
+		}
 		i = GetToken();
 		if (( i != TK_OBJ )&&( i != TK_NUM )&&( i != TK_STRING )) {
 			SetError("illegal option parameter"); return PPRESULT_ERROR;
 		}
-		sprintf( tmp, ";!%s=%s", optname, (char *)s3 );
-		AddPackfile( tmp, 2 );
+		optvalue = (char*)s3;
+#if defined(HSPWIN) && defined(HSP_PATHIO_UTF8)
+		if (i == TK_STRING && !pp_utf8) {
+			if (hsp_path_from_ansi(converted_value, hsp_path::ansi_view(optvalue)) != 0) return PPRESULT_ERROR;
+			optvalue = converted_value.data();
+		}
+#endif
+		int option_length = snprintf( tmp, sizeof(tmp), ";!%s=%s", optname, optvalue );
+		if ( option_length < 0 || (size_t)option_length >= sizeof(tmp) ) {
+			SetError("pack option is too long");
+			return PPRESULT_ERROR;
+		}
+		if (AddPackfile(tmp, 2) == hspcmp_pack_path_error) {
+			SetError("pack option path is too long or invalid UTF-8");
+			return PPRESULT_ERROR;
+		}
 	}
 	return PPRESULT_SUCCESS;
 }
@@ -3411,7 +3476,7 @@ ppresult_t CToken::PP_CmpOpt( void )
 }
 
 
-void CToken::SetRuntime(char* runtime_name)
+ppresult_t CToken::SetRuntime(char* runtime_name)
 {
 	//		ランタイム名を設定
 	//
@@ -3421,13 +3486,17 @@ void CToken::SetRuntime(char* runtime_name)
 
 	if (packbuf != NULL) {
 		sprintf(tmp, ";!runtime=%s.hrt", hed_runtime);
-		AddPackfile(tmp, 2);
+		if (AddPackfile(tmp, 2) == hspcmp_pack_path_error) {
+			SetError("pack path is too long or invalid UTF-8");
+			return PPRESULT_ERROR;
+		}
 	}
 
 	hed_option |= HEDINFO_RUNTIME;
 
 	sprintf(tmp, "\"%s\"", hed_runtime);
 	RegistExtMacro("__runtime__", tmp);			// ランタイム名マクロを更新
+	return PPRESULT_SUCCESS;
 }
 
 
@@ -3441,8 +3510,7 @@ ppresult_t CToken::PP_RuntimeOpt( void )
 	if ( i != TK_STRING ) {
 		SetError("illegal runtime name"); return PPRESULT_ERROR;
 	}
-	SetRuntime((char *)s3);
-	return PPRESULT_SUCCESS;
+	return SetRuntime((char *)s3);
 }
 
 
@@ -3898,10 +3966,23 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 			a1 = (unsigned char)p[2];
 			if (a1 == 0xbf) {
 				if (pp_utf8 == 0) {
+#ifdef HSPCMP_DLL
+					hspcmp_message_path message_refname(refname);
+#endif
 #ifdef JPNMSG
-					Mesf("#ファイルに予期しない BOM があります [%s]", refname);
+					Mesf("#ファイルに予期しない BOM があります [%s]",
+#ifdef HSPCMP_DLL
+						message_refname.c_str());
 #else
-					Mesf("#Unexpected BOM in file.[%s]", refname);
+						refname);
+#endif
+#else
+					Mesf("#Unexpected BOM in file.[%s]",
+#ifdef HSPCMP_DLL
+						message_refname.c_str());
+#else
+						refname);
+#endif
 #endif
 				}
 				p += 3;
@@ -3920,21 +4001,49 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 		if (pp_utf8 == 0) {
 			if (utf8text) {
 				//	UTF-8 -> Shift-JIS
+#ifdef HSPCMP_DLL
+				hspcmp_message_path message_refname(refname);
+				Mesf("#Convert to SJIS [%s].", message_refname.c_str());
+#else
 				Mesf("#Convert to SJIS [%s].", refname);
+#endif
 				char* p_sjis = src->InitSubBuffer(currentsize);
 				int newsize = ConvUtf82SJis(p, p_sjis, currentsize);
-				src->ExchangeSubToMainBuffer(newsize);
+				if (newsize < 0) {
+#ifdef HSPCMP_DLL
+					hspcmp_message_path message_refname_err(refname);
+					Mesf("#Source conversion failed [%s].", message_refname_err.c_str());
+#else
+					Mesf("#Source conversion failed [%s].", refname);
+#endif
+					return -1;
+				}
+				src->ExchangeSubToMainBuffer(newsize - 1); // CMemBuf size excludes the terminating NUL.
 				p = src->GetBuffer();
 			}
 		}
 		else {
 			if (!utf8text) {
 				//	Shift-JIS -> UTF-8
+#ifdef HSPCMP_DLL
+				hspcmp_message_path message_refname(refname);
+				Mesf("#Convert to UTF8 [%s].", message_refname.c_str());
+#else
 				Mesf("#Convert to UTF8 [%s].", refname);
+#endif
 				currentsize = currentsize * 4;
 				char* p_utf8 = src->InitSubBuffer(currentsize);
 				int newsize = ConvSJis2Utf8(p, p_utf8, currentsize);
-				src->ExchangeSubToMainBuffer(newsize);
+				if (newsize < 0) {
+#ifdef HSPCMP_DLL
+					hspcmp_message_path message_refname_err(refname);
+					Mesf("#Source conversion failed [%s].", message_refname_err.c_str());
+#else
+					Mesf("#Source conversion failed [%s].", refname);
+#endif
+					return -1;
+				}
+				src->ExchangeSubToMainBuffer(newsize - 1); // CMemBuf size excludes the terminating NUL.
 				p = src->GetBuffer();
 			}
 		}
@@ -3945,7 +4054,7 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 		pp_orgline = pline;
 
 		if (cg_labout_line == pline) {					// 解析用のラインか?
-			if (strcmp(cg_labout_orgfile, refname) == 0) {
+			if (strcmp(cg_labout_orgfile.c_str(), refname) == 0) {
 				//	解析ラインの状態を保存する
 				//Alertf( "#Module %s in file[%s] line %d.", modname, refname, pline );
 				strcpy(cg_labout_modname, modname);
@@ -4035,8 +4144,12 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 				pline += 1+mline;
 
 				char *fname_literal = to_hsp_string_literal( refname, true );
+				if (fname_literal == NULL) {
+					Mesf("#Source path conversion failed [%s].", refname != NULL ? refname : "");
+					return -1;
+				}
 				RegistExtMacro( "__file__", fname_literal );			// ファイル名マクロを更新
-				strcpy(pp_orgfile, refname);
+				pp_orgfile = refname;
 
 				wrtbuf = buf;
 				wrtbuf->PutStrf( "##%d %s\r\n", pline-1, fname_literal );
@@ -4072,48 +4185,68 @@ int CToken::ExpandLine( CMemBuf *buf, CMemBuf *src, char *refname )
 }
 
 
-int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
+int CToken::ExpandFile( CMemBuf *buf, const char *fname, const char *refname )
 {
 	//		ソースファイルをmembufへ展開する
 	//
 	int res;
-	char cname[HSP_MAX_PATH];
-	char purename[HSP_MAX_PATH];
-	char foldername[HSP_MAX_PATH];
-	char refname_copy[HSP_MAX_PATH];
-	char vaild_file[HSP_MAX_PATH];
-
-	char org_filename[HSP_MAX_PATH];
-	char org_filenamefull[HSP_MAX_PATH];
+	std::string cname;
+	std::string purename;
+	std::string foldername;
+	std::string valid_file;
+	std::string org_filename = pp_orgfile;
+	std::string org_filenamefull = pp_orgfilefull;
 	char org_fileline;
 
 	CMemBuf fbuf;
 
 	//	元の情報を保存する
-	strcpy(org_filename, pp_orgfile);
-	strcpy(org_filenamefull, pp_orgfilefull);
 	org_fileline = pp_orgline;
 
-	getpath( fname, purename, 8 );
-	getpath( fname, foldername, 32 );
-	if ( *foldername != 0 ) strcpy( search_path, foldername );
+	if (!hspcmp_path_component(fname, 8, purename) || !hspcmp_path_component(fname, 32, foldername)) {
+		Mes((char*)"#Invalid source path.");
+		return -1;
+	}
+	if (!foldername.empty()) search_path = foldername;
 
-	strcpy(vaild_file, refname);
+	valid_file = refname != NULL ? refname : "";
 	if ( fbuf.PutFile( fname ) < 0 ) {
-		strcpy( cname, common_path );strcat( cname, purename );
-		strcpy(vaild_file, common_path); strcat(vaild_file, refname);
-		if ( fbuf.PutFile( cname ) < 0 ) {
-			strcpy( cname, search_path );strcat( cname, purename );
-			strcpy(vaild_file, search_path); strcat(vaild_file, refname);
-			if ( fbuf.PutFile( cname ) < 0 ) {
-				strcpy(cname, common_path); strcat(cname, search_path); strcat(cname, purename);
-				strcpy(vaild_file, common_path); strcat(vaild_file, search_path); strcat(vaild_file, refname);
-				if ( fbuf.PutFile( cname ) < 0 ) {
+		if (!hspcmp_join_paths({ common_path, purename }, cname) ||
+			!hspcmp_join_paths({ common_path, refname != NULL ? refname : "" }, valid_file)) {
+			Mes((char*)"#Invalid source path.");
+			return -1;
+		}
+		if ( fbuf.PutFile( cname.c_str() ) < 0 ) {
+			if (!hspcmp_join_paths({ search_path, purename }, cname) ||
+				!hspcmp_join_paths({ search_path, refname != NULL ? refname : "" }, valid_file)) {
+				Mes((char*)"#Invalid source path.");
+				return -1;
+			}
+			if ( fbuf.PutFile( cname.c_str() ) < 0 ) {
+				if (!hspcmp_join_paths({ common_path, search_path, purename }, cname) ||
+					!hspcmp_join_paths({ common_path, search_path, refname != NULL ? refname : "" }, valid_file)) {
+					Mes((char*)"#Invalid source path.");
+					return -1;
+				}
+				if ( fbuf.PutFile( cname.c_str() ) < 0 ) {
 					if ( fileadd == 0 ) {
+#ifdef HSPCMP_DLL
+						hspcmp_message_path message_purename(purename.c_str());
+#endif
 #ifdef JPNMSG
-						Mesf( "#スクリプトファイルが見つかりません [%s]", purename );
+						Mesf( "#スクリプトファイルが見つかりません [%s]",
+#ifdef HSPCMP_DLL
+							message_purename.c_str());
 #else
-						Mesf( "#Source file not found.[%s]", purename );
+							purename.c_str());
+#endif
+#else
+						Mesf( "#Source file not found.[%s]",
+#ifdef HSPCMP_DLL
+							message_purename.c_str());
+#else
+							purename.c_str());
+#endif
 #endif
 					}
 					return -1;
@@ -4122,26 +4255,45 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 		}
 	}
 	fbuf.Put( (char)0 );
-	strcpy(pp_orgfilefull, vaild_file);
+	pp_orgfilefull = valid_file;
 
 	if ( fileadd ) {
-		Mesf( "#Use file [%s]",purename );
+#ifdef HSPCMP_DLL
+		hspcmp_message_path message_purename(purename.c_str());
+		Mesf( "#Use file [%s]", message_purename.c_str() );
+#else
+		Mesf( "#Use file [%s]",purename.c_str() );
+#endif
 	}
 
 	char *fname_literal = to_hsp_string_literal( refname, true );
+	if (fname_literal == NULL) {
+		Mesf("#Source path conversion failed [%s].", refname != NULL ? refname : "");
+		pp_orgfilefull = org_filenamefull;
+		return -1;
+	}
 	RegistExtMacro( "__file__", fname_literal );			// ファイル名マクロを更新
-	strcpy(pp_orgfile, refname);
+	pp_orgfile = refname != NULL ? refname : "";
 
-	fname_literal = to_hsp_string_literal( pp_orgfilefull, true );
-	buf->PutStrf( "##0 %s\r\n", fname_literal );
+	char *full_fname_literal = to_hsp_string_literal( pp_orgfilefull.c_str(), true );
+	if (full_fname_literal == NULL) {
+		free( fname_literal );
+		Mesf("#Source path conversion failed [%s].", pp_orgfilefull.c_str());
+		pp_orgfile = org_filename;
+		pp_orgfilefull = org_filenamefull;
+		return -1;
+	}
+	buf->PutStrf( "##0 %s\r\n", full_fname_literal );
 	free( fname_literal );
+	free( full_fname_literal );
 
-	strcpy2( refname_copy, refname, sizeof refname_copy );
-	res = ExpandLine( buf, &fbuf, refname_copy );
+	std::vector<char> refname_copy(refname != NULL ? strlen(refname) + 1 : 1, 0);
+	if (refname != NULL) memcpy(refname_copy.data(), refname, refname_copy.size());
+	res = ExpandLine( buf, &fbuf, refname_copy.data() );
 
 	//	元の情報に復帰させる
-	strcpy(pp_orgfile, org_filename );
-	strcpy(pp_orgfilefull, org_filenamefull );
+	pp_orgfile = org_filename;
+	pp_orgfilefull = org_filenamefull;
 	pp_orgline = org_fileline;
 
 	if ( res == 0 ) {
@@ -4149,10 +4301,23 @@ int CToken::ExpandFile( CMemBuf *buf, char *fname, char *refname )
 		//
 		res = tstack->StackCheck( linebuf );
 		if ( res ) {
+#ifdef HSPCMP_DLL
+			hspcmp_message_path message_refname_copy(refname_copy.data());
+#endif
 #ifdef JPNMSG
-			Mesf( "#スタックが空になっていないマクロタグが%d個あります [%s]", res, refname_copy );
+			Mesf( "#スタックが空になっていないマクロタグが%d個あります [%s]", res,
+#ifdef HSPCMP_DLL
+				message_refname_copy.c_str());
 #else
-			Mesf( "#%d unresolved macro(s).[%s]", res, refname_copy );
+				refname_copy.data());
+#endif
+#else
+			Mesf( "#%d unresolved macro(s).[%s]", res,
+#ifdef HSPCMP_DLL
+				message_refname_copy.c_str());
+#else
+				refname_copy.data());
+#endif
 #endif
 			Mes( linebuf );
 		}
@@ -4182,10 +4347,9 @@ int CToken::SetAdditionMode( int mode )
 }
 
 
-void CToken::SetCommonPath( char *path )
+void CToken::SetCommonPath( const char *path )
 {
-	if ( path==NULL ) { common_path[0]=0; return; }
-	strcpy( common_path, path );
+	common_path = path != NULL ? path : "";
 }
 
 
@@ -4442,9 +4606,10 @@ void CToken::InitSCNV( int size )
 		free( scnvbuf );
 		scnvbuf = NULL;
 	}
+	scnvsize = 0;
 	if ( size <= 0 ) return;
 	scnvbuf = (char *)malloc(size);
-	scnvsize = size;
+	if ( scnvbuf != NULL ) scnvsize = size;
 }
 
 
@@ -4455,25 +4620,48 @@ char *CToken::ExecSCNV( char *srcbuf, int opt )
 	//int ressize;
 	int size;
 
+	if ( srcbuf == NULL ) return NULL;
 	if ( scnvbuf == NULL ) InitSCNV( SCNVBUF_DEFAULTSIZE );
+	if ( scnvbuf == NULL ) return NULL;
 
 	size = (int)strlen( srcbuf );
 	switch( opt ) {
 	case SCNV_OPT_NONE:
-		strcpy( scnvbuf, srcbuf );
+		if (size >= scnvsize) {
+			SetError((char*)"String conversion buffer overflow");
+			return NULL;
+		} else {
+			strcpy( scnvbuf, srcbuf );
+		}
 		break;
 	case SCNV_OPT_SJISUTF8:
 #ifdef HSPWIN
-		ConvSJis2Utf8( srcbuf, scnvbuf, scnvsize );
+		if (ConvSJis2Utf8( srcbuf, scnvbuf, scnvsize ) < 0) {
+			SetError((char*)"String conversion failed");
+			return NULL;
+		}
 #else
-		strcpy( scnvbuf, srcbuf );
+		if (size >= scnvsize) {
+			SetError((char*)"String conversion buffer overflow");
+			return NULL;
+		} else {
+			strcpy( scnvbuf, srcbuf );
+		}
 #endif
 		break;
 	case SCNV_OPT_UTF8SJIS:
 #ifdef HSPWIN
-		ConvUtf82SJis(srcbuf, scnvbuf, scnvsize);
+		if (ConvUtf82SJis(srcbuf, scnvbuf, scnvsize) < 0) {
+			SetError((char*)"String conversion failed");
+			return NULL;
+		}
 #else
-		strcpy(scnvbuf, srcbuf);
+		if (size >= scnvsize) {
+			SetError((char*)"String conversion buffer overflow");
+			return NULL;
+		} else {
+			strcpy(scnvbuf, srcbuf);
+		}
 #endif
 		break;
 	default:
@@ -4538,54 +4726,47 @@ int CToken::SkipMultiByte( unsigned char byte )
 
 int CToken::ConvSJis2Utf8(char* pSource, char* pDist, int buffersize)
 {
-	int size = 0;
-	if (pDist == NULL) return -1;
+	if (pSource == NULL || pDist == NULL || buffersize <= 0) return -1;
 
 #ifdef HSPWIN
 	//ShiftJISからUTF-16へ変換
 	const int nSize = ::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, NULL, 0);
+	if (nSize <= 0) return -1;
 
-	BYTE* buffUtf16 = new BYTE[nSize * 2 + 2];
-	::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, (LPWSTR)buffUtf16, nSize);
+	std::vector<wchar_t> buffUtf16((size_t)nSize);
+	if (::MultiByteToWideChar(CP_ACP, 0, (LPCSTR)pSource, -1, (LPWSTR)buffUtf16.data(), nSize) == 0) return -1;
 
 	//UTF-16からUTF-8へ変換
-	size = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16, -1, NULL, 0, NULL, NULL);
-	size *= 2;
-	if (size > buffersize) size = buffersize;
-	ZeroMemory(pDist, size);
-	::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16, -1, (LPSTR)pDist, size, NULL, NULL);
+	int needed = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16.data(), -1, NULL, 0, NULL, NULL);
+	if (needed <= 0 || needed > buffersize) return -1;
 
-	size = lstrlen((char*)pDist) + 1;
-
-	delete [] buffUtf16;
+	if (::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)buffUtf16.data(), -1, (LPSTR)pDist, buffersize, NULL, NULL) == 0) return -1;
+	return needed; // Keep the legacy return contract: include the terminating NUL.
+#else
+	return -1;
 #endif
-	return size;
 }
 
 
 int CToken::ConvUtf82SJis(char* pSource, char* pDist, int buffersize)
 {
-	int size = 0;
+	if (pSource == NULL || pDist == NULL || buffersize <= 0) return -1;
 
 #ifdef HSPWIN
+	int iLenUnicode = ::MultiByteToWideChar(CP_UTF8, 0, pSource, -1, NULL, 0);
+	if (iLenUnicode <= 0) return -1;
 
-	// サイズを計算する
-	int iLenUnicode = ::MultiByteToWideChar(CP_UTF8, 0, pSource, (int)strlen(pSource) + 1, NULL, 0);
-	BYTE* buffUtf16 = new BYTE[iLenUnicode * 2 + 2];
+	std::vector<wchar_t> buffUtf16((size_t)iLenUnicode);
+	if (::MultiByteToWideChar(CP_UTF8, 0, pSource, -1, buffUtf16.data(), iLenUnicode) == 0) return -1;
 
-	::MultiByteToWideChar(CP_UTF8, 0, pSource, (int)strlen(pSource) + 1, (LPWSTR)buffUtf16, iLenUnicode);
+	int needed = ::WideCharToMultiByte(CP_ACP, 0, buffUtf16.data(), -1, NULL, 0, NULL, NULL);
+	if (needed <= 0 || needed > buffersize) return -1;
 
-	size = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)buffUtf16, iLenUnicode, NULL, 0, NULL, NULL);
-	if (size > buffersize) size = buffersize;
-	::WideCharToMultiByte(CP_ACP, 0,
-				(LPCWSTR)buffUtf16, iLenUnicode,
-				pDist, size,
-				NULL, NULL);
-
-	delete [] buffUtf16;
-	pDist[size] = 0;
+	if (::WideCharToMultiByte(CP_ACP, 0, buffUtf16.data(), -1, pDist, buffersize, NULL, NULL) == 0) return -1;
+	return needed; // Keep the legacy return contract: include the terminating NUL.
+#else
+	return -1;
 #endif
-	return size;
 }
 
 
@@ -4617,22 +4798,49 @@ char* CToken::to_hsp_string_literal(const char* src, bool filename) {
 	//		戻り値のメモリは呼び出し側がfreeする必要がある。
 	//		HSPの文字列リテラルで表せない文字は
 	//		そのまま出力されるので注意。（'\n'など）
-	//		ファイル名の場合はSJISと仮定して処理する(Winのみ)
+	//		旧Windows DLLのファイル名はSJISとして処理する。
+	//		UTF-8パス契約のビルドではSJISソース時だけパスをSJISへ変換する。
 	//
 	int skip;
 	char* utftmp;
+	bool owns_utftmp = false;
+	bool utf8text = pp_utf8 != 0;
 	size_t length = 2;
 
 	utftmp = (char *)src;
 #ifdef HSPWIN
 	if (filename) {
-		if (pp_utf8) {			// 入力がUTF8でファイル名の場合は変換する
+		#if defined(HSP_PATHIO_UTF8) && !defined(HSPUTF8)
+		if (!pp_utf8) {      // UTF-8パスをSJISソースの文字列へ変換する
+			int len = (int)strlen(src) + 2;
+			utftmp = (char*)malloc(len);
+			if (utftmp == NULL) return NULL;
+			owns_utftmp = true;
+			if (ConvUtf82SJis((char*)src, utftmp, len) < 0) {
+				free(utftmp);
+				return NULL;
+			}
+		}
+		#elif !defined(HSP_PATHIO_UTF8)
+		if (pp_utf8) {			// DLLの既存ACPパスをUTF-8へ変換する
 			int len = (int)strlen(src) * 4 + 1;
 			utftmp = (char*)malloc(len);
-			ConvSJis2Utf8((char*)src, utftmp, len);
+			if (utftmp == NULL) return NULL;
+			owns_utftmp = true;
+			if (ConvSJis2Utf8((char*)src, utftmp, len) < 0) {
+				free(utftmp);
+				return NULL;
+			}
 		}
+		#endif
 	}
 #endif
+	#if !defined(HSPWIN) || defined(HSPUTF8)
+	if (filename) {
+		utf8text = true;
+	}
+	#endif
+	if (utftmp == NULL) return NULL;
 	const unsigned char* s = (unsigned char*)utftmp;
 	while (1) {
 		unsigned char c = *s;
@@ -4650,7 +4858,7 @@ char* CToken::to_hsp_string_literal(const char* src, bool filename) {
 			break;
 		default:
 			length++;
-			skip = SkipMultiByte(c);
+			skip = utf8text ? CheckByteUTF8(c) : CheckByteSJIS(c);
 			s += skip;
 			length+=skip;
 			break;
@@ -4690,7 +4898,7 @@ char* CToken::to_hsp_string_literal(const char* src, bool filename) {
 			*d++ = '\\';
 			break;
 		default:
-			skip = SkipMultiByte(c);
+			skip = utf8text ? CheckByteUTF8(c) : CheckByteSJIS(c);
 			*d++ = c;
 			while (skip>0) {
 				s++;
@@ -4703,10 +4911,8 @@ char* CToken::to_hsp_string_literal(const char* src, bool filename) {
 	*d++ = '"';
 	*d = '\0';
 #ifdef HSPWIN
-	if (filename) {
-		if (pp_utf8) {
-			free(utftmp);
-		}
+	if (owns_utftmp) {
+		free(utftmp);
 	}
 #endif
 	return dest;
@@ -4736,7 +4942,7 @@ int64_t CToken::strtoull_as_int64(const char* s, int base)
 void CToken::GenerateLabelListAndTagPP(char *name, int flag)
 {
 	if (labbuf == NULL) return;
-	GenerateLabelTag(name, flag, 0, pp_orgfilefull, pp_orgline);
+	GenerateLabelTag(name, flag, 0, pp_orgfilefull.c_str(), pp_orgline);
 }
 
 
@@ -4744,7 +4950,7 @@ void CToken::GenerateLabelListAndTagRefPP(char* name, int flag)
 {
 	if (labbuf == NULL) return;
 	if ((cg_labout_mode & LABLIST_MODE_REFERENCE) == 0) return;
-	GenerateLabelTag(name, flag| LABBUF_FLAG_REFER, 0, pp_orgfilefull, pp_orgline);
+	GenerateLabelTag(name, flag| LABBUF_FLAG_REFER, 0, pp_orgfilefull.c_str(), pp_orgline);
 }
 
 

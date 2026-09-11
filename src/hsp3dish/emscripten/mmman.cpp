@@ -4,6 +4,7 @@
 //				onion software/onitama 2012/6
 //				zakki 2014/7
 //
+#include <string>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -19,6 +20,7 @@
 #include "../../hsp3/hsp3config.h"
 #include "../../hsp3/dpmread.h"
 #include "../../hsp3/strbuf.h"
+#include "../../hsp3/hsp3pathio.h"
 #include "../supio.h"
 
 #include "mmman.h"
@@ -313,12 +315,12 @@ void MMMan::Stop( void )
 int MMMan::BankLoad( MMM *mmm, char *fname )
 {
 	bool is_music = false;
-	char fext[8];
+	std::string fext;
 	if ( mmm == NULL ) return -9;
 
-	getpath(fname,fext,16+2);
-	if (!strcmp(fext,".mp3")) is_music = true;
-	if (!strcmp(fext,".ogg")) is_music = true;
+	if (!getpath(std::string(fname != NULL ? fname : ""), fext, 16+2)) fext.clear();
+	if (fext == ".mp3") is_music = true;
+	if (fext == ".ogg") is_music = true;
 	if ( is_music ) {
 		mmm->fname = (char *)malloc( strlen(fname)+1 );
 		strcpy( mmm->fname,fname );

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <math.h>
 #include <tchar.h>
 #include <direct.h>
@@ -33,6 +34,7 @@
 #endif
 
 #include "../supio.h"
+#include "../hsp3pathio.h"
 #include "../hsp3ext.h"
 #include "hsp3extlib.h"
 #include "../hspwnd.h"
@@ -98,16 +100,11 @@ static void InitSystemInformation(void)
 	sbStrCopy(&(ctx->cmdline), resp8);
 	freehc(&resp8);
 
-	TCHAR pw[HSPCTX_REFSTR_MAX];
-	TCHAR fname[HSPCTX_REFSTR_MAX];
-	GetModuleFileName(NULL, fname, _MAX_PATH);
-	getpathW(fname, pw, 32);
-	apichartohspchar(pw, &resp8);
-	sbStrCopy(&(ctx->stmp), resp8);
-	CutLastChr(ctx->stmp, '\\');
+	std::string module_directory;
+	if (hsp_path_get_module_directory(module_directory) != 0) return;
+	sbStrCopy(&(ctx->stmp), module_directory.c_str());
 	sbStrCopy(&(ctx->modfilename), ctx->stmp);
-	strcat(ctx->stmp, "\\hsptv\\");
-	freehc(&resp8);
+	sbStrAdd(&(ctx->stmp), "\\hsptv\\");
 	sbStrCopy(&(ctx->tvfoldername), ctx->stmp);
 }
 

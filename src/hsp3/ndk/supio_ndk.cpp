@@ -23,8 +23,6 @@
 #include <sys/types.h>
 // changedir delfile get_current_dir_name stat
 #include <unistd.h>
-// dirlist
-#include <dirent.h>
 
 #include "supio_ndk.h"
 #include "../dpmread.h"
@@ -90,36 +88,6 @@ void freeac(char **ppc)
 //
 //		Internal function support (without Windows API)
 //
-static int wildcard( char *text, char *wc )
-{
-	//		textに対してワイルドカード処理を適応
-	//		return value: yes 1, no 0
-	//
-	if ( wc[0]=='\0' && *text=='\0' ) {
-		return 1;
-	}
-	if ( wc[0]=='*' ) {
-		if ( *text=='\0' && wc[1]=='\0' ) {
-			return 1;
-		} else if ( *text=='\0' ) {
-			return 0;
-		}
-		if ( wc[1]==*text | wc[1]=='*' ) {
-			if (wildcard( text, wc+1 )) {
-				return 1;
-			}
-		}
-		if ( *text!='\0' ) {
-			return wildcard( text+1, wc );
-		}
-	}
-	if ( (*text!='\0')&&(wc[0]==*text) ) {
-		return wildcard( text+1, wc+1 );
-	}
-	return 0;
-}
-
-
 //
 //		basic C I/O support
 //
@@ -134,11 +102,11 @@ void mem_bye( void *ptr ) {
 }
 
 
-int mem_save( char *p_fname, void *mem, int msize, int seekofs )
+int mem_save( const char *p_fname, void *mem, int msize, int seekofs )
 {
 	FILE *fp;
 	int flen;
-	char *fname;
+	const char *fname;
 
 	fname = p_fname;
 	if ( *fname != '/' ) {
@@ -177,12 +145,12 @@ void strcase( char *target )
 }
 
 
-int strcpy2( char *str1, char *str2 )
+int strcpy2( char *str1, const char *str2 )
 {
 	//	string copy (ret:length)
 	//
 	char *p;
-	char *src;
+	const char *src;
 	char a1;
 	src = str2;
 	p = str1;
@@ -195,7 +163,7 @@ int strcpy2( char *str1, char *str2 )
 }
 
 
-int strcat2( char *str1, char *str2 )
+int strcat2( char *str1, const char *str2 )
 {
 	//	string cat (ret:length)
 	//
@@ -212,12 +180,12 @@ int strcat2( char *str1, char *str2 )
 }
 
 
-char *strstr2( char *target, char *src )
+char *strstr2( char *target, const char *src )
 {
 	//		strstr関数の全角対応版
 	//
 	unsigned char *p;
-	unsigned char *s;
+	const unsigned char *s;
 	unsigned char *p2;
 	unsigned char a1;
 	unsigned char a2;
@@ -271,149 +239,22 @@ char *strchr2( char *target, char code )
 }
 
 
-static void _splitpath( char *path, char *p_drive, char *dir, char *fname, char *ext )
-{
-	//		Linux用ファイルパス切り出し
-	//
-	char *p, pathtmp[256];
-    
-	p_drive[0] = 0;
-	strcpy( pathtmp, path );
-    
-	p = strchr2( pathtmp, '.' );
-	if ( p == NULL ) {
-		ext[0] = 0;
-	} else {
-		strcpy( ext, p );
-		*p = 0;
-	}
-	p = strchr2( pathtmp, '/' );
-	if ( p == NULL ) {
-		dir[0] = 0;
-		strcpy( fname, pathtmp );
-	} else {
-		strcpy( fname, p+1 );
-		p[1] = 0;
-		strcpy( dir, pathtmp );
-	}
-}
-
-
-void getpath( char *stmp, char *outbuf, int p2 )
-{
-	char *p;
-	char tmp[_MAX_PATH];
-	char p_drive[_MAX_PATH];
-	char p_dir[_MAX_DIR];
-	char p_fname[_MAX_FNAME];
-	char p_ext[_MAX_EXT];
-
-	p = outbuf;
-	if (p2&16) strcase( stmp );
-	_splitpath( stmp, p_drive, p_dir, p_fname, p_ext );
-
-	strcat( p_drive, p_dir );
-	if ( p2&8 ) {
-		strcpy( tmp, p_fname ); strcat( tmp, p_ext );
-	} else if ( p2&32 ) {
-		strcpy( tmp, p_drive );
-	} else {
-		strcpy( tmp, stmp );
-	}
-	switch( p2&7 ) {
-	case 1:			// Name only ( without ext )
-		stmp[ strlen(tmp)-strlen(p_ext) ] = 0;
-		strcpy( p, tmp );
-		break;
-	case 2:			// Ext only
-		strcpy( p, p_ext );
-		break;
-	default:		// Direct Copy
-		strcpy( p, tmp );
-		break;
-	}
-}
-
-
-int makedir( char *name )
+int makedir( const char *name )
 {
 	return mkdir( name, 0755 );
 }
 
 
-int changedir( char *name )
+int changedir( const char *name )
 {
 	return chdir( name );
 }
 
 
-int delfile( char *name )
+int delfile( const char *name )
 {
 	return unlink( name ) == 0;
 	//return remove( name );		// ディレクトリにもファイルにも対応
-}
-
-
-int dirlist( char *fname, char **target, int p3 )
-{
-	//		Linux System
-	//
-	enum { MASK = 3 };			// mode 3までのビット反転用
-	char *p;
-	unsigned int fl;
-	unsigned int stat_main;
-	unsigned int fmask;
-	DIR *sh;
-	struct dirent *fd;
-	struct stat st;
-	char curdir[_MAX_PATH+1];
-
-	stat_main=0;
-
-	//sh = opendir( get_current_dir_name() );
-	getcwd( curdir, _MAX_PATH );
-	sh = opendir( curdir );	// get_current_dir_nameはMinGWで通らなかったのでとりあえず
-
-	fd = readdir( sh );
-	while( fd != NULL ) {
-		p = fd->d_name; fl = 1;
-		if ( *p==0 ) fl=0;			// 空行を除外
-		if ( *p=='.') {				// '.','..'を除外
-			if ( p[1]==0 ) fl=0;
-			if ((p[1]=='.')&&(p[2]==0)) fl=0;
-		}
-		//		表示/非表示のマスク
-		//		Linux用なのでシステム属性は考慮しない
-		if (p3!=0 && fl==1) {
-			stat( p, &st );
-			fmask=0;
-			if (p3&4) {				// 条件反転
-				if (S_ISREG( st.st_mode )&&( *p!='.' )) {
-					fl=0;
-				} else {
-					fmask=MASK;
-				}
-			}
-			if ( fl==1 ) {
-				if ((p3^fmask)&1 && S_ISDIR( st.st_mode )) fl=0;	//ディレクトリ
-				if ((p3^fmask)&2 && ( *p=='.' )) fl=0;				//隠しファイル
-			}
-		}
-		//		ワイルドカード処理
-		//
-		if (fl) {
-			fl=wildcard( p, fname );
-		}
-		
-		if (fl) {
-			stat_main++;
-			sbStrAdd( target, p );
-			sbStrAdd( target, "\n" );
-		}
-		fd = readdir( sh );
-	}
-	closedir( sh );
-	return stat_main;
 }
 
 
@@ -475,7 +316,7 @@ int strsp_getptr( void )
 	return splc;
 }
 
-int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
+int strsp_get( const char *srcstr, char *dststr, char splitchr, int len )
 {
 	//		split string with parameters
 	//
@@ -577,7 +418,7 @@ static int htoi_sub( char hstr )
 }
 
 
-int htoi( char *str )
+int htoi( const char *str )
 {
 	char a1;
 	int d;
@@ -810,4 +651,3 @@ void Alert( const char *mes )
 {
 	LOGI( mes, 1 );
 }
-

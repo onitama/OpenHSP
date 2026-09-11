@@ -92,7 +92,7 @@ void mem_bye( void *ptr ) {
 }
 
 
-int mem_save( LPTSTR fname, void *mem, int msize, int seekofs )
+int mem_save( LPCTSTR fname, void *mem, int msize, int seekofs )
 {
 	FILE *fp;
 	int flen;
@@ -234,12 +234,12 @@ void strcase( LPTSTR target )
 }
 
 
-int strcpy2( LPTSTR str1, LPTSTR str2 )
+int strcpy2( LPTSTR str1, LPCTSTR str2 )
 {
 	//	string copy (ret:length)
 	//
 	LPTSTR p;
-	LPTSTR src;
+	LPCTSTR src;
 	TCHAR a1;
 	src = str2;
 	p = str1;
@@ -252,7 +252,7 @@ int strcpy2( LPTSTR str1, LPTSTR str2 )
 }
 
 
-int strcat2( LPTSTR str1, LPTSTR str2 )
+int strcat2( LPTSTR str1, LPCTSTR str2 )
 {
 	//	string cat (ret:length)
 	//
@@ -269,12 +269,12 @@ int strcat2( LPTSTR str1, LPTSTR str2 )
 }
 
 
-char *strstr2( LPTSTR target, LPTSTR src )
+char *strstr2( LPTSTR target, LPCTSTR src )
 {
 	//		strstr関数の全角対応版
 	//
 	unsigned char *p;
-	unsigned char *s;
+	const unsigned char *s;
 	unsigned char *p2;
 	unsigned char a1;
 	unsigned char a2;
@@ -356,19 +356,19 @@ void getpath( LPTSTR stmp, LPTSTR outbuf, int p2 )
 }
 
 
-int makedir( LPTSTR name )
+int makedir( LPCTSTR name )
 {
 	return _tmkdir( name );
 }
 
 
-int changedir( LPTSTR name )
+int changedir( LPCTSTR name )
 {
 	return _tchdir( name );
 }
 
 
-int delfile( LPTSTR name )
+int delfile( LPCTSTR name )
 {
 	return DeleteFile( name );
 }
@@ -408,7 +408,7 @@ int strsp_getptr( void )
 	return splc;
 }
 
-int strsp_get( LPTSTR srcstr, LPTSTR dststr, TCHAR splitchr, int len )
+int strsp_get( LPCTSTR srcstr, LPTSTR dststr, TCHAR splitchr, int len )
 {
 	//		split string with parameters
 	//
@@ -459,7 +459,7 @@ int GetLimit( int num, int min, int max )
 //		windows debug support
 //
 
-void Alert( LPTSTR mes )
+void Alert( LPCTSTR mes )
 {
 	MessageBox( NULL, mes, TEXT("error"),MB_ICONINFORMATION | MB_OK );
 }
@@ -471,7 +471,7 @@ void AlertV( LPTSTR *mes, int val )
 	MessageBox( NULL, ss, TEXT("error"),MB_ICONINFORMATION | MB_OK );
 }
 
-void Alertf( LPTSTR format, ... )
+void Alertf( LPCTSTR format, ... )
 {
 	TCHAR textbf[1024];
 	va_list args;
@@ -480,6 +480,4 @@ void Alertf( LPTSTR format, ... )
 	va_end(args);
 	MessageBox( NULL, textbf, TEXT("error"),MB_ICONINFORMATION | MB_OK );
 }
-
-
 

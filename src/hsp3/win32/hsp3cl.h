@@ -6,7 +6,7 @@
 #define __hsp3cl_h
 
 int hsp3cl_exec( void );
-int hsp3cl_init( char *startfile );
+int hsp3cl_init( const char *startfile );
 void hsp3win_dialog( char *mes );
 
 #endif

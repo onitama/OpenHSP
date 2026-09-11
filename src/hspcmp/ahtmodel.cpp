@@ -614,7 +614,7 @@ AHTPROP *AHTMODEL::AddProperty( void )
 }
 
 
-void AHTMODEL::SetSource( char *filename )
+void AHTMODEL::SetSource( const char *filename )
 {
 	strcpy2( fname, filename, AHTMODEL_FNMAX );
 	propstr = new CMemBuf;
@@ -623,37 +623,37 @@ void AHTMODEL::SetSource( char *filename )
 }
 
 
-void AHTMODEL::SetSourcePath( char *filename )
+void AHTMODEL::SetSourcePath( const char *filename )
 {
 	strcpy2( fpath, filename, AHTMODEL_FNMAX );
 }
 
 
-void AHTMODEL::SetName( char *dname )
+void AHTMODEL::SetName( const char *dname )
 {
 	strcpy2( name, dname, 128 );
 }
 
 
-void AHTMODEL::SetAuthor( char *name )
+void AHTMODEL::SetAuthor( const char *name )
 {
 	strcpy2( author, name, 32 );
 }
 
 
-void AHTMODEL::SetVersion( char *name )
+void AHTMODEL::SetVersion( const char *name )
 {
 	strcpy2( ver, name, 32 );
 }
 
 
-void AHTMODEL::SetClass( char *name )
+void AHTMODEL::SetClass( const char *name )
 {
 	strcpy2( classname, name, 128 );
 }
 
 
-void AHTMODEL::SetIconFile( char *name )
+void AHTMODEL::SetIconFile( const char *name )
 {
 	strcpy2( icon, name, 32 );
 }
@@ -895,5 +895,4 @@ double AHTPROP::GetValueDouble( void )
 	p = GetValue();
 	return atof( p );
 }
-
 

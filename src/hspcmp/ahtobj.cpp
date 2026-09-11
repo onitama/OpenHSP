@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <string>
+#include <stdint.h>
 
 #include "../hsp3/hsp3config.h"
 #include "../hsp3/strnote.h"
@@ -19,30 +21,81 @@
 #include <direct.h>
 #endif
 
+#if defined(HSP_PATHIO_UTF8) && defined(HSPWIN)
+static int copy_wide_dirinfo_path(char* destination, size_t destination_size, const wchar_t* source)
+{
+	std::string utf8_path;
+	if (hsp_path_utf8_from_wide(utf8_path, source) != 0 || utf8_path.size() >= destination_size) {
+		return -1;
+	}
+	strcpy(destination, utf8_path.c_str());
+	return 0;
+}
+#endif
+
 void dirinfo(char* p, int id)
 {
 	//		dirinfo命令の内容をstmpに設定する
 	//
 #ifdef HSPWIN
-	char fname[_MAX_PATH + 1];
-
 	switch (id) {
 	case 0:				//    カレント(現在の)ディレクトリ
-		_getcwd(p, _MAX_PATH);
+	{
+		std::string current_directory;
+		if (hsp_path_get_current_directory(current_directory) != 0 ||
+			current_directory.size() >= _MAX_PATH) p[0] = 0;
+		else strcpy(p, current_directory.c_str());
+	}
 		break;
 	case 1:				//    実行ファイルがあるディレクトリ
-		GetModuleFileName(NULL, fname, _MAX_PATH);
-		getpath(fname, p, 32);
+	{
+		std::string module_filename;
+		if (hsp_path_get_module_filename(module_filename) != 0) {
+			p[0] = 0;
+			break;
+		}
+		std::string module_directory;
+		if (!getpath(module_filename, module_directory, 32) || module_directory.size() >= 512) {
+			p[0] = 0;
+		}
+		else {
+			strcpy(p, module_directory.c_str());
+		}
 		break;
+	}
 	case 2:				//    Windowsディレクトリ
+	#ifdef HSP_PATHIO_UTF8
+		{
+			wchar_t wide_path[_MAX_PATH];
+			UINT path_length = GetWindowsDirectoryW(wide_path, _MAX_PATH);
+			if (path_length == 0 || path_length >= _MAX_PATH ||
+				copy_wide_dirinfo_path(p, _MAX_PATH, wide_path) != 0) p[0] = 0;
+		}
+	#else
 		GetWindowsDirectory(p, _MAX_PATH);
+	#endif
 		break;
 	case 3:				//    Windowsのシステムディレクトリ
+	#ifdef HSP_PATHIO_UTF8
+		{
+			wchar_t wide_path[_MAX_PATH];
+			UINT path_length = GetSystemDirectoryW(wide_path, _MAX_PATH);
+			if (path_length == 0 || path_length >= _MAX_PATH ||
+				copy_wide_dirinfo_path(p, _MAX_PATH, wide_path) != 0) p[0] = 0;
+		}
+	#else
 		GetSystemDirectory(p, _MAX_PATH);
+	#endif
 		break;
 	default:
 		if (id & 0x10000) {
+	#ifdef HSP_PATHIO_UTF8
+			wchar_t wide_path[_MAX_PATH];
+			if (!SHGetSpecialFolderPathW(NULL, wide_path, id & 0xffff, FALSE) ||
+				copy_wide_dirinfo_path(p, _MAX_PATH, wide_path) != 0) p[0] = 0;
+	#else
 			SHGetSpecialFolderPath(NULL, p, id & 0xffff, FALSE);
+	#endif
 			break;
 		}
 		*p = 0;
@@ -216,7 +269,7 @@ void CAht::UnlinkModel( int id )
 	model2->SetPrevID( -1 );
 }
 
-int CAht::BuildGlobalIDSub( char *fname, char *pname, int i )
+int CAht::BuildGlobalIDSub( const char *fname, const char *pname, int i )
 {
 	int j,myid;
 	AHTMODEL *m;
@@ -437,7 +490,10 @@ CAht::CAht( void )
 	mem_ahtmodel = NULL;				// model data
 	model_cnt = 0;
 	mem_ahtmodel_size = 0;
+	objbuf = NULL;
+	strbuf = NULL;
 	mem_parts = NULL;
+	maxparts = 0;
 	objlist = NULL;
 	ahtwrt_buf = NULL;
 	ahtini_buf = NULL;
@@ -454,6 +510,16 @@ CAht::~CAht( void )
 	DisposeMakeBuffer();
 	DisposeModel();
 	DisposeParts();
+	DisposeObj();
+}
+
+
+void CAht::DisposeObj( void )
+{
+	if ( objbuf != NULL ) delete objbuf;
+	if ( strbuf != NULL ) delete strbuf;
+	objbuf = NULL;
+	strbuf = NULL;
 }
 
 
@@ -463,20 +529,29 @@ char *CAht::GetStdBuffer( void )
 }
 
 
-int CAht::LoadProject( char *fname )
+int CAht::LoadProject( const char *fname )
 {
 	FILE *fp;
 	char *p;
 	int res;
 	int bufsize,strsize;
+	int64_t file_size;
 
 	Reset();
 
 	res = 0;
-	fp=fopen( fname, "rb" );
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "rb");
 	if (fp == NULL) return -1;
+	file_size = hsp_path_filesize(hsp_path::path_view(fname));
+	if (file_size < (int64_t)sizeof(HTPHED)) {
+		fclose(fp);
+		return -3;
+	}
 
-	fread( &hed, 1, sizeof(HTPHED), fp );
+	if (fread(&hed, 1, sizeof(HTPHED), fp) != sizeof(HTPHED)) {
+		fclose(fp);
+		return -2;
+	}
 
 	if (( hed.h1 != HTP_MAGIC1 )||
 	    ( hed.h2 != HTP_MAGIC2 )||
@@ -488,6 +563,15 @@ int CAht::LoadProject( char *fname )
 
 	bufsize = hed.modsize;
 	strsize = hed.strsize;
+	if (bufsize < 0 || strsize < 0 || hed.max_mod < 0 ||
+		hed.modtable != (int)sizeof(HTPHED) ||
+		(int64_t)hed.strtable != (int64_t)sizeof(HTPHED) + bufsize ||
+		bufsize % (int)sizeof(HTPOBJ) != 0 ||
+		hed.max_mod > bufsize / (int)sizeof(HTPOBJ) ||
+		(int64_t)sizeof(HTPHED) + bufsize + strsize > file_size) {
+		fclose(fp);
+		return -3;
+	}
 
 	curpage = hed.curpage;
 	maxpage = hed.maxpage;
@@ -496,12 +580,26 @@ int CAht::LoadProject( char *fname )
 	strbuf = new CMemBuf;
 
 	if ( bufsize ) {
-		p = objbuf->PreparePtr( bufsize );
-		fread( p, 1, bufsize, fp );
+		if (!objbuf->TryPreparePtr(bufsize, &p) ||
+			fread(p, 1, bufsize, fp) != (size_t)bufsize) {
+			delete objbuf;
+			delete strbuf;
+			objbuf = NULL;
+			strbuf = NULL;
+			fclose(fp);
+			return -3;
+		}
 	}
 	if ( strsize ) {
-		p = strbuf->PreparePtr( strsize );
-		fread( p, 1, strsize, fp );
+		if (!strbuf->TryPreparePtr(strsize, &p) ||
+			fread(p, 1, strsize, fp) != (size_t)strsize) {
+			delete objbuf;
+			delete strbuf;
+			objbuf = NULL;
+			strbuf = NULL;
+			fclose(fp);
+			return -3;
+		}
 	}
 
 	fclose(fp);
@@ -519,16 +617,23 @@ int CAht::LoadProjectApply( int modelid, int fileid )
 	if ( model == NULL ) return -1;
 
 	obj = GetProjectFileObject( fileid );
-	model->SetObj( (AHTOBJ *)GetProjectFileString( obj->ahtobj ) );
+	if (obj == NULL) return -1;
+	char *objdata = GetProjectFileString( obj->ahtobj );
+	if (objdata == NULL) return -1;
+	model->SetObj( (AHTOBJ *)objdata );
 	obj++;
+	int remaining = hed.max_mod - (int)(obj - (HTPOBJ *)objbuf->GetBuffer());
 
 	//			プロパティ全設定
-	while(1) {
+	while(remaining-- > 0) {
 		if ( obj->ahtsource != -1 ) break;
 		//Alertf( "%s=%s", GetProjectFileString( obj->propname), GetProjectFileString( obj->defvalue )  );
-		prop = model->GetProperty( GetProjectFileString( obj->propname) );
+		char *propname = GetProjectFileString( obj->propname );
+		char *defvalue = GetProjectFileString( obj->defvalue );
+		if (propname == NULL || defvalue == NULL) return -1;
+		prop = model->GetProperty( propname );
 		if ( prop != NULL ) {
-			prop->SetNewVal( GetProjectFileString( obj->defvalue ) );
+			prop->SetNewVal( defvalue );
 		}
 		//model->SetPropertyDefault( GetProjectFileString( obj->propname), GetProjectFileString( obj->defvalue )  );
 		obj++;
@@ -539,8 +644,7 @@ int CAht::LoadProjectApply( int modelid, int fileid )
 
 void CAht::LoadProjectEnd( void )
 {
-	delete objbuf;
-	delete strbuf;
+	DisposeObj();
 }
 
 
@@ -549,6 +653,7 @@ int CAht::GetProjectFileModelMax( void )
 	int i;
 	int res;
 	HTPOBJ *obj;
+	if (objbuf == NULL) return 0;
 	obj = (HTPOBJ *)(objbuf->GetBuffer());
 
 	res = 0;
@@ -564,6 +669,7 @@ char *CAht::GetProjectFileModel( int id )
 {
 	HTPOBJ *obj;
 	obj = GetProjectFileObject( id );
+	if (obj == NULL) return NULL;
 	return GetProjectFileString( obj->ahtsource );
 }
 
@@ -572,6 +678,7 @@ char *CAht::GetProjectFileModelPath( int id )
 {
 	HTPOBJ *obj;
 	obj = GetProjectFileObject( id );
+	if (obj == NULL) return NULL;
 	return GetProjectFileString( obj->propname );
 }
 
@@ -580,6 +687,7 @@ int CAht::GetProjectFileModelID( int id )
 {
 	HTPOBJ *obj;
 	obj = GetProjectFileObject( id );
+	if (obj == NULL) return -1;
 	return obj->defvalue;
 }
 
@@ -587,6 +695,7 @@ int CAht::GetProjectFileModelID( int id )
 char *CAht::GetProjectFileString( int ptr )
 {
 	char *p;
+	if (strbuf == NULL || ptr < 0 || ptr >= strbuf->GetSize()) return NULL;
 	p = (char *)(strbuf->GetBuffer());
 	p += ptr;
 	return p;
@@ -599,8 +708,8 @@ HTPOBJ *CAht::GetProjectFileObject( int id )
 	int res;
 	HTPOBJ *obj;
 
+	if (objbuf == NULL || id < 0) return NULL;
 	obj = (HTPOBJ *)(objbuf->GetBuffer());
-	if ( id < 0 ) return NULL;
 
 	res = 0;
 	for(i=0;i<hed.max_mod;i++) {
@@ -658,7 +767,7 @@ void CAht::SaveProjectSub( AHTMODEL *model )
 }
 
 
-int CAht::SaveProject( char *fname )
+int CAht::SaveProject( const char *fname )
 {
 	FILE *fp;
 	HTPOBJ *obj;
@@ -686,7 +795,7 @@ int CAht::SaveProject( char *fname )
 	//	Output file
 	//
 	res = 0;
-	fp=fopen( fname, "wb" );
+	fp=hsp_path_fopen(hsp_path::path_view(fname), "w+b");
 	if (fp != NULL) {
 
 		strsize = strbuf->GetSize() & 15;
@@ -720,8 +829,7 @@ int CAht::SaveProject( char *fname )
 		res = -1;
 	}
 
-	delete objbuf;
-	delete strbuf;
+	DisposeObj();
 	return res;
 }
 
@@ -751,16 +859,18 @@ void CAht::DisposeParts( void )
 		mem_bye( mem_parts );
 		mem_parts = NULL;
 	}
+	maxparts = 0;
 }
 
 
-void CAht::PickLineBuffer( char *out )
+void CAht::PickLineBuffer( char *out, size_t out_size )
 {
 	int a;
 	int dq;
 	char a1;
 	a = 0;
 	dq = 0;
+	if (out == NULL || out_size == 0) return;
 	while(1) {
 		a1 = linebuf[pickptr];
 		if ( a1 == 0 ) break;
@@ -777,8 +887,10 @@ void CAht::PickLineBuffer( char *out )
 		if ( dq ) {
 			if ( a1 == 0x22 ) break;
 		}
+		if ((size_t)a + 1 >= out_size) break;
 		out[a++]=a1;
 		if ( a1 & 128 ) {
+			if ((size_t)a + 1 >= out_size) break;
 			a1 = linebuf[pickptr++];
 			out[a++]=a1;
 		}
@@ -787,7 +899,7 @@ void CAht::PickLineBuffer( char *out )
 }
 
 
-int CAht::BuildPartsSub( int id, char *fname )
+int CAht::BuildPartsSub( int id, const char *fname )
 {
 	//		簡易ahtパース
 	//
@@ -810,25 +922,32 @@ int CAht::BuildPartsSub( int id, char *fname )
 	}
 	note.Select( tmp.GetBuffer() );
 	maxline = note.GetMaxLine();
-	getpath( fname, p->name, 1+8+16 );			// 仮にファイル名を入れておく
+	std::string component_name;
+	if (fname == NULL || !getpath(std::string(fname), component_name, 1+8+16) ||
+		component_name.size() >= sizeof(p->name)) return -1;
+	strcpy(p->name, component_name.c_str());			// 仮にファイル名を入れておく
 
 	for(i=0;i<maxline;i++) {
 		pickptr = 0;
 		note.GetLine( linebuf, i, 255 );
-		PickLineBuffer( s1 );
+		PickLineBuffer( s1, sizeof(s1) );
 		if ( tstrcmp( s1,"#aht" ) ) {
-			PickLineBuffer( s1 );
+			PickLineBuffer( s1, sizeof(s1) );
 			if ( tstrcmp( s1,"iconid" ) ) {
-				PickLineBuffer( s1 );
+				PickLineBuffer( s1, sizeof(s1) );
 				p->icon = atoi( s1 );
 			}
 			if ( tstrcmp( s1,"name" ) ) {
-				PickLineBuffer( s1 );
-				strcpy( p->name, s1 );
+				PickLineBuffer( s1, sizeof(s1) );
+				if (strlen(s1) >= sizeof(p->name)) return -1;
+				strncpy( p->name, s1, sizeof(p->name) - 1 );
+				p->name[sizeof(p->name) - 1] = 0;
 			}
 			if ( tstrcmp( s1,"class" ) ) {
-				PickLineBuffer( s1 );
-				strcpy( p->classname, s1 );
+				PickLineBuffer( s1, sizeof(s1) );
+				if (strlen(s1) >= sizeof(p->classname)) return -1;
+				strncpy( p->classname, s1, sizeof(p->classname) - 1 );
+				p->classname[sizeof(p->classname) - 1] = 0;
 			}
 		}
 	}
@@ -837,23 +956,37 @@ int CAht::BuildPartsSub( int id, char *fname )
 }
 
 
-int CAht::BuildParts( char *list, char *path )
+int CAht::BuildParts( char *list, const char *path )
 {
 	int i;
-	char fullpath[256];
+	int part_count;
 	char fname[256];
 	CStrNote note;
+	if (list == NULL || path == NULL) return -1;
 
 	note.Select( list );
-	maxparts = note.GetMaxLine();
+	part_count = note.GetMaxLine();
+	if (part_count <= 0) {
+		DisposeParts();
+		return 0;
+	}
 	DisposeParts();
+	if ((size_t)part_count > (size_t)-1 / sizeof(AHTPARTS)) return -1;
+	maxparts = part_count;
 	mem_parts = (AHTPARTS *)mem_ini( sizeof(AHTPARTS) * maxparts );
+	if (mem_parts == NULL) {
+		maxparts = 0;
+		return -1;
+	}
 	for(i=0;i<maxparts;i++) {
 		note.GetLine( fname, i, 255 );
-		strcpy( fullpath, path );
-		strcat( fullpath, fname );
+		std::string fullpath = path;
+		fullpath += fname;
 		//Alertf( "#%d [%s]",i, fullpath );
-		BuildPartsSub( i, fullpath );
+		if (BuildPartsSub(i, fullpath.c_str()) < 0) {
+			DisposeParts();
+			return -1;
+		}
 	}
 	return maxparts;
 }
@@ -903,7 +1036,7 @@ void CAht::DisposeMakeBuffer( void )
 }
 
 
-int CAht::SaveMakeBuffer( char *fname )
+int CAht::SaveMakeBuffer( const char *fname )
 {
 	//		初期化スクリプトバッファ+スクリプトバッファを保存
 	//
@@ -971,4 +1104,3 @@ int CAht::tstrcmp(const char* str1, const char* str2)
 	}
 	return -1;
 }
-

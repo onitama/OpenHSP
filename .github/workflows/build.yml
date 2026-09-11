@@ -89,3 +89,8 @@ jobs:
         name: openhsp-win32
         path: |
           src/hsp3/Release/**/*
+          src/hsp3/Release64/**/*
+          src/hsp3dish/Release/**/*
+          src/hsp3dish/Release64/**/*
+          src/hspcmp/Release/**/*
+          src/hspcmp/Release64/**/*

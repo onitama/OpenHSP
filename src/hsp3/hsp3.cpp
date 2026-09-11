@@ -80,10 +80,15 @@ Hsp3::~Hsp3()
 */
 /*------------------------------------------------------------*/
 
-void Hsp3::SetFileName( char *name )
+void Hsp3::SetFileName( const char *name )
 {
-	if ( *name == 0 ) { axname = NULL; return; }
-	axname = name;
+	axname_storage.clear();
+	if (name == NULL || *name == 0) {
+		axname = NULL;
+		return;
+	}
+	axname_storage.assign(name);
+	axname = (char *)axname_storage.c_str();
 }
 
 
@@ -121,6 +126,7 @@ int Hsp3::Reset( int mode )
 	int i;
 	char *ptr;
 	char fname[512];
+	char *loadname;
 	HSPHED *hsphed;
 	if ( hspctx.mem_mcs != NULL ) Dispose();
 
@@ -175,12 +181,13 @@ int Hsp3::Reset( int mode )
 				return -1;	// DPM,packfileからのみstart.axを読み込む
 			}
 		}
+		loadname = fname;
 	}
 	else {
-		strcpy( fname, axname );
+		loadname = axname;
 	}
 
-	ptr = dpm_readalloc(fname);
+	ptr = dpm_readalloc(loadname);
 	if (ptr == NULL) return -1;
 #endif
 
@@ -435,5 +442,3 @@ STRUCTDAT *Hsp3::copy_STRUCTDAT(HSPHED *hsphed, char *ptr, size_t size)
 	hsphed->max_finfo = newsize;
 	return mem_dst;
 }
-
-

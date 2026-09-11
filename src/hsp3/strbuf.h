@@ -52,10 +52,10 @@ void sbFree( void *ptr );
 char *sbExpand( char *ptr, size_t size );
 STRINF *sbGetSTRINF( char *ptr );
 
-void sbCopy( char **ptr, char *data, size_t size );
-void sbStrCopy( char **ptr, char *str );
-void sbAdd( char **ptr, char *data, size_t size, size_t offset );
-void sbStrAdd( char **ptr, char *str );
+void sbCopy( char **ptr, const char *data, size_t size );
+void sbStrCopy( char **ptr, const char *str );
+void sbAdd( char **ptr, const char *data, size_t size, size_t offset );
+void sbStrAdd( char **ptr, const char *str );
 
 void *sbGetOption( char *ptr );
 void sbSetOption( char *ptr, void *option );

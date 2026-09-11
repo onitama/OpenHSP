@@ -85,6 +85,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>/nodefaultlib:libci %(AdditionalOptions)</AdditionalOptions>
@@ -108,6 +109,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>/nodefaultlib:libci %(AdditionalOptions)</AdditionalOptions>
@@ -135,6 +137,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>/source-charset:utf-8 /execution-charset:shift_jis %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>/nodefaultlib:libci %(AdditionalOptions)</AdditionalOptions>
@@ -157,6 +160,7 @@
     <ClCompile Include="..\..\hsp3\filepack.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3crypt.cpp" />
     <ClCompile Include="..\..\hsp3\hsp3utfcnv.cpp" />
+    <ClCompile Include="..\..\hsp3\hsp3pathio.cpp" />
     <ClCompile Include="..\..\hsp3\hspvar_int64.cpp" />
     <ClCompile Include="..\..\hsp3\win32gui\filedlg.cpp" />
     <ClCompile Include="..\..\hsp3\dpmread.cpp" />
@@ -204,6 +208,7 @@
     <ClInclude Include="..\..\hsp3\filepack.h" />
     <ClInclude Include="..\..\hsp3\hsp3crypt.h" />
     <ClInclude Include="..\..\hsp3\hsp3utfcnv.h" />
+    <ClInclude Include="..\..\hsp3\hsp3pathio.h" />
     <ClInclude Include="..\..\hsp3\win32gui\filedlg.h" />
     <ClInclude Include="..\..\hsp3\dpmread.h" />
     <ClInclude Include="..\..\hsp3\hsp3.h" />

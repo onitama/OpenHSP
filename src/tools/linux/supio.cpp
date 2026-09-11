@@ -34,7 +34,7 @@ void mem_bye( void *ptr ) {
 }
 
 
-int dpm_read( char *fname, void *readmem, int rlen, int seekofs )
+int dpm_read( const char *fname, void *readmem, int rlen, int seekofs )
 {
 	char *lpRd;
 	FILE *ff;
@@ -56,7 +56,7 @@ int dpm_read( char *fname, void *readmem, int rlen, int seekofs )
 	return a1;
 }
 
-int dpm_exist( char *fname )
+int dpm_exist( const char *fname )
 {
 	FILE *ff;
 	int length;
@@ -71,7 +71,7 @@ int dpm_exist( char *fname )
 	return length;
 }
 
-char *dpm_readalloc( char *fname )
+char *dpm_readalloc( const char *fname )
 {
 	char *p;
 	int len;
@@ -83,7 +83,7 @@ char *dpm_readalloc( char *fname )
 	return p;
 }
 
-int dpm_save( char *fname, void *mem, int msize, int seekofs )
+int dpm_save( const char *fname, void *mem, int msize, int seekofs )
 {
 	FILE *fp;
 	int flen;
@@ -113,7 +113,7 @@ int strsp_getptr( void )
 	return splc;
 }
 
-int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
+int strsp_get( const char *srcstr, char *dststr, char splitchr, int len )
 {
 	//		split string with parameters
 	//
@@ -163,7 +163,7 @@ int strsp_get( char *srcstr, char *dststr, char splitchr, int len )
 //
 //		Internal function support (without Windows API)
 //
-static void _splitpath( char *path, char *p_drive, char *dir, char *fname, char *ext )
+static void _splitpath( const char *path, char *p_drive, char *dir, char *fname, char *ext )
 {
 	//		Linux用ファイルパス切り出し
 	//
@@ -190,7 +190,7 @@ static void _splitpath( char *path, char *p_drive, char *dir, char *fname, char 
 	}
 }
 
-static int wildcard( char *text, char *wc )
+static int wildcard( const char *text, const char *wc )
 {
 	//		textに対してワイルドカード処理を適応
 	//		return value: yes 1, no 0
@@ -269,12 +269,12 @@ void strcase( char *target )
 	}
 }
 
-int strcpy2( char *str1, char *str2 )
+int strcpy2( char *str1, const char *str2 )
 {
 	//	string copy (ret:length)
 	//
 	char *p;
-	char *src;
+	const char *src;
 	char a1;
 	src = str2;
 	p = str1;
@@ -287,7 +287,7 @@ int strcpy2( char *str1, char *str2 )
 }
 
 
-int strcat2( char *str1, char *str2 )
+int strcat2( char *str1, const char *str2 )
 {
 	//	string cat (ret:length)
 	//
@@ -304,12 +304,12 @@ int strcat2( char *str1, char *str2 )
 }
 
 
-char *strstr2( char *target, char *src )
+char *strstr2( char *target, const char *src )
 {
 	//		strstr関数のutf8対応版
 	//
 	unsigned char *p;
-	unsigned char *s;
+	const unsigned char *s;
 	unsigned char *p2;
 	unsigned char a1;
 	unsigned char a2;

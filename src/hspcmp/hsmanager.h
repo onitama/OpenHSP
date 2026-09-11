@@ -19,9 +19,9 @@ public:
 	~HspHelpManager();
 
 	void terminate( void );
-	int initalize( char *pathname );
+	int initalize( const char *pathname );
 
-	int searchIndex( char *key );
+	int searchIndex( const char *key );
 	char *getMessage(void);
 
 	//		Data
@@ -70,11 +70,11 @@ private:
 
 	//		Private members
 	//
-	int openHSFile(char *fname, int offset=0);
+	int openHSFile(const char *fname, int offset=0);
 	int getTaggedInfoFromHS(int target_line = 0);
 	int getInfoFromHS(int target_line = 0);
 	int getTypesFromHS(char *start, char *limit_addr);
-	int getKeywordFromIndex(char * key);
+	int getKeywordFromIndex(const char * key);
 
 	void strsp_ini(char *src);
 	char *strsp_getptr(void);

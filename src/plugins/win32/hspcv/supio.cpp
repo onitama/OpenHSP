@@ -20,7 +20,7 @@
 
 char *mem_ini( int size ) { return (char *)malloc(size); }
 void mem_bye( void *ptr ) { free(ptr); }
-int mem_load( char *fname, void *mem, int msize )
+int mem_load( const char *fname, void *mem, int msize )
 {
 	FILE *fp;
 	int flen;
@@ -30,7 +30,7 @@ int mem_load( char *fname, void *mem, int msize )
 	fclose(fp);
 	return flen;
 }
-int mem_save( char *fname, void *mem, int msize )
+int mem_save( const char *fname, void *mem, int msize )
 {
 	FILE *fp;
 	int flen;
@@ -41,7 +41,7 @@ int mem_save( char *fname, void *mem, int msize )
 	return flen;
 }
 
-int filecopy( char *fname, char *sname )
+int filecopy( const char *fname, const char *sname )
 {
 	FILE *fp;
 	FILE *fp2;
@@ -75,7 +75,7 @@ void prtini( char *mes )
 	mespt=0;
 }
 
-void prt( char *mes )
+void prt( const char *mes )
 {
 	//		message buffer send
 	//
@@ -108,7 +108,7 @@ void strcase( char *str )
 	}
 }
 
-int tstrcmp( char *str1, char *str2 )
+int tstrcmp( const char *str1, const char *str2 )
 {
 	//	string compare (0=not same/-1=same)
 	//
@@ -161,19 +161,19 @@ void getpath( char *stmp, char *outbuf, int p2 )
 //		windows debug support
 //
 
-void Alert( char *mes )
+void Alert( const char *mes )
 {
 	MessageBox( NULL, mes, "error",MB_ICONINFORMATION | MB_OK );
 }
 
-void AlertV( char *mes, int val )
+void AlertV( const char *mes, int val )
 {
 	char ss[128];
 	sprintf( ss, "%s%d",mes,val );
 	MessageBox( NULL, ss, "error",MB_ICONINFORMATION | MB_OK );
 }
 
-void Alertf( char *format, ... )
+void Alertf( const char *format, ... )
 {
 	char textbf[1024];
 	va_list args;
@@ -182,4 +182,3 @@ void Alertf( char *format, ... )
 	va_end(args);
 	MessageBox( NULL, textbf, "error",MB_ICONINFORMATION | MB_OK );
 }
-

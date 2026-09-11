@@ -85,9 +85,9 @@ public:
 	void DeleteSlot(int slot = 0);
 	int GetEmptySlot(void);
 
-	int LoadPackFile(char* name, int encode = 0, HFPSIZE dpmoffset = 0, int slot = 0);
+	int LoadPackFile(const char* name, int encode = 0, HFPSIZE dpmoffset = 0, int slot = 0);
 	void PrintFiles(void);
-	HFPSIZE GetFileSize( char *name );
+	HFPSIZE GetFileSize( const char *name );
 	HFPSIZE GetCurrentDPMOffset(void);
 	void SetCurrentSlot(int slot) { curnum = slot; };
 
@@ -107,10 +107,10 @@ public:
 
 	//	For Save Process
 	//
-	int SavePackFile( char *fname, char *packname, int encode=0, int opt_encode=0 );
-	int ExtractFile( char *fname, char *savename=NULL, int encode=0 );
-	int ExtractFile(HFPHED* hed, char* name, char* savename = NULL, int encode = 0 );
-	int MakeEXEFile(int mode, char* hspexe, char *basename, int deckey=0, int opt1=640, int opt2=480, int opt3=0);
+	int SavePackFile( const char *fname, const char *packname, int encode=0, int opt_encode=0 );
+	int ExtractFile( const char *fname, char *savename=NULL, int encode=0 );
+	int ExtractFile(HFPHED* hed, const char* name, char* savename = NULL, int encode = 0 );
+	int MakeEXEFile(int mode, const char* hspexe, const char *basename, int deckey=0, int opt1=640, int opt2=480, int opt3=0);
 
 	//	For Info
 	//
@@ -120,13 +120,13 @@ public:
 	HSP3Crypt *GetCurrentCryptManager(void);
 	HFPHED *GetPackHeader( int slot );
 	char *GetPackName( HFPHED *hed );
-	int GetFileNum( HFPHED *hed );
+	int GetFileNum( const HFPHED *hed );
 	HFPOBJ *GetFileObject( HFPHED *hed, int id );
-	HFPOBJ *SearchFileObject( HFPHED *hed, char *name );
-	HFPOBJ *SearchFileObject(char* name);
+	HFPOBJ *SearchFileObject( HFPHED *hed, const char *name );
+	HFPOBJ *SearchFileObject(const char* name);
 	void SetErrorBuffer(CMemBuf *err);
 
-	void Print(char* mes);
+	void Print(const char* mes);
 	char *GetString(HFPHED *hed, int ptr);
 	char* GetFileName(HFPOBJ* obj);
 	char* GetFolderName(HFPOBJ* obj);
@@ -158,15 +158,15 @@ private:
 	//	Internal Use
 	//
 	void PrepareRead(int slot = 0, int encode = 0);
-	int CopyFileToDPM( FILE *ff, char *filename, HFPSIZE size, int encode );
+	int CopyFileToDPM( FILE *ff, const char *filename, HFPSIZE size, int encode );
 	void PrepareWrite(int slot = 0, int encode = 0);
-	int RegisterFromPacklist(char* name, int crypt = 1);
-	HSPPTRINT RegisterFile(char* name, int crypt = 0, int orig = 0);
+	int RegisterFromPacklist(const char* name, int crypt = 1);
+	HSPPTRINT RegisterFile(const char* name, int crypt = 0, int orig = 0);
 
 	//	Utility
 	//
 	void StrCase(char* str);
-	void StrSplit(char* target, char* fpath, char* filename);
+	void StrSplit(const char* target, char* fpath, char* filename);
 
 };
 

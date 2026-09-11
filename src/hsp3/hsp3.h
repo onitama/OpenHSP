@@ -9,6 +9,7 @@
 #include "hsp3struct.h"
 #include "hsp3ext.h"
 #include "hsp3code.h"
+#include <string>
 
 #define HSP3_AXTYPE_NONE 0
 #define HSP3_AXTYPE_ENCRYPT 1
@@ -24,7 +25,7 @@ public:
 	void Dispose( void );						// HSP axの破棄
 	int Reset( int mode );						// HSP axの初期化を行なう
 	void SetPackValue( int sum, int dec );		// packfile用の設定データを渡す
-	void SetFileName( char *name );				// axファイル名を指定する
+	void SetFileName( const char *name );			// axファイル名を指定する
 	void SetCommandLinePrm(char *prm);			// コマンドライン文字列を指定する
 	void SetModuleFilePrm(char *prm);			// モジュールファイル名文字列を指定する
 	void SetHSPTVFolderPrm(char *prm);			// HSPTVフォルダ名文字列を指定する
@@ -40,6 +41,7 @@ public:
 	int axtype;									// axファイルの設定(hsp3imp用)
 
 private:
+	std::string axname_storage;
 
 	void *copy_DAT(char* ptr, size_t size);
 	LIBDAT *copy_LIBDAT(HSPHED *hsphed, char *ptr, size_t size);

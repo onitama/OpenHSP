@@ -19,13 +19,40 @@
 #endif
 #include <string.h>
 #include <ctype.h>
+#include <string>
+#ifdef HSPWIN
+#include <vector>
+#endif
 
 #include "../hsp3/hsp3config.h"
+#include "../hsp3/hsp3pathio.h"
 #include "supio.h"
 
 #include "hsc3.h"
 #include "token.h"
 #include "hsmanager.h"
+
+namespace {
+
+static void addext(std::string& path, const char* extension)
+{
+	std::string current_extension;
+	if (getpath(path, current_extension, 2)) {
+		if (current_extension.empty()) {
+			path += ".";
+			path += extension;
+		}
+		return;
+	}
+	size_t separator = path.find_last_of("/\\");
+	size_t dot = path.find_last_of('.');
+	if (dot == std::string::npos || (separator != std::string::npos && dot <= separator)) {
+		path += ".";
+		path += extension;
+	}
+}
+
+}
 
 /*----------------------------------------------------------*/
 
@@ -63,7 +90,11 @@ static 	char *p[] = {
 
 /*----------------------------------------------------------*/
 
+#ifdef HSPWIN
+int wmain( int argc, wchar_t *argv[] )
+#else
 int main( int argc, char *argv[] )
+#endif
 {
 	char a1,a2,a3;
 	int b,st;
@@ -71,13 +102,23 @@ int main( int argc, char *argv[] )
 	char *opt_lk = NULL;
 	char *opt_ls = NULL;
 	int opt_lsref, opt_lsmode;
-	char fname[HSP_MAX_PATH];
-	char fname2[HSP_MAX_PATH];
-	char oname[HSP_MAX_PATH];
-	char compath[HSP_MAX_PATH];
-	char syspath[HSP_MAX_PATH];
-	char helpkey[256];
+	std::string fname;
+	std::string fname2;
+	std::string oname;
+	std::string compath;
+	std::string syspath;
+	std::string helpkey;
 	CHsc3 *hsc3=NULL;
+
+#ifdef HSPWIN
+	std::vector<std::string> utf8_args;
+	utf8_args.reserve(argc);
+	for (int i = 0; i < argc; ++i) {
+		std::string converted;
+		if (hsp_path_utf8_from_wide(converted, argv[i]) != 0) return 1;
+		utf8_args.push_back(converted);
+	}
+#endif
 
 	//	check switch and prm
 
@@ -85,34 +126,33 @@ int main( int argc, char *argv[] )
 
 	st = 0; ppopt = 0; cmpopt = 0; utfopt = 0; pponly = 0; strmap = 0; hsphelp = 0; opt_lsref = 0; opt_lsmode = 0; hsp64 = 1;
 	execobj = 0;
-	fname[0]=0;
-	fname2[0]=0;
-	oname[0]=0;
-	syspath[0]=0;
-	helpkey[0] = 0;
-
 #ifdef HSPLINUX
-	strcpy( compath,"common/" );
+	compath = "common/";
 #else
-	strcpy( compath,"common\\" );
+	compath = "common\\";
 #endif
 
 	for (b=1;b<argc;b++) {
-		a1=*argv[b];a2=tolower(*(argv[b]+1));
+#ifdef HSPWIN
+		const char* arg = utf8_args[b].c_str();
+#else
+		const char* arg = argv[b];
+#endif
+		a1=*arg;a2=tolower(*(arg+1));
 #ifdef HSPLINUX
 		if (a1!='-') {
 #else
 		if ((a1!='/')&&(a1!='-')) {
 #endif
-			strcpy(fname,argv[b]);
+			fname = arg;
 		} else {
-			a3=tolower(*(argv[b]+2));
-			if (strncmp(argv[b], "--compath=", 10) == 0) {
-				strcpy( compath, argv[b] + 10 );
+			a3=tolower(*(arg+2));
+			if (strncmp(arg, "--compath=", 10) == 0) {
+				compath = arg + 10;
 				continue;
 			}
-			if (strncmp(argv[b], "--syspath=", 10) == 0) {
-				strcpy( syspath, argv[b] + 10 );
+			if (strncmp(arg, "--syspath=", 10) == 0) {
+				syspath = arg + 10;
 				continue;
 			}
 			switch (a2) {
@@ -135,7 +175,7 @@ int main( int argc, char *argv[] )
 			case 'm':
 				ppopt |= HSC3_OPT_EMSCRIPTEN; break;
 			case 'o':
-				strcpy(oname, argv[b] + 2);
+				oname = arg + 2;
 				break;
 			case 'e':
 				execobj = 1;
@@ -147,23 +187,23 @@ int main( int argc, char *argv[] )
 				break;
 			case 'h':
 				hsphelp = 1;
-				strcpy(helpkey, argv[b] + 2);
+				helpkey = arg + 2;
 				break;
 			case 'l':
 				if (a3 == 'k') {
-					opt_lk = argv[b] + 3; break;
+					opt_lk = (char*)arg + 3; break;
 				}
 				if (a3 == 'l') {
 					opt_lsmode = 0;
-					opt_ls = argv[b] + 3; break;
+					opt_ls = (char*)arg + 3; break;
 				}
 				if (a3 == 'v') {
 					opt_lsmode = 1;
-					opt_ls = argv[b] + 3; break;
+					opt_ls = (char*)arg + 3; break;
 				}
 				if (a3 == 's') {
 					opt_lsmode = 2;
-					opt_ls = argv[b] + 3; break;
+					opt_ls = (char*)arg + 3; break;
 				}
 				if (a3 == 'r') {
 					opt_lsref = 16; break;
@@ -187,17 +227,17 @@ int main( int argc, char *argv[] )
 	if (hsphelp) {
 		int res;
 		HspHelpManager hman;
-		strcat(syspath, "hsphelp");
-		res = hman.initalize(syspath);
+		syspath += "hsphelp";
+		res = hman.initalize(syspath.c_str());
 		if (res == 0) {
-			res = hman.searchIndex(helpkey);
+			res = hman.searchIndex(helpkey.c_str());
 		}
 		puts(hman.getMessage());
 		return res;
 	}
 
 	hsc3 = new CHsc3;
-	hsc3->SetCommonPath(compath);
+	hsc3->SetCommonPath(compath.c_str());
 
 	//		keyword main
 	if (opt_lk) {
@@ -208,10 +248,11 @@ int main( int argc, char *argv[] )
 		return st;
 	}
 
-	if (fname[0]==0) { printf("No file name selected.\n");return 1; }
+	if (fname.empty()) { printf("No file name selected.\n");return 1; }
 
-	if (oname[0]==0) {
-		strcpy( oname,fname ); cutext( oname );
+	if (oname.empty()) {
+		oname = fname;
+		hsp_path_cut_extension(oname);
 		if (strmap) {
 			addext(oname, "strmap");
 		}
@@ -219,7 +260,9 @@ int main( int argc, char *argv[] )
 			addext(oname, "ax");
 		}
 	}
-	strcpy( fname2, fname ); cutext( fname2 ); addext( fname2,"i" );
+	fname2 = fname;
+	hsp_path_cut_extension(fname2);
+	addext( fname2,"i" );
 	addext( fname,"hsp" );			// 拡張子がなければ追加する
 
 	//		HSP64 check
@@ -233,14 +276,14 @@ int main( int argc, char *argv[] )
 
 		//		通常のコンパイル
 		hsc3->InitAnalysisInfo(opt_lsmode | opt_lsref, opt_ls);
-		st = hsc3->PreProcess(fname, fname2, ppopt, fname);
+		st = hsc3->PreProcess(fname.c_str(), fname2.c_str(), ppopt, fname.c_str());
 		if ((pponly == 0) && (st == 0)) {
 			if (hsp64) {
 				if (hsc3->GetHeaderOption() & HEDINFO_HSP64) {
 					cmpopt |= HSC3_MODE_RUNTIME64 | HSC3_MODE_UTF8;
 				}
 			}
-			st = hsc3->CompileLabelOut(fname2, cmpopt);
+			st = hsc3->CompileLabelOut(fname2.c_str(), cmpopt);
 		}
 		if (st >= 0) {
 			puts(hsc3->GetAnalysisInfo());
@@ -258,23 +301,27 @@ int main( int argc, char *argv[] )
 
 	if ( execobj ) {
 		//		ランタイムを起動
-		char execmd[4096];
-		st = hsc3->GetRuntimeFromHeader( fname, oname );
+		std::string execmd;
+		std::string runtime_name;
+		st = hsc3->GetRuntimeFromHeader( fname.c_str(), runtime_name );
 		if ( st != 1 ) {
-			strcpy( oname, "hsp3.exe" );			// デフォルトランタイム
+			oname = "hsp3.exe";			// デフォルトランタイム
+		}
+		else {
+			oname = runtime_name;
 		}
 
 #if defined(HSPLINUX)||defined(HSPMAC)
-		cutext( oname );
+		hsp_path_cut_extension(oname);
 		if ( execobj & 8 ) {
-			printf("Runtime[%s].\n",oname);
+			printf("Runtime[%s].\n",oname.c_str());
 		} else {
 			int result;
-			printf("Execute from %s runtime[%s](%d).\n",fname,oname,execobj);
-			sprintf(execmd,"%s./%s %s",syspath,oname,fname);
+			printf("Execute from %s runtime[%s](%d).\n",fname.c_str(),oname.c_str(),execobj);
+			execmd = syspath + "./" + oname + " " + fname;
 			//sprintf(execmd,"%s./%s %s >%s.hspres",syspath,oname,fname,syspath);
 			
-			result = system(execmd);
+			result = system(execmd.c_str());
 			if ( WIFEXITED(result) ) {
 				result = WEXITSTATUS(result);
 				printf("hsed: Process end %d.\n",result);
@@ -292,10 +339,10 @@ int main( int argc, char *argv[] )
 		}
 #else
 		if ( execobj & 8 ) {
-			printf("Runtime[%s].\n",oname);
+			printf("Runtime[%s].\n",oname.c_str());
 		} else {
-			sprintf( execmd, "%s %s", oname, fname );
-			st = WinExec( execmd, SW_SHOW );
+			execmd = oname + " " + fname;
+			st = hsp_path_exec_utf8( hsp_path::utf8_view(execmd.c_str()) );
 			if ( st < 32 ) {
 				printf("Runtime file missing.\n");
 			}
@@ -304,14 +351,14 @@ int main( int argc, char *argv[] )
 
 	} else {
 		//		通常のコンパイル
-		st = hsc3->PreProcess( fname, fname2, ppopt, fname );
+		st = hsc3->PreProcess( fname.c_str(), fname2.c_str(), ppopt, fname.c_str() );
 		if (( pponly == 0 )&&( st == 0 )) {
 			if (hsp64) {
 				if (hsc3->GetHeaderOption() & HEDINFO_HSP64) {
 					cmpopt |= HSC3_MODE_RUNTIME64 | HSC3_MODE_UTF8;
 				}
 			}
-			st = hsc3->Compile( fname2, oname, cmpopt );
+			st = hsc3->Compile( fname2.c_str(), oname.c_str(), cmpopt );
 		}
 		puts( hsc3->GetError() );
 		hsc3->PreProcessEnd();
@@ -320,4 +367,3 @@ int main( int argc, char *argv[] )
 	if ( hsc3 != NULL ) { delete hsc3; hsc3=NULL; }
 	return st;
 }
-
