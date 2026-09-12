@@ -76,6 +76,13 @@ int main()
 	std::string current_directory;
 	assert(hsp_path_get_current_directory(current_directory) == 0);
 	assert(!current_directory.empty());
+	std::string command_line_argument;
+	assert(hsp_path_get_command_line_argument_utf8(command_line_argument, 0) == 0);
+	assert(!command_line_argument.empty());
+	assert(hsp_path_get_command_line_argument_utf8(command_line_argument, -1) != 0);
+	assert(command_line_argument.empty());
+	assert(hsp_path_get_command_line_argument_utf8(command_line_argument, 9999) != 0);
+	assert(command_line_argument.empty());
 	std::string native_hsptv_path;
 	assert(hsp_path_get_hsptv_path(native_hsptv_path,
 		hsp_path::path_view("native-test.dat")) == 0);

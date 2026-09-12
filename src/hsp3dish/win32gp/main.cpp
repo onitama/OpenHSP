@@ -14,6 +14,10 @@
 
 #include "hsp3dish.h"
 
+#ifdef HSPUTF8
+#include "../../hsp3/hsp3pathio.h"
+#endif
+
 /*----------------------------------------------------------*/
 
 #ifndef HSP3DLL
@@ -28,7 +32,16 @@ int APIENTRY WinMain ( HINSTANCE hInstance,
 	if (res) return res;
 
 #ifdef HSPDEBUG
+#ifdef HSPUTF8
+	std::string startfile;
+	const char *sptr = "";
+	if (hsp_path_get_command_line_argument_utf8(startfile, 1) == 0) {
+		sptr = startfile.c_str();
+	}
+	res = hsp3dish_init(hInstance, sptr, NULL);
+#else
 	res = hsp3dish_init( hInstance, lpCmdParam, NULL);
+#endif
 #else
 	res = hsp3dish_init( hInstance, NULL, NULL);
 #endif
@@ -182,11 +195,4 @@ EXPORT BOOL WINAPI hspexec(int p1, int p2, int p3, int p4)
 {
 	return 0;
 }
-
-
-
-
 #endif
-
-
-

@@ -59,6 +59,9 @@ int hsp_path_get_module_filename_utf8(std::string& result);
 int hsp_path_get_module_filename_utf8(std::string& result, void* module);
 int hsp_path_get_module_directory_utf8(std::string& result);
 int hsp_path_get_current_directory_utf8(std::string& result);
+// Return one process command-line argument as UTF-8.
+// Returns zero on success and -1 when the index or command line is unavailable.
+int hsp_path_get_command_line_argument_utf8(std::string& result, int index);
 int hsp_path_get_hsptv_path_utf8(std::string& result, hsp_path::utf8_view name);
 int hsp_path_get_hsptv_path_utf8(std::string& result, hsp_path::ansi_view name);
 
