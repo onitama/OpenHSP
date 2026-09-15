@@ -193,6 +193,7 @@ int hsp_path_get_hsptv_path_utf8(std::string& result, hsp_path::utf8_view direct
 #if defined(HSPWIN) || defined(_WIN32)
 
 #include <windows.h>
+#include <shellapi.h>
 #include <sys/stat.h>
 
 static wchar_t* hsp_path_utf8_to_wide(const char* text)
@@ -250,6 +251,18 @@ static int hsp_path_narrow_from_wide_strict(std::string& result, const wchar_t* 
 int hsp_path_utf8_from_wide(std::string& result, const wchar_t* text)
 {
 	return hsp_path_narrow_from_wide_strict(result, text, utf16_to_utf8_strict);
+}
+
+int hsp_path_get_command_line_argument_utf8(std::string& result, int index)
+{
+	result.clear();
+	if (index < 0) return -1;
+	int count = 0;
+	wchar_t** arguments = CommandLineToArgvW(GetCommandLineW(), &count);
+	if (arguments == NULL) return -1;
+	int status = index < count ? hsp_path_utf8_from_wide(result, arguments[index]) : -1;
+	LocalFree(arguments);
+	return status;
 }
 
 static int hsp_path_enumerate_utf8(hsp_path::utf8_view pattern, int flags, hsp_path_list_callback callback, void* user_data)

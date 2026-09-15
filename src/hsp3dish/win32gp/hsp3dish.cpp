@@ -1045,13 +1045,13 @@ int hsp3dish_setwindow(int bootprm, int wx, int wy)
 	return 0;
 }
 
-int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
+int hsp3dish_init(HINSTANCE hInstance, const char *startfile, HWND hParent)
 {
 	//		HSP3Dishシステム関連の初期化
 	//
 	int orgexe, mode;
+#if defined(HSPDEBUG) && !defined(HSPUTF8)
 	char *ss;
-#ifdef HSPDEBUG
 	int i;
 #endif
 
@@ -1075,19 +1075,28 @@ int hsp3dish_init(HINSTANCE hInstance, char *startfile, HWND hParent)
 	h_dbgwin = NULL;
 	dbgwnd = NULL;
 
-	ss = strsp_cmds(startfile);
-	i = (int)(ss - startfile);
-	ss = startfile;
-	if (ss[i - 1] == 32) i--;
-	if (*ss == 0x22) {
-		ss++; i -= 2;
+#ifdef HSPUTF8
+	if (startfile != NULL) {
+		hsp->SetFileName(startfile);
 	}
-	if (i > 0) {
-		char fname2[_MAX_PATH + 1];
-		strncpy(fname2, ss, i);
-		fname2[i] = 0;
-		hsp->SetFileName(fname2);
+#else
+	if (startfile != NULL) {
+		ss = strsp_cmds(const_cast<char *>(startfile));
+		i = (int)(ss - startfile);
+		ss = const_cast<char *>(startfile);
+		if (i > 0 && ss[i - 1] == 32) i--;
+		if (*ss == 0x22) {
+			ss++;
+			i = i >= 2 ? i - 2 : 0;
+		}
+		if (i > 0) {
+			char fname2[_MAX_PATH + 1];
+			strncpy(fname2, ss, i);
+			fname2[i] = 0;
+			hsp->SetFileName(fname2);
+		}
 	}
+#endif
 #else
 	if (startfile != NULL) {
 		hsp->SetFileName(startfile);

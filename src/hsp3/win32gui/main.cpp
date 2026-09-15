@@ -16,10 +16,7 @@
 #include "hsp3win.h"
 
 #ifdef HSPUTF8
-#include <shellapi.h>
-#include "../hsp3utfcnv.h"
-static LPWSTR* szArglist;
-static int nArgs;
+#include "../hsp3pathio.h"
 #endif
 
 /*----------------------------------------------------------*/
@@ -32,17 +29,12 @@ int APIENTRY WinMain ( HINSTANCE hInstance,
 	int res;
 #ifdef HSPDEBUG
 #ifdef HSPUTF8
-	char* sptr = lpCmdParam;
-	char utf8filename[4096];
-	szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
-	if (szArglist) {
-		if (nArgs > 1) {
-			utf16_to_hsp3(utf8filename, szArglist[1], 4095);
-			sptr = utf8filename;
-		}
+	std::string startfile;
+	const char *sptr = "";
+	if (hsp_path_get_command_line_argument_utf8(startfile, 1) == 0) {
+		sptr = startfile.c_str();
 	}
-	res = hsp3win_init( hInstance, sptr);
-	LocalFree(szArglist);
+	res = hsp3win_init(hInstance, sptr);
 #else
 	char fname[_MAX_PATH + 1];
 	char *ss = lpCmdParam;

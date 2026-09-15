@@ -9,7 +9,7 @@ int app_init(void);
 void app_bye(void);
 
 int hsp3dish_exec( void );
-int hsp3dish_init( HINSTANCE hInstance, char *startfile, HWND hParent );
+int hsp3dish_init( HINSTANCE hInstance, const char *startfile, HWND hParent );
 int hsp3dish_reset(void);
 int hsp3dish_setwindow(int bootprm, int wx, int wy);
 void hsp3dish_bye(void);
