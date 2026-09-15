@@ -1,0 +1,17 @@
+#include "hgimg4.as"
+; Run with HGIMG4 x64. Expected: mode=1, timer=123, alpha=128, mode=0.
+gpreset
+gpbox object_id, 1
+gpsetprm object_id, PRMSET_MODE, OBJ_HIDE
+gpsetprm object_id, PRMSET_TIMER, 123
+gpsetprm object_id, PRMSET_ALPHA, 128
+gpgetprm value, object_id, PRMSET_MODE
+mes "mode=" + value
+gpgetprm value, object_id, PRMSET_TIMER
+mes "timer=" + value
+gpgetprm value, object_id, PRMSET_ALPHA
+mes "alpha=" + value
+gpsetprmoff object_id, PRMSET_MODE, OBJ_HIDE
+gpgetprm value, object_id, PRMSET_MODE
+mes "mode=" + value
+stop
