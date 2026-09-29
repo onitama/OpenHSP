@@ -1,0 +1,9 @@
+; Run with HSPCL on Linux from the OpenHSP repository root.
+; Expected: one file (hspdef.as), then one directory (basic).
+dirlist listing, "common/hspdef.as", 1
+mes "files=" + stat
+mes listing
+dirlist listing, "sample/basic", 5
+mes "directories=" + stat
+mes listing
+end
