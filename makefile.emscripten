@@ -86,6 +86,7 @@ OBJS = \
 	src/hsp3dish/emscripten/fontsystem.js.o \
 	src/hsp3dish/emscripten/hgtex.js.o \
 	src/hsp3dish/emscripten/hgiox.js.o \
+	src/hsp3dish/sdl_key.js.o \
 	src/hsp3dish/emscripten/hsp3dish.js.o \
 	src/hsp3dish/emscripten/main.js.o \
 	src/hsp3dish/emscripten/mmman.js.o \
@@ -132,6 +133,7 @@ OBJS_GP = \
 	src/hsp3dish/emscripten/fontsystem.g.o \
 	src/hsp3dish/emscripten/hgtex.g.o \
 	src/hsp3dish/win32gp/hgiox.g.o \
+	src/hsp3dish/sdl_key.g.o \
 	src/hsp3dish/emscripten/hsp3dish.g.o \
 	src/hsp3dish/emscripten/main.g.o \
 	src/hsp3dish/emscripten/mmman.g.o \

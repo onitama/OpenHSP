@@ -2006,6 +2006,10 @@ void hgio_touch( int xx, int yy, int button )
 	mouse_x = ( xx - _originX ) * _rateX;
 	mouse_y = ( yy - _originY ) * _rateY;
 	mouse_btn = button;
+#if defined(HSPEMSCRIPTEN) || defined(HSPLINUX)
+    // Right/middle are mouse keys, not a touch or a GUI object's left press.
+    button &= SDL_BUTTON_LMASK;
+#endif
     if ( mainbm != NULL ) {
         mainbm->savepos[BMSCR_SAVEPOS_MOSUEX] = mouse_x;
         mainbm->savepos[BMSCR_SAVEPOS_MOSUEY] = mouse_y;
@@ -2041,6 +2045,9 @@ void hgio_mtouchid( int pointid, int xx, int yy, int button, int opt )
     bm = (Bmscr *)mainbm;
 	x = ( xx - _originX ) * _rateX;
 	y = ( yy - _originY ) * _rateY;
+#if defined(HSPLINUX) || defined(HSPEMSCRIPTEN)
+	hgio_cnvview(mainbm, &x, &y);
+#endif
     if ( opt == 0 ) {
         mouse_x = x;
         mouse_y = y;

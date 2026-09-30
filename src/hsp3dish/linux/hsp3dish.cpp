@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <string>
 
 #if defined( __GNUC__ )
@@ -42,6 +43,7 @@ struct engine;
 
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
+#include "../sdl_key.h"
 
 //#define USE_OBAQ
 
@@ -84,6 +86,7 @@ static int hsp_sscnt, hsp_ssx, hsp_ssy;
 
 #define SDLK_SCANCODE_MAX 0x200
 static bool keys[SDLK_SCANCODE_MAX];
+static unsigned int mouse_buttons = 0;
 SDL_Window *window = NULL;
 static SDL_Renderer *renderer;
 static SDL_GLContext context;
@@ -167,31 +170,17 @@ static int handleEvent( void ) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch(event.type) {
-		case SDL_FINGERMOTION:
 		case SDL_FINGERDOWN:
-			{
-				//int id;
-				float x,y;
-				Bmscr *bm;
-				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
-				x = event.tfinger.x * bm->sx;
-				y = event.tfinger.y * bm->sy;
-				//id = event.tfinger.touchId;
-				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
-				hgio_touch( (int)x, (int)y, 1 );
-				break;
-			}
+		case SDL_FINGERMOTION:
 		case SDL_FINGERUP:
 			{
-				//int id;
-				float x,y;
-				Bmscr *bm;
-				bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
-				x = event.tfinger.x * bm->sx;
-				y = event.tfinger.y * bm->sy;
-				//id = event.tfinger.touchId;
-				//hgio_mtouchid( id, (int)x, (int)y, 1, 0 );
-				hgio_touch( (int)x, (int)y, 0 );
+				if (window == NULL) break;
+				int width, height;
+				SDL_GetWindowSize(window, &width, &height);
+				// hgio_mtouchid converts window coordinates to logical/view coordinates.
+				int x = (int)(event.tfinger.x * width);
+				int y = (int)(event.tfinger.y * height);
+				hgio_mtouchid((int)event.tfinger.fingerId, x, y, event.type != SDL_FINGERUP, 0);
 				break;
 			}
 
@@ -221,18 +210,55 @@ static int handleEvent( void ) {
 				//result += 2 * (m->x + m->y + m->xrel + m->yrel);
 				break;
 			}
-		case SDL_MOUSEBUTTONDOWN:
-			{
-				SDL_MouseButtonEvent *m = (SDL_MouseButtonEvent*)&event;
-				//printf("button down: %d,%d  %d,%d\n", m->button, m->state, m->x, m->y);
-				hgio_touch( m->x, m->y, 1 );
-				break;
+		case SDL_MOUSEWHEEL:
+			if (exinfo != NULL) {
+				Bmscr *bm = (Bmscr *)exinfo->HspFunc_getbmscr(0);
+				if (bm == NULL) break;
+				// HSP uses signed Windows wheel units (120 per notch), not SDL steps.
+				// Keep sub-unit precision for touchpads and accumulate until mousew reads it.
+				static double remainder = 0.0;
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+				double amount = event.wheel.preciseY * 120.0;
+#else
+				double amount = event.wheel.y * 120.0;
+#endif
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+				if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) amount = -amount;
+#endif
+				remainder += amount;
+				int delta = (int)round(remainder);
+				remainder -= delta;
+				if (delta != 0) bm->SetMouseWheel(0, bm->savepos[BMSCR_SAVEPOS_MOSUEW] + delta);
 			}
+			break;
+		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
 			{
-				SDL_MouseButtonEvent *m = (SDL_MouseButtonEvent*)&event;
-				//printf("button up: %d,%d  %d,%d\n", m->button, m->state, m->x, m->y);
-				hgio_touch( m->x, m->y, 0 );
+				SDL_MouseButtonEvent *m = &event.button;
+				const bool down = (event.type == SDL_MOUSEBUTTONDOWN);
+				// Track events in order: SDL_GetMouseState may already include later releases.
+				if (down) mouse_buttons |= SDL_BUTTON(m->button);
+				else mouse_buttons &= ~SDL_BUTTON(m->button);
+				hgio_touch(m->x, m->y, mouse_buttons);
+				if (down && exinfo != NULL && code_isirq(HSPIRQ_ONCLICK)) {
+					int button = -1;
+					if (m->button == SDL_BUTTON_LEFT) button = 0;
+					if (m->button == SDL_BUTTON_RIGHT) button = 3;
+					if (m->button == SDL_BUTTON_MIDDLE) button = 6;
+					if (button >= 0) {
+						// Like Windows lParam, use client coordinates before scaling/view transforms.
+						const int x = m->x, y = m->y;
+						// Match WM_*BUTTONDOWN iparam, MK_* wparam and packed coordinates.
+						int flags = 0;
+						if (mouse_buttons & SDL_BUTTON_LMASK) flags |= 1;
+						if (mouse_buttons & SDL_BUTTON_RMASK) flags |= 2;
+						if (keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT]) flags |= 4;
+						if (keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]) flags |= 8;
+						if (mouse_buttons & SDL_BUTTON_MMASK) flags |= 16;
+						const unsigned int position = (x & 0xffff) | ((unsigned int)(y & 0xffff) << 16);
+						code_sendirq(HSPIRQ_ONCLICK, button, flags, (int)position);
+					}
+				}
 				break;
 			}
 		case SDL_KEYDOWN:
@@ -334,6 +360,7 @@ static int handleEvent( void ) {
 					bm->SendHSPObjectNotice(wparam);
 				}
 			}
+			hsp_sdl_send_key_irq(event.key);
 			//printf("key down: sym %d scancode %d\n", event.key.keysym.sym, event.key.keysym.scancode);
 			break;
 			}
@@ -355,6 +382,13 @@ static int handleEvent( void ) {
 			}
 
 		case SDL_WINDOWEVENT:
+			if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+				int x, y;
+				SDL_GetMouseState(&x, &y);
+				mouse_buttons = 0;
+				memset(keys, 0, sizeof(keys));
+				hgio_touch(x, y, 0);
+			}
 			if (event.window.event==SDL_WINDOWEVENT_CLOSE) {
 				int id,retval;
 				id = 0;
