@@ -996,7 +996,7 @@ char* hgio_texmaskbuffer(BMSCR* bm, char* resname)
 	p = game->getPixelMaskBuffer(resname, &xsize, &ysize);
 	CloseMemFilePtr();
 	if (p) {
-		if ((xsize == bm->sx) || (ysize == bm->sy)) {
+		if ((xsize == bm->sx) && (ysize == bm->sy)) {
 			return p;
 		}
 		free(p);

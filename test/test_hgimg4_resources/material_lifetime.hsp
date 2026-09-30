@@ -1,0 +1,25 @@
+#include "hgimg4.as"
+; Run with HGIMG4. Both deletion orders should complete without a crash.
+gpreset
+gpbox object_id, 1
+gpnodeinfo proxy_id, object_id, GPNODEINFO_MATERIAL
+delobj object_id
+gpmatprm proxy_id, "u_diffuseColor", 1.0, 0.0, 0.0
+delobj proxy_id
+
+gpbox object_id, 1
+gpnodeinfo proxy_id, object_id, GPNODEINFO_MATERIAL
+delobj proxy_id
+gpmatprm object_id, "u_diffuseColor", 0.0, 1.0, 0.0
+delobj object_id
+
+; Reassigning a material repeatedly should not retain the old clones.
+gpcolormat material_id, $ffffff, GPOBJ_MATOPT_NOLIGHT
+gpbox object_id, 1
+repeat 1000
+    gpsetprm object_id, PRMSET_USEGPMAT, material_id
+loop
+delobj object_id
+gpreset
+mes "completed"
+stop
