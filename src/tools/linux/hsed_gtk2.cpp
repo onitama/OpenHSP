@@ -792,10 +792,10 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	switch( flag ) {
 	case 1:
-		sprintf(cmd,"./hspcmp -i -u %s/start.ax",mydir);
+		sprintf(cmd,"./hspcmp -i -u \"%s/start.ax\"",mydir);
 		break;
 	default:
-		sprintf(cmd,"./hspcmp -d -i -u %s/%s",mydir,TEMP_HSP);  // -o obj
+		sprintf(cmd,"./hspcmp -d -i -u \"%s/%s\"",mydir,TEMP_HSP);  // -o obj
 		break;
 	}
 
@@ -827,7 +827,7 @@ static void HSP_run(GtkWidget *w,int flag)
 
 	// ランタイムを取得する
 	p = 0;
-	sprintf(cmd,"%s/hspcmp -e0 %s", hspdir,TEMP_AX);
+	sprintf(cmd,"\"%s/hspcmp\" -e0 %s", hspdir,TEMP_AX);
 	fp=popen(cmd,"r");
 	while(feof(fp)==0){
 		p+=fread(complog+p,1,400,fp);
@@ -866,11 +866,11 @@ static void HSP_run(GtkWidget *w,int flag)
 
 
 	if ( needres ) {
-		sprintf(cmd,"%s/%s -r %s",hspdir, runtime, TEMP_AX);
+		sprintf(cmd,"\"%s/%s\" -r %s",hspdir, runtime, TEMP_AX);
 	} else {
 //		sprintf(cmd,"/usr/bin/lxterminal --working-directory=\"%s\" --command=\"%s/hspcmp %s %s --syspath=%s/\""
 //			, mydir, hspdir, option, TEMP_AX, hspdir );
-		sprintf(cmd,"%s/hspcmp %s %s --syspath=%s/",hspdir, option, TEMP_AX, hspdir);
+		sprintf(cmd,"\"%s/hspcmp\" %s %s --syspath=\"%s/\"",hspdir, option, TEMP_AX, hspdir);
 	}
 
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(edit),FALSE);
@@ -1081,11 +1081,11 @@ static void HSP_help(GtkWidget *w,int flag)
 
 	p = dpm_exist( HELPMES_AX );
 	if ( p <= 0 ) {
-		sprintf( cmd, "%s/hspcmp -i -u hspsdk/hsphelp/helpmes.hsp -o%s/%s", hspdir, hspdir,HELPMES_AX );
+		sprintf( cmd, "\"%s/hspcmp\" -i -u hspsdk/hsphelp/helpmes.hsp \"-o%s/%s\"", hspdir, hspdir,HELPMES_AX );
 		getCommandResult(cmd);
 	}
 
-	sprintf(cmd,"%s/hsp3cl %s \"%s\"",hspdir,HELPMES_AX,helpkw);
+	sprintf(cmd,"\"%s/hsp3cl\" %s \"%s\"",hspdir,HELPMES_AX,helpkw);
 	getCommandResult(cmd);
 
 	chdir(mydir);
