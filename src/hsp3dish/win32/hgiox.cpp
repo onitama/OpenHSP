@@ -17,16 +17,11 @@
 #include "hgtex.h"
 #include "filedlg.h"
 
+#include "dx11_renderer.h"
+
 #include "../texmes.h"
 #include "../emscripten/fontsystem.h"
 void hgio_fontsystem_win32_init(HWND wnd);
-
-#define RELEASE(x) 	if(x){x->Release();x=NULL;}
-
-#pragma comment(lib, "d3d8.lib")
-#pragma comment(lib, "d3dx8.lib")
-#pragma comment(lib, "d3dxof.lib")
-#pragma comment(lib, "dxguid.lib")
 
 /*------------------------------------------------------------*/
 /*
@@ -48,7 +43,7 @@ void InitMemFile( void )
 int OpenMemFilePtr( char *fname )
 {
 	int fsize;
-	fsize = dpm_exist( fname );		// ファイルのサイズを取得
+	fsize = (int)dpm_exist( fname );		// ファイルのサイズを取得
 	if ( fsize <= 0 ) {
 		return -1;
 	}
@@ -77,18 +72,21 @@ void CloseMemFilePtr( void )
 
 /*------------------------------------------------------------*/
 /*
-		DirectX8 Service
+		DirectX11 Service
 */
 /*------------------------------------------------------------*/
 
 //		Settings
 //
+HGIO_DX11_RENDERER *render = NULL;
+
 static		char *lpDest;		// 描画画面のバッファ
 static		int nDestWidth;		// 描画座標幅
 static		int nDestHeight;	// 描画座標高さ
 
 static		HWND master_wnd;	// 表示対象Window
 static		int drawflag;		// レンダー開始フラグ
+static		bool need_vsync;	// VSync有効フラグ
 
 static		texmesManager tmes;	// テキストメッセージマネージャー
 
@@ -97,6 +95,10 @@ static		char m_tfont[256];	// テキスト使用フォント
 static		int m_tsize;		// テキスト使用フォントのサイズ
 static		int m_tstyle;		// テキスト使用フォントのスタイル指定
 static		float center_x, center_y;
+
+static		int lineColor = 0;
+static		float lineBaseX = 0.0f;
+static		float lineBaseY = 0.0f;
 
 static		BMSCR *backbm;		// 背景消去用のBMSCR(null=NC)
 
@@ -108,267 +110,10 @@ static		MATRIX mat_unproj;	// プロジェクション逆変換マトリクス
 static		HCURSOR cursor_arrow;	// 通常カーソル
 static		HCURSOR cursor_ibeam;	// テキストエリア用カーソル
 
-//		DirectX objects
-//
-static		D3DDISPLAYMODE target_disp;
-static		LPDIRECT3D8 d3d = NULL;
-static		LPDIRECT3DDEVICE8 d3ddev = NULL;
-static		D3DDEVTYPE	d3ddevtype;
-static		D3DPRESENT_PARAMETERS d3dapp;
-
 #define CIRCLE_DIV 32
 #define DEFAULT_FONT_NAME ""
 #define DEFAULT_FONT_SIZE 18
 #define DEFAULT_FONT_STYLE 0
-
-/*------------------------------------------------------------*/
-/*
-		Direct3D interface
-*/
-/*------------------------------------------------------------*/
-
-typedef struct _D3DTLVERTEX_ {
-	float x,y,z;
-	float rhw;
-	DWORD color;
-	DWORD specular;
-	float tu0,tv0;
-}D3DTLVERTEX;
-
-typedef struct _D3DTLVERTEXC_ {
-	float x, y, z;
-	float rhw;
-	DWORD color;
-	DWORD specular;
-}D3DTLVERTEXC;
-
-typedef struct _D3DEXVERTEX_ {
-	float x, y, z;
-	DWORD color;
-	//	DWORD specular;
-	float tu0, tv0;
-}D3DEXVERTEX;
-
-typedef struct _D3DEXVERTEXC_ {
-	float x, y, z;
-	DWORD color;
-	DWORD specular;
-}D3DEXVERTEXC;
-
-//	頂点フォーマット
-//
-#define D3DFVF_TLVERTEX 		(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
-#define D3DFVF_TLVERTEXC 		(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR )
-
-#define D3DFVF_EXVERTEXC 		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR )
-#define D3DFVF_EXVERTEX 		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-
-#define vertex2D_max 5
-
-static D3DTLVERTEX vertex2D[ vertex2D_max ];
-static D3DTLVERTEXC vertex2DC[ vertex2D_max ];
-static D3DEXVERTEX vertex2DEX[vertex2D_max];
-static D3DEXVERTEXC vertex2DEXC[vertex2D_max];
-static float linebasex, linebasey;
-
-static void InitDraw( void )
-{
-    d3ddev->SetRenderState( D3DRS_ZENABLE, FALSE);			// T&L使用時
-//	d3ddev->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESS );
-	d3ddev->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
-//	d3ddev->SetRenderState( D3DRS_AMBIENT, 0xff808080 );
-//    d3ddev->SetRenderState( D3DRS_AMBIENT, 0xffffffff);
-	d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	//d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	//d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
-
-	d3ddev->SetRenderState(D3DRS_LIGHTING,FALSE);           //ライティングしない
-	//d3ddev->SetRenderState(D3DRS_COLORVERTEX,TRUE);
-	d3ddev->SetRenderState( D3DRS_COLORVERTEX, FALSE );
-
-//	d3ddev->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR  );
-//	d3ddev->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTEXF_LINEAR  );
-	d3ddev->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTEXF_POINT  );
-	d3ddev->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTEXF_POINT  );
-
-	//	DiffuseA x TextureA をAlpha値とする
-	d3ddev->SetTextureStageState( 0,D3DTSS_ALPHAOP,D3DTOP_MODULATE );
-	d3ddev->SetTextureStageState( 0,D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-	d3ddev->SetTextureStageState( 0,D3DTSS_ALPHAARG2, D3DTA_CURRENT );
-
-	//  αテスト
-	d3ddev -> SetRenderState( D3DRS_ALPHATESTENABLE, TRUE );
-	d3ddev -> SetRenderState( D3DRS_ALPHAREF, 0 );
-	d3ddev -> SetRenderState( D3DRS_ALPHAFUNC, D3DCMP_NOTEQUAL );
-}
-
-
-static int Init3DDevicesW( HWND hwnd )
-{
-	//
-	//	Direct3Dデバイス初期化
-	//
-	int vmode;
-	D3DDISPLAYMODE dmode;
-	unsigned long VertexShaderVersion;
-
-	//現在のディスプレイモードを得る
-	if(FAILED( d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT,&dmode)))	//DEFAULT指定でプライマリアダプタを選択
-//	if(FAILED( d3d->GetDisplayMode(&dmode)))	//DEFAULT指定でプライマリアダプタを選択
-	{
-		SetSysReq( SYSREQ_RESULT, 2 );
-		return FALSE;
-	}
-
-	//バックサーフェースのフォーマットをコピーして使用する
-	ZeroMemory( &d3dapp, sizeof(d3dapp) );
-	d3dapp.Windowed = TRUE;							//ウィンドウモード
-	d3dapp.SwapEffect = D3DSWAPEFFECT_DISCARD;		//垂直同期でフリップ
- 
-	d3dapp.BackBufferFormat = dmode.Format;
-	d3dapp.BackBufferCount = 1;
-	d3dapp.MultiSampleType = D3DMULTISAMPLE_NONE;
-	d3dapp.hDeviceWindow = hwnd;
-
-	if ( GetSysReq( SYSREQ_DXMODE ) ) {
-		d3dapp.Windowed = FALSE;
-		d3dapp.BackBufferWidth = GetSysReq( SYSREQ_DXWIDTH );
-		d3dapp.BackBufferHeight = GetSysReq( SYSREQ_DXHEIGHT );
-		if ( GetSysReq( SYSREQ_DXVSYNC ) ) {
-			d3dapp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-		} else {
-			d3dapp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
-		}
-	}
-
-	// Z バッファの自動作成(T&L使用時)
-	d3dapp.EnableAutoDepthStencil = TRUE;
-	d3dapp.AutoDepthStencilFormat = D3DFMT_D16;
-
-	target_disp = dmode;
-	vmode = dmode.Format;
-	SetSysReq( SYSREQ_RESVMODE, vmode );
-
-
-	//==============================================================================
-	// シェーダーバージョン取得
-	//==============================================================================
-	D3DCAPS8 caps;
-	d3d->GetDeviceCaps( 0, D3DDEVTYPE_HAL, &caps );
-	VertexShaderVersion = caps.VertexShaderVersion;
-
-	//==============================================================================
-	// デバイスの生成
-	//==============================================================================
-
-	int devset;
-	devset = 0;
-	if ( GetSysReq( SYSREQ_FPUPRESERVE ) ) {
-		devset |= D3DCREATE_FPU_PRESERVE;
-	}
-
-	// 頂点シェーダーの1.1はあるのんか？(なぜか1.1だと動かない機種が出るのでなし)
-	//	if ( VertexShaderVersion >= D3DVS_VERSION(1,1) )
-	d3ddevtype = D3DDEVTYPE_HAL;
-	if ( VertexShaderVersion >= D3DVS_VERSION(1,0) )
-	{
-		// HARDWARE T&L
-		if FAILED( d3d->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hwnd, D3DCREATE_HARDWARE_VERTEXPROCESSING | devset, &d3dapp, &d3ddev ) )
-		{
-			// SOFTWARE T&L
-			if FAILED( d3d->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hwnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING | devset, &d3dapp, &d3ddev ) )
-			{
-				// REFERENCE RASTERIZE
-				if FAILED( d3d->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, hwnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING | devset, &d3dapp, &d3ddev ) )
-				{				
-					// だめそうです
-					MessageBox( NULL,"Direct3Dデバイスの生成に失敗しました", "Error" , MB_OK | MB_ICONSTOP );
-					SetSysReq( SYSREQ_RESULT, 3 );
-					return false;
-				} else {
-					d3ddevtype = D3DDEVTYPE_REF;				// 奇跡的にREFがあった場合
-					vmode|=0x1000;
-				}
-			}
-		}
-	}
-	else
-	{
-			// SOFTWARE T&L
-			if FAILED( d3d->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hwnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING | devset, &d3dapp, &d3ddev ) )
-			{
-				// REFERENCE RASTERIZE
-				if FAILED( d3d->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, hwnd, D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE | devset, &d3dapp, &d3ddev ) )
-				{				
-					// だめそうです
-					MessageBox( NULL,"Direct3Dデバイスの生成に失敗しました", "Error" , MB_OK | MB_ICONSTOP );
-					SetSysReq( SYSREQ_RESULT, 3 );
-					return false;
-				} else {
-					d3ddevtype = D3DDEVTYPE_REF;				// 奇跡的にREFがあった場合
-					vmode|=0x1000;
-				}
-			}
-	}
-
-	//D3DXCreateTextureFromFile(pD3DDevice,"chr.bmp",&pTexture);
-
-	//バックバッファを得る
-	//pD3DDevice->GetBackBuffer(0,D3DBACKBUFFER_TYPE_MONO,&pBackBuffer);
-
-	SetSysReq( SYSREQ_RESVMODE, vmode );
-	SetSysReq( SYSREQ_PTRD3D, (int)d3d );
-	SetSysReq( SYSREQ_PTRD3DDEV, (int)d3ddev );
-
-	InitDraw();
-
-	return TRUE;
-}
-
-
-static void Term3DDevices( void )
-{
-	//
-	//	Direct3Dデバイス解放
-	//
-	d3ddev->Reset(&d3dapp);
-	RELEASE( d3ddev );
-	delete d3ddev;
-	RELEASE( d3d );
-	delete d3d;
-}
-
-
-static void InitVertexTemp( void )
-{
-	int i;
-	D3DTLVERTEX *v;
-	D3DTLVERTEXC* vc;
-	D3DEXVERTEX* ve;
-	D3DEXVERTEXC* vec;
-	for( i=0;i<vertex2D_max;i++ ) {
-		v = &vertex2D[ i ];
-		v->z = 0.0f;
-		v->rhw = 1.0f;
-		v->color = 0;
-		v->specular = 0;
-
-		vc = &vertex2DC[ i ];
-		vc->z = 0.0f;
-		vc->rhw = 1.0f;
-		vc->color = 0;
-		vc->specular = 0;
-
-		ve = &vertex2DEX[i];
-		ve->z = 0.0f;
-		ve->color = 0;
-
-		vec = &vertex2DEXC[i];
-		vec->z = 0.0f;
-		vec->color = 0;
-		vec->specular = 0;
-	}
-}
 
 
 static int Get2N(int val)
@@ -381,110 +126,10 @@ static int Get2N(int val)
 	return res;
 }
 
-
 int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mode )
 {
 	//	VRAMの情報を取得する
 	//
-	HRESULT hr;
-	IDirect3DSurface8 *pBackBuffer;
-	IDirect3DSurface8 *pTmp;
-	RECT tmparea;
-	D3DLOCKED_RECT rect;
-	BYTE *base;
-	BYTE *hspvram;
-	int *data;
-	int i,j,k,ofsx,xand;
-	int sx_fix, sy_fix;
-
-	//バックバッファを得る
-
-	hr = d3ddev->GetBackBuffer(0,D3DBACKBUFFER_TYPE_MONO,&pBackBuffer);
-	if ( FAILED(hr) ) return -1;
-
-	sx_fix = sx;
-	sy_fix = sy;
-	if (sx_fix > hgio_getWidth()) { sx_fix = hgio_getWidth(); }
-	if (sy_fix > hgio_getHeight()) { sy_fix = hgio_getHeight(); }
-
-	// ARGB用フォーマットのサーフェースをつくる
-	int main_sx = Get2N(hgio_getWidth());
-	int main_sy = Get2N(hgio_getHeight());
-	hr = d3ddev->CreateImageSurface(main_sx, main_sy, D3DFMT_A8R8G8B8, &pTmp);
-	if (FAILED(hr)) {
-		if (main_sx < main_sy) {
-			main_sx = main_sy;
-		}
-		else {
-			if (main_sx > main_sy) main_sy = main_sx;
-		}
-		hr = d3ddev->CreateImageSurface(main_sx, main_sy, D3DFMT_A8R8G8B8, &pTmp);
-		if (FAILED(hr)) return -5;
-	}
-
-	tmparea.left = 0;
-	tmparea.top = 0;
-	tmparea.right = sx - 1;
-	tmparea.bottom = sy - 1;
-
-	hr = D3DXLoadSurfaceFromSurface( pTmp, NULL, &tmparea, pBackBuffer, NULL, NULL, D3DX_FILTER_NONE, 0 );
-	if ( FAILED(hr) ) return -4;
-
-	hr = pTmp->LockRect( &rect, NULL, 0 );
-	if ( FAILED(hr) ) return -3;
-
-	data = (int *)res;
-	xand = ( px - 1 )<<2;
-	switch( mode ) {
-	case 0:
-		//	HSP互換(RGBA)
-		for (j = 0; j < sy_fix; j += py) {
-			hspvram = ((BYTE *)res) + ((sx * 4) * j);
-			base = ((BYTE *)rect.pBits) + rect.Pitch * j;
-			for (i = 0; i < sx_fix; i += px) {
-				*hspvram++ = base[2];
-				*hspvram++ = base[1];
-				*hspvram++ = base[0];
-				*hspvram++ = 0xff;
-				base += 4;
-			}
-		}
-		break;
-	case 1:
-		//	OpenGL互換(BGRA)
-		for (j = 0; j < sy_fix; j += py) {
-			hspvram = ((BYTE *)res) + ((sx * 4) * j);
-			base = ((BYTE *)rect.pBits) + rect.Pitch * j;
-			for (i = 0; i < sx_fix; i += px) {
-				*hspvram++ = base[0];
-				*hspvram++ = base[1];
-				*hspvram++ = base[2];
-				*hspvram++ = 0xff;
-				base += 4;
-			}
-		}
-		break;
-
-	default:
-		for(j=0;j<sy;j+=py) {
-			base = ((BYTE *)rect.pBits ) + rect.Pitch * j;
-			for(i=0;i<sx;i+=px) {
-				for(k=0;k<4;k++) {
-					ofsx = (i+k)<<2;
-					//*data++  = 0x33 * k;
-					*data++  = (base[ofsx+2]<<16)|(base[ofsx+1]<<8)|base[ofsx];
-					//*data++  = (base[2]<<16)|(base[1]<<8)|base[0];
-					//base+=4;
-				}
-			}
-		}
-		break;
-	}
-
-	pTmp->UnlockRect();
-
-	pTmp->Release();
-	pBackBuffer->Release();
 	return 0;
 }
 
@@ -494,88 +139,19 @@ static void ClearDest( int mode, int color, int tex )
 	switch ( mode ) {
 	case CLSMODE_NONE:
 		//消去(Zバッファのみ)
-		d3ddev->Clear(0,NULL,D3DCLEAR_ZBUFFER,color,1.0f,0);
+		//d3ddev->Clear(0,NULL,D3DCLEAR_ZBUFFER,color,1.0f,0);
 		break;
 	case CLSMODE_SOLID:
 		//塗りつぶして消去
-		d3ddev->Clear(0,NULL,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,color,1.0f,0);	// T&L使用時
+		//d3ddev->Clear(0,NULL,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,color,1.0f,0);	// T&L使用時
 		break;
 	case CLSMODE_TEXTURE:
 		{
 		//テクスチャで消去
-		int i;
-		D3DTLVERTEX v[4];
-		TEXINF *texinf;
-		d3ddev->Clear(0,NULL,D3DCLEAR_ZBUFFER,color,1.0f,0);
-		ChangeTex( tex );
-		texinf = GetTex( tex );
-		d3ddev->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
-		d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, FALSE );
-		d3ddev->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
-
-		v[3].x = (float)-0.5f; v[3].y = (float)-0.5f;
-		v[2].x = (float)(nDestWidth)-0.5f; v[2].y = v[3].y;
-		v[1].x = v[2].x; v[1].y = (float)(nDestHeight)-0.5f;
-		v[0].x = v[3].x; v[0].y = v[1].y;
-	
-		for(i=0;i<4;i++) {
-			v[i].z = 0.0f;
-			v[i].rhw = 1.0f;
-			v[i].color = 0xffffffff;
-			v[i].specular = 0;
-			if ( v[i].x < 0.0f ) v[i].tu0 = 0.0f; else v[i].tu0 = texinf->ratex * texinf->width;
-			if ( v[i].y < 0.0f ) v[i].tv0 = 0.0f; else v[i].tv0 = texinf->ratey * texinf->height;
-		}
-		//デバイスに使用する頂点フォーマットをセットする
-		d3ddev->SetVertexShader(D3DFVF_TLVERTEX);
-		// とりあえず直接描画(四角形)
-		d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,v,sizeof(D3DTLVERTEX));
-		//　Zテストを戻す
-		d3ddev->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
-		break;
 		}
 	case CLSMODE_BLUR:
 		{
 		//blur clear
-		int i;
-		int col;
-		D3DTLVERTEX v[4];
-		d3ddev->Clear(0,NULL,D3DCLEAR_ZBUFFER,color,1.0f,0);
-		d3ddev->SetTexture( 0, NULL );
-//	 	d3ddev->BeginScene();
-
-//		d3ddev->SetRenderState( D3DRS_ZENABLE, FALSE );
-		d3ddev->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
-
-		d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, FALSE );
-//		d3ddev->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
-		d3ddev->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-//		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_ZERO );
-//		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		col = color & 0xff;
-
-	
-		v[3].x = (float)0.0f; v[3].y = (float)0.0f;
-		v[2].x = (float)(nDestWidth); v[2].y = (float)0.0f;
-		v[1].x = (float)(nDestWidth); v[1].y = (float)(nDestHeight);
-		v[0].x = (float)0.0f; v[0].y = (float)(nDestHeight);
-	
-		for(i=0;i<4;i++) {
-			v[i].z = 0.0f;
-			v[i].rhw = 1.0f;
-			v[i].color = (col<<24);
-			v[i].specular = 0; v[i].tu0 = 0.0f; v[i].tv0 = 0.0f;
-		}
-		//デバイスに使用する頂点フォーマットをセットする
-		d3ddev->SetVertexShader(D3DFVF_TLVERTEX);
-		// とりあえず直接描画(四角形)
-		d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,v,sizeof(D3DTLVERTEX));
-		//　Zテストを戻す
-		d3ddev->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
-//		d3ddev->SetRenderState( D3DRS_ZENABLE, TRUE );
-//		d3ddev->EndScene();
 		break;
 		}
 	}
@@ -586,8 +162,9 @@ static void InitTexture(void)
 {
 	//		テクスチャ情報初期化
 	//
-	TexSetD3DParam(d3d, d3ddev, target_disp);
+	TexSetParam(render);
 	TexInit();
+
 
 	//		テキストを初期化
 	//
@@ -619,6 +196,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	drawflag = 0;
 	nDestWidth = sx;
 	nDestHeight = sy;
+	need_vsync = false;
 
 	hgio_fontsystem_win32_init(master_wnd);
 
@@ -628,16 +206,21 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 
 	//	Direct3Dオブジェクトの取得
 	//
-	d3d = Direct3DCreate8(D3D_SDK_VERSION);
-	if( d3d == NULL ) {
+	render = new HGIO_DX11_RENDERER;
+	if(render == NULL ) {
 		SetSysReq( SYSREQ_RESULT, 1 );
+		return;
+	}
+
+	// DX11デバイスとスワップチェーンを作成する。
+	if (!render->Create(master_wnd, sx, sy,
+		GetSysReq(SYSREQ_DXMODE) != 0, GetSysReq(SYSREQ_DXVSYNC) == 0)) {
+		SetSysReq(SYSREQ_RESULT, 1);
 		return;
 	}
 
 	//		デバイス初期化
 	//
-	Init3DDevicesW( (HWND)hwnd );
-	InitVertexTemp();
 	InitTexture();
 
 	//		infovalをリセット
@@ -664,41 +247,14 @@ void hgio_clsmode( int mode, int color, int tex )
 
 void hgio_resize_window(int x, int y)
 {
-	if (d3ddev == NULL) return;
-
-	HRESULT hr;
-	IDirect3DSurface8* pBackBuffer;
-	D3DSURFACE_DESC pDesc;
-
-	//バックバッファを得る
-
-	hr = d3ddev->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-	if (FAILED(hr)) return;
-
-	hr = pBackBuffer->GetDesc(&pDesc);
-	if (FAILED(hr)) return;
-
-	pBackBuffer->Release();
-
-	nDestWidth = pDesc.Width;
-	nDestHeight = pDesc.Height;
-	//d3dapp.BackBufferWidth = pDesc.Width;
-	//d3dapp.BackBufferHeight = pDesc.Height;
-	//d3ddev->Reset(&d3dapp);
+	if (render == NULL) return;
+	if (render->Resize(x, y)) { nDestWidth = x; nDestHeight = y; }
 }
 
 
 int hgio_device_ready(void)
 {
-	HRESULT hr;
-	if (FAILED(hr = d3ddev->TestCooperativeLevel())) {
-
-		if (D3DERR_DEVICELOST == hr) return -1;
-		if (D3DERR_DEVICENOTRESET == hr) {
-			return 0;
-		}
-	}
-	return 1;
+	return 0;
 }
 
 
@@ -707,31 +263,7 @@ int hgio_device_restore( void )
 	//	デバイスの修復
 	//		(0=OK/1=NG)
 	//
-	HRESULT hr;
-	if( FAILED( hr = d3ddev->TestCooperativeLevel() ) ) {
-
-		if( D3DERR_DEVICELOST == hr ) return -1;
-		if( D3DERR_DEVICENOTRESET == hr ) {
-
-			//		デバイス再初期化
-			//
-//			VertexShaderTerm();
-			hr = d3ddev->Reset(&d3dapp);
-			if ( FAILED(hr) ) {
-				return -2;
-			}
-			Init3DDevicesW( master_wnd );
-			InitVertexTemp();
-			InitTexture();
-			//			VertexShaderInit();
-			TexSetD3DParam( d3d, d3ddev, target_disp );
-
-			SetSysReq(SYSREQ_DEVLOST, 0);			// デバイス戻った
-			drawflag = 0;
-			return 0;
-		}
-	}
-	return -2;
+	return 0;
 }
 
 
@@ -750,45 +282,18 @@ int hgio_render_end( void )
 
 	res = 0;
 
-	//テクスチャステージのリセット
-	d3ddev->SetTexture( 0, NULL );
 	//シーンレンダー終了
-	d3ddev->EndScene();
-	hr =  d3ddev->Present(NULL,NULL,NULL,NULL);
+	hr = render->EndFrame(GetSysReq(SYSREQ_DXVSYNC) == 0);
 	if (FAILED(hr)) {
 		res = -1;
 	}
-	SetSysReq( SYSREQ_DEVLOST, res );
+	SetSysReq(SYSREQ_DEVLOST, res);
 	drawflag = 0;
 
 	if (res == 0) {
 		tmes.texmesProc();
 	}
 	return res;
-}
-
-
-static void Mat2D3DMAT(D3DXMATRIX* dst, MATRIX* src)
-{
-	dst->_11 = src->m00;
-	dst->_12 = src->m01;
-	dst->_13 = src->m02;
-	dst->_14 = src->m03;
-
-	dst->_21 = src->m10;
-	dst->_22 = src->m11;
-	dst->_23 = src->m12;
-	dst->_24 = src->m13;
-
-	dst->_31 = src->m20;
-	dst->_32 = src->m21;
-	dst->_33 = src->m22;
-	dst->_34 = src->m23;
-
-	dst->_41 = src->m30;
-	dst->_42 = src->m31;
-	dst->_43 = src->m32;
-	dst->_44 = src->m33;
 }
 
 
@@ -799,42 +304,31 @@ int hgio_render_start( void )
 		hgio_render_end();
 	}
 
-	//	マトリクスを設定
-	D3DXMATRIX matrixIdentitiy;
-	ZeroMemory(&matrixIdentitiy, sizeof(matrixIdentitiy));
-	matrixIdentitiy._11 = 1.0f;
-	matrixIdentitiy._22 = 1.0f;
-	matrixIdentitiy._33 = 1.0f;
-	matrixIdentitiy._44 = 1.0f;
-	d3ddev->SetTransform(D3DTS_WORLD, &matrixIdentitiy);
-	d3ddev->SetTransform(D3DTS_VIEW, &matrixIdentitiy);
-
-	//D3DXMATRIX matrixView;
-	//Mat2D3DMAT(&matrixView, GetCurrentMatrixPtr());
-	//d3ddev->SetTransform(D3DTS_VIEW, &matrixView);
-
 	//	標準の投影マトリクスを設定する
-	D3DXMATRIX matrixProj;
-	MATRIX *mymat = &mat_proj;
 	UnitMatrix();
-	OrthoMatrix(0.0f, 0.0f, (float)nDestWidth, (float)nDestHeight, 0.0f, 1.0f);
-	GetCurrentMatrix(mymat);
-	Mat2D3DMAT(&matrixProj, mymat);
-	d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
+	OrthoMatrix(0.0f, 0.0f, static_cast<float>(nDestWidth), static_cast<float>(nDestHeight), 0.0f, 1.0f);
+	GetCurrentMatrix(&mat_proj);
+	render->SetViewMatrix(&mat_proj);
+
+	hgio_setfilter(0, 0);
+
+	// DX11フレームを開始する。テクスチャ／ブラー背景は従来のClearDestで続けて描く。
+	render->BeginFrame(GetSysReq(SYSREQ_CLSCOLOR)|0xff000000,
+		GetSysReq(SYSREQ_CLSMODE) != CLSMODE_NONE);
+
+	//render->BeginFrame(0xff202838, true);
+	render->SetBlend(HGIO_BLEND_COPY, false);
 
 	//	画面クリア
 	int bgtex = -1;
 	if (backbm != NULL) { bgtex = backbm->texid; }
-	ClearDest(GetSysReq(SYSREQ_CLSMODE), GetSysReq(SYSREQ_CLSCOLOR), bgtex);
+	//ClearDest(GetSysReq(SYSREQ_CLSMODE), GetSysReq(SYSREQ_CLSCOLOR), bgtex);
 
 	//	ユーザー設定の投影マトリクスを設定する
-	hgio_setview(mainbm);
-
-	//	デバイス初期化
-	InitDraw();
+	if (mainbm) hgio_setview(mainbm);
+	//render->SetViewMatrix(&mymat);
 
 	//シーンレンダー開始
-	d3ddev->BeginScene();
 	TexReset();
 	drawflag = 1;
 
@@ -894,7 +388,7 @@ void hgio_term( void )
 	hgio_render_end();
 	tmes.texmesTerm();
 	TexTerm();
-	Term3DDevices();
+	render->Destroy();
 	GeometryTerm();
 }
 
@@ -978,7 +472,7 @@ int hgio_redraw( BMSCR *bm, int flag )
 		}
 	}
 	SetCursor(hc);
-	SetClassLong(hwnd, -12, (LONG)hc);
+	SetClassLongPtr(hwnd, -12, (LONG_PTR)hc);
 
 	return 0;
 }
@@ -1017,12 +511,50 @@ int hgio_dialog( int mode, char *str1, char *str2 )
 {
 	//		dialog表示
 	//
-	int i,res;
-	i = 0;
+	int res;
+	int i;
+	int p1, p2;
+	char* ptr;
+	char* ps;
+	char stmp[0x4000];
+	HSPAPICHAR* hactmp1 = 0;
+	HSPAPICHAR* hactmp2 = 0;
+	ptr = str1;
+	strncpy(stmp, ptr, 0x4000 - 1);
+	p1 = mode;
+	ps = str2;
+	p2 = 0;
+	res = 0;
 
-	if (mode&1) i|=MB_ICONEXCLAMATION; else i|=MB_ICONINFORMATION;
-	if (mode&2) i|=MB_YESNO; else i|=MB_OK;
-	res = MessageBox( master_wnd, str1, str2, i );
+	if (p1 >= 64) {
+		return res;
+	}
+	if (p1 & 16) {
+		res = fd_dialog(master_wnd, p1 & 3, stmp, ps);
+		if (res == 0) {
+			//ctx->refstr[0] = 0;
+		}
+		else {
+			//strncpy(ctx->refstr, fd_getfname(), HSPCTX_REFSTR_MAX - 1);
+		}
+	}
+	else if (p1 & 32) {
+		i = (int)fd_selcolor(master_wnd, p1 & 1);
+		if (i == -1) res = 0;
+		else {
+			mainbm->color = i;
+			res = 1;
+		}
+	}
+	else {
+		i = 0;
+		if (p1 & 1) i |= MB_ICONEXCLAMATION; else i |= MB_ICONINFORMATION;
+		if (p1 & 2) i |= MB_YESNO; else i |= MB_OK;
+		res = MessageBox(master_wnd,
+			chartoapichar(stmp, &hactmp1), chartoapichar(ps, &hactmp2), i);
+		freehac(&hactmp1);
+		freehac(&hactmp2);
+	}
 	return res;
 }
 
@@ -1031,7 +563,9 @@ int hgio_title( char *str1 )
 {
 	//		title変更
 	//
-	SetWindowText( master_wnd, str1 );
+	HSPAPICHAR* hactmp1 = 0;
+	SetWindowText(master_wnd, chartoapichar(str1, &hactmp1));
+	freehac(&hactmp1);
 	return 0;
 }
 
@@ -1044,7 +578,7 @@ int hgio_texload( BMSCR *bm, char *fname )
 	TEXINF *tex;
 
 	fsize = OpenMemFilePtr( fname );				// HSPリソースを含めて検索する
-	i = RegistTex( GetMemFilePtr(), fsize, 0, -1, -1, -1 );
+	i = RegistTex( GetMemFilePtr(), fsize );
 	CloseMemFilePtr();
 	if ( i < 0 ) return i;
 
@@ -1129,114 +663,67 @@ int hgio_bufferop(BMSCR* bm, int mode, char *ptr)
 */
 /*------------------------------------------------------------*/
 
-static void SetAlphaMode( int p_alpha )
+// Converts the HSP packed color to the renderer vertex color format.
+static unsigned int ColorWithAlpha(int color, int alpha)
 {
-	//		アルファブレンドオペレーション処理
-	//
-	if ( p_alpha < 2 ) {
-		d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, FALSE );
-		d3ddev->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
-	} else {
-		d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, TRUE );
-		d3ddev->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-	}
-	switch( p_alpha ) {
-	default:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		break;
-	case 5:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
-		break;
-	case 6:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_ZERO );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR );
-		break;
-	case 7:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_ZERO );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		break;
-	}
+	return (static_cast<unsigned int>(alpha & 255) << 24) |
+		(static_cast<unsigned int>(color) & 0x00ffffff);
 }
 
-
-static int GetCopyTexAlpha(BMSCR *bm)
+static void DrawLine(float x0, float y0, float x1, float y1, unsigned int color)
 {
-	//		ブレント設定
-	int alpha;
-	int rate;
-
-	SetAlphaMode(bm->gmode);
-	if (bm->gmode < 3) {
-		alpha = 0xff000000;
-	}
-	else {
-		rate = bm->gfrate;
-		if (rate > 255) rate = 255;
-		alpha = rate << 24;
-	}
-	return alpha;
+	const HGIO_DX11_VERTEX v[] = {
+		{ x0, y0, 0.0f, color, 0.0f, 0.0f },
+		{ x1, y1, 0.0f, color, 0.0f, 0.0f },
+	};
+	render->Draw(HGIO_TOPOLOGY_LINE_LIST, v, ARRAYSIZE(v), false);
 }
 
-
-static int GetCopyTexAlphaMes(BMSCR *bm)
+static void DrawQuad(const HGIO_DX11_VERTEX* vertices, bool textured)
 {
-	//		Alphaを含むテクスチャ用のブレント設定
-	int alpha;
-	int gmode;
-	gmode = bm->gmode;
-	if (gmode < 3) gmode = 3;
-	SetAlphaMode(gmode);
-	if (bm->gmode < 3) {
-		alpha = 0xff000000;
-	}
-	else {
-		alpha = (bm->gfrate & 0xff) << 24;
-	}
-	return alpha;
+	render->Draw(HGIO_TOPOLOGY_TRIANGLE_FAN, vertices, 4, textured);
 }
 
-
-static int SetAlphaModeDG( int p_alpha )
+static void SetAlphaMode(int mode)
 {
-	//		アルファブレンドオペレーション処理(DG用)
-	//
-	int alpha, alphaop;
-	alphaop = p_alpha >> 8;
-	alpha = (p_alpha & 255)<<24;
-	d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, TRUE );
-	d3ddev->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-	switch( alphaop ) {
+	switch (mode) {
 	case 0:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+		render->SetBlend(HGIO_BLEND_COPY, false);
 		break;
-	case 1:
-	case 5:
-		alpha = 0xff000000;
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		break;
-	case 2:
-	case 6:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
-		break;
-	case 3:
-	case 7:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_ZERO );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		break;
-	case 4:
-	case 8:
-		d3ddev->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_ZERO );
-		d3ddev->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR );
+	case 5: render->SetBlend(HGIO_BLEND_ADD, true); break;
+	case 6: render->SetBlend(HGIO_BLEND_SUB, true); break;
+	case 7: render->SetBlend(HGIO_BLEND_INVSRCALPHA, true); break;
+	default:
+		render->SetBlend(HGIO_BLEND_ALPHA, true);
 		break;
 	}
-	return alpha;
 }
 
+static int CopyAlpha(BMSCR* bm, bool forceTextureAlpha)
+{
+	int mode = bm->gmode;
+	if (forceTextureAlpha) {
+		if (mode < 3) mode = 3;
+		SetAlphaMode(mode);
+	} else {
+		SetAlphaMode(mode);
+	}
+	return mode < 3 ? 255 : (bm->gfrate > 255 ? 255 : bm->gfrate);
+}
+
+static void DrawTexturedQuad(BMSCR* bm, int texid, float x0, float y0, float x1, float y1,
+	float u0, float v0, float u1, float v1, int alpha, int rgb)
+{
+	ChangeTex(texid);
+	const unsigned int color = ColorWithAlpha(rgb, alpha);
+	const HGIO_DX11_VERTEX v[] = {
+		{ x0, y0, 0.0f, color, u0, v0 },
+		{ x1, y0, 0.0f, color, u1, v0 },
+		{ x1, y1, 0.0f, color, u1, v1 },
+		{ x0, y1, 0.0f, color, u0, v1 },
+	};
+	DrawQuad(v, true);
+}
 
 /*------------------------------------------------------------*/
 /*
@@ -1251,26 +738,12 @@ void hgio_line( BMSCR *bm, float x, float y )
 	//		(bm==NULL の場合、ライン描画完了)
 	//		(ラインの座標は必要な数だけhgio_line2を呼び出す)
 	//
-	int color;
-	D3DEXVERTEXC *v;
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
-	ChangeTex( -1 );
-	SetAlphaMode( 0 );
-
-	color = bm->color;
-	linebasex = x;
-	linebasey = y;
-
-	v = vertex2DEXC;
-	v[0].color = v[1].color = color;
-
-	d3ddev->SetRenderState( D3DRS_ALPHATESTENABLE, FALSE );
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
+	ChangeTex(-1); SetAlphaMode(0);
+	lineBaseX = x; lineBaseY = y; lineColor = bm->color;
 }
 
 
@@ -1279,60 +752,39 @@ void hgio_line2( float x, float y )
 	//		ライン描画
 	//		(hgio_lineで開始後に必要な回数呼ぶ、hgio_line(NULL)で終了すること)
 	//
-	D3DEXVERTEXC *v;
-	v = vertex2DEXC;
-	v[0].x = (float)linebasex;
-	v[0].y = (float)linebasey;
-	v[1].x = (float)x;
-	v[1].y = (float)y;
-
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_LINELIST,1,vertex2DEXC,sizeof(D3DEXVERTEXC));
-
-	linebasex = x;
-	linebasey = y;
+	DrawLine(lineBaseX, lineBaseY, x, y, ColorWithAlpha(lineColor, 255));
+	lineBaseX = x; lineBaseY = y;
 }
 
 
-void hgio_boxfAlpha(BMSCR *bm, float x1, float y1, float x2, float y2, int alphamode)
+void hgio_boxfAlpha(BMSCR *bm, float x0, float y0, float x1, float y1, int alphamode)
 {
 	//		矩形描画
 	//
-	int col;
-	D3DEXVERTEXC *v;
+	unsigned int color;
 
 	if (bm == NULL) return;
 	if (bm->type != HSPWND_TYPE_MAIN) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	ChangeTex(-1);
-
-	if (alphamode == 0) {
-		col = bm->color;
-		SetAlphaMode(0);
+	if (alphamode) {
+		int alpha = alphamode ? CopyAlpha(bm, false) : 255;
+		color = ColorWithAlpha(bm->color, alpha);
 	}
 	else {
-		col = GetCopyTexAlpha(bm) | (bm->color & 0xffffff);
+		SetAlphaMode(0);
+		color = ColorWithAlpha(bm->color, 255);
 	}
 
-	v = vertex2DEXC;
-	v[0].color = v[1].color = v[2].color = v[3].color = col;
-
-	v[3].x = (float)x1;
-	v[3].y = (float)y1;
-	v[2].x = (float)x2;
-	v[2].y = (float)y1;
-	v[1].x = (float)x2;
-	v[1].y = (float)y2;
-	v[0].x = (float)x1;
-	v[0].y = (float)y2;
-
-	d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertex2DEXC, sizeof(D3DEXVERTEXC));
+	// Opaque blue rectangle.
+	const HGIO_DX11_VERTEX Rect[] = {
+		{ x0, y0, 0.0f, color, 0.0f, 0.0f },
+		{ x1, y0, 0.0f, color, 0.0f, 0.0f },
+		{ x1, y1, 0.0f, color, 0.0f, 0.0f },
+		{ x0, y1, 0.0f, color, 0.0f, 0.0f },
+	};
+	DrawQuad(Rect, false);
 }
 
 
@@ -1342,61 +794,27 @@ void hgio_boxf( BMSCR *bm, float x1, float y1, float x2, float y2 )
 }
 
 
-void hgio_circle( BMSCR *bm, float x1, float y1, float x2, float y2, int mode )
+void hgio_circle(BMSCR* bm, float x0, float y0, float x1, float y1, int mode)
 {
 	//		円描画
 	//
-	D3DEXVERTEXC *v;
-	D3DEXVERTEXC arScreen[CIRCLE_DIV + 2];
-	int col;
-	float x,y,rx,ry,sx,sy,rate;
-
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
-	rate = D3DX_PI * 2.0f / (float)CIRCLE_DIV;
-	sx = (float)fabs(x2-x1); sy = (float)fabs(y2-y1);
-	rx = sx * 0.5f;
-	ry = sy * 0.5f;
-	x = x1 + rx;
-	y = y1 + ry;
-
+	const float cx = (x0 + x1) * 0.5f, cy = (y0 + y1) * 0.5f, rx = fabsf(x1 - x0) * 0.5f, ry = fabsf(y1 - y0) * 0.5f;
+	const float step = 6.283185307179586f / CIRCLE_DIV;
 	if (mode == 0) {
-		float xx, yy;
-		for (int i = 0; i <= CIRCLE_DIV; i++) {
-			xx = x + cos((float)i * rate) * rx;
-			yy = y + sin((float)i * rate) * ry;
-			if (i == 0) {
-				hgio_line(bm, xx, yy);
-			}
-			else {
-				hgio_line2(xx, yy);
-			}
+		for (int i = 0; i <= CIRCLE_DIV; ++i) {
+			const float x = cx + cosf(i * step) * rx, y = cy + sinf(i * step) * ry;
+			if (i) DrawLine(lineBaseX, lineBaseY, x, y, ColorWithAlpha(bm->color, 255));
+			lineBaseX = x; lineBaseY = y;
 		}
-		hgio_line(NULL, 0.0f, 0.0f);
 		return;
 	}
-
-	ChangeTex( -1 );
-	SetAlphaMode( 0 );
-	col = bm->color;
-
-	v = arScreen;
-	for(int i = 1; i<=CIRCLE_DIV + 1; i ++) {
-		v->x = x + (float)cos((float)i * rate)*rx;
-		v->y = y + (float)sin((float)i * rate)*ry;
-		v->z = 0.0f;
-		v->color = col;
-		v++;
-	}
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
-	// とりあえず直接描画(四角形)
-	d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,CIRCLE_DIV,arScreen,sizeof(D3DEXVERTEXC));
-	d3ddev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
+	HGIO_DX11_VERTEX v[CIRCLE_DIV + 2];
+	for (int i = 0; i <= CIRCLE_DIV; ++i) v[i] = { cx + cosf(i * step) * rx,cy + sinf(i * step) * ry,0,ColorWithAlpha(bm->color,255),0,0 };
+	render->Draw(HGIO_TOPOLOGY_TRIANGLE_FAN, v, CIRCLE_DIV + 1, false);
 }
 
 
@@ -1404,68 +822,39 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 {
 	//		矩形(回転)描画
 	//
-	D3DEXVERTEXC *v;
-	float x0,y0,x1,y1,ofsx,ofsy;
-
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
-	ofsx = sx;
-	ofsy = sy;
-	x0 = -(float)sin( ang );
-	y0 = (float)cos( ang );
-	x1 = -y0;
-	y1 = x0;
+	ChangeTex(-1);
+	const float sinAngle = sinf(ang);
+	const float cosAngle = cosf(ang);
+	const float halfX = sx * 0.5f;
+	const float halfY = sy * 0.5f;
+	const float axisXx = cosAngle * halfX;
+	const float axisXy = sinAngle * halfX;
+	const float axisYx = -sinAngle * halfY;
+	const float axisYy = cosAngle * halfY;
+	const unsigned int color = ColorWithAlpha(bm->color, CopyAlpha(bm, false));
 
-	ofsx *= -0.5f;
-	ofsy *= -0.5f;
-	x0 *= ofsy;
-	y0 *= ofsy;
-	x1 *= ofsx;
-	y1 *= ofsx;
-
-	ChangeTex( -1 );
-
-	v = vertex2DEXC;
-	v[0].color = v[1].color = v[2].color = v[3].color =  GetCopyTexAlpha( bm ) | (bm->color & 0xffffff);
-
-
-	v->x = (-x0+x1) + x;
-	v->y = (-y0+y1) + y;
-	v++;
-
-	v->x = (x0+x1) + x;
-	v->y = (y0+y1) + y;
-	v++;
-
-	v->x = (x0-x1) + x;
-	v->y = (y0-y1) + y;
-	v++;
-
-	v->x = (-x0-x1) + x;
-	v->y = (-y0-y1) + y;
-	v++;
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEXC,sizeof(D3DEXVERTEXC));
+	const HGIO_DX11_VERTEX v[] = {
+		{ x - axisXx - axisYx, y - axisXy - axisYy, 0.0f, color, 0.0f, 0.0f },
+		{ x + axisXx - axisYx, y + axisXy - axisYy, 0.0f, color, 0.0f, 0.0f },
+		{ x + axisXx + axisYx, y + axisXy + axisYy, 0.0f, color, 0.0f, 0.0f },
+		{ x - axisXx + axisYx, y - axisXy + axisYy, 0.0f, color, 0.0f, 0.0f },
+	};
+	DrawQuad(v, false);
 }
 
 
-void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *bmsrc, float s_psx, float s_psy )
+void hgio_copy(BMSCR* bm, short xx, short yy, short sx, short sy, BMSCR* bmsrc, float scaleX, float scaleY)
 {
 	//		画像コピー
 	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
 	//		カレントポジション、描画モードはBMSCRから取得
 	//
-	D3DEXVERTEX *v;
 	TEXINF *tex;
 	int texid;
-	float psx,psy;
-	float x1,y1,x2,y2,sx,sy;
-	float tx0,ty0,tx1,ty1;
 
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) {
@@ -1474,67 +863,17 @@ void hgio_copy( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, BMSCR *
 	}
 	if (drawflag == 0) hgio_render_start();
 
-	if ( s_psx < 0.0 ) {
-		psx = -s_psx;
-		tx1 = ((float)xx);
-		tx0 = ((float)(xx + srcsx));
-	} else {
-		psx = s_psx;
-		tx0 = ((float)xx);
-		tx1 = ((float)(xx + srcsx));
-	}
-	if ( s_psy < 0.0 ) {
-		psy = -s_psy;
-		ty1 = ((float)yy);
-		ty0 = ((float)(yy + srcsy));
-	} else {
-		psy = s_psy;
-		ty0 = ((float)yy);
-		ty1 = ((float)(yy + srcsy));
-	}
-
-	x1 = ((float)bm->cx);// -0.5f;
-	y1 = ((float)bm->cy);// -0.5f;
-	x2 = x1 + psx;
-	y2 = y1 + psy;
-
 	texid = bmsrc->texid;
-	ChangeTex( texid );
-	tex = GetTex( texid );
-	sx = tex->ratex;
-	sy = tex->ratey;
+	tex = GetTex(texid); if (!tex) return;
 
-	tx0 *= sx;
-	tx1 *= sx;
-	ty0 *= sy;
-	ty1 *= sy;
-	tx0 += tex->ratehx;
-	ty0 += tex->ratehy;
+	const float u0 = xx * tex->ratex + tex->ratehx, v0 = yy * tex->ratey + tex->ratehy;
+	const float u1 = (xx + sx) * tex->ratex, v1 = (yy + sy) * tex->ratey;
+	float fx = ((float)bm->cx) + 0.5f;
+	float fy = ((float)bm->cy) + 0.5f;
+	DrawTexturedQuad(bm, bmsrc->texid, fx, fy, fx + scaleX, fy + scaleY,
+		scaleX < 0 ? u1 : u0, scaleY < 0 ? v1 : v0, scaleX < 0 ? u0 : u1, scaleY < 0 ? v0 : v1,
+		CopyAlpha(bm, false), bm->mulcolor);
 
-	v = vertex2DEX;
-	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) | ( bm->mulcolor );
-
-	v[3].x = x1;
-	v[3].y = y1;
-	v[3].tu0 = tx0;
-	v[3].tv0 = ty0;
-	v[2].x = x2;
-	v[2].y = y1;
-	v[2].tu0 = tx1;
-	v[2].tv0 = ty0;
-	v[1].x = x2;
-	v[1].y = y2;
-	v[1].tu0 = tx1;
-	v[1].tv0 = ty1;
-	v[0].x = x1;
-	v[0].y = y2;
-	v[0].tu0 = tx0;
-	v[0].tv0 = ty1;
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEX);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEX,sizeof(D3DEXVERTEX));
 }
 
 
@@ -1544,11 +883,6 @@ void hgio_fontcopy(BMSCR *bm, int x, int y, int psx, int psy, int texid, int bas
 	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
 	//		カレントポジション、描画モードはBMSCRから取得
 	//
-	D3DEXVERTEX *v;
-	TEXINF *tex;
-	float x1, y1, x2, y2, sx, sy;
-	float tx0, ty0, tx1, ty1;
-
 	if (bm == NULL) return;
 	if (bm->type != HSPWND_TYPE_MAIN) {
 		//Alertf( "type%d #%d",bm->type,bm->wid );
@@ -1556,18 +890,25 @@ void hgio_fontcopy(BMSCR *bm, int x, int y, int psx, int psy, int texid, int bas
 	}
 	if (drawflag == 0) hgio_render_start();
 
+	TEXINF* tex = GetTex(texid);
+	if (!tex) return;
+	ChangeTex(texid);
+
+	HGIO_DX11_VERTEX vertices[4];
+	HGIO_DX11_VERTEX* v;
+	float x1, y1, x2, y2, sx, sy;
+	float tx0, ty0, tx1, ty1;
+
 	tx0 = ((float)(basex));
 	tx1 = ((float)(psx));
 	ty0 = ((float)(basey));
 	ty1 = ((float)(psy));
 
-	x1 = ((float)x) - 0.5f;
-	y1 = ((float)y) - 0.5f;
+	x1 = ((float)x)+0.5f;
+	y1 = ((float)y)+0.5f;
 	x2 = x1 + psx;
 	y2 = y1 + psy;
 
-	ChangeTex(texid);
-	tex = GetTex(texid);
 	sx = tex->ratex;
 	sy = tex->ratey;
 
@@ -1580,58 +921,66 @@ void hgio_fontcopy(BMSCR *bm, int x, int y, int psx, int psy, int texid, int bas
 
 	int col;
 	if (GetSysReq(SYSREQ_FIXMESALPHA)) {
-		col = bm->color;
 		SetAlphaMode(2);
+		col = ColorWithAlpha(bm->color, 255);
 	}
 	else {
-		col = GetCopyTexAlphaMes(bm) | (bm->color & 0xffffff);
+		const int alpha = CopyAlpha(bm, true);
+		col = ColorWithAlpha(bm->color, alpha);
 	}
-
-	v = vertex2DEX;
+	v = &vertices[0];
 	v[0].color = v[1].color = v[2].color = v[3].color = col;
 
-	v[3].x = x1;
-	v[3].y = y1;
-	v[3].tu0 = tx0;
-	v[3].tv0 = ty0;
-	v[2].x = x2;
-	v[2].y = y1;
-	v[2].tu0 = tx1;
-	v[2].tv0 = ty0;
-	v[1].x = x2;
-	v[1].y = y2;
-	v[1].tu0 = tx1;
-	v[1].tv0 = ty1;
 	v[0].x = x1;
-	v[0].y = y2;
-	v[0].tu0 = tx0;
-	v[0].tv0 = ty1;
+	v[0].y = y1;
+	v[0].z = 0.0f;
+	v[0].u = tx0;
+	v[0].v = ty0;
 
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEX);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertex2DEX, sizeof(D3DEXVERTEX));
+	v[1].x = x2;
+	v[1].y = y1;
+	v[1].z = 0.0f;
+	v[1].u = tx1;
+	v[1].v = ty0;
+
+	v[2].x = x2;
+	v[2].y = y2;
+	v[2].z = 0.0f;
+	v[2].u = tx1;
+	v[2].v = ty1;
+
+	v[3].x = x1;
+	v[3].y = y2;
+	v[3].z = 0.0f;
+	v[3].u = tx0;
+	v[3].v = ty1;
+
+	DrawQuad(vertices, true);
 }
 
 
-void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, float s_ofsx, float s_ofsy, BMSCR *bmsrc, float psx, float psy, float ang )
+void hgio_copyrot(BMSCR* bm, short xx, short yy, short srcsx, short srcsy, float s_ofsx, float s_ofsy, BMSCR* bmsrc, float psx, float psy, float ang)
 {
 	//		画像コピー
 	//		texid内の(xx,yy)-(xx+srcsx,yy+srcsy)を現在の画面に(psx,psy)サイズでコピー
 	//		カレントポジション、描画モードはBMSCRから取得
 	//
-	D3DEXVERTEX *v;
-	TEXINF *tex;
-	int texpx,texpy,texid;
-	float x,y,x0,y0,x1,y1,ofsx,ofsy,mx0,mx1,my0,my1;
-	float tx0,ty0,tx1,ty1,sx,sy;
-
-	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if (bm == NULL) return;
+	if (bm->type != HSPWND_TYPE_MAIN) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
-	mx0=-(float)sin( ang );
-	my0=(float)cos( ang );
+	TEXINF* tex = GetTex(bmsrc->texid);
+	if (!tex) return;
+	ChangeTex(bmsrc->texid);
+
+	HGIO_DX11_VERTEX vertices[4];
+	HGIO_DX11_VERTEX *v;
+	int texpx, texpy, texid;
+	float x, y, x0, y0, x1, y1, ofsx, ofsy, mx0, mx1, my0, my1;
+	float tx0, ty0, tx1, ty1, sx, sy;
+
+	mx0 = -(float)sin(ang);
+	my0 = (float)cos(ang);
 	mx1 = -my0;
 	my1 = mx0;
 
@@ -1643,8 +992,8 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	y1 = my1 * ofsx;
 
 	//		基点の算出
-	x = ( (float)bm->cx - (-x0+x1) );
-	y = ( (float)bm->cy - (-y0+y1) );
+	x = ((float)bm->cx - (-x0 + x1));
+	y = ((float)bm->cy - (-y0 + y1));
 
 	/*-------------------------------*/
 
@@ -1659,8 +1008,8 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	/*-------------------------------*/
 
 	texid = bmsrc->texid;
-	ChangeTex( texid );
-	tex = GetTex( texid );
+	ChangeTex(texid);
+	tex = GetTex(texid);
 	sx = tex->ratex;
 	sy = tex->ratey;
 	texpx = xx + srcsx;
@@ -1673,66 +1022,65 @@ void hgio_copyrot( BMSCR *bm, short xx, short yy, short srcsx, short srcsy, floa
 	tx0 += tex->ratehx;
 	ty0 += tex->ratehy;
 
-	v = vertex2DEX;
-	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) |  ( bm->mulcolor );
-
-	/*-------------------------------*/
-
-	v->x = ((-x0+x1) + x);
-	v->y = ((-y0+y1) + y);
-	v->tu0 = tx1;
-	v->tv0 = ty1;
-	v++;
-
-	/*-------------------------------*/
-
-	v->x = ((x1) + x);
-	v->y = ((y1) + y);
-	v->tu0 = tx1;
-	v->tv0 = ty0;
-	v++;
+	v = &vertices[0];
+	const int alpha = CopyAlpha(bm, false);
+	v[0].color = v[1].color = v[2].color = v[3].color = ColorWithAlpha(bm->mulcolor, alpha);
 
 	/*-------------------------------*/
 
 	v->x = (x);
 	v->y = (y);
-	v->tu0 = tx0;
-	v->tv0 = ty0;
+	v->z = 0.0f;
+	v->u = tx0;
+	v->v = ty0;
+	v++;
+
+	/*-------------------------------*/
+
+	v->x = ((x1)+x);
+	v->y = ((y1)+y);
+	v->z = 0.0f;
+	v->u = tx1;
+	v->v = ty0;
+	v++;
+
+	/*-------------------------------*/
+
+	v->x = ((-x0 + x1) + x);
+	v->y = ((-y0 + y1) + y);
+	v->z = 0.0f;
+	v->u = tx1;
+	v->v = ty1;
 	v++;
 
 	/*-------------------------------*/
 
 	v->x = ((-x0) + x);
 	v->y = ((-y0) + y);
-	v->tu0 = tx0;
-	v->tv0 = ty1;
+	v->z = 0.0f;
+	v->u = tx0;
+	v->v = ty1;
 	v++;
 
 	/*-------------------------------*/
 
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEX);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEX,sizeof(D3DEXVERTEX));
+	DrawQuad(vertices, true);
 }
 
 
 void hgio_setfilter( int type, int opt )
 {
-	int ft;
 	switch( type ) {
 	case HGIO_FILTER_TYPE_LINEAR:
-		ft = D3DTEXF_LINEAR;
+		render->SetLinearFilter(true);
 		break;
 	case HGIO_FILTER_TYPE_LINEAR2:
-		ft = D3DTEXF_FLATCUBIC;
+		render->SetLinearFilter(true);
 		break;
 	default:
-		ft = D3DTEXF_POINT;
+		render->SetLinearFilter(false);
 		break;
 	}
-	d3ddev->SetTextureStageState( 0, D3DTSS_MAGFILTER, ft  );
-	d3ddev->SetTextureStageState( 0, D3DTSS_MINFILTER, ft  );
 }
 
 
@@ -1741,127 +1089,47 @@ void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, i
 {
 	//		四角形(square)テクスチャ描画
 	//
-	D3DEXVERTEX *v;
-	TEXINF *tex;
-	int texid;
-	float sx,sy;
-
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
-	texid = bmsrc->texid;
-	ChangeTex( texid );
-	tex = GetTex( texid );
-	if (tex==NULL) throw HSPERR_ILLEGAL_FUNCTION;
-	sx = tex->ratex;
-	sy = tex->ratey;
+	TEXINF* tex = GetTex(bmsrc->texid);
+	if (!tex) return;
 
-	v = vertex2DEX;
-	v[0].color = v[1].color = v[2].color = v[3].color = GetCopyTexAlpha( bm ) | 0xffffff;
-
-	v->x = (float)posx[2];
-	v->y = (float)posy[2];
-	v->tu0 = ((float)uvx[2]) * sx;
-	v->tv0 = ((float)uvy[2]) * sy;
-	v++;
-	v->x = (float)posx[1];
-	v->y = (float)posy[1];
-	v->tu0 = ((float)uvx[1]) * sx;
-	v->tv0 = ((float)uvy[1]) * sy;
-	v++;
-	v->x = (float)posx[0];
-	v->y = (float)posy[0];
-	v->tu0 = ((float)uvx[0]) * sx;
-	v->tv0 = ((float)uvy[0]) * sy;
-	v++;
-	v->x = (float)posx[3];
-	v->y = (float)posy[3];
-	v->tu0 = ((float)uvx[3]) * sx;
-	v->tv0 = ((float)uvy[3]) * sy;
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEX);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEX,sizeof(D3DEXVERTEX));
+	ChangeTex(bmsrc->texid);
+	const unsigned int color = ColorWithAlpha(0x00ffffff, CopyAlpha(bm, false));
+	HGIO_DX11_VERTEX vertices[4];
+	// Preserve the winding used by the original primitive fan.
+	for (int i = 0; i < 4; ++i) {
+		vertices[i] = { static_cast<float>(posx[i]), static_cast<float>(posy[i]), 0.0f, color,
+			uvx[i] * tex->ratex, uvy[i] * tex->ratey };
+	}
+	DrawQuad(vertices, true);
 }
 
 
-void hgio_square( BMSCR *bm, int *posx, int *posy, int *color )
+void hgio_square( BMSCR *bm, int *posx, int *posy, int *colors )
 {
 	//		四角形(square)単色描画
 	//
-	D3DEXVERTEXC *v;
-	int basecolor;
-
 	if ( bm == NULL ) return;
 	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
-	ChangeTex( -1 );
-
-	v = vertex2DEXC;
-	basecolor = GetCopyTexAlpha( bm );
-
-	v[2].color = basecolor | ( color[0] & 0xffffff );
-	v[1].color = basecolor | ( color[1] & 0xffffff );
-	v[0].color = basecolor | ( color[2] & 0xffffff );
-	v[3].color = basecolor | ( color[3] & 0xffffff );
-
-	v->x = (float)posx[2];
-	v->y = (float)posy[2];
-	v++;
-	v->x = (float)posx[1];
-	v->y = (float)posy[1];
-	v++;
-	v->x = (float)posx[0];
-	v->y = (float)posy[0];
-	v++;
-	v->x = (float)posx[3];
-	v->y = (float)posy[3];
-
-	//デバイスに使用する頂点フォーマットをセットする
-	d3ddev->SetVertexShader(D3DFVF_EXVERTEXC);
-	// とりあえず直接描画(四角形)
-	d3ddev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN,2,vertex2DEXC,sizeof(D3DEXVERTEXC));
+	ChangeTex(-1);
+	const int alpha = CopyAlpha(bm, false);
+	HGIO_DX11_VERTEX vertices[4];
+	for (int i = 0; i < 4; ++i) {
+		vertices[i] = { static_cast<float>(posx[i]), static_cast<float>(posy[i]), 0.0f,
+			ColorWithAlpha(colors[i], alpha), 0.0f, 0.0f };
+	}
+	DrawQuad(vertices, false);
 }
 
 
 int hgio_gettick( void )
 {
 	return timeGetTime();
-}
-
-
-int hgio_exec( char *stmp, char *option, int mode )
-{
-	int i,j;
-	j=SW_SHOWDEFAULT;if (mode&2) j=SW_SHOWMINIMIZED;
-
-	if ( *option != 0 ) {
-		SHELLEXECUTEINFO exinfo;
-		memset( &exinfo, 0, sizeof(SHELLEXECUTEINFO) );
-		exinfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		exinfo.fMask = SEE_MASK_INVOKEIDLIST;
-		exinfo.hwnd = master_wnd;
-		exinfo.lpVerb = option;
-		exinfo.lpFile = stmp;
-		exinfo.nShow = SW_SHOWNORMAL;
-		if ( ShellExecuteEx( &exinfo ) == false ) throw HSPERR_EXTERNAL_EXECUTE;
-		return 0;
-	}
-		
-	if ( mode&16 ) {
-		i = (int)ShellExecute( NULL,NULL,stmp,"","",j );
-	}
-	else if ( mode&32 ) {
-		i = (int)ShellExecute( NULL,"print",stmp,"","",j );
-	}
-	else {
-		i=WinExec( stmp,j );
-	}
-	if (i<32) throw HSPERR_EXTERNAL_EXECUTE;
-	return 0;
 }
 
 
@@ -1952,58 +1220,30 @@ void hgio_setview(BMSCR* bm)
 {
 	// vp_flagに応じたビューポートの設定を行う
 	//
-	int i;
-	MATRIX *vmat;
-	MATRIX tmpmat;
-	float* vp;
-	vmat = &mat_proj;
-	vp = (float*)vmat;
-	float* mat = (float*)GetCurrentMatrixPtr();
+	if (!bm || bm->vp_flag == BMSCR_VPFLAG_NOUSE) return;
 
+	MATRIX tmp;
 	switch (bm->vp_flag) {
 	case BMSCR_VPFLAG_2D:
-		//	2D projection mode
-		UnitMatrix();
-		RotZ(bm->vp_viewrotate[2]);
-		GetCurrentMatrix(&tmpmat);
-		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1], (float)nDestWidth / bm->vp_viewscale[0], (float)nDestHeight / bm->vp_viewscale[1], 0.0f, 1.0f);
-		MulMatrix(&tmpmat);
-		break;
+		UnitMatrix(); RotZ(bm->vp_viewrotate[2]); GetCurrentMatrix(&tmp);
+		OrthoMatrix(-bm->vp_viewtrans[0], -bm->vp_viewtrans[1],
+			nDestWidth / bm->vp_viewscale[0], nDestHeight / bm->vp_viewscale[1], 0.0f, 1.0f);
+		MulMatrix(&tmp); GetCurrentMatrix(&mat_proj); break;
 	case BMSCR_VPFLAG_3D:
-		//	3D projection mode
-		UnitMatrix();
-		RotZ(bm->vp_viewrotate[2]);
-		RotY(bm->vp_viewrotate[1]);
-		RotX(bm->vp_viewrotate[0]);
+		UnitMatrix(); RotZ(bm->vp_viewrotate[2]); RotY(bm->vp_viewrotate[1]); RotX(bm->vp_viewrotate[0]);
 		Scale(bm->vp_viewscale[0], bm->vp_viewscale[1], bm->vp_viewscale[2]);
-		Trans(bm->vp_viewtrans[0], bm->vp_viewtrans[1], bm->vp_viewtrans[2]);
-		GetCurrentMatrix(&tmpmat);
-		PerspectiveFOV(bm->vp_view3dprm[0], bm->vp_view3dprm[1], bm->vp_view3dprm[2], 0.0f, 0.0f, (float)nDestWidth / 10, (float)nDestHeight / 10);
-		//PerspectiveFOV(45.0f, 1.0f, 500.0f, 0.0f, 0.0f, (float)nDestWidth / 10, (float)nDestHeight / 10);
-		//PerspectiveWithZBuffer(10.0f, 0.0f, 60.0f, 1.0f, 0.0f);
-		MulMatrix(&tmpmat);
-		break;
+		Trans(bm->vp_viewtrans[0], bm->vp_viewtrans[1], bm->vp_viewtrans[2]); GetCurrentMatrix(&tmp);
+		PerspectiveFOV(bm->vp_view3dprm[0], bm->vp_view3dprm[1], bm->vp_view3dprm[2], 0, 0,
+			nDestWidth / 10.0f, nDestHeight / 10.0f); MulMatrix(&tmp); GetCurrentMatrix(&mat_proj); break;
 	case BMSCR_VPFLAG_MATRIX:
-		//	user matrix mode
-		mat = &bm->vp_viewtrans[0];
-		break;
-	case BMSCR_VPFLAG_NOUSE:
-	default:
-		return;
+		memcpy(&mat_proj, bm->vp_viewtrans, sizeof(mat_proj)); break;
+	default: return;
 	}
 
-	//	mat_projに設定する
-	for (i = 0; i < 16; i++) {
-		*vp++ = *mat++;
-	}
-
-	D3DXMATRIX matrixProj;
-	Mat2D3DMAT(&matrixProj, vmat);
-	d3ddev->SetTransform(D3DTS_PROJECTION, &matrixProj);
+	render->SetViewMatrix(&mat_proj);
 
 	//	投影マトリクスの逆行列を設定する
-	//D3DXMatrixInverse(&InvViewport, NULL, &matrixProj);
-	SetCurrentMatrix(vmat);
+	SetCurrentMatrix(&mat_proj);
 	InverseMatrix(&mat_unproj);
 
 }
@@ -2212,7 +1452,8 @@ void hgio_fontsystem_delete(int id)
 int hgio_fontsystem_setup(int sx, int sy, void *buffer)
 {
 	int id = RegistTexEmpty(sx, sy, 1);
-	if (UpdateTex32(id, (char*)buffer, 0) < 0) return -1;
+	int res = UpdateTex32(id, (char*)buffer, 0);
+	if ( res < 0) return -1;
 	return id;
 }
 
@@ -2226,7 +1467,7 @@ void hgio_editputclip(BMSCR* bm, char *str)
 	if (!OpenClipboard(master_wnd)) return;
 	EmptyClipboard();
 
-	int len = strlen(str)+1;
+	int len = (int)strlen(str)+1;
 	hg = GlobalAlloc(GHND | GMEM_SHARE, len);
 	strMem = (char *)GlobalLock(hg);
 	strcpy(strMem, str);
@@ -2244,7 +1485,7 @@ char *hgio_editgetclip(BMSCR* bm)
 	HGLOBAL hg;
 	char *strClip;
 	if (OpenClipboard(master_wnd) && (hg = GetClipboardData(CF_TEXT))) {
-		char *p = code_stmp(GlobalSize(hg));
+		char* p = code_stmp((int)GlobalSize(hg));
 		strClip = (char *)GlobalLock(hg);
 		strcpy(p, strClip);
 		GlobalUnlock(hg);

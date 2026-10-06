@@ -39,10 +39,9 @@ enum {
 void TexInit( void );
 void TexTerm( void );
 void TexReset( void );
-void TexSetD3DParam( LPDIRECT3D8 p1, LPDIRECT3DDEVICE8 p2, D3DDISPLAYMODE p3 );
+void TexSetParam(void * p_render);
 
-int RegistTex( char *data, int sx, int sy, int width, int height, int sw );
-int RegistTexIndex( char *data, char *palette, int sx, int sy, int width, int height, int sw, int pals );
+int RegistTex( char *data, int size );
 int RegistTexEmpty( int w, int h, int tmode );
 int UpdateTex( int texid, char *data, int sw );
 int UpdateTexStar(int texid, int mode);
@@ -56,7 +55,7 @@ void ChangeTex( int id );
 TEXINF *GetTex( int id );
 void SetSrcTex( void *src, int sx, int sy );
 
-int CreateTexture2( int w, int h, D3DFORMAT Format, LPDIRECT3DTEXTURE8 &pTexture );
+//int CreateTexture2( int w, int h, D3DFORMAT Format, LPDIRECT3DTEXTURE8 &pTexture );
 void TexDivideSize( int id, int new_divsx, int new_divsy, int new_ofsx, int new_ofsy );
 
 /*---------------------------------------------------------------------------*/

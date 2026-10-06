@@ -5,12 +5,13 @@
 #include <stdio.h>
 #define STRICT
 #include <windows.h>
-#include <d3d8.h>
-#include <d3dx8.h>
+#include <wincodec.h>
 #include <math.h>
 #include <vector>
+#include <dxgiformat.h>
 
 #include "hgtex.h"
+#include "dx11_renderer.h"
 
 #include "../sysreq.h"
 #include "../supio.h"
@@ -29,10 +30,6 @@ static		char ck3;			// カラーキー3
 static		char *lpTex;		// テクスチャのバッファ
 static		int curtex;			// current texID
 
-static		D3DDISPLAYMODE target_disp;
-static		LPDIRECT3D8 d3d;
-static		LPDIRECT3DDEVICE8 d3ddev;
-
 static		DWORD AlphaTbl[34];
 static		int FixedFontWidth;
 static		HFONT htexfont;		// TEXTURE用のフォント
@@ -42,7 +39,6 @@ static		HDC htexdc;
 static		HWND htexwnd;
 static		int htexsize;
 static		int lasttex;
-static		D3DLOCKED_RECT MemTexRect;	// テクスチャ作業バッファ
 static		int drawsx, drawsy;	// 描画サイズ
 static		int spacing;		// 文字の間隔(dot)
 static		int linespace;		// 行の間隔(dot)
@@ -174,6 +170,60 @@ static void star_draw(char *dest, int sx, int sy, int mode)
 
 /*------------------------------------------------------------*/
 /*
+		texture service
+*/
+/*------------------------------------------------------------*/
+
+static		HGIO_DX11_RENDERER* render;
+
+
+HGIO_DX11_TEXTURE* Texture(TEXINF* info) { return info ? reinterpret_cast<HGIO_DX11_TEXTURE*>(info->data) : NULL; }
+
+static void SetTexture(int id, int flag, int mode, int sx, int sy, int width, int height, HGIO_DX11_TEXTURE* texture)
+{
+	TEXINF* t = GetTex(id);
+	t->flag = flag; t->mode = mode; t->sx = sx; t->sy = sy; t->width = width; t->height = height;
+	t->data = reinterpret_cast<char*>(texture);
+	t->ratex = 1.0f / sx; t->ratey = 1.0f / sy;
+	t->ratehx = 0.5f / sx; t->ratehy = 0.5f / sy;
+	TexDivideSize(id, 0, 0, 0, 0);
+}
+
+static bool DecodeBGRA(const void* data, size_t size, std::vector<unsigned char>& pixels, UINT& width, UINT& height)
+{
+	IWICImagingFactory* factory = NULL; IWICStream* stream = NULL; IWICBitmapDecoder* decoder = NULL;
+	IWICBitmapFrameDecode* frame = NULL; IWICFormatConverter* converter = NULL; bool result = false;
+	if (FAILED(CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&factory)))) goto done;
+	if (FAILED(factory->CreateStream(&stream)) || FAILED(stream->InitializeFromMemory((WICInProcPointer)data, (DWORD)size)) ||
+		FAILED(factory->CreateDecoderFromStream(stream, NULL, WICDecodeMetadataCacheOnLoad, &decoder)) ||
+		FAILED(decoder->GetFrame(0, &frame)) || FAILED(frame->GetSize(&width, &height)) ||
+		FAILED(factory->CreateFormatConverter(&converter)) ||
+		FAILED(converter->Initialize(frame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0, WICBitmapPaletteTypeCustom))) goto done;
+	pixels.resize((size_t)width * height * 4);
+	result = SUCCEEDED(converter->CopyPixels(NULL, width * 4, (UINT)pixels.size(), pixels.data()));
+done:
+	if (converter) converter->Release(); if (frame) frame->Release(); if (decoder) decoder->Release();
+	if (stream) stream->Release(); if (factory) factory->Release();
+	return result;
+}
+
+static void Convert24(const char* source, int sx, int sy, int sw, std::vector<unsigned char>& pixels)
+{
+	pixels.resize((size_t)sx * sy * 4);
+	for (int y = 0; y < sy; ++y) {
+		const char* src = source + (sw & 1 ? y : sy - 1 - y) * sx * 3;
+		unsigned char* dst = pixels.data() + (size_t)y * sx * 4;
+		for (int x = 0; x < sx; ++x) {
+			const unsigned char r = (unsigned char)src[x * 3];
+			const unsigned char g = (unsigned char)src[x * 3 + 1];
+			const unsigned char b = (unsigned char)src[x * 3 + 2];
+			dst[x * 4] = r; dst[x * 4 + 1] = g; dst[x * 4 + 2] = b; dst[x * 4 + 3] = 255;
+		}
+	}
+}
+
+/*------------------------------------------------------------*/
+/*
 		texture process
 */
 /*------------------------------------------------------------*/
@@ -191,17 +241,16 @@ void TexInit( void )
 }
 
 
-void TexSetD3DParam( LPDIRECT3D8 p1, LPDIRECT3DDEVICE8 p2, D3DDISPLAYMODE p3 )
+void TexSetParam(void* p_render)
 {
-	d3d = p1;
-	d3ddev = p2;
-	target_disp = p3;
+	//		renderパラメータ設定
+	//
+	render = (HGIO_DX11_RENDERER *)p_render;
 }
-
 
 void TexTerm( void )
 {
-	d3ddev->SetTexture( 0, NULL );
+	render->SetTexture(NULL);
 	if ( lpFont != NULL ) { free( lpFont ); lpFont = NULL; }
 
 	if (!texinf.empty()) {
@@ -216,7 +265,7 @@ void TexTerm( void )
 void TexReset( void )
 {
 	curtex = -1;
-	d3ddev->SetTexture( 0, NULL );
+	render->SetTexture(NULL);
 	FixedFontWidth = 0;
 	htexfont = NULL;
 	htexsize = 0;
@@ -309,7 +358,7 @@ static void TexCopySub16( char *dst, char *src, int size )
 	}
 }
 
-
+#if 0
 static D3DFORMAT GetAvailableFormat( int sw )
 {
 	//		テクスチャの使用可能なフォーマットを調べる
@@ -353,7 +402,8 @@ static D3DFORMAT GetAvailableFormat( int sw )
 	if ( hr==D3D_OK ) return ok;
 	return D3DFMT_UNKNOWN;
 }
-	
+#endif
+
 
 static int Get2N( int val )
 {
@@ -366,330 +416,79 @@ static int Get2N( int val )
 }
 
 
-int CreateTexture2( int w, int h, D3DFORMAT Format, LPDIRECT3DTEXTURE8 &pTexture )
+int RegistTex( char *data, int size )
 {
-	int sx,sy;
-	HRESULT hr;
-	sx = Get2N( w );
-	sy = Get2N( h );
-	hr = d3ddev->CreateTexture( sx, sy, 1, 0,Format, D3DPOOL_MANAGED, &pTexture );
-	if SUCCEEDED( hr ) return 0;
-	if ( sx < sy ) sx=sy;
-	hr = d3ddev->CreateTexture( sx, sx, 1, 0,Format, D3DPOOL_MANAGED, &pTexture );
-	if SUCCEEDED( hr ) return 0;
-	return -1;
-}
-
-
-int RegistTexFromMemFile( char *data, int size, int orgx, int orgy )
-{
-	int sel,sx,sy,px,py;
-	HRESULT hr;
-	LPDIRECT3DTEXTURE8 t;
-	D3DSURFACE_DESC desc;
-	D3DFORMAT format;
-	D3DXIMAGE_INFO info;
-
-	format = D3DFMT_A8R8G8B8;
-	//format = D3DFMT_A4R4G4B4;
-	//GetSysReq(SYSREQ_NOMIPMAP) = 0
-	hr = D3DXCreateTextureFromFileInMemoryEx( d3ddev, data, size, 0, 0, 0, 0, format,
-								D3DPOOL_MANAGED, D3DX_FILTER_NONE, D3DX_FILTER_NONE,
-								0, &info, NULL, &t );
-//	hr = D3DXCreateTextureFromFileInMemoryEx( d3ddev, data, size, 0, 0, 0, 0, format,
-//								D3DPOOL_MANAGED, D3DX_FILTER_LINEAR, D3DX_FILTER_LINEAR,
-//								0, &info, NULL, &t );
-	if ( FAILED(hr) ) return -1;
-
-	t->GetLevelDesc( 0, &desc );
-	sx = desc.Width;
-	sy = desc.Height;
-	//Alertf( "Lev[%d][%d][%d][%d][%d]", t->GetLevelCount(),sx,sy,orgx,orgy );
-	px = orgx; if ( px <= 0 ) px = sx;
-	py = orgy; if ( py <= 0 ) py = sy;
-	//px = orgx; if ( px <= 0 ) px = info.Width;
-	//py = orgy; if ( py <= 0 ) py = info.Height;
-
-	sel = GetNextTexID();
-	SetTex( sel, TEXMODE_NORMAL, 0, px, py, info.Width, info.Height, t );
+	HGIO_DX11_TEXTURE* dxTexture = new HGIO_DX11_TEXTURE{};
+	if (!render->CreateTextureFromMemory(dxTexture, data, (size_t)size)) {
+		delete dxTexture;
+		return -1;
+	}
+	int sel = GetNextTexID();
+	SetTex(sel, TEXMODE_NORMAL, 0, dxTexture->width, dxTexture->height, dxTexture->width, dxTexture->height, dxTexture);
 	return sel;
 }
 
-
-int RegistTex( char *data, int sx, int sy, int width, int height, int sw )
-{
-	int sel,y,i;
-	LPDIRECT3DTEXTURE8 pTex;
-	D3DLOCKED_RECT lock;
-	char *p;
-	char *src;
-	D3DFORMAT textype;
-
-	if ( sw < 0 ) {
-		return RegistTexFromMemFile( data, sx, width, height );
-	}
-
-	//		カラーキー更新
-	//
-	i = 0;
-	//i = GetSysReq( SYSREQ_COLORKEY );
-	ck1 = i & 0xff;
-	ck2 = (i>>8) & 0xff;
-	ck3 = (i>>16) & 0xff;
-
-	//		フォーマット変換
-	//
-	textype = GetAvailableFormat( 0 );
-	if ( textype==D3DFMT_UNKNOWN ) return -2;
-
-	//hr = d3ddev->CreateTexture( sx,sy,1,0, textype, D3DPOOL_MANAGED, &pTex );
-	i = CreateTexture2( sx, sy, textype, pTex );
-	if ( i ) return -1;
-
-	pTex->LockRect( 0,&lock,NULL,0 );
-	p = (char *)lock.pBits;
-	if (( textype==D3DFMT_A1R5G5B5 )||( textype==D3DFMT_X1R5G5B5 )) {
-		//	16bit texture
-		if ( (sw&1) == 0 ) {
-			for(y=0;y<sy;y++) {
-				src = data + (sx*3*(sy-1-y));
-				TexCopySub16( p, src, sx );
-				p+=sx*2;
-			}
-		}
-		else {
-			TexCopySub16( p, data, sx*sy );
-		}
-	}
-	else {
-		//	32bit texture
-
-		if ( (sw&1) == 0 ) {
-			for(y=0;y<sy;y++) {
-				src = data + (sx*3*(sy-1-y));
-				TexCopySub32( p, src, sx );
-				p+=sx*4;
-			}
-		}
-		else {
-			TexCopySub32( p, data, sx*sy );
-		}
-	}
-	pTex->UnlockRect( 0 );
-
-	sel = GetNextTexID();
-	SetTex( sel, TEXMODE_NORMAL, sw, sx, sy, width, height, pTex );
-	return sel;
-}
-
-
-int RegistTexIndex( char *data, char *palette, int sx, int sy, int width, int height, int sw, int pals )
-{
-	int sel,y,i;
-	LPDIRECT3DTEXTURE8 pTex;
-	D3DLOCKED_RECT lock;
-	char *p;
-	char *src;
-	D3DFORMAT textype;
-
-	textype = GetAvailableFormat( 1 );
-	if ( textype==D3DFMT_UNKNOWN ) return -2;
-
-	i = CreateTexture2( sx, sy, textype, pTex );
-	if ( i ) return -1;
-
-	d3ddev->SetPaletteEntries( 0, (PALETTEENTRY*)palette );
-	pTex->LockRect( 0,&lock,NULL,0 );
-	p = (char *)lock.pBits;
-	if ( (sw&1) == 0 ) {
-		for(y=0;y<sy;y++) {
-			src = data + (sx*(sy-1-y));
-			memcpy( p, src, sx );
-			p+=sx;
-		}
-	}
-	else {
-		memcpy( p, data, sx*sy );
-	}
-	pTex->UnlockRect( 0 );
-
-	sel = GetNextTexID();
-	SetTex( sel, TEXMODE_NORMAL, sw, sx, sy, width, height, pTex );
-
-	return sel;
-}
-
-
-int UpdateTexStar(int texid, int mode)
-{
-	int sx, sy, width, height, Format;
-	TEXINF* texinf;
-	HRESULT hr;
-	LPDIRECT3DTEXTURE8 pTex;
-	D3DLOCKED_RECT lock;
-
-	texinf = GetTex(texid);
-	if (texinf == NULL) return -1;
-	if (texinf->flag == TEXMODE_NONE) { return -1; }
-
-	Format = texinf->flag;
-	sx = texinf->sx;
-	sy = texinf->sy;
-	width = texinf->width;
-	height = texinf->height;
-	pTex = (LPDIRECT3DTEXTURE8)texinf->data;
-
-	hr = pTex->LockRect(0, &lock, NULL, 0);
-	if (FAILED(hr)) return -1;
-
-	switch (Format) {
-	case TEXMODE_MES4:
-		break;
-	case TEXMODE_MES8:
-		// 転送先のサーフェイスの始点(32bit)
-#ifdef USE_STAR_FIELD
-		char* p;
-		p = (char*)lock.pBits;
-		star_draw(p, lock.Pitch, sy, mode);
-#endif
-		break;
-	}
-	pTex->UnlockRect(0);
-	return 0;
-}
 
 int UpdateTex32(int texid, char * srcptr, int mode)
 {
-	int sx, sy, width, height, Format;
-	TEXINF* texinf;
-	HRESULT hr;
-	LPDIRECT3DTEXTURE8 pTex;
-	D3DLOCKED_RECT lock;
-
-	texinf = GetTex(texid);
-	if (texinf == NULL) return -1;
-	if (texinf->flag == TEXMODE_NONE) { return -1; }
-
-	Format = texinf->flag;
-	sx = texinf->sx;
-	sy = texinf->sy;
-	width = texinf->width;
-	height = texinf->height;
-	pTex = (LPDIRECT3DTEXTURE8)texinf->data;
-
-	hr = pTex->LockRect(0, &lock, NULL, 0);
-	if (FAILED(hr)) return -1;
-
-	switch (Format) {
-	case TEXMODE_MES4:
-		break;
-	case TEXMODE_MES8:
-		// 転送先のサーフェイスの始点(32bit)
-		char* p;
-		p = (char*)lock.pBits;
-		if (mode & 1) {
-			memcpy(p, srcptr, sx*sy * 4);
-		}
-		else {
-			int i;
-			char *src = srcptr;
-			char a1,a2,a3,a4;
-			for (i = 0; i < sx*sy; i++) {
-				a1 = *src++;
-				a2 = *src++;
-				a3 = *src++;
-				a4 = *src++;
-				*p++ = a3;
-				*p++ = a2;
-				*p++ = a1;
-				*p++ = a4;
-			}
-		}
-		break;
+	TEXINF *dxInfo = GetTex(texid);
+	if (dxInfo == NULL || dxInfo->flag == TEXMODE_NONE) return -1;
+	HGIO_DX11_TEXTURE *dxTexture = (HGIO_DX11_TEXTURE *)dxInfo->data;
+	if (dxTexture == NULL) return -1;
+	if (mode & 1) return render->UpdateTexture(dxTexture, srcptr, dxInfo->sx * 4) ? 0 : -1;
+	std::vector<unsigned char> pixels((size_t)dxInfo->sx * dxInfo->sy * 4);
+	for (int i = 0; i < dxInfo->sx * dxInfo->sy; ++i) {
+		pixels[i * 4] = srcptr[i * 4 + 2];
+		pixels[i * 4 + 1] = srcptr[i * 4 + 1];
+		pixels[i * 4 + 2] = srcptr[i * 4];
+		pixels[i * 4 + 3] = srcptr[i * 4 + 3];
 	}
-	pTex->UnlockRect(0);
+	return render->UpdateTexture(dxTexture, pixels.data(), dxInfo->sx * 4) ? 0 : -1;
+}
+
+int UpdateTexStar(int texid, int mode)
+{
+#ifdef USE_STAR_FIELD
+	TEXINF* dxInfo = GetTex(texid);
+	if (dxInfo == NULL || dxInfo->flag == TEXMODE_NONE) return -1;
+	HGIO_DX11_TEXTURE* dxTexture = (HGIO_DX11_TEXTURE*)dxInfo->data;
+	if (dxTexture == NULL) return -1;
+	std::vector<unsigned char> pixels((size_t)dxInfo->sx * dxInfo->sy * 4);
+	char* m_stars_pixel = (char*)pixels.data();
+	star_draw(m_stars_pixel, STAR_SX * sizeof(int), STAR_SY, mode);
+	return UpdateTex32(texid, m_stars_pixel, mode);
+#else
 	return 0;
+#endif
 }
 
 int UpdateTex( int texid, char *data, int sw )
 {
-	int y,i;
-	int sx,sy,width,height;
-	TEXINF *texinf;
-	HRESULT hr;
-	LPDIRECT3DTEXTURE8 pTex;
-	D3DLOCKED_RECT lock;
-	char *p;
-	char *src;
-	D3DFORMAT textype;
-
-	//		カラーキー更新
-	//
-	//i = GetSysReq( SYSREQ_COLORKEY );
-	i = 0;
-	ck1 = i & 0xff;
-	ck2 = (i>>8) & 0xff;
-	ck3 = (i>>16) & 0xff;
-
-	texinf = GetTex( texid );
-	if (texinf == NULL) return -1;
-	sx = texinf->sx;
-	sy = texinf->sy;
-	width = texinf->width;
-	height = texinf->height;
-	pTex = (LPDIRECT3DTEXTURE8)texinf->data;
-
-
-	//		フォーマット変換
-	//
-	textype = GetAvailableFormat( 0 );
-	if ( textype==D3DFMT_UNKNOWN ) return -2;
-
-	hr = pTex->LockRect( 0,&lock,NULL,0 );
-	if ( FAILED( hr ) ) return -1;
-	p = (char *)lock.pBits;
-	if (( textype==D3DFMT_A1R5G5B5 )||( textype==D3DFMT_X1R5G5B5 )) {
-		//	16bit texture
-		if ( (sw&1) == 0 ) {
-			for(y=0;y<sy;y++) {
-				src = data + (sx*3*(sy-1-y));
-				TexCopySub16( p, src, sx );
-				p+=sx*2;
-			}
-		}
-		else {
-			TexCopySub16( p, data, sx*sy );
-		}
+	TEXINF *dxInfo = GetTex(texid);
+	if (dxInfo == NULL || dxInfo->flag == TEXMODE_NONE) return -1;
+	HGIO_DX11_TEXTURE *dxTexture = (HGIO_DX11_TEXTURE *)dxInfo->data;
+	if (dxTexture == NULL) return -1;
+	std::vector<unsigned char> pixels((size_t)dxInfo->sx * dxInfo->sy * 4);
+	for (int y = 0; y < dxInfo->sy; ++y) {
+		char *src = data + (sw & 1 ? dxInfo->sx * 3 * y : dxInfo->sx * 3 * (dxInfo->sy - 1 - y));
+		TexCopySub32((char *)&pixels[(size_t)y * dxInfo->sx * 4], src, dxInfo->sx);
 	}
-	else {
-		//	32bit texture
-
-		if ( (sw&1) == 0 ) {
-			for(y=0;y<sy;y++) {
-				src = data + (sx*3*(sy-1-y));
-				TexCopySub32( p, src, sx );
-				p+=sx*4;
-			}
-		}
-		else {
-			TexCopySub32( p, data, sx*sy );
-		}
-	}
-	pTex->UnlockRect( 0 );
-	return 0;
+	return render->UpdateTexture(dxTexture, pixels.data(), dxInfo->sx * 4) ? 0 : -1;
 }
 
 
 void DeleteTex( int id )
 {
-	TEXINF *t;
-	LPDIRECT3DTEXTURE8 pTex;
-	t = GetTex( id );
-	if ( t == NULL ) return;
-	if ( t->flag == TEXMODE_NONE ) return;
-	t->flag = TEXMODE_NONE;
-	pTex = (LPDIRECT3DTEXTURE8)t->data;
-	RELEASE( pTex );
+	TEXINF *dxInfo = GetTex(id);
+	if (dxInfo == NULL || dxInfo->flag == TEXMODE_NONE) return;
+	dxInfo->flag = TEXMODE_NONE;
+	HGIO_DX11_TEXTURE *dxTexture = (HGIO_DX11_TEXTURE *)dxInfo->data;
+	if (dxTexture) {
+		render->DeleteTexture(dxTexture);
+		delete dxTexture;
+	}
+	dxInfo->data = NULL;
+	return;
 }
 
 
@@ -698,7 +497,7 @@ void ChangeTex( int id )
 	TEXINF *t;
 	if ( id < 0 ) {
 		curtex=-1;
-		d3ddev->SetTexture( 0, NULL );
+		render->SetTexture(NULL);
 		return;
 	}
 	if ( curtex == id ) return;
@@ -706,11 +505,12 @@ void ChangeTex( int id )
 	if (t == NULL) return;
 	if ( t->flag == TEXMODE_NONE ) {
 		curtex=-1;
-		d3ddev->SetTexture( 0, NULL );
+		render->SetTexture(NULL);
 		return;
 	}
 	curtex = id;
-	d3ddev->SetTexture( 0, (LPDIRECT3DTEXTURE8)t->data );
+	HGIO_DX11_TEXTURE *texture = (HGIO_DX11_TEXTURE *)t->data;
+	render->SetTexture(texture ? texture->srv : NULL);
 }
 
 
@@ -746,39 +546,15 @@ void TexDivideSize(int id, int new_divsx, int new_divsy, int new_ofsx, int new_o
 
 int RegistTexEmpty(int w, int h, int tmode)
 {
-	// メッセージエリア用のテクスチャ作成
-	int sel, sx, sy, flag;
-	D3DSURFACE_DESC desc;
-	LPDIRECT3DTEXTURE8 lpTex;
-
-	if (tmode == 0) {
-		if (CreateTexture2(w, h, D3DFMT_A4R4G4B4, lpTex)) {
-			if (CreateTexture2(w, h, D3DFMT_A8R8G8B8, lpTex)) {
-				RELEASE(lpTex);
-				return -1;
-			}
-		}
-
+	HGIO_DX11_TEXTURE *dxTexture = new HGIO_DX11_TEXTURE{};
+	if (!render->CreateTexture(dxTexture, w, h,
+		DXGI_FORMAT_B8G8R8A8_UNORM, NULL, 0)) {
+		delete dxTexture;
+		return -1;
 	}
-	else {
-		if (CreateTexture2(w, h, D3DFMT_A8R8G8B8, lpTex)) {
-			if (CreateTexture2(w, h, D3DFMT_A4R4G4B4, lpTex)) {
-				RELEASE(lpTex);
-				return -1;
-			}
-		}
-	}
-
-	lpTex->GetLevelDesc(0, &desc);
-	// データ
-	sx = desc.Width;
-	sy = desc.Height;
-	flag = TEXMODE_MES8;
-	if (desc.Format == D3DFMT_A4R4G4B4) flag = TEXMODE_MES4;
-
-	sel = GetNextTexID();
-	SetTex(sel, flag, 0, sx, sy, sx, sy, lpTex);
-	return sel;
+	int dxSel = GetNextTexID();
+	SetTex(dxSel, TEXMODE_MES8, 0, w, h, w, h, dxTexture);
+	return dxSel;
 }
 
 
@@ -787,45 +563,5 @@ char* GetPixelMaskBuffer(char* fileptr, int size, int *xsize, int *ysize)
 	//		画像のピクセルバッファを取得する
 	//		(画像ファイルのポインタを渡すと、αチャンルを2値化したバッファを返す)
 	//
-	int sx, sy;
-	HRESULT hr;
-	LPDIRECT3DTEXTURE8 pTex;
-	D3DSURFACE_DESC desc;
-	D3DFORMAT format;
-	D3DXIMAGE_INFO info;
-	D3DLOCKED_RECT lock;
-
-	format = D3DFMT_A8R8G8B8;
-	hr = D3DXCreateTextureFromFileInMemoryEx(d3ddev, fileptr, size, 0, 0, 0, 0, format,
-		D3DPOOL_MANAGED, D3DX_FILTER_NONE, D3DX_FILTER_NONE,
-		0, &info, NULL, &pTex);
-	if (FAILED(hr)) return NULL;
-
-	pTex->GetLevelDesc(0, &desc);
-	sx = desc.Width;
-	sy = desc.Height;
-
-	hr = pTex->LockRect(0, &lock, NULL, 0);
-	if (FAILED(hr)) return NULL;
-
-	int bwsize = sx * sy;
-	char* mem = (char *)malloc(bwsize);
-
-	// 転送先のサーフェイスの始点(32bit)
-	int i;
-	//char a1;
-	char* p = (char*)lock.pBits;
-	char* src = mem;
-	for (i = 0; i < bwsize; i++) {
-		*src++ = p[3];
-		p += 4;
-	}
-	pTex->UnlockRect(0);
-	*xsize = sx;
-	*ysize = sy;
-
-	RELEASE(pTex);
-	return mem;
+	return NULL;
 }
-
-

@@ -11,6 +11,7 @@
 #include <string>
 #include <objbase.h>
 #include <commctrl.h>
+#include <tchar.h>
 
 #if defined( __GNUC__ )
 #include <ctype.h>
@@ -134,23 +135,24 @@ static	bool (WINAPI *i_RegisterTouchWindow)( HWND, int );
 static	bool (WINAPI *i_GetTouchInputInfo)( HANDLE, int, TOUCHINPUT *, int );
 static	bool (WINAPI *i_CloseTouchInputHandle)( HANDLE ); 
 static	TOUCHINPUT touchinput[BMSCR_MAX_MTOUCH];
-static void	MTouchInit( HWND hwnd )
+
+static void	MTouchInit(HWND hwnd)
 {
 	int sysmet;
 	mt_flag = 0;
 	i_RegisterTouchWindow = NULL;
 	i_GetTouchInputInfo = NULL;
 	i_CloseTouchInputHandle = NULL;
-	sysmet = GetSystemMetrics( SM_DIGITIZER );
-	if (( sysmet & NID_READY ) == 0 ) return;
-	if (( sysmet & NID_MULTI_INPUT ) == 0 ) return;
-	h_user32 = GetModuleHandle("USER32.DLL");
-	if ( h_user32 ) {
-		i_RegisterTouchWindow = (bool (WINAPI *)( HWND, int )) GetProcAddress(h_user32, "RegisterTouchWindow" ); 
-		i_CloseTouchInputHandle =(bool (WINAPI *)( HANDLE )) GetProcAddress(h_user32, "CloseTouchInputHandle" ); 
-		i_GetTouchInputInfo = (bool (WINAPI *)( HANDLE, int, TOUCHINPUT *, int )) GetProcAddress(h_user32, "GetTouchInputInfo" ); 
-		if ( i_RegisterTouchWindow ) {
-			i_RegisterTouchWindow( hwnd, 0 );
+	sysmet = GetSystemMetrics(SM_DIGITIZER);
+	if ((sysmet & NID_READY) == 0) return;
+	if ((sysmet & NID_MULTI_INPUT) == 0) return;
+	h_user32 = GetModuleHandle(_T("USER32.DLL"));
+	if (h_user32) {
+		i_RegisterTouchWindow = (bool (WINAPI*)(HWND, int)) GetProcAddress(h_user32, "RegisterTouchWindow");
+		i_CloseTouchInputHandle = (bool (WINAPI*)(HANDLE)) GetProcAddress(h_user32, "CloseTouchInputHandle");
+		i_GetTouchInputInfo = (bool (WINAPI*)(HANDLE, int, TOUCHINPUT*, int)) GetProcAddress(h_user32, "GetTouchInputInfo");
+		if (i_RegisterTouchWindow) {
+			i_RegisterTouchWindow(hwnd, 0);
 			mt_flag = 1;
 		}
 	}
@@ -218,7 +220,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 #ifdef HSPERR_HANDLE
 		try {
 #endif
-			int retval;
+			HSPPTRINT retval;
 			if (code_checkirq((int)GetWindowLongPtr(hwnd, GWLP_USERDATA), (HSPPTRINT)uMessage, (HSPPTRINT)wParam, (HSPPTRINT)lParam)) {
 				if (code_irqresult(&retval)) return retval;
 			}
@@ -525,21 +527,22 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam
 	return DefWindowProc (hwnd, uMessage, wParam, lParam) ;
 }
 
+
 static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int yy, int style, int hidesw)
 {
 #ifdef HSPDEBUG
-	char* windowtitle = "HSPDish ver" hspver;
+	TCHAR* windowtitle = _T("HSPDish ver" hspver);
 #else
-	char* windowtitle = NULL;
+	TCHAR* windowtitle = NULL;
 #endif
 
 	// Register the windows class
 	WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
-							LoadIcon( hInstance, MAKEINTRESOURCE(128) ),
-							LoadCursor( NULL, IDC_ARROW ),
+							LoadIcon(hInstance, MAKEINTRESOURCE(128)),
+							LoadCursor(NULL, IDC_ARROW),
 							(HBRUSH)GetStockObject(WHITE_BRUSH),
-							NULL, "HSP3DishWindow" };
-	RegisterClass( &wndClass );
+							NULL, _T("HSP3DishWindow") };
+	RegisterClass(&wndClass);
 
 	// Set the window's initial style
 	//DWORD m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
@@ -565,38 +568,44 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 	RECT rc;
 	SetRect(&rc, 0, 0, sx, sy);
 
-	// Set the window's initial width
-	AdjustWindowRect(&rc, m_dwWindowStyle, false);
+	if (m_hWndParent) {
+		m_dwWindowStyle = WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+
+	}
+	else {
+		// Set the window's initial width
+		AdjustWindowRect(&rc, m_dwWindowStyle, false);
+	}
+
 
 	// Create the render window
-	m_hWnd = CreateWindowEx(exstyle, "HSP3DishWindow", windowtitle, m_dwWindowStyle,
+	m_hWnd = CreateWindowEx(exstyle, _T("HSP3DishWindow"), windowtitle, m_dwWindowStyle,
 
 		(xx != -1 ? xx : CW_USEDEFAULT),
 		(yy != -1 ? yy : CW_USEDEFAULT),
-		(rc.right - rc.left), (rc.bottom - rc.top), 0,
+		(rc.right - rc.left), (rc.bottom - rc.top), m_hWndParent,
 		NULL, hInstance, 0);
 
 	SetWindowPos(m_hWnd, HWND_TOP, 0, 0, 0, 0,
 		(hidesw & 1 ? SWP_NOACTIVATE | SWP_NOZORDER : SWP_SHOWWINDOW) |
 		SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 
-
 	// 描画APIに渡す
-	hgio_init( 0, sx, sy, m_hWnd );
-	hgio_clsmode( CLSMODE_SOLID, 0xffffff, 0 );
+	hgio_init(0, sx, sy, m_hWnd);
+	hgio_clsmode(CLSMODE_SOLID, 0xffffff, 0);
 
 	// マルチタッチ初期化
-	MTouchInit( m_hWnd );
+	MTouchInit(m_hWnd);
 
 	// HWNDをHSPCTXに保存する
 	ctx->wnd_parent = m_hWnd;
 }
 
 
-
 void hsp3dish_dialog( char *mes )
 {
-	MessageBox( NULL, mes, "Error",MB_ICONEXCLAMATION | MB_OK );
+	HspToApiStr mesw{ mes };
+	MessageBox(NULL, mesw, _T("Error"), MB_ICONEXCLAMATION | MB_OK);
 }
 
 
@@ -649,37 +658,42 @@ void hsp3dish_drawoff( void )
 }
 
 
-int hsp3dish_debugopen( void )
+int hsp3dish_debugopen(void)
 {
 	//		デバッグウインドゥ表示
 	//
 #ifdef HSPDEBUG
-	if ( h_dbgwin != NULL ) return 0;
+	if (h_dbgwin != NULL) return 0;
 #ifdef HSP64
-	h_dbgwin = LoadLibrary( "hsp3debug_64.dll" );
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE "_64.dll"));
 #else
-	h_dbgwin = LoadLibrary("hsp3debug.dll");
+#ifndef HSPUTF8
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE ".dll"));
+#else
+	h_dbgwin = LoadLibrary(TEXT(HSP3DEBUG_MODULE) TEXT("_u8.dll"));
 #endif
-	if ( h_dbgwin != NULL ) {
+#endif
+	if (h_dbgwin != NULL) {
 #ifdef HSP64
-		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "debugini");
-		dbgnotice = (HSP3DBGFUNC)GetProcAddress( h_dbgwin, "debug_notice" );
+		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, HSP3DEBUG_INIT);
+		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, HSP3DEBUG_NOTICE);
 #else
-		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_debugini@16");
-		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_debug_notice@16");
+		dbgwin = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_" HSP3DEBUG_INIT "@16");
+		dbgnotice = (HSP3DBGFUNC)GetProcAddress(h_dbgwin, "_" HSP3DEBUG_NOTICE "@16");
 #endif
 		if ((dbgwin == NULL) || (dbgnotice == NULL)) h_dbgwin = NULL;
 	}
-	if ( h_dbgwin == NULL ) {
-		hsp3dish_dialog( "No debug module." );
+	if (h_dbgwin == NULL) {
+		hsp3dish_dialog("No debug module.");
 		return -1;
 	}
 	dbginfo->get_value = hsp3dish_debug;
-	dbgwin( dbginfo, 0, 0, 0 );
-	dbgwnd = (HWND)( dbginfo->dbgwin );
+	dbgwin(dbginfo, 0, 0, 0);
+	dbgwnd = (HWND)(dbginfo->dbgwin);
 #endif
 	return 0;
 }
+
 
 /*----------------------------------------------------------*/
 //		デバイスコントロール関連
@@ -1071,12 +1085,13 @@ int hsp3dish_init( HINSTANCE hInstance, char *startfile )
 
 	{
 	//		コマンドライン関連
-	ss = GetCommandLine();
-	ss = strsp_cmds( ss );
+	LPTSTR cl;
+	cl = GetCommandLine();
+	cl = strsp_cmdsW(cl);
 #ifdef HSPDEBUG
-	ss = strsp_cmds( ss );
+	cl = strsp_cmdsW(cl);
 #endif
-	sbStrCopy( &ctx->cmdline, ss );					// コマンドラインパラメーターを保存
+	sbStrCopy( &ctx->cmdline, (char *)cl );					// コマンドラインパラメーターを保存
 	}
 
 	//		SSaver proc
