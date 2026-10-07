@@ -1577,6 +1577,11 @@ static int code_callfunc( int cmd )
 	//	ユーザー拡張命令を呼び出す
 	//
 	code_callfunc_enter( cmd );
+#ifdef HSPEMSCRIPTEN
+	// Command-style calls enter frames asynchronously. A nested deffunc return
+	// must not finish the enclosing synchronous defcfunc evaluation.
+	const int function_sublev = hspctx->sublev;
+#endif
 
 	//		命令内で呼び出しを完結させる
 	//
@@ -1591,6 +1596,9 @@ static int code_callfunc( int cmd )
 			}
 			if ( hspctx->runmode == RUNMODE_RETURN ) {
 				cmdfunc_return();
+#ifdef HSPEMSCRIPTEN
+				if ( hspctx->sublev >= function_sublev ) continue;
+#endif
 				break;
 			} else {
 				if (hspctx->callback_flag) {
@@ -2594,7 +2602,12 @@ static int cmdfunc_prog( int cmd )
 			p2++;
 		}
 		if ( otbak != NULL ) {
+#ifdef HSPEMSCRIPTEN
+			// code_getlb2 has already decoded the next instruction.
+			cmdfunc_gosub( otbak, mcsbak );
+#else
 			code_call( otbak );
+#endif
 			return hspctx->runmode;
 		}
 		break;

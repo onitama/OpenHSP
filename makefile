@@ -63,6 +63,7 @@ OBJS = \
 	src/hsp3dish/obaq/game.do \
 	src/obaq/physics/rock.do \
 	src/obaq/physics/vessel.do \
+	src/hsp3dish/sdl_key.do \
 	src/hsp3dish/linux/hsp3dish.do \
 	src/hsp3dish/linux/webtask_linux.do \
 	src/hsp3/linux/supio_linux.do
@@ -161,6 +162,7 @@ OBJS_GP = \
 	src/hsp3dish/win32gp/gplgt.gpo \
 	src/hsp3dish/win32gp/gpmat.gpo \
 	src/hsp3dish/win32gp/gpphy.gpo \
+	src/hsp3dish/sdl_key.gpo \
 	src/hsp3dish/linux/hsp3dish.gpo \
 	src/hsp3dish/linux/webtask_linux.gpo \
 	src/hsp3/linux/supio_linux.gpo

@@ -39,8 +39,6 @@ gpmat::~gpmat()
 
 void gpmat::revoke(void)
 {
-	if (_flag == GPMAT_FLAG_NONE) return;
-
 	if (_matbuffer) {
 		delete[] _matbuffer;
 	}
@@ -128,12 +126,15 @@ int gpmat::setParameter(char *name, double* p_mat, int count)
 			(float)p_mat[8], (float)p_mat[9], (float)p_mat[10], (float)p_mat[11],
 			(float)p_mat[12], (float)p_mat[13], (float)p_mat[14], (float)p_mat[15]
 		};
+		p_mat += 16;
 	}
 	if (count == 1) {
 		_material->getParameter(name)->setValue(_matbuffer[0]);
 	}
 	else {
-		_material->getParameter(name)->setValue((const gameplay::Matrix*)_matbuffer, count);
+		// The material may outlive this wrapper, and other parameters may also
+		// contain arrays. Each parameter must own its own matrix data.
+		_material->getParameter(name)->setMatrixArray(_matbuffer, count, true);
 	}
 
 	return 0;
@@ -382,19 +383,14 @@ int gamehsp::deleteMat( int id )
 {
 	gpmat *mat = getMat( id );
 	if ( mat == NULL ) return -1;
-	mat->_flag = GPMAT_FLAG_NONE;
 	if ( mat->_mesh ) {
 		delete mat->_mesh;
 		mat->_mesh = NULL;
 	}
 
-	Material* material = mat->_material;
-	if (material) {
-		//material->removeParameter("u_texture");
-		material->removeParameter("u_diffuseTexture");
-
-		SAFE_RELEASE(material);
-	}
+	// Models and other wrappers may still use this material and its parameters.
+	SAFE_RELEASE(mat->_material);
+	mat->revoke();
 	return 0;
 }
 
@@ -669,9 +665,11 @@ int gamehsp::makeNewMatFromObj(int objid, int part, char *nodename)
 	}
 	else {
 		Node* node = getNodeFromName(objid, nodename);
+		if (node == NULL) return -1;
 		Drawable* drawable = node->getDrawable();
 		if (drawable == NULL) return -1;
 		Model* model = dynamic_cast<Model*>(drawable);
+		if (model == NULL) return -1;
 		if (model->getMeshPartCount() == 0) {
 			material = model->getMaterial();
 		}
@@ -685,6 +683,7 @@ int gamehsp::makeNewMatFromObj(int objid, int part, char *nodename)
 	if (mat == NULL) return -1;
 
 	mat->_material = material;
+	material->addRef();
 	mat->_mode = GPMAT_MODE_PROXY;
 	return mat->_id;
 }
@@ -749,6 +748,10 @@ char* gamehsp::getPixelMaskBuffer(char* fname, int* xsize, int* ysize)
 	int sy = (int)image->getHeight();
 	int bwsize = sx * sy;
 	char* mem = (char*)malloc(bwsize);
+	if (mem == NULL) {
+		SAFE_RELEASE(image);
+		return NULL;
+	}
 
 	char* p = (char *)image->getData();		// 転送先のサーフェイスの始点(32bit)
 	int i;
@@ -761,7 +764,7 @@ char* gamehsp::getPixelMaskBuffer(char* fname, int* xsize, int* ysize)
 	*ysize = sy;
 
 	SAFE_RELEASE(image);
-	return NULL;
+	return mem;
 }
 
 
@@ -1075,5 +1078,4 @@ int gamehsp::applySamplerModeByString(Texture::Sampler* sampler, char* name, cha
 	}
 	return -1;
 }
-
 

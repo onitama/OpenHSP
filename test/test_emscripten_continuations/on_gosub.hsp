@@ -1,0 +1,20 @@
+; Run with HSP3Dish on Emscripten.
+; Expected output: before, outer-before, inner, outer-after, after.
+mes "before"
+on 1 gosub *wrong, *outer
+mes "after"
+on -1 gosub *wrong
+on 2 gosub *wrong, *wrong
+end
+*outer
+mes "outer-before"
+on 0 gosub *inner
+mes "outer-after"
+return
+*inner
+mes "inner"
+wait 1
+return
+*wrong
+mes "wrong"
+return

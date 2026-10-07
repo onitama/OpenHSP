@@ -1,0 +1,31 @@
+#include "hgimg4.as"
+; Run with HGIMG4 from sample/hgimg4 so res/shaders is available.
+; Watch the runtime's memory usage while this script keeps running.
+; Before the fix, each reassignment leaves a material clone referenced.
+; After the fix, memory should settle instead of growing with the counter.
+gpreset
+material_a = 0
+material_b = 0
+object_id = 0
+gpcolormat material_a, $ffffff, GPOBJ_MATOPT_NOLIGHT
+gpcolormat material_b, $ff0000, GPOBJ_MATOPT_NOLIGHT
+; Set _usegpmat at creation so the old x64 parameter access cannot bypass
+; the reassignment path. Alternate IDs to also avoid same-ID shortcuts.
+gpbox object_id, 1, , material_a
+reassignments = 0
+repeat
+    repeat 100
+        gpsetprm object_id, PRMSET_USEGPMAT, material_b
+        gpsetprm object_id, PRMSET_USEGPMAT, material_a
+    loop
+    reassignments += 200
+    redraw 0
+    color 0, 0, 0
+    boxf
+    color 255, 255, 255
+    pos 8, 8
+    mes "Material reassignments: " + reassignments
+    mes "Watch the runtime's memory usage. Close the window to finish."
+    redraw 1
+    await 16
+loop

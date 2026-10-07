@@ -491,7 +491,13 @@ static bool hsp_path_wildcard_match(const char* text, const char* pattern)
 static int hsp_path_enumerate_utf8(hsp_path::utf8_view pattern, int flags, hsp_path_list_callback callback, void* user_data)
 {
 	if (callback == NULL || !hsp_path_utf8_is_valid((const unsigned char*)pattern.c_str())) return -1;
-	DIR* directory = opendir(".");
+	// Only the final component is a wildcard pattern; resolve entries relative
+	// to its directory without changing the process's current directory.
+	const char* separator = strrchr(pattern.c_str(), '/');
+	std::string directory_path = separator == NULL ? "./" :
+		std::string(pattern.c_str(), separator - pattern.c_str() + 1);
+	const char* filename_pattern = separator == NULL ? pattern.c_str() : separator + 1;
+	DIR* directory = opendir(directory_path.c_str());
 	if (directory == NULL) return -1;
 
 	int count = 0;
@@ -503,7 +509,8 @@ static int hsp_path_enumerate_utf8(hsp_path::utf8_view pattern, int flags, hsp_p
 
 		if (selected && flags != 0) {
 			struct stat status;
-			if (stat(name, &status) != 0) {
+			std::string entry_path = directory_path + name;
+			if (stat(entry_path.c_str(), &status) != 0) {
 				selected = false;
 			}
 			else {
@@ -521,7 +528,7 @@ static int hsp_path_enumerate_utf8(hsp_path::utf8_view pattern, int flags, hsp_p
 			}
 		}
 
-		if (!selected || !hsp_path_wildcard_match(name, pattern.c_str())) continue;
+		if (!selected || !hsp_path_wildcard_match(name, filename_pattern)) continue;
 		++count;
 		if (callback(hsp_path::utf8_view(name), user_data) != 0) {
 			closedir(directory);

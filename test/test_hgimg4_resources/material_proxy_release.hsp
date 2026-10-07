@@ -1,0 +1,25 @@
+#include "hgimg4.as"
+; Run with HGIMG4 from sample/hgimg4 so res/shaders is available.
+; Before the fix, a material proxy from gpnodeinfo did not add a reference,
+; but deleting the proxy released the model's material. Deleting two proxies
+; frees the material while the box still draws it, so gpdraw crashes.
+; After the fix, the white box keeps rotating.
+gpreset
+setpos GPOBJ_CAMERA, 0, 0, 6
+gpbox object_id, 1, $ffffff
+gpnodeinfo proxy_id, object_id, GPNODEINFO_MATERIAL
+delobj proxy_id
+gpnodeinfo proxy_id, object_id, GPNODEINFO_MATERIAL
+delobj proxy_id
+frames = 0
+repeat
+    addang object_id, 0.01, 0.02
+    redraw 0
+    gpdraw
+    color 0, 0, 0
+    pos 8, 8
+    mes "Frames drawn: " + frames
+    redraw 1
+    frames++
+    await 16
+loop

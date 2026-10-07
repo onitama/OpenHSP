@@ -1,0 +1,14 @@
+; Run with HSP3Dish on Emscripten.
+; Expected output: 10, caller.
+#module
+#defcfunc calculate local value
+value = 2
+on 0 gosub *bump
+return value
+*bump
+value += 5
+return
+#global
+mes calculate() + 3
+mes "caller"
+end

@@ -1,0 +1,39 @@
+#include "hsp3dish.as"
+; Run with HSP3Dish on Linux or Emscripten; inspect input manually.
+; A/Enter/arrows/F1 should update the key values. Left/right/middle clicks
+; should report button IDs 0/3/6. Hold buttons together and release one.
+; Wheel steps should report +/-120; touch coordinates should follow fingers.
+key_message = "Press a key"
+click_message = "Click a mouse button"
+last_wheel = 0
+onkey gosub *key_event
+onclick gosub *click_event
+repeat
+    redraw 0
+    color 0, 0, 0
+    boxf
+    color 255, 255, 255
+    pos 8, 8
+    mes key_message
+    mes click_message
+    stick buttons, 256 + 512
+    mes "stick=" + buttons + " mouse=" + mousex + "," + mousey
+    wheel_delta = mousew
+    if wheel_delta != 0 : last_wheel = wheel_delta
+    mes "wheel=" + last_wheel
+    mtlist point_ids
+    point_count = stat
+    repeat point_count
+        mtinfo point_info, point_ids(cnt)
+        mes "touch=" + point_info(3) + " x=" + point_info(1) + " y=" + point_info(2)
+    loop
+    redraw 1
+    await 16
+loop
+
+*key_event
+key_message = "key=" + iparam + " vk=" + wparam + " details=" + lparam
+return
+*click_event
+click_message = "button=" + iparam + " flags=" + wparam + " position=" + lparam
+return
