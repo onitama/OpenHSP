@@ -544,11 +544,8 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 							NULL, _T("HSP3DishWindow") };
 	RegisterClass(&wndClass);
 
-	// Set the window's initial style
-	//DWORD m_dwWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | /* WS_THICKFRAME | */
-	//	WS_MINIMIZEBOX | /*WS_MAXIMIZEBOX |*/ WS_VISIBLE | WS_CLIPCHILDREN;
-	DWORD m_dwWindowStyle = 0;
 	int exstyle = 0;
+	m_dwWindowStyle = 0;
 
 	// スクリーンタイプごとのウィンドウスタイルの設定。
 	if (style & 0x10100) {
@@ -599,6 +596,22 @@ static void hsp3dish_initwindow(HINSTANCE hInstance, int sx, int sy, int xx, int
 
 	// HWNDをHSPCTXに保存する
 	ctx->wnd_parent = m_hWnd;
+}
+
+
+static void hsp3dish_resizewindow(int sx, int sy)
+{
+	RECT rc;
+	SetRect(&rc, 0, 0, sx, sy);
+	// Set the window's initial width
+	AdjustWindowRect(&rc, m_dwWindowStyle, false);
+
+	SetWindowPos(m_hWnd, NULL, 0, 0, (rc.right - rc.left), (rc.bottom - rc.top), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+//	SetWindowPos(m_hWnd, HWND_TOP, 0, 0,
+//		(rc.right - rc.left), (rc.bottom - rc.top),
+//		SWP_SHOWWINDOW |
+//		SWP_FRAMECHANGED | SWP_NOMOVE);
+
 }
 
 
@@ -927,7 +940,7 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 				hsp_wposx = 0;
 				hsp_wposy = 0;
 			}
-
+#if 0
 			hsp3dish_drawoff();
 			if (m_hWnd != NULL) {
 				hgio_term();
@@ -951,10 +964,12 @@ void hsp3dish_msgfunc( HSPCTX *hspctx )
 			hsp3typeinit_dw_restart(code_gettypeinfo(TYPE_USERDEF));
 #endif
 			DestroyWindow(bak_hwnd);
+#endif
+			hsp3dish_resizewindow(hsp_wx, hsp_wy);
+			hgio_resize_window(hsp_wx, hsp_wy);
 			MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
 			//hgio_rebuild(hsp_wx, hsp_wy, hsp_fullscr, m_hWnd);
 			hspctx->runmode = RUNMODE_RUN;
-			hgio_resize_window(hsp_wx, hsp_wy);
 			break;
 		}
 		default:
