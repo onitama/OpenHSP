@@ -938,6 +938,11 @@ int Bmscr::BmpSave( char *fname )
 {
 	//		save BMP,DIB file
 	//
+#ifdef HSPWIN
+#ifndef HSPDISHGP
+	if (hgio_bmpsave(fname) == false) return -1;
+#endif
+#endif
 	return 0;
 }
 

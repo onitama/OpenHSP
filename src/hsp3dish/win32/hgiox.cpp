@@ -134,30 +134,6 @@ int GetSurface( int x, int y, int sx, int sy, int px, int py, void *res, int mod
 }
 
 
-static void ClearDest( int mode, int color, int tex )
-{
-	switch ( mode ) {
-	case CLSMODE_NONE:
-		//消去(Zバッファのみ)
-		//d3ddev->Clear(0,NULL,D3DCLEAR_ZBUFFER,color,1.0f,0);
-		break;
-	case CLSMODE_SOLID:
-		//塗りつぶして消去
-		//d3ddev->Clear(0,NULL,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,color,1.0f,0);	// T&L使用時
-		break;
-	case CLSMODE_TEXTURE:
-		{
-		//テクスチャで消去
-		}
-	case CLSMODE_BLUR:
-		{
-		//blur clear
-		break;
-		}
-	}
-}
-
-
 static void InitTexture(void)
 {
 	//		テクスチャ情報初期化
@@ -245,10 +221,12 @@ void hgio_clsmode( int mode, int color, int tex )
 }
 
 
-void hgio_resize_window(int x, int y)
+void hgio_resize_window(int x, int y, bool fullscr)
 {
 	if (render == NULL) return;
-	if (render->Resize(x, y)) { nDestWidth = x; nDestHeight = y; }
+	if (render->Resize(x, y, fullscr)) {
+		nDestWidth = x; nDestHeight = y;
+	}
 }
 
 
@@ -270,69 +248,6 @@ int hgio_device_restore( void )
 void hgio_resume( void )
 {
 	hgio_device_restore();
-}
-
-
-int hgio_render_end( void )
-{
-	HRESULT hr;
-	int res;
-
-	if ( drawflag == 0 ) return 0;
-
-	res = 0;
-
-	//シーンレンダー終了
-	hr = render->EndFrame(GetSysReq(SYSREQ_DXVSYNC) == 0);
-	if (FAILED(hr)) {
-		res = -1;
-	}
-	SetSysReq(SYSREQ_DEVLOST, res);
-	drawflag = 0;
-
-	if (res == 0) {
-		tmes.texmesProc();
-	}
-	return res;
-}
-
-
-int hgio_render_start( void )
-{
-	//static D3DXMATRIX InvViewport;
-	if ( drawflag ) {
-		hgio_render_end();
-	}
-
-	//	標準の投影マトリクスを設定する
-	UnitMatrix();
-	OrthoMatrix(0.0f, 0.0f, static_cast<float>(nDestWidth), static_cast<float>(nDestHeight), 0.0f, 1.0f);
-	GetCurrentMatrix(&mat_proj);
-	render->SetViewMatrix(&mat_proj);
-
-	hgio_setfilter(0, 0);
-
-	// DX11フレームを開始する。テクスチャ／ブラー背景は従来のClearDestで続けて描く。
-	render->BeginFrame(GetSysReq(SYSREQ_CLSCOLOR)|0xff000000,
-		GetSysReq(SYSREQ_CLSMODE) != CLSMODE_NONE);
-
-	//render->BeginFrame(0xff202838, true);
-	render->SetBlend(HGIO_BLEND_COPY, false);
-
-	//	画面クリア
-	int bgtex = -1;
-	if (backbm != NULL) { bgtex = backbm->texid; }
-	//ClearDest(GetSysReq(SYSREQ_CLSMODE), GetSysReq(SYSREQ_CLSCOLOR), bgtex);
-
-	//	ユーザー設定の投影マトリクスを設定する
-	if (mainbm) hgio_setview(mainbm);
-	//render->SetViewMatrix(&mymat);
-
-	//シーンレンダー開始
-	TexReset();
-	drawflag = 1;
-
-	return 0;
 }
 
 
@@ -711,7 +626,7 @@ static int CopyAlpha(BMSCR* bm, bool forceTextureAlpha)
 	return mode < 3 ? 255 : (bm->gfrate > 255 ? 255 : bm->gfrate);
 }
 
-static void DrawTexturedQuad(BMSCR* bm, int texid, float x0, float y0, float x1, float y1,
+static void DrawTexturedQuad(int texid, float x0, float y0, float x1, float y1,
 	float u0, float v0, float u1, float v1, int alpha, int rgb)
 {
 	ChangeTex(texid);
@@ -723,6 +638,78 @@ static void DrawTexturedQuad(BMSCR* bm, int texid, float x0, float y0, float x1,
 		{ x0, y1, 0.0f, color, u0, v1 },
 	};
 	DrawQuad(v, true);
+}
+
+/*------------------------------------------------------------*/
+/*
+		Frame Manager
+*/
+/*------------------------------------------------------------*/
+
+int hgio_render_end(void)
+{
+	HRESULT hr;
+	int res;
+
+	if (drawflag == 0) return 0;
+
+	res = 0;
+
+	//シーンレンダー終了
+	hr = render->EndFrame(GetSysReq(SYSREQ_DXVSYNC) == 0);
+	if (FAILED(hr)) {
+		res = -1;
+	}
+	SetSysReq(SYSREQ_DEVLOST, res);
+	drawflag = 0;
+
+	if (res == 0) {
+		tmes.texmesProc();
+	}
+	return res;
+}
+
+
+int hgio_render_start(void)
+{
+	//static D3DXMATRIX InvViewport;
+	if (drawflag) {
+		hgio_render_end();
+	}
+
+	//	標準の投影マトリクスを設定する
+	UnitMatrix();
+	OrthoMatrix(0.0f, 0.0f, static_cast<float>(nDestWidth), static_cast<float>(nDestHeight), 0.0f, 1.0f);
+	GetCurrentMatrix(&mat_proj);
+	render->SetViewMatrix(&mat_proj);
+
+	//	画面クリア
+	// DX11フレームを開始する。テクスチャ／ブラー背景は従来のClearDestで続けて描く。
+	render->BeginFrame(GetSysReq(SYSREQ_CLSCOLOR) | 0xff000000,
+		GetSysReq(SYSREQ_CLSMODE) == CLSMODE_SOLID);
+
+	hgio_setfilter(0, 0);
+	render->SetBlend(HGIO_BLEND_COPY, false);
+
+	//シーンレンダー開始
+	TexReset();
+	drawflag = 1;
+
+	if (GetSysReq(SYSREQ_CLSMODE) == CLSMODE_TEXTURE) {
+		if (backbm) {
+			float x0 = 0.0f;
+			float y0 = 0.0f;
+			float x1 = (float)nDestWidth;
+			float y1 = (float)nDestHeight;
+			DrawTexturedQuad(backbm->texid,x0,y0,x1,y1,0.0f,0.0f,1.0f,1.0f, 255, 0xffffff);
+		}
+		//hgio_copy(mainbm, 0, 0, nDestWidth, nDestHeight, backbm, 1.0f, 1.0f);
+	}
+
+	//	ユーザー設定の投影マトリクスを設定する
+	if (mainbm) hgio_setview(mainbm);
+
+	return 0;
 }
 
 /*------------------------------------------------------------*/
@@ -870,7 +857,7 @@ void hgio_copy(BMSCR* bm, short xx, short yy, short sx, short sy, BMSCR* bmsrc, 
 	const float u1 = (xx + sx) * tex->ratex, v1 = (yy + sy) * tex->ratey;
 	float fx = ((float)bm->cx) + 0.5f;
 	float fy = ((float)bm->cy) + 0.5f;
-	DrawTexturedQuad(bm, bmsrc->texid, fx, fy, fx + scaleX, fy + scaleY,
+	DrawTexturedQuad(bmsrc->texid, fx, fy, fx + scaleX, fy + scaleY,
 		scaleX < 0 ? u1 : u0, scaleY < 0 ? v1 : v0, scaleX < 0 ? u0 : u1, scaleY < 0 ? v0 : v1,
 		CopyAlpha(bm, false), bm->mulcolor);
 
@@ -1495,4 +1482,45 @@ char *hgio_editgetclip(BMSCR* bm)
 	return NULL;
 }
 
+
+// Saves BGRA8 pixels to a top-down BMP. Arguments: path, pixels and image size.
+bool hgio_bmpsave(char *fname)
+{
+	int width = nDestWidth;
+	int height = nDestHeight;
+	HSPAPICHAR* hactmp1 = 0;
+	const DWORD pixelBytes = static_cast<DWORD>(width * height * 4);
+	std::vector<unsigned char> pixels(pixelBytes);
+	if (render->ReadBack(0, 0, width, height, pixels.data(), width * 4) == false) return false;
+
+	BITMAPFILEHEADER fileHeader = {};
+	BITMAPINFOHEADER infoHeader = {};
+
+	fileHeader.bfType = 0x4d42; // "BM"
+	fileHeader.bfOffBits = sizeof(fileHeader) + sizeof(infoHeader);
+	fileHeader.bfSize = fileHeader.bfOffBits + pixelBytes;
+	infoHeader.biSize = sizeof(infoHeader);
+	infoHeader.biWidth = width;
+	infoHeader.biHeight = -height; // Top-down: the DX11 row order is retained.
+	infoHeader.biPlanes = 1;
+	infoHeader.biBitCount = 32;
+	infoHeader.biCompression = BI_RGB;
+	infoHeader.biSizeImage = pixelBytes;
+
+	wchar_t* path = chartoapichar(fname, &hactmp1);
+
+	HANDLE file = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+	freehac(&hactmp1);
+	if (file == INVALID_HANDLE_VALUE) return false;
+
+	DWORD written = 0;
+	const bool ok = WriteFile(file, &fileHeader, sizeof(fileHeader), &written, NULL) &&
+		written == sizeof(fileHeader) &&
+		WriteFile(file, &infoHeader, sizeof(infoHeader), &written, NULL) &&
+		written == sizeof(infoHeader) &&
+		WriteFile(file, pixels.data(), pixelBytes, &written, NULL) && written == pixelBytes;
+	CloseHandle(file);
+	return ok;
+}
 

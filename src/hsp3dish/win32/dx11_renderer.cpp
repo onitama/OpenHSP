@@ -32,7 +32,7 @@ namespace {
 // 描画層を初期化する。すべてのDirect3Dリソースを未生成状態にする。
 HGIO_DX11_RENDERER::HGIO_DX11_RENDERER() : device_(0), context_(0), swapChain_(0), rtv_(0),
  backBuffer_(0), vs_(0), psColor_(0), psTexture_(0), layout_(0), vertexBuffer_(0),
- constantBuffer_(0), pointSampler_(0), linearSampler_(0), width_(0), height_(0) {
+ constantBuffer_(0), pointSampler_(0), linearSampler_(0), width_(0), height_(0), resizing_(false) {
     memset(blend_, 0, sizeof(blend_));
 }
 
@@ -170,6 +170,32 @@ bool HGIO_DX11_RENDERER::Resize(int width,int height) {
     context_->OMSetRenderTargets(0,0,0);
     ReleaseTargets();
     return SUCCEEDED(swapChain_->ResizeBuffers(0,width,height,DXGI_FORMAT_UNKNOWN,0)) && CreateTargets(width,height);
+}
+
+// 表示モードとバックバッファーを変更する。width/height はピクセル数、fullscr は全画面指定。
+bool HGIO_DX11_RENDERER::Resize(int width, int height, bool fullscr) {
+    if (!swapChain_ || !context_ || width <= 0 || height <= 0 || resizing_) return false;
+    // SetFullscreenState can synchronously raise WM_SIZE and reenter Resize.
+    struct ResizeGuard {
+        bool& flag;
+        explicit ResizeGuard(bool& value) : flag(value) { flag = true; }
+        ~ResizeGuard() { flag = false; }
+    } guard(resizing_);
+
+    BOOL fullscreen = FALSE;
+    if (FAILED(swapChain_->GetFullscreenState(&fullscreen, nullptr))) return false;
+    if ((fullscreen != FALSE) != fullscr &&
+        FAILED(swapChain_->SetFullscreenState(fullscr ? TRUE : FALSE, nullptr))) return false;
+
+    const int oldWidth = width_, oldHeight = height_;
+    context_->OMSetRenderTargets(0, nullptr, nullptr);
+    ReleaseTargets();
+    if (FAILED(swapChain_->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0))) {
+        // The old buffers still exist if ResizeBuffers fails; restore their views.
+        CreateTargets(oldWidth, oldHeight);
+        return false;
+    }
+    return CreateTargets(width, height);
 }
 
 // 左上原点の2D画面座標をクリップ空間へ変換する既定行列を設定する。

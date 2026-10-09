@@ -1025,6 +1025,7 @@ static int cmdfunc_extcmd( int cmd )
 #endif
 		}
 		bmscr = wnd->GetBmscr( p1 );
+		bmscr->Viewcalc_reset();
 		cur_window = p1;
 		hgio_gsel( (BMSCR *)bmscr );
 		break;

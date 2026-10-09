@@ -759,9 +759,9 @@ static void hsp3dish_setdevinfo(HSP3DEVINFO *devinfo)
 	//		Initalize DEVINFO
 	mem_devinfo = devinfo;
 #ifdef GP_USE_ANGLE
-	devinfo->devname = "win32dx9";
+	devinfo->devname = "win64dx9";
 #else
-	devinfo->devname = "win32opengl";
+	devinfo->devname = "win64opengl";
 #endif
 	devinfo->error = "";
 	devinfo->devprm = hsp3dish_devprm;
@@ -1161,6 +1161,20 @@ int hsp3dish_init(HINSTANCE hInstance, const char *startfile, HWND hParent)
 	}
 
 	ctx = &hsp->hspctx;
+
+#ifdef HSPUTF8
+	{
+		//		コマンドライン関連
+		LPTSTR cl;
+		cl = GetCommandLine();
+		cl = strsp_cmdsW(cl);
+#ifdef HSPDEBUG
+		cl = strsp_cmdsW(cl);
+#endif
+		sbStrCopy(&ctx->cmdline, (char*)cl);					// コマンドラインパラメーターを保存
+	}
+#endif
+
 	return 0;
 }
 

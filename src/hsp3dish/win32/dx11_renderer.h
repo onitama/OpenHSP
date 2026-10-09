@@ -29,6 +29,7 @@ public:
     bool Create(HWND window, int width, int height, bool fullscreen, bool vsync);
     void Destroy();
     bool Resize(int width, int height);
+    bool Resize(int width, int height, bool fullscr);
     // hgio_render_start / hgio_render_end correspond to these two calls.
     void BeginFrame(unsigned int clearColor, bool clear);
     HRESULT EndFrame(bool vsync);
@@ -80,5 +81,6 @@ private:
     ID3D11SamplerState *linearSampler_;
     ID3D11BlendState *blend_[5];
     int width_, height_;
+    bool resizing_;
     MATRIX view_;
 };
