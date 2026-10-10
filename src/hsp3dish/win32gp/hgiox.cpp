@@ -576,7 +576,7 @@ bool hgio_bmpsave(char* fname)
 #endif
 	SAFE_RELEASE(image);
 
-	return ok;
+	return true;
 }
 
 
