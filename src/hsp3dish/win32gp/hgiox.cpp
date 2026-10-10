@@ -538,6 +538,7 @@ bool hgio_bmpsave(char* fname)
 	gameplay::Image* image = game->getFrameBufferImage();
 	if (image == NULL) return false;
 
+#ifdef HSPWIN
 	int width = nDestWidth;
 	int height = nDestHeight;
 	HSPAPICHAR* hactmp1 = 0;
@@ -557,7 +558,7 @@ bool hgio_bmpsave(char* fname)
 	infoHeader.biBitCount = 32;
 	infoHeader.biCompression = BI_RGB;
 	infoHeader.biSizeImage = pixelBytes;
-#ifdef HSPWIN
+
 	wchar_t* path = chartoapichar(fname, &hactmp1);
 
 	HANDLE file = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
