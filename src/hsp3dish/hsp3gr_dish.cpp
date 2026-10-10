@@ -4667,7 +4667,7 @@ void hsp3gr_cleanup(void)
 	//
 	if (wnd) {
 		wnd->ClearAllObjects();
-		wnd->Dispose();
+		//wnd->Dispose();
 	}
 }
 

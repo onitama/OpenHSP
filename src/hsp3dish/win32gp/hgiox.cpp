@@ -532,6 +532,51 @@ int hgio_render_start( void )
 	return 0;
 }
 
+// Saves BGRA8 pixels to a top-down BMP. Arguments: path, pixels and image size.
+bool hgio_bmpsave(char* fname)
+{
+	gameplay::Image* image = game->getFrameBufferImage();
+	if (image == NULL) return false;
+
+	int width = nDestWidth;
+	int height = nDestHeight;
+	HSPAPICHAR* hactmp1 = 0;
+	const DWORD pixelBytes = static_cast<DWORD>(width * height * 4);
+
+
+	BITMAPFILEHEADER fileHeader = {};
+	BITMAPINFOHEADER infoHeader = {};
+
+	fileHeader.bfType = 0x4d42; // "BM"
+	fileHeader.bfOffBits = sizeof(fileHeader) + sizeof(infoHeader);
+	fileHeader.bfSize = fileHeader.bfOffBits + pixelBytes;
+	infoHeader.biSize = sizeof(infoHeader);
+	infoHeader.biWidth = width;
+	infoHeader.biHeight = -height; // Top-down: the DX11 row order is retained.
+	infoHeader.biPlanes = 1;
+	infoHeader.biBitCount = 32;
+	infoHeader.biCompression = BI_RGB;
+	infoHeader.biSizeImage = pixelBytes;
+
+	wchar_t* path = chartoapichar(fname, &hactmp1);
+
+	HANDLE file = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+	freehac(&hactmp1);
+	if (file == INVALID_HANDLE_VALUE) return false;
+
+	DWORD written = 0;
+	const bool ok = WriteFile(file, &fileHeader, sizeof(fileHeader), &written, NULL) &&
+		written == sizeof(fileHeader) &&
+		WriteFile(file, &infoHeader, sizeof(infoHeader), &written, NULL) &&
+		written == sizeof(infoHeader) &&
+		WriteFile(file, image->getData(), pixelBytes, &written, NULL) && written == pixelBytes;
+	CloseHandle(file);
+	SAFE_RELEASE(image);
+
+	return ok;
+}
+
 
 int hgio_gsel(BMSCR *bm)
 {

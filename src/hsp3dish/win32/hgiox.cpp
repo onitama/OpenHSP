@@ -90,7 +90,8 @@ static		bool need_vsync;	// VSync有効フラグ
 
 static		texmesManager tmes;	// テキストメッセージマネージャー
 
-static		BMSCR *mainbm;		// メインスクリーンのBMSCR
+static		BMSCR* mainbm;		// メインスクリーンのBMSCR
+static		BMSCR* selbm;		// 描画先スクリーンのBMSCR
 static		char m_tfont[256];	// テキスト使用フォント
 static		int m_tsize;		// テキスト使用フォントのサイズ
 static		int m_tstyle;		// テキスト使用フォントのスタイル指定
@@ -168,6 +169,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 
 	master_wnd = (HWND)hwnd;
 	mainbm = NULL;
+	selbm = NULL;
 	backbm = NULL;
 	drawflag = 0;
 	nDestWidth = sx;
@@ -268,6 +270,7 @@ void hgio_screen( BMSCR *bm )
 	drawflag = 0;
 	if (bm->type == HSPWND_TYPE_MAIN) {
 		mainbm = bm;
+		selbm = bm;
 	}
 	hgio_font( DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, DEFAULT_FONT_STYLE );
 }
@@ -351,7 +354,7 @@ int hgio_redraw( BMSCR *bm, int flag )
 	//		(必ずredraw 0～redraw 1をペアにすること)
 	//
 	if ( bm == NULL ) return -1;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 
 	if ( flag & 1 ) {
 		hgio_render_end();
@@ -365,30 +368,32 @@ int hgio_redraw( BMSCR *bm, int flag )
 		hgio_render_start();
 	}
 
-	//	ウインドウアクティブの更新
-	//
-	HWND hwnd;
-	hwnd = GetActiveWindow();
-	if (hwnd != master_wnd) {
-		bm->window_active = 0;
-	}
-	else {
-		bm->window_active = 1;
-	}
+	if (bm->type == HSPWND_TYPE_MAIN) {
 
-	//	カーソルの更新
-	//
-	HSPOBJINFO *info = bm->cur_mo_obj;
-	HCURSOR hc = cursor_arrow;
-
-	if (info) {
-		if (info->owmode & (HSPOBJ_OPTION_EDITSEL| HSPOBJ_OPTION_MULTISEL)) {
-			hc = cursor_ibeam;
+		//	ウインドウアクティブの更新
+		//
+		HWND hwnd;
+		hwnd = GetActiveWindow();
+		if (hwnd != master_wnd) {
+			bm->window_active = 0;
 		}
-	}
-	SetCursor(hc);
-	SetClassLongPtr(hwnd, -12, (LONG_PTR)hc);
+		else {
+			bm->window_active = 1;
+		}
 
+		//	カーソルの更新
+		//
+		HSPOBJINFO *info = bm->cur_mo_obj;
+		HCURSOR hc = cursor_arrow;
+
+		if (info) {
+			if (info->owmode & (HSPOBJ_OPTION_EDITSEL| HSPOBJ_OPTION_MULTISEL)) {
+				hc = cursor_ibeam;
+			}
+		}
+		SetCursor(hc);
+		SetClassLongPtr(hwnd, -12, (LONG_PTR)hc);
+	}
 	return 0;
 }
 
@@ -529,7 +534,10 @@ int hgio_gsel( BMSCR *bm )
 {
 	//		gsel(描画先変更)
 	//
-	hgio_render_end();
+	if ((bm->type == HSPWND_TYPE_MAIN) || (bm->type == HSPWND_TYPE_OFFSCREEN)) {
+		if (drawflag) hgio_render_end();
+	}
+	selbm = bm;
 	return 0;
 }
 
@@ -654,18 +662,25 @@ int hgio_render_end(void)
 	if (drawflag == 0) return 0;
 
 	res = 0;
-
-	//シーンレンダー終了
-	hr = render->EndFrame(GetSysReq(SYSREQ_DXVSYNC) == 0);
-	if (FAILED(hr)) {
-		res = -1;
-	}
-	SetSysReq(SYSREQ_DEVLOST, res);
 	drawflag = 0;
 
-	if (res == 0) {
-		tmes.texmesProc();
+	if (selbm->type == HSPWND_TYPE_MAIN) {
+
+		//シーンレンダー終了
+		hr = render->EndFrame(GetSysReq(SYSREQ_DXVSYNC) == 0);
+		if (FAILED(hr)) {
+			res = -1;
+		}
+		SetSysReq(SYSREQ_DEVLOST, res);
+
+		if (res == 0) {
+			tmes.texmesProc();
+		}
 	}
+	else {
+		render->SetRenderTarget(NULL);
+	}
+
 	return res;
 }
 
@@ -683,10 +698,20 @@ int hgio_render_start(void)
 	GetCurrentMatrix(&mat_proj);
 	render->SetViewMatrix(&mat_proj);
 
-	//	画面クリア
-	// DX11フレームを開始する。テクスチャ／ブラー背景は従来のClearDestで続けて描く。
-	render->BeginFrame(GetSysReq(SYSREQ_CLSCOLOR) | 0xff000000,
-		GetSysReq(SYSREQ_CLSMODE) == CLSMODE_SOLID);
+	if (selbm->type == HSPWND_TYPE_MAIN) {
+		// DX11フレームを開始する
+		render->BeginFrame(GetSysReq(SYSREQ_CLSCOLOR) | 0xff000000,
+			GetSysReq(SYSREQ_CLSMODE) == CLSMODE_SOLID);
+	}
+	else {
+		// DX11テクスチャフレームを開始する
+		TEXINF *tex = GetTex(selbm->texid);
+		if (!tex) return -1;
+		HGIO_DX11_TEXTURE* texture = (HGIO_DX11_TEXTURE*)tex->data;
+		if (render->SetRenderTarget(texture) == false) {
+			return -2;
+		}
+	}
 
 	hgio_setfilter(0, 0);
 	render->SetBlend(HGIO_BLEND_COPY, false);
@@ -695,19 +720,21 @@ int hgio_render_start(void)
 	TexReset();
 	drawflag = 1;
 
-	if (GetSysReq(SYSREQ_CLSMODE) == CLSMODE_TEXTURE) {
-		if (backbm) {
-			float x0 = 0.0f;
-			float y0 = 0.0f;
-			float x1 = (float)nDestWidth;
-			float y1 = (float)nDestHeight;
-			DrawTexturedQuad(backbm->texid,x0,y0,x1,y1,0.0f,0.0f,1.0f,1.0f, 255, 0xffffff);
+	if (selbm->type == HSPWND_TYPE_MAIN) {
+		if (GetSysReq(SYSREQ_CLSMODE) == CLSMODE_TEXTURE) {
+			if (backbm) {
+				float x0 = 0.0f;
+				float y0 = 0.0f;
+				float x1 = (float)nDestWidth;
+				float y1 = (float)nDestHeight;
+				DrawTexturedQuad(backbm->texid, x0, y0, x1, y1, 0.0f, 0.0f, 1.0f, 1.0f, 255, 0xffffff);
+			}
+			//hgio_copy(mainbm, 0, 0, nDestWidth, nDestHeight, backbm, 1.0f, 1.0f);
 		}
-		//hgio_copy(mainbm, 0, 0, nDestWidth, nDestHeight, backbm, 1.0f, 1.0f);
 	}
 
 	//	ユーザー設定の投影マトリクスを設定する
-	if (mainbm) hgio_setview(mainbm);
+	if (selbm) hgio_setview(selbm);
 
 	return 0;
 }
@@ -726,7 +753,7 @@ void hgio_line( BMSCR *bm, float x, float y )
 	//		(ラインの座標は必要な数だけhgio_line2を呼び出す)
 	//
 	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	ChangeTex(-1); SetAlphaMode(0);
@@ -751,7 +778,7 @@ void hgio_boxfAlpha(BMSCR *bm, float x0, float y0, float x1, float y1, int alpha
 	unsigned int color;
 
 	if (bm == NULL) return;
-	if (bm->type != HSPWND_TYPE_MAIN) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	ChangeTex(-1);
@@ -786,7 +813,7 @@ void hgio_circle(BMSCR* bm, float x0, float y0, float x1, float y1, int mode)
 	//		円描画
 	//
 	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	const float cx = (x0 + x1) * 0.5f, cy = (y0 + y1) * 0.5f, rx = fabsf(x1 - x0) * 0.5f, ry = fabsf(y1 - y0) * 0.5f;
@@ -810,7 +837,7 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 	//		矩形(回転)描画
 	//
 	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	ChangeTex(-1);
@@ -844,17 +871,16 @@ void hgio_copy(BMSCR* bm, short xx, short yy, short sx, short sy, BMSCR* bmsrc, 
 	int texid;
 
 	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) {
-		//Alertf( "type%d #%d",bm->type,bm->wid );
-		throw HSPERR_UNSUPPORTED_FUNCTION;
-	}
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	texid = bmsrc->texid;
 	tex = GetTex(texid); if (!tex) return;
 
-	const float u0 = xx * tex->ratex + tex->ratehx, v0 = yy * tex->ratey + tex->ratehy;
-	const float u1 = (xx + sx) * tex->ratex, v1 = (yy + sy) * tex->ratey;
+	const float u0 = xx * tex->ratex; //+tex->ratehx
+	const float v0 = yy * tex->ratey; //+tex->ratehy
+	const float u1 = (float)(xx + sx) * tex->ratex;
+	const float v1 = (float)(yy + sy) * tex->ratey;
 	float fx = ((float)bm->cx) + 0.5f;
 	float fy = ((float)bm->cy) + 0.5f;
 	DrawTexturedQuad(bmsrc->texid, fx, fy, fx + scaleX, fy + scaleY,
@@ -871,10 +897,7 @@ void hgio_fontcopy(BMSCR *bm, int x, int y, int psx, int psy, int texid, int bas
 	//		カレントポジション、描画モードはBMSCRから取得
 	//
 	if (bm == NULL) return;
-	if (bm->type != HSPWND_TYPE_MAIN) {
-		//Alertf( "type%d #%d",bm->type,bm->wid );
-		throw HSPERR_UNSUPPORTED_FUNCTION;
-	}
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	TEXINF* tex = GetTex(texid);
@@ -903,8 +926,8 @@ void hgio_fontcopy(BMSCR *bm, int x, int y, int psx, int psy, int texid, int bas
 	tx1 *= sx;
 	ty0 *= sy;
 	ty1 *= sy;
-	tx0 += tex->ratehx;
-	ty0 += tex->ratehy;
+	//tx0 += tex->ratehx;
+	//ty0 += tex->ratehy;
 
 	int col;
 	if (GetSysReq(SYSREQ_FIXMESALPHA)) {
@@ -953,7 +976,7 @@ void hgio_copyrot(BMSCR* bm, short xx, short yy, short srcsx, short srcsy, float
 	//		カレントポジション、描画モードはBMSCRから取得
 	//
 	if (bm == NULL) return;
-	if (bm->type != HSPWND_TYPE_MAIN) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	TEXINF* tex = GetTex(bmsrc->texid);
@@ -979,8 +1002,8 @@ void hgio_copyrot(BMSCR* bm, short xx, short yy, short srcsx, short srcsy, float
 	y1 = my1 * ofsx;
 
 	//		基点の算出
-	x = ((float)bm->cx - (-x0 + x1));
-	y = ((float)bm->cy - (-y0 + y1));
+	x = (((float)bm->cx) + 0.5f - (-x0 + x1));
+	y = (((float)bm->cy) + 0.5f - (-y0 + y1));
 
 	/*-------------------------------*/
 
@@ -1006,8 +1029,8 @@ void hgio_copyrot(BMSCR* bm, short xx, short yy, short srcsx, short srcsy, float
 	ty0 = ((float)yy) * sy;
 	tx1 = ((float)(texpx)) * sx;
 	ty1 = ((float)(texpy)) * sy;
-	tx0 += tex->ratehx;
-	ty0 += tex->ratehy;
+	//tx0 += tex->ratehx;
+	//ty0 += tex->ratehy;
 
 	v = &vertices[0];
 	const int alpha = CopyAlpha(bm, false);
@@ -1077,7 +1100,7 @@ void hgio_square_tex( BMSCR *bm, int *posx, int *posy, BMSCR *bmsrc, int *uvx, i
 	//		四角形(square)テクスチャ描画
 	//
 	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	TEXINF* tex = GetTex(bmsrc->texid);
@@ -1100,7 +1123,7 @@ void hgio_square( BMSCR *bm, int *posx, int *posy, int *colors )
 	//		四角形(square)単色描画
 	//
 	if ( bm == NULL ) return;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	ChangeTex(-1);
@@ -1162,7 +1185,7 @@ int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSC
 	int total;
 
 	if ( bm == NULL ) return 0;
-	if ( bm->type != HSPWND_TYPE_MAIN ) throw HSPERR_UNSUPPORTED_FUNCTION;
+	if ((bm->type != HSPWND_TYPE_MAIN) && (bm->type != HSPWND_TYPE_OFFSCREEN)) throw HSPERR_UNSUPPORTED_FUNCTION;
 	if (drawflag == 0) hgio_render_start();
 
 	total =0;

@@ -1,6 +1,8 @@
 #include "dx11_renderer.h"
 #include <cstring>
 #include <wincodec.h>
+#include "../../hsp3/hsp3config.h"
+#include "../supio.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -270,18 +272,16 @@ void HGIO_DX11_RENDERER::Draw(HGIO_DX11_TOPOLOGY t,const HGIO_DX11_VERTEX *v,uns
 }
 
 // GPUテクスチャを作成する。r は受け取り先、w/h はサイズ、f は形式、p/pitch は任意の初期画素と1行のバイト数。
-bool HGIO_DX11_RENDERER::CreateTexture(HGIO_DX11_TEXTURE *r,int w,int h,DXGI_FORMAT f,const void *p,unsigned int pitch) {
+bool HGIO_DX11_RENDERER::CreateTexture(HGIO_DX11_TEXTURE* r, int w, int h, DXGI_FORMAT f, const void* p, unsigned int pitch) {
     // r must either be zero-initialized or have been returned by this class.
-    if (!r || w <= 0 || h <= 0) return false;
-    DeleteTexture(r);
-    D3D11_TEXTURE2D_DESC d={}; d.Width=w; d.Height=h; d.MipLevels=1; d.ArraySize=1; d.Format=f; d.SampleDesc.Count=1;
-    d.Usage=D3D11_USAGE_DEFAULT; d.BindFlags=D3D11_BIND_SHADER_RESOURCE;
-    D3D11_SUBRESOURCE_DATA s={}; s.pSysMem=p; s.SysMemPitch=pitch;
-    if (FAILED(device_->CreateTexture2D(&d,p?&s:0,&r->texture))) return false;
-    if (FAILED(device_->CreateShaderResourceView(r->texture,0,&r->srv))) {
-        DeleteTexture(r); return false;
-    }
-    r->width=w; r->height=h; return true;
+    if (!r || w <= 0 || h <= 0) return false; DeleteTexture(r);
+    D3D11_TEXTURE2D_DESC d = {}; d.Width = w; d.Height = h; d.MipLevels = 1; d.ArraySize = 1; d.Format = f; d.SampleDesc.Count = 1;
+    d.Usage = D3D11_USAGE_DEFAULT; d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    if (f == DXGI_FORMAT_B8G8R8A8_UNORM) d.BindFlags |= D3D11_BIND_RENDER_TARGET;
+    D3D11_SUBRESOURCE_DATA s = {}; s.pSysMem = p; s.SysMemPitch = pitch;
+    if (FAILED(device_->CreateTexture2D(&d, p ? &s : 0, &r->texture))) return false;
+    if (FAILED(device_->CreateShaderResourceView(r->texture, 0, &r->srv))) { DeleteTexture(r); return false; }
+    r->width = w; r->height = h; return true;
 }
 
 // テクスチャ画素を更新する。t は対象、p/pitch は入力画素、area は更新範囲（nullなら全体）。
@@ -346,6 +346,61 @@ done:
 }
 
 
+// 描画先を切り替える。texture は描画先（nullptr で画面）、
+// clear は消去指定、clearColor は AARRGGBB 形式の消去色。
+bool HGIO_DX11_RENDERER::SetRenderTarget( const HGIO_DX11_TEXTURE* texture )
+{
+    if (!device_ || !context_) return false;
+
+    ID3D11RenderTargetView* target = rtv_;
+    int width = width_;
+    int height = height_;
+
+    if (texture) {
+        if (!texture->texture) return false;
+
+        D3D11_TEXTURE2D_DESC desc = {};
+        texture->texture->GetDesc(&desc);
+        if (!(desc.BindFlags & D3D11_BIND_RENDER_TARGET)) return false;
+
+        if (FAILED(device_->CreateRenderTargetView(
+            texture->texture, nullptr, &target))) {
+            return false;
+        }
+
+        width = static_cast<int>(desc.Width);
+        height = static_cast<int>(desc.Height);
+    }
+
+    if (!target || width <= 0 || height <= 0) return false;
+
+    // 同じテクスチャを読み込み用と描画先に同時設定しない。
+    // このレンダラーで使用する読み込みスロット t0 を解除する。
+    SetTexture(nullptr);
+    context_->OMSetRenderTargets(1, &target, nullptr);
+
+    D3D11_VIEWPORT viewport = {};
+    viewport.Width = static_cast<float>(width);
+    viewport.Height = static_cast<float>(height);
+    viewport.MaxDepth = 1.0f;
+    context_->RSSetViewports(1, &viewport);
+
+    // 描画先の左上を原点とするピクセル座標に設定する。
+    MATRIX matrix = {};
+    matrix.m00 = 2.0f / width;
+    matrix.m11 = -2.0f / height;
+    matrix.m22 = 1.0f;
+    matrix.m33 = 1.0f;
+    matrix.m30 = -1.0f;
+    matrix.m31 = 1.0f;
+    SetViewMatrix(&matrix);
+
+    // 設定後はコンテキストが参照を保持する。
+    if (texture) target->Release();
+    return true;
+}
+
+
 void HGIO_DX11_RENDERER::Test(void)
 {
     RECT client = {};
@@ -381,6 +436,4 @@ void HGIO_DX11_RENDERER::Test(void)
     };
     this->Draw(HGIO_TOPOLOGY_TRIANGLE_FAN, redRect, ARRAYSIZE(redRect), false);
 }
-
-
 

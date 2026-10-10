@@ -193,7 +193,6 @@ void HspWnd::MakeBmscr( int id, int type, int x, int y, int sx, int sy, int opti
 	bm->Init( sx, sy );
 	bm->master_hspwnd = static_cast< void * >( this );
 	bm->buffer_option = option;
-
 	if (type == HSPWND_TYPE_OFFSCREEN) {
 		bm->resname = "*buffer" + std::to_string(bm->wid);
 		hgio_buffer( (BMSCR *)bm );
@@ -939,9 +938,7 @@ int Bmscr::BmpSave( char *fname )
 	//		save BMP,DIB file
 	//
 #ifdef HSPWIN
-#ifndef HSPDISHGP
 	if (hgio_bmpsave(fname) == false) return -1;
-#endif
 #endif
 	return 0;
 }

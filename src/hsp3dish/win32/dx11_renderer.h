@@ -54,6 +54,7 @@ public:
     bool ReadBack(int x, int y, int width, int height, void *dest, unsigned int destRowPitch);
     void Draw(HGIO_DX11_TOPOLOGY topology, const HGIO_DX11_VERTEX *vertices,
               unsigned int count, bool textured);
+    bool HGIO_DX11_RENDERER::SetRenderTarget(const HGIO_DX11_TEXTURE* texture);
 
     void Test(void);
 

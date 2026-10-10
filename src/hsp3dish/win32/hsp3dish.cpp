@@ -1246,7 +1246,7 @@ void hsp3dish_bye( void )
 	try {
 #endif
 		hsp3gr_cleanup();
-		hsp->Dispose();
+//		hsp->Dispose();
 #ifdef HSPERR_HANDLE
 	}
 	catch (HSPERROR code) {						// HSPエラー例外処理

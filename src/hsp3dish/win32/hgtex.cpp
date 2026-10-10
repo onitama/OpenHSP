@@ -358,53 +358,6 @@ static void TexCopySub16( char *dst, char *src, int size )
 	}
 }
 
-#if 0
-static D3DFORMAT GetAvailableFormat( int sw )
-{
-	//		テクスチャの使用可能なフォーマットを調べる
-	//				sw: 0=full color/1=palette 
-	D3DFORMAT ok;
-	HRESULT hr;
-	int bitn;
-	int vmode = 0;	//GetSysReq( SYSREQ_RESVMODE );
-	D3DDEVTYPE dtype;
-
-	if ( vmode & 0x1000 ) dtype = D3DDEVTYPE_REF; else dtype = D3DDEVTYPE_HAL;
-	if ( sw == 0 ) {
-		bitn=32;
-		if ((target_disp.Format==D3DFMT_X1R5G5B5)||
-		    (target_disp.Format==D3DFMT_A1R5G5B5)) {
-			bitn=16;
-		}
-		if ( bitn==32 ) {
-			ok = D3DFMT_A8R8G8B8;
-			hr = d3d->CheckDeviceFormat( D3DADAPTER_DEFAULT, dtype,
-					target_disp.Format, 0, D3DRTYPE_TEXTURE, ok );
-			if ( hr==D3D_OK ) return ok;
-			ok = D3DFMT_X8R8G8B8;
-			hr = d3d->CheckDeviceFormat( D3DADAPTER_DEFAULT, dtype,
-					target_disp.Format, 0, D3DRTYPE_TEXTURE, ok );
-			if ( hr==D3D_OK ) return ok;
-		}
-		ok = D3DFMT_A1R5G5B5;
-		hr = d3d->CheckDeviceFormat( D3DADAPTER_DEFAULT, dtype,
-				target_disp.Format, 0, D3DRTYPE_TEXTURE, ok );
-		if ( hr==D3D_OK ) return ok;
-		ok = D3DFMT_X1R5G5B5;
-		hr = d3d->CheckDeviceFormat( D3DADAPTER_DEFAULT, dtype,
-				target_disp.Format, 0, D3DRTYPE_TEXTURE, ok );
-		if ( hr==D3D_OK ) return ok;
-		return D3DFMT_UNKNOWN;
-	}
-	ok = D3DFMT_P8;
-	hr = d3d->CheckDeviceFormat( D3DADAPTER_DEFAULT, dtype,
-			target_disp.Format, 0, D3DRTYPE_TEXTURE, ok );
-	if ( hr==D3D_OK ) return ok;
-	return D3DFMT_UNKNOWN;
-}
-#endif
-
-
 static int Get2N( int val )
 {
 	int res = 1;

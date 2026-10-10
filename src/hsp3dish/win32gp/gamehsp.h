@@ -600,6 +600,7 @@ public:
 	int addFreeVertexPolygon(int id1, int id2, int id3, int id4=-1);
 	int makeFreeVertexNode(int color, int matid);
 
+	Image *getFrameBufferImage(void);
 
 protected:
     /**

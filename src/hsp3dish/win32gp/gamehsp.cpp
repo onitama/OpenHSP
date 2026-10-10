@@ -651,6 +651,44 @@ void gamehsp::resumeFrameBuffer(void)
 }
 
 
+Image* gamehsp::getFrameBufferImage(void)
+{
+	//	フレームバッファの内容をImageに変換する
+	//
+	int width = getWidth();
+	int height = getHeight();
+	gameplay::Image* image = Image::create(width, height, gameplay::Image::RGBA);
+	if (_previousFrameBuffer == NULL) {
+		unsigned char *pixels = image->getData();
+		int rowSize = (width * 4); 
+		std::vector<unsigned char> glPixels(width * height * 4);
+		unsigned char* gp = &glPixels[0];
+		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+		glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, gp);
+		for (int y = height-1; y >= 0 ; y--)
+		{
+			unsigned char* p = pixels + (rowSize * y);
+			for (int x = 0; x < width; x++)
+			{
+				unsigned char a1 = gp[2]; //B
+				unsigned char a2 = gp[1]; //G
+				unsigned char a3 = gp[0]; //R
+				unsigned char a4 = gp[3]; //R
+				gp += 4;
+				*p++ = a1;
+				*p++ = a2;
+				*p++ = a3;
+				*p++ = a4;
+			}
+		}
+	}
+	else {
+		_previousFrameBuffer->getScreenshot(image);
+	}
+	return image;
+}
+
+
 void gamehsp::clearFrameBuffer(void)
 {
 	Vector4 clscolor;
