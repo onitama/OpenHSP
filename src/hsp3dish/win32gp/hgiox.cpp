@@ -557,7 +557,7 @@ bool hgio_bmpsave(char* fname)
 	infoHeader.biBitCount = 32;
 	infoHeader.biCompression = BI_RGB;
 	infoHeader.biSizeImage = pixelBytes;
-
+#ifdef HSPWIN
 	wchar_t* path = chartoapichar(fname, &hactmp1);
 
 	HANDLE file = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
@@ -572,6 +572,7 @@ bool hgio_bmpsave(char* fname)
 		written == sizeof(infoHeader) &&
 		WriteFile(file, image->getData(), pixelBytes, &written, NULL) && written == pixelBytes;
 	CloseHandle(file);
+#endif
 	SAFE_RELEASE(image);
 
 	return ok;
