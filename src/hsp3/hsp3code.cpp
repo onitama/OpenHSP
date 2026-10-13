@@ -4243,6 +4243,8 @@ char *code_dbgvarinf( char *target, int option )
 	code_inidbg();
 	max = maxvar;
 
+	int lang = hspctx->language;
+
 	if ( target == NULL ) {
 		for(i=0;i<max;i++) {
 			name = code_getdebug_varname( i );
@@ -4267,22 +4269,42 @@ char *code_dbgvarinf( char *target, int option )
 
 	pv = &hspctx->mem_var[id];
 	proc = HspVarCoreGetProc(pv->flag);
-	code_adddbg2( "変数名", name );
-	code_adddbg2( "型", proc->vartype_name );
+
+	char* msg1 = "Variable";
+	char* msg2 = "Type";
+	char* msg3 = "Array";
+	char* msg4 = "Mode";
+	char* msg5 = "Memory Size";
+	char* msg6 = "Buffer Size";
+	char* msg7 = "Detail:";
+
+	if (lang == HSPCTX_LANGUAGE_JP) {
+		msg1 = "変数名";
+		msg2 = "型";
+		msg3 = "配列";
+		msg4 = "モード";
+		msg5 = "使用サイズ";
+		msg6 = "バッファサイズ";
+		msg7 = "内容:";
+	}
+
+	code_adddbg2( msg1, name );
+	code_adddbg2( msg2, proc->vartype_name );
 	sprintf( tmp, "(%d,%d,%d,%d)",pv->len[1],pv->len[2],pv->len[3],pv->len[4] );
-	code_adddbg2( "配列", tmp );
-	code_adddbg2( "モード", pv->mode );
-	code_adddbg2( "使用サイズ", pv->size );
+	code_adddbg2( msg3, tmp );
+	code_adddbg2( msg4, pv->mode );
+	code_adddbg2( msg5, pv->size );
 
 	HspVarCoreReset( pv );
 	src = proc->GetPtr( pv );
 	padr = (char *)proc->GetBlockSize( pv, src, &size );
-	code_adddbg2( "バッファサイズ", size );
+	code_adddbg2( msg6, size );
 
 	switch( pv->flag ) {
 	case HSPVAR_FLAG_STR:
 	case HSPVAR_FLAG_DOUBLE:
 	case HSPVAR_FLAG_INT:
+	case HSPVAR_FLAG_INT64:
 		if ( pv->flag != HSPVAR_FLAG_STR ) {
 			p = (char *)HspVarCoreCnv( pv->flag, HSPVAR_FLAG_STR, src );
 		} else {
@@ -4292,17 +4314,17 @@ char *code_dbgvarinf( char *target, int option )
 		if ( orgsize >= 1024 ) {
 			strncpy( hspctx->stmp, p, 1023 );
 			p = hspctx->stmp; p[1023] = 0;
-			sprintf( tmp, "(内容%dbytesの一部を表示しています)\r\n",orgsize );
+			sprintf( tmp, "(... Total %dbytes)\r\n",orgsize );
 			sbStrAdd( &dbgbuf, tmp );
 		}
-		code_adddbg( "内容:", p );
+		code_adddbg(msg7, p );
 		break;
 	case HSPVAR_FLAG_LABEL:
 	default:
 		{
 		char tmpbuf[256];
 		code_dbgvarinf_ext( pv, src, tmpbuf );
-		code_adddbg( "内容:", tmpbuf );
+		code_adddbg(msg7, tmpbuf );
 		break;
 		}
 	}

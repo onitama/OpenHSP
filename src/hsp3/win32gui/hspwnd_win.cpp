@@ -19,11 +19,17 @@
 
 #ifndef HSP_COMPACT
 #include "fcpoly.h"
-#define USE_STBIMAGE
+//#define USE_STBIMAGE
+#define USE_WICIMAGE
 #endif
 
 #ifdef USE_STBIMAGE
 #include "stb_image.h"
+#endif
+
+#ifdef USE_WICIMAGE
+#include <wincodec.h>
+#pragma comment(lib, "windowscodecs.lib")
 #endif
 
 #include <ocidl.h>
@@ -646,7 +652,106 @@ void HspWnd::MakeBmscr( int id, int type, int xx, int yy, int wx, int wy, int sx
 	}
 }
 
+#ifdef USE_WICIMAGE
+#define SAFE_RELEASE(p) do { if (p) { (p)->Release(); (p) = 0; } } while (0)
+int HspWnd::Picload(int id, char* fname, int mode)
+{
+	//		picload
+	//		( mode:0=resize/1=overwrite )
+	//
+	Bmscr* bm;
+	void* pBuf;
+	HGLOBAL h;
+	HSPPTRINT i,size;
+	int res;
+	int x, y;
+	HRESULT hr;
 
+	res = 0;
+	bm = GetBmscr(id);
+	if (bm == NULL) return 1;
+	if (bm->flag == BMSCR_FLAG_NOUSE) return 1;
+
+	//　ファイルサイズを取得
+	size = dpm_exist(fname);
+	if (size <= 0) return 1;
+
+	// グローバル領域を確保
+	h = GlobalAlloc(GMEM_MOVEABLE, size);
+	if (h == NULL) return 2;
+	pBuf = GlobalLock(h);
+	if (pBuf == NULL) return 2;
+	i = dpm_read(fname, pBuf, size, 0);
+	if (i <= 0) return 1;
+
+	IWICImagingFactory* f = 0;
+	IWICStream* stream = 0;
+	IWICBitmapDecoder* dec = 0;
+	IWICBitmapFrameDecode* frame = 0;
+	IWICFormatConverter* cv = 0;
+	unsigned int psx, psy;
+	res = 3;
+	if (FAILED(CoCreateInstance(CLSID_WICImagingFactory, 0, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&f)))) goto wic_over;
+	if (FAILED(f->CreateStream(&stream)) || FAILED(stream->InitializeFromMemory((WICInProcPointer)pBuf, (DWORD)size))) goto wic_over;
+	if (FAILED(f->CreateDecoderFromStream(stream, 0, WICDecodeMetadataCacheOnLoad, &dec)) || FAILED(dec->GetFrame(0, &frame)) || FAILED(f->CreateFormatConverter(&cv))) goto wic_over;
+
+	if (FAILED(frame->GetSize(&psx, &psy)) || FAILED(cv->Initialize(frame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, 0, 0, WICBitmapPaletteTypeCustom))) goto wic_over;
+	{
+		// 画像サイズで初期化する
+		if ((mode == 0) || (mode == 2)) {
+			int palsw, type;
+			type = bm->type; palsw = bm->palmode;
+			MakeBmscr(id, type, -1, -1, psx, psy, psx, psy, palsw);
+			bm = GetBmscr(id);
+			if (mode == 2) bm->Cls(4);	// 黒色でクリアしておく
+			bm->resname = "";
+		}
+		unsigned int pitch = psx * 4, bytes = pitch * psy;
+
+		// 負の高さで、画像データと同じ上から下への行順にする。
+		BITMAPINFO info = {};
+		info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		info.bmiHeader.biWidth = static_cast<LONG>(psx);
+		info.bmiHeader.biHeight = -static_cast<LONG>(psy);
+		info.bmiHeader.biPlanes = 1;
+		info.bmiHeader.biBitCount = 32;
+		info.bmiHeader.biCompression = BI_RGB;
+
+		void* pixels = NULL;
+		HBITMAP bitmap = CreateDIBSection( bm->hdc, &info, DIB_RGB_COLORS, &pixels, NULL, 0);
+		if (!bitmap) return 4;
+		hr = cv->CopyPixels( NULL, pitch, bytes, static_cast<BYTE*>(pixels));
+		if (SUCCEEDED(hr)) {
+			HDC source = CreateCompatibleDC(bm->hdc);
+			if (source) {
+				HGDIOBJ oldBitmap = SelectObject(source, bitmap);
+				if (oldBitmap) {
+					BLENDFUNCTION blend = {};
+					blend.BlendOp = AC_SRC_OVER;
+					blend.SourceConstantAlpha = 255;
+					blend.AlphaFormat = AC_SRC_ALPHA;
+
+					// setup initial position
+					x = bm->cx; y = bm->cy;
+					AlphaBlend(bm->hdc, x, y, psx, psy, source, 0, 0, psx, psy, blend);
+					//BitBlt(bm->hdc, x, y, psx, psy, source, 0, 0, SRCCOPY);
+					SelectObject(source, oldBitmap);
+					bm->Send(x, y, psx, psy);
+					bm->resname = fname;
+					res = 0;
+				}
+				DeleteDC(source);
+			}
+		}
+		DeleteObject(bitmap);
+	}
+wic_over:
+	SAFE_RELEASE(cv); SAFE_RELEASE(frame); SAFE_RELEASE(dec); SAFE_RELEASE(stream); SAFE_RELEASE(f);
+	GlobalUnlock(h);
+	GlobalFree(h);
+	return res;
+}
+#else
 int HspWnd::Picload( int id, char *fname, int mode )
 {
 	//		picload
@@ -756,7 +861,7 @@ int HspWnd::Picload( int id, char *fname, int mode )
 	GlobalFree(h);
 	return 0;
 }
-
+#endif
 
 Bmscr *HspWnd::GetBmscrSafe( int id )
 {
