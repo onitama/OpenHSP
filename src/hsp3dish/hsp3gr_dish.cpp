@@ -832,6 +832,7 @@ static int cmdfunc_extcmd( int cmd )
 		bmscr->gx = p2;
 		bmscr->gy = p3;
 		bmscr->gfrate = p4;
+		if ( bmscr->gfrate > 255 ) bmscr->gfrate = 255;
 		//Alertf("OK");
 		break;
 

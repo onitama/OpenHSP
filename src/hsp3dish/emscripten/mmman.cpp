@@ -392,7 +392,7 @@ int MMMan::Play( int num, int ch )
 		if (m->vol>=0) {
 			MusicVolume( m->vol );
 		}
-		MusicPlay(num,m->opt);
+		MusicPlay(num, loop ? -1 : 0);
 		break;
 	default:
 		return 2;
