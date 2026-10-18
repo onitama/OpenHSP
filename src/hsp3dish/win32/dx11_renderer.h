@@ -4,6 +4,7 @@
 #include <d3d11.h>
 #include <dxgi.h>
 #include <d3dcompiler.h>
+#include <vector>
 #include "../geometry.h"
 
 struct HGIO_DX11_VERTEX {
@@ -55,6 +56,11 @@ public:
     void Draw(HGIO_DX11_TOPOLOGY topology, const HGIO_DX11_VERTEX *vertices,
               unsigned int count, bool textured);
     bool HGIO_DX11_RENDERER::SetRenderTarget(const HGIO_DX11_TEXTURE* texture);
+    // Keep texture/blend/filter/view/target unchanged until DrawEnd. Do not interleave Draw.
+    // Each DrawAdd is an independent fan or line list; vertices are copied immediately.
+    void DrawStart(HGIO_DX11_TOPOLOGY t, bool textured);
+    void DrawAdd(const HGIO_DX11_VERTEX* v, unsigned int n);
+    void DrawEnd(void);
 
     void Test(void);
 
@@ -84,4 +90,10 @@ private:
     int width_, height_;
     bool resizing_;
     MATRIX view_;
+
+    ID3D11Buffer* batchBuffer_;
+    unsigned int batchCapacity_;
+    bool batchActive_, batchTextured_;
+    HGIO_DX11_TOPOLOGY batchTopology_;
+    std::vector<HGIO_DX11_VERTEX> batchVertices_;
 };

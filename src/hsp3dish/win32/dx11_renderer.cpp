@@ -36,6 +36,11 @@ HGIO_DX11_RENDERER::HGIO_DX11_RENDERER() : device_(0), context_(0), swapChain_(0
  backBuffer_(0), vs_(0), psColor_(0), psTexture_(0), layout_(0), vertexBuffer_(0),
  constantBuffer_(0), pointSampler_(0), linearSampler_(0), width_(0), height_(0), resizing_(false) {
     memset(blend_, 0, sizeof(blend_));
+    batchBuffer_ = nullptr;
+    batchCapacity_ = 0;
+    batchActive_ = false;
+    batchTextured_ = false;
+    batchTopology_ = HGIO_TOPOLOGY_LINE_LIST;
 }
 
 // 描画層を破棄する。保持しているDirect3Dリソースを解放する。
@@ -343,6 +348,93 @@ bool HGIO_DX11_RENDERER::CreateTextureFromMemory(HGIO_DX11_TEXTURE *r,const void
 done:
     SAFE_RELEASE(cv);SAFE_RELEASE(frame);SAFE_RELEASE(dec);SAFE_RELEASE(stream);SAFE_RELEASE(f);
     return ok;
+}
+
+
+// 一括描画を開始する。t は各DrawAddのプリミティブ種別、textured はテクスチャ使用指定。
+void HGIO_DX11_RENDERER::DrawStart(HGIO_DX11_TOPOLOGY t, bool textured) {
+    // Starting again discards an unfinished batch without drawing it.
+    batchVertices_.clear();
+    batchTopology_ = t;
+    batchTextured_ = textured;
+    batchActive_ = device_ && context_ &&
+        (t == HGIO_TOPOLOGY_LINE_LIST || t == HGIO_TOPOLOGY_TRIANGLE_FAN);
+}
+
+// 頂点をCPU側へ追加する。v は頂点配列、n は頂点数。各呼び出しは独立した図形として扱う。
+void HGIO_DX11_RENDERER::DrawAdd(const HGIO_DX11_VERTEX* v, unsigned int n) {
+    if (!batchActive_ || !v) return;
+    if (batchTopology_ == HGIO_TOPOLOGY_TRIANGLE_FAN) {
+        if (n < 3) return;
+        const size_t triangles = static_cast<size_t>(n) - 2;
+        if (triangles > (batchVertices_.max_size() - batchVertices_.size()) / 3) return;
+        const size_t start = batchVertices_.size();
+        batchVertices_.resize(start + triangles * 3);
+        HGIO_DX11_VERTEX* out = batchVertices_.data() + start;
+        for (unsigned int i = 1; i < n - 1; ++i) {
+            *out++ = v[0]; *out++ = v[i]; *out++ = v[i + 1];
+        }
+    }
+    else {
+        // A trailing unpaired vertex must not connect to the next DrawAdd.
+        n -= n % 2;
+        if (!n || n > batchVertices_.max_size() - batchVertices_.size()) return;
+        batchVertices_.insert(batchVertices_.end(), v, v + n);
+    }
+}
+
+// 蓄積した頂点をGPUへ転送して一括描画する。引数なし。巨大なバッチのみ複数回に分割する。
+void HGIO_DX11_RENDERER::DrawEnd(void) {
+    if (!batchActive_) return;
+    batchActive_ = false;
+    if (batchVertices_.empty() || !device_ || !context_) return;
+
+    // A reusable buffer, bounded to about 1.5 MB. Multiples of six keep both
+    // triangle and line primitives intact at every chunk boundary.
+    const unsigned int maxCapacity = 65532;
+    const unsigned int needed = static_cast<unsigned int>(
+        batchVertices_.size() < maxCapacity ? batchVertices_.size() : maxCapacity);
+    if (batchCapacity_ < needed) {
+        unsigned int capacity = batchCapacity_ ? batchCapacity_ : 1020;
+        while (capacity < needed) capacity = capacity * 2 < maxCapacity ? capacity * 2 : maxCapacity;
+        D3D11_BUFFER_DESC desc = {};
+        desc.ByteWidth = capacity * sizeof(HGIO_DX11_VERTEX);
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        ID3D11Buffer* buffer = nullptr;
+        if (FAILED(device_->CreateBuffer(&desc, nullptr, &buffer))) {
+            batchVertices_.clear();
+            return;
+        }
+        SAFE_RELEASE(batchBuffer_);
+        batchBuffer_ = buffer;
+        batchCapacity_ = capacity;
+    }
+
+    Constants constants;
+    memcpy(constants.transform, &view_, sizeof(constants.transform));
+    context_->UpdateSubresource(constantBuffer_, 0, nullptr, &constants, 0, 0);
+    const UINT stride = sizeof(HGIO_DX11_VERTEX), offset = 0;
+    context_->IASetInputLayout(layout_);
+    context_->IASetVertexBuffers(0, 1, &batchBuffer_, &stride, &offset);
+    context_->IASetPrimitiveTopology(batchTopology_ == HGIO_TOPOLOGY_TRIANGLE_FAN
+        ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST : D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    context_->VSSetShader(vs_, nullptr, 0);
+    context_->VSSetConstantBuffers(0, 1, &constantBuffer_);
+    context_->PSSetShader(batchTextured_ ? psTexture_ : psColor_, nullptr, 0);
+
+    for (size_t first = 0; first < batchVertices_.size();) {
+        const size_t remaining = batchVertices_.size() - first;
+        const UINT count = static_cast<UINT>(remaining < batchCapacity_ ? remaining : batchCapacity_);
+        D3D11_MAPPED_SUBRESOURCE mapped = {};
+        if (FAILED(context_->Map(batchBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped))) break;
+        memcpy(mapped.pData, batchVertices_.data() + first, count * sizeof(HGIO_DX11_VERTEX));
+        context_->Unmap(batchBuffer_, 0);
+        context_->Draw(count, 0);
+        first += count;
+    }
+    batchVertices_.clear(); // Retain CPU allocation for the next batch.
 }
 
 

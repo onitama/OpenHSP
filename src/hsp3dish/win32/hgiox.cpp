@@ -111,6 +111,8 @@ static		MATRIX mat_unproj;	// プロジェクション逆変換マトリクス
 static		HCURSOR cursor_arrow;	// 通常カーソル
 static		HCURSOR cursor_ibeam;	// テキストエリア用カーソル
 
+static		int spbatch_id;			// スプライトバッチID(0=start,-1=NC)
+
 #define CIRCLE_DIV 32
 #define DEFAULT_FONT_NAME ""
 #define DEFAULT_FONT_SIZE 18
@@ -175,6 +177,7 @@ void hgio_init( int mode, int sx, int sy, void *hwnd )
 	nDestWidth = sx;
 	nDestHeight = sy;
 	need_vsync = false;
+	spbatch_id = -1;
 
 	hgio_fontsystem_win32_init(master_wnd);
 
@@ -648,6 +651,26 @@ static void DrawTexturedQuad(int texid, float x0, float y0, float x1, float y1,
 	DrawQuad(v, true);
 }
 
+static void DrawTexturedQuadBatch(int texid, float x0, float y0, float x1, float y1,
+	float u0, float v0, float u1, float v1, int alpha, int rgb)
+{
+	if (spbatch_id < 0) return;
+
+	const unsigned int color = ColorWithAlpha(rgb, alpha);
+	const HGIO_DX11_VERTEX v[] = {
+		{ x0, y0, 0.0f, color, u0, v0 },
+		{ x1, y0, 0.0f, color, u1, v0 },
+		{ x1, y1, 0.0f, color, u1, v1 },
+		{ x0, y1, 0.0f, color, u0, v1 },
+	};
+	if (spbatch_id == 0) {
+		ChangeTex(texid);
+		render->DrawStart(HGIO_TOPOLOGY_TRIANGLE_FAN, true);
+	}
+	render->DrawAdd(v, 4);
+	spbatch_id++;
+}
+
 /*------------------------------------------------------------*/
 /*
 		Frame Manager
@@ -691,6 +714,9 @@ int hgio_render_start(void)
 	if (drawflag) {
 		hgio_render_end();
 	}
+
+	//	バッチ処理をリセット
+	spbatch_id = -1;
 
 	//	標準の投影マトリクスを設定する
 	UnitMatrix();
@@ -861,6 +887,25 @@ void hgio_fillrot( BMSCR *bm, float x, float y, float sx, float sy, float ang )
 }
 
 
+void hgio_spbatch_start(void)
+{
+	//		画像コピーのbatch開始
+	//
+	spbatch_id = 0;
+}
+
+
+void hgio_spbatch_end(void)
+{
+	//		画像コピーのbatch終了
+	//
+	if (spbatch_id > 0) {
+		render->DrawEnd();
+	}
+	spbatch_id = -1;
+}
+
+
 void hgio_copy(BMSCR* bm, short xx, short yy, short sx, short sy, BMSCR* bmsrc, float scaleX, float scaleY)
 {
 	//		画像コピー
@@ -877,16 +922,25 @@ void hgio_copy(BMSCR* bm, short xx, short yy, short sx, short sy, BMSCR* bmsrc, 
 	texid = bmsrc->texid;
 	tex = GetTex(texid); if (!tex) return;
 
-	const float u0 = xx * tex->ratex; //+tex->ratehx
-	const float v0 = yy * tex->ratey; //+tex->ratehy
+	const float u0 = xx * tex->ratex + tex->ratehx;
+	const float v0 = yy * tex->ratey + tex->ratehy;
 	const float u1 = (float)(xx + sx) * tex->ratex;
 	const float v1 = (float)(yy + sy) * tex->ratey;
 	float fx = ((float)bm->cx) + 0.5f;
 	float fy = ((float)bm->cy) + 0.5f;
-	DrawTexturedQuad(bmsrc->texid, fx, fy, fx + scaleX, fy + scaleY,
-		scaleX < 0 ? u1 : u0, scaleY < 0 ? v1 : v0, scaleX < 0 ? u0 : u1, scaleY < 0 ? v0 : v1,
-		CopyAlpha(bm, false), bm->mulcolor);
 
+	if (spbatch_id < 0) {
+		//	通常の描画
+		DrawTexturedQuad(bmsrc->texid, fx, fy, fx + scaleX, fy + scaleY,
+			scaleX < 0 ? u1 : u0, scaleY < 0 ? v1 : v0, scaleX < 0 ? u0 : u1, scaleY < 0 ? v0 : v1,
+			CopyAlpha(bm, false), bm->mulcolor);
+	}
+	else {
+		//	バッチ描画
+		DrawTexturedQuadBatch(bmsrc->texid, fx, fy, fx + scaleX, fy + scaleY,
+			scaleX < 0 ? u1 : u0, scaleY < 0 ? v1 : v0, scaleX < 0 ? u0 : u1, scaleY < 0 ? v0 : v1,
+			CopyAlpha(bm, false), bm->mulcolor);
+	}
 }
 
 
@@ -926,8 +980,10 @@ void hgio_fontcopy(BMSCR *bm, int x, int y, int psx, int psy, int texid, int bas
 	tx1 *= sx;
 	ty0 *= sy;
 	ty1 *= sy;
-	//tx0 += tex->ratehx;
-	//ty0 += tex->ratehy;
+	tx0 += tex->ratehx;
+	ty0 += tex->ratehy;
+	tx1 += tex->ratehx;
+	ty1 += tex->ratehy;
 
 	int col;
 	if (GetSysReq(SYSREQ_FIXMESALPHA)) {
@@ -1189,6 +1245,10 @@ int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSC
 	if (drawflag == 0) hgio_render_start();
 
 	total =0;
+	if (count <= 0) return 0;
+
+	//	バッチで描画する
+	hgio_spbatch_start();
 
 	p_xpos = xpos;
 	p_ypos = ypos;
@@ -1221,6 +1281,7 @@ int hgio_celputmulti( BMSCR *bm, int *xpos, int *ypos, int *cel, int count, BMSC
 		p_cel++;
 
 	}
+	hgio_spbatch_end();
 
 	return total;
 }

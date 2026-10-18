@@ -580,6 +580,20 @@ bool hgio_bmpsave(char* fname)
 }
 
 
+void hgio_spbatch_start(void)
+{
+	//		画像コピーのbatch開始
+	//
+}
+
+
+void hgio_spbatch_end(void)
+{
+	//		画像コピーのbatch終了
+	//
+}
+
+
 int hgio_gsel(BMSCR *bm)
 {
 	//		描画先設定

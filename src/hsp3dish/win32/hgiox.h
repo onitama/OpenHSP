@@ -12,4 +12,7 @@ int hgio_dialog_ex(HSPCTX* ctx, Bmscr* bmscr, int mode, char* str1, char* str2);
 void hgio_resize_window(int x, int y, bool fullscr=false);
 bool hgio_bmpsave(char* fname);
 
+void hgio_spbatch_start(void);
+void hgio_spbatch_end(void);
+
 #endif

@@ -15,4 +15,7 @@ int hgio_getSizeY( void );
 int hgio_getWidthOffset( void );
 int hgio_getHeightOffset( void );
 
+void hgio_spbatch_start(void);
+void hgio_spbatch_end(void);
+
 #endif
