@@ -3305,17 +3305,15 @@ int CToken::GenerateCode( CMemBuf *srcbuf, const char *oname, int mode )
 			}
 		}
 		//		型固定情報の作成
-		if (cg_debug) {
-			for (i = 0; i < lb->GetCount(); i++) {
-				if (lb->GetType(i) == TYPE_VAR) {
-					int fixedvalue = lb->GetForceType(i);
-					if (fixedvalue != LAB_TYPEFIX_NONE) {
-						int bodysize = sizeof(int) * 2;
-						//Mes(lb->GetName(i));
-						exoptbuf.Put((int)(HSPHED_EXOPTION_TAG_VARFIX)+(bodysize << 16));
-						exoptbuf.Put(lb->GetOpt(i));
-						exoptbuf.Put(fixedvalue);
-					}
+		for (i = 0; i < lb->GetCount(); i++) {
+			if (lb->GetType(i) == TYPE_VAR) {
+				int fixedvalue = lb->GetForceType(i);
+				if (fixedvalue != LAB_TYPEFIX_NONE) {
+					int bodysize = sizeof(int) * 2;
+					//Mes(lb->GetName(i));
+					exoptbuf.Put((int)(HSPHED_EXOPTION_TAG_VARFIX)+(bodysize << 16));
+					exoptbuf.Put(lb->GetOpt(i));
+					exoptbuf.Put(fixedvalue);
 				}
 			}
 		}
